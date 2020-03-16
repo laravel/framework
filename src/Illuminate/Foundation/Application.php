@@ -148,6 +148,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $namespace;
 
     /**
+     * The application namespace.
+     *
+     * @var array
+     */
+    protected $absolutePathPrefixes = [DIRECTORY_SEPARATOR];
+
+    /**
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
@@ -1010,7 +1017,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             return $this->bootstrapPath($default);
         }
 
-        return Str::startsWith($env, '/')
+        return Str::startsWith($env, $this->absolutePathPrefixes)
                 ? $env
                 : $this->basePath($env);
     }
@@ -1269,5 +1276,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         throw new RuntimeException('Unable to detect application namespace.');
+    }
+
+    /**
+     * Add new prefix to list of absolute path prefixes.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function addAbsolutePathPrefix(string $prefix): void
+    {
+        $this->absolutePathPrefixes[] = $prefix;
     }
 }
