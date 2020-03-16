@@ -469,7 +469,7 @@ if (! function_exists('throw_unless')) {
 
 if (! function_exists('times')) {
     /**
-     * Throw the given exception unless the given condition is true.
+     * Returns a collection of a set number of items to easily loop through.
      *
      * @param $times
      * @return \Illuminate\Support\Collection
