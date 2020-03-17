@@ -149,7 +149,7 @@ class ComponentTagCompiler
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
-            return $this->componentString($matches[1], $attributes)."\n@endcomponentClass";
+            return $this->componentString($matches[1], $attributes)."\n@endcomponentClass ";
         }, $value);
     }
 
@@ -270,7 +270,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endcomponentClass', $value);
+        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endcomponentClass ', $value);
     }
 
     /**
