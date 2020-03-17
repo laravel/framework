@@ -78,7 +78,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function any(callable $callback = null)
     {
-        if ( ! $callback) {
+        if (! $callback) {
             return $this->isNotEmpty();
         }
 
