@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v7.2.0...7.x)
 
 
-## [v7.1.4 (2020-03-17)](https://github.com/laravel/framework/compare/v7.1.3...v7.2.0)
+## [v7.2.0 (2020-03-17)](https://github.com/laravel/framework/compare/v7.1.3...v7.2.0)
 
 ### Added
 - Added `Illuminate\Testing\PendingCommand::expectsConfirmation()` ([#31965](https://github.com/laravel/framework/pull/31965))
