@@ -59,6 +59,8 @@ class ComponentTagCompiler
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function compileTags(string $value)
     {
@@ -74,6 +76,8 @@ class ComponentTagCompiler
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileOpeningTags(string $value)
     {
@@ -116,6 +120,8 @@ class ComponentTagCompiler
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileSelfClosingTags(string $value)
     {
@@ -149,7 +155,7 @@ class ComponentTagCompiler
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
-            return $this->componentString($matches[1], $attributes)."\n@endcomponentClass";
+            return $this->componentString($matches[1], $attributes)."\n@endcomponentClass ";
         }, $value);
     }
 
@@ -159,6 +165,8 @@ class ComponentTagCompiler
      * @param  string  $component
      * @param  array  $attributes
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function componentString(string $component, array $attributes)
     {
@@ -193,6 +201,8 @@ class ComponentTagCompiler
      *
      * @param  string  $component
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function componentClass(string $component)
     {
@@ -268,7 +278,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endcomponentClass', $value);
+        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endcomponentClass ', $value);
     }
 
     /**
@@ -378,6 +388,9 @@ class ComponentTagCompiler
 
     /**
      * Strip any quotes from the given string.
+     *
+     * @param  string  $value
+     * @return string
      */
     public function stripQuotes(string $value)
     {

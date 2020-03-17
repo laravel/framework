@@ -376,10 +376,10 @@ class PendingRequest
      * Issue a GET request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $query
+     * @param  array|string|null  $query
      * @return \Illuminate\Http\Client\Response
      */
-    public function get(string $url, array $query = [])
+    public function get(string $url, $query = null)
     {
         return $this->send('GET', $url, [
             'query' => $query,
@@ -468,7 +468,6 @@ class PendingRequest
             try {
                 return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
                     'laravel_data' => $options[$this->bodyFormat] ?? [],
-                    'query' => $this->parseQueryParams($url),
                     'on_stats' => function ($transferStats) {
                         $this->transferStats = $transferStats;
                     },
@@ -602,19 +601,6 @@ class PendingRequest
     public function mergeOptions(...$options)
     {
         return array_merge_recursive($this->options, ...$options);
-    }
-
-    /**
-     * Parse the query parameters in the given URL.
-     *
-     * @param  string  $url
-     * @return array
-     */
-    public function parseQueryParams(string $url)
-    {
-        return tap([], function (&$query) use ($url) {
-            parse_str(parse_url($url, PHP_URL_QUERY), $query);
-        });
     }
 
     /**

@@ -31,9 +31,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes(['type' => 'foo','limit' => '5','@click' => 'foo','required' => true]); ?>
-@endcomponentClass @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
+@endcomponentClass  @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes([]); ?>
-@endcomponentClass</div>", trim($result));
+@endcomponentClass </div>", trim($result));
     }
 
     public function testBasicComponentWithEmptyAttributesParsing()
@@ -42,7 +42,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes(['type' => '','limit' => '','@click' => '','required' => true]); ?>
-@endcomponentClass</div>", trim($result));
+@endcomponentClass </div>", trim($result));
     }
 
     public function testDataCamelCasing()
@@ -91,7 +91,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes([]); ?>
-@endcomponentClass</div>", trim($result));
+@endcomponentClass </div>", trim($result));
     }
 
     public function testClassNamesCanBeGuessed()
@@ -138,6 +138,23 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', ['title' => 'foo'])
 <?php \$component->withAttributes(['class' => 'bar','wire:model' => 'foo']); ?>
 @endcomponentClass", trim($result));
+    }
+
+    public function testComponentsCanHaveAttachedWord()
+    {
+        $result = (new ComponentTagCompiler(['profile' => TestProfileComponent::class]))->compileTags('<x-profile></x-profile>Words');
+
+        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', [])
+<?php \$component->withAttributes([]); ?> @endcomponentClass Words", trim($result));
+    }
+
+    public function testSelfClosingComponentsCanHaveAttachedWord()
+    {
+        $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<x-alert/>Words');
+
+        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
+<?php \$component->withAttributes([]); ?>
+@endcomponentClass Words", trim($result));
     }
 
     public function testSelfClosingComponentsCanBeCompiledWithBoundData()

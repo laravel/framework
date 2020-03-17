@@ -1,12 +1,45 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.1.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.1.3...7.x)
+
+### Added
+- Added `Illuminate\Testing\PendingCommand::expectsConfirmation()` ([#31965](https://github.com/laravel/framework/pull/31965))
+
+### Changed
+- Changed `cookie` helper signature to match `CookieFactory` ([#31974](https://github.com/laravel/framework/pull/31974))
+
+
+## [v7.1.3 (2020-03-14)](https://github.com/laravel/framework/compare/v7.1.2...v7.1.3)
+
+### Fixed
+- Unset `pivotParent` on `Pivot::unsetRelations()` ([#31956](https://github.com/laravel/framework/pull/31956))
+
+### Changed
+- Escape merged attributes by default in `Illuminate\View\ComponentAttributeBag` ([83c8e6e](https://github.com/laravel/framework/commit/83c8e6e6b575d0029ea164ba4b44f4c4895dbb3d))
+ 
+
+## [v7.1.2 (2020-03-13)](https://github.com/laravel/framework/compare/v7.1.1...v7.1.2)
+
+### Fixed
+- Fixed null value injected from container in routes ([#31867](https://github.com/laravel/framework/pull/31867), [c666c42](https://github.com/laravel/framework/commit/c666c424e8a60539a8fbd7cb5a3474785d9db22a))
+
+### Changed 
+- Escape attributes automatically in some situations in `Illuminate\View\Compilers\ComponentTagCompiler` ([#31945](https://github.com/laravel/framework/pull/31945))
+
+
+## [v7.1.1 (2020-03-12)](https://github.com/laravel/framework/compare/v7.1.0...v7.1.1)
+
+### Added
+- Added `dispatchToQueue()` to `BusFake` ([#31935](https://github.com/laravel/framework/pull/31935))
+- Support either order of arguments for symmetry with livewire ([8d558670](https://github.com/laravel/framework/commit/8d5586700ad97b92ac622ea72c1fefe52c359265))
 
 ### Fixed
 - Bring `--daemon` option back to `queue:work` command ([24c1818](https://github.com/laravel/framework/commit/24c18182a82ee24be62d2ac1c6793c237944cda8))
+- Fixed ComponentAttributeBag merge behaviour ([#31932](https://github.com/laravel/framework/pull/31932))
 
-### TODO
-- Support either order of arguments for symmetry with livewire ([8d558670](https://github.com/laravel/framework/commit/8d5586700ad97b92ac622ea72c1fefe52c359265))
+### Changed
+- Intelligently drop unnamed prefix name routes when caching ([#31917](https://github.com/laravel/framework/pull/31917))
+- Closure jobs needs illuminate/queue ([#31933](https://github.com/laravel/framework/pull/31933)) 
 - Fixed bad dependency assumptions ([#31894](https://github.com/laravel/framework/pull/31894))
 - Have a cache aware interface instead of concrete checks ([#31903](https://github.com/laravel/framework/pull/31903))
 
