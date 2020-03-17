@@ -223,4 +223,70 @@ class HttpClientTest extends TestCase
         $this->assertSame('bar', $responseCookie['Value']);
         $this->assertSame('https://laravel.com', $responseCookie['Domain']);
     }
+
+    public function testGetWithArrayQueryParam()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get', ['foo' => 'bar']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo=bar';
+        });
+    }
+
+    public function testGetWithStringQueryParam()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get', 'foo=bar');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo=bar';
+        });
+    }
+
+    public function testGetWithQuery()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get?foo=bar&page=1');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo=bar&page=1';
+        });
+    }
+
+    public function testGetWithQueryWontEncode()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get?foo;bar;1;5;10&page=1');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo;bar;1;5;10&page=1';
+        });
+    }
+
+    public function testGetWithArrayQueryParamOverwrites()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get?foo=bar&page=1', ['hello' => 'world']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?hello=world';
+        });
+    }
+
+    public function testGetWithArrayQueryParamEncodes()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get', ['foo;bar; space test' => 'laravel']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo%3Bbar%3B%20space%20test=laravel';
+        });
+    }
 }
