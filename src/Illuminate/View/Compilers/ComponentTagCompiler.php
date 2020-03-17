@@ -193,6 +193,8 @@ class ComponentTagCompiler
      *
      * @param  string  $component
      * @return string
+     *
+     * @throws InvalidArgumentException
      */
     protected function componentClass(string $component)
     {
