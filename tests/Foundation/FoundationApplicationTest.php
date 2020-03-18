@@ -444,7 +444,7 @@ class FoundationApplicationTest extends TestCase
     public function testEnvPathsAreAbsoluteInWindows()
     {
         $app = new Application(__DIR__);
-        $app->addAbsolutePathPrefix('C:');
+        $app->addAbsoluteCachePathPrefix('C:');
         $_SERVER['APP_SERVICES_CACHE'] = 'C:\framework\services.php';
         $_SERVER['APP_PACKAGES_CACHE'] = 'C:\framework\packages.php';
         $_SERVER['APP_CONFIG_CACHE'] = 'C:\framework\config.php';
