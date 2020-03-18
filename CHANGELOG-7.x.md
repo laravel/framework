@@ -1,12 +1,25 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.1.3...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.2.0...7.x)
+
+
+## [v7.2.0 (2020-03-17)](https://github.com/laravel/framework/compare/v7.1.3...v7.2.0)
 
 ### Added
 - Added `Illuminate\Testing\PendingCommand::expectsConfirmation()` ([#31965](https://github.com/laravel/framework/pull/31965))
+- Allowed configuring the timeout for the smtp mail driver ([#31973](https://github.com/laravel/framework/pull/31973))
+- Added `Http client` query string support ([#31996](https://github.com/laravel/framework/pull/31996))
+
+### Fixed
+- Added missing `ramsey/uuid` dependency to `Illuminate/Queue/composer.json` ([#31988](https://github.com/laravel/framework/pull/31988))
+- Fixed output of component attributes in View ([#31994](https://github.com/laravel/framework/pull/31994))
 
 ### Changed
 - Changed `cookie` helper signature to match `CookieFactory` ([#31974](https://github.com/laravel/framework/pull/31974))
+- Publish the form request stub used by RequestMakeCommand ([#31962](https://github.com/laravel/framework/pull/31962))
+- Handle prefix update on route level prefix ([449c80](https://github.com/laravel/framework/commit/449c8056cc0f13e7e20428700045339bae6bdca2))
+- Ensure SqsQueue queues are only suffixed once ([#31925](https://github.com/laravel/framework/pull/31925))
+- Added space after component closing tag for the View ([#32005](https://github.com/laravel/framework/pull/32005))
 
 
 ## [v7.1.3 (2020-03-14)](https://github.com/laravel/framework/compare/v7.1.2...v7.1.3)

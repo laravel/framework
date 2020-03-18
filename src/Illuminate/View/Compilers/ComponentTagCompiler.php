@@ -59,6 +59,8 @@ class ComponentTagCompiler
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function compileTags(string $value)
     {
@@ -74,6 +76,8 @@ class ComponentTagCompiler
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileOpeningTags(string $value)
     {
@@ -116,6 +120,8 @@ class ComponentTagCompiler
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileSelfClosingTags(string $value)
     {
@@ -159,6 +165,8 @@ class ComponentTagCompiler
      * @param  string  $component
      * @param  array  $attributes
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function componentString(string $component, array $attributes)
     {
@@ -380,6 +388,9 @@ class ComponentTagCompiler
 
     /**
      * Strip any quotes from the given string.
+     *
+     * @param  string  $value
+     * @return string
      */
     public function stripQuotes(string $value)
     {
