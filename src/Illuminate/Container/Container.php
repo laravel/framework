@@ -581,9 +581,11 @@ class Container implements ArrayAccess, ContainerContract
      * Call the given Closure / class@method and inject its dependencies.
      *
      * @param  callable|string  $callback
-     * @param  array  $parameters
+     * @param  array<string, mixed>  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function call($callback, array $parameters = [], $defaultMethod = null)
     {
