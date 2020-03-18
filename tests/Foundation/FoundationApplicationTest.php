@@ -440,6 +440,31 @@ class FoundationApplicationTest extends TestCase
             $_SERVER['APP_EVENTS_CACHE']
         );
     }
+
+    public function testEnvPathsAreAbsoluteInWindows()
+    {
+        $app = new Application(__DIR__);
+        $app->addAbsolutePathPrefix('C:');
+        $_SERVER['APP_SERVICES_CACHE'] = 'C:\framework\services.php';
+        $_SERVER['APP_PACKAGES_CACHE'] = 'C:\framework\packages.php';
+        $_SERVER['APP_CONFIG_CACHE'] = 'C:\framework\config.php';
+        $_SERVER['APP_ROUTES_CACHE'] = 'C:\framework\routes.php';
+        $_SERVER['APP_EVENTS_CACHE'] = 'C:\framework\events.php';
+
+        $this->assertSame('C:\framework\services.php', $app->getCachedServicesPath());
+        $this->assertSame('C:\framework\packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('C:\framework\config.php', $app->getCachedConfigPath());
+        $this->assertSame('C:\framework\routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('C:\framework\events.php', $app->getCachedEventsPath());
+
+        unset(
+            $_SERVER['APP_SERVICES_CACHE'],
+            $_SERVER['APP_PACKAGES_CACHE'],
+            $_SERVER['APP_CONFIG_CACHE'],
+            $_SERVER['APP_ROUTES_CACHE'],
+            $_SERVER['APP_EVENTS_CACHE']
+        );
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
