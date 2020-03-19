@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
+use Illuminate\Routing\CompiledRouteCollection;
 use Illuminate\Tests\Integration\IntegrationTest;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Tests\Integration\Routing\Fixtures\TrailingSlashBugMiddleware;
 
 class CompiledRouteCollectionTest extends IntegrationTest
 {
@@ -448,6 +450,20 @@ class CompiledRouteCollectionTest extends IntegrationTest
         );
 
         $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/'))->getName());
+    }
+
+    public function testTrailingSlashIsTrimmedWhenMatchingCachedRoutes()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $request = Request::create('/foo/bar/');
+
+        // Access to request path info before matching route
+        $request->getPathInfo();
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
     }
 
     /**
