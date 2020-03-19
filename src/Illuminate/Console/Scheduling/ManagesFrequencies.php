@@ -124,8 +124,10 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run every specified minutes.
      *
-     * @param  int $minutes
+     * @param  int  $minutes
      * @return $this
+     *
+     * @throws \OutOfRangeException
      */
     public function everyFewMinutes($minutes)
     {
