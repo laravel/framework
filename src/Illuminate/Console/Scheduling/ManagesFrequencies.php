@@ -122,6 +122,21 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every specified minutes.
+     *
+     * @param  int $minutes
+     * @return $this
+     */
+    public function everyFewMinutes(int $minutes)
+    {
+        if ($minutes > 59 || $minutes < 2) {
+            throw new \OutOfRangeException('Minutes need to be between 2 and 59');
+        }
+
+        return $this->spliceIntoPosition(1, '*/' . $minutes);
+    }
+
+    /**
      * Schedule the event to run hourly.
      *
      * @return $this
