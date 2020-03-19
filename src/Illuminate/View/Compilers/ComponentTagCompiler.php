@@ -208,7 +208,8 @@ class ComponentTagCompiler
     {
         $viewFactory = Container::getInstance()->make(Factory::class);
 
-        if (isset($this->aliases[$component]) && $viewFactory->exists($view = $this->aliases[$component])) {
+        if (isset($this->aliases[$component]) && 
+            $viewFactory->exists($view = $this->aliases[$component])) {
             return $view;
         }
 
