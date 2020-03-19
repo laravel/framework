@@ -206,16 +206,27 @@ class ComponentTagCompiler
      */
     protected function componentClass(string $component)
     {
+        $viewFactory = Container::getInstance()->make(Factory::class);
+
         if (isset($this->aliases[$component])) {
-            return $this->aliases[$component];
+            if (class_exists($alias = $this->aliases[$component])) {
+                return $alias;
+            }
+
+            if ($viewFactory->exists($alias)) {
+                return $alias;
+            }
+
+            throw new InvalidArgumentException(
+                "Unable to locate class or view [{$alias}] for component [{$component}]."
+            );
         }
 
         if (class_exists($class = $this->guessClassName($component))) {
             return $class;
         }
 
-        if (Container::getInstance()->make(Factory::class)
-                    ->exists($view = "components.{$component}")) {
+        if ($viewFactory->exists($view = "components.{$component}")) {
             return $view;
         }
 
