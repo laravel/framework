@@ -22,6 +22,7 @@ class TrimStrings extends TransformsRequest
      */
     protected function transform($key, $value)
     {
+        $key = preg_replace('/\.\d+/', '.*', $key);
         if (in_array($key, $this->except, true)) {
             return $value;
         }
