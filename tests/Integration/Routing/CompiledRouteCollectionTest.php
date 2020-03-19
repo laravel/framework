@@ -417,6 +417,16 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertSame('pre/{locale}', $route->getPrefix());
     }
 
+    public function testGroupGenerateNameForDuplicateRouteNamesThatEndWithDot()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo', ['uses' => 'FooController@index'])->name('foo.'));
+        $this->routeCollection->add($route = $this->newRoute('GET', 'bar', ['uses' => 'BarController@index'])->name('foo.'));
+
+        $routes = $this->collection();
+
+        $this->assertSame('BarController@index', $routes->match(Request::create('/bar', 'GET'))->getAction()['uses']);
+    }
+
     public function testRouteBindingsAreProperlySaved()
     {
         $this->routeCollection->add($this->newRoute('GET', 'posts/{post:slug}/show', [
