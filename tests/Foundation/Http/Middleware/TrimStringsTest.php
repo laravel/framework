@@ -26,8 +26,8 @@ class TrimStringsTest extends TestCase
                 [
                     'abc' => ' 222 ',
                     'pqr' => ' 333 ',
-                ]
-            ]
+                ],
+            ],
         ]);
         $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
         $request = Request::createFromBase($symfonyRequest);
