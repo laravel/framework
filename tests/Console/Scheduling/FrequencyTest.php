@@ -33,6 +33,11 @@ class FrequencyTest extends TestCase
         $this->assertSame('*/5 * * * *', $this->event->everyFiveMinutes()->getExpression());
     }
 
+    public function testEveryFewMinutes()
+    {
+        $this->assertSame('*/24 * * * *', $this->event->everyFewMinutes(24)->getExpression());
+    }
+
     public function testDaily()
     {
         $this->assertSame('0 0 * * *', $this->event->daily()->getExpression());
