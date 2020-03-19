@@ -33,7 +33,7 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public function store($path, $options = [])
     {
-        return $this->storeAs($path, $this->hashName(), $this->parseOptions($options));
+        return $this->storeAs($path, $this->hashName(), $options);
     }
 
     /**
