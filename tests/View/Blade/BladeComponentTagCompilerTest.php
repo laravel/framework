@@ -22,7 +22,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = (new ComponentTagCompiler)->compileSlots('<x-slot name="foo">
 </x-slot>');
 
-        $this->assertSame("@slot('foo') ".PHP_EOL.' @endslot', trim($result));
+        $this->assertSame("@slot('foo') \n".' @endslot', trim($result));
     }
 
     public function testBasicComponentParsing()
