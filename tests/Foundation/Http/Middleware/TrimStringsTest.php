@@ -21,11 +21,11 @@ class TrimStringsTest extends TestCase
             'lmn' => [
                 [
                     'abc' => ' 123 ',
-                    'pqr' => ' 111 '
+                    'pqr' => ' 111 ',
                 ],
                 [
                     'abc' => ' 222 ',
-                    'pqr' => ' 333 '
+                    'pqr' => ' 333 ',
                 ]
             ]
         ]);
@@ -54,6 +54,6 @@ class TrimStringsWithExceptAttribute extends TrimStrings
         'foo',
         'bar',
         'pqr.*',
-        'lmn.*.abc'
+        'lmn.*.abc',
     ];
 }
