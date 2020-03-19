@@ -581,9 +581,11 @@ class Container implements ArrayAccess, ContainerContract
      * Call the given Closure / class@method and inject its dependencies.
      *
      * @param  callable|string  $callback
-     * @param  array  $parameters
+     * @param  array<string, mixed>  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function call($callback, array $parameters = [], $defaultMethod = null)
     {
@@ -609,6 +611,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function makeWith($abstract, array $parameters = [])
     {
@@ -785,7 +789,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Instantiate a concrete instance of the given type.
      *
-     * @param  string  $concrete
+     * @param  \Closure|string  $concrete
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException

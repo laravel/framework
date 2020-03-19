@@ -55,9 +55,6 @@ jobs:
       - name: Install dependencies
         run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-suggest
 
-      - name: Start MySQL
-        run: sudo /etc/init.d/mysql start
-
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
         env:

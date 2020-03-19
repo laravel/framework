@@ -148,6 +148,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $namespace;
 
     /**
+     * The prefixes of absolute cache paths for use during normalization.
+     *
+     * @var array
+     */
+    protected $absoluteCachePathPrefixes = [DIRECTORY_SEPARATOR];
+
+    /**
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
@@ -1010,9 +1017,22 @@ class Application extends Container implements ApplicationContract, CachesConfig
             return $this->bootstrapPath($default);
         }
 
-        return Str::startsWith($env, '/')
+        return Str::startsWith($env, $this->absoluteCachePathPrefixes)
                 ? $env
                 : $this->basePath($env);
+    }
+
+    /**
+     * Add new prefix to list of absolute path prefixes.
+     *
+     * @param  string  $prefix
+     * @return $this
+     */
+    public function addAbsoluteCachePathPrefix($prefix)
+    {
+        $this->absoluteCachePathPrefixes[] = $prefix;
+
+        return $this;
     }
 
     /**
