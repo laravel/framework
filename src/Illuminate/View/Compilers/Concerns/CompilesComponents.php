@@ -23,7 +23,7 @@ trait CompilesComponents
     {
         [$component, $data] = strpos($expression, ',') !== false
                     ? array_map('trim', explode(',', trim($expression, '()'), 2))
-                    : [trim($expression, '()'), null];
+                    : [trim($expression, '()'), ''];
 
         $component = trim($component, '\'"');
 
