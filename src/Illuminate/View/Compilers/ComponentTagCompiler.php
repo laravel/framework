@@ -208,8 +208,18 @@ class ComponentTagCompiler
     {
         $viewFactory = Container::getInstance()->make(Factory::class);
 
-        if (isset($this->aliases[$component]) && $viewFactory->exists($view = $this->aliases[$component])) {
-            return $view;
+        if (isset($this->aliases[$component])) {
+            if (class_exists($alias = $this->aliases[$component])) {
+                return $alias;
+            }
+
+            if ($viewFactory->exists($alias)) {
+                return $alias;
+            }
+
+            throw new InvalidArgumentException(
+                "Unable to locate the set alias [{$alias}] for component [{$component}]."
+            );
         }
 
         if (class_exists($class = $this->guessClassName($component))) {
