@@ -127,7 +127,7 @@ trait ManagesFrequencies
      * @param  int $minutes
      * @return $this
      */
-    public function everyFewMinutes(int $minutes)
+    public function everyFewMinutes($minutes)
     {
         if ($minutes > 59 || $minutes < 2) {
             throw new \OutOfRangeException('Minutes need to be between 2 and 59');
