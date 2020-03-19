@@ -218,7 +218,7 @@ class ComponentTagCompiler
             }
 
             throw new InvalidArgumentException(
-                "Unable to locate the set alias [{$alias}] for component [{$component}]."
+                "Unable to locate class or view [{$alias}] for component [{$component}]."
             );
         }
 
