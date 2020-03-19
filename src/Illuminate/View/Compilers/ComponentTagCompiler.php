@@ -206,16 +206,17 @@ class ComponentTagCompiler
      */
     protected function componentClass(string $component)
     {
-        if (isset($this->aliases[$component])) {
-            return $this->aliases[$component];
+        $viewFactory = Container::getInstance()->make(Factory::class);
+
+        if (isset($this->aliases[$component]) && $viewFactory->exists($view = $this->aliases[$component])) {
+            return $view;
         }
 
         if (class_exists($class = $this->guessClassName($component))) {
             return $class;
         }
 
-        if (Container::getInstance()->make(Factory::class)
-                    ->exists($view = "components.{$component}")) {
+        if ($viewFactory->exists($view = "components.{$component}")) {
             return $view;
         }
 
