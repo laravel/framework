@@ -142,7 +142,7 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * Wrap the notifiable(s) in a collection.
      *
-     * @param mixed $notifiables
+     * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
      * @return \Illuminate\Support\Collection
      */
     protected function wrapNotifiables($notifiables)
