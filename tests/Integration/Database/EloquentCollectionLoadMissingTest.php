@@ -105,9 +105,6 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingThrowsBadMethodCallException()
     {
-        $this->expectException(\BadMethodCallException::class);
-        $this->expectExceptionMessage('Method Illuminate\Database\Eloquent\Collection::relationLoaded does not exist.');
-
         $user = User::create();
 
         $post1 = Post::create(['user_id' => $user->id]);
