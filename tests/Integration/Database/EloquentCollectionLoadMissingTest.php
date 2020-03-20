@@ -37,6 +37,19 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
             $table->unsignedInteger('comment_id');
         });
 
+        Schema::create('sponsor_posts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('post_id');
+        });
+        Schema::create('ads', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('sponsor_post_id');
+        });
+        Schema::create('ad_revisions', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('ad_id');
+        });
+
         User::create();
 
         Post::create(['user_id' => 1]);
@@ -89,6 +102,23 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
         $this->assertTrue($posts[0]->comments[1]->parent->relationLoaded('parent'));
     }
+
+    public function testLoadMissingThrowsBadMethodCallException()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Illuminate\Database\Eloquent\Collection::relationLoaded does not exist.');
+
+        $user = User::create();
+
+        $post1 = Post::create(['user_id' => $user->id]);
+        $post2 = Post::create(['user_id' => $user->id]);
+
+        $sponsorPost = SponsorPost::create(['post_id' => $post2->id]);
+        $ad = Ad::create(['sponsor_post_id' => $sponsorPost->id]);
+        AdRevisions::create(['ad_id' => $ad->id]);
+
+        $user->loadMissing('posts.sponsorPost.ads.adRevisions');
+    }
 }
 
 class Comment extends Model
@@ -123,6 +153,10 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function sponsorPost() {
+        return $this->hasOne(SponsorPost::class);
+    }
 }
 
 class Revision extends Model
@@ -135,4 +169,39 @@ class Revision extends Model
 class User extends Model
 {
     public $timestamps = false;
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+}
+
+class SponsorPost extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = ['id'];
+
+    public function ads()
+    {
+        return $this->hasMany(Ad::class);
+    }
+}
+
+class Ad extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = ['id'];
+
+    public function adRevisions() {
+        return $this->hasMany(AdRevisions::class);
+    }
+}
+
+class AdRevisions extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = ['id'];
 }
