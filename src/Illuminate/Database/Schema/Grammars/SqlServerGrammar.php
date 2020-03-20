@@ -313,6 +313,21 @@ class SqlServerGrammar extends Grammar
             $this->wrap($command->to)
         );
     }
+    
+    /**
+     * Compile a rename foreign key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileRenameForeignKey(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf("sp_rename N'%s', %s, N'OBJECT'",
+            $this->wrap($blueprint->getTable().'.'.$command->from),
+            $this->wrap($command->to)
+        );
+    }
 
     /**
      * Compile the command to enable foreign key constraints.

@@ -388,6 +388,18 @@ class Blueprint
     {
         return $this->addCommand('renameIndex', compact('from', 'to'));
     }
+    
+    /**
+     * Indicate that the given foreign keys should be renamed.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return \Illuminate\Support\Fluent
+     */
+    public function renameForeignKey($from, $to)
+    {
+        return $this->addCommand('renameForeignKey', compact('from', 'to'));
+    }
 
     /**
      * Indicate that the timestamp columns should be dropped.
