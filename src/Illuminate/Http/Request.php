@@ -423,10 +423,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public static function createFromBase(SymfonyRequest $request)
     {
-        if ($request instanceof static) {
-            return $request;
-        }
-
         $newRequest = (new static)->duplicate(
             $request->query->all(), $request->request->all(), $request->attributes->all(),
             $request->cookies->all(), $request->files->all(), $request->server->all()
@@ -702,16 +698,5 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         return Arr::get($this->all(), $key, function () use ($key) {
             return $this->route($key);
         });
-    }
-
-    /**
-     * Clones the current request.
-     */
-    public function __clone()
-    {
-        parent::__clone();
-
-        $this->pathInfo = null;
-        $this->requestUri = null;
     }
 }
