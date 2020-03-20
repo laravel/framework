@@ -67,6 +67,23 @@ class SendQueuedNotifications implements ShouldQueue
     }
 
     /**
+     * Wrap the notifiable(s) in a collection.
+     *
+     * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
+     * @return \Illuminate\Support\Collection
+     */
+    protected function wrapNotifiables($notifiables)
+    {
+        if ($notifiables instanceof Collection) {
+            return $notifiables;
+        } elseif ($notifiables instanceof Model) {
+            return EloquentCollection::wrap($notifiables);
+        }
+
+        return Collection::wrap($notifiables);
+    }
+
+    /**
      * Send the notifications.
      *
      * @param  \Illuminate\Notifications\ChannelManager  $manager
@@ -137,28 +154,5 @@ class SendQueuedNotifications implements ShouldQueue
     {
         $this->notifiables = clone $this->notifiables;
         $this->notification = clone $this->notification;
-    }
-
-    /**
-     * Wrap the notifiable(s) in a collection.
-     *
-     * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
-     * @return \Illuminate\Support\Collection
-     */
-    protected function wrapNotifiables($notifiables)
-    {
-        if ($notifiables instanceof Collection) {
-            // If the notifiable(s) are already wrapped, pass them as is.
-            // This prevents any custom queueable collections from being re-wrapped
-            return $notifiables;
-        }
-
-        if ($notifiables instanceof Model) {
-            // In the case of a model we want to wrap it in an eloquent collection
-            // This way the job can take advantage of model serialization
-            return EloquentCollection::wrap($notifiables);
-        }
-
-        return Collection::wrap($notifiables);
     }
 }
