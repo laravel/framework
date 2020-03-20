@@ -62,6 +62,20 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $this->assertArrayNotHasKey('id', $posts[0]->comments[1]->parent->revisions[0]->getAttributes());
     }
 
+    public function testLoadMissingWithFourLengthRelations()
+    {
+        $posts = Post::with('comments', 'user')->get();
+
+        DB::enableQueryLog();
+
+        $posts->loadMissing('comments.parent.revisions.comment');
+
+        $this->assertCount(3, DB::getQueryLog());
+        $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
+        $this->assertTrue($posts[0]->comments[1]->parent->relationLoaded('revisions'));
+        $this->assertTrue($posts[0]->comments[1]->parent->revisions[0]->relationLoaded('comment'));
+    }
+
     public function testLoadMissingWithClosure()
     {
         $posts = Post::with('comments')->get();
@@ -130,6 +144,11 @@ class Revision extends Model
     public $timestamps = false;
 
     protected $guarded = ['id'];
+
+    public function comment()
+    {
+        return $this->belongsTo(Comment::class);
+    }
 }
 
 class User extends Model
