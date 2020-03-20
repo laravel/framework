@@ -52,7 +52,7 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  mixed  $notifiables
+     * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  array|null  $channels
      * @return void
