@@ -154,7 +154,8 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function sponsorPost() {
+    public function sponsorPost()
+    {
         return $this->hasOne(SponsorPost::class);
     }
 }
@@ -194,7 +195,8 @@ class Ad extends Model
 
     protected $guarded = ['id'];
 
-    public function adRevisions() {
+    public function adRevisions()
+    {
         return $this->hasMany(AdRevisions::class);
     }
 }
