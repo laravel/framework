@@ -313,7 +313,7 @@ class SqlServerGrammar extends Grammar
             $this->wrap($command->to)
         );
     }
-    
+
     /**
      * Compile a rename foreign key command.
      *

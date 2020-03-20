@@ -2,13 +2,13 @@
 
 namespace Illuminate\Database\Schema;
 
-use BadMethodCallException;
 use Closure;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Grammars\Grammar;
-use Illuminate\Database\SQLiteConnection;
+use BadMethodCallException;
 use Illuminate\Support\Fluent;
+use Illuminate\Database\Connection;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\Schema\Grammars\Grammar;
 
 class Blueprint
 {
@@ -388,7 +388,7 @@ class Blueprint
     {
         return $this->addCommand('renameIndex', compact('from', 'to'));
     }
-    
+
     /**
      * Indicate that the given foreign keys should be renamed.
      *
