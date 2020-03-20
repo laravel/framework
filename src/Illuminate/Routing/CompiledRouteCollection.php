@@ -152,7 +152,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     protected function requestWithoutTrailingSlash(Request $request)
     {
-        $trimmedRequest = clone $request;
+        $trimmedRequest = Request::createFromBase($request);
 
         $trimmedRequest->server->set(
             'REQUEST_URI', rtrim($request->server->get('REQUEST_URI'), '/')
