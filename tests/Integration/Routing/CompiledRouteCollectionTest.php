@@ -10,7 +10,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Tests\Integration\IntegrationTest;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Illuminate\Tests\Integration\Routing\Fixtures\TrailingSlashBugMiddleware;
 
 class CompiledRouteCollectionTest extends IntegrationTest
 {
