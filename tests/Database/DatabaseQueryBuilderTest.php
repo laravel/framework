@@ -2622,9 +2622,9 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testJsonPathEscaping()
     {
-        $expectedWithJsonEscaped = <<<SQL
-select json_unquote(json_extract(`json`, '$."\'))#"'))
-SQL;
+//         $expectedWithJsonEscaped = <<<SQL
+// select json_unquote(json_extract(`json`, '$."\'))#"'))
+// SQL;
 
         $builder = $this->getMySqlBuilder();
         $builder->select("json->'))#");
@@ -3581,6 +3581,17 @@ SQL;
         $builder->fromRaw(new Raw('(select max(last_seen_at) as last_seen_at from "sessions") as "last_seen_at"'))->where('last_seen_at', '>', '1520652582');
         $this->assertSame('select * from (select max(last_seen_at) as last_seen_at from "sessions") as "last_seen_at" where "last_seen_at" > ?', $builder->toSql());
         $this->assertEquals(['1520652582'], $builder->getBindings());
+    }
+
+    public function testFirstMethodWithAsClassFunctionality()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->expects('setFetchClass')->once()->andReturnSelf();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', [1], true)->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $builder->from('users')->as(ValueObject::class)->where('id', '=', 1)->first();
     }
 
     protected function getBuilder()

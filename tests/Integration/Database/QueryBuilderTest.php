@@ -186,4 +186,33 @@ class QueryBuilderTest extends DatabaseTestCase
             (object) ['title' => 'Bar Post', 'content' => 'Lorem Ipsum.'],
         ]);
     }
+
+    public function testConvertingToValueObjectClass()
+    {
+        $result = DB::table('posts')->as(PostValueObject::class)->first();
+
+        $this->assertInstanceOf(PostValueObject::class, $result);
+        $this->assertEquals('Lorem Ipsum.', $result->content);
+    }
+
+    public function testConvertingToValueObjectClassWithFirstAs()
+    {
+        $result = DB::table('posts')->firstAs(PostValueObject::class);
+
+        $this->assertInstanceOf(PostValueObject::class, $result);
+        $this->assertEquals('Lorem Ipsum.', $result->content);
+
+        $result = DB::table('posts')->firstAs(PostValueObject::class, 'id', 'title', 'content');
+
+        $this->assertInstanceOf(PostValueObject::class, $result);
+        $this->assertEquals('Lorem Ipsum.', $result->content);
+    }
+}
+
+class PostValueObject
+{
+    public $id;
+    public $title;
+    public $content;
+    public $created_at;
 }
