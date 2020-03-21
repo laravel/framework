@@ -2622,9 +2622,9 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testJsonPathEscaping()
     {
-//         $expectedWithJsonEscaped = <<<SQL
-// select json_unquote(json_extract(`json`, '$."\'))#"'))
-// SQL;
+        $expectedWithJsonEscaped = <<<SQL
+select json_unquote(json_extract(`json`, '$."\'))#"'))
+SQL;
 
         $builder = $this->getMySqlBuilder();
         $builder->select("json->'))#");
