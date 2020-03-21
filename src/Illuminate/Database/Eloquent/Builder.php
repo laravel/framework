@@ -1384,7 +1384,7 @@ class Builder
         // Ignore calls to the underlying QueryBuilder's `asClass`/`as` method
         // as Eloquent models already are converted into an object.
         // We will silently ignore this call, as it's not an exceptional case.
-        if (in_array($method, ['as', 'asClass'])) {
+        if (in_array($method, ['as', 'asClass'], true)) {
             return $this;
         }
 

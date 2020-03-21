@@ -108,7 +108,7 @@ class Connection implements ConnectionInterface
     /**
      * The class to fetch as if $fetchMode is set to PDO::FETCH_CLASS.
      *
-     * @var null|int
+     * @var null|string
      */
     protected $fetchClass = null;
 
