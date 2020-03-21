@@ -2256,6 +2256,33 @@ class Builder
         return $this->asClass($class);
     }
 
+
+    /**
+     * Dynamically call `asClass` when calling another method as well.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return void
+     */
+    public function dynamicAs($method, $parameters)
+    {
+        // First parameter much be the class name, so let's pass that into `asClass`
+        // and remove it from the parameters array, so that the rest of the parameters can
+        // be passed to the $method.
+        $this->asClass(array_shift($parameters));
+
+        // Remove "As" from the end of the $method name, so that we can call $method.
+        $method = substr($method, 0, strlen($method) - 2);
+
+        // If the $parameters is empty, call $method without passing in parameters,
+        // or else the default parameters won't be used.
+        if (empty($parameters)) {
+            return $this->$method();
+        }
+
+        return $this->$method($parameters);
+    }
+
     /**
      * Run a pagination count query.
      *
@@ -3121,9 +3148,7 @@ class Builder
         }
 
         if (Str::endsWith($method, 'As')) {
-            $this->asClass(array_shift($parameters));
-            $method = substr($method, 0, strlen($method) - 2);
-            return $this->$method($parameters);
+            return $this->dynamicAs($method, $parameters);
         }
 
         static::throwBadMethodCallException($method);
