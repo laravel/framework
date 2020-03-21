@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
+use InvalidArgumentException;
 use Mockery;
 
 class BladeComponentTagCompilerTest extends AbstractBladeTestCase
@@ -22,11 +23,13 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = (new ComponentTagCompiler)->compileSlots('<x-slot name="foo">
 </x-slot>');
 
-        $this->assertSame("@slot('foo') ".PHP_EOL.' @endslot', trim($result));
+        $this->assertSame("@slot('foo') \n".' @endslot', trim($result));
     }
 
     public function testBasicComponentParsing()
     {
+        $this->mockViewFactory();
+
         $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<div><x-alert type="foo" limit="5" @click="foo" required /><x-alert /></div>');
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
@@ -124,6 +127,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testComponentsCanBeCompiledWithHyphenAttributes()
     {
+        $this->mockViewFactory();
+
         $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<x-alert class="bar" wire:model="foo" x-on:click="bar" @click="baz" />');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
@@ -205,6 +210,42 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertEquals(e('1'), BladeCompiler::sanitizeComponentAttribute('1'));
         $this->assertEquals(1, BladeCompiler::sanitizeComponentAttribute(1));
         $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute($class));
+    }
+
+    public function testItThrowsAnExceptionForNonExistingAliases()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $container->instance(Factory::class, $factory = Mockery::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $factory->shouldReceive('exists')->andReturn(false);
+        Container::setInstance($container);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        (new ComponentTagCompiler(['alert' => 'foo.bar']))->compileTags('<x-alert />');
+    }
+
+    public function testItThrowsAnExceptionForNonExistingClass()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $container->instance(Factory::class, $factory = Mockery::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $factory->shouldReceive('exists')->andReturn(false);
+        Container::setInstance($container);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        (new ComponentTagCompiler)->compileTags('<x-alert />');
+    }
+
+    protected function mockViewFactory($existsSucceeds = true)
+    {
+        $container = new Container;
+        $container->instance(Factory::class, $factory = Mockery::mock(Factory::class));
+        $factory->shouldReceive('exists')->andReturn($existsSucceeds);
+        Container::setInstance($container);
     }
 }
 

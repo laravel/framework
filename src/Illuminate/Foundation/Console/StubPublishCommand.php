@@ -12,7 +12,7 @@ class StubPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'stub:publish';
+    protected $signature = 'stub:publish {--force : Overwrite any existing files}';
 
     /**
      * The console command description.
@@ -54,7 +54,9 @@ class StubPublishCommand extends Command
         ];
 
         foreach ($files as $from => $to) {
-            file_put_contents($to, file_get_contents($from));
+            if (! file_exists($to) || $this->option('force')) {
+                file_put_contents($to, file_get_contents($from));
+            }
         }
 
         $this->info('Stubs published successfully.');

@@ -23,7 +23,7 @@ trait CompilesComponents
     {
         [$component, $data] = strpos($expression, ',') !== false
                     ? array_map('trim', explode(',', trim($expression, '()'), 2))
-                    : [trim($expression, '()'), null];
+                    : [trim($expression, '()'), ''];
 
         $component = trim($component, '\'"');
 
@@ -59,7 +59,7 @@ trait CompilesComponents
      */
     public static function compileClassComponentOpening(string $component, string $data, string $hash)
     {
-        return implode(PHP_EOL, [
+        return implode("\n", [
             '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
             '<?php $component = $__env->getContainer()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
             '<?php if ($component->shouldRender()): ?>',
@@ -76,7 +76,7 @@ trait CompilesComponents
     {
         $hash = array_pop(static::$componentHashStack);
 
-        return implode(PHP_EOL, [
+        return implode("\n", [
             '<?php if (isset($__componentOriginal'.$hash.')): ?>',
             '<?php $component = $__componentOriginal'.$hash.'; ?>',
             '<?php unset($__componentOriginal'.$hash.'); ?>',
@@ -92,7 +92,7 @@ trait CompilesComponents
      */
     public function compileEndComponentClass()
     {
-        return static::compileEndComponent().PHP_EOL.implode(PHP_EOL, [
+        return static::compileEndComponent()."\n".implode("\n", [
             '<?php endif; ?>',
         ]);
     }

@@ -30,10 +30,6 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->router = $this->app['router'];
 
         $this->routeCollection = new RouteCollection;
-
-        // $this->routeCollection = (new CompiledRouteCollection([], []))
-        //     ->setRouter($this->router)
-        //     ->setContainer($this->app);
     }
 
     protected function tearDown(): void
@@ -417,6 +413,16 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertSame('pre/{locale}', $route->getPrefix());
     }
 
+    public function testGroupGenerateNameForDuplicateRouteNamesThatEndWithDot()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo', ['uses' => 'FooController@index'])->name('foo.'));
+        $this->routeCollection->add($route = $this->newRoute('GET', 'bar', ['uses' => 'BarController@index'])->name('foo.'));
+
+        $routes = $this->collection();
+
+        $this->assertSame('BarController@index', $routes->match(Request::create('/bar', 'GET'))->getAction()['uses']);
+    }
+
     public function testRouteBindingsAreProperlySaved()
     {
         $this->routeCollection->add($this->newRoute('GET', 'posts/{post:slug}/show', [
@@ -438,6 +444,29 @@ class CompiledRouteCollectionTest extends IntegrationTest
         );
 
         $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/'))->getName());
+    }
+
+    public function testMatchingUriWithQuery()
+    {
+        $this->routeCollection->add(
+            $route = $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/?foo=bar'))->getName());
+    }
+
+    public function testTrailingSlashIsTrimmedWhenMatchingCachedRoutes()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $request = Request::create('/foo/bar/');
+
+        // Access to request path info before matching route
+        $request->getPathInfo();
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
     }
 
     /**
