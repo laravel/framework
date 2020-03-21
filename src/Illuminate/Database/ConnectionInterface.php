@@ -160,4 +160,13 @@ interface ConnectionInterface
      * @return array
      */
     public function pretend(Closure $callback);
+
+    /**
+     * Convert the output from a stdClass to a specified object class.
+     *
+     * @param  string|null  $class  The classname of the value object to convert the output to.
+     *                              If set to NULL, it will reset the fetchMode and fetchClass.
+     * @return void
+     */
+    public function setFetchClass($class);
 }

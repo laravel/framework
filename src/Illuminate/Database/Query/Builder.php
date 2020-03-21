@@ -2231,6 +2231,32 @@ class Builder
     }
 
     /**
+     * Convert the output from a stdClass to a specified object class.
+     *
+     * @param  string  $class The classname of the value object to convert the output to.
+     * @return $this
+     */
+    public function asClass($class)
+    {
+        $this->connection->setFetchClass($class);
+
+        return $this;
+    }
+
+    /**
+     * Convert the output from a stdClass to a specified object class.
+     * Alias for asClass.
+     *
+     * @param  string  $class The classname of the value object to convert the output to.
+     * @return $this
+     * @see self::asClass()
+     */
+    public function as($class)
+    {
+        return $this->asClass($class);
+    }
+
+    /**
      * Run a pagination count query.
      *
      * @param  array  $columns
@@ -3092,6 +3118,12 @@ class Builder
 
         if (Str::startsWith($method, 'where')) {
             return $this->dynamicWhere($method, $parameters);
+        }
+
+        if (Str::endsWith($method, 'As')) {
+            $this->asClass(array_shift($parameters));
+            $method = substr($method, 0, strlen($method) - 2);
+            return $this->$method($parameters);
         }
 
         static::throwBadMethodCallException($method);

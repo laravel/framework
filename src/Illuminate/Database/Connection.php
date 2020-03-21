@@ -106,6 +106,13 @@ class Connection implements ConnectionInterface
     protected $fetchMode = PDO::FETCH_OBJ;
 
     /**
+     * The class to fetch as if $fetchMode is set to PDO::FETCH_CLASS.
+     *
+     * @var null|int
+     */
+    protected $fetchClass = null;
+
+    /**
      * The number of active transactions.
      *
      * @var int
@@ -377,6 +384,23 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Convert the output from a stdClass to a specified object class.
+     *
+     * @param  string|null  $class  The classname of the value object to convert the output to.
+     *                              If set to NULL, it will reset the fetchMode and fetchClass.
+     * @return void
+     */
+    public function setFetchClass($class)
+    {
+        $this->fetchMode = PDO::FETCH_CLASS;
+        $this->fetchClass = $class;
+
+        if (is_null($class)) {
+            $this->fetchMode = PDO::FETCH_OBJ;
+        }
+    }
+
+    /**
      * Configure the PDO prepared statement.
      *
      * @param  \PDOStatement  $statement
@@ -384,7 +408,11 @@ class Connection implements ConnectionInterface
      */
     protected function prepared(PDOStatement $statement)
     {
-        $statement->setFetchMode($this->fetchMode);
+        $statement->setFetchMode($this->fetchMode, $this->fetchClass);
+
+        // Set the fetch class back to null, so that the next request for an
+        // object made against this connection won't fetch the class.
+        $this->setFetchClass(null);
 
         $this->event(new StatementPrepared(
             $this, $statement
