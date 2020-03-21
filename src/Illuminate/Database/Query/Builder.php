@@ -2256,7 +2256,6 @@ class Builder
         return $this->asClass($class);
     }
 
-
     /**
      * Dynamically call `asClass` when calling another method as well.
      *
