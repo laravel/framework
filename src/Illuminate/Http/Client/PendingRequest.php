@@ -578,7 +578,7 @@ class PendingRequest
     /**
      * Execute the "before sending" callbacks.
      *
-     * @param  \GuzzleHttp\Psr7\RequestInterface
+     * @param  \GuzzleHttp\Psr7\RequestInterface  $request
      * @param  array  $options
      * @return \Closure
      */

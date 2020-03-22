@@ -1,6 +1,28 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.2.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.2.2...7.x)
+
+
+## [v7.2.2 (2020-03-20)](https://github.com/laravel/framework/compare/v7.2.1...v7.2.2)
+
+### Fixed
+- Fixed empty data for blade components ([#32032](https://github.com/laravel/framework/pull/32032))
+- Fixed subdirectories when making components by `make:component` ([#32030](https://github.com/laravel/framework/pull/32030))
+- Fixed serialization of models when sending notifications ([#32051](https://github.com/laravel/framework/pull/32051))
+- Fixed route trailing slash in cached routes matcher ([#32048](https://github.com/laravel/framework/pull/32048))
+
+### Changed
+- Throw exception for non existing component alias ([#32036](https://github.com/laravel/framework/pull/32036))
+- Don't overwrite published stub files by default in `stub:publish` command ([#32038](https://github.com/laravel/framework/pull/32038))
+
+
+## [v7.2.1 (2020-03-19)](https://github.com/laravel/framework/compare/v7.2.0...v7.2.1)
+
+### Fixed
+- Enabling Windows absolute cache paths normalizing ([#31985](https://github.com/laravel/framework/pull/31985), [adfcb59](https://github.com/laravel/framework/commit/adfcb593fef058a32398d1e84d9083c8c5f893ac))
+- Fixed blade newlines ([#32026](https://github.com/laravel/framework/pull/32026))
+- Fixed exception rendering in debug mode ([#32027](https://github.com/laravel/framework/pull/32027))
+- Fixed route naming issue ([#32028](https://github.com/laravel/framework/pull/32028))
 
 
 ## [v7.2.0 (2020-03-17)](https://github.com/laravel/framework/compare/v7.1.3...v7.2.0)

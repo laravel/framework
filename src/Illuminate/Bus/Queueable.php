@@ -46,6 +46,8 @@ trait Queueable
 
     /**
      * The middleware the job should be dispatched through.
+     *
+     * @var array
      */
     public $middleware = [];
 
@@ -154,8 +156,7 @@ trait Queueable
     /**
      * Serialize a job for queuing.
      *
-     * @param mixed $job
-     *
+     * @param  mixed  $job
      * @return string
      */
     protected function serializeJob($job)
