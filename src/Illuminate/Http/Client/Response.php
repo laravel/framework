@@ -29,7 +29,7 @@ class Response implements ArrayAccess
     /**
      * Create a new response instance.
      *
-     * @param  \Psr\Http\Message\MessageInterface
+     * @param  \Psr\Http\Message\MessageInterface  $response
      * @return void
      */
     public function __construct($response)
