@@ -1418,9 +1418,22 @@ trait HasAttributes
      */
     public function append($attributes)
     {
-        $this->appends = array_unique(
+
+        [$appends , $relationshipAppends]=  collect(array_unique(
             array_merge($this->appends, is_string($attributes) ? func_get_args() : $attributes)
-        );
+        ))->partition(function ($append){
+            return strpos($append, '.') === false;
+        });
+
+        $appends->each(function ($append){
+            array_push($this->appends, $append);
+        });
+
+            $relationshipAppends->each(function ($append){
+                [$relationKey, $accessor] = explode('.', $append);
+
+                BaseCollection::wrap($this->getRelation($relationKey))->each->append($accessor);
+            });
 
         return $this;
     }
