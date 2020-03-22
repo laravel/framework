@@ -448,6 +448,8 @@ class FilesystemTest extends TestCase
         $content = str_repeat('123456', 1000000);
         $result = 1;
 
+        posix_setpgid(0, 0);
+
         for ($i = 1; $i <= 20; $i++) {
             $pid = pcntl_fork();
 
