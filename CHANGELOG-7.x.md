@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v7.2.2...7.x)
 
+### Fixed
+- Corrected suggested dependencies ([#32072](https://github.com/laravel/framework/pull/32072), [c01a70e](https://github.com/laravel/framework/commit/c01a70e33198e81d06d4b581e36e25a80acf8a68))
+- Avoid deadlock in test when sharing process group ([#32067](https://github.com/laravel/framework/pull/32067))
 
 ## [v7.2.2 (2020-03-20)](https://github.com/laravel/framework/compare/v7.2.1...v7.2.2)
 
@@ -33,11 +36,11 @@
 - Added `Http client` query string support ([#31996](https://github.com/laravel/framework/pull/31996))
 
 ### Fixed
+- Fixed `cookie` helper signature , matching match `CookieFactory` ([#31974](https://github.com/laravel/framework/pull/31974))
 - Added missing `ramsey/uuid` dependency to `Illuminate/Queue/composer.json` ([#31988](https://github.com/laravel/framework/pull/31988))
 - Fixed output of component attributes in View ([#31994](https://github.com/laravel/framework/pull/31994))
 
 ### Changed
-- Changed `cookie` helper signature to match `CookieFactory` ([#31974](https://github.com/laravel/framework/pull/31974))
 - Publish the form request stub used by RequestMakeCommand ([#31962](https://github.com/laravel/framework/pull/31962))
 - Handle prefix update on route level prefix ([449c80](https://github.com/laravel/framework/commit/449c8056cc0f13e7e20428700045339bae6bdca2))
 - Ensure SqsQueue queues are only suffixed once ([#31925](https://github.com/laravel/framework/pull/31925))
@@ -56,6 +59,7 @@
 ## [v7.1.2 (2020-03-13)](https://github.com/laravel/framework/compare/v7.1.1...v7.1.2)
 
 ### Fixed
+- Corrected suggested dependencies ([bb0ec42](https://github.com/laravel/framework/commit/bb0ec42b5a55b3ebf3a5a35cc6df01eec290dfa9))
 - Fixed null value injected from container in routes ([#31867](https://github.com/laravel/framework/pull/31867), [c666c42](https://github.com/laravel/framework/commit/c666c424e8a60539a8fbd7cb5a3474785d9db22a))
 
 ### Changed 
@@ -70,12 +74,12 @@
 
 ### Fixed
 - Bring `--daemon` option back to `queue:work` command ([24c1818](https://github.com/laravel/framework/commit/24c18182a82ee24be62d2ac1c6793c237944cda8))
+- Fixed scheduler dependency assumptions ([#31894](https://github.com/laravel/framework/pull/31894))
 - Fixed ComponentAttributeBag merge behaviour ([#31932](https://github.com/laravel/framework/pull/31932))
 
 ### Changed
 - Intelligently drop unnamed prefix name routes when caching ([#31917](https://github.com/laravel/framework/pull/31917))
 - Closure jobs needs illuminate/queue ([#31933](https://github.com/laravel/framework/pull/31933)) 
-- Fixed bad dependency assumptions ([#31894](https://github.com/laravel/framework/pull/31894))
 - Have a cache aware interface instead of concrete checks ([#31903](https://github.com/laravel/framework/pull/31903))
 
 
@@ -84,11 +88,12 @@
 ### Added
 - Added `Illuminate\Routing\RouteRegistrar::apiResource()` method ([#31857](https://github.com/laravel/framework/pull/31857)) 
 - Added optional $table parameter to `ForeignIdColumnDefinition::constrained()` method ([#31853](https://github.com/laravel/framework/pull/31853))
-- Added `The connection is broken and recovery is not possible. ...` to `DetectsLostConnections` ([#31539](https://github.com/laravel/framework/pull/31539))
 
 ### Fixed
-- Fixed phpredis `zadd` and `exists` on cluster ([#31838](https://github.com/laravel/framework/pull/31838))
+- Fixed phpredis "zadd" and "exists" on cluster ([#31838](https://github.com/laravel/framework/pull/31838))
 - Fixed trailing slash in `Illuminate\Routing\CompiledRouteCollection::match()` ([3d58cd9](https://github.com/laravel/framework/commit/3d58cd91d6ec483a43a4c23af9b75ecdd4a358de), [ac6f3a8](https://github.com/laravel/framework/commit/ac6f3a8bd0e94ea1319b6f278ecf7f3f8bada3c2))
+- Fixed "srid" mysql schema ([#31852](https://github.com/laravel/framework/pull/31852))
+- Fixed Microsoft ODBC lost connection handling ([#31879](https://github.com/laravel/framework/pull/31879))
 
 ### Changed
 - Fire `MessageLogged` event after the message has been logged (not before) ([#31843](https://github.com/laravel/framework/pull/31843))
@@ -101,10 +106,10 @@
 
 ### Added
 - Added `Illuminate\Mail\Mailable::when()` method ([#31828](https://github.com/laravel/framework/pull/31828))
-- Allowed dynamically adding of routes during caching ([#31829](https://github.com/laravel/framework/pull/31829))
 
 ### Fixed
 - Match Symfony's `Command::setHidden` declaration ([#31840](https://github.com/laravel/framework/pull/31840))
+- Fixed dynamically adding of routes during caching ([#31829](https://github.com/laravel/framework/pull/31829))
 
 ### Changed
 - Update the encryption algorithm to provide deterministic encryption sizes ([#31721](https://github.com/laravel/framework/pull/31721))
@@ -137,12 +142,12 @@
 - Catch Symfony `MethodNotAllowedException` exception in `CompiledRouteCollection::match()` method ([#31762](https://github.com/laravel/framework/pull/31762))
 - Fixed a bug with slash prefix in the route ([#31760](https://github.com/laravel/framework/pull/31760))
 - Fixed root URI not showing in the `route:list` ([#31771](https://github.com/laravel/framework/pull/31771))
-- Fixed model restoring right after soft deleting it ([#31719](https://github.com/laravel/framework/pull/31719))
+- Fixed model restoring right after being soft deleting ([#31719](https://github.com/laravel/framework/pull/31719))
+- Fixed array lock release behavior ([#31795](https://github.com/laravel/framework/pull/31795))
+- Fixed `Illuminate\Support\Str::slug()` method ([e4f22d8](https://github.com/laravel/framework/commit/e4f22d855b429e4141885d542438c859f84bfe49))
 
 ### Changed
 - Throw exception for duplicate route names in `Illuminate\Routing\AbstractRouteCollection::addToSymfonyRoutesCollection()` method ([#31755](https://github.com/laravel/framework/pull/31755))
-- Changed `Illuminate\Support\Str::slug()` method ([e4f22d8](https://github.com/laravel/framework/commit/e4f22d855b429e4141885d542438c859f84bfe49))
-- Check if an array lock exists before releasing it in `Illuminate\Cache\ArrayLock::release()` ([#31795](https://github.com/laravel/framework/pull/31795))
 - Revert disabling expired views checks ([#31798](https://github.com/laravel/framework/pull/31798))
 
 
