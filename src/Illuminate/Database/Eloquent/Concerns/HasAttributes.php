@@ -1430,7 +1430,7 @@ trait HasAttributes
         });
 
             $relationshipAppends->each(function ($append){
-                [$relationKey, $accessor] = explode('.', $append);
+                [$relationKey, $accessor] = explode('.', $append, 2);
 
                 BaseCollection::wrap($this->getRelation($relationKey))->each->append($accessor);
             });
