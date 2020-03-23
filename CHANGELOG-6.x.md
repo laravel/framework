@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.18.0...6.x)
 
 
-## [v6.18.10 (2020-03-03)](https://github.com/laravel/framework/compare/v6.17.1...v6.18.0)
+## [v6.18.0 (2020-03-03)](https://github.com/laravel/framework/compare/v6.17.1...v6.18.0)
 
 ### Added
 - Added `Arr::hasAny()` method ([#31636](https://github.com/laravel/framework/pull/31636))
