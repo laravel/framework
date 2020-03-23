@@ -800,7 +800,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function performBinding($key, $value, $route)
     {
-        return call_user_func($this->binders[$key], $value, $route);
+        return call_user_func($this->binders[$key], $value, $route, $key);
     }
 
     /**

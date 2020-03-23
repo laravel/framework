@@ -57,7 +57,7 @@ class RouteBinding
      */
     public static function forModel($container, $class, $callback = null)
     {
-        return function ($value) use ($container, $class, $callback) {
+        return function ($value, $route, $key) use ($container, $class, $callback) {
             if (is_null($value)) {
                 return;
             }
@@ -67,7 +67,9 @@ class RouteBinding
             // throw a not found exception otherwise we will return the instance.
             $instance = $container->make($class);
 
-            if ($model = $instance->resolveRouteBinding($value)) {
+            $field = $route->bindingFieldFor($key);
+
+            if ($model = $instance->resolveRouteBinding($value, $field)) {
                 return $model;
             }
 
