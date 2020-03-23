@@ -149,8 +149,12 @@ class SqsQueue extends Queue implements QueueContract
     {
         $queue = $queue ?: $this->default;
 
+        $prefix = Str::endsWith($this->prefix, ['-', '_']) === true
+            ? $this->prefix
+            : rtrim($this->prefix, '/').'/';
+
         return filter_var($queue, FILTER_VALIDATE_URL) === false
-            ? rtrim($this->prefix, '/').'/'.Str::finish($queue, $this->suffix)
+            ? $prefix.Str::finish($queue, $this->suffix)
             : $queue;
     }
 
