@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.18.2...6.x)
 
 ### Fixed
-- Corrected suggested dependencies ([#32072](https://github.com/laravel/framework/pull/32072))
+- Corrected suggested dependencies ([#32072](https://github.com/laravel/framework/pull/32072), [c01a70e](https://github.com/laravel/framework/commit/c01a70e33198e81d06d4b581e36e25a80acf8a68))
 - Avoid deadlock in test when sharing process group ([#32067](https://github.com/laravel/framework/pull/32067))
 
 
@@ -12,16 +12,16 @@
 ### Fixed
 - Fixed scheduler dependency assumptions ([#31894](https://github.com/laravel/framework/pull/31894))
 - Corrected suggested dependencies ([bb0ec42](https://github.com/laravel/framework/commit/bb0ec42b5a55b3ebf3a5a35cc6df01eec290dfa9))
-- Unset pivotParent on unsetRelations call ([#31956](https://github.com/laravel/framework/pull/31956))
-- Fixed cookie helper signature ([#31974](https://github.com/laravel/framework/pull/31974))
+- Unset `pivotParent` on `Pivot::unsetRelations()` ([#31956](https://github.com/laravel/framework/pull/31956))
+- Fixed `cookie` helper signature , matching match `CookieFactory` ([#31974](https://github.com/laravel/framework/pull/31974))
 
 
 ## [v6.18.1 (2020-03-10)](https://github.com/laravel/framework/compare/v6.18.0...v6.18.1)
 
 ### Fixed
 - Fixed array lock release behavior ([#31795](https://github.com/laravel/framework/pull/31795))
-- Fixed model restoring right after being soft deleting ([#31795](https://github.com/laravel/framework/pull/31795))
-- Fix phpredis "zadd" and "exists" on cluster ([#31838](https://github.com/laravel/framework/pull/31838))
+- Fixed model restoring right after being soft deleting ([#31719](https://github.com/laravel/framework/pull/31719))
+- Fixed phpredis "zadd" and "exists" on cluster ([#31838](https://github.com/laravel/framework/pull/31838))
 - Fixed "srid" mysql schema ([#31852](https://github.com/laravel/framework/pull/31852))
 - Fixed Microsoft ODBC lost connection handling ([#31879](https://github.com/laravel/framework/pull/31879))
 
