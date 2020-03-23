@@ -913,6 +913,16 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testModelBindingWithCustomField()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar:slug}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->model('bar', RouteModelBindingWithCustomFieldStub::class);
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }    
+
     public function testModelBindingWithNullReturn()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -2054,6 +2064,22 @@ class RouteModelBindingStub extends Model
     public function first()
     {
         return strtoupper($this->value);
+    }
+}
+
+class RouteModelBindingWithCustomFieldStub extends Model
+{
+    public function where($key, $value)
+    {
+        $this->key = $key;
+        $this->{$key} = $value;
+
+        return $this;
+    }
+
+    public function first()
+    {
+        return strtoupper($this->{$this->key});
     }
 }
 
