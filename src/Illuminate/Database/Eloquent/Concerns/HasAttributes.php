@@ -1422,15 +1422,15 @@ trait HasAttributes
         [$appends , $relationshipAppends]=  collect(array_unique(
             array_merge($this->appends, is_string($attributes) ? func_get_args() : $attributes)
         ))->partition(function ($append){
-            return strpos($append, '.') === false;
+            return !preg_match('/[.:]/', $append);
         });
 
         $appends->each(function ($append){
-            array_push($this->appends, $append);
+           $this->appends = array_merge($this->appends, explode(',',$append));
         });
 
             $relationshipAppends->each(function ($append){
-                [$relationKey, $accessor] = explode('.', $append, 2);
+                [$relationKey, $accessor] = preg_split('/[.:]/', $append, 2);
 
                 BaseCollection::wrap($this->getRelation($relationKey))->each->append($accessor);
             });
