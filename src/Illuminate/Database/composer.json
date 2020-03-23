@@ -37,7 +37,8 @@
         "illuminate/console": "Required to use the database commands (^6.0).",
         "illuminate/events": "Required to use the observers with Eloquent (^6.0).",
         "illuminate/filesystem": "Required to use the migrations (^6.0).",
-        "illuminate/pagination": "Required to paginate the result set (^6.0)."
+        "illuminate/pagination": "Required to paginate the result set (^6.0).",
+        "symfony/finder": "Required to use Eloquent model factories (^4.3.4)."
     },
     "config": {
         "sort-packages": true
