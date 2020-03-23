@@ -1419,23 +1419,38 @@ trait HasAttributes
     public function append($attributes)
     {
 
-        [$appends , $relationshipAppends]=  collect(array_unique(
+        [$appends , $relationshipAppends] =  collect(array_unique(
             array_merge($this->appends, is_string($attributes) ? func_get_args() : $attributes)
         ))->partition(function ($append){
             return !preg_match('/[.:]/', $append);
         });
 
-        $appends->each(function ($append){
-           $this->appends = array_merge($this->appends, explode(',',$append));
-        });
+       $this->appendToSelf($appends);
 
-            $relationshipAppends->each(function ($append){
-                [$relationKey, $accessor] = preg_split('/[.:]/', $append, 2);
-
-                BaseCollection::wrap($this->getRelation($relationKey))->each->append($accessor);
-            });
+       $this->appendToRelation($relationshipAppends);
 
         return $this;
+    }
+
+    /**
+     * @param  BaseCollection  $appends
+     */
+    protected function appendToSelf($appends){
+        $appends->each(function ($append){
+            $this->appends = array_merge($this->appends, explode(',',$append));
+        });
+    }
+
+    /**
+     * @param  BaseCollection  $appends
+     */
+    protected function appendToRelation($appends)
+    {
+        $appends->each(function ($append){
+            [$relationKey, $accessor] = preg_split('/[.:]/', $append, 2);
+
+            BaseCollection::wrap($this->getRelation($relationKey))->each->append($accessor);
+        });
     }
 
     /**
