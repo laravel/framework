@@ -43,6 +43,7 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Database/Migrations/stubs/migration.create.stub') => $stubsPath.'/migration.create.stub',
             realpath(__DIR__.'/../../Database/Migrations/stubs/migration.stub') => $stubsPath.'/migration.stub',
             realpath(__DIR__.'/../../Database/Migrations/stubs/migration.update.stub') => $stubsPath.'/migration.update.stub',
+            realpath(__DIR__.'/../../Database/Console/Factories/stubs/factory.stub') => $stubsPath.'/factory.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/policy.plain.stub') => $stubsPath.'/policy.plain.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/policy.stub') => $stubsPath.'/policy.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.api.stub') => $stubsPath.'/controller.api.stub',
