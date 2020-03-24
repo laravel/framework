@@ -40,8 +40,7 @@
     },
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (^8.0).",
-        "moontoast/math": "Required to use ordered UUIDs (^1.1).",
-        "ramsey/uuid": "Required to use Str::uuid() (^3.7).",
+        "ramsey/uuid": "Required to use Str::uuid() (^3.7|^4.0).",
         "symfony/process": "Required to use the composer class (^5.1).",
         "symfony/var-dumper": "Required to use the dd function (^5.1).",
         "vlucas/phpdotenv": "Required to use the Env class and env helper (^4.0)."
