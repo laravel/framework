@@ -871,9 +871,10 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * Destroy the models for the given IDs.
      *
      * @param  \Illuminate\Support\Collection|array|int  $ids
+     * @param  string|null  $key
      * @return int
      */
-    public static function destroy($ids)
+    public static function destroy($ids, string $key = null)
     {
         // We'll initialize a count here so we will return the total number of deletes
         // for the operation. The developers can then check this number as a boolean
@@ -889,7 +890,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         // We will actually pull the models from the database table and call delete on
         // each of them individually so that their events get fired properly with a
         // correct set of attributes in case the developers wants to check these.
-        $key = ($instance = new static)->getKeyName();
+        $key = $key ?? ($instance = new static)->getKeyName();
 
         foreach ($instance->whereIn($key, $ids)->get() as $model) {
             if ($model->delete()) {
