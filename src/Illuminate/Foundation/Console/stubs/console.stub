@@ -1,10 +1,10 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Illuminate\Console\Command;
 
-class DummyClass extends Command
+class {{ class }} extends Command
 {
     /**
      * The name and signature of the console command.
