@@ -50,7 +50,11 @@ class ConsoleMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/console.stub';
+        $relativePath = '/stubs/console.stub';
+
+        return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
+            ? $customPath
+            : __DIR__ .$relativePath;
     }
 
     /**
