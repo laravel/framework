@@ -54,7 +54,7 @@ class ConsoleMakeCommand extends GeneratorCommand
 
         return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
             ? $customPath
-            : __DIR__ .$relativePath;
+            : __DIR__.$relativePath;
     }
 
     /**
