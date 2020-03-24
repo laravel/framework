@@ -455,6 +455,15 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/?foo=bar'))->getName());
     }
 
+    public function testMatchingRootUri()
+    {
+        $this->routeCollection->add(
+            $route = $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $this->assertSame('foo', $this->collection()->match(Request::create('http://example.com'))->getName());
+    }
+
     public function testTrailingSlashIsTrimmedWhenMatchingCachedRoutes()
     {
         $this->routeCollection->add(
