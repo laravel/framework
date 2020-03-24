@@ -1,0 +1,14 @@
+workspace: true
+
+jobs:
+  install:
+    image: composer
+    script:
+      - composer update --prefer-dist --prefer-stable --no-interaction --no-suggest
+
+  test:
+    image: php:7.3-alpine
+    before_script:
+      - docker-php-ext-install pdo_mysql
+    script:
+      - vendor/bin/phpunit -d memory_limit=2G

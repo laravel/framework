@@ -10,7 +10,7 @@
          processIsolation="false"
          stopOnError="false"
          stopOnFailure="false"
-         verbose="true"
+         verbose="false"
 >
     <testsuites>
         <testsuite name="Laravel Test Suite">
