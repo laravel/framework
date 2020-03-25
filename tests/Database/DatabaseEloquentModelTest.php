@@ -1534,8 +1534,10 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->append(['relatedToOne:is_admin,camelCased', 'relatedToMany:is_admin,camelCased']);
 
-        $this->assertArrayHasKey('camelCased', $model->relatedToOne->toArray());
-        $this->assertArrayHasKey('is_admin', $model->relatedToOne->toArray());
+        $model->relatedToMany->push($model->relatedToOne)->each(function ($relation){
+        $this->assertArrayHasKey('camelCased', $relation->toArray());
+        $this->assertArrayHasKey('is_admin', $relation->toArray());
+        });
     }
 
     public function testGetMutatedAttributes()
