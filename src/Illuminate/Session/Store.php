@@ -97,7 +97,7 @@ class Store implements Session
         if ($data = $this->handler->read($this->getId())) {
             $data = @unserialize($this->prepareForUnserialize($data));
 
-            if ($data !== false && ! is_null($data) && is_array($data)) {
+            if (is_array($data) && $data !== false && ! is_null($data)) {
                 return $data;
             }
         }

@@ -51,8 +51,8 @@ class MailChannel
     {
         $message = $notification->toMail($notifiable);
 
-        if (! $notifiable->routeNotificationFor('mail', $notification) &&
-            ! $message instanceof Mailable) {
+        if (! $message instanceof Mailable &&
+            ! $notifiable->routeNotificationFor('mail', $notification)) {
             return;
         }
 

@@ -82,7 +82,7 @@ class SendQueuedMailable
      */
     public function retryAfter()
     {
-        if (! method_exists($this->mailable, 'retryAfter') && ! isset($this->mailable->retryAfter)) {
+        if (! isset($this->mailable->retryAfter) && ! method_exists($this->mailable, 'retryAfter')) {
             return;
         }
 

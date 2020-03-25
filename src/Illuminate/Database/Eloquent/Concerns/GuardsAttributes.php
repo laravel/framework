@@ -184,7 +184,7 @@ trait GuardsAttributes
      */
     protected function fillableFromArray(array $attributes)
     {
-        if (count($this->getFillable()) > 0 && ! static::$unguarded) {
+        if (! static::$unguarded && count($this->getFillable()) > 0) {
             return array_intersect_key($attributes, array_flip($this->getFillable()));
         }
 

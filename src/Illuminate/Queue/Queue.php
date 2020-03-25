@@ -169,7 +169,7 @@ abstract class Queue
      */
     public function getJobRetryDelay($job)
     {
-        if (! method_exists($job, 'retryAfter') && ! isset($job->retryAfter)) {
+        if (! isset($job->retryAfter) && ! method_exists($job, 'retryAfter')) {
             return;
         }
 
@@ -187,7 +187,7 @@ abstract class Queue
      */
     public function getJobExpiration($job)
     {
-        if (! method_exists($job, 'retryUntil') && ! isset($job->timeoutAt)) {
+        if (! isset($job->timeoutAt) && ! method_exists($job, 'retryUntil')) {
             return;
         }
 

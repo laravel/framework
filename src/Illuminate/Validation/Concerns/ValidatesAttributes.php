@@ -917,11 +917,11 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gt');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if ((is_numeric($value) && is_numeric($parameters[0])) && is_null($comparedToValue)) {
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
-        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+        if (is_numeric($comparedToValue) && is_numeric($value) && $this->hasRule($attribute, $this->numericRules)) {
             return $value > $comparedToValue;
         }
 
@@ -948,11 +948,11 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lt');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if ((is_numeric($value) && is_numeric($parameters[0])) && is_null($comparedToValue)) {
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
-        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+        if (is_numeric($comparedToValue) && is_numeric($value) && $this->hasRule($attribute, $this->numericRules)) {
             return $value < $comparedToValue;
         }
 
@@ -979,11 +979,11 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gte');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if ((is_numeric($value) && is_numeric($parameters[0])) && is_null($comparedToValue)) {
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
-        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+        if (is_numeric($comparedToValue) && is_numeric($value) && $this->hasRule($attribute, $this->numericRules)) {
             return $value >= $comparedToValue;
         }
 
@@ -1010,11 +1010,11 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lte');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if ((is_numeric($value) && is_numeric($parameters[0])) && is_null($comparedToValue)) {
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
-        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+        if (is_numeric($comparedToValue) && is_numeric($value) && $this->hasRule($attribute, $this->numericRules)) {
             return $value <= $comparedToValue;
         }
 

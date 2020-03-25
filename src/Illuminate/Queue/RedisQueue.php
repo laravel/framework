@@ -229,7 +229,7 @@ class RedisQueue extends Queue implements QueueContract
 
         [$job, $reserved] = $nextJob;
 
-        if (! $job && ! is_null($this->blockFor) && $block &&
+        if ($block && ! $job && ! is_null($this->blockFor) &&
             $this->getConnection()->blpop([$queue.':notify'], $this->blockFor)) {
             return $this->retrieveNextJob($queue, false);
         }

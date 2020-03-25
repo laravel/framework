@@ -175,11 +175,11 @@ class Blueprint
      */
     protected function addImpliedCommands(Grammar $grammar)
     {
-        if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
+        if (! $this->creating() && count($this->getAddedColumns()) > 0) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
 
-        if (count($this->getChangedColumns()) > 0 && ! $this->creating()) {
+        if (! $this->creating() && count($this->getChangedColumns()) > 0) {
             array_unshift($this->commands, $this->createCommand('change'));
         }
 

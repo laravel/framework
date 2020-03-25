@@ -815,7 +815,7 @@ class TestResponse implements ArrayAccess
     {
         $decodedResponse = json_decode($this->getContent(), true);
 
-        if (is_null($decodedResponse) || $decodedResponse === false) {
+        if ($decodedResponse === false || is_null($decodedResponse)) {
             if ($this->exception) {
                 throw $this->exception;
             } else {

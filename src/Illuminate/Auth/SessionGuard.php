@@ -164,7 +164,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function userFromRecaller($recaller)
     {
-        if (! $recaller->valid() || $this->recallAttempted) {
+        if ($this->recallAttempted || ! $recaller->valid()) {
             return;
         }
 

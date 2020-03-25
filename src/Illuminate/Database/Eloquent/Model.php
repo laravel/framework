@@ -316,7 +316,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         $class = $class ?: static::class;
 
-        if (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) {
+        if (! $class::UPDATED_AT || ! get_class_vars($class)['timestamps']) {
             return true;
         }
 
@@ -733,7 +733,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         $this->fireModelEvent('saved', false);
 
-        if ($this->isDirty() && ($options['touch'] ?? true)) {
+        if (($options['touch'] ?? true) && $this->isDirty()) {
             $this->touchOwners();
         }
 

@@ -611,7 +611,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function register($provider, $force = false)
     {
-        if (($registered = $this->getProvider($provider)) && ! $force) {
+        if (! $force && ($registered = $this->getProvider($provider))) {
             return $registered;
         }
 
@@ -802,7 +802,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected function loadDeferredProviderIfNeeded($abstract)
     {
-        if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
+        if (! isset($this->instances[$abstract]) && $this->isDeferredService($abstract)) {
             $this->loadDeferredProvider($abstract);
         }
     }

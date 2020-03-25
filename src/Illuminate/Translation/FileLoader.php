@@ -63,7 +63,7 @@ class FileLoader implements Loader
             return $this->loadJsonPaths($locale);
         }
 
-        if (is_null($namespace) || $namespace === '*') {
+        if ($namespace === '*' || is_null($namespace)) {
             return $this->loadPath($this->path, $locale, $group);
         }
 

@@ -971,7 +971,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
+        if ($column->autoIncrement && in_array($column->type, $this->serials)) {
             return ' auto_increment primary key';
         }
     }
@@ -1027,7 +1027,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifySrid(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->srid) && is_int($column->srid) && $column->srid > 0) {
+        if ($column->srid > 0 && is_int($column->srid) && ! is_null($column->srid)) {
             return ' srid '.$column->srid;
         }
     }
