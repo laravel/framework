@@ -4120,7 +4120,7 @@ class SupportCollectionTest extends TestCase
             ['simpleKey' => 'simpleValue'],
             ['simpleKey' => 'anotherSimpleValue'],
         ])->collect();
-        $this->assertfalse(
+        $this->assertFalse(
             $dataWithCustomElementNotRepeated->allEquals(function ($element) {
                 return $element['simpleKey'];
             })
