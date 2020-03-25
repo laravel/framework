@@ -8,6 +8,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {

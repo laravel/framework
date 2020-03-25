@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class EventsDispatcherTest extends TestCase
 {
