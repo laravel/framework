@@ -1,10 +1,20 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.2.2...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.3.0...7.x)
+
+### Added
+- Makes the stubs used for `make:policy` customizable ([#32040](https://github.com/laravel/framework/pull/32040), [9d36a36](https://github.com/laravel/framework/commit/9d36a369d377044d0f468d1f02fa317cbb93571f))
+
+
+## [v7.3.0 (2020-03-24)](https://github.com/laravel/framework/compare/v7.2.2...v7.3.0)
+
+### Added
+- Added possibility to use `^4.0` versions of `ramsey/uuid` ([#32086](https://github.com/laravel/framework/pull/32086))
 
 ### Fixed
 - Corrected suggested dependencies ([#32072](https://github.com/laravel/framework/pull/32072), [c01a70e](https://github.com/laravel/framework/commit/c01a70e33198e81d06d4b581e36e25a80acf8a68))
 - Avoid deadlock in test when sharing process group ([#32067](https://github.com/laravel/framework/pull/32067))
+
 
 ## [v7.2.2 (2020-03-20)](https://github.com/laravel/framework/compare/v7.2.1...v7.2.2)
 

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
+use League\Flysystem\Adapter\Ftp;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
