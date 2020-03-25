@@ -1525,6 +1525,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals([], $model->toArray());
     }
 
+    public function testAppendingOfRelatedAttributes()
+    {
+        $model = new EloquentModelStub();
+
+        $model->setRelation('relatedToMany', new Collection([new EloquentModelAppendsStub(), new EloquentModelAppendsStub()]));
+        $model->setRelation('relatedToOne', new EloquentModelAppendsStub());
+
+        $model->append(['relatedToOne:is_admin,camelCased', 'relatedToMany:is_admin,camelCased']);
+
+        $this->assertArrayHasKey('camelCased', $model->relatedToOne->toArray());
+        $this->assertArrayHasKey('is_admin', $model->relatedToOne->toArray());
+    }
+
     public function testGetMutatedAttributes()
     {
         $model = new EloquentModelGetMutatorsStub;
