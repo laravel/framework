@@ -223,6 +223,29 @@ trait EnumeratesValues
     }
 
     /**
+     * Determine if all items are equals.
+     *
+     * @param  callable  $callback
+     * @return bool
+     */
+    public function allEquals(callable $callback = null)
+    {
+        if ($this->isEmpty()) {
+            return true;
+        }
+
+        $callback = $callback ?? function ($element) {
+            return $element;
+        };
+
+        $baseToCompare = $callback($this->first());
+
+        return $this->every(function ($element) use ($callback, $baseToCompare) {
+            return $baseToCompare === $callback($element);
+        });
+    }
+
+    /**
      * Get the first item by the given key value pair.
      *
      * @param  string  $key

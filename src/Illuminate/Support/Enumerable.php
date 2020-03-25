@@ -228,6 +228,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function every($key, $operator = null, $value = null);
 
     /**
+     * Determine if all items are equals.
+     *
+     * @param  callable  $callback
+     * @return bool
+     */
+    public function allEquals(callable $callback = null);
+
+    /**
      * Get all items except for those with the specified keys.
      *
      * @param  mixed  $keys

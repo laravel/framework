@@ -4092,6 +4092,42 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testAllEquals($collection)
+    {
+        $emptyCollection = $collection::make([])->collect();
+        $this->assertTrue($emptyCollection->allEquals());
+
+        $dataWithSingleElement = $collection::make([1])->collect();
+        $dataWithSimpleRepeated = $collection::make([1, 1])->collect();
+        $dataWithSimpleNotRepeated = $collection::make([1, 2])->collect();
+        $this->assertTrue($dataWithSingleElement->allEquals());
+        $this->assertTrue($dataWithSimpleRepeated->allEquals());
+        $this->assertFalse($dataWithSimpleNotRepeated->allEquals());
+
+        $dataWithCustomElementRepeated = $collection::make([
+            ['simpleKey' => 'simpleValue'],
+            ['simpleKey' => 'simpleValue'],
+        ])->collect();
+        $this->assertTrue(
+            $dataWithCustomElementRepeated->allEquals(function ($element) {
+                return $element['simpleKey'];
+            })
+        );
+
+        $dataWithCustomElementNotRepeated = $collection::make([
+            ['simpleKey' => 'simpleValue'],
+            ['simpleKey' => 'anotherSimpleValue'],
+        ])->collect();
+        $this->assertfalse(
+            $dataWithCustomElementNotRepeated->allEquals(function ($element) {
+                return $element['simpleKey'];
+            })
+        );
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array
