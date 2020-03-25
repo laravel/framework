@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Closure;
-use Exception;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;

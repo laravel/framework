@@ -22,6 +22,7 @@ use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use stdClass;
 
 class DatabaseConnectionTest extends TestCase
 {
