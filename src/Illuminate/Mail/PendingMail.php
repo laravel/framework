@@ -123,18 +123,6 @@ class PendingMail
     }
 
     /**
-     * Send a mailable message immediately.
-     *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
-     * @return mixed
-     * @deprecated Use send() instead.
-     */
-    public function sendNow(MailableContract $mailable)
-    {
-        return $this->mailer->send($this->fill($mailable));
-    }
-
-    /**
      * Push the given mailable onto the queue.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
