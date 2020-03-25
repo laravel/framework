@@ -117,7 +117,7 @@ class CacheRedisStoreTest extends TestCase
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
         $redis->getRedis()->shouldReceive('set')->once()->with('prefix:foo', serialize('foo'))->andReturn('OK');
-        $result = $redis->forever('foo', 'foo', 60);
+        $result = $redis->forever('foo', 'foo');
         $this->assertTrue($result);
     }
 

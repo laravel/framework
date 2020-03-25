@@ -87,7 +87,7 @@ class CacheFileStoreTest extends TestCase
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
         $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
         $store = new FileStore($files, __DIR__);
-        $result = $store->forever('foo', 'Hello World', 10);
+        $result = $store->forever('foo', 'Hello World');
         $this->assertTrue($result);
     }
 

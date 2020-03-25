@@ -1415,7 +1415,7 @@ class EloquentBuilderTestModelSelfRelatedStub extends Model
 
     public function childFoos()
     {
-        return $this->hasMany(self::class, 'parent_id', 'id', 'children');
+        return $this->hasMany(self::class, 'parent_id', 'id');
     }
 
     public function parentBars()
@@ -1430,7 +1430,7 @@ class EloquentBuilderTestModelSelfRelatedStub extends Model
 
     public function bazes()
     {
-        return $this->hasMany(EloquentBuilderTestModelFarRelatedStub::class, 'foreign_key', 'id', 'bar');
+        return $this->hasMany(EloquentBuilderTestModelFarRelatedStub::class, 'foreign_key', 'id');
     }
 }
 

@@ -82,7 +82,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
         } else {
             $null = null;
 
-            $values = $this->memcached->getMulti($prefixedKeys, $null, Memcached::GET_PRESERVE_ORDER);
+            $values = $this->memcached->getMulti($prefixedKeys, Memcached::GET_PRESERVE_ORDER);
         }
 
         if ($this->memcached->getResultCode() != 0) {

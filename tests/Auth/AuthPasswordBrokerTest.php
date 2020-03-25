@@ -111,7 +111,7 @@ class AuthPasswordBrokerTest extends TestCase
 
     protected function getBroker($mocks)
     {
-        return new PasswordBroker($mocks['tokens'], $mocks['users'], $mocks['mailer'], $mocks['view']);
+        return new PasswordBroker($mocks['tokens'], $mocks['users']);
     }
 
     protected function getMocks()
