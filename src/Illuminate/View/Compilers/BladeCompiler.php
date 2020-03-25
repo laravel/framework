@@ -178,7 +178,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function getOpenAndClosingPhpTokens($contents)
     {
         return collect(token_get_all($contents))
-            ->pluck(0)
+            ->pluck('0')
             ->filter(function ($token) {
                 return in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
             });
