@@ -622,17 +622,17 @@ trait HasAttributes
             return $this->setMutatedAttributeValue($key, $value);
         }
 
+        elseif ($this->isClassCastable($key)) {
+            $this->setClassCastableAttribute($key, $value);
+
+            return $this;
+        }
+
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
         elseif ($value && $this->isDateAttribute($key)) {
             $value = $this->fromDateTime($value);
-        }
-
-        if ($this->isClassCastable($key)) {
-            $this->setClassCastableAttribute($key, $value);
-
-            return $this;
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {

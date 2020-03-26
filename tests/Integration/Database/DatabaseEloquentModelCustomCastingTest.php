@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Database\Eloquent\Model;
@@ -113,6 +114,13 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
+
+    public function testCustomCastSkipsDateCasting()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->updated_at = Carbon::now();
+    }
 }
 
 class TestEloquentModelWithCustomCast extends Model
@@ -135,6 +143,7 @@ class TestEloquentModelWithCustomCast extends Model
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
         'options' => JsonCaster::class,
+        'updated_at' => DateTimeWithMicrosecondsCaster::class,
     ];
 }
 
@@ -187,6 +196,21 @@ class JsonCaster implements CastsAttributes
     public function set($model, $key, $value, $attributes)
     {
         return json_encode($value);
+    }
+}
+
+class DateTimeWithMicrosecondsCaster implements CastsAttributes
+{
+    public function get($model, string $key, $value, array $attributes)
+    {
+        //
+    }
+
+    public function set($model, string $key, $value, array $attributes)
+    {
+        return is_null($value)
+            ? null
+            : $value->format('Y-m-d H:i:s.u');
     }
 }
 
