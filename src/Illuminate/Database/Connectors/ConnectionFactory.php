@@ -250,7 +250,7 @@ class ConnectionFactory
                 return new SqlServerConnector;
         }
 
-        throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
+        throw new InvalidArgumentException("Unsupported driver [{$config['driver']}].");
     }
 
     /**
@@ -282,6 +282,6 @@ class ConnectionFactory
                 return new SqlServerConnection($connection, $database, $prefix, $config);
         }
 
-        throw new InvalidArgumentException("Unsupported driver [{$driver}]");
+        throw new InvalidArgumentException("Unsupported driver [{$driver}].");
     }
 }

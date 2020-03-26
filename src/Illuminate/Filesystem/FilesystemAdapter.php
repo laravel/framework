@@ -725,7 +725,7 @@ class FilesystemAdapter implements CloudFilesystemContract
                 return AdapterInterface::VISIBILITY_PRIVATE;
         }
 
-        throw new InvalidArgumentException("Unknown visibility: {$visibility}");
+        throw new InvalidArgumentException("Unknown visibility: {$visibility}.");
     }
 
     /**
