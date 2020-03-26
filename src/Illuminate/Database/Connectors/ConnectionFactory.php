@@ -78,7 +78,7 @@ class ConnectionFactory
     }
 
     /**
-     * Create a single database connection instance.
+     * Create a read / write database connection instance.
      *
      * @param  array  $config
      * @return \Illuminate\Database\Connection
@@ -115,7 +115,7 @@ class ConnectionFactory
     }
 
     /**
-     * Get the read configuration for a read / write connection.
+     * Get the write configuration for a read / write connection.
      *
      * @param  array  $config
      * @return array
