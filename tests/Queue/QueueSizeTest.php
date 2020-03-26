@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Queue;
+namespace Illuminate\Tests\Queue;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Events;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Tests\Events\Fixtures\ExampleEvent;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -374,11 +375,6 @@ class EventsDispatcherTest extends TestCase
         unset($_SERVER['__event.test1']);
         unset($_SERVER['__event.test2']);
     }
-}
-
-class ExampleEvent
-{
-    //
 }
 
 interface SomeEventInterface

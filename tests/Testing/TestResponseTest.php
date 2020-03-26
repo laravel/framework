@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation;
+namespace Illuminate\Tests\Testing;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;

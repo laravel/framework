@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation;
+namespace Illuminate\Tests\Foundation\Bootstrap;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;

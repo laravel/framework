@@ -5,6 +5,10 @@ namespace Illuminate\Tests\Container;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Tests\Container\Fixtures\ContainerConcreteStub;
+use Illuminate\Tests\Container\Fixtures\ContainerImplementationStub;
+use Illuminate\Tests\Container\Fixtures\ContainerInjectVariableStub;
+use Illuminate\Tests\Container\Fixtures\IContainerContractStub;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -297,7 +301,7 @@ class ContainerTest extends TestCase
     public function testBindingResolutionExceptionMessage()
     {
         $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable.');
+        $this->expectExceptionMessage('Target [Illuminate\Tests\Container\Fixtures\IContainerContractStub] is not instantiable.');
 
         $container = new Container;
         $container->make(IContainerContractStub::class, []);
@@ -306,7 +310,7 @@ class ContainerTest extends TestCase
     public function testBindingResolutionExceptionMessageIncludesBuildStack()
     {
         $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable while building [Illuminate\Tests\Container\ContainerDependentStub].');
+        $this->expectExceptionMessage('Target [Illuminate\Tests\Container\Fixtures\IContainerContractStub] is not instantiable while building [Illuminate\Tests\Container\ContainerDependentStub].');
 
         $container = new Container;
         $container->make(ContainerDependentStub::class, []);
@@ -555,21 +559,6 @@ class ContainerTest extends TestCase
     }
 }
 
-class ContainerConcreteStub
-{
-    //
-}
-
-interface IContainerContractStub
-{
-    //
-}
-
-class ContainerImplementationStub implements IContainerContractStub
-{
-    //
-}
-
 class ContainerImplementationStubTwo implements IContainerContractStub
 {
     //
@@ -618,16 +607,6 @@ class ContainerMixedPrimitiveStub
         $this->stub = $stub;
         $this->last = $last;
         $this->first = $first;
-    }
-}
-
-class ContainerInjectVariableStub
-{
-    public $something;
-
-    public function __construct(ContainerConcreteStub $concrete, $something)
-    {
-        $this->something = $something;
     }
 }
 

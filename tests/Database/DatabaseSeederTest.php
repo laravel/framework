@@ -10,22 +10,6 @@ use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TestSeeder extends Seeder
-{
-    public function run()
-    {
-        //
-    }
-}
-
-class TestDepsSeeder extends Seeder
-{
-    public function run(Mock $someDependency)
-    {
-        //
-    }
-}
-
 class DatabaseSeederTest extends TestCase
 {
     protected function tearDown(): void
@@ -77,5 +61,21 @@ class DatabaseSeederTest extends TestCase
         $seeder->__invoke();
 
         $container->shouldHaveReceived('call')->once()->with([$seeder, 'run']);
+    }
+}
+
+class TestSeeder extends Seeder
+{
+    public function run()
+    {
+        //
+    }
+}
+
+class TestDepsSeeder extends Seeder
+{
+    public function run(Mock $someDependency)
+    {
+        //
     }
 }

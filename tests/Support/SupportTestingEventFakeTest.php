@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
+use Illuminate\Tests\Support\Fixtures\EventStub;
 use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -23,7 +24,7 @@ class SupportTestingEventFakeTest extends TestCase
             $this->fake->assertDispatched(EventStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\EventStub] event was not dispatched.'));
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\Fixtures\EventStub] event was not dispatched.'));
         }
 
         $this->fake->dispatch(EventStub::class);
@@ -40,7 +41,7 @@ class SupportTestingEventFakeTest extends TestCase
             $this->fake->assertDispatched(EventStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 times.'));
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\Fixtures\EventStub] event was dispatched 2 times instead of 1 times.'));
         }
 
         $this->fake->assertDispatched(EventStub::class, 2);
@@ -55,7 +56,7 @@ class SupportTestingEventFakeTest extends TestCase
             $this->fake->assertDispatchedTimes(EventStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 times.'));
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\Fixtures\EventStub] event was dispatched 2 times instead of 1 times.'));
         }
 
         $this->fake->assertDispatchedTimes(EventStub::class, 2);
@@ -71,7 +72,7 @@ class SupportTestingEventFakeTest extends TestCase
             $this->fake->assertNotDispatched(EventStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\EventStub] event was dispatched.'));
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\Fixtures\EventStub] event was dispatched.'));
         }
     }
 
@@ -95,9 +96,4 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->assertDispatched('Bar');
         $fake->assertNotDispatched('Baz');
     }
-}
-
-class EventStub
-{
-    //
 }

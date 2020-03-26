@@ -1,0 +1,1491 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Auth/Access/Gate.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: src/Illuminate/Auth/Access/Response.php
+
+		-
+			message: "#^Result of function abort \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Auth/Middleware/EnsureEmailIsVerified.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Auth/RequestGuard.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Auth\\\\SessionGuard\\:\\:failedBasicResponse\\(\\) \\(void\\) is used\\.$#"
+			count: 2
+			path: src/Illuminate/Auth/SessionGuard.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Console\\\\Command\\:\\:error\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Cache/Console/ClearCommand.php
+
+		-
+			message: "#^Caught class Psr\\\\Http\\\\Client\\\\ClientExceptionInterface not found\\.$#"
+			count: 1
+			path: src/Illuminate/Console/Scheduling/Event.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Container\\\\Container\\:\\:notInstantiable\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Container/Container.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Container/Container.php
+
+		-
+			message: "#^Cannot unset offset string on Symfony\\\\Component\\\\HttpFoundation\\\\Cookie\\.$#"
+			count: 1
+			path: src/Illuminate/Cookie/CookieJar.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Connection\\:\\:getDoctrineDriver\\(\\)\\.$#"
+			count: 2
+			path: src/Illuminate/Database/Connection.php
+
+		-
+			message: "#^Undefined variable\\: \\$database$#"
+			count: 2
+			path: src/Illuminate/Database/Connectors/MySqlConnector.php
+
+		-
+			message: "#^Undefined variable\\: \\$host$#"
+			count: 2
+			path: src/Illuminate/Database/Connectors/MySqlConnector.php
+
+		-
+			message: "#^Undefined variable\\: \\$database$#"
+			count: 1
+			path: src/Illuminate/Database/Connectors/PostgresConnector.php
+
+		-
+			message: "#^Undefined variable\\: \\$port$#"
+			count: 1
+			path: src/Illuminate/Database/Connectors/PostgresConnector.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Console\\\\Migrations\\\\BaseCommand\\:\\:\\$migrator\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Console/Migrations/BaseCommand.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Console\\\\Command\\:\\:comment\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Console/Migrations/ResetCommand.php
+
+		-
+			message: "#^Result of static method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\:\\:registerMixin\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Eloquent/Builder.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 10
+			path: src/Illuminate/Database/Eloquent/Collection.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 8
+			path: src/Illuminate/Database/Eloquent/Model.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Eloquent/Factory.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 3
+			path: src/Illuminate/Database/Eloquent/JsonEncodingException.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Eloquent/RelationNotFoundException.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Eloquent/Relations/Pivot.php
+
+		-
+			message: "#^Call to an undefined static method Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:addGlobalScope\\(\\)\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:\\$dates\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:\\$exists\\.$#"
+			count: 2
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:newModelQuery\\(\\)\\.$#"
+			count: 2
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:syncOriginalAttributes\\(\\)\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Call to an undefined static method Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:registerModelEvent\\(\\)\\.$#"
+			count: 2
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:qualifyColumn\\(\\)\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\DatabaseSoftDeletingTraitStub\\:\\:UPDATED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSoftDeletingTraitTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\EloquentBuilderTestNestedStub\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentBuilderTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\EloquentBuilderTestNestedStub\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentBuilderTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\EloquentTestUserWithGlobalScopeRemovingOtherScope\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\EloquentTestUserWithGlobalScopeRemovingOtherScope\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\HasManyThroughSoftDeletesTestUser\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentHasManyThroughIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\HasManyThroughSoftDeletesTestUser\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentHasManyThroughIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\HasOneThroughSoftDeletesTestUser\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentHasOneThroughIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\HasOneThroughSoftDeletesTestUser\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentHasOneThroughIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestAddress\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestAddress\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestComment\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestComment\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestCommentWithTrashed\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestCommentWithTrashed\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestGroup\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestGroup\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestPost\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestPost\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestUser\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestUser\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestUserWithTrashedPosts\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\SoftDeletesTestUserWithTrashedPosts\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentSoftDeletesIntegrationTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Database\\\\SoftDeletingModel\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSoftDeletingTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Database\\\\SoftDeletingModel\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSoftDeletingTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Foundation\\\\ProductStub\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Foundation/FoundationInteractsWithDatabaseTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Foundation\\\\ProductStub\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Foundation/FoundationInteractsWithDatabaseTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Foundation\\\\FoundationInteractsWithDatabaseTest\\:\\:\\$app\\.$#"
+			count: 1
+			path: tests/Foundation/FoundationInteractsWithDatabaseTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Foundation\\\\FoundationInteractsWithDatabaseTest\\:\\:artisan\\(\\)\\.$#"
+			count: 1
+			path: tests/Foundation/FoundationInteractsWithDatabaseTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentCollectionLoadCountTest\\\\Post\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentCollectionLoadCountTest/EloquentCollectionLoadCountTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentCollectionLoadCountTest\\\\Post\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentCollectionLoadCountTest/EloquentCollectionLoadCountTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentHasManyThroughTest\\\\Category\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentHasManyThroughTest/EloquentHasManyThroughTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentHasManyThroughTest\\\\Category\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentHasManyThroughTest/EloquentHasManyThroughTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentModelLoadCountTest\\\\DeletedRelated\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentModelLoadCountTest/EloquentModelLoadCountTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentModelLoadCountTest\\\\DeletedRelated\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentModelLoadCountTest/EloquentModelLoadCountTest.php
+
+		-
+			message: "#^Call to static method enableQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 2
+			path: tests/Integration/Database/EloquentModelLoadCountTest/EloquentModelLoadCountTest.php
+
+		-
+			message: "#^Call to static method getQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 2
+			path: tests/Integration/Database/EloquentModelLoadCountTest/EloquentModelLoadCountTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentModelRefreshTest\\\\Post\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentModelRefreshTest/EloquentModelRefreshTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentModelRefreshTest\\\\Post\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentModelRefreshTest/EloquentModelRefreshTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentMorphToGlobalScopesTest\\\\Post\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentMorphToGlobalScopesTest/EloquentMorphToGlobalScopesTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentMorphToGlobalScopesTest\\\\Post\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentMorphToGlobalScopesTest/EloquentMorphToGlobalScopesTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentWhereHasMorphTest\\\\Comment\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentWhereHasMorphTest/EloquentWhereHasMorphTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentWhereHasMorphTest\\\\Comment\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentWhereHasMorphTest/EloquentWhereHasMorphTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentWhereHasMorphTest\\\\Post\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentWhereHasMorphTest/EloquentWhereHasMorphTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\EloquentWhereHasMorphTest\\\\Post\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentWhereHasMorphTest/EloquentWhereHasMorphTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\Role\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentDeleteTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\Role\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentDeleteTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\TestUpdateModel2\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentUpdateTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\TestUpdateModel2\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentUpdateTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Integration\\\\Database\\\\TestUpdateModel3\\:\\:runSoftDelete\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentUpdateTest.php
+
+		-
+			message: "#^Access to undefined constant Illuminate\\\\Tests\\\\Integration\\\\Database\\\\TestUpdateModel3\\:\\:DELETED_AT\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentUpdateTest.php
+
+		-
+			message: "#^Static call to instance method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:increment\\(\\)\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentUpdateTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Database\\\\Migrations\\\\Migrator\\:\\:pretendToRun\\(\\) \\(void\\) is used\\.$#"
+			count: 2
+			path: src/Illuminate/Database/Migrations/Migrator.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Query/Builder.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Query/JoinClause.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Schema\\\\Grammars\\\\Grammar\\:\\:\\$modifiers\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Schema/Grammars/Grammar.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Database\\\\Schema\\\\SQLiteBuilder\\:\\:refreshDatabaseFile\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Database/Schema/SQLiteBuilder.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/AliasLoader.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Foundation\\\\Application\\:\\:afterBootstrapping\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Application.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Foundation\\\\FoundationTestAuthorizeTraitClass\\:\\:middleware\\(\\)\\.$#"
+			count: 1
+			path: tests/Foundation/FoundationAuthorizesRequestsTraitTest.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 5
+			path: src/Illuminate/Foundation/Console/QueuedCommand.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 5
+			path: src/Illuminate/Queue/CallQueuedClosure.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 30
+			path: tests/Integration/Queue/JobChainingTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Console\\\\Command\\:\\:error\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Console/EventListCommand.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Console\\\\Command\\:\\:line\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Console/KeyGenerateCommand.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Console\\\\Command\\:\\:error\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Console/RouteCacheCommand.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Console\\\\Command\\:\\:error\\(\\) \\(void\\) is used\\.$#"
+			count: 2
+			path: src/Illuminate/Foundation/Console/RouteListCommand.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Foundation\\\\Console\\\\VendorPublishCommand\\:\\:publishFile\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Console/VendorPublishCommand.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Foundation\\\\Console\\\\VendorPublishCommand\\:\\:publishDirectory\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Console/VendorPublishCommand.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Foundation\\\\Providers\\\\FoundationServiceProvider\\:\\:all\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Providers/FoundationServiceProvider.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Foundation\\\\Providers\\\\FoundationServiceProvider\\:\\:validate\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Providers/FoundationServiceProvider.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Cache\\\\RedisCacheIntegrationTest\\:\\:\\$app\\.$#"
+			count: 1
+			path: tests/Cache/RedisCacheIntegrationTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\RedisQueueIntegrationTest\\:\\:\\$app\\.$#"
+			count: 1
+			path: tests/Queue/RedisQueueIntegrationTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Redis\\\\ConcurrentLimiterTest\\:\\:\\$app\\.$#"
+			count: 1
+			path: tests/Redis/ConcurrentLimiterTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Redis\\\\DurationLimiterTest\\:\\:\\$app\\.$#"
+			count: 1
+			path: tests/Redis/DurationLimiterTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Redis\\\\RedisConnectionTest\\:\\:\\$app\\.$#"
+			count: 1
+			path: tests/Redis/RedisConnectionTest.php
+
+		-
+			message: "#^Cannot unset offset 'middleware\\.disable' on Illuminate\\\\Contracts\\\\Foundation\\\\Application\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Testing/TestCase.php
+
+		-
+			message: "#^Cannot unset offset mixed on Illuminate\\\\Contracts\\\\Foundation\\\\Application\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Testing/TestCase.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Foundation\\\\Testing\\\\TestCase\\:\\:refreshDatabase\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Testing/TestCase.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Foundation\\\\Testing\\\\TestCase\\:\\:runDatabaseMigrations\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Testing/TestCase.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Foundation\\\\Testing\\\\TestCase\\:\\:beginDatabaseTransaction\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Testing/TestCase.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Foundation\\\\Testing\\\\TestCase\\:\\:disableMiddlewareForAllTests\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Testing/TestCase.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Foundation\\\\Testing\\\\TestCase\\:\\:disableEventsForAllTests\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Testing/TestCase.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Foundation\\\\Testing\\\\TestCase\\:\\:setUpFaker\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Foundation/Testing/TestCase.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Http\\\\Client\\\\Response\\:\\:\\$transferStats\\.$#"
+			count: 1
+			path: src/Illuminate/Http/Client/Response.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Http\\\\Client\\\\Response\\:\\:\\$cookies\\.$#"
+			count: 1
+			path: src/Illuminate/Http/Client/Response.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: src/Illuminate/Http/Request.php
+
+		-
+			message: "#^Access to an undefined property class@anonymous/tests/Integration/Http/ResourceTest\\.php\\:1007\\:\\:\\$resource\\.$#"
+			count: 7
+			path: tests/Integration/Http/ResourceTest.php
+
+		-
+			message: "#^Access to an undefined property class@anonymous/tests/Integration/Http/ResourceTest\\.php\\:806\\:\\:\\$resource\\.$#"
+			count: 7
+			path: tests/Integration/Http/ResourceTest.php
+
+		-
+			message: "#^Access to an undefined property class@anonymous/tests/Integration/Http/ResourceTest\\.php\\:826\\:\\:\\$resource\\.$#"
+			count: 7
+			path: tests/Integration/Http/ResourceTest.php
+
+		-
+			message: "#^Access to an undefined property class@anonymous/tests/Integration/Http/ResourceTest\\.php\\:850\\:\\:\\$resource\\.$#"
+			count: 7
+			path: tests/Integration/Http/ResourceTest.php
+
+		-
+			message: "#^Access to an undefined property class@anonymous/tests/Integration/Http/ResourceTest\\.php\\:875\\:\\:\\$resource\\.$#"
+			count: 7
+			path: tests/Integration/Http/ResourceTest.php
+
+		-
+			message: "#^Access to an undefined property class@anonymous/tests/Integration/Http/ResourceTest\\.php\\:900\\:\\:\\$resource\\.$#"
+			count: 7
+			path: tests/Integration/Http/ResourceTest.php
+
+		-
+			message: "#^Access to an undefined property class@anonymous/tests/Integration/Http/ResourceTest\\.php\\:925\\:\\:\\$resource\\.$#"
+			count: 7
+			path: tests/Integration/Http/ResourceTest.php
+
+		-
+			message: "#^Access to an undefined property class@anonymous/tests/Integration/Http/ResourceTest\\.php\\:956\\:\\:\\$resource\\.$#"
+			count: 7
+			path: tests/Integration/Http/ResourceTest.php
+
+		-
+			message: "#^Access to an undefined property class@anonymous/tests/Integration/Http/ResourceTest\\.php\\:982\\:\\:\\$resource\\.$#"
+			count: 7
+			path: tests/Integration/Http/ResourceTest.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: src/Illuminate/Http/Resources/Json/JsonResource.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Http\\\\RedirectResponse\\:\\:\\$callback\\.$#"
+			count: 1
+			path: src/Illuminate/Http/RedirectResponse.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Http\\\\Response\\:\\:\\$callback\\.$#"
+			count: 1
+			path: src/Illuminate/Http/Response.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Http/UploadedFile.php
+
+		-
+			message: "#^Instantiated class Postmark\\\\Transport not found\\.$#"
+			count: 1
+			path: src/Illuminate/Mail/MailManager.php
+
+		-
+			message: "#^Instantiated class Postmark\\\\ThrowExceptionOnFailurePlugin not found\\.$#"
+			count: 1
+			path: src/Illuminate/Mail/MailManager.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Mail\\\\Mailer\\:\\:send\\(\\) \\(void\\) is used\\.$#"
+			count: 3
+			path: src/Illuminate/Mail/Mailer.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Notifications\\\\NotificationChannelManagerTestNotifiable\\:\\:morphMany\\(\\)\\.$#"
+			count: 1
+			path: tests/Notifications/NotificationChannelManagerTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Notifications\\\\NotificationChannelManagerTestNotifiable\\:\\:\\$email\\.$#"
+			count: 1
+			path: tests/Notifications/NotificationChannelManagerTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Notifications\\\\NotificationChannelManagerTestNotification\\:\\:line\\(\\)\\.$#"
+			count: 1
+			path: tests/Notifications/NotificationChannelManagerTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Notifications\\\\NotificationChannelManagerTestNotificationWithTwoChannels\\:\\:line\\(\\)\\.$#"
+			count: 1
+			path: tests/Notifications/NotificationChannelManagerTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Notifications\\\\NotificationChannelManagerTestQueuedNotification\\:\\:line\\(\\)\\.$#"
+			count: 1
+			path: tests/Notifications/NotificationChannelManagerTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Notifications\\\\NotificationSender\\:\\:queueNotification\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Notifications/NotificationSender.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Notifications\\\\NotificationSender\\:\\:sendNow\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Notifications/NotificationSender.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Notifications\\\\RoutesNotificationsTestInstance\\:\\:notifications\\(\\)\\.$#"
+			count: 1
+			path: tests/Notifications/NotificationRoutesNotificationsTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$level$#"
+			count: 2
+			path: src/Illuminate/Notifications/resources/views/email.blade.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Pagination/UrlWindow.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Pipeline\\\\Hub\\:\\:pipeline\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Pipeline/Hub.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Queue\\\\CallQueuedHandler\\:\\:handleModelNotFound\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Queue/CallQueuedHandler.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Console\\\\Command\\:\\:info\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Queue/Console/ListFailedCommand.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Queue\\\\Console\\\\WorkCommand\\:\\:writeStatus\\(\\) \\(void\\) is used\\.$#"
+			count: 3
+			path: src/Illuminate/Queue/Console/WorkCommand.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Queue\\\\Queue\\:\\:push\\(\\)\\.$#"
+			count: 2
+			path: src/Illuminate/Queue/Queue.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Queue\\\\Queue\\:\\:later\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Queue/Queue.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Queue\\\\QueueManager\\:\\:addConnector\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Queue/QueueManager.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Queue\\\\Worker\\:\\:runJob\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Queue/Worker.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Queue\\\\Worker\\:\\:process\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Queue/Worker.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Queue\\\\Worker\\:\\:raiseAfterJobEvent\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Queue/Worker.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Redis\\\\Connections\\\\Connection\\:\\:createSubscription\\(\\) \\(void\\) is used\\.$#"
+			count: 2
+			path: src/Illuminate/Redis/Connections/Connection.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Routing/Exceptions/UrlGenerationException.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Routing/RouteUri.php
+
+		-
+			message: "#^Instantiated class Symfony\\\\Bridge\\\\PsrHttpMessage\\\\Factory\\\\HttpFoundationFactory not found\\.$#"
+			count: 1
+			path: src/Illuminate/Routing/Router.php
+
+		-
+			message: "#^Class Nyholm\\\\Psr7\\\\Factory\\\\Psr17Factory not found\\.$#"
+			count: 1
+			path: src/Illuminate/Routing/RoutingServiceProvider.php
+
+		-
+			message: "#^Class Symfony\\\\Bridge\\\\PsrHttpMessage\\\\Factory\\\\PsrHttpFactory not found\\.$#"
+			count: 1
+			path: src/Illuminate/Routing/RoutingServiceProvider.php
+
+		-
+			message: "#^Instantiated class Nyholm\\\\Psr7\\\\Factory\\\\Psr17Factory not found\\.$#"
+			count: 1
+			path: src/Illuminate/Routing/RoutingServiceProvider.php
+
+		-
+			message: "#^Instantiated class Symfony\\\\Bridge\\\\PsrHttpMessage\\\\Factory\\\\PsrHttpFactory not found\\.$#"
+			count: 1
+			path: src/Illuminate/Routing/RoutingServiceProvider.php
+
+		-
+			message: "#^Class Nyholm\\\\Psr7\\\\Response not found\\.$#"
+			count: 1
+			path: src/Illuminate/Routing/RoutingServiceProvider.php
+
+		-
+			message: "#^Instantiated class Nyholm\\\\Psr7\\\\Response not found\\.$#"
+			count: 1
+			path: src/Illuminate/Routing/RoutingServiceProvider.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 67
+			path: src/Illuminate/Support/Collection.php
+
+		-
+			message: "#^Result of static method Illuminate\\\\Support\\\\DateFactory\\:\\:useCallable\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/DateFactory.php
+
+		-
+			message: "#^Result of static method Illuminate\\\\Support\\\\DateFactory\\:\\:useClass\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/DateFactory.php
+
+		-
+			message: "#^Result of static method Illuminate\\\\Support\\\\DateFactory\\:\\:useFactory\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/DateFactory.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 40
+			path: src/Illuminate/Support/LazyCollection.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 36
+			path: src/Illuminate/Support/Stringable.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Support\\\\Testing\\\\Fakes\\\\BusFake\\:\\:assertDispatchedTimes\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/Testing/Fakes/BusFake.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Support\\\\Testing\\\\Fakes\\\\BusFake\\:\\:assertDispatchedAfterResponseTimes\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/Testing/Fakes/BusFake.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Support\\\\Testing\\\\Fakes\\\\EventFake\\:\\:assertDispatchedTimes\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/Testing/Fakes/EventFake.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Support\\\\Testing\\\\Fakes\\\\MailFake\\:\\:assertSentTimes\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/Testing/Fakes/MailFake.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Support\\\\Testing\\\\Fakes\\\\MailFake\\:\\:assertQueuedTimes\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/Testing/Fakes/MailFake.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Support\\\\Testing\\\\Fakes\\\\NotificationFake\\:\\:assertSentToTimes\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/Testing/Fakes/NotificationFake.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Support\\\\Testing\\\\Fakes\\\\NotificationFake\\:\\:sendNow\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/Testing/Fakes/NotificationFake.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Support\\\\Testing\\\\Fakes\\\\QueueFake\\:\\:assertPushedTimes\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/Testing/Fakes/QueueFake.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Support\\\\Testing\\\\Fakes\\\\QueueFake\\:\\:assertPushed\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Support/Testing/Fakes/QueueFake.php
+
+		-
+			message: "#^Call to static method factory\\(\\) on an unknown class PHPUnit\\\\Util\\\\InvalidArgumentHelper\\.$#"
+			count: 2
+			path: src/Illuminate/Testing/Assert.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Testing/TestResponse.php
+
+		-
+			message: "#^Result of static method PHPUnit\\\\Framework\\\\Assert\\:\\:fail\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Testing/TestResponse.php
+
+		-
+			message: "#^Undefined variable\\: \\$key$#"
+			count: 1
+			path: src/Illuminate/Testing/TestResponse.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Illuminate/Validation/ValidationException.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Validation\\\\Validator\\:\\:addFailure\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Validation/Validator.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Validation\\\\Validator\\:\\:validateUsingCustomRule\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Validation/Validator.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Validation\\\\Validator\\:\\:excludeAttribute\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/Validation/Validator.php
+
+		-
+			message: "#^Result of method Illuminate\\\\View\\\\Compilers\\\\BladeCompiler\\:\\:aliasInclude\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: src/Illuminate/View/Compilers/BladeCompiler.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 3
+			path: src/Illuminate/View/ComponentAttributeBag.php
+
+		-
+			message: "#^Class Illuminate\\\\Cookie\\\\CookieJar does not have a constructor and must be instantiated without any parameters\\.$#"
+			count: 1
+			path: tests/Auth/AuthGuardTest.php
+
+		-
+			message: "#^Result of method PHPUnit\\\\Framework\\\\Assert\\:\\:fail\\(\\) \\(void\\) is used\\.$#"
+			count: 2
+			path: tests/Auth/AuthenticateMiddlewareTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Console\\\\Scheduling\\\\FrequencyTest\\:\\:spliceIntoPosition\\(\\)\\.$#"
+			count: 1
+			path: tests/Console/Scheduling/FrequencyTest.php
+
+		-
+			message: "#^Instantiated class Illuminate\\\\Tests\\\\Container\\\\ContainerImplementationStub not found\\.$#"
+			count: 5
+			path: tests/Container/ContextualBindingTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Container\\\\ContainerInjectVariableStub not found\\.$#"
+			count: 4
+			path: tests/Container/ContextualBindingTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Container\\\\ContainerConcreteStub not found\\.$#"
+			count: 2
+			path: tests/Container/ContextualBindingTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$port$#"
+			count: 2
+			path: tests/Database/DatabaseConnectorTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$database$#"
+			count: 2
+			path: tests/Database/DatabaseConnectorTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$host$#"
+			count: 2
+			path: tests/Database/DatabaseConnectorTest.php
+
+		-
+			message: "#^Call to static method create\\(\\) on an unknown class Illuminate\\\\Tests\\\\Database\\\\EloquentTestUser\\.$#"
+			count: 2
+			path: tests/Database/DatabaseEloquentIntegrationWithTablePrefixTest.php
+
+		-
+			message: "#^Call to static method fromQuery\\(\\) on an unknown class Illuminate\\\\Tests\\\\Database\\\\EloquentTestUser\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentIntegrationWithTablePrefixTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Database\\\\EloquentTestUser not found\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentIntegrationWithTablePrefixTest.php
+
+		-
+			message: "#^Instantiated class Foo\\\\Bar\\\\EloquentModelNamespacedStub not found\\.$#"
+			count: 1
+			path: tests/Database/DatabaseEloquentModelTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Database\\\\NotExistClass not found\\.$#"
+			count: 2
+			path: tests/Database/DatabaseEloquentModelTest.php
+
+		-
+			message: "#^Class Foo\\\\Bar\\\\EloquentModelNamespacedStub not found\\.$#"
+			count: 2
+			path: tests/Database/DatabaseEloquentMorphTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Database\\\\DatabaseSchemaBlueprintTest\\:\\:addCommand\\(\\)\\.$#"
+			count: 1
+			path: tests/Database/DatabaseSchemaBlueprintTest.php
+
+		-
+			message: "#^Instantiated class Illuminate\\\\Tests\\\\Events\\\\ExampleEvent not found\\.$#"
+			count: 1
+			path: tests/Events/BroadcastedEventsTest.php
+
+		-
+			message: "#^Instantiated class some_alias_foo_bar not found\\.$#"
+			count: 1
+			path: tests/Foundation/FoundationAliasLoaderTest.php
+
+		-
+			message: "#^Instantiated class some_alias_foo not found\\.$#"
+			count: 1
+			path: tests/Foundation/FoundationAliasLoaderTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Integration\\\\Database\\\\HashCaster\\:\\:\\$algorithm\\.$#"
+			count: 2
+			path: tests/Integration/Database/DatabaseEloquentModelCustomCastingTest.php
+
+		-
+			message: "#^Call to static method enableQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 3
+			path: tests/Integration/Database/EloquentCollectionLoadMissingTest/EloquentCollectionLoadMissingTest.php
+
+		-
+			message: "#^Call to static method getQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 3
+			path: tests/Integration/Database/EloquentCollectionLoadMissingTest/EloquentCollectionLoadMissingTest.php
+
+		-
+			message: "#^Call to static method enableQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentLazyEagerLoadingTest/EloquentLazyEagerLoadingTest.php
+
+		-
+			message: "#^Call to static method getQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentLazyEagerLoadingTest/EloquentLazyEagerLoadingTest.php
+
+		-
+			message: "#^Call to static method enableQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentModelLoadMissingTest/EloquentModelLoadMissingTest.php
+
+		-
+			message: "#^Call to static method getQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentModelLoadMissingTest/EloquentModelLoadMissingTest.php
+
+		-
+			message: "#^Call to static method enableQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentMorphToLazyEagerLoadingTest/EloquentMorphToLazyEagerLoadingTest.php
+
+		-
+			message: "#^Call to static method getQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 1
+			path: tests/Integration/Database/EloquentMorphToLazyEagerLoadingTest/EloquentMorphToLazyEagerLoadingTest.php
+
+		-
+			message: "#^Call to static method enableQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 2
+			path: tests/Integration/Database/EloquentMorphToTouchesTest/EloquentMorphToTouchesTest.php
+
+		-
+			message: "#^Call to static method getQueryLog\\(\\) on an unknown class DB\\.$#"
+			count: 2
+			path: tests/Integration/Database/EloquentMorphToTouchesTest/EloquentMorphToTouchesTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Integration\\\\Notifications\\\\SendingMailNotificationsTest\\:\\:\\$mailFactory\\.$#"
+			count: 2
+			path: tests/Integration/Notifications/SendingMailNotificationsTest.php
+
+		-
+			message: "#^Call to static method create\\(\\) on an unknown class Schema\\.$#"
+			count: 6
+			path: tests/Integration/Queue/ModelSerializationTest.php
+
+		-
+			message: "#^Call to static method connection\\(\\) on an unknown class Schema\\.$#"
+			count: 1
+			path: tests/Integration/Queue/ModelSerializationTest.php
+
+		-
+			message: "#^Instantiated class Illuminate\\\\Tests\\\\Integration\\\\Queue\\\\TypedPropertyTestClass not found\\.$#"
+			count: 1
+			path: tests/Integration/Queue/ModelSerializationTest.php
+
+		-
+			message: "#^Instantiated class Illuminate\\\\Tests\\\\Integration\\\\Queue\\\\TypedPropertyCollectionTestClass not found\\.$#"
+			count: 1
+			path: tests/Integration/Queue/ModelSerializationTest.php
+
+		-
+			message: "#^Call to static method fake\\(\\) on an unknown class Queue\\.$#"
+			count: 1
+			path: tests/Integration/Queue/QueuedListenersTest.php
+
+		-
+			message: "#^Call to an undefined static method Event\\:\\:listen\\(\\)\\.$#"
+			count: 2
+			path: tests/Integration/Queue/QueuedListenersTest.php
+
+		-
+			message: "#^Call to an undefined static method Event\\:\\:dispatch\\(\\)\\.$#"
+			count: 1
+			path: tests/Integration/Queue/QueuedListenersTest.php
+
+		-
+			message: "#^Call to static method assertPushed\\(\\) on an unknown class Queue\\.$#"
+			count: 1
+			path: tests/Integration/Queue/QueuedListenersTest.php
+
+		-
+			message: "#^Call to static method assertNotPushed\\(\\) on an unknown class Queue\\.$#"
+			count: 1
+			path: tests/Integration/Queue/QueuedListenersTest.php
+
+		-
+			message: "#^Array has 2 duplicate keys with value 'route redirect with two parameter replacements' \\('route redirect with two parameter replacements', 'route redirect with two parameter replacements'\\)\\.$#"
+			count: 1
+			path: tests/Integration/Routing/RouteRedirectTest.php
+
+		-
+			message: "#^Class Swift_Mime_Message not found\\.$#"
+			count: 2
+			path: tests/Mail/MailMessageTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$key\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$secret\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$service\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$region\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$account\\.$#"
+			count: 3
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$queueName\\.$#"
+			count: 3
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$baseUrl\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$releaseDelay\\.$#"
+			count: 3
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$queueUrl\\.$#"
+			count: 4
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$mockedSqsClient\\.$#"
+			count: 4
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$mockedContainer\\.$#"
+			count: 4
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$mockedJob\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$mockedData\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$mockedPayload\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$mockedMessageId\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$mockedReceiptHandle\\.$#"
+			count: 3
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsJobTest\\:\\:\\$mockedJobData\\.$#"
+			count: 2
+			path: tests/Queue/QueueSqsJobTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$sqs\\.$#"
+			count: 17
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$account\\.$#"
+			count: 11
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$queueName\\.$#"
+			count: 25
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$baseUrl\\.$#"
+			count: 5
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$prefix\\.$#"
+			count: 4
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$queueUrl\\.$#"
+			count: 18
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedJob\\.$#"
+			count: 7
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedData\\.$#"
+			count: 7
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedPayload\\.$#"
+			count: 7
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedDelay\\.$#"
+			count: 5
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedMessageId\\.$#"
+			count: 4
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedReceiptHandle\\.$#"
+			count: 1
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedSendMessageResponseModel\\.$#"
+			count: 4
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedReceiveMessageResponseModel\\.$#"
+			count: 2
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedReceiveEmptyMessageResponseModel\\.$#"
+			count: 2
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueSqsQueueTest\\:\\:\\$mockedQueueAttributesResponseModel\\.$#"
+			count: 2
+			path: tests/Queue/QueueSqsQueueTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\QueueWorkerTest\\:\\:\\$maintenanceFlags\\.$#"
+			count: 2
+			path: tests/Queue/QueueWorkerTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Queue\\\\InsomniacWorker\\:\\:\\$stoppedWithStatus\\.$#"
+			count: 1
+			path: tests/Queue/QueueWorkerTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Routing\\\\RouteRegistrarControllerStubOne not found\\.$#"
+			count: 6
+			path: tests/Routing/RouteRegistrarTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Routing\\\\RouteRegistrarControllerStubTwo not found\\.$#"
+			count: 6
+			path: tests/Routing/RouteRegistrarTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Routing\\\\RouteRegistrarControllerStubThree not found\\.$#"
+			count: 6
+			path: tests/Routing/RouteRegistrarTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Routing\\\\RoutingRouteTest\\:\\:\\$action\\.$#"
+			count: 1
+			path: tests/Routing/RoutingRouteTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Routing\\\\Placeholder1 not found\\.$#"
+			count: 2
+			path: tests/Routing/RoutingRouteTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Routing\\\\Placeholder2 not found\\.$#"
+			count: 2
+			path: tests/Routing/RoutingRouteTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Routing\\\\Placeholder3 not found\\.$#"
+			count: 2
+			path: tests/Routing/RoutingRouteTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Routing\\\\RouteModelInterface not found\\.$#"
+			count: 2
+			path: tests/Routing/RoutingRouteTest.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: tests/Support/Fixtures/CustomDateClass.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Support\\\\ForwardsCallsBase\\:\\:missingMethod\\(\\)\\.$#"
+			count: 1
+			path: tests/Support/ForwardsCallsTest.php
+
+		-
+			message: "#^Result of method Illuminate\\\\Tests\\\\Support\\\\SupportCapsuleManagerTraitTest\\:\\:setupContainer\\(\\) \\(void\\) is used\\.$#"
+			count: 2
+			path: tests/Support/SupportCapsuleManagerTraitTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Support\\\\SupportCarbonTest\\:\\:diffInYears\\(\\)\\.$#"
+			count: 1
+			path: tests/Support/SupportCarbonTest.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Tests\\\\Support\\\\SupportCollectionTest\\:\\:filter\\(\\)\\.$#"
+			count: 2
+			path: tests/Support/SupportCollectionTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$data$#"
+			count: 1
+			path: tests/Support/SupportCollectionTest.php
+
+		-
+			message: "#^Class Illuminate\\\\Tests\\\\Support\\\\EventStub not found\\.$#"
+			count: 2
+			path: tests/Support/SupportFacadesEventTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Support\\\\SupportHelpersTest\\:\\:\\$value\\.$#"
+			count: 1
+			path: tests/Support/SupportHelpersTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Support\\\\SupportMacroableTest\\:\\:\\$protectedVariable\\.$#"
+			count: 1
+			path: tests/Support/SupportMacroableTest.php
+
+		-
+			message: "#^Call to an undefined static method Illuminate\\\\Tests\\\\Support\\\\SupportMacroableTest\\:\\:getProtectedStatic\\(\\)\\.$#"
+			count: 1
+			path: tests/Support/SupportMacroableTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Support\\\\TestMixin\\:\\:\\$protectedVariable\\.$#"
+			count: 1
+			path: tests/Support/SupportMacroableTest.php
+
+		-
+			message: "#^Instantiated class Illuminate\\\\Tests\\\\Support\\\\StringableObjectStub not found\\.$#"
+			count: 2
+			path: tests/Support/SupportStringableTest.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: tests/Support/SupportTappableTest.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Tests\\\\Support\\\\SupportTestingEventFakeTest\\:\\:\\$fake\\.$#"
+			count: 15
+			path: tests/Support/SupportTestingEventFakeTest.php
+
+		-
+			message: "#^Array has 2 duplicate keys with value 'bar' \\('bar', 'bar'\\)\\.$#"
+			count: 1
+			path: tests/Testing/TestResponseTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$name$#"
+			count: 1
+			path: tests/View/fixtures/component.php
+
+		-
+			message: "#^Undefined variable\\: \\$slot$#"
+			count: 1
+			path: tests/View/fixtures/component.php
+
+		-
+			message: "#^Undefined variable\\: \\$title$#"
+			count: 1
+			path: tests/View/fixtures/component.php
+
+		-
+			message: "#^Undefined variable\\: \\$website$#"
+			count: 1
+			path: tests/View/fixtures/component.php
+
+		-
+			message: "#^Undefined variable\\: \\$sub$#"
+			count: 1
+			path: tests/View/fixtures/nested/child.php
+
+		-
+			message: "#^Undefined variable\\: \\$__env$#"
+			count: 1
+			path: tests/View/fixtures/section-exception-layout.php
+
+		-
+			message: "#^Undefined variable\\: \\$__env$#"
+			count: 2
+			path: tests/View/fixtures/section-exception.php

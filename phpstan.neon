@@ -1,0 +1,11 @@
+includes:
+    - phpstan-baseline.neon
+parameters:
+  level: 0
+  excludes_analyse:
+        - tests/Database/migrations/*
+        - tests/Database/stubs/*
+        - tests/Integration/Database/stubs/*
+        - tests/Integration/Migration/fixtures/*
+        - tests/Integration/Queue/typed-properties.php
+        - tests/Routing/fixtures/*

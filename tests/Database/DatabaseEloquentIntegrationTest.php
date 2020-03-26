@@ -18,6 +18,9 @@ use Illuminate\Database\QueryException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\Database\Fixtures\EloquentTestPhoto;
+use Illuminate\Tests\Database\Fixtures\EloquentTestPost;
+use Illuminate\Tests\Database\Fixtures\EloquentTestUser;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
@@ -1700,50 +1703,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 /**
  * Eloquent Models...
  */
-class EloquentTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $dates = ['birthday'];
-    protected $guarded = [];
-
-    public function friends()
-    {
-        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id');
-    }
-
-    public function friendsOne()
-    {
-        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 1);
-    }
-
-    public function friendsTwo()
-    {
-        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
-    }
-
-    public function posts()
-    {
-        return $this->hasMany(EloquentTestPost::class, 'user_id');
-    }
-
-    public function post()
-    {
-        return $this->hasOne(EloquentTestPost::class, 'user_id');
-    }
-
-    public function photos()
-    {
-        return $this->morphMany(EloquentTestPhoto::class, 'imageable');
-    }
-
-    public function postWithPhotos()
-    {
-        return $this->post()->join('photo', function ($join) {
-            $join->on('photo.imageable_id', 'post.id');
-            $join->where('photo.imageable_type', 'EloquentTestPost');
-        });
-    }
-}
 
 class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
 {
@@ -1814,47 +1773,10 @@ class EloquentTestUserWithGlobalScopeRemovingOtherScope extends Eloquent
     }
 }
 
-class EloquentTestPost extends Eloquent
-{
-    protected $table = 'posts';
-    protected $guarded = [];
-
-    public function user()
-    {
-        return $this->belongsTo(EloquentTestUser::class, 'user_id');
-    }
-
-    public function photos()
-    {
-        return $this->morphMany(EloquentTestPhoto::class, 'imageable');
-    }
-
-    public function childPosts()
-    {
-        return $this->hasMany(self::class, 'parent_id');
-    }
-
-    public function parentPost()
-    {
-        return $this->belongsTo(self::class, 'parent_id');
-    }
-}
-
 class EloquentTestFriendLevel extends Eloquent
 {
     protected $table = 'friend_levels';
     protected $guarded = [];
-}
-
-class EloquentTestPhoto extends Eloquent
-{
-    protected $table = 'photos';
-    protected $guarded = [];
-
-    public function imageable()
-    {
-        return $this->morphTo();
-    }
 }
 
 class EloquentTestUserWithStringCastId extends EloquentTestUser
