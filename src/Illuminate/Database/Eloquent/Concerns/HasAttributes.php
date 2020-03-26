@@ -1434,6 +1434,7 @@ trait HasAttributes
 
     /**
      * @param  BaseCollection  $appends
+     * @return  void
      */
     protected function appendToSelf($appends){
         $appends->each(function ($append){
@@ -1443,6 +1444,8 @@ trait HasAttributes
 
     /**
      * @param  BaseCollection  $appends
+     * @return  void
+
      */
     protected function appendToRelation($appends)
     {
