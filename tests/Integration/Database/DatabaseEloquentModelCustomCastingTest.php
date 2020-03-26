@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * @group integration
@@ -119,7 +120,11 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
     {
         $model = new TestEloquentModelWithCustomCast;
 
-        $model->updated_at = Carbon::now();
+        $model->updated_at = $now = Carbon::now()->microseconds(14);
+
+        $this->assertSame(14, $model->updated_at->microsecond);
+
+        $this->assertTrue(Str::endsWith(json_decode($model->toJson())->updated_at, '14Z'));
     }
 }
 
@@ -203,7 +208,9 @@ class DateTimeWithMicrosecondsCaster implements CastsAttributes
 {
     public function get($model, string $key, $value, array $attributes)
     {
-        //
+        return is_null($value)
+            ? null
+            : Carbon::createFromFormat('Y-m-d H:i:s.u', $value);
     }
 
     public function set($model, string $key, $value, array $attributes)
