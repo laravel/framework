@@ -1433,6 +1433,8 @@ trait HasAttributes
     }
 
     /**
+     * Append attributes to this model
+     *
      * @param  BaseCollection  $appends
      * @return  void
      */
@@ -1443,6 +1445,8 @@ trait HasAttributes
     }
 
     /**
+     * Send accessors to the related models
+     *
      * @param  BaseCollection  $appends
      * @return  void
 
