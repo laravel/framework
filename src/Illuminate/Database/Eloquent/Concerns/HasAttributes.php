@@ -620,9 +620,7 @@ trait HasAttributes
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key)) {
             return $this->setMutatedAttributeValue($key, $value);
-        }
-
-        elseif ($this->isClassCastable($key)) {
+        } elseif ($this->isClassCastable($key)) {
             $this->setClassCastableAttribute($key, $value);
 
             return $this;
