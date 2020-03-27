@@ -176,11 +176,12 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string  $path
      * @param  string|null  $name
      * @param  array|null  $headers
+     * @param  string  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function download($path, $name = null, array $headers = [])
+    public function download($path, $name = null, array $headers = [], string $disposition = 'attachment')
     {
-        return $this->response($path, $name, $headers, 'attachment');
+        return $this->response($path, $name, $headers, $disposition);
     }
 
     /**
