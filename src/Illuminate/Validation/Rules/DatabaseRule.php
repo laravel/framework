@@ -37,6 +37,13 @@ trait DatabaseRule
     protected $using = [];
 
     /**
+     * The model being queried.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    protected $model;
+
+    /**
      * Create a new rule instance.
      *
      * @param  string  $table
@@ -62,10 +69,10 @@ trait DatabaseRule
             return $table;
         }
 
-        $model = new $table;
+        $this->model = new $table;
 
-        return $model instanceof Model
-                ? $model->getTable()
+        return $this->model instanceof Model
+                ? $this->model->getTable()
                 : $table;
     }
 
