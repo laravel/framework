@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Contracts\Database\Eloquent\HasCasterClass;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -73,6 +74,33 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model->syncOriginal();
         $model->options = ['foo' => 'bar'];
         $this->assertTrue($model->isDirty('options'));
+
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->setRawAttributes([
+            'address_line_one' => '110 Kingsbrook St.',
+            'address_line_two' => 'My Childhood House',
+        ]);
+
+        $this->assertSame('110 Kingsbrook St.', $model->address_with_caster->lineOne);
+        $this->assertSame('My Childhood House', $model->address_with_caster->lineTwo);
+
+        $this->assertSame('110 Kingsbrook St.', $model->toArray()['address_line_one']);
+        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
+
+        $model->address_with_caster->lineOne = '117 Spencer St.';
+
+        $this->assertFalse(isset($model->toArray()['address']));
+        $this->assertSame('117 Spencer St.', $model->toArray()['address_line_one']);
+        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
+
+        $this->assertSame('117 Spencer St.', json_decode($model->toJson(), true)['address_line_one']);
+        $this->assertSame('My Childhood House', json_decode($model->toJson(), true)['address_line_two']);
+
+        $model->address_with_caster = null;
+
+        $this->assertNull($model->toArray()['address_line_one']);
+        $this->assertNull($model->toArray()['address_line_two']);
     }
 
     public function testOneWayCasting()
@@ -135,6 +163,7 @@ class TestEloquentModelWithCustomCast extends Model
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
         'options' => JsonCaster::class,
+        'address_with_caster' => AddressWithCaster::class,
     ];
 }
 
@@ -199,5 +228,13 @@ class Address
     {
         $this->lineOne = $lineOne;
         $this->lineTwo = $lineTwo;
+    }
+}
+
+class AddressWithCaster extends Address implements HasCasterClass
+{
+    public static function getCasterClass()
+    {
+        return AddressCaster::class;
     }
 }
