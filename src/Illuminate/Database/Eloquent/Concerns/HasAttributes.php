@@ -826,7 +826,7 @@ trait HasAttributes
 
     /**
      * Decode the given JSON into an object.
-     * 
+     *
      * @param  string  $value
      * @return object
      */
