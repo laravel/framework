@@ -1104,14 +1104,30 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
             $router->group(['prefix' => 'bar'], function () use ($router) {
-                $router->get('baz', ['as' => 'baz', function () {
+                $router->prefix('foz')->get('baz', ['as' => 'baz', function () {
                     return 'hello';
                 }]);
             });
         });
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::baz');
-        $this->assertSame('foo/bar/baz', $route->uri());
+        $this->assertSame('foz/foo/bar/baz', $route->uri());
+    }
+
+    public function testNestedRouteGroupingPrefixing()
+    {
+        /*
+         * nested with layer skipped
+         */
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->prefix('bar')->get('baz', ['as' => 'baz', function () {
+                return 'hello';
+            }]);
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::baz');
+        $this->assertSame('bar/foo', $route->getAction('prefix'));
     }
 
     public function testRouteMiddlewareMergeWithMiddlewareAttributesAsStrings()
