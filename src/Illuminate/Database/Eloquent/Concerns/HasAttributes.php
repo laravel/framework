@@ -1064,17 +1064,20 @@ trait HasAttributes
     {
         $castType = $this->getCasts()[$key];
 
+        $arguments = [];
+
+        if (strpos($castType, ':') !== false) {
+            $segments = explode(':', $castType, 2);
+
+            $castType = $segments[0];
+            $arguments = explode(',', $segments[1]);
+        }
+
         if (is_subclass_of($castType, HasCasterClass::class)) {
             $castType = $castType::getCasterClass();
         }
 
-        if (strpos($castType, ':') === false) {
-            return new $castType;
-        }
-
-        $segments = explode(':', $castType, 2);
-
-        return new $segments[0](...explode(',', $segments[1]));
+        return new $castType(...$arguments);
     }
 
     /**

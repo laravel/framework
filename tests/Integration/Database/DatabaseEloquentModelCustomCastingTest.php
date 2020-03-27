@@ -74,33 +74,6 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model->syncOriginal();
         $model->options = ['foo' => 'bar'];
         $this->assertTrue($model->isDirty('options'));
-
-        $model = new TestEloquentModelWithCustomCast;
-
-        $model->setRawAttributes([
-            'address_line_one' => '110 Kingsbrook St.',
-            'address_line_two' => 'My Childhood House',
-        ]);
-
-        $this->assertSame('110 Kingsbrook St.', $model->address_with_caster->lineOne);
-        $this->assertSame('My Childhood House', $model->address_with_caster->lineTwo);
-
-        $this->assertSame('110 Kingsbrook St.', $model->toArray()['address_line_one']);
-        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
-
-        $model->address_with_caster->lineOne = '117 Spencer St.';
-
-        $this->assertFalse(isset($model->toArray()['address']));
-        $this->assertSame('117 Spencer St.', $model->toArray()['address_line_one']);
-        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
-
-        $this->assertSame('117 Spencer St.', json_decode($model->toJson(), true)['address_line_one']);
-        $this->assertSame('My Childhood House', json_decode($model->toJson(), true)['address_line_two']);
-
-        $model->address_with_caster = null;
-
-        $this->assertNull($model->toArray()['address_line_one']);
-        $this->assertNull($model->toArray()['address_line_two']);
     }
 
     public function testOneWayCasting()
@@ -141,6 +114,23 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
+
+    public function testWithHasCasterClassInterface()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->setRawAttributes([
+            'value_object_with_caster' => serialize(new ValueObject('hello'))
+        ]);
+
+        $this->assertInstanceOf(ValueObject::class, $model->value_object_with_caster);
+
+        $model->setRawAttributes([
+            'value_object_caster_with_argument' => null
+        ]);
+
+        $this->assertEquals('argument', $model->value_object_caster_with_argument);
+    }
 }
 
 class TestEloquentModelWithCustomCast extends Model
@@ -163,7 +153,8 @@ class TestEloquentModelWithCustomCast extends Model
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
         'options' => JsonCaster::class,
-        'address_with_caster' => AddressWithCaster::class,
+        'value_object_with_caster' => ValueObject::class,
+        'value_object_caster_with_argument' => ValueObject::class.':argument',
     ];
 }
 
@@ -219,6 +210,45 @@ class JsonCaster implements CastsAttributes
     }
 }
 
+class ValueObjectCaster implements CastsAttributes
+{
+    private $argument;
+
+    public function __construct($argument = null)
+    {
+        $this->argument = $argument;
+    }
+
+    public function get($model, $key, $value, $attributes)
+    {
+        if ($this->argument) {
+            return $this->argument;
+        }
+
+        return unserialize($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return serialize($value);
+    }
+}
+
+class ValueObject implements HasCasterClass
+{
+    public $name;
+
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public static function getCasterClass()
+    {
+        return ValueObjectCaster::class;
+    }
+}
+
 class Address
 {
     public $lineOne;
@@ -228,13 +258,5 @@ class Address
     {
         $this->lineOne = $lineOne;
         $this->lineTwo = $lineTwo;
-    }
-}
-
-class AddressWithCaster extends Address implements HasCasterClass
-{
-    public static function getCasterClass()
-    {
-        return AddressCaster::class;
     }
 }
