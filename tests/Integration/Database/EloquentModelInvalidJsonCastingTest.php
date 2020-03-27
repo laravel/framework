@@ -8,7 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class EloquentModelInvalidJsonCastingTest  extends TestCase
+class EloquentModelInvalidJsonCastingTest extends TestCase
 {
     protected function setUp(): void
     {

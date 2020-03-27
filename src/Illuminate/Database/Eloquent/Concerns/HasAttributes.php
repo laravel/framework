@@ -800,7 +800,7 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given JSON back
+     * Decode the given JSON back.
      *
      * @param  string  $value
      * @param  bool  $asObject
@@ -812,7 +812,7 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given JSON into an array
+     * Decode the given JSON into an array.
      * @param $value
      * @return array
      */
@@ -823,7 +823,7 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given JSON into an object
+     * Decode the given JSON into an object.
      * @param $value
      * @return object
      */
