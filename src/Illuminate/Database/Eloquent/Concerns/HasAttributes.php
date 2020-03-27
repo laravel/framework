@@ -813,7 +813,8 @@ trait HasAttributes
 
     /**
      * Decode the given JSON into an array.
-     * @param $value
+     *
+     * @param  string  $value
      * @return array
      */
     protected function fromArrayJson($value)
@@ -825,7 +826,8 @@ trait HasAttributes
 
     /**
      * Decode the given JSON into an object.
-     * @param $value
+     * 
+     * @param  string  $value
      * @return object
      */
     protected function fromObjectJson($value)
