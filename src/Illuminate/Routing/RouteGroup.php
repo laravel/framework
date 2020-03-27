@@ -11,9 +11,10 @@ class RouteGroup
      *
      * @param  array  $new
      * @param  array  $old
+     * @param  bool  $prefixOldFirst
      * @return array
      */
-    public static function merge($new, $old)
+    public static function merge($new, $old, $prefixOldFirst = true)
     {
         if (isset($new['domain'])) {
             unset($old['domain']);
@@ -21,7 +22,7 @@ class RouteGroup
 
         $new = array_merge(static::formatAs($new, $old), [
             'namespace' => static::formatNamespace($new, $old),
-            'prefix' => static::formatPrefix($new, $old),
+            'prefix' => static::formatPrefix($new, $old, $prefixOldFirst),
             'where' => static::formatWhere($new, $old),
         ]);
 
@@ -53,13 +54,18 @@ class RouteGroup
      *
      * @param  array  $new
      * @param  array  $old
+     * @param  bool  $prefixOldFirst
      * @return string|null
      */
-    protected static function formatPrefix($new, $old)
+    protected static function formatPrefix($new, $old, $prefixOldFirst = true)
     {
         $old = $old['prefix'] ?? null;
 
-        return isset($new['prefix']) ? trim($old, '/').'/'.trim($new['prefix'], '/') : $old;
+        if ($prefixOldFirst) {
+            return isset($new['prefix']) ? trim($old, '/').'/'.trim($new['prefix'], '/') : $old;
+        } else {
+            return isset($new['prefix']) ? trim($new['prefix'], '/').'/'.trim($old, '/') : $old;
+        }
     }
 
     /**
