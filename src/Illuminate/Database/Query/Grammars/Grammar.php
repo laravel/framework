@@ -1226,9 +1226,7 @@ class Grammar extends BaseGrammar
      */
     protected function concatenate($segments)
     {
-        return implode(' ', array_filter($segments, function ($value) {
-            return (string) $value !== '';
-        }));
+        return implode(' ', array_filter($segments));
     }
 
     /**
