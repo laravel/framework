@@ -819,6 +819,7 @@ trait HasAttributes
     protected function fromArrayJson($value)
     {
         $decoded = $this->fromJson($value, false);
+
         return is_array($decoded) ? $decoded : [];
     }
 
@@ -830,6 +831,7 @@ trait HasAttributes
     protected function fromObjectJson($value)
     {
         $decoded = $this->fromJson($value, true);
+        
         return is_object($decoded) ? $decoded : new stdClass;
     }
 
