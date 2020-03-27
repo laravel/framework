@@ -93,7 +93,7 @@ class ComponentMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Gets the view path relative to the components dir.
+     * Get the view name relative to the components directory.
      *
      * @return string view
      */
