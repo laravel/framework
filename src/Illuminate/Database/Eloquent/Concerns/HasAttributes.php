@@ -828,8 +828,8 @@ trait HasAttributes
      */
     protected function databaseConnectionAllowsUnicode()
     {
-        return strpos('utf', $this->getConnectionCollation()) === 0 &&
-                strpos('utf', $this->getConnectionCharset()) === 0 ;
+        return strpos($this->getConnectionCollation(), 'utf') === 0 &&
+                strpos($this->getConnectionCharset(), 'utf') === 0 ;
     }
 
     /**
