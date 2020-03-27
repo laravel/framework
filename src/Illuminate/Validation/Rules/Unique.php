@@ -24,9 +24,9 @@ class Unique
     protected $idColumn = 'id';
 
     /**
-     * Indicates that the soft deleted records must be checked even if the model implements soft delete
+     * Indicates that the soft deleted records must be checked even if the model implements soft delete.
      *
-     * @var boolean
+     * @var bool
      */
     protected $checkSoftDelete = false;
 
@@ -65,7 +65,7 @@ class Unique
     }
 
     /**
-     * Checks for soft deleted records even if the model implements soft delete
+     * Checks for soft deleted records even if the model implements soft delete.
      * @return $this
      */
     public function checkSoftDelete()
@@ -76,7 +76,7 @@ class Unique
     }
 
     /**
-     * Eliminate the need to exclude soft delete records
+     * Eliminate the need to exclude soft delete records.
      * @return $this
      */
     protected function ignoreSoftDelete()
@@ -85,7 +85,7 @@ class Unique
             return $this;
         }
 
-        if (!$this->model->hasGlobalScope(SoftDeletingScope::class)) {
+        if (! $this->model->hasGlobalScope(SoftDeletingScope::class)) {
             return $this;
         }
 
