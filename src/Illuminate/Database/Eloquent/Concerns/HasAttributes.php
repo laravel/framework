@@ -831,7 +831,7 @@ trait HasAttributes
     protected function fromObjectJson($value)
     {
         $decoded = $this->fromJson($value, true);
-        
+
         return is_object($decoded) ? $decoded : new stdClass;
     }
 
