@@ -14,6 +14,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use LogicException;
+use stdClass;
 
 trait HasAttributes
 {
@@ -523,8 +524,9 @@ trait HasAttributes
             case 'boolean':
                 return (bool) $value;
             case 'object':
-                return $this->fromJson($value, true);
+                return $this->fromObjectJson($value);
             case 'array':
+                return $this->fromArrayJson($value);
             case 'json':
                 return $this->fromJson($value);
             case 'collection':
@@ -798,7 +800,7 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given JSON back into an array or object.
+     * Decode the given JSON back
      *
      * @param  string  $value
      * @param  bool  $asObject
@@ -807,6 +809,28 @@ trait HasAttributes
     public function fromJson($value, $asObject = false)
     {
         return json_decode($value, ! $asObject);
+    }
+
+    /**
+     * Decode the given JSON into an array
+     * @param $value
+     * @return array
+     */
+    protected function fromArrayJson($value)
+    {
+        $decoded = $this->fromJson($value, false);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Decode the given JSON into an object
+     * @param $value
+     * @return object
+     */
+    protected function fromObjectJson($value)
+    {
+        $decoded = $this->fromJson($value, true);
+        return is_object($decoded) ? $decoded : new stdClass;
     }
 
     /**
