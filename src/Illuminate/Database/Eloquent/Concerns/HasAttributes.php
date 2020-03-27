@@ -788,13 +788,48 @@ trait HasAttributes
 
     /**
      * Encode the given value as JSON.
+     * UTF8, UTF16, UTF32 characters are escaped from input value ONLY IF database collation/charset DOES NOT allow them.
      *
      * @param  mixed  $value
      * @return string
      */
     protected function asJson($value)
     {
-        return json_encode($value);
+        return json_encode($value, $this->databaseConnectionAllowsUnicode() ? 
+                                            JSON_UNESCAPED_UNICODE : 0 );
+    }
+    
+    /**
+     * Returns the collation of the database to which our model is connecting.
+     * The collation is retrieved from /config/database.php @ "connections" key
+     *
+     * @return string
+     */
+    protected function getConnectionCollation()
+    {
+        return config('database.connections')[$this->getConnectionName()]['collation'];
+    }
+    
+    /**
+     * Returns the character set with which our model is connecting to database.
+     * The character set is retrieved from /config/database.php @ "connections" key
+     *
+     * @return string
+     */
+    protected function getConnectionCharset()
+    {
+        return config('database.connections')[$this->getConnectionName()]['charset'];
+    }
+    
+    /**
+     * Determines if our database collation and connection driver allow unicode.
+     *
+     * @return bool
+     */
+    protected function databaseConnectionAllowsUnicode()
+    {
+        return strpos('utf', $this->getConnectionCollation()) === 0 &&
+                strpos('utf', $this->getConnectionCharset()) === 0 ;
     }
 
     /**
