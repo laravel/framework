@@ -13,12 +13,12 @@ use PHPUnit\Framework\TestCase;
 class SupportTestingQueueFakeTest extends TestCase
 {
     /**
-     * @var QueueFake
+     * @var \Illuminate\Support\Testing\Fakes\QueueFake
      */
     private $fake;
 
     /**
-     * @var JobStub
+     * @var \Illuminate\Tests\Support\JobStub
      */
     private $job;
 

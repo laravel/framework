@@ -266,7 +266,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $now = Carbon::now();
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::find(2);
         $userModel->delete();
         $this->assertEquals($now->toDateTimeString(), $userModel->getOriginal('deleted_at'));
@@ -281,7 +281,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::find(2);
         $userModel->delete();
         $userModel->restore();
@@ -296,7 +296,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::withTrashed()->find(1);
         $userModel->restore();
         $this->assertEquals($userModel->deleted_at, SoftDeletesTestUser::find(1)->deleted_at);
@@ -311,7 +311,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::find(2);
         $userModel->email = 'foo@bar.com';
         $userModel->delete();

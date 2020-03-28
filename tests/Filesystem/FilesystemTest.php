@@ -533,7 +533,7 @@ class FilesystemTest extends TestCase
             'unsupportedParam' => true,
         ]);
 
-        /** @var Ftp $adapter */
+        /** @var \League\Flysystem\Adapter\Ftp $adapter */
         $adapter = $driver->getAdapter();
         $this->assertEquals(0700, $adapter->getPermPublic());
         $this->assertSame('ftp.example.com', $adapter->getHost());

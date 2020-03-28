@@ -144,7 +144,6 @@ class HttpClientTest extends TestCase
                 ->pushStatus(403),
         ]);
 
-        /** @var PendingRequest */
         $response = $this->factory->get('https://example.com');
         $this->assertSame('Ok', $response->body());
         $this->assertSame(201, $response->status());
