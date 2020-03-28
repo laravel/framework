@@ -15,6 +15,7 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
     public function register()
     {
         $this->registerIlluminateMailer();
+        $this->registerSwiftMailer();
         $this->registerMarkdownRenderer();
     }
 
@@ -31,6 +32,22 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
 
         $this->app->bind('mailer', function ($app) {
             return $app->make('mail.manager')->mailer();
+        });
+    }
+
+    /**
+     * Register the Swift Mailer instance.
+     *
+     * @return void
+     */
+    public function registerSwiftMailer()
+    {
+        $this->app->singleton('swift.mailer', function ($app) {
+            return $app->make('mailer')->getSwiftMailer();
+        });
+
+        $this->app->singleton('swift.transport', function ($app) {
+            return $app->make('swift.mailer')->getTransport();
         });
     }
 
