@@ -96,8 +96,8 @@ class FakeRedisConnnector implements Connector
     /**
      * Create a new clustered Predis connection.
      *
-     * @param array $config
-     * @param array $options
+     * @param  array  $config
+     * @param  array  $options
      * @return \Illuminate\Contracts\Redis\Connection
      */
     public function connect(array $config, array $options)
@@ -108,9 +108,9 @@ class FakeRedisConnnector implements Connector
     /**
      * Create a new clustered Predis connection.
      *
-     * @param array $config
-     * @param array $clusterOptions
-     * @param array $options
+     * @param  array  $config
+     * @param  array  $clusterOptions
+     * @param  array  $options
      * @return \Illuminate\Contracts\Redis\Connection
      */
     public function connectToCluster(array $config, array $clusterOptions, array $options)
