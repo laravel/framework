@@ -25,14 +25,14 @@ class EloquentWhereTest extends DatabaseTestCase
 
     public function testWhereAndWhereOrBehavior()
     {
-        /** @var UserWhereTest $firstUser */
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $firstUser */
         $firstUser = UserWhereTest::create([
             'name' => 'test-name',
             'email' => 'test-email',
             'address' => 'test-address',
         ]);
 
-        /** @var UserWhereTest $secondUser */
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $secondUser */
         $secondUser = UserWhereTest::create([
             'name' => 'test-name1',
             'email' => 'test-email1',
@@ -67,14 +67,14 @@ class EloquentWhereTest extends DatabaseTestCase
 
     public function testFirstWhere()
     {
-        /** @var UserWhereTest $firstUser */
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $firstUser */
         $firstUser = UserWhereTest::create([
             'name' => 'test-name',
             'email' => 'test-email',
             'address' => 'test-address',
         ]);
 
-        /** @var UserWhereTest $secondUser */
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $secondUser */
         $secondUser = UserWhereTest::create([
             'name' => 'test-name1',
             'email' => 'test-email1',

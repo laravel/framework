@@ -11,9 +11,7 @@ use PHPUnit\Framework\TestCase;
 class RedisManagerExtensionTest extends TestCase
 {
     /**
-     * Redis manager instance.
-     *
-     * @var RedisManager
+     * @var \Illuminate\Redis\RedisManager
      */
     protected $redis;
 

@@ -15,17 +15,17 @@ use PHPUnit\Framework\TestCase;
 class SupportTestingNotificationFakeTest extends TestCase
 {
     /**
-     * @var NotificationFake
+     * @var \Illuminate\Support\Testing\Fakes\NotificationFake
      */
     private $fake;
 
     /**
-     * @var NotificationStub
+     * @var \Illuminate\Tests\Support\NotificationStub
      */
     private $notification;
 
     /**
-     * @var UserStub
+     * @var \Illuminate\Tests\Support\UserStub
      */
     private $user;
 

@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Http;
 
 use Illuminate\Http\Client\Factory;
-use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
@@ -144,7 +143,6 @@ class HttpClientTest extends TestCase
                 ->pushStatus(403),
         ]);
 
-        /** @var PendingRequest */
         $response = $this->factory->get('https://example.com');
         $this->assertSame('Ok', $response->body());
         $this->assertSame(201, $response->status());

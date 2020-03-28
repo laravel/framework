@@ -17,7 +17,7 @@ class RedisQueueIntegrationTest extends TestCase
     use InteractsWithRedis, InteractsWithTime;
 
     /**
-     * @var RedisQueue
+     * @var \Illuminate\Queue\RedisQueue
      */
     private $queue;
 
@@ -123,7 +123,7 @@ class RedisQueueIntegrationTest extends TestCase
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
-        /** @var RedisJob $redisJob */
+        /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
         $after = $this->currentTime();
 
@@ -213,7 +213,7 @@ class RedisQueueIntegrationTest extends TestCase
         $this->queue->push($job);
 
         // Pop and check it is popped correctly
-        /** @var RedisJob $redisJob */
+        /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
 
         $this->assertNotNull($redisJob);
@@ -377,7 +377,7 @@ class RedisQueueIntegrationTest extends TestCase
         $job = new RedisQueueIntegrationTestJob(30);
         $this->queue->push($job);
 
-        /** @var RedisJob $redisJob */
+        /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
         $redisJob->release(-3);
 

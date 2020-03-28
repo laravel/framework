@@ -6,7 +6,6 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
-use League\Flysystem\Adapter\Ftp;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
@@ -533,7 +532,7 @@ class FilesystemTest extends TestCase
             'unsupportedParam' => true,
         ]);
 
-        /** @var Ftp $adapter */
+        /** @var \League\Flysystem\Adapter\Ftp $adapter */
         $adapter = $driver->getAdapter();
         $this->assertEquals(0700, $adapter->getPermPublic());
         $this->assertSame('ftp.example.com', $adapter->getHost());

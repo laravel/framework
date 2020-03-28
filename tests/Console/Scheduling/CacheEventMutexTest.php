@@ -12,12 +12,12 @@ use PHPUnit\Framework\TestCase;
 class CacheEventMutexTest extends TestCase
 {
     /**
-     * @var CacheEventMutex
+     * @var \Illuminate\Console\Scheduling\CacheEventMutex
      */
     protected $cacheMutex;
 
     /**
-     * @var Event
+     * @var \Illuminate\Console\Scheduling\Event
      */
     protected $event;
 

@@ -30,10 +30,10 @@ class MailSesTransportTest extends TestCase
 
         $manager = new MailManager($container);
 
-        /** @var SesTransport $transport */
+        /** @var \Illuminate\Mail\Transport\SesTransport $transport */
         $transport = $manager->createTransport(['transport' => 'ses']);
 
-        /** @var SesClient $ses */
+        /** @var \Aws\Ses\SesClient $ses */
         $ses = $transport->ses();
 
         $this->assertSame('us-east-1', $ses->getRegion());
