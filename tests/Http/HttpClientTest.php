@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Http;
 
 use Illuminate\Http\Client\Factory;
-use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
