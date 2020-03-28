@@ -547,7 +547,7 @@ class FilesystemTest extends TestCase
     }
 
     /**
-     * @param string $file
+     * @param  string  $file
      * @return int
      */
     private function getFilePermissions($file)

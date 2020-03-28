@@ -78,11 +78,6 @@ class sendRawEmailMock
         $this->getResponse = $responseValue;
     }
 
-    /**
-     * Mock the get() call for the sendRawEmail response.
-     * @param  [type] $key [description]
-     * @return [type]      [description]
-     */
     public function get($key)
     {
         return $this->getResponse;

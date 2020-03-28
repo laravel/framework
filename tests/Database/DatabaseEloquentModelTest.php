@@ -1991,12 +1991,6 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
-    /**
-     * Test that the getOriginal method on an Eloquent model also uses the casts array.
-     *
-     * @param void
-     * @return void
-     */
     public function testGetOriginalCastsAttributes()
     {
         $model = new EloquentModelCastingStub();

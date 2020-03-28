@@ -13,6 +13,8 @@ class BelongsTo extends Relation
 
     /**
      * The child model instance of the relation.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
      */
     protected $child;
 

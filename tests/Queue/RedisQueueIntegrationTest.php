@@ -39,7 +39,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testExpiredJobsArePopped($driver)
     {
@@ -111,7 +111,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testPopProperlyPopsJobOffOfRedis($driver)
     {
@@ -146,7 +146,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testPopProperlyPopsDelayedJobOffOfRedis($driver)
     {
@@ -173,7 +173,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testPopPopsDelayedJobOffOfRedisWhenExpireNull($driver)
     {
@@ -202,7 +202,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testBlockingPopProperlyPopsJobOffOfRedis($driver)
     {
@@ -223,7 +223,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testBlockingPopProperlyPopsExpiredJobs($driver)
     {
@@ -254,7 +254,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testNotExpireJobsWhenExpireNull($driver)
     {
@@ -299,7 +299,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testExpireJobsWhenExpireSet($driver)
     {
@@ -328,7 +328,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testRelease($driver)
     {
@@ -369,7 +369,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testReleaseInThePast($driver)
     {
@@ -387,7 +387,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testDelete($driver)
     {
@@ -411,7 +411,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testSize($driver)
     {
@@ -430,7 +430,7 @@ class RedisQueueIntegrationTest extends TestCase
     }
 
     /**
-     * @param string $driver
+     * @param  string  $driver
      * @param  string  $default
      * @param  string  $connection
      * @param  int  $retryAfter
