@@ -125,6 +125,17 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['framework' => ['language' => 'PHP']], Arr::except($array, ['name', 'framework.name']));
     }
 
+    public function testEvery()
+    {
+        $this->assertTrue(Arr::every([1, 2, 3, 4, 5, 6], function ($item) {
+            return $item < 7;
+        }));
+
+        $this->assertFalse(Arr::every([1, 2, 3, 4, 5, 6], function ($item) {
+            return $item < 4;
+        }));
+    }
+
     public function testExists()
     {
         $this->assertTrue(Arr::exists([1], 0));
@@ -137,17 +148,6 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::exists([null], 1));
         $this->assertFalse(Arr::exists(['a' => 1], 0));
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
-    }
-
-    public function testEvery()
-    {
-        $this->assertTrue(Arr::every([1, 2, 3, 4, 5, 6], function ($item) {
-            return $item < 7;
-        }));
-
-        $this->assertFalse(Arr::every([1, 2, 3, 4, 5, 6], function ($item) {
-            return $item < 4;
-        }));
     }
 
     public function testFirst()
