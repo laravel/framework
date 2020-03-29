@@ -129,6 +129,14 @@ class MySqlConnector extends Connector implements ConnectorInterface
     {
         extract($config, EXTR_SKIP);
 
+        /**
+         * 'localhost' and '127.0.0.1' is not treated the same in MySQL.
+         * With 'localhost', Unix socket will be used instead of TCP.
+         *
+         * See https://dev.mysql.com/doc/refman/8.0/en/can-not-connect-to-server.html
+         */
+        $host = ($host === 'localhost') ? '127.0.0.1' : $host;
+
         return isset($port)
                     ? "mysql:host={$host};port={$port};dbname={$database}"
                     : "mysql:host={$host};dbname={$database}";
