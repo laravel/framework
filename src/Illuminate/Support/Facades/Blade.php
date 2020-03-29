@@ -14,7 +14,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool check(string $name, array ...$parameters)
  * @method static void component(string $class, string|null $alias = null, string $prefix = '')
  * @method static void components(array $components, string $prefix = '')
- * @method statuc array getClassComponentAliases()
+ * @method static array getClassComponentAliases()
  * @method static void aliasComponent(string $path, string|null $alias = null)
  * @method static void include(string $path, string|null $alias = null)
  * @method static void aliasInclude(string $path, string|null $alias = null)
