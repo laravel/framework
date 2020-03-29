@@ -89,7 +89,7 @@ class ResponseSequence
     /**
      * Push a response to the sequence.
      *
-     * @param  mixed $response
+     * @param  mixed  $response
      * @return $this
      */
     public function pushResponse($response)

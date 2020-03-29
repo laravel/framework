@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 class ConsoleEventSchedulerTest extends TestCase
 {
     /**
-     * @var Schedule
+     * @var \Illuminate\Console\Scheduling\Schedule
      */
     private $schedule;
 

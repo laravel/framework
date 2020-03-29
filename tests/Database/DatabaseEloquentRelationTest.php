@@ -59,7 +59,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
     public function testCanDisableParentTouchingForAllModels()
     {
-        /** @var EloquentNoTouchingModelStub $related */
+        /** @var \Illuminate\Tests\Database\EloquentNoTouchingModelStub $related */
         $related = m::mock(EloquentNoTouchingModelStub::class)->makePartial();
         $related->shouldReceive('getUpdatedAtColumn')->never();
         $related->shouldReceive('freshTimestampString')->never();

@@ -632,7 +632,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Fires the validated event if the dispatcher is set.
      *
-     * @param $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return void
      */
     protected function fireValidatedEvent($user)
     {

@@ -78,7 +78,7 @@ class ConnectionFactory
     }
 
     /**
-     * Create a single database connection instance.
+     * Create a read / write database connection instance.
      *
      * @param  array  $config
      * @return \Illuminate\Database\Connection
@@ -115,7 +115,7 @@ class ConnectionFactory
     }
 
     /**
-     * Get the read configuration for a read / write connection.
+     * Get the write configuration for a read / write connection.
      *
      * @param  array  $config
      * @return array
@@ -250,7 +250,7 @@ class ConnectionFactory
                 return new SqlServerConnector;
         }
 
-        throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
+        throw new InvalidArgumentException("Unsupported driver [{$config['driver']}].");
     }
 
     /**
@@ -282,6 +282,6 @@ class ConnectionFactory
                 return new SqlServerConnection($connection, $database, $prefix, $config);
         }
 
-        throw new InvalidArgumentException("Unsupported driver [{$driver}]");
+        throw new InvalidArgumentException("Unsupported driver [{$driver}].");
     }
 }
