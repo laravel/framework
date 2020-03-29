@@ -152,6 +152,24 @@ class Arr
     }
 
     /**
+     * Determine if all items pass the given truth test.
+     *
+     * @param  iterable  $array
+     * @param  callable  $callback
+     * @return bool
+     */
+    public static function every($array, callable $callback)
+    {
+        foreach ($array as $key => $value) {
+            if (! $callback($value, $key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  iterable  $array

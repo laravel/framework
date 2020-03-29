@@ -139,6 +139,17 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
     }
 
+    public function testEvery()
+    {
+        $this->assertTrue(Arr::every([1, 2, 3, 4, 5, 6], function ($item) {
+            return $item < 7;
+        }));
+
+        $this->assertFalse(Arr::every([1, 2, 3, 4, 5, 6], function ($item) {
+            return $item < 4;
+        }));
+    }
+
     public function testFirst()
     {
         $array = [100, 200, 300];
