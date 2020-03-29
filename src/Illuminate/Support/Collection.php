@@ -161,6 +161,18 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get a combination of n items of this collection
+     *
+     * @param int $n
+     * @return LazyCollection
+     */
+    public function combinations(int $n)
+    {
+        return new LazyCollection(
+            (new Itertool($this->items))->combinations($n));
+    }
+
+    /**
      * Determine if an item exists in the collection.
      *
      * @param  mixed  $key
@@ -1240,6 +1252,19 @@ class Collection implements ArrayAccess, Enumerable
     public function pad($size, $value)
     {
         return new static(array_pad($this->items, $size, $value));
+    }
+
+    /**
+     * Get permutations of this collection
+     *
+     * @param void
+     * @return LazyCollection
+     *
+     */
+    public function permutations()
+    {
+        return new LazyCollection(
+            (new Itertool($this->items))->permutations());
     }
 
     /**

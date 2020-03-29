@@ -171,4 +171,44 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame([1, 2, 3, 4, 5], $data);
         $this->assertSame([1, 2, 3, 4, 5], $tapped);
     }
+
+    public function testCombinations()
+    {
+        $data = new LazyCollection([1, 2, 3, 4]);
+        $this->assertEmpty($data->combinations(0));
+        $this->assertEquals(
+            $data->combinations(1)->collect()->toArray(), [[1], [2], [3], [4]]);
+        $this->assertEquals(
+            $data->combinations(2)->collect()->toArray(),
+            [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+        );
+        $this->assertEquals(
+            $data->combinations(3)->collect()->toArray(),
+            [[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]
+        );
+        $this->assertEquals(
+            $data->combinations(4)->collect()->toArray(),
+            [[1, 2, 3, 4]]
+        );
+    }
+
+    public function testPermutations()
+    {
+        $collection = new LazyCollection([1, 2, 3, 4]);
+        $this->assertEmpty(LazyCollection::empty()->permutations()->collect()->toArray());
+        $this->assertEquals(
+            $collection->permutations()->collect()->toArray(),
+            [
+                [1, 2, 3, 4], [1, 2, 4, 3], [1, 3, 2, 4],
+                [1, 3, 4, 2], [1, 4, 2, 3], [1, 4, 3, 2],
+                [2, 1, 3, 4], [2, 1, 4, 3], [2, 3, 1, 4],
+                [2, 3, 4, 1], [2, 4, 1, 3], [2, 4, 3, 1],
+                [3, 1, 2, 4], [3, 1, 4, 2], [3, 2, 1, 4],
+                [3, 2, 4, 1], [3, 4, 1, 2], [3, 4, 2, 1],
+                [4, 1, 2, 3], [4, 1, 3, 2], [4, 2, 1, 3],
+                [4, 2, 3, 1], [4, 3, 1, 2], [4, 3, 2, 1]
+            ]
+        );
+        $this->assertEquals((new LazyCollection([1, 2, 3, 4, 5, 6]))->permutations()->count(), 720);
+    }
 }

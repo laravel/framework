@@ -1140,6 +1140,22 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testCombinationsIsLazy()
+    {
+        $data = $this->make([1, 2, 3, 4]);
+        $this->assertDoesNotEnumerateCollection($data, function ($collection) {
+            $collection->combinations(3);
+        });
+    }
+
+    public function testPermutationsIsLazy()
+    {
+        $data = $this->make([1, 2, 3, 4]);
+        $this->assertDoesNotEnumerateCollection($data, function ($collection) {
+            $collection->permutations();
+        });
+    }
+
     public function testWhenNotEmptyIsLazy()
     {
         $this->assertEnumerates(1, function ($collection) {

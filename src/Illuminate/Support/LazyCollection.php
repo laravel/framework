@@ -199,6 +199,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Get combinations of n item of this collection
+     *
+     * @param int $n
+     * @return LazyCollection
+     */
+    public function combinations(int $n)
+    {
+        return $this->passthru('combinations', [$n]);
+    }
+
+    /**
      * Determine if an item exists in the enumerable.
      *
      * @param  mixed  $key
@@ -1197,6 +1208,16 @@ class LazyCollection implements Enumerable
                 yield $value;
             }
         });
+    }
+
+    /**
+     * Get permutations of this collection
+     * @param void
+     * @return LazyCollection
+     */
+    public function permutations()
+    {
+        return $this->passthru('permutations', func_get_args());
     }
 
     /**

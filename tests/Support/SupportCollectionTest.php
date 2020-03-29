@@ -4013,6 +4013,60 @@ class SupportCollectionTest extends TestCase
 
     /**
      * @dataProvider collectionClassProvider
+     * @param Collection $collection
+     */
+    public function testCombinations($collection)
+    {
+        $collection = new $collection([1, 2, 3, 4]);
+        $this->assertEmpty($collection->combinations(0));
+        $this->assertEquals(
+            $collection->combinations(1)->collect()->toArray(), [[1], [2], [3], [4]]);
+        $this->assertEquals(
+            $collection->combinations(2)->collect()->toArray(),
+            [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+        );
+        $this->assertEquals(
+            $collection->combinations(3)->collect()->toArray(),
+            [[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]
+        );
+        $this->assertEquals(
+            $collection->combinations(4)->collect()->toArray(),
+            [[1, 2, 3, 4]]
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     * @param Collection $collection
+     */
+    public function testPermutations($collection)
+    {
+        $collection = new $collection([1, 2, 3, 4]);
+        $this->assertEmpty((new $collection([]))->permutations()->collect()->toArray());
+        $this->assertEquals(
+            $collection->permutations()->collect()->toArray(),
+            [
+                [1, 2, 3, 4], [1, 2, 4, 3], [1, 3, 2, 4],
+                [1, 3, 4, 2], [1, 4, 2, 3], [1, 4, 3, 2],
+                [2, 1, 3, 4], [2, 1, 4, 3], [2, 3, 1, 4],
+                [2, 3, 4, 1], [2, 4, 1, 3], [2, 4, 3, 1],
+                [3, 1, 2, 4], [3, 1, 4, 2], [3, 2, 1, 4],
+                [3, 2, 4, 1], [3, 4, 1, 2], [3, 4, 2, 1],
+                [4, 1, 2, 3], [4, 1, 3, 2], [4, 2, 1, 3],
+                [4, 2, 3, 1], [4, 3, 1, 2], [4, 3, 2, 1]
+            ]
+        );
+        $count = 0;
+        foreach ((new $collection([1, 2, 3, 4, 5, 6]))->permutations() as $v) {
+            $count++;
+        }
+        $this->assertEquals($count, 720);
+    }
+
+
+
+    /**
+     * @dataProvider collectionClassProvider
      */
     public function testWhereNotNull($collection)
     {
