@@ -1346,7 +1346,7 @@ class Blueprint
      *
      * @param  string  $type
      * @param  string|array  $columns
-     * @param  string  $index
+     * @param  string|null  $index
      * @param  string|null  $algorithm
      * @return \Illuminate\Support\Fluent
      */
