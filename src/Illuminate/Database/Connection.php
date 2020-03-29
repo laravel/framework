@@ -327,8 +327,9 @@ class Connection implements ConnectionInterface
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
-            $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
-                              ->prepare($query));
+            $statement = $this->prepared(
+                $this->getPdoForSelect($useReadPdo)->prepare($query)
+            );
 
             $this->bindValues($statement, $this->prepareBindings($bindings));
 

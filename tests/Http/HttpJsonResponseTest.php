@@ -79,7 +79,7 @@ class HttpJsonResponseTest extends TestCase
     }
 
     /**
-     * @param mixed $data
+     * @param  mixed  $data
      *
      * @dataProvider jsonErrorDataProvider
      */
