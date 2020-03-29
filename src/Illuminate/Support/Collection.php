@@ -161,7 +161,7 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Get a combination of n items of this collection
+     * Get a combination of n items of this collection.
      *
      * @param int $n
      * @return LazyCollection
@@ -1255,11 +1255,10 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Get permutations of this collection
+     * Get permutations of this collection.
      *
      * @param void
      * @return LazyCollection
-     *
      */
     public function permutations()
     {

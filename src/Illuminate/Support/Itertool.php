@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Illuminate\Support;
-
 
 class Itertool
 {
@@ -25,13 +23,13 @@ class Itertool
         } while ($this->nextCombination($keys, $size));
     }
 
-
     private function only($keys)
     {
         $a = [];
         foreach ($keys as $v) {
             $a[] = $this->items[$v];
         }
+
         return $a;
     }
 
@@ -55,6 +53,7 @@ class Itertool
             for (; $j < $n; $j++) {
                 $iter[$j] = $iter[$j - 1] + 1;
             }
+
             return true;
         } else {
             return false;
@@ -65,8 +64,9 @@ class Itertool
     {
         if (count($this->items) == 0) {
             return;
-        } else if (count($this->items) == 1) {
+        } elseif (count($this->items) == 1) {
             yield $this->items;
+
             return;
         }
         $size = count($this->items);
@@ -74,13 +74,21 @@ class Itertool
         while (true) {
             yield $this->only($keys);
             $i = $size - 2;
-            while ($i >= 0 && $keys[$i] > $keys[$i + 1])
+
+            while ($i >= 0 && $keys[$i] > $keys[$i + 1]) {
                 $i--;
-            if ($i < 0)
+            }
+
+            if ($i < 0) {
                 break;
+            }
+
             $j = $size - 1;
-            while ($keys[$i] > $keys[$j])
+
+            while ($keys[$i] > $keys[$j]) {
                 $j--;
+            }
+
             self::swap($keys, $i, $j);
             self::reverse($keys, $i + 1, $size - 1);
         }

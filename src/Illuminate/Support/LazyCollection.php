@@ -199,7 +199,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Get combinations of n item of this collection
+     * Get combinations of n item of this collection.
      *
      * @param int $n
      * @return LazyCollection
@@ -1211,7 +1211,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Get permutations of this collection
+     * Get permutations of this collection.
      * @param void
      * @return LazyCollection
      */
