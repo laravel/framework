@@ -5,6 +5,20 @@
 ### Added
 - Makes the stubs used for `make:policy` customizable ([#32040](https://github.com/laravel/framework/pull/32040), [9d36a36](https://github.com/laravel/framework/commit/9d36a369d377044d0f468d1f02fa317cbb93571f))
 
+### Fixed
+- Added missing return in the `PendingMailFake::sendNow()` and `PendingMailFake::send()` ([#32093](https://github.com/laravel/framework/pull/32093))
+- Fixed custom Model attributes casts ([#32118](https://github.com/laravel/framework/pull/32118))
+- Fixed route group prefixing ([#32135](https://github.com/laravel/framework/pull/32135), [870efef](https://github.com/laravel/framework/commit/870efef4c23ff7f151b6e1f267ac18951a3af2f1))
+- Fixed component class view reference ([#32132](https://github.com/laravel/framework/pull/32132))
+
+### TODO
+- Publish console stub ([#32096](https://github.com/laravel/framework/pull/32096))
+- Publish rule stub ([#32097](https://github.com/laravel/framework/pull/32097))
+- Publish factory stub ([#32100](https://github.com/laravel/framework/pull/32100))
+- Publish middleware stub ([#32099](https://github.com/laravel/framework/pull/32099))
+- Use standard {{ rootNamespace }} instead of DummyRootNamespace ([#32105](https://github.com/laravel/framework/pull/32105))
+- Publish seeder stub ([#32122](https://github.com/laravel/framework/pull/32122))
+
 
 ## [v7.3.0 (2020-03-24)](https://github.com/laravel/framework/compare/v7.2.2...v7.3.0)
 
