@@ -1350,7 +1350,7 @@ class Blueprint
      * @param  string|null  $algorithm
      * @return \Illuminate\Support\Fluent
      */
-    protected function indexCommand($type, $columns, $index, $algorithm = null)
+    protected function indexCommand($type, $columns, $index = null, $algorithm = null)
     {
         $columns = (array) $columns;
 
