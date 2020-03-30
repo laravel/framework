@@ -1212,7 +1212,7 @@ class LazyCollection implements Enumerable
 
     /**
      * Get permutations of this collection.
-     * @param void
+     *
      * @return LazyCollection
      */
     public function permutations()

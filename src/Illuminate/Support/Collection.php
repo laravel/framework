@@ -1257,7 +1257,6 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get permutations of this collection.
      *
-     * @param void
      * @return LazyCollection
      */
     public function permutations()
