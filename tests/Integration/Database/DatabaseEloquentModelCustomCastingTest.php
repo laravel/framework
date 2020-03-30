@@ -113,6 +113,34 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
+
+    public function testGettingSubsetOfRawAttributes()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->uppercase = 'taylor';
+        $model->address = (object)[
+            'lineOne' => 'line1',
+            'lineTwo' => 'line2',
+        ];
+
+        $this->assertSame(['uppercase' => 'TAYLOR'], $model->onlyRaw('uppercase'));
+        $this->assertSame(['uppercase' => 'TAYLOR'], $model->onlyRaw(['uppercase']));
+        $this->assertSame(['address_line_one' => 'line1'], $model->onlyRaw(['address_line_one']));
+        $this->assertSame(['address_line_two' => 'line2'], $model->onlyRaw(['address_line_two']));
+        $this->assertSame(
+            ['address' => ['address_line_one' => 'line1', 'address_line_two' => 'line2']],
+            $model->onlyRaw(['address']));
+        $this->assertSame(
+            ['address' => ['address_line_one' => 'line1', 'address_line_two' => 'line2'], 'uppercase' => 'TAYLOR'],
+            $model->onlyRaw(['address', 'uppercase']));
+        $this->assertSame([
+                'address' => ['address_line_one' => 'line1', 'address_line_two' => 'line2'],
+                'uppercase' => 'TAYLOR',
+                'address_line_one' => 'line1',
+                'address_line_two' => 'line2'],
+            $model->onlyRaw(['address', 'uppercase', 'address_line_one', 'address_line_two']));
+    }
 }
 
 class TestEloquentModelWithCustomCast extends Model

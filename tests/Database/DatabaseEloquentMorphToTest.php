@@ -107,7 +107,7 @@ class DatabaseEloquentMorphToTest extends TestCase
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('onlyRaw')->once()->with('foreign_key')->andReturn(['foreign_key' => 'foreign.value']);
 
         $relation = $this->getRelationAssociate($parent);
 
@@ -125,7 +125,7 @@ class DatabaseEloquentMorphToTest extends TestCase
     public function testAssociateMethodIgnoresNullValue()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('onlyRaw')->once()->with('foreign_key')->andReturn(['foreign_key' => 'foreign.value']);
 
         $relation = $this->getRelationAssociate($parent);
 
@@ -139,7 +139,7 @@ class DatabaseEloquentMorphToTest extends TestCase
     public function testDissociateMethodDeletesUnsetsKeyAndTypeOnModel()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('onlyRaw')->once()->with('foreign_key')->andReturn(['foreign_key' => 'foreign.value']);
 
         $relation = $this->getRelation($parent);
 

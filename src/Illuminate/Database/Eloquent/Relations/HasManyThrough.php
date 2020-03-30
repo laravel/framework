@@ -91,7 +91,7 @@ class HasManyThrough extends Relation
      */
     public function addConstraints()
     {
-        $localValue = $this->farParent[$this->localKey];
+        $localValue = $this->farParent->onlyRaw($this->localKey)[$this->localKey] ?? $this->farParent[$this->localKey];
 
         $this->performJoin();
 
@@ -186,7 +186,7 @@ class HasManyThrough extends Relation
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->getAttribute($this->localKey)])) {
+            if (isset($dictionary[$key = ($model->onlyRaw($this->localKey)[$this->localKey] ?? $model->getAttribute($this->localKey))])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
                 );

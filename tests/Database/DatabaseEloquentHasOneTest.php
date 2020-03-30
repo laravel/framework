@@ -61,7 +61,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     public function testHasOneWithDynamicDefaultUseParentModel()
     {
         $relation = $this->getRelation()->withDefault(function ($newModel, $parentModel) {
-            $newModel->username = $parentModel->username;
+            $newModel->username = $parentModel->onlyRaw('username')['username'];
         });
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
@@ -72,7 +72,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $this->assertSame($newModel, $relation->getResults());
 
-        $this->assertSame('taylor', $newModel->username);
+        $this->assertSame('taylor', $newModel->getAttribute('username'));
 
         $this->assertSame(1, $newModel->getAttribute('foreign_key'));
     }
@@ -204,8 +204,8 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->related = m::mock(Model::class);
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $this->parent = m::mock(Model::class);
-        $this->parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $this->parent->shouldReceive('getAttribute')->with('username')->andReturn('taylor');
+        $this->parent->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 1]);
+        $this->parent->shouldReceive('onlyRaw')->with('username')->andReturn(['username' => 'taylor']);
         $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $this->parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
         $this->parent->shouldReceive('newQueryWithoutScopes')->andReturn($this->builder);

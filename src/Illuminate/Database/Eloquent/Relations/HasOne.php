@@ -62,7 +62,7 @@ class HasOne extends HasOneOrMany
     public function newRelatedInstanceFor(Model $parent)
     {
         return $this->related->newInstance()->setAttribute(
-            $this->getForeignKeyName(), $parent->{$this->localKey}
+            $this->getForeignKeyName(), ($parent->onlyRaw($this->localKey)[$this->localKey] ?? $parent->{$this->localKey})
         );
     }
 }

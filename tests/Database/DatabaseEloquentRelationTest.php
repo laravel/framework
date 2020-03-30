@@ -41,7 +41,7 @@ class DatabaseEloquentRelationTest extends TestCase
     {
         $builder = m::mock(Builder::class);
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 1]);
         $related = m::mock(EloquentNoTouchingModelStub::class)->makePartial();
         $builder->shouldReceive('getModel')->andReturn($related);
         $builder->shouldReceive('whereNotNull');
@@ -72,7 +72,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $builder = m::mock(Builder::class);
             $parent = m::mock(Model::class);
 
-            $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+            $parent->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 1]);
             $builder->shouldReceive('getModel')->andReturn($related);
             $builder->shouldReceive('whereNotNull');
             $builder->shouldReceive('where');
@@ -104,7 +104,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $builder = m::mock(Builder::class);
             $parent = m::mock(Model::class);
 
-            $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+            $parent->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 1]);
             $builder->shouldReceive('getModel')->andReturn($related);
             $builder->shouldReceive('whereNotNull');
             $builder->shouldReceive('where');
@@ -117,7 +117,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherBuilder = m::mock(Builder::class);
             $anotherParent = m::mock(Model::class);
 
-            $anotherParent->shouldReceive('getAttribute')->with('id')->andReturn(2);
+            $anotherParent->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 2]);
             $anotherBuilder->shouldReceive('getModel')->andReturn($anotherRelated);
             $anotherBuilder->shouldReceive('whereNotNull');
             $anotherBuilder->shouldReceive('where');
@@ -154,7 +154,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $builder = m::mock(Builder::class);
             $parent = m::mock(Model::class);
 
-            $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+            $parent->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 1]);
             $builder->shouldReceive('getModel')->andReturn($related);
             $builder->shouldReceive('whereNotNull');
             $builder->shouldReceive('where');
@@ -167,7 +167,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherBuilder = m::mock(Builder::class);
             $anotherParent = m::mock(Model::class);
 
-            $anotherParent->shouldReceive('getAttribute')->with('id')->andReturn(2);
+            $anotherParent->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 2]);
             $anotherBuilder->shouldReceive('getModel')->andReturn($relatedChild);
             $anotherBuilder->shouldReceive('whereNotNull');
             $anotherBuilder->shouldReceive('where');
@@ -262,6 +262,7 @@ class DatabaseEloquentRelationTest extends TestCase
         });
 
         $model = new EloquentRelationResetModelStub;
+
         $relation = new EloquentRelationStub($model->newQuery(), $model);
 
         $result = $relation->foo();

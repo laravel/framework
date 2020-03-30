@@ -221,7 +221,7 @@ class BelongsToMany extends Relation
     protected function addWhereConstraints()
     {
         $this->query->where(
-            $this->getQualifiedForeignPivotKeyName(), '=', $this->parent->{$this->parentKey}
+            $this->getQualifiedForeignPivotKeyName(), '=', $this->parent->onlyRaw($this->parentKey)[$this->parentKey] ?? $this->parent->{$this->parentKey}
         );
 
         return $this;
@@ -275,7 +275,7 @@ class BelongsToMany extends Relation
         // children back to their parent using the dictionary and the keys on the
         // the parent models. Then we will return the hydrated models back out.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->{$this->parentKey}])) {
+            if (isset($dictionary[$key = ($model->onlyRaw($this->parentKey)[$this->parentKey] ?? $model->{$this->parentKey})])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
                 );

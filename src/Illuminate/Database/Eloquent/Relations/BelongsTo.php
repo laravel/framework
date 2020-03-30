@@ -98,7 +98,7 @@ class BelongsTo extends Relation
             // of the related models matching on the foreign key that's on a parent.
             $table = $this->related->getTable();
 
-            $this->query->where($table.'.'.$this->ownerKey, '=', $this->child->{$this->foreignKey});
+            $this->query->where($table.'.'.$this->ownerKey, '=', $this->child->onlyRaw($this->foreignKey)[$this->foreignKey] ?? $this->child->{$this->foreignKey});
         }
     }
 
@@ -180,15 +180,16 @@ class BelongsTo extends Relation
         $dictionary = [];
 
         foreach ($results as $result) {
-            $dictionary[$result->getAttribute($owner)] = $result;
+            /** @var Model $result */
+            $dictionary[$result->onlyRaw($owner)[$owner] ?? $result->getAttribute($owner)] = $result;
         }
 
         // Once we have the dictionary constructed, we can loop through all the parents
         // and match back onto their children using these keys of the dictionary and
         // the primary key of the children to map them onto the correct instances.
         foreach ($models as $model) {
-            if (isset($dictionary[$model->{$foreign}])) {
-                $model->setRelation($relation, $dictionary[$model->{$foreign}]);
+            if (isset($dictionary[$key = ($model->onlyRaw($foreign)[$foreign] ?? $model->{$foreign})])) {
+                $model->setRelation($relation, $dictionary[$key]);
             }
         }
 
@@ -203,7 +204,7 @@ class BelongsTo extends Relation
      */
     public function associate($model)
     {
-        $ownerKey = $model instanceof Model ? $model->getAttribute($this->ownerKey) : $model;
+        $ownerKey = $model instanceof Model ? ($model->onlyRaw($this->ownerKey)[$this->ownerKey] ?? $model->getAttribute($this->ownerKey)) : $model;
 
         $this->child->setAttribute($this->foreignKey, $ownerKey);
 

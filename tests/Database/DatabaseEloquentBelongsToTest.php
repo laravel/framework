@@ -100,26 +100,26 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation();
         $result1 = m::mock(stdClass::class);
-        $result1->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $result1->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 1]);
         $result2 = m::mock(stdClass::class);
-        $result2->shouldReceive('getAttribute')->with('id')->andReturn(2);
+        $result2->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 2]);
         $model1 = new EloquentBelongsToModelStub;
         $model1->foreign_key = 1;
         $model2 = new EloquentBelongsToModelStub;
         $model2->foreign_key = 2;
         $models = $relation->match([$model1, $model2], new Collection([$result1, $result2]), 'foo');
 
-        $this->assertEquals(1, $models[0]->foo->getAttribute('id'));
-        $this->assertEquals(2, $models[1]->foo->getAttribute('id'));
+        $this->assertEquals(['id' => 1], $models[0]->foo->onlyRaw('id'));
+        $this->assertEquals(['id' => 2], $models[1]->foo->onlyRaw('id'));
     }
 
     public function testAssociateMethodSetsForeignKeyOnModel()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('onlyRaw')->with('foreign_key')->andReturn(['foreign_key' => 'foreign.value']);
         $relation = $this->getRelation($parent);
         $associate = m::mock(Model::class);
-        $associate->shouldReceive('getAttribute')->once()->with('id')->andReturn(1);
+        $associate->shouldReceive('onlyRaw')->once()->with('id')->andReturn(['id' => 1]);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
         $parent->shouldReceive('setRelation')->once()->with('relation', $associate);
 
@@ -129,7 +129,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     public function testDissociateMethodUnsetsForeignKeyOnModel()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('onlyRaw')->with('foreign_key')->andReturn(['foreign_key' => 'foreign.value']);
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', null);
 
@@ -142,7 +142,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     public function testAssociateMethodSetsForeignKeyOnModelById()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('onlyRaw')->with('foreign_key')->andReturn(['foreign_key' => 'foreign.value']);
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
@@ -186,6 +186,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->builder = m::mock(Builder::class);
         $this->builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
         $this->related = m::mock(Model::class);
+        $this->related->shouldReceive('onlyRaw')->with('foreign_key')->andReturn(['foreign_key' => 'foreign.value']);
         $this->related->shouldReceive('getKeyType')->andReturn($keyType);
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');

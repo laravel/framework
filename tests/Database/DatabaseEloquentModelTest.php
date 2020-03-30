@@ -201,6 +201,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->only(['first_name', 'last_name']));
     }
 
+    public function testOnlyRaw()
+    {
+        $model = new EloquentModelStub;
+        $model->first_name = 'taylor';
+        $model->last_name = 'otwell';
+        $model->project = 'laravel';
+
+        $this->assertEquals(['project' => 'laravel'], $model->only('project'));
+        $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->onlyRaw('first_name', 'last_name'));
+        $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->onlyRaw(['first_name', 'last_name']));
+    }
+
     public function testNewInstanceReturnsNewInstanceWithAttributesSet()
     {
         $model = new EloquentModelStub;

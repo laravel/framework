@@ -131,7 +131,7 @@ abstract class HasOneOrMany extends Relation
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->getAttribute($this->localKey)])) {
+            if (isset($dictionary[$key = ($model->onlyRaw($this->localKey)[$this->localKey] ?? $model->getAttribute($this->localKey))])) {
                 $model->setRelation(
                     $relation, $this->getRelationValue($dictionary, $key, $type)
                 );
@@ -166,8 +166,8 @@ abstract class HasOneOrMany extends Relation
     {
         $foreign = $this->getForeignKeyName();
 
-        return $results->mapToDictionary(function ($result) use ($foreign) {
-            return [$result->{$foreign} => $result];
+        return $results->mapToDictionary(function (Model $result) use ($foreign) {
+            return [($result->onlyRaw($foreign)[$foreign] ?? $result->{$foreign}) => $result];
         })->all();
     }
 
@@ -373,7 +373,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function getParentKey()
     {
-        return $this->parent->getAttribute($this->localKey);
+        return $this->parent->onlyRaw($this->localKey)[$this->localKey] ?? $this->parent->getAttribute($this->localKey);
     }
 
     /**

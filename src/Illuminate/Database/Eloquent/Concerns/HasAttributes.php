@@ -1086,20 +1086,24 @@ trait HasAttributes
     /**
      * Merge the cast class attributes back into the model.
      *
-     * @return void
+     * @param array|null $filter
+     * @return array
      */
-    protected function mergeAttributesFromClassCasts()
+    protected function mergeAttributesFromClassCasts(?array $filter = null)
     {
-        foreach ($this->classCastCache as $key => $value) {
+        $castedValues = [];
+        $filteredCast = $filter ? array_intersect_key($this->classCastCache, array_flip($filter)) : $this->classCastCache;
+        foreach ($filteredCast as $key => $value) {
             $caster = $this->resolveCasterClass($key);
 
             $this->attributes = array_merge(
                 $this->attributes,
                 $caster instanceof CastsInboundAttributes
                        ? [$key => $value]
-                       : $this->normalizeCastClassResponse($key, $caster->set($this, $key, $value, $this->attributes))
+                       : $this->normalizeCastClassResponse($key, $castedValues[$key] = $caster->set($this, $key, $value, $this->attributes))
             );
         }
+        return $castedValues;
     }
 
     /**
@@ -1193,6 +1197,21 @@ trait HasAttributes
         }
 
         return $results;
+    }
+
+    /**
+     * Get a subset of the model's raw attributes.
+     *
+     * @param  array|mixed  $attributes
+     * @return array
+     */
+    public function onlyRaw($attributes)
+    {
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        $castedAttributes = $this->mergeAttributesFromClassCasts($attributes);
+
+        return array_intersect_key(array_merge($castedAttributes, $this->attributes), array_flip($attributes));
     }
 
     /**

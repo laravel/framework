@@ -42,7 +42,7 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $parent->shouldReceive('getKey')->andReturn(1);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('onlyRaw')->with('id')->andReturn(['id' => 1]);
 
         $builder = m::mock(Builder::class);
         $related = m::mock(Model::class);
