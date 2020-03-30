@@ -90,6 +90,13 @@ class PendingRequest
     protected $stubCallbacks;
 
     /**
+     * The middleware that will be run as part of this request
+     *
+     * @var array
+     */
+    protected $middleware = [];
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -509,6 +516,10 @@ class PendingRequest
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());
             $stack->push($this->buildStubHandler());
+
+            foreach ($this->middleware as $middleware) {
+                $stack->push($middleware);
+            }
         });
     }
 
@@ -612,6 +623,16 @@ class PendingRequest
     public function stub($callback)
     {
         $this->stubCallbacks = collect($callback);
+
+        return $this;
+    }
+
+    /**
+     * Add the given middleware to the request
+     */
+    public function withMiddleware(array $middleware)
+    {
+        $this->middleware = array_merge($this->middleware, $middleware);
 
         return $this;
     }
