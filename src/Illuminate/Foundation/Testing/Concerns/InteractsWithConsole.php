@@ -35,7 +35,7 @@ trait InteractsWithConsole
      *
      * @var array
      */
-    public $expectedChoices = [];    
+    public $expectedChoices = [];
 
     /**
      * Call artisan command and return code.
