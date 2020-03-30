@@ -24,18 +24,18 @@ trait InteractsWithConsole
     public $expectedOutput = [];
 
     /**
-     * All of the expected choice questions.
-     *
-     * @var array
-     */
-    public $expectedChoices = [];
-
-    /**
      * All of the expected questions.
      *
      * @var array
      */
     public $expectedQuestions = [];
+
+    /**
+     * All of the expected choice questions.
+     *
+     * @var array
+     */
+    public $expectedChoices = [];    
 
     /**
      * Call artisan command and return code.
@@ -59,7 +59,7 @@ trait InteractsWithConsole
                 foreach ($this->expectedChoices as $question => $answers) {
                     $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
 
-                    $this->$assertion(
+                    $this->{$assertion}(
                         $answers['expected'],
                         $answers['actual'],
                         'Question "'.$question.'" has different options.'
