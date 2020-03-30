@@ -30,7 +30,7 @@ jobs:
         php: [7.3, 7.4]
         stability: [prefer-lowest, prefer-stable]
 
-    name: P${{ matrix.php }} - S${{ matrix.stability }}
+    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
