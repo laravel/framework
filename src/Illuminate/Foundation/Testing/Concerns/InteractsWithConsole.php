@@ -55,7 +55,7 @@ trait InteractsWithConsole
                 $this->fail('Question "'.Arr::first($this->expectedQuestions)[0].'" was not asked.');
             }
 
-            if (count($this->expectedChoices)) {
+            if (count($this->expectedChoices) > 0) {
                 foreach ($this->expectedChoices as $question => $answers) {
                     $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
 
