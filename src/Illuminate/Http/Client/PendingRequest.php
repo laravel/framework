@@ -90,7 +90,7 @@ class PendingRequest
     protected $stubCallbacks;
 
     /**
-     * The middleware that will be run as part of this request
+     * The middleware that will be run as part of this request.
      *
      * @var array
      */
@@ -628,7 +628,7 @@ class PendingRequest
     }
 
     /**
-     * Add the given middleware to the request
+     * Add the given middleware to the request.
      */
     public function withMiddleware(array $middleware)
     {
