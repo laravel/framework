@@ -139,6 +139,23 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has a 302 status code.
+     *
+     * @return $this
+     */
+    public function assertFound()
+    {
+        $actual = $this->getStatusCode();
+
+        PHPUnit::assertTrue(
+            302 === $actual,
+            'Response status code ['.$actual.'] does not match expected 302 status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has a forbidden status code.
      *
      * @return $this

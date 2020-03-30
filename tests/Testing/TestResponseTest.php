@@ -232,6 +232,22 @@ class TestResponseTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function testAssertFound()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] does not match expected 302 status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertFound();
+    }
+
     public function testAssertForbidden()
     {
         $statusCode = 500;
