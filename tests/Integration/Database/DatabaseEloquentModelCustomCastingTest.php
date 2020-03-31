@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
-use Illuminate\Contracts\Database\Eloquent\HasCasterClass;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -121,13 +120,13 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model = new TestEloquentModelWithCustomCast;
 
         $model->setRawAttributes([
-            'value_object_with_caster' => serialize(new ValueObject('hello'))
+            'value_object_with_caster' => serialize(new ValueObject('hello')),
         ]);
 
         $this->assertInstanceOf(ValueObject::class, $model->value_object_with_caster);
 
         $model->setRawAttributes([
-            'value_object_caster_with_argument' => null
+            'value_object_caster_with_argument' => null,
         ]);
 
         $this->assertEquals('argument', $model->value_object_caster_with_argument);
