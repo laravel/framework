@@ -262,7 +262,7 @@ class Str
             // pattern such as "library/*", making any string check convenient.
             $pattern = str_replace('\*', '.*', $pattern);
 
-            if (preg_match('#^'.$pattern.'\z#u', $value) === 1) {
+            if (preg_match('#^'.$pattern.'\z#us', $value) === 1) {
                 return true;
             }
         }
