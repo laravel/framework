@@ -2020,7 +2020,7 @@ class Builder
     /**
      * Remove all existing orders and optionally add a new order.
      *
-     * @return static
+     * @return $this
      */
     public function reorder($column = null, $direction = 'asc')
     {
