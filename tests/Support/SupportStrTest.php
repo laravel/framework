@@ -222,6 +222,9 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::is(['a*', 'b*'], 123));
         $this->assertTrue(Str::is(['*2*', 'b*'], 11211));
 
+        // new lines
+        $this->assertTrue(Str::is('foo/*', "foo/\nbar"));
+
         $this->assertTrue(Str::is('*/foo', 'blah/baz/foo'));
 
         $valueObject = new StringableObjectStub('foo/bar/baz');
