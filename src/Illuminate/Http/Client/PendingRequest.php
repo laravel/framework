@@ -92,7 +92,7 @@ class PendingRequest
     /**
      * The middleware that will be run as part of this request.
      *
-     * @var array
+     * @var callable[]
      */
     protected $middleware = [];
 
@@ -629,6 +629,9 @@ class PendingRequest
 
     /**
      * Add the given middleware to the request.
+     *
+     * @param  callable[]  $middleware
+     * @return $this
      */
     public function withMiddleware(array $middleware)
     {
