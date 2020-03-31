@@ -2597,6 +2597,8 @@ class ValidationValidatorTest extends TestCase
             ['https://laravel.com#'],
             ['https://laravel.com#fragment'],
             ['https://laravel.com/#fragment'],
+            ['http://u%24er:password@symfony.com'],
+            ['http://user:pa%24%24word@symfony.com'],
         ];
     }
 
@@ -2614,6 +2616,8 @@ class ValidationValidatorTest extends TestCase
             ['http://[::1'],
             ['foo://bar'],
             ['javascript://test%0Aalert(321)'],
+            ['http://nota%hex:password@symfony.com'],
+            ['http://username:nota%hex@symfony.com'],
         ];
     }
 
