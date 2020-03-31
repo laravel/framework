@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Contracts\Database\Eloquent\HasCasterClass;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -113,6 +114,23 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
+
+    public function testWithHasCasterClassInterface()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->setRawAttributes([
+            'value_object_with_caster' => serialize(new ValueObject('hello'))
+        ]);
+
+        $this->assertInstanceOf(ValueObject::class, $model->value_object_with_caster);
+
+        $model->setRawAttributes([
+            'value_object_caster_with_argument' => null
+        ]);
+
+        $this->assertEquals('argument', $model->value_object_caster_with_argument);
+    }
 }
 
 class TestEloquentModelWithCustomCast extends Model
@@ -135,6 +153,8 @@ class TestEloquentModelWithCustomCast extends Model
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
         'options' => JsonCaster::class,
+        'value_object_with_caster' => ValueObject::class,
+        'value_object_caster_with_argument' => ValueObject::class.':argument',
     ];
 }
 
@@ -187,6 +207,45 @@ class JsonCaster implements CastsAttributes
     public function set($model, $key, $value, $attributes)
     {
         return json_encode($value);
+    }
+}
+
+class ValueObjectCaster implements CastsAttributes
+{
+    private $argument;
+
+    public function __construct($argument = null)
+    {
+        $this->argument = $argument;
+    }
+
+    public function get($model, $key, $value, $attributes)
+    {
+        if ($this->argument) {
+            return $this->argument;
+        }
+
+        return unserialize($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return serialize($value);
+    }
+}
+
+class ValueObject implements HasCasterClass
+{
+    public $name;
+
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public static function getCasterClass()
+    {
+        return ValueObjectCaster::class;
     }
 }
 

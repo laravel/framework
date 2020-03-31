@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Contracts\Database\Eloquent\HasCasterClass;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -1061,13 +1062,22 @@ trait HasAttributes
      */
     protected function resolveCasterClass($key)
     {
-        if (strpos($castType = $this->getCasts()[$key], ':') === false) {
-            return new $castType;
+        $castType = $this->getCasts()[$key];
+
+        $arguments = [];
+
+        if (strpos($castType, ':') !== false) {
+            $segments = explode(':', $castType, 2);
+
+            $castType = $segments[0];
+            $arguments = explode(',', $segments[1]);
         }
 
-        $segments = explode(':', $castType, 2);
+        if (is_subclass_of($castType, HasCasterClass::class)) {
+            $castType = $castType::getCasterClass();
+        }
 
-        return new $segments[0](...explode(',', $segments[1]));
+        return new $castType(...$arguments);
     }
 
     /**
