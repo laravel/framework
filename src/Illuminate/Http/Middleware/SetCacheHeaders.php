@@ -21,7 +21,7 @@ class SetCacheHeaders
     {
         $response = $next($request);
 
-        if (! $request->isMethodCacheable() || ! $response->getContent()) {
+        if (! $request->isMethodCacheable()) {
             return $response;
         }
 
