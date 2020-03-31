@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Database\Eloquent\HasCasterClass;
@@ -115,7 +116,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
 
-    public function testWithHasCasterClassInterface()
+    public function testWithCastableInterface()
     {
         $model = new TestEloquentModelWithCustomCast;
 
@@ -234,7 +235,7 @@ class ValueObjectCaster implements CastsAttributes
     }
 }
 
-class ValueObject implements HasCasterClass
+class ValueObject implements Castable
 {
     public $name;
 
@@ -243,7 +244,7 @@ class ValueObject implements HasCasterClass
         $this->name = $name;
     }
 
-    public static function getCasterClass()
+    public static function castUsing()
     {
         return ValueObjectCaster::class;
     }

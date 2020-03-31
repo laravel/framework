@@ -4,8 +4,8 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
-use Illuminate\Contracts\Database\Eloquent\HasCasterClass;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -1073,8 +1073,8 @@ trait HasAttributes
             $arguments = explode(',', $segments[1]);
         }
 
-        if (is_subclass_of($castType, HasCasterClass::class)) {
-            $castType = $castType::getCasterClass();
+        if (is_subclass_of($castType, Castable::class)) {
+            $castType = $castType::castUsing();
         }
 
         return new $castType(...$arguments);
