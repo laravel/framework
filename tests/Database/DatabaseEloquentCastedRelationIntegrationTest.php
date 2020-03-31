@@ -158,7 +158,7 @@ class DatabaseEloquentCastedRelationIntegrationTest extends TestCase
         /* Create relations */
         $modelA->manyModelC()->saveMany([
             ModelC::firstWhere(['uuid' => 'C-XXX-XXX-1']),
-            ModelC::firstWhere(['uuid' => 'C-XXX-XXX-2'])]);
+            ModelC::firstWhere(['uuid' => 'C-XXX-XXX-2']), ]);
 
         $modelCs = $modelA->manyModelC;
 
@@ -175,7 +175,7 @@ class DatabaseEloquentCastedRelationIntegrationTest extends TestCase
         /* Create relations */
         $modelC->manyModelA()->saveMany([
             ModelA::firstWhere(['uuid' => 'A-XXX-XXX-1']),
-            ModelA::firstWhere(['uuid' => 'A-XXX-XXX-2'])]);
+            ModelA::firstWhere(['uuid' => 'A-XXX-XXX-2']), ]);
 
         $modelAs = $modelC->manyModelA;
 
@@ -262,6 +262,6 @@ class ToObject implements CastsAttributes
 
     public function get($model, string $key, $value, array $attributes): object
     {
-        return (object)['value' => $value];
+        return (object) ['value' => $value];
     }
 }

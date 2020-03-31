@@ -119,7 +119,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model = new TestEloquentModelWithCustomCast;
 
         $model->uppercase = 'taylor';
-        $model->address = (object)[
+        $model->address = (object) [
             'lineOne' => 'line1',
             'lineTwo' => 'line2',
         ];
@@ -135,10 +135,10 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
             ['address' => ['address_line_one' => 'line1', 'address_line_two' => 'line2'], 'uppercase' => 'TAYLOR'],
             $model->onlyRaw(['address', 'uppercase']));
         $this->assertSame([
-                'address' => ['address_line_one' => 'line1', 'address_line_two' => 'line2'],
-                'uppercase' => 'TAYLOR',
-                'address_line_one' => 'line1',
-                'address_line_two' => 'line2'],
+            'address' => ['address_line_one' => 'line1', 'address_line_two' => 'line2'],
+            'uppercase' => 'TAYLOR',
+            'address_line_one' => 'line1',
+            'address_line_two' => 'line2', ],
             $model->onlyRaw(['address', 'uppercase', 'address_line_one', 'address_line_two']));
     }
 }

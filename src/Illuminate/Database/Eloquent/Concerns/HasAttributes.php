@@ -1103,6 +1103,7 @@ trait HasAttributes
                        : $this->normalizeCastClassResponse($key, $castedValues[$key] = $caster->set($this, $key, $value, $this->attributes))
             );
         }
+
         return $castedValues;
     }
 
