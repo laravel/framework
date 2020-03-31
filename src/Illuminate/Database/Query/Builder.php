@@ -2018,6 +2018,21 @@ class Builder
     }
 
     /**
+     * Remove all the existing orders from the query.
+     *
+     * @return static
+     */
+    public function removeOrders()
+    {
+        $this->orders = null;
+        $this->unionOrders = null;
+        $this->bindings['order'] = [];
+        $this->bindings['unionOrder'] = [];
+
+        return $this;
+    }
+
+    /**
      * Get an array with all orders with a given column removed.
      *
      * @param  string  $column
