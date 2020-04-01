@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\URL;
 class VerifyEmail extends Notification
 {
     /**
+     * The callback that should be used to create the verification URL.
+     *
+     * @var \Closure|null
+     */
+    public static $createUrlCallback;
+
+    /**
      * The callback that should be used to build the mail message.
      *
      * @var \Closure|null
@@ -37,7 +44,11 @@ class VerifyEmail extends Notification
      */
     public function toMail($notifiable)
     {
-        $verificationUrl = $this->verificationUrl($notifiable);
+        if (static::$createUrlCallback) {
+            $verificationUrl = call_user_func(static::$createUrlCallback, $notifiable);
+        } else {
+            $verificationUrl = $this->verificationUrl($notifiable);
+        }
 
         if (static::$toMailCallback) {
             return call_user_func(static::$toMailCallback, $notifiable, $verificationUrl);
@@ -66,6 +77,17 @@ class VerifyEmail extends Notification
                 'hash' => sha1($notifiable->getEmailForVerification()),
             ]
         );
+    }
+
+    /**
+     * Set a callback that should be used when creating the reset password button URL.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function createUrlUsing($callback)
+    {
+        static::$createUrlCallback = $callback;
     }
 
     /**
