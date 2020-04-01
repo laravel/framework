@@ -142,7 +142,7 @@ if (! function_exists('data_get')) {
 
         $key = is_array($key) ? $key : explode('.', $key);
 
-        foreach($key as $i => $segment) {
+        foreach ($key as $i => $segment) {
             unset($key[$i]);
     
             if ($segment === '*') {
