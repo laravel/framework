@@ -5,6 +5,13 @@ namespace Illuminate\Auth\Events;
 class Attempting
 {
     /**
+     * The authentication guard name.
+     *
+     * @var string
+     */
+    public $guard;
+
+    /**
      * The credentials for the user.
      *
      * @var array
@@ -19,22 +26,16 @@ class Attempting
     public $remember;
 
     /**
-     * Indicates if the user should be authenticated if successful.
-     *
-     * @var bool
-     */
-    public $login;
-
-    /**
      * Create a new event instance.
      *
+     * @param  string  $guard
      * @param  array  $credentials
      * @param  bool  $remember
-     * @param  bool  $login
+     * @return void
      */
-    public function __construct($credentials, $remember, $login)
+    public function __construct($guard, $credentials, $remember)
     {
-        $this->login = $login;
+        $this->guard = $guard;
         $this->remember = $remember;
         $this->credentials = $credentials;
     }

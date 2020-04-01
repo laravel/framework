@@ -1,18 +1,26 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Database;
 
-class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase
+use Illuminate\Database\Console\Migrations\InstallCommand;
+use Illuminate\Database\Migrations\MigrationRepositoryInterface;
+use Illuminate\Foundation\Application;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+
+class DatabaseMigrationInstallCommandTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
 
     public function testFireCallsRepositoryToInstall()
     {
-        $command = new Illuminate\Database\Console\Migrations\InstallCommand($repo = m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'));
-        $command->setLaravel(new Illuminate\Foundation\Application);
+        $command = new InstallCommand($repo = m::mock(MigrationRepositoryInterface::class));
+        $command->setLaravel(new Application);
         $repo->shouldReceive('setSource')->once()->with('foo');
         $repo->shouldReceive('createRepository')->once();
 
@@ -21,6 +29,6 @@ class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase
 
     protected function runCommand($command, $options = [])
     {
-        return $command->run(new Symfony\Component\Console\Input\ArrayInput($options), new Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new ArrayInput($options), new NullOutput);
     }
 }

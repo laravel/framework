@@ -1,58 +1,93 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
-use DummyRootNamespaceUser;
-use NamespacedDummyModel;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use {{ namespacedModel }};
+use {{ namespacedUserModel }};
 
-class DummyClass
+class {{ class }}
 {
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view the dummyModelName.
+     * Determine whether the user can view any models.
      *
-     * @param  DummyRootNamespaceUser  $user
-     * @param  DummyRootNamespaceDummyModel  $dummyModelName
+     * @param  \{{ namespacedUserModel }}  $user
      * @return mixed
      */
-    public function view(User $user, DummyModel $dummyModelName)
+    public function viewAny({{ user }} $user)
     {
         //
     }
 
     /**
-     * Determine whether the user can create dummyPluralModelName.
+     * Determine whether the user can view the model.
      *
-     * @param  DummyRootNamespaceUser  $user
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return mixed
      */
-    public function create(User $user)
+    public function view({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
         //
     }
 
     /**
-     * Determine whether the user can update the dummyModelName.
+     * Determine whether the user can create models.
      *
-     * @param  DummyRootNamespaceUser  $user
-     * @param  DummyRootNamespaceDummyModel  $dummyModelName
+     * @param  \{{ namespacedUserModel }}  $user
      * @return mixed
      */
-    public function update(User $user, DummyModel $dummyModelName)
+    public function create({{ user }} $user)
     {
         //
     }
 
     /**
-     * Determine whether the user can delete the dummyModelName.
+     * Determine whether the user can update the model.
      *
-     * @param  DummyRootNamespaceUser  $user
-     * @param  DummyRootNamespaceDummyModel  $dummyModelName
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return mixed
      */
-    public function delete(User $user, DummyModel $dummyModelName)
+    public function update({{ user }} $user, {{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     *
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return mixed
+     */
+    public function delete({{ user }} $user, {{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     *
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return mixed
+     */
+    public function restore({{ user }} $user, {{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     *
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return mixed
+     */
+    public function forceDelete({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
         //
     }

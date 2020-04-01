@@ -1,14 +1,17 @@
 <?php
 
-use Illuminate\Notifications\Action;
+namespace Illuminate\Tests\Notifications;
 
-class NotificationActionTest extends PHPUnit_Framework_TestCase
+use Illuminate\Notifications\Action;
+use PHPUnit\Framework\TestCase;
+
+class NotificationActionTest extends TestCase
 {
     public function testActionIsCreatedProperly()
     {
         $action = new Action('Text', 'url');
 
-        $this->assertEquals('Text', $action->text);
-        $this->assertEquals('url', $action->url);
+        $this->assertSame('Text', $action->text);
+        $this->assertSame('url', $action->url);
     }
 }

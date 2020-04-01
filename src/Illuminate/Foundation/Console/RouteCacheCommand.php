@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
 
@@ -47,13 +48,13 @@ class RouteCacheCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $this->call('route:clear');
 
         $routes = $this->getFreshApplicationRoutes();
 
-        if (count($routes) == 0) {
+        if (count($routes) === 0) {
             return $this->error("Your application doesn't have any routes.");
         }
 
@@ -75,11 +76,22 @@ class RouteCacheCommand extends Command
      */
     protected function getFreshApplicationRoutes()
     {
-        $app = require $this->laravel->bootstrapPath().'/app.php';
+        return tap($this->getFreshApplication()['router']->getRoutes(), function ($routes) {
+            $routes->refreshNameLookups();
+            $routes->refreshActionLookups();
+        });
+    }
 
-        $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
-
-        return $app['router']->getRoutes();
+    /**
+     * Get a fresh application instance.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    protected function getFreshApplication()
+    {
+        return tap(require $this->laravel->bootstrapPath().'/app.php', function ($app) {
+            $app->make(ConsoleKernelContract::class)->bootstrap();
+        });
     }
 
     /**
@@ -92,6 +104,6 @@ class RouteCacheCommand extends Command
     {
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-        return str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
+        return str_replace('{{routes}}', var_export($routes->compile(), true), $stub);
     }
 }

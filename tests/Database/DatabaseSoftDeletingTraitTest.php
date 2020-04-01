@@ -1,31 +1,43 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Database;
 
-class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
+
+class DatabaseSoftDeletingTraitTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
 
     public function testDeleteSetsSoftDeletedColumn()
     {
-        $model = m::mock('DatabaseSoftDeletingTraitStub');
-        $model->shouldDeferMissing();
-        // $model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('StdClass'));
-        $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
-        $query->shouldReceive('update')->once()->with(['deleted_at' => 'date-time']);
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
+        $model->makePartial();
+        $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
+        $query->shouldReceive('update')->once()->with([
+            'deleted_at' => 'date-time',
+            'updated_at' => 'date-time',
+        ]);
+        $model->shouldReceive('syncOriginalAttributes')->once()->with([
+            'deleted_at',
+            'updated_at',
+        ]);
         $model->delete();
 
-        $this->assertInstanceOf('Carbon\Carbon', $model->deleted_at);
+        $this->assertInstanceOf(Carbon::class, $model->deleted_at);
     }
 
     public function testRestore()
     {
-        $model = m::mock('DatabaseSoftDeletingTraitStub');
-        $model->shouldDeferMissing();
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
+        $model->makePartial();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
         $model->shouldReceive('save')->once();
         $model->shouldReceive('fireModelEvent')->with('restored', false)->andReturn(true);
@@ -37,8 +49,8 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
 
     public function testRestoreCancel()
     {
-        $model = m::mock('DatabaseSoftDeletingTraitStub');
-        $model->shouldDeferMissing();
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
+        $model->makePartial();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();
 
@@ -48,8 +60,10 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
 
 class DatabaseSoftDeletingTraitStub
 {
-    use Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
     public $deleted_at;
+    public $updated_at;
+    public $timestamps = true;
 
     public function newQuery()
     {
@@ -83,11 +97,28 @@ class DatabaseSoftDeletingTraitStub
 
     public function freshTimestamp()
     {
-        return Carbon\Carbon::now();
+        return Carbon::now();
     }
 
     public function fromDateTime()
     {
         return 'date-time';
+    }
+
+    public function getUpdatedAtColumn()
+    {
+        return defined('static::UPDATED_AT') ? static::UPDATED_AT : 'updated_at';
+    }
+
+    public function setKeysForSaveQuery($query)
+    {
+        $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
+
+        return $query;
+    }
+
+    protected function getKeyForSaveQuery()
+    {
+        return 1;
     }
 }

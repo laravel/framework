@@ -3,6 +3,10 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @method static void queue(...$parameters)
+ * @method static unqueue($name)
+ * @method static array getQueuedCookies()
+ *
  * @see \Illuminate\Cookie\CookieJar
  */
 class Cookie extends Facade
@@ -21,9 +25,9 @@ class Cookie extends Facade
     /**
      * Retrieve a cookie from the request.
      *
-     * @param  string  $key
-     * @param  mixed   $default
-     * @return string
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return string|array|null
      */
     public static function get($key = null, $default = null)
     {

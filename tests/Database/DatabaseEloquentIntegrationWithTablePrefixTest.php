@@ -1,16 +1,21 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Model as Eloquent;
+namespace Illuminate\Tests\Database;
 
-class DatabaseEloquentIntegrationWithTablePrefixTest
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use PHPUnit\Framework\TestCase;
+
+class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
 {
     /**
      * Bootstrap Eloquent.
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -29,33 +34,31 @@ class DatabaseEloquentIntegrationWithTablePrefixTest
 
     protected function createSchema()
     {
-        foreach (['default'] as $connection) {
-            $this->schema($connection)->create('users', function ($table) {
-                $table->increments('id');
-                $table->string('email');
-                $table->timestamps();
-            });
+        $this->schema('default')->create('users', function ($table) {
+            $table->increments('id');
+            $table->string('email');
+            $table->timestamps();
+        });
 
-            $this->schema($connection)->create('friends', function ($table) {
-                $table->integer('user_id');
-                $table->integer('friend_id');
-            });
+        $this->schema('default')->create('friends', function ($table) {
+            $table->integer('user_id');
+            $table->integer('friend_id');
+        });
 
-            $this->schema($connection)->create('posts', function ($table) {
-                $table->increments('id');
-                $table->integer('user_id');
-                $table->integer('parent_id')->nullable();
-                $table->string('name');
-                $table->timestamps();
-            });
+        $this->schema('default')->create('posts', function ($table) {
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->integer('parent_id')->nullable();
+            $table->string('name');
+            $table->timestamps();
+        });
 
-            $this->schema($connection)->create('photos', function ($table) {
-                $table->increments('id');
-                $table->morphs('imageable');
-                $table->string('name');
-                $table->timestamps();
-            });
-        }
+        $this->schema('default')->create('photos', function ($table) {
+            $table->increments('id');
+            $table->morphs('imageable');
+            $table->string('name');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -63,7 +66,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         foreach (['default'] as $connection) {
             $this->schema($connection)->drop('users');
@@ -80,12 +83,35 @@ class DatabaseEloquentIntegrationWithTablePrefixTest
         EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
 
-        $models = EloquentTestUser::hydrateRaw('SELECT * FROM prefix_users WHERE email = ?', ['abigailotwell@gmail.com'], 'foo_connection');
+        $models = EloquentTestUser::fromQuery('SELECT * FROM prefix_users WHERE email = ?', ['abigailotwell@gmail.com']);
 
-        $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
-        $this->assertInstanceOf('EloquentTestUser', $models[0]);
-        $this->assertEquals('abigailotwell@gmail.com', $models[0]->email);
-        $this->assertEquals('foo_connection', $models[0]->getConnectionName());
-        $this->assertEquals(1, $models->count());
+        $this->assertInstanceOf(Collection::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertSame('abigailotwell@gmail.com', $models[0]->email);
+        $this->assertCount(1, $models);
+    }
+
+    /**
+     * Helpers...
+     */
+
+    /**
+     * Get a database connection instance.
+     *
+     * @return \Illuminate\Database\Connection
+     */
+    protected function connection($connection = 'default')
+    {
+        return Eloquent::getConnectionResolver()->connection($connection);
+    }
+
+    /**
+     * Get a schema builder instance.
+     *
+     * @return \Illuminate\Database\Schema\Builder
+     */
+    protected function schema($connection = 'default')
+    {
+        return $this->connection($connection)->getSchemaBuilder();
     }
 }

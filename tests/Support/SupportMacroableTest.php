@@ -1,19 +1,22 @@
 <?php
 
-use Illuminate\Support\Traits\Macroable;
+namespace Illuminate\Tests\Support;
 
-class SupportMacroableTest extends PHPUnit_Framework_TestCase
+use Illuminate\Support\Traits\Macroable;
+use PHPUnit\Framework\TestCase;
+
+class SupportMacroableTest extends TestCase
 {
     private $macroable;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->macroable = $this->createObjectForTrait();
     }
 
     private function createObjectForTrait()
     {
-        return $this->getObjectForTrait(Macroable::class);
+        return new EmptyMacroable;
     }
 
     public function testRegisterMacro()
@@ -22,7 +25,7 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
         $macroable::macro(__CLASS__, function () {
             return 'Taylor';
         });
-        $this->assertEquals('Taylor', $macroable::{__CLASS__}());
+        $this->assertSame('Taylor', $macroable::{__CLASS__}());
     }
 
     public function testRegisterMacroAndCallWithoutStatic()
@@ -31,7 +34,7 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
         $macroable::macro(__CLASS__, function () {
             return 'Taylor';
         });
-        $this->assertEquals('Taylor', $macroable->{__CLASS__}());
+        $this->assertSame('Taylor', $macroable->{__CLASS__}());
     }
 
     public function testWhenCallingMacroClosureIsBoundToObject()
@@ -45,11 +48,36 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
         $instance = new TestMacroable;
 
         $result = $instance->tryInstance();
-        $this->assertEquals('instance', $result);
+        $this->assertSame('instance', $result);
 
         $result = TestMacroable::tryStatic();
-        $this->assertEquals('static', $result);
+        $this->assertSame('static', $result);
     }
+
+    public function testClassBasedMacros()
+    {
+        TestMacroable::mixin(new TestMixin);
+        $instance = new TestMacroable;
+        $this->assertSame('instance-Adam', $instance->methodOne('Adam'));
+    }
+
+    public function testClassBasedMacrosNoReplace()
+    {
+        TestMacroable::macro('methodThree', function () {
+            return 'bar';
+        });
+        TestMacroable::mixin(new TestMixin, false);
+        $instance = new TestMacroable;
+        $this->assertSame('bar', $instance->methodThree());
+
+        TestMacroable::mixin(new TestMixin);
+        $this->assertSame('foo', $instance->methodThree());
+    }
+}
+
+class EmptyMacroable
+{
+    use Macroable;
 }
 
 class TestMacroable
@@ -61,5 +89,29 @@ class TestMacroable
     protected static function getProtectedStatic()
     {
         return 'static';
+    }
+}
+
+class TestMixin
+{
+    public function methodOne()
+    {
+        return function ($value) {
+            return $this->methodTwo($value);
+        };
+    }
+
+    protected function methodTwo()
+    {
+        return function ($value) {
+            return $this->protectedVariable.'-'.$value;
+        };
+    }
+
+    protected function methodThree()
+    {
+        return function () {
+            return 'foo';
+        };
     }
 }

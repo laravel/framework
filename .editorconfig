@@ -11,6 +11,5 @@ trim_trailing_whitespace = true
 [*.md]
 trim_trailing_whitespace = false
 
-[*.yml]
-indent_style = space
+[*.{yml,yaml}]
 indent_size = 2

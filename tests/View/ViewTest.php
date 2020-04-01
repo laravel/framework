@@ -1,11 +1,23 @@
 <?php
 
-use Mockery as m;
-use Illuminate\View\View;
+namespace Illuminate\Tests\View;
 
-class ViewTest extends PHPUnit_Framework_TestCase
+use ArrayAccess;
+use BadMethodCallException;
+use Closure;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\View\Engine;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
+use Illuminate\View\Factory;
+use Illuminate\View\View;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class ViewTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -30,14 +42,14 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
         $view->getEngine()->shouldReceive('get')->once()->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn('contents');
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
-        $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
+        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
 
         $callback = function (View $rendered, $contents) use ($view) {
             $this->assertEquals($view, $rendered);
-            $this->assertEquals('contents', $contents);
+            $this->assertSame('contents', $contents);
         };
 
-        $this->assertEquals('contents', $view->render($callback));
+        $this->assertSame('contents', $view->render($callback));
     }
 
     public function testRenderHandlingCallbackReturnValues()
@@ -48,9 +60,9 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('getShared')->andReturn(['shared' => 'foo']);
         $view->getEngine()->shouldReceive('get')->andReturn('contents');
         $view->getFactory()->shouldReceive('decrementRender');
-        $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering');
+        $view->getFactory()->shouldReceive('flushStateIfDoneRendering');
 
-        $this->assertEquals('new contents', $view->render(function () {
+        $this->assertSame('new contents', $view->render(function () {
             return 'new contents';
         }));
 
@@ -58,22 +70,22 @@ class ViewTest extends PHPUnit_Framework_TestCase
             return '';
         }));
 
-        $this->assertEquals('contents', $view->render(function () {
+        $this->assertSame('contents', $view->render(function () {
             //
         }));
     }
 
     public function testRenderSectionsReturnsEnvironmentSections()
     {
-        $view = m::mock('Illuminate\View\View[render]', [
-            m::mock('Illuminate\View\Factory'),
-            m::mock('Illuminate\View\Engines\EngineInterface'),
+        $view = m::mock(View::class.'[render]', [
+            m::mock(Factory::class),
+            m::mock(Engine::class),
             'view',
             'path',
             [],
         ]);
 
-        $view->shouldReceive('render')->with(m::type('Closure'))->once()->andReturn($sections = ['foo' => 'bar']);
+        $view->shouldReceive('render')->with(m::type(Closure::class))->once()->andReturn($sections = ['foo' => 'bar']);
 
         $this->assertEquals($sections, $view->renderSections());
     }
@@ -86,10 +98,10 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('getShared')->twice()->andReturn(['shared' => 'foo']);
         $view->getEngine()->shouldReceive('get')->twice()->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn('contents');
         $view->getFactory()->shouldReceive('decrementRender')->twice();
-        $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->twice();
+        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->twice();
 
-        $this->assertEquals('contents', $view->render());
-        $this->assertEquals('contents', (string) $view);
+        $this->assertSame('contents', $view->render());
+        $this->assertSame('contents', (string) $view);
     }
 
     public function testViewNestBindsASubView()
@@ -98,24 +110,24 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('make')->once()->with('foo', ['data']);
         $result = $view->nest('key', 'foo', ['data']);
 
-        $this->assertInstanceOf('Illuminate\View\View', $result);
+        $this->assertInstanceOf(View::class, $result);
     }
 
     public function testViewAcceptsArrayableImplementations()
     {
-        $arrayable = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $arrayable = m::mock(Arrayable::class);
         $arrayable->shouldReceive('toArray')->once()->andReturn(['foo' => 'bar', 'baz' => ['qux', 'corge']]);
 
         $view = $this->getView($arrayable);
 
-        $this->assertEquals('bar', $view->foo);
+        $this->assertSame('bar', $view->foo);
         $this->assertEquals(['qux', 'corge'], $view->baz);
     }
 
     public function testViewGettersSetters()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $this->assertEquals($view->getName(), 'view');
+        $this->assertEquals($view->name(), 'view');
         $this->assertEquals($view->getPath(), 'path');
         $data = $view->getData();
         $this->assertEquals($data['foo'], 'bar');
@@ -126,7 +138,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
     public function testViewArrayAccess()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $this->assertInstanceOf('ArrayAccess', $view);
+        $this->assertInstanceOf(ArrayAccess::class, $view);
         $this->assertTrue($view->offsetExists('foo'));
         $this->assertEquals($view->offsetGet('foo'), 'bar');
         $view->offsetSet('foo', 'baz');
@@ -138,7 +150,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
     public function testViewConstructedWithObjectData()
     {
         $view = $this->getView(new DataObjectStub);
-        $this->assertInstanceOf('ArrayAccess', $view);
+        $this->assertInstanceOf(ArrayAccess::class, $view);
         $this->assertTrue($view->offsetExists('foo'));
         $this->assertEquals($view->offsetGet('foo'), 'bar');
         $view->offsetSet('foo', 'baz');
@@ -160,11 +172,11 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($view->offsetExists('foo'));
     }
 
-    /**
-     * @expectedException BadMethodCallException
-     */
     public function testViewBadMethod()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Illuminate\View\View::badMethodCall does not exist.');
+
         $view = $this->getView();
         $view->badMethodCall();
     }
@@ -177,11 +189,11 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
         $view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
-        $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
+        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
 
-        $view->renderable = m::mock('Illuminate\Contracts\Support\Renderable');
+        $view->renderable = m::mock(Renderable::class);
         $view->renderable->shouldReceive('render')->once()->andReturn('text');
-        $this->assertEquals('contents', $view->render());
+        $this->assertSame('contents', $view->render());
     }
 
     public function testViewRenderSections()
@@ -192,7 +204,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
         $view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
-        $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
+        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
 
         $view->getFactory()->shouldReceive('getSections')->once()->andReturn(['foo', 'bar']);
         $sections = $view->renderSections();
@@ -205,22 +217,27 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view = $this->getView();
         $errors = ['foo' => 'bar', 'qu' => 'ux'];
         $this->assertSame($view, $view->withErrors($errors));
-        $this->assertInstanceOf('Illuminate\Support\MessageBag', $view->errors);
+        $this->assertInstanceOf(ViewErrorBag::class, $view->errors);
         $foo = $view->errors->get('foo');
         $this->assertEquals($foo[0], 'bar');
         $qu = $view->errors->get('qu');
         $this->assertEquals($qu[0], 'ux');
         $data = ['foo' => 'baz'];
-        $this->assertSame($view, $view->withErrors(new Illuminate\Support\MessageBag($data)));
+        $this->assertSame($view, $view->withErrors(new MessageBag($data)));
         $foo = $view->errors->get('foo');
+        $this->assertEquals($foo[0], 'baz');
+        $foo = $view->errors->getBag('default')->get('foo');
+        $this->assertEquals($foo[0], 'baz');
+        $this->assertSame($view, $view->withErrors(new MessageBag($data), 'login'));
+        $foo = $view->errors->getBag('login')->get('foo');
         $this->assertEquals($foo[0], 'baz');
     }
 
     protected function getView($data = [])
     {
         return new View(
-            m::mock('Illuminate\View\Factory'),
-            m::mock('Illuminate\View\Engines\EngineInterface'),
+            m::mock(Factory::class),
+            m::mock(Engine::class),
             'view',
             'path',
             $data

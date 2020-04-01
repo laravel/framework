@@ -20,7 +20,7 @@ interface Factory
      *
      * @param  string  $rule
      * @param  \Closure|string  $extension
-     * @param  string  $message
+     * @param  string|null  $message
      * @return void
      */
     public function extend($rule, $extension, $message = null);
@@ -28,9 +28,9 @@ interface Factory
     /**
      * Register a custom implicit validator extension.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $extension
-     * @param  string  $message
+     * @param  string|null  $message
      * @return void
      */
     public function extendImplicit($rule, $extension, $message = null);
@@ -38,7 +38,7 @@ interface Factory
     /**
      * Register a custom implicit validator message replacer.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $replacer
      * @return void
      */

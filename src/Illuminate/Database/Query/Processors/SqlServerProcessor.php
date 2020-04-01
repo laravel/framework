@@ -13,8 +13,8 @@ class SqlServerProcessor extends Processor
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $sql
-     * @param  array   $values
-     * @param  string  $sequence
+     * @param  array  $values
+     * @param  string|null  $sequence
      * @return int
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
@@ -37,11 +37,14 @@ class SqlServerProcessor extends Processor
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return int
+     *
      * @throws \Exception
      */
     protected function processInsertGetIdForOdbc(Connection $connection)
     {
-        $result = $connection->selectFromWriteConnection('SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid');
+        $result = $connection->selectFromWriteConnection(
+            'SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid'
+        );
 
         if (! $result) {
             throw new Exception('Unable to retrieve lastInsertID for ODBC.');
@@ -60,12 +63,8 @@ class SqlServerProcessor extends Processor
      */
     public function processColumnListing($results)
     {
-        $mapping = function ($r) {
-            $r = (object) $r;
-
-            return $r->name;
-        };
-
-        return array_map($mapping, $results);
+        return array_map(function ($result) {
+            return ((object) $result)->name;
+        }, $results);
     }
 }

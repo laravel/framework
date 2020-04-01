@@ -2,13 +2,11 @@
 
 namespace Illuminate\Routing;
 
-use Closure;
-use Throwable;
-use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 /**
  * This extended pipeline catches any exceptions that occur during each slice.
@@ -18,58 +16,31 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 class Pipeline extends BasePipeline
 {
     /**
-     * Get a Closure that represents a slice of the application onion.
+     * Handles the value returned from each pipe before passing it to the next.
      *
-     * @return \Closure
+     * @param  mixed  $carry
+     * @return mixed
      */
-    protected function getSlice()
+    protected function handleCarry($carry)
     {
-        return function ($stack, $pipe) {
-            return function ($passable) use ($stack, $pipe) {
-                try {
-                    $slice = parent::getSlice();
-
-                    return call_user_func($slice($stack, $pipe), $passable);
-                } catch (Exception $e) {
-                    return $this->handleException($passable, $e);
-                } catch (Throwable $e) {
-                    return $this->handleException($passable, new FatalThrowableError($e));
-                }
-            };
-        };
-    }
-
-    /**
-     * Get the initial slice to begin the stack call.
-     *
-     * @param  \Closure  $destination
-     * @return \Closure
-     */
-    protected function getInitialSlice(Closure $destination)
-    {
-        return function ($passable) use ($destination) {
-            try {
-                return call_user_func($destination, $passable);
-            } catch (Exception $e) {
-                return $this->handleException($passable, $e);
-            } catch (Throwable $e) {
-                return $this->handleException($passable, new FatalThrowableError($e));
-            }
-        };
+        return $carry instanceof Responsable
+            ? $carry->toResponse($this->getContainer()->make(Request::class))
+            : $carry;
     }
 
     /**
      * Handle the given exception.
      *
      * @param  mixed  $passable
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return mixed
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
-    protected function handleException($passable, Exception $e)
+    protected function handleException($passable, Throwable $e)
     {
-        if (! $this->container->bound(ExceptionHandler::class) || ! $passable instanceof Request) {
+        if (! $this->container->bound(ExceptionHandler::class) ||
+            ! $passable instanceof Request) {
             throw $e;
         }
 

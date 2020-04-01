@@ -3,6 +3,11 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\Events\ScheduledTaskFinished;
+use Illuminate\Console\Events\ScheduledTaskSkipped;
+use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Facades\Date;
 
 class ScheduleRunCommand extends Command
 {
@@ -28,14 +33,34 @@ class ScheduleRunCommand extends Command
     protected $schedule;
 
     /**
+     * The 24 hour timestamp this scheduler command started running.
+     *
+     * @var \Illuminate\Support\Carbon
+     */
+    protected $startedAt;
+
+    /**
+     * Check if any events ran.
+     *
+     * @var bool
+     */
+    protected $eventsRan = false;
+
+    /**
+     * The event dispatcher.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
      * Create a new command instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    public function __construct(Schedule $schedule)
+    public function __construct()
     {
-        $this->schedule = $schedule;
+        $this->startedAt = Date::now();
 
         parent::__construct();
     }
@@ -43,28 +68,72 @@ class ScheduleRunCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public function fire()
+    public function handle(Schedule $schedule, Dispatcher $dispatcher)
     {
-        $events = $this->schedule->dueEvents($this->laravel);
+        $this->schedule = $schedule;
+        $this->dispatcher = $dispatcher;
 
-        $eventsRan = 0;
-
-        foreach ($events as $event) {
+        foreach ($this->schedule->dueEvents($this->laravel) as $event) {
             if (! $event->filtersPass($this->laravel)) {
+                $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+
                 continue;
             }
 
-            $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
+            if ($event->onOneServer) {
+                $this->runSingleServerEvent($event);
+            } else {
+                $this->runEvent($event);
+            }
 
-            $event->run($this->laravel);
-
-            ++$eventsRan;
+            $this->eventsRan = true;
         }
 
-        if (count($events) === 0 || $eventsRan === 0) {
+        if (! $this->eventsRan) {
             $this->info('No scheduled commands are ready to run.');
         }
+    }
+
+    /**
+     * Run the given single server event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return void
+     */
+    protected function runSingleServerEvent($event)
+    {
+        if ($this->schedule->serverShouldRun($event, $this->startedAt)) {
+            $this->runEvent($event);
+        } else {
+            $this->line('<info>Skipping command (has already run on another server):</info> '.$event->getSummaryForDisplay());
+        }
+    }
+
+    /**
+     * Run the given event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return void
+     */
+    protected function runEvent($event)
+    {
+        $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
+
+        $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
+
+        $start = microtime(true);
+
+        $event->run($this->laravel);
+
+        $this->dispatcher->dispatch(new ScheduledTaskFinished(
+            $event,
+            round(microtime(true) - $start, 2)
+        ));
+
+        $this->eventsRan = true;
     }
 }

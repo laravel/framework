@@ -3,8 +3,9 @@
 namespace Illuminate\Queue;
 
 use Aws\Sqs\SqsClient;
-use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Jobs\SqsJob;
+use Illuminate\Support\Str;
 
 class SqsQueue extends Queue implements QueueContract
 {
@@ -16,18 +17,25 @@ class SqsQueue extends Queue implements QueueContract
     protected $sqs;
 
     /**
-     * The name of the default tube.
+     * The name of the default queue.
      *
      * @var string
      */
     protected $default;
 
     /**
-     * The sqs prefix url.
+     * The queue URL prefix.
      *
      * @var string
      */
     protected $prefix;
+
+    /**
+     * The queue name suffix.
+     *
+     * @var string
+     */
+    private $suffix;
 
     /**
      * Create a new Amazon SQS queue instance.
@@ -35,84 +43,99 @@ class SqsQueue extends Queue implements QueueContract
      * @param  \Aws\Sqs\SqsClient  $sqs
      * @param  string  $default
      * @param  string  $prefix
+     * @param  string  $suffix
      * @return void
      */
-    public function __construct(SqsClient $sqs, $default, $prefix = '')
+    public function __construct(SqsClient $sqs, $default, $prefix = '', $suffix = '')
     {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
+        $this->suffix = $suffix;
+    }
+
+    /**
+     * Get the size of the queue.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function size($queue = null)
+    {
+        $response = $this->sqs->getQueueAttributes([
+            'QueueUrl' => $this->getQueue($queue),
+            'AttributeNames' => ['ApproximateNumberOfMessages'],
+        ]);
+
+        $attributes = $response->get('Attributes');
+
+        return (int) $attributes['ApproximateNumberOfMessages'];
     }
 
     /**
      * Push a new job onto the queue.
      *
      * @param  string  $job
-     * @param  mixed   $data
-     * @param  string  $queue
+     * @param  mixed  $data
+     * @param  string|null  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushRaw($this->createPayload($job, $data), $queue);
+        return $this->pushRaw($this->createPayload($job, $queue ?: $this->default, $data), $queue);
     }
 
     /**
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string  $queue
-     * @param  array   $options
+     * @param  string|null  $queue
+     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $response = $this->sqs->sendMessage([
+        return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
-        ]);
-
-        return $response->get('MessageId');
+        ])->get('MessageId');
     }
 
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
-     * @param  mixed   $data
-     * @param  string  $queue
+     * @param  mixed  $data
+     * @param  string|null  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        $payload = $this->createPayload($job, $data);
-
-        $delay = $this->getSeconds($delay);
-
         return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue),
-            'MessageBody' => $payload,
-            'DelaySeconds' => $delay,
+            'MessageBody' => $this->createPayload($job, $queue ?: $this->default, $data),
+            'DelaySeconds' => $this->secondsUntil($delay),
         ])->get('MessageId');
     }
 
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)
     {
-        $queue = $this->getQueue($queue);
-
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $queue,
+            'QueueUrl' => $queue = $this->getQueue($queue),
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
-        if (count($response['Messages']) > 0) {
-            return new SqsJob($this->container, $this->sqs, $queue, $response['Messages'][0]);
+        if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
+            return new SqsJob(
+                $this->container, $this->sqs, $response['Messages'][0],
+                $this->connectionName, $queue
+            );
         }
     }
 
@@ -126,11 +149,9 @@ class SqsQueue extends Queue implements QueueContract
     {
         $queue = $queue ?: $this->default;
 
-        if (filter_var($queue, FILTER_VALIDATE_URL) !== false) {
-            return $queue;
-        }
-
-        return rtrim($this->prefix, '/').'/'.($queue);
+        return filter_var($queue, FILTER_VALIDATE_URL) === false
+            ? rtrim($this->prefix, '/').'/'.Str::finish($queue, $this->suffix)
+            : $queue;
     }
 
     /**

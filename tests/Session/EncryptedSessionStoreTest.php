@@ -1,10 +1,17 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Session;
 
-class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Session\EncryptedStore;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use SessionHandlerInterface;
+
+class EncryptedSessionStoreTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -26,7 +33,6 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase
                 'new' => [],
                 'old' => ['baz'],
             ],
-            '_sf2_meta' => $session->getBagData('_sf2_meta'),
         ]);
         $session->getEncrypter()->shouldReceive('encrypt')->once()->with($serialized)->andReturn($serialized);
         $session->getHandler()->shouldReceive('write')->once()->with(
@@ -40,7 +46,7 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase
 
     public function getSession()
     {
-        $reflection = new ReflectionClass('Illuminate\Session\EncryptedStore');
+        $reflection = new ReflectionClass(EncryptedStore::class);
 
         return $reflection->newInstanceArgs($this->getMocks());
     }
@@ -49,8 +55,8 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase
     {
         return [
             $this->getSessionName(),
-            m::mock('SessionHandlerInterface'),
-            m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+            m::mock(SessionHandlerInterface::class),
+            m::mock(Encrypter::class),
             $this->getSessionId(),
         ];
     }

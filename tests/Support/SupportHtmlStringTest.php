@@ -1,8 +1,11 @@
 <?php
 
-use Illuminate\Support\HtmlString;
+namespace Illuminate\Tests\Support;
 
-class SupportHtmlStringTest extends PHPUnit_Framework_TestCase
+use Illuminate\Support\HtmlString;
+use PHPUnit\Framework\TestCase;
+
+class SupportHtmlStringTest extends TestCase
 {
     public function testToHtml()
     {

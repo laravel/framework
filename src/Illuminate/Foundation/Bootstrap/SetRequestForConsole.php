@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Request;
 
 class SetRequestForConsole
 {
@@ -15,8 +15,21 @@ class SetRequestForConsole
      */
     public function bootstrap(Application $app)
     {
-        $url = $app->make('config')->get('app.url', 'http://localhost');
+        $uri = $app->make('config')->get('app.url', 'http://localhost');
 
-        $app->instance('request', Request::create($url, 'GET', [], [], [], $_SERVER));
+        $components = parse_url($uri);
+
+        $server = $_SERVER;
+
+        if (isset($components['path'])) {
+            $server = array_merge($server, [
+                'SCRIPT_FILENAME' => $components['path'],
+                'SCRIPT_NAME' => $components['path'],
+            ]);
+        }
+
+        $app->instance('request', Request::create(
+            $uri, 'GET', [], [], [], $server
+        ));
     }
 }

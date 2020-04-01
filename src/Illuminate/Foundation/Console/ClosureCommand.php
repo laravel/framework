@@ -3,18 +3,25 @@
 namespace Illuminate\Foundation\Console;
 
 use Closure;
-use ReflectionFunction;
 use Illuminate\Console\Command;
+use ReflectionFunction;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ClosureCommand extends Command
 {
     /**
+     * The command callback.
+     *
+     * @var \Closure
+     */
+    protected $callback;
+
+    /**
      * Create a new command instance.
      *
      * @param  string  $signature
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function __construct($signature, Closure $callback)
@@ -30,7 +37,7 @@ class ClosureCommand extends Command
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return mixed
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -40,11 +47,13 @@ class ClosureCommand extends Command
 
         foreach ((new ReflectionFunction($this->callback))->getParameters() as $parameter) {
             if (isset($inputs[$parameter->name])) {
-                $parameters[] = $inputs[$parameter->name];
+                $parameters[$parameter->name] = $inputs[$parameter->name];
             }
         }
 
-        return call_user_func_array($this->callback->bindTo($this, $this), $parameters);
+        return (int) $this->laravel->call(
+            $this->callback->bindTo($this, $this), $parameters
+        );
     }
 
     /**

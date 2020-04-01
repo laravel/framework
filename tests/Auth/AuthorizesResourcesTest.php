@@ -1,50 +1,55 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
-use Illuminate\Routing\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+namespace Illuminate\Tests\Auth;
 
-class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
+use Closure;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Routing\Router;
+use PHPUnit\Framework\TestCase;
+
+class AuthorizesResourcesTest extends TestCase
 {
     public function testCreateMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'create', 'can:create,App\User');
     }
 
     public function testStoreMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'store', 'can:create,App\User');
     }
 
     public function testShowMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'show', 'can:view,user');
     }
 
     public function testEditMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'edit', 'can:update,user');
     }
 
     public function testUpdateMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'update', 'can:update,user');
     }
 
     public function testDestroyMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user');
     }
@@ -59,12 +64,12 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
      */
     protected function assertHasMiddleware($controller, $method, $middleware)
     {
-        $router = new Router(new Illuminate\Events\Dispatcher);
+        $router = new Router(new Dispatcher);
 
-        $router->middleware('can', 'AuthorizesResourcesMiddleware');
-        $router->get($method)->uses('AuthorizesResourcesController@'.$method);
+        $router->aliasMiddleware('can', AuthorizesResourcesMiddleware::class);
+        $router->get($method)->uses(AuthorizesResourcesController::class.'@'.$method);
 
-        $this->assertEquals(
+        $this->assertSame(
             'caught '.$middleware,
             $router->dispatch(Request::create($method, 'GET'))->getContent(),
             "The [{$middleware}] middleware was not registered for method [{$method}]"

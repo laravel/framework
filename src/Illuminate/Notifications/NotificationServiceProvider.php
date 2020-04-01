@@ -2,19 +2,12 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Support\ServiceProvider;
 
 class NotificationServiceProvider extends ServiceProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     /**
      * Boot the application services.
      *
@@ -26,7 +19,7 @@ class NotificationServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/resources/views' => resource_path('views/vendor/notifications'),
+                __DIR__.'/resources/views' => $this->app->resourcePath('views/vendor/notifications'),
             ], 'laravel-notifications');
         }
     }
@@ -49,17 +42,5 @@ class NotificationServiceProvider extends ServiceProvider
         $this->app->alias(
             ChannelManager::class, FactoryContract::class
         );
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [
-            ChannelManager::class, DispatcherContract::class, FactoryContract::class,
-        ];
     }
 }

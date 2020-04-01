@@ -1,19 +1,25 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Queue;
 
-class QueueListenerTest extends PHPUnit_Framework_TestCase
+use Illuminate\Queue\Listener;
+use Illuminate\Queue\ListenerOptions;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
+
+class QueueListenerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
 
     public function testRunProcessCallsProcess()
     {
-        $process = m::mock('Symfony\Component\Process\Process')->makePartial();
+        $process = m::mock(Process::class)->makePartial();
         $process->shouldReceive('run')->once();
-        $listener = m::mock('Illuminate\Queue\Listener')->makePartial();
+        $listener = m::mock(Listener::class)->makePartial();
         $listener->shouldReceive('memoryExceeded')->once()->with(1)->andReturn(false);
 
         $listener->runProcess($process, 1);
@@ -21,9 +27,9 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase
 
     public function testListenerStopsWhenMemoryIsExceeded()
     {
-        $process = m::mock('Symfony\Component\Process\Process')->makePartial();
+        $process = m::mock(Process::class)->makePartial();
         $process->shouldReceive('run')->once();
-        $listener = m::mock('Illuminate\Queue\Listener')->makePartial();
+        $listener = m::mock(Listener::class)->makePartial();
         $listener->shouldReceive('memoryExceeded')->once()->with(1)->andReturn(true);
         $listener->shouldReceive('stop')->once();
 
@@ -32,13 +38,49 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase
 
     public function testMakeProcessCorrectlyFormatsCommandLine()
     {
-        $listener = new Illuminate\Queue\Listener(__DIR__);
-        $process = $listener->makeProcess('connection', 'queue', 1, 2, 3);
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
+        $listener = new Listener(__DIR__);
+        $options = new ListenerOptions;
+        $options->delay = 1;
+        $options->memory = 2;
+        $options->timeout = 3;
+        $process = $listener->makeProcess('connection', 'queue', $options);
+        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
 
-        $this->assertInstanceOf('Symfony\Component\Process\Process', $process);
+        $this->assertInstanceOf(Process::class, $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals($escape.PHP_BINARY.$escape." artisan queue:work {$escape}connection{$escape} --queue={$escape}queue{$escape} --delay=1 --memory=2 --sleep=3 --tries=0", $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--queue=queue{$escape} {$escape}--delay=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape}", $process->getCommandLine());
+    }
+
+    public function testMakeProcessCorrectlyFormatsCommandLineWithAnEnvironmentSpecified()
+    {
+        $listener = new Listener(__DIR__);
+        $options = new ListenerOptions('test');
+        $options->delay = 1;
+        $options->memory = 2;
+        $options->timeout = 3;
+        $process = $listener->makeProcess('connection', 'queue', $options);
+        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+
+        $this->assertInstanceOf(Process::class, $process);
+        $this->assertEquals(__DIR__, $process->getWorkingDirectory());
+        $this->assertEquals(3, $process->getTimeout());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--queue=queue{$escape} {$escape}--delay=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
+    }
+
+    public function testMakeProcessCorrectlyFormatsCommandLineWhenTheConnectionIsNotSpecified()
+    {
+        $listener = new Listener(__DIR__);
+        $options = new ListenerOptions('test');
+        $options->delay = 1;
+        $options->memory = 2;
+        $options->timeout = 3;
+        $process = $listener->makeProcess(null, 'queue', $options);
+        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+
+        $this->assertInstanceOf(Process::class, $process);
+        $this->assertEquals(__DIR__, $process->getWorkingDirectory());
+        $this->assertEquals(3, $process->getTimeout());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}--once{$escape} {$escape}--queue=queue{$escape} {$escape}--delay=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
     }
 }

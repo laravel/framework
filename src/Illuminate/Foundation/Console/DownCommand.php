@@ -2,17 +2,22 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\InteractsWithTime;
 
 class DownCommand extends Command
 {
+    use InteractsWithTime;
+
     /**
      * The console command signature.
      *
      * @var string
      */
-    protected $signature = 'down {--message= : The message for the maintenance mode. }
-            {--retry= : The number of seconds after which the request may be retried.}';
+    protected $signature = 'down {--message= : The message for the maintenance mode}
+                                 {--retry= : The number of seconds after which the request may be retried}
+                                 {--allow=* : IP or networks allowed to access the application while in maintenance mode}';
 
     /**
      * The console command description.
@@ -24,16 +29,29 @@ class DownCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function fire()
+    public function handle()
     {
-        file_put_contents(
-            $this->laravel->storagePath().'/framework/down',
-            json_encode($this->getDownFilePayload(), JSON_PRETTY_PRINT)
-        );
+        try {
+            if (file_exists(storage_path('framework/down'))) {
+                $this->comment('Application is already down.');
 
-        $this->comment('Application is now in maintenance mode.');
+                return true;
+            }
+
+            file_put_contents(storage_path('framework/down'),
+                              json_encode($this->getDownFilePayload(),
+                              JSON_PRETTY_PRINT));
+
+            $this->comment('Application is now in maintenance mode.');
+        } catch (Exception $e) {
+            $this->error('Failed to enter maintenance mode.');
+
+            $this->error($e->getMessage());
+
+            return 1;
+        }
     }
 
     /**
@@ -44,9 +62,10 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
-            'time' => time(),
+            'time' => $this->currentTime(),
             'message' => $this->option('message'),
             'retry' => $this->getRetryTime(),
+            'allowed' => $this->option('allow'),
         ];
     }
 

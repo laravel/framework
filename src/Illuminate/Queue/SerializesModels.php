@@ -4,13 +4,11 @@ namespace Illuminate\Queue;
 
 use ReflectionClass;
 use ReflectionProperty;
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Contracts\Database\ModelIdentifier;
-use Illuminate\Contracts\Queue\QueueableCollection;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 trait SerializesModels
 {
+    use SerializesAndRestoresModelIdentifiers;
+
     /**
      * Prepare the instance for serialization.
      *
@@ -26,9 +24,9 @@ trait SerializesModels
             ));
         }
 
-        return array_map(function ($p) {
-            return $p->getName();
-        }, $properties);
+        return array_values(array_filter(array_map(function ($p) {
+            return $p->isStatic() ? null : $p->getName();
+        }, $properties)));
     }
 
     /**
@@ -39,6 +37,10 @@ trait SerializesModels
     public function __wakeup()
     {
         foreach ((new ReflectionClass($this))->getProperties() as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
             $property->setValue($this, $this->getRestoredPropertyValue(
                 $this->getPropertyValue($property)
             ));
@@ -46,57 +48,76 @@ trait SerializesModels
     }
 
     /**
-     * Get the property value prepared for serialization.
+     * Prepare the instance values for serialization.
      *
-     * @param  mixed  $value
-     * @return mixed
+     * @return array
      */
-    protected function getSerializedPropertyValue($value)
+    public function __serialize()
     {
-        if ($value instanceof QueueableCollection) {
-            return new ModelIdentifier($value->getQueueableClass(), $value->getQueueableIds());
+        $values = [];
+
+        $properties = (new ReflectionClass($this))->getProperties();
+
+        $class = get_class($this);
+
+        foreach ($properties as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
+            $name = $property->getName();
+
+            if ($property->isPrivate()) {
+                $name = "\0{$class}\0{$name}";
+            } elseif ($property->isProtected()) {
+                $name = "\0*\0{$name}";
+            }
+
+            $values[$name] = $this->getSerializedPropertyValue(
+                $this->getPropertyValue($property)
+            );
         }
 
-        if ($value instanceof QueueableEntity) {
-            return new ModelIdentifier(get_class($value), $value->getQueueableId());
-        }
-
-        return $value;
+        return $values;
     }
 
     /**
-     * Get the restored property value after deserialization.
+     * Restore the model after serialization.
      *
-     * @param  mixed  $value
-     * @return mixed
+     * @param  array  $values
+     * @return array
      */
-    protected function getRestoredPropertyValue($value)
+    public function __unserialize(array $values)
     {
-        if (! $value instanceof ModelIdentifier) {
-            return $value;
+        $properties = (new ReflectionClass($this))->getProperties();
+
+        $class = get_class($this);
+
+        foreach ($properties as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
+            $name = $property->getName();
+
+            if ($property->isPrivate()) {
+                $name = "\0{$class}\0{$name}";
+            } elseif ($property->isProtected()) {
+                $name = "\0*\0{$name}";
+            }
+
+            if (! array_key_exists($name, $values)) {
+                continue;
+            }
+
+            $property->setAccessible(true);
+
+            $property->setValue(
+                $this, $this->getRestoredPropertyValue($values[$name])
+            );
         }
 
-        return is_array($value->id)
-                ? $this->restoreCollection($value)
-                : (new $value->class)->newQuery()->useWritePdo()->findOrFail($value->id);
-    }
-
-    /**
-     * Restore a queueable collection instance.
-     *
-     * @param  \Illuminate\Contracts\Database\ModelIdentifier  $value
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    protected function restoreCollection($value)
-    {
-        if (! $value->class || count($value->id) === 0) {
-            return new EloquentCollection;
-        }
-
-        $model = new $value->class;
-
-        return $model->newQuery()->useWritePdo()
-                    ->whereIn($model->getKeyName(), $value->id)->get();
+        return $values;
     }
 
     /**

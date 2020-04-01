@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class PolicyMakeCommand extends GeneratorCommand
@@ -37,11 +37,34 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $stub = parent::buildClass($name);
+        $stub = $this->replaceUserNamespace(
+            parent::buildClass($name)
+        );
 
         $model = $this->option('model');
 
         return $model ? $this->replaceModel($stub, $model) : $stub;
+    }
+
+    /**
+     * Replace the User model namespace.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function replaceUserNamespace($stub)
+    {
+        $model = $this->userProviderModel();
+
+        if (! $model) {
+            return $stub;
+        }
+
+        return str_replace(
+            $this->rootNamespace().'User',
+            $model,
+            $stub
+        );
     }
 
     /**
@@ -56,18 +79,39 @@ class PolicyMakeCommand extends GeneratorCommand
         $model = str_replace('/', '\\', $model);
 
         if (Str::startsWith($model, '\\')) {
-            $stub = str_replace('NamespacedDummyModel', trim($model, '\\'), $stub);
+            $namespacedModel = trim($model, '\\');
         } else {
-            $stub = str_replace('NamespacedDummyModel', $this->laravel->getNamespace().$model, $stub);
+            $namespacedModel = $this->laravel->getNamespace().$model;
         }
 
         $model = class_basename(trim($model, '\\'));
 
-        $stub = str_replace('DummyModel', $model, $stub);
+        $dummyUser = class_basename($this->userProviderModel());
 
-        $stub = str_replace('dummyModelName', Str::lower($model), $stub);
+        $dummyModel = Str::camel($model) === 'user' ? 'model' : $model;
 
-        return str_replace('dummyPluralModelName', Str::plural(Str::lower($model)), $stub);
+        $replace = [
+            'NamespacedDummyModel' => $namespacedModel,
+            '{{ namespacedModel }}' => $namespacedModel,
+            '{{namespacedModel}}' => $namespacedModel,
+            'DummyModel' => $model,
+            '{{ model }}' => $model,
+            '{{model}}' => $model,
+            'dummyModel' => Str::camel($dummyModel),
+            '{{ modelVariable }}' => Str::camel($dummyModel),
+            '{{modelVariable}}' => Str::camel($dummyModel),
+            'DummyUser' => $dummyUser,
+            '{{ user }}' => $dummyUser,
+            '{{user}}' => $dummyUser,
+        ];
+
+        $stub = str_replace(
+            array_keys($replace), array_values($replace), $stub
+        );
+
+        return str_replace(
+            "use {$namespacedModel};\nuse {$namespacedModel};", "use {$namespacedModel};", $stub
+        );
     }
 
     /**
@@ -77,11 +121,22 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('model')) {
-            return __DIR__.'/stubs/policy.stub';
-        }
+        return $this->option('model')
+                    ? $this->resolveStubPath('/stubs/policy.stub')
+                    : $this->resolveStubPath('/stubs/policy.plain.stub');
+    }
 
-        return __DIR__.'/stubs/policy.plain.stub';
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
@@ -103,7 +158,7 @@ class PolicyMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to.'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to'],
         ];
     }
 }

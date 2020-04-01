@@ -21,16 +21,18 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function registerPolicies()
     {
-        foreach ($this->policies as $key => $value) {
+        foreach ($this->policies() as $key => $value) {
             Gate::policy($key, $value);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * Get the policies defined on the provider.
+     *
+     * @return array
      */
-    public function register()
+    public function policies()
     {
-        //
+        return $this->policies;
     }
 }

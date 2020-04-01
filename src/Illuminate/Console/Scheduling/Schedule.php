@@ -2,28 +2,96 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Symfony\Component\Process\ProcessUtils;
-use Symfony\Component\Process\PhpExecutableFinder;
+use Closure;
+use DateTimeInterface;
+use Illuminate\Console\Application;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\ProcessUtils;
+use Illuminate\Support\Traits\Macroable;
+use RuntimeException;
 
 class Schedule
 {
+    use Macroable;
+
     /**
      * All of the events on the schedule.
      *
-     * @var array
+     * @var \Illuminate\Console\Scheduling\Event[]
      */
     protected $events = [];
 
     /**
+     * The event mutex implementation.
+     *
+     * @var \Illuminate\Console\Scheduling\EventMutex
+     */
+    protected $eventMutex;
+
+    /**
+     * The scheduling mutex implementation.
+     *
+     * @var \Illuminate\Console\Scheduling\SchedulingMutex
+     */
+    protected $schedulingMutex;
+
+    /**
+     * The timezone the date should be evaluated on.
+     *
+     * @var \DateTimeZone|string
+     */
+    protected $timezone;
+
+    /**
+     * The job dispatcher implementation.
+     *
+     * @var \Illuminate\Contracts\Bus\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
+     * Create a new schedule instance.
+     *
+     * @param  \DateTimeZone|string|null  $timezone
+     * @return void
+     */
+    public function __construct($timezone = null)
+    {
+        $this->timezone = $timezone;
+
+        if (! class_exists(Container::class)) {
+            throw new RuntimeException(
+                'A container implementation is required to use the scheduler. Please install illuminate/container.'
+            );
+        }
+
+        $container = Container::getInstance();
+
+        $this->eventMutex = $container->bound(EventMutex::class)
+                                ? $container->make(EventMutex::class)
+                                : $container->make(CacheEventMutex::class);
+
+        $this->schedulingMutex = $container->bound(SchedulingMutex::class)
+                                ? $container->make(SchedulingMutex::class)
+                                : $container->make(CacheSchedulingMutex::class);
+    }
+
+    /**
      * Add a new callback event to the schedule.
      *
-     * @param  string  $callback
-     * @param  array   $parameters
-     * @return \Illuminate\Console\Scheduling\Event
+     * @param  string|callable  $callback
+     * @param  array  $parameters
+     * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function call($callback, array $parameters = [])
     {
-        $this->events[] = $event = new CallbackEvent($callback, $parameters);
+        $this->events[] = $event = new CallbackEvent(
+            $this->eventMutex, $callback, $parameters
+        );
 
         return $event;
     }
@@ -37,11 +105,70 @@ class Schedule
      */
     public function command($command, array $parameters = [])
     {
-        $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+        if (class_exists($command)) {
+            $command = Container::getInstance()->make($command)->getName();
+        }
 
-        $artisan = defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
+        return $this->exec(
+            Application::formatCommandString($command), $parameters
+        );
+    }
 
-        return $this->exec("{$binary} {$artisan} {$command}", $parameters);
+    /**
+     * Add a new job callback event to the schedule.
+     *
+     * @param  object|string  $job
+     * @param  string|null  $queue
+     * @param  string|null  $connection
+     * @return \Illuminate\Console\Scheduling\CallbackEvent
+     */
+    public function job($job, $queue = null, $connection = null)
+    {
+        return $this->call(function () use ($job, $queue, $connection) {
+            $job = is_string($job) ? Container::getInstance()->make($job) : $job;
+
+            if ($job instanceof ShouldQueue) {
+                $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
+            } else {
+                $this->dispatchNow($job);
+            }
+        })->name(is_string($job) ? $job : get_class($job));
+    }
+
+    /**
+     * Dispatch the given job to the queue.
+     *
+     * @param  object  $job
+     * @param  string|null  $queue
+     * @param  string|null  $connection
+     * @return void
+     */
+    protected function dispatchToQueue($job, $queue, $connection)
+    {
+        if ($job instanceof Closure) {
+            if (! class_exists(CallQueuedClosure::class)) {
+                throw new RuntimeException(
+                    'To enable support for closure jobs, please install illuminate/queue.'
+                );
+            }
+
+            $job = CallQueuedClosure::create($job);
+        }
+
+        $this->getDispatcher()->dispatch(
+            $job->onConnection($connection)->onQueue($queue)
+        );
+    }
+
+    /**
+     * Dispatch the given job right now.
+     *
+     * @param  object  $job
+     * @return void
+     */
+    protected function dispatchNow($job)
+    {
+        $this->getDispatcher()->dispatchNow($job);
     }
 
     /**
@@ -57,7 +184,7 @@ class Schedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($command);
+        $this->events[] = $event = new Event($this->eventMutex, $command, $this->timezone);
 
         return $event;
     }
@@ -71,14 +198,45 @@ class Schedule
     protected function compileParameters(array $parameters)
     {
         return collect($parameters)->map(function ($value, $key) {
-            return is_numeric($key) ? $value : $key.'='.(is_numeric($value) ? $value : ProcessUtils::escapeArgument($value));
+            if (is_array($value)) {
+                $value = collect($value)->map(function ($value) {
+                    return ProcessUtils::escapeArgument($value);
+                })->implode(' ');
+            } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
+                $value = ProcessUtils::escapeArgument($value);
+            }
+
+            return is_numeric($key) ? $value : "{$key}={$value}";
         })->implode(' ');
+    }
+
+    /**
+     * Determine if the server is allowed to run this event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \DateTimeInterface  $time
+     * @return bool
+     */
+    public function serverShouldRun(Event $event, DateTimeInterface $time)
+    {
+        return $this->schedulingMutex->create($event, $time);
+    }
+
+    /**
+     * Get all of the events on the schedule that are due.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return \Illuminate\Support\Collection
+     */
+    public function dueEvents($app)
+    {
+        return collect($this->events)->filter->isDue($app);
     }
 
     /**
      * Get all of the events on the schedule.
      *
-     * @return array
+     * @return \Illuminate\Console\Scheduling\Event[]
      */
     public function events()
     {
@@ -86,15 +244,42 @@ class Schedule
     }
 
     /**
-     * Get all of the events on the schedule that are due.
+     * Specify the cache store that should be used to store mutexes.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return array
+     * @param  string  $store
+     * @return $this
      */
-    public function dueEvents($app)
+    public function useCache($store)
     {
-        return array_filter($this->events, function ($event) use ($app) {
-            return $event->isDue($app);
-        });
+        if ($this->eventMutex instanceof CacheAware) {
+            $this->eventMutex->useStore($store);
+        }
+
+        if ($this->schedulingMutex instanceof CacheAware) {
+            $this->schedulingMutex->useStore($store);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the job dispatcher, if available.
+     *
+     * @return \Illuminate\Contracts\Bus\Dispatcher
+     */
+    protected function getDispatcher()
+    {
+        if ($this->dispatcher === null) {
+            try {
+                $this->dispatcher = Container::getInstance()->make(Dispatcher::class);
+            } catch (BindingResolutionException $e) {
+                throw new RuntimeException(
+                    'Unable to resolve the dispatcher from the service container. Please bind it or install illuminate/bus.',
+                    $e->getCode(), $e
+                );
+            }
+        }
+
+        return $this->dispatcher;
     }
 }

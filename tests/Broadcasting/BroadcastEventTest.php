@@ -1,48 +1,43 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Broadcasting;
 
-class BroadcastEventTest extends PHPUnit_Framework_TestCase
+use Illuminate\Broadcasting\BroadcastEvent;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class BroadcastEventTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
 
     public function testBasicEventBroadcastParameterFormatting()
     {
-        $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+        $broadcaster = m::mock(Broadcaster::class);
 
         $broadcaster->shouldReceive('broadcast')->once()->with(
-            ['test-channel'], 'TestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
+            ['test-channel'], TestBroadcastEvent::class, ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
         $event = new TestBroadcastEvent;
-        $serializedEvent = serialize($event);
-        $jobData = ['event' => $serializedEvent];
 
-        $job = m::mock('Illuminate\Contracts\Queue\Job');
-        $job->shouldReceive('delete')->once();
-
-        (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+        (new BroadcastEvent($event))->handle($broadcaster);
     }
 
     public function testManualParameterSpecification()
     {
-        $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+        $broadcaster = m::mock(Broadcaster::class);
 
         $broadcaster->shouldReceive('broadcast')->once()->with(
-            ['test-channel'], 'TestBroadcastEventWithManualData', ['name' => 'Taylor']
+            ['test-channel'], TestBroadcastEventWithManualData::class, ['name' => 'Taylor', 'socket' => null]
         );
 
         $event = new TestBroadcastEventWithManualData;
-        $serializedEvent = serialize($event);
-        $jobData = ['event' => $serializedEvent];
 
-        $job = m::mock('Illuminate\Contracts\Queue\Job');
-        $job->shouldReceive('delete')->once();
-
-        (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+        (new BroadcastEvent($event))->handle($broadcaster);
     }
 }
 

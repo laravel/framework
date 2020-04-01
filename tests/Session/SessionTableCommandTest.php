@@ -1,12 +1,20 @@
 <?php
 
-use Illuminate\Session\Console\SessionTableCommand;
-use Illuminate\Foundation\Application;
-use Mockery as m;
+namespace Illuminate\Tests\Session;
 
-class SessionTableCommandTest extends PHPUnit_Framework_TestCase
+use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use Illuminate\Session\Console\SessionTableCommand;
+use Illuminate\Support\Composer;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+
+class SessionTableCommandTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -14,12 +22,12 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase
     public function testCreateMakesMigration()
     {
         $command = new SessionTableCommandTestStub(
-            $files = m::mock('Illuminate\Filesystem\Filesystem'),
-            $composer = m::mock('Illuminate\Support\Composer')
+            $files = m::mock(Filesystem::class),
+            $composer = m::mock(Composer::class)
         );
-        $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
+        $creator = m::mock(MigrationCreator::class)->shouldIgnoreMissing();
 
-        $app = new Application();
+        $app = new Application;
         $app->useDatabasePath(__DIR__);
         $app['migration.creator'] = $creator;
         $command->setLaravel($app);
@@ -34,7 +42,7 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new ArrayInput($input), new NullOutput);
     }
 }
 
@@ -42,6 +50,6 @@ class SessionTableCommandTestStub extends SessionTableCommand
 {
     public function call($command, array $arguments = [])
     {
-        //
+        return 0;
     }
 }

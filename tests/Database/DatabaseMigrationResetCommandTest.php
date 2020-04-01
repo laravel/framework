@@ -1,49 +1,60 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Foundation\Application;
-use Illuminate\Database\Console\Migrations\ResetCommand;
+namespace Illuminate\Tests\Database;
 
-class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
+use Closure;
+use Illuminate\Database\Console\Migrations\ResetCommand;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Foundation\Application;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+
+class DatabaseMigrationResetCommandTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
 
     public function testResetCommandCallsMigratorWithProperArguments()
     {
-        $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command = new ResetCommand($migrator = m::mock(Migrator::class));
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('setConnection')->once()->with(null);
+        $migrator->shouldReceive('usingConnection')->once()->with(null, m::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
+            $callback();
+        });
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
-        $migrator->shouldReceive('reset')->once()->with([__DIR__.'/migrations'], false);
-        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
+        $migrator->shouldReceive('reset')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], false);
 
         $this->runCommand($command);
     }
 
     public function testResetCommandCanBePretended()
     {
-        $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command = new ResetCommand($migrator = m::mock(Migrator::class));
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('setConnection')->once()->with('foo');
+        $migrator->shouldReceive('usingConnection')->once()->with('foo', m::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
+            $callback();
+        });
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
-        $migrator->shouldReceive('reset')->once()->with([__DIR__.'/migrations'], true);
-        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
+        $migrator->shouldReceive('reset')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new ArrayInput($input), new NullOutput);
     }
 }
 
@@ -56,7 +67,7 @@ class ApplicationDatabaseResetStub extends Application
         }
     }
 
-    public function environment()
+    public function environment(...$environments)
     {
         return 'development';
     }

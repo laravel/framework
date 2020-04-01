@@ -3,42 +3,61 @@
 namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Notifications\Notification;
+use RuntimeException;
 
 class DatabaseChannel
 {
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    public function send($notifiables, Notification $notification)
+    public function send($notifiable, Notification $notification)
     {
-        foreach ($notifiables as $notifiable) {
-            $this->createNotification($notifiable, $notification);
-        }
+        return $notifiable->routeNotificationFor('database', $notification)->create(
+            $this->buildPayload($notifiable, $notification)
+        );
     }
 
     /**
-     * Create a database notification record for the notifiable.
+     * Get the data for the notification.
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return \Illuminate\Notifications\DatabaseNotification
+     * @return array
+     *
+     * @throws \RuntimeException
      */
-    protected function createNotification($notifiable, Notification $notification)
+    protected function getData($notifiable, Notification $notification)
     {
-        $message = $notification->message($notifiable);
+        if (method_exists($notification, 'toDatabase')) {
+            return is_array($data = $notification->toDatabase($notifiable))
+                                ? $data : $data->data;
+        }
 
-        return $notifiable->routeNotificationFor('database')->create([
+        if (method_exists($notification, 'toArray')) {
+            return $notification->toArray($notifiable);
+        }
+
+        throw new RuntimeException('Notification is missing toDatabase / toArray method.');
+    }
+
+    /**
+     * Build an array payload for the DatabaseNotification Model.
+     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return array
+     */
+    protected function buildPayload($notifiable, Notification $notification)
+    {
+        return [
+            'id' => $notification->id,
             'type' => get_class($notification),
-            'level' => $message->level,
-            'intro' => $message->introLines,
-            'outro' => $message->outroLines,
-            'action_text' => $message->actionText,
-            'action_url' => $message->actionUrl,
-            'read' => false,
-        ]);
+            'data' => $this->getData($notifiable, $notification),
+            'read_at' => null,
+        ];
     }
 }

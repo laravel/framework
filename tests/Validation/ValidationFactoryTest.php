@@ -1,14 +1,17 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Validation\Factory;
-use Illuminate\Validation\Validator;
-use Illuminate\Validation\PresenceVerifierInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+namespace Illuminate\Tests\Validation;
 
-class ValidationFactoryTest extends PHPUnit_Framework_TestCase
+use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
+use Illuminate\Validation\Factory;
+use Illuminate\Validation\PresenceVerifierInterface;
+use Illuminate\Validation\Validator;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class ValidationFactoryTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -24,27 +27,32 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase
 
         $presence = m::mock(PresenceVerifierInterface::class);
         $noop1 = function () {
+            //
         };
         $noop2 = function () {
+            //
         };
         $noop3 = function () {
+            //
         };
         $factory->extend('foo', $noop1);
         $factory->extendImplicit('implicit', $noop2);
+        $factory->extendDependent('dependent', $noop3);
         $factory->replacer('replacer', $noop3);
         $factory->setPresenceVerifier($presence);
         $validator = $factory->make([], []);
-        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2], $validator->getExtensions());
-        $this->assertEquals(['replacer' => $noop3], $validator->getReplacers());
+        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
+        $this->assertEquals(['replacer' => $noop3], $validator->replacers);
         $this->assertEquals($presence, $validator->getPresenceVerifier());
 
         $presence = m::mock(PresenceVerifierInterface::class);
         $factory->extend('foo', $noop1, 'foo!');
         $factory->extendImplicit('implicit', $noop2, 'implicit!');
+        $factory->extendImplicit('dependent', $noop3, 'dependent!');
         $factory->setPresenceVerifier($presence);
         $validator = $factory->make([], []);
-        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2], $validator->getExtensions());
-        $this->assertEquals(['foo' => 'foo!', 'implicit' => 'implicit!'], $validator->getFallbackMessages());
+        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
+        $this->assertEquals(['foo' => 'foo!', 'implicit' => 'implicit!', 'dependent' => 'dependent!'], $validator->fallbackMessages);
         $this->assertEquals($presence, $validator->getPresenceVerifier());
     }
 
@@ -55,12 +63,17 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase
         $factory = m::mock(Factory::class.'[make]', [$translator]);
 
         $factory->shouldReceive('make')->once()
-                ->with(['foo' => 'bar'], ['foo' => 'required'], [], [])
+                ->with(['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'required'], [], [])
                 ->andReturn($validator);
 
-        $validator->shouldReceive('validate')->once();
+        $validator->shouldReceive('validate')->once()->andReturn(['foo' => 'bar']);
 
-        $factory->validate(['foo' => 'bar'], ['foo' => 'required']);
+        $validated = $factory->validate(
+            ['foo' => 'bar', 'baz' => 'boom'],
+            ['foo' => 'required']
+        );
+
+        $this->assertEquals($validated, ['foo' => 'bar']);
     }
 
     public function testCustomResolverIsCalled()
@@ -80,5 +93,17 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => 'bar'], $validator->getData());
         $this->assertEquals(['baz' => ['boom']], $validator->getRules());
         unset($_SERVER['__validator.factory']);
+    }
+
+    public function testValidateMethodCanBeCalledPublicly()
+    {
+        $translator = m::mock(TranslatorInterface::class);
+        $factory = new Factory($translator);
+        $factory->extend('foo', function ($attribute, $value, $parameters, $validator) {
+            return $validator->validateArray($attribute, $value);
+        });
+
+        $validator = $factory->make(['bar' => ['baz']], ['bar' => 'foo']);
+        $this->assertTrue($validator->passes());
     }
 }

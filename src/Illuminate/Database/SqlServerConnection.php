@@ -3,12 +3,12 @@
 namespace Illuminate\Database;
 
 use Closure;
-use Exception;
-use Throwable;
 use Doctrine\DBAL\Driver\PDOSqlsrv\Driver as DoctrineDriver;
-use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
+use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
+use Illuminate\Database\Schema\SqlServerBuilder;
+use Throwable;
 
 class SqlServerConnection extends Connection
 {
@@ -16,41 +16,40 @@ class SqlServerConnection extends Connection
      * Execute a Closure within a transaction.
      *
      * @param  \Closure  $callback
+     * @param  int  $attempts
      * @return mixed
      *
-     * @throws \Exception|\Throwable
+     * @throws \Throwable
      */
-    public function transaction(Closure $callback)
+    public function transaction(Closure $callback, $attempts = 1)
     {
-        if ($this->getDriverName() == 'sqlsrv') {
-            return parent::transaction($callback);
+        for ($a = 1; $a <= $attempts; $a++) {
+            if ($this->getDriverName() === 'sqlsrv') {
+                return parent::transaction($callback);
+            }
+
+            $this->getPdo()->exec('BEGIN TRAN');
+
+            // We'll simply execute the given callback within a try / catch block
+            // and if we catch any exception we can rollback the transaction
+            // so that none of the changes are persisted to the database.
+            try {
+                $result = $callback($this);
+
+                $this->getPdo()->exec('COMMIT TRAN');
+            }
+
+            // If we catch an exception, we will roll back so nothing gets messed
+            // up in the database. Then we'll re-throw the exception so it can
+            // be handled how the developer sees fit for their applications.
+            catch (Throwable $e) {
+                $this->getPdo()->exec('ROLLBACK TRAN');
+
+                throw $e;
+            }
+
+            return $result;
         }
-
-        $this->getPdo()->exec('BEGIN TRAN');
-
-        // We'll simply execute the given callback within a try / catch block
-        // and if we catch any exception we can rollback the transaction
-        // so that none of the changes are persisted to the database.
-        try {
-            $result = $callback($this);
-
-            $this->getPdo()->exec('COMMIT TRAN');
-        }
-
-        // If we catch an exception, we will roll back so nothing gets messed
-        // up in the database. Then we'll re-throw the exception so it can
-        // be handled how the developer sees fit for their applications.
-        catch (Exception $e) {
-            $this->getPdo()->exec('ROLLBACK TRAN');
-
-            throw $e;
-        } catch (Throwable $e) {
-            $this->getPdo()->exec('ROLLBACK TRAN');
-
-            throw $e;
-        }
-
-        return $result;
     }
 
     /**
@@ -61,6 +60,20 @@ class SqlServerConnection extends Connection
     protected function getDefaultQueryGrammar()
     {
         return $this->withTablePrefix(new QueryGrammar);
+    }
+
+    /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return \Illuminate\Database\Schema\SqlServerBuilder
+     */
+    public function getSchemaBuilder()
+    {
+        if (is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
+
+        return new SqlServerBuilder($this);
     }
 
     /**

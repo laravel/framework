@@ -7,21 +7,21 @@ use Illuminate\Support\ServiceProvider;
 class DummyClass extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
+     * Register services.
      *
      * @return void
      */
-    public function boot()
+    public function register()
     {
         //
     }
 
     /**
-     * Register the application services.
+     * Bootstrap services.
      *
      * @return void
      */
-    public function register()
+    public function boot()
     {
         //
     }

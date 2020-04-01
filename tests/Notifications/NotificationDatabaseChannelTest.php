@@ -1,40 +1,70 @@
 <?php
 
-use Illuminate\Notifications\Message;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Channels\DatabaseChannel;
+namespace Illuminate\Tests\Notifications;
 
-class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
+use Illuminate\Notifications\Channels\DatabaseChannel;
+use Illuminate\Notifications\Messages\DatabaseMessage;
+use Illuminate\Notifications\Notification;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class NotificationDatabaseChannelTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
-        Mockery::close();
+        m::close();
     }
 
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationDatabaseChannelTestNotification;
-        $notifiables = collect([$notifiable = Mockery::mock()]);
+        $notification->id = 1;
+        $notifiable = m::mock();
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
+            'id' => 1,
             'type' => get_class($notification),
-            'level' => 'info',
-            'intro' => [],
-            'outro' => [],
-            'action_text' => null,
-            'action_url' => null,
-            'read' => false,
+            'data' => ['invoice_id' => 1],
+            'read_at' => null,
         ]);
 
         $channel = new DatabaseChannel;
-        $channel->send($notifiables, $notification);
+        $channel->send($notifiable, $notification);
+    }
+
+    public function testCorrectPayloadIsSentToDatabase()
+    {
+        $notification = new NotificationDatabaseChannelTestNotification;
+        $notification->id = 1;
+        $notifiable = m::mock();
+
+        $notifiable->shouldReceive('routeNotificationFor->create')->with([
+            'id' => 1,
+            'type' => get_class($notification),
+            'data' => ['invoice_id' => 1],
+            'read_at' => null,
+            'something' => 'else',
+        ]);
+
+        $channel = new ExtendedDatabaseChannel;
+        $channel->send($notifiable, $notification);
     }
 }
 
 class NotificationDatabaseChannelTestNotification extends Notification
 {
-    public function message($notifiable)
+    public function toDatabase($notifiable)
     {
-        return new Message;
+        return new DatabaseMessage(['invoice_id' => 1]);
+    }
+}
+
+class ExtendedDatabaseChannel extends DatabaseChannel
+{
+    protected function buildPayload($notifiable, Notification $notification)
+    {
+        return array_merge(parent::buildPayload($notifiable, $notification), [
+            'something' => 'else',
+        ]);
     }
 }

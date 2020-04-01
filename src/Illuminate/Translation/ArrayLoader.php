@@ -2,7 +2,9 @@
 
 namespace Illuminate\Translation;
 
-class ArrayLoader implements LoaderInterface
+use Illuminate\Contracts\Translation\Loader;
+
+class ArrayLoader implements Loader
 {
     /**
      * All of the translation messages.
@@ -16,18 +18,14 @@ class ArrayLoader implements LoaderInterface
      *
      * @param  string  $locale
      * @param  string  $group
-     * @param  string  $namespace
+     * @param  string|null  $namespace
      * @return array
      */
     public function load($locale, $group, $namespace = null)
     {
         $namespace = $namespace ?: '*';
 
-        if (isset($this->messages[$namespace][$locale][$group])) {
-            return $this->messages[$namespace][$locale][$group];
-        }
-
-        return [];
+        return $this->messages[$namespace][$locale][$group] ?? [];
     }
 
     /**
@@ -38,6 +36,17 @@ class ArrayLoader implements LoaderInterface
      * @return void
      */
     public function addNamespace($namespace, $hint)
+    {
+        //
+    }
+
+    /**
+     * Add a new JSON path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addJsonPath($path)
     {
         //
     }
@@ -58,5 +67,15 @@ class ArrayLoader implements LoaderInterface
         $this->messages[$namespace][$locale][$group] = $messages;
 
         return $this;
+    }
+
+    /**
+     * Get an array of all the registered namespaces.
+     *
+     * @return array
+     */
+    public function namespaces()
+    {
+        return [];
     }
 }

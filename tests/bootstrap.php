@@ -14,7 +14,7 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +30,5 @@ use Carbon\Carbon;
 date_default_timezone_set('UTC');
 
 Carbon::setTestNow(Carbon::now());
+
+setlocale(LC_ALL, 'C.UTF-8');

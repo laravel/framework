@@ -8,11 +8,10 @@ interface StatefulGuard extends Guard
      * Attempt to authenticate a user using the given credentials.
      *
      * @param  array  $credentials
-     * @param  bool   $remember
-     * @param  bool   $login
+     * @param  bool  $remember
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false, $login = true);
+    public function attempt(array $credentials = [], $remember = false);
 
     /**
      * Log a user into the application without sessions or cookies.
@@ -35,7 +34,7 @@ interface StatefulGuard extends Guard
      * Log the given user ID into the application.
      *
      * @param  mixed  $id
-     * @param  bool   $remember
+     * @param  bool  $remember
      * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     public function loginUsingId($id, $remember = false);
@@ -44,7 +43,7 @@ interface StatefulGuard extends Guard
      * Log the given user ID into the application without sessions or cookies.
      *
      * @param  mixed  $id
-     * @return bool
+     * @return \Illuminate\Contracts\Auth\Authenticatable|bool
      */
     public function onceUsingId($id);
 

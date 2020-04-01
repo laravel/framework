@@ -1,35 +1,42 @@
 <?php
 
-use Aws\Ses\SesClient;
-use Illuminate\Foundation\Application;
-use Illuminate\Mail\TransportManager;
-use Illuminate\Mail\Transport\SesTransport;
-use Illuminate\Support\Collection;
+namespace Illuminate\Tests\Mail;
 
-class MailSesTransportTest extends PHPUnit_Framework_TestCase
+use Aws\Ses\SesClient;
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Mail\MailManager;
+use Illuminate\Mail\Transport\SesTransport;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
+use Swift_Message;
+
+class MailSesTransportTest extends TestCase
 {
+    /** @group Foo */
     public function testGetTransport()
     {
-        /** @var Application $app */
-        $app = [
-            'config' => new Collection([
+        $container = new Container();
+
+        $container->singleton('config', function () {
+            return new Repository([
                 'services.ses' => [
-                    'key'    => 'foo',
+                    'key' => 'foo',
                     'secret' => 'bar',
                     'region' => 'us-east-1',
                 ],
-            ]),
-        ];
+            ]);
+        });
 
-        $manager = new TransportManager($app);
+        $manager = new MailManager($container);
 
-        /** @var SesTransport $transport */
-        $transport = $manager->driver('ses');
+        /** @var \Illuminate\Mail\Transport\SesTransport $transport */
+        $transport = $manager->createTransport(['transport' => 'ses']);
 
-        /** @var SesClient $ses */
-        $ses = $this->readAttribute($transport, 'ses');
+        /** @var \Aws\Ses\SesClient $ses */
+        $ses = $transport->ses();
 
-        $this->assertEquals('us-east-1', $ses->getRegion());
+        $this->assertSame('us-east-1', $ses->getRegion());
     }
 
     public function testSend()
@@ -39,19 +46,40 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase
         $message->setTo('me@example.com');
         $message->setBcc('you@example.com');
 
-        $client = $this->getMockBuilder('Aws\Ses\SesClient')
+        $client = $this->getMockBuilder(SesClient::class)
             ->setMethods(['sendRawEmail'])
             ->disableOriginalConstructor()
             ->getMock();
         $transport = new SesTransport($client);
 
+        // Generate a messageId for our mock to return to ensure that the post-sent message
+        // has X-SES-Message-ID in its headers
+        $messageId = Str::random(32);
+        $sendRawEmailMock = new sendRawEmailMock($messageId);
         $client->expects($this->once())
             ->method('sendRawEmail')
             ->with($this->equalTo([
                 'Source' => 'myself@example.com',
                 'RawMessage' => ['Data' => (string) $message],
-            ]));
+            ]))
+            ->willReturn($sendRawEmailMock);
 
         $transport->send($message);
+        $this->assertEquals($messageId, $message->getHeaders()->get('X-SES-Message-ID')->getFieldBody());
+    }
+}
+
+class sendRawEmailMock
+{
+    protected $getResponse;
+
+    public function __construct($responseValue)
+    {
+        $this->getResponse = $responseValue;
+    }
+
+    public function get($key)
+    {
+        return $this->getResponse;
     }
 }

@@ -1,13 +1,14 @@
 <?php
 
-use Illuminate\Database\Connection;
-use Illuminate\Database\Query\Builder;
+namespace Illuminate\Tests\Database;
+
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use PHPUnit\Framework\TestCase;
 
-class DatabaseEloquentPolymorphicIntegrationTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -65,7 +66,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends PHPUnit_Framework_TestC
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
@@ -116,6 +117,26 @@ class DatabaseEloquentPolymorphicIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(TestUser::first(), $like->likeable->owner);
     }
 
+    public function testItLoadsNestedMorphRelationshipsOnDemand()
+    {
+        $this->seedData();
+
+        TestPost::first()->likes()->create([]);
+
+        $likes = TestLike::with('likeable.owner')->get()->loadMorph('likeable', [
+            TestComment::class => ['commentable'],
+            TestPost::class => 'comments',
+        ]);
+
+        $this->assertTrue($likes[0]->relationLoaded('likeable'));
+        $this->assertTrue($likes[0]->likeable->relationLoaded('owner'));
+        $this->assertTrue($likes[0]->likeable->relationLoaded('commentable'));
+
+        $this->assertTrue($likes[1]->relationLoaded('likeable'));
+        $this->assertTrue($likes[1]->likeable->relationLoaded('owner'));
+        $this->assertTrue($likes[1]->likeable->relationLoaded('comments'));
+    }
+
     /**
      * Helpers...
      */
@@ -131,7 +152,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends PHPUnit_Framework_TestC
     /**
      * Get a database connection instance.
      *
-     * @return Connection
+     * @return \Illuminate\Database\Connection
      */
     protected function connection()
     {
@@ -141,7 +162,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends PHPUnit_Framework_TestC
     /**
      * Get a schema builder instance.
      *
-     * @return Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema()
     {
@@ -179,6 +200,11 @@ class TestPost extends Eloquent
     public function owner()
     {
         return $this->belongsTo(TestUser::class, 'user_id');
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(TestLike::class, 'likeable');
     }
 }
 

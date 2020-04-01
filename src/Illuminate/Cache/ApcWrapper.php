@@ -36,8 +36,8 @@ class ApcWrapper
      * Store an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
-     * @param  int     $seconds
+     * @param  mixed  $value
+     * @param  int  $seconds
      * @return array|bool
      */
     public function put($key, $value, $seconds)
@@ -49,7 +49,7 @@ class ApcWrapper
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value)
@@ -61,7 +61,7 @@ class ApcWrapper
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value)
@@ -83,10 +83,10 @@ class ApcWrapper
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
-        $this->apcu ? apcu_clear_cache() : apc_clear_cache('user');
+        return $this->apcu ? apcu_clear_cache() : apc_clear_cache('user');
     }
 }

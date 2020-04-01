@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 
 class ListFailedCommand extends Command
 {
@@ -33,11 +33,9 @@ class ListFailedCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
-        $jobs = $this->getFailedJobs();
-
-        if (count($jobs) == 0) {
+        if (count($jobs = $this->getFailedJobs()) === 0) {
             return $this->info('No failed jobs!');
         }
 
@@ -51,13 +49,11 @@ class ListFailedCommand extends Command
      */
     protected function getFailedJobs()
     {
-        $results = [];
+        $failed = $this->laravel['queue.failer']->all();
 
-        foreach ($this->laravel['queue.failer']->all() as $failed) {
-            $results[] = $this->parseFailedJob((array) $failed);
-        }
-
-        return array_filter($results);
+        return collect($failed)->map(function ($failed) {
+            return $this->parseFailedJob((array) $failed);
+        })->filter()->all();
     }
 
     /**
@@ -86,18 +82,23 @@ class ListFailedCommand extends Command
         $payload = json_decode($payload, true);
 
         if ($payload && (! isset($payload['data']['command']))) {
-            return Arr::get($payload, 'job');
+            return $payload['job'] ?? null;
+        } elseif ($payload && isset($payload['data']['command'])) {
+            return $this->matchJobName($payload);
         }
+    }
 
-        if ($payload && isset($payload['data']['command'])) {
-            preg_match('/"([^"]+)"/', $payload['data']['command'], $matches);
+    /**
+     * Match the job name from the payload.
+     *
+     * @param  array  $payload
+     * @return string|null
+     */
+    protected function matchJobName($payload)
+    {
+        preg_match('/"([^"]+)"/', $payload['data']['command'], $matches);
 
-            if (isset($matches[1])) {
-                return $matches[1];
-            } else {
-                return Arr::get($payload, 'job');
-            }
-        }
+        return $matches[1] ?? $payload['job'] ?? null;
     }
 
     /**

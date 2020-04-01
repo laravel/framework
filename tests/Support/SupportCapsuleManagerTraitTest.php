@@ -1,14 +1,19 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Container\Container;
-use Illuminate\Support\Traits\CapsuleManagerTrait;
+namespace Illuminate\Tests\Support;
 
-class SupportCapsuleManagerTraitTest extends PHPUnit_Framework_TestCase
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Support\Fluent;
+use Illuminate\Support\Traits\CapsuleManagerTrait;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class SupportCapsuleManagerTraitTest extends TestCase
 {
     use CapsuleManagerTrait;
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -20,17 +25,17 @@ class SupportCapsuleManagerTraitTest extends PHPUnit_Framework_TestCase
 
         $this->assertNull($this->setupContainer($app));
         $this->assertEquals($app, $this->getContainer());
-        $this->assertInstanceOf('Illuminate\Support\Fluent', $app['config']);
+        $this->assertInstanceOf(Fluent::class, $app['config']);
     }
 
     public function testSetupContainerForCapsuleWhenConfigIsBound()
     {
         $this->container = null;
         $app = new Container;
-        $app['config'] = m::mock('Illuminate\Config\Repository');
+        $app['config'] = m::mock(Repository::class);
 
         $this->assertNull($this->setupContainer($app));
         $this->assertEquals($app, $this->getContainer());
-        $this->assertInstanceOf('Illuminate\Config\Repository', $app['config']);
+        $this->assertInstanceOf(Repository::class, $app['config']);
     }
 }

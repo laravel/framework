@@ -2,14 +2,14 @@
 
 namespace Illuminate\Console;
 
-use Closure;
-
 trait ConfirmableTrait
 {
     /**
      * Confirm before proceeding with the action.
      *
-     * @param  string    $warning
+     * This method only asks for confirmation in production.
+     *
+     * @param  string  $warning
      * @param  \Closure|bool|null  $callback
      * @return bool
      */
@@ -17,22 +17,19 @@ trait ConfirmableTrait
     {
         $callback = is_null($callback) ? $this->getDefaultConfirmCallback() : $callback;
 
-        $shouldConfirm = $callback instanceof Closure ? call_user_func($callback) : $callback;
+        $shouldConfirm = value($callback);
 
         if ($shouldConfirm) {
-            if ($this->option('force')) {
+            if ($this->hasOption('force') && $this->option('force')) {
                 return true;
             }
 
-            $this->comment(str_repeat('*', strlen($warning) + 12));
-            $this->comment('*     '.$warning.'     *');
-            $this->comment(str_repeat('*', strlen($warning) + 12));
-            $this->output->writeln('');
+            $this->alert($warning);
 
             $confirmed = $this->confirm('Do you really wish to run this command?');
 
             if (! $confirmed) {
-                $this->comment('Command Cancelled!');
+                $this->comment('Command Canceled!');
 
                 return false;
             }
@@ -49,7 +46,7 @@ trait ConfirmableTrait
     protected function getDefaultConfirmCallback()
     {
         return function () {
-            return $this->getLaravel()->environment() == 'production';
+            return $this->getLaravel()->environment() === 'production';
         };
     }
 }

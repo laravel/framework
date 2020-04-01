@@ -1,16 +1,19 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use \Illuminate\Queue\DatabaseQueue;
-use Carbon\Carbon;
-use Illuminate\Container\Container;
+namespace Illuminate\Tests\Queue;
 
-class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
+use Illuminate\Container\Container;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\TestCase;
+
+class QueueDatabaseQueueIntegrationTest extends TestCase
 {
     /**
-     * @var DatabaseQueue The queue instance.
+     * @var \Illuminate\Queue\DatabaseQueue
      */
     protected $queue;
 
@@ -20,11 +23,11 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
     protected $table;
 
     /**
-     * @var Container The IOC container.
+     * @var \Illuminate\Container\Container
      */
     protected $container;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -80,7 +83,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
     /**
      * Get a schema builder instance.
      *
-     * @return Illuminate\Database\Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema()
     {
@@ -92,7 +95,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->schema()->drop('jobs');
     }

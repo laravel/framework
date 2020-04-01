@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class Create{{tableClassName}}Table extends Migration
 {
@@ -13,7 +14,7 @@ class Create{{tableClassName}}Table extends Migration
     public function up()
     {
         Schema::create('{{table}}', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->text('connection');
             $table->text('queue');
             $table->longText('payload');
@@ -29,6 +30,6 @@ class Create{{tableClassName}}Table extends Migration
      */
     public function down()
     {
-        Schema::drop('{{table}}');
+        Schema::dropIfExists('{{table}}');
     }
 }

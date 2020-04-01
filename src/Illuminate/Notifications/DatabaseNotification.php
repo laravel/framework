@@ -7,6 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class DatabaseNotification extends Model
 {
     /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
      * The table associated with the model.
      *
      * @var string
@@ -26,13 +40,14 @@ class DatabaseNotification extends Model
      * @var array
      */
     protected $casts = [
-        'intro' => 'array',
-        'outro' => 'array',
-        'read' => 'boolean',
+        'data' => 'array',
+        'read_at' => 'datetime',
     ];
 
     /**
      * Get the notifiable entity that the notification belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function notifiable()
     {
@@ -46,6 +61,51 @@ class DatabaseNotification extends Model
      */
     public function markAsRead()
     {
-        $this->forceFill(['read' => true])->save();
+        if (is_null($this->read_at)) {
+            $this->forceFill(['read_at' => $this->freshTimestamp()])->save();
+        }
+    }
+
+    /**
+     * Mark the notification as unread.
+     *
+     * @return void
+     */
+    public function markAsUnread()
+    {
+        if (! is_null($this->read_at)) {
+            $this->forceFill(['read_at' => null])->save();
+        }
+    }
+
+    /**
+     * Determine if a notification has been read.
+     *
+     * @return bool
+     */
+    public function read()
+    {
+        return $this->read_at !== null;
+    }
+
+    /**
+     * Determine if a notification has not been read.
+     *
+     * @return bool
+     */
+    public function unread()
+    {
+        return $this->read_at === null;
+    }
+
+    /**
+     * Create a new database notification collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Notifications\DatabaseNotificationCollection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new DatabaseNotificationCollection($models);
     }
 }

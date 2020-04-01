@@ -4,13 +4,21 @@ namespace Illuminate\Contracts\Notifications;
 
 interface Dispatcher
 {
-    // *
-    //  * Dispatch the given notification instance to the given notifiable.
-    //  *
-    //  * @param  mixed  $notifiable
-    //  * @param  mixed  $instance
-    //  * @param  array  $channels
-    //  * @return void
+    /**
+     * Send the given notification to the given notifiable entities.
+     *
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  mixed  $notification
+     * @return void
+     */
+    public function send($notifiables, $notification);
 
-    // public function dispatch($notifiable, $instance, array $channels = []);
+    /**
+     * Send the given notification immediately.
+     *
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  mixed  $notification
+     * @return void
+     */
+    public function sendNow($notifiables, $notification);
 }

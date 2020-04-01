@@ -38,19 +38,20 @@ trait InteractsWithQueue
     /**
      * Fail the job from the queue.
      *
+     * @param  \Throwable|null  $exception
      * @return void
      */
-    public function failed()
+    public function fail($exception = null)
     {
         if ($this->job) {
-            return $this->job->failed();
+            $this->job->fail($exception);
         }
     }
 
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param  int  $delay
      * @return void
      */
     public function release($delay = 0)

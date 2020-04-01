@@ -2,27 +2,13 @@
 
 namespace Illuminate\Routing;
 
-use ReflectionMethod;
-use ReflectionParameter;
 use Illuminate\Support\Arr;
 use ReflectionFunctionAbstract;
+use ReflectionMethod;
+use ReflectionParameter;
 
 trait RouteDependencyResolverTrait
 {
-    /**
-     * Call a class method with the resolved dependencies.
-     *
-     * @param  object  $instance
-     * @param  string  $method
-     * @return mixed
-     */
-    protected function callWithDependencies($instance, $method)
-    {
-        return call_user_func_array(
-            [$instance, $method], $this->resolveClassMethodDependencies([], $instance, $method)
-        );
-    }
-
     /**
      * Resolve the object method's type-hinted dependencies.
      *
@@ -51,15 +37,22 @@ trait RouteDependencyResolverTrait
      */
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
-        $originalParameters = $parameters;
+        $instanceCount = 0;
+
+        $values = array_values($parameters);
+
+        $skippableValue = new \stdClass;
 
         foreach ($reflector->getParameters() as $key => $parameter) {
-            $instance = $this->transformDependency(
-                $parameter, $parameters, $originalParameters
-            );
+            $instance = $this->transformDependency($parameter, $parameters, $skippableValue);
 
-            if (! is_null($instance)) {
+            if ($instance !== $skippableValue) {
+                $instanceCount++;
+
                 $this->spliceIntoParameters($parameters, $key, $instance);
+            } elseif (! isset($values[$key - $instanceCount]) &&
+                      $parameter->isDefaultValueAvailable()) {
+                $this->spliceIntoParameters($parameters, $key, $parameter->getDefaultValue());
             }
         }
 
@@ -71,10 +64,10 @@ trait RouteDependencyResolverTrait
      *
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
-     * @param  array  $originalParameters
+     * @param  object  $skippableValue
      * @return mixed
      */
-    protected function transformDependency(ReflectionParameter $parameter, $parameters, $originalParameters)
+    protected function transformDependency(ReflectionParameter $parameter, $parameters, $skippableValue)
     {
         $class = $parameter->getClass();
 
@@ -82,8 +75,12 @@ trait RouteDependencyResolverTrait
         // the list of parameters. If it is we will just skip it as it is probably a model
         // binding and we do not want to mess with those; otherwise, we resolve it here.
         if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
-            return $this->container->make($class->name);
+            return $parameter->isDefaultValueAvailable()
+                        ? null
+                        : $this->container->make($class->name);
         }
+
+        return $skippableValue;
     }
 
     /**
@@ -104,14 +101,14 @@ trait RouteDependencyResolverTrait
      * Splice the given value into the parameter list.
      *
      * @param  array  $parameters
-     * @param  string  $key
-     * @param  mixed  $instance
+     * @param  string  $offset
+     * @param  mixed  $value
      * @return void
      */
-    protected function spliceIntoParameters(array &$parameters, $key, $instance)
+    protected function spliceIntoParameters(array &$parameters, $offset, $value)
     {
         array_splice(
-            $parameters, $key, 0, [$instance]
+            $parameters, $offset, 0, [$value]
         );
     }
 }

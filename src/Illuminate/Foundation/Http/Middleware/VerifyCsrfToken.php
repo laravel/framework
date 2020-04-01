@@ -3,17 +3,22 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Foundation\Application;
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\InteractsWithTime;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class VerifyCsrfToken
 {
+    use InteractsWithTime;
+
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -32,9 +37,16 @@ class VerifyCsrfToken
     protected $except = [];
 
     /**
+     * Indicates whether the XSRF-TOKEN cookie should be set on the response.
+     *
+     * @var bool
+     */
+    protected $addHttpCookie = true;
+
+    /**
      * Create a new middleware instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      * @return void
      */
@@ -58,34 +70,28 @@ class VerifyCsrfToken
         if (
             $this->isReading($request) ||
             $this->runningUnitTests() ||
-            $this->shouldPassThrough($request) ||
+            $this->inExceptArray($request) ||
             $this->tokensMatch($request)
         ) {
-            return $this->addCookieToResponse($request, $next($request));
+            return tap($next($request), function ($response) use ($request) {
+                if ($this->shouldAddXsrfTokenCookie()) {
+                    $this->addCookieToResponse($request, $response);
+                }
+            });
         }
 
-        throw new TokenMismatchException;
+        throw new TokenMismatchException('CSRF token mismatch.');
     }
 
     /**
-     * Determine if the request has a URI that should pass through CSRF verification.
+     * Determine if the HTTP request uses a ‘read’ verb.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    protected function shouldPassThrough($request)
+    protected function isReading($request)
     {
-        foreach ($this->except as $except) {
-            if ($except !== '/') {
-                $except = trim($except, '/');
-            }
-
-            if ($request->is($except)) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array($request->method(), ['HEAD', 'GET', 'OPTIONS']);
     }
 
     /**
@@ -99,6 +105,27 @@ class VerifyCsrfToken
     }
 
     /**
+     * Determine if the request has a URI that should pass through CSRF verification.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function inExceptArray($request)
+    {
+        foreach ($this->except as $except) {
+            if ($except !== '/') {
+                $except = trim($except, '/');
+            }
+
+            if ($request->fullUrlIs($except) || $request->is($except)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if the session and input CSRF tokens match.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -106,19 +133,38 @@ class VerifyCsrfToken
      */
     protected function tokensMatch($request)
     {
-        $sessionToken = $request->session()->token();
+        $token = $this->getTokenFromRequest($request);
 
+        return is_string($request->session()->token()) &&
+               is_string($token) &&
+               hash_equals($request->session()->token(), $token);
+    }
+
+    /**
+     * Get the CSRF token from the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
+    protected function getTokenFromRequest($request)
+    {
         $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
 
         if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
-            $token = $this->encrypter->decrypt($header);
+            $token = $this->encrypter->decrypt($header, static::serialized());
         }
 
-        if (! is_string($sessionToken) || ! is_string($token)) {
-            return false;
-        }
+        return $token;
+    }
 
-        return hash_equals($sessionToken, $token);
+    /**
+     * Determine if the cookie should be added to the response.
+     *
+     * @return bool
+     */
+    public function shouldAddXsrfTokenCookie()
+    {
+        return $this->addHttpCookie;
     }
 
     /**
@@ -132,10 +178,14 @@ class VerifyCsrfToken
     {
         $config = config('session');
 
+        if ($response instanceof Responsable) {
+            $response = $response->toResponse($request);
+        }
+
         $response->headers->setCookie(
             new Cookie(
-                'XSRF-TOKEN', $request->session()->token(), time() + 60 * $config['lifetime'],
-                $config['path'], $config['domain'], $config['secure'], false
+                'XSRF-TOKEN', $request->session()->token(), $this->availableAt(60 * $config['lifetime']),
+                $config['path'], $config['domain'], $config['secure'], false, false, $config['same_site'] ?? null
             )
         );
 
@@ -143,13 +193,12 @@ class VerifyCsrfToken
     }
 
     /**
-     * Determine if the HTTP request uses a ‘read’ verb.
+     * Determine if the cookie contents should be serialized.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    protected function isReading($request)
+    public static function serialized()
     {
-        return in_array($request->method(), ['HEAD', 'GET', 'OPTIONS']);
+        return EncryptCookies::serialized('XSRF-TOKEN');
     }
 }
