@@ -80,7 +80,7 @@ class VerifyEmail extends Notification
     }
 
     /**
-     * Set a callback that should be used when creating the reset password button URL.
+     * Set a callback that should be used when creating the verify email button URL.
      *
      * @param  \Closure  $callback
      * @return void
