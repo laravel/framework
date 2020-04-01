@@ -145,6 +145,10 @@ if (! function_exists('data_get')) {
         foreach ($key as $i => $segment) {
             unset($key[$i]);
 
+            if ($segment === null) {
+                return $target;
+            }
+
             if ($segment === '*') {
                 if ($target instanceof Collection) {
                     $target = $target->all();
