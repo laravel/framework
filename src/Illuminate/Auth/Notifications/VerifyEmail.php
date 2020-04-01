@@ -14,7 +14,7 @@ class VerifyEmail extends Notification
     /**
      * The callback that should be used to create the verification URL.
      *
-     * @var \Closure|null
+     * @var callable|null
      */
     public static $createUrlCallback;
 
@@ -82,10 +82,10 @@ class VerifyEmail extends Notification
     /**
      * Set a callback that should be used when creating the verify email button URL.
      *
-     * @param  \Closure  $callback
+     * @param  callable|null  $callback
      * @return void
      */
-    public static function createUrlUsing($callback)
+    public static function createUrlUsing(callable $callback = null)
     {
         static::$createUrlCallback = $callback;
     }
