@@ -24,7 +24,7 @@ class SupportFacadesEventTest extends TestCase
     {
         parent::setUp();
 
-        $this->events = m::spy(Dispatcher::class);
+        $this->events = m::mock(Dispatcher::class);
 
         $container = new Container;
         $container->instance('events', $this->events);
