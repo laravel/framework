@@ -662,10 +662,10 @@ class Container implements ArrayAccess, ContainerContract
     protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
         $abstract = $this->getAlias($abstract);
+        
+        $concrete = $this->getContextualConcrete($abstract);
 
-        $needsContextualBuild = ! empty($parameters) || ! is_null(
-            $this->getContextualConcrete($abstract)
-        );
+        $needsContextualBuild = ! empty($parameters) || ! is_null($concrete);
 
         // If an instance of the type is currently being managed as a singleton we'll
         // just return an existing instance instead of instantiating new instances
@@ -676,7 +676,9 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->with[] = $parameters;
 
-        $concrete = $this->getConcrete($abstract);
+        if (is_null($concrete)) {
+            $concrete = $this->getConcrete($abstract);
+        }
 
         // We're ready to instantiate an instance of the concrete type registered for
         // the binding. This will instantiate the types, as well as resolve any of
@@ -723,10 +725,6 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getConcrete($abstract)
     {
-        if (! is_null($concrete = $this->getContextualConcrete($abstract))) {
-            return $concrete;
-        }
-
         // If we don't have a registered resolver or concrete for the type, we'll just
         // assume each type is a concrete name and will attempt to resolve it as is
         // since the container should be able to resolve concretes automatically.
