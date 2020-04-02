@@ -245,7 +245,28 @@ class ValueObject implements Castable
 
     public static function castUsing(array $arguments)
     {
-        return ValueObjectCaster::class;
+        return new class(...$arguments) implements CastsAttributes {
+            private $argument;
+
+            public function __construct($argument = null)
+            {
+                $this->argument = $argument;
+            }
+
+            public function get($model, $key, $value, $attributes)
+            {
+                if ($this->argument) {
+                    return $this->argument;
+                }
+
+                return unserialize($value);
+            }
+
+            public function set($model, $key, $value, $attributes)
+            {
+                return serialize($value);
+            }
+        };
     }
 }
 
