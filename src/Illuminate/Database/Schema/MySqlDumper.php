@@ -16,6 +16,13 @@ class MySqlDumper
     protected $files;
 
     /**
+     * The process factory callback.
+     *
+     * @var callable
+     */
+    protected $processFactory;
+
+    /**
      * The output callable instance.
      *
      * @var callable
@@ -26,16 +33,20 @@ class MySqlDumper
      * Create a new dumper instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  callable  $output
+     * @param  callable  $processFactory
      * @return void
      */
-    public function __construct(Filesystem $files, callable $output = null)
+    public function __construct(Filesystem $files, callable $processFactory = null)
     {
         $this->files = $files;
 
-        $this->output = $output ?: function () {
-            //
+        $this->processFactory = $processFactory ?: function (...$arguments) {
+            return new Process(...$arguments);
         };
+
+        $this->handleOutputUsing(function () {
+            //
+        });
     }
 
     /**
@@ -47,15 +58,15 @@ class MySqlDumper
      */
     public function dump(Connection $connection, $path)
     {
-        (new Process(array_merge($this->dumpCommand($connection->getConfig()), [
+        $this->makeProcess(array_merge($this->dumpCommand($connection->getConfig()), [
             '--routines',
             '--result-file='.$path,
             '--no-data',
-        ])))->mustRun($this->output);
+        ]))->mustRun($this->output);
 
         $this->removeAutoIncrementingState($path);
 
-        with($process = new Process(array_merge($this->dumpCommand($connection->getConfig()), [
+        with($process = $this->makeProcess(array_merge($this->dumpCommand($connection->getConfig()), [
             'migrations',
             '--no-create-info',
             '--skip-extended-insert',
@@ -103,5 +114,29 @@ class MySqlDumper
             '--password='.$config['password'],
             $config['database'],
         ];
+    }
+
+    /**
+     * Create a new process instance.
+     *
+     * @param  array  $arguments
+     * @return \Symfony\Component\Process\Process
+     */
+    public function makeProcess(...$arguments)
+    {
+        return call_user_func($this->processFactory, ...$arguments);
+    }
+
+    /**
+     * Specify the callback that should be used to handle process output.
+     *
+     * @param  callable  $output
+     * @return $this
+     */
+    public function handleOutputUsing(callable $output)
+    {
+        $this->output = $output;
+
+        return $this;
     }
 }

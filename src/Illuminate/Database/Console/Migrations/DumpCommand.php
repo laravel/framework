@@ -60,7 +60,7 @@ class DumpCommand extends Command
 
         switch ($driver) {
             case 'mysql':
-                return new MySqlDumper(new Filesystem, $output);
+                return (new MySqlDumper(new Filesystem))->handleOutputUsing($output);
             default:
                 throw new InvalidArgumentException("Schema dumps not supported for database driver [{$driver}].");
         }
