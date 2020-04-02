@@ -60,7 +60,7 @@ class MySqlSchemaState
     }
 
     /**
-     * Dump the given connection's schema into an SQL string.
+     * Dump the database's schema into a file.
      *
      * @param  string  $path
      * @return void
@@ -112,6 +112,17 @@ class MySqlSchemaState
         ))->mustRun();
 
         $this->files->append($path, $process->getOutput());
+    }
+
+    /**
+     * Load the given schema file into the database.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function load($path)
+    {
+        //
     }
 
     /**
