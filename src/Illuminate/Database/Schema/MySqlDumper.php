@@ -107,7 +107,7 @@ class MySqlDumper
     }
 
     /**
-     * Get the dump command for MySQL as an array.
+     * Get the base dump command arguments for MySQL as an array.
      *
      * @param  array  $config
      * @return array
