@@ -243,7 +243,7 @@ class ValueObject implements Castable
         $this->name = $name;
     }
 
-    public static function castUsing()
+    public static function castUsing(array $arguments)
     {
         return ValueObjectCaster::class;
     }
