@@ -51,7 +51,7 @@ class MySqlSchemaState
         $this->files = $files ?: new Filesystem;
 
         $this->processFactory = $processFactory ?: function (...$arguments) {
-            return new Process(...$arguments);
+            return Process::fromShellCommandline(...$arguments);
         };
 
         $this->handleOutputUsing(function () {
@@ -67,11 +67,11 @@ class MySqlSchemaState
      */
     public function dump($path)
     {
-        $this->makeProcess(array_merge($this->baseDumpCommand($this->connection->getConfig()), [
-            '--routines',
-            '--result-file='.$path,
-            '--no-data',
-        ]))->mustRun($this->output);
+        $this->makeProcess(
+            $this->baseDumpCommand().' --routines --result-file=$LARAVEL_LOAD_PATH --no-data'
+        )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
+            'LARAVEL_LOAD_PATH' => $path,
+        ]));
 
         $this->removeAutoIncrementingState($path);
 
@@ -102,14 +102,10 @@ class MySqlSchemaState
     protected function appendMigrationData(string $path)
     {
         with($process = $this->makeProcess(
-            array_merge($this->baseDumpCommand($this->connection->getConfig()), [
-                'migrations',
-                '--no-create-info',
-                '--skip-extended-insert',
-                '--skip-routines',
-                '--compact',
-            ])
-        ))->mustRun();
+            $this->baseDumpCommand().' migrations --no-create-info --skip-extended-insert --skip-routines --compact'
+        ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+            //
+        ]));
 
         $this->files->append($path, $process->getOutput());
     }
@@ -122,28 +118,22 @@ class MySqlSchemaState
      */
     public function load($path)
     {
-        $config = $this->connection->getConfig();
+        $process = $this->makeProcess('mysql --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD --database=$LARAVEL_LOAD_DATABASE < $LARAVEL_LOAD_PATH');
 
-        $process = Process::fromShellCommandline('mysql --no-beep --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD --database=$LARAVEL_LOAD_DATABASE < $LARAVEL_LOAD_PATH');
-
-        $process->mustRun(null, [
-            'LARAVEL_LOAD_HOST' => $config['host'],
-            'LARAVEL_LOAD_PORT' => $config['port'],
-            'LARAVEL_LOAD_USER' => $config['username'],
-            'LARAVEL_LOAD_PASSWORD' => $config['password'],
-            'LARAVEL_LOAD_DATABASE' => $config['database'],
+        $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
-        ]);
+        ]));
     }
 
     /**
-     * Get the base dump command arguments for MySQL as an array.
+     * Get the base dump command arguments for MySQL as a string.
      *
-     * @param  array  $config
-     * @return array
+     * @return string
      */
-    protected function baseDumpCommand(array $config)
+    protected function baseDumpCommand()
     {
+        return 'mysqldump --set-gtid-purged=OFF --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
+
         return [
             'mysqldump',
             '--set-gtid-purged=OFF',
@@ -157,6 +147,23 @@ class MySqlSchemaState
             '--user='.$config['username'],
             '--password='.$config['password'],
             $config['database'],
+        ];
+    }
+
+    /**
+     * Get the base variables for a dump / load command.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function baseVariables(array $config)
+    {
+        return [
+            'LARAVEL_LOAD_HOST' => $config['host'],
+            'LARAVEL_LOAD_PORT' => $config['port'],
+            'LARAVEL_LOAD_USER' => $config['username'],
+            'LARAVEL_LOAD_PASSWORD' => $config['password'],
+            'LARAVEL_LOAD_DATABASE' => $config['database'],
         ];
     }
 
