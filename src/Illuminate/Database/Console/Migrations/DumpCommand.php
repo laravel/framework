@@ -8,6 +8,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Database\Schema\MySqlDumper;
+use Illuminate\Database\Schema\MySqlSchemaState;
 use Illuminate\Filesystem\Filesystem;
 use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
@@ -37,7 +38,7 @@ class DumpCommand extends Command
     {
         $this->dumper(
             $connection = $connections->connection($database = $this->input->getOption('database'))
-        )->dump($connection, $path = $this->path($connection));
+        )->dump($path = $this->path($connection));
 
         $dispatcher->dispatch(new SchemaDumped($connection, $path));
 
@@ -60,7 +61,7 @@ class DumpCommand extends Command
 
         switch ($driver) {
             case 'mysql':
-                return (new MySqlDumper(new Filesystem))->handleOutputUsing($output);
+                return (new MySqlSchemaState($connection))->handleOutputUsing($output);
             default:
                 throw new InvalidArgumentException("Schema dumps not supported for database driver [{$driver}].");
         }

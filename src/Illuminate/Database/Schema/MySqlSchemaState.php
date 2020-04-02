@@ -2,12 +2,19 @@
 
 namespace Illuminate\Database\Schema;
 
-use Illuminate\Database\Connection;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
-class MySqlDumper
+class MySqlSchemaState
 {
+    /**
+     * The connection instance.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
     /**
      * The filesystem instance.
      *
@@ -32,13 +39,16 @@ class MySqlDumper
     /**
      * Create a new dumper instance.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  callable  $processFactory
      * @return void
      */
-    public function __construct(Filesystem $files, callable $processFactory = null)
+    public function __construct(MySqlConnection $connection, Filesystem $files = null, callable $processFactory = null)
     {
-        $this->files = $files;
+        $this->connection = $connection;
+
+        $this->files = $files ?: new Filesystem;
 
         $this->processFactory = $processFactory ?: function (...$arguments) {
             return new Process(...$arguments);
@@ -52,13 +62,12 @@ class MySqlDumper
     /**
      * Dump the given connection's schema into an SQL string.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
      * @return void
      */
-    public function dump(Connection $connection, $path)
+    public function dump($path)
     {
-        $this->makeProcess(array_merge($this->baseDumpCommand($connection->getConfig()), [
+        $this->makeProcess(array_merge($this->baseDumpCommand($this->connection->getConfig()), [
             '--routines',
             '--result-file='.$path,
             '--no-data',
@@ -66,7 +75,7 @@ class MySqlDumper
 
         $this->removeAutoIncrementingState($path);
 
-        $this->appendMigrationData($connection, $path);
+        $this->appendMigrationData($path);
     }
 
     /**
@@ -87,14 +96,13 @@ class MySqlDumper
     /**
      * Append the migration data to the schema dump.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
      * @return void
      */
-    protected function appendMigrationData(Connection $connection, string $path)
+    protected function appendMigrationData(string $path)
     {
         with($process = $this->makeProcess(
-            array_merge($this->baseDumpCommand($connection->getConfig()), [
+            array_merge($this->baseDumpCommand($this->connection->getConfig()), [
                 'migrations',
                 '--no-create-info',
                 '--skip-extended-insert',
