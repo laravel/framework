@@ -31,6 +31,13 @@ trait InteractsWithConsole
     public $expectedQuestions = [];
 
     /**
+     * All of the expected choice questions.
+     *
+     * @var array
+     */
+    public $expectedChoices = [];
+
+    /**
      * Call artisan command and return code.
      *
      * @param  string  $command
@@ -46,6 +53,18 @@ trait InteractsWithConsole
         $this->beforeApplicationDestroyed(function () {
             if (count($this->expectedQuestions)) {
                 $this->fail('Question "'.Arr::first($this->expectedQuestions)[0].'" was not asked.');
+            }
+
+            if (count($this->expectedChoices) > 0) {
+                foreach ($this->expectedChoices as $question => $answers) {
+                    $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
+
+                    $this->{$assertion}(
+                        $answers['expected'],
+                        $answers['actual'],
+                        'Question "'.$question.'" has different options.'
+                    );
+                }
             }
 
             if (count($this->expectedOutput)) {

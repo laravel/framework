@@ -99,6 +99,25 @@ class PendingCommand
     }
 
     /**
+     * Specify an expected choice question with expected answers that will be asked/shown when the command runs.
+     *
+     * @param  string  $question
+     * @param  string  $answer
+     * @param  array  $answers
+     * @param  bool  $strict
+     * @return $this
+     */
+    public function expectsChoice($question, $answer, $answers, $strict = false)
+    {
+        $this->test->expectedChoices[$question] = [
+            'expected' => $answers,
+            'strict' => $strict,
+        ];
+
+        return $this->expectsQuestion($question, $answer);
+    }
+
+    /**
      * Specify output that should be printed when the command runs.
      *
      * @param  string  $output
@@ -181,6 +200,10 @@ class PendingCommand
                 ->once()
                 ->ordered()
                 ->with(Mockery::on(function ($argument) use ($question) {
+                    if (isset($this->test->expectedChoices[$question[0]])) {
+                        $this->test->expectedChoices[$question[0]]['actual'] = $argument->getAutocompleterValues();
+                    }
+
                     return $argument->getQuestion() == $question[0];
                 }))
                 ->andReturnUsing(function () use ($question, $i) {
