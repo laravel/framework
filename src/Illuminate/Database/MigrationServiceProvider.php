@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Console\Migrations\FreshCommand;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
+use Illuminate\Database\Console\Migrations\DumpCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\ResetCommand;
@@ -25,6 +26,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected $commands = [
         'Migrate' => 'command.migrate',
+        'MigrateDump' => 'command.migrate.dump',
         'MigrateFresh' => 'command.migrate.fresh',
         'MigrateInstall' => 'command.migrate.install',
         'MigrateRefresh' => 'command.migrate.refresh',
@@ -117,6 +119,18 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     {
         $this->app->singleton('command.migrate', function ($app) {
             return new MigrateCommand($app['migrator']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerMigrateDumpCommand()
+    {
+        $this->app->singleton('command.migrate.dump', function () {
+            return new DumpCommand;
         });
     }
 
