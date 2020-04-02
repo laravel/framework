@@ -87,6 +87,27 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testSpecificRequestIsNotBeingSent()
+    {
+        $this->factory->fake();
+
+        $this->factory->post('http://foo.com/form', [
+            'name' => 'Taylor',
+        ]);
+
+        $this->factory->assertNotSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                $request['name'] === 'Peter';
+        });
+    }
+
+    public function testNoRequestIsNotBeingSent()
+    {
+        $this->factory->fake();
+
+        $this->factory->assertNothingSent();
+    }
+
     public function testCanSendMultipartData()
     {
         $this->factory->fake();

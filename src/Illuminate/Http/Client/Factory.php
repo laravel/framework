@@ -192,6 +192,33 @@ class Factory
     }
 
     /**
+     * Assert that a request / response pair was not recorded matching a given truth test.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function assertNotSent($callback)
+    {
+        PHPUnit::assertFalse(
+            $this->recorded($callback)->count() > 0,
+            'Unexpected request was recorded.'
+        );
+    }
+
+    /**
+     * Assert that no request / response pair was recorded.
+     *
+     * @return void
+     */
+    public function assertNothingSent()
+    {
+        PHPUnit::assertEmpty(
+            $this->recorded,
+            'Requests were recorded.'
+        );
+    }
+
+    /**
      * Assert that every created response sequence is empty.
      *
      * @return void
