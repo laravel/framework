@@ -28,6 +28,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static bool deleteDirectory(string $directory)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertExists(string|array $path)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertMissing(string|array $path)
+ * @method static string temporaryUrl(string  $path, \DateTimeInterface  $expiration, array  $options)
  *
  * @see \Illuminate\Filesystem\FilesystemManager
  */
