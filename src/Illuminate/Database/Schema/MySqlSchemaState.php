@@ -122,7 +122,18 @@ class MySqlSchemaState
      */
     public function load($path)
     {
-        //
+        $config = $this->connection->getConfig();
+
+        $process = Process::fromShellCommandline('mysql --no-beep --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD --database=$LARAVEL_LOAD_DATABASE < $LARAVEL_LOAD_PATH');
+
+        $process->mustRun(null, [
+            'LARAVEL_LOAD_HOST' => $config['host'],
+            'LARAVEL_LOAD_PORT' => $config['port'],
+            'LARAVEL_LOAD_USER' => $config['username'],
+            'LARAVEL_LOAD_PASSWORD' => $config['password'],
+            'LARAVEL_LOAD_DATABASE' => $config['database'],
+            'LARAVEL_LOAD_PATH' => $path,
+        ]);
     }
 
     /**

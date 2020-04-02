@@ -38,7 +38,7 @@ class DumpCommand extends Command
     {
         $this->dumper(
             $connection = $connections->connection($database = $this->input->getOption('database'))
-        )->dump($path = $this->path($connection));
+        )->load($path = $this->path($connection));
 
         $dispatcher->dispatch(new SchemaDumped($connection, $path));
 
