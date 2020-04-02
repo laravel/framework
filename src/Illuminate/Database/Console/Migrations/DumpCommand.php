@@ -3,8 +3,10 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Database\Schema\MySqlDumper;
 use Illuminate\Filesystem\Filesystem;
 use InvalidArgumentException;
@@ -31,11 +33,13 @@ class DumpCommand extends Command
      *
      * @return int
      */
-    public function handle(ConnectionResolverInterface $connections)
+    public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
     {
         $this->dumper(
             $connection = $connections->connection($database = $this->input->getOption('database'))
-        )->dump($connection, $this->path($connection));
+        )->dump($connection, $path = $this->path($connection));
+
+        $dispatcher->dispatch(new SchemaDumped($connection, $path));
 
         $this->info('Database schema dumped successfully.');
     }
