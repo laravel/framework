@@ -145,7 +145,7 @@ if (! function_exists('data_get')) {
         foreach ($key as $i => $segment) {
             unset($key[$i]);
 
-            if ($segment === null) {
+            if (is_null($segment)) {
                 return $target;
             }
 
