@@ -58,7 +58,7 @@ class MySqlDumper
      */
     public function dump(Connection $connection, $path)
     {
-        $this->makeProcess(array_merge($this->dumpCommand($connection->getConfig()), [
+        $this->makeProcess(array_merge($this->baseDumpCommand($connection->getConfig()), [
             '--routines',
             '--result-file='.$path,
             '--no-data',
@@ -66,15 +66,7 @@ class MySqlDumper
 
         $this->removeAutoIncrementingState($path);
 
-        with($process = $this->makeProcess(array_merge($this->dumpCommand($connection->getConfig()), [
-            'migrations',
-            '--no-create-info',
-            '--skip-extended-insert',
-            '--skip-routines',
-            '--compact',
-        ])))->mustRun();
-
-        $this->files->append($path, $process->getOutput());
+        $this->appendMigrationData($connection, $path);
     }
 
     /**
@@ -93,12 +85,34 @@ class MySqlDumper
     }
 
     /**
+     * Append the migration data to the schema dump.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  string  $path
+     * @return void
+     */
+    protected function appendMigrationData(Connection $connection, string $path)
+    {
+        with($process = $this->makeProcess(
+            array_merge($this->baseDumpCommand($connection->getConfig()), [
+                'migrations',
+                '--no-create-info',
+                '--skip-extended-insert',
+                '--skip-routines',
+                '--compact',
+            ])
+        ))->mustRun();
+
+        $this->files->append($path, $process->getOutput());
+    }
+
+    /**
      * Get the dump command for MySQL as an array.
      *
      * @param  array  $config
      * @return array
      */
-    protected function dumpCommand(array $config)
+    protected function baseDumpCommand(array $config)
     {
         return [
             'mysqldump',
