@@ -662,7 +662,9 @@ class Container implements ArrayAccess, ContainerContract
     protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
         $abstract = $this->getAlias($abstract);
+        
         $concrete = $this->getContextualConcrete($abstract);
+
         $needsContextualBuild = ! empty($parameters) || ! is_null($concrete);
 
         // If an instance of the type is currently being managed as a singleton we'll
@@ -674,8 +676,6 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->with[] = $parameters;
 
-        // If we don't have any contextual concrete binding for the given abstract,
-        // we'll continue to find the concrete type in the bindings array
         if (is_null($concrete)) {
             $concrete = $this->getConcrete($abstract);
         }
