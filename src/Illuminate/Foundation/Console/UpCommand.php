@@ -32,7 +32,7 @@ class UpCommand extends Command
             if (! file_exists(storage_path('framework/down'))) {
                 $this->comment('Application is already up.');
 
-                return true;
+                return 0;
             }
 
             unlink(storage_path('framework/down'));
