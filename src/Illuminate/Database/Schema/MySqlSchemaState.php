@@ -133,21 +133,6 @@ class MySqlSchemaState
     protected function baseDumpCommand()
     {
         return 'mysqldump --set-gtid-purged=OFF --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
-
-        return [
-            'mysqldump',
-            '--set-gtid-purged=OFF',
-            '--skip-add-drop-table',
-            '--skip-add-locks',
-            '--skip-comments',
-            '--skip-set-charset',
-            '--tz-utc',
-            '--host='.$config['host'],
-            '--port='.$config['port'],
-            '--user='.$config['username'],
-            '--password='.$config['password'],
-            $config['database'],
-        ];
     }
 
     /**
