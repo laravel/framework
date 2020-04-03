@@ -130,6 +130,12 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         ]);
 
         $this->assertEquals('argument', $model->value_object_caster_with_argument);
+
+        $model->setRawAttributes([
+            'value_object_caster_with_caster_instance' => serialize(new ValueObject('hello')),
+        ]);
+
+        $this->assertInstanceOf(ValueObject::class, $model->value_object_caster_with_caster_instance);
     }
 }
 
@@ -155,6 +161,7 @@ class TestEloquentModelWithCustomCast extends Model
         'options' => JsonCaster::class,
         'value_object_with_caster' => ValueObject::class,
         'value_object_caster_with_argument' => ValueObject::class.':argument',
+        'value_object_caster_with_caster_instance' => ValueObjectWithCasterInstance::class,
     ];
 }
 
@@ -267,6 +274,14 @@ class ValueObject implements Castable
                 return serialize($value);
             }
         };
+    }
+}
+
+class ValueObjectWithCasterInstance extends ValueObject
+{
+    public static function castUsing(array $arguments)
+    {
+        return new ValueObjectCaster(...$arguments);
     }
 }
 

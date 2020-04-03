@@ -1066,7 +1066,7 @@ trait HasAttributes
 
         $arguments = [];
 
-        if (strpos($castType, ':') !== false) {
+        if (is_string($castType) && strpos($castType, ':') !== false) {
             $segments = explode(':', $castType, 2);
 
             $castType = $segments[0];
@@ -1075,6 +1075,10 @@ trait HasAttributes
 
         if (is_subclass_of($castType, Castable::class)) {
             $castType = $castType::castUsing($arguments);
+        }
+
+        if (is_object($castType)) {
+            return $castType;
         }
 
         return new $castType(...$arguments);
