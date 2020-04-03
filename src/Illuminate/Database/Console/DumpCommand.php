@@ -8,7 +8,6 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Input\InputOption;
 
 class DumpCommand extends Command
 {
@@ -17,7 +16,9 @@ class DumpCommand extends Command
      *
      * @var string
      */
-    protected $name = 'schema:dump';
+    protected $signature = 'schema:dump
+                {--database= : The database connection to use}
+                {--path= : The path where the schema dump file should be stored}';
 
     /**
      * The console command description.
@@ -63,20 +64,8 @@ class DumpCommand extends Command
      */
     protected function path(Connection $connection)
     {
-        return tap(database_path('migrations/schema/'.$connection->getName().'-schema.sql'), function ($path) {
+        return tap($this->option('path') ?: database_path('migrations/schema/'.$connection->getName().'-schema.sql'), function ($path) {
             (new Filesystem)->ensureDirectoryExists(dirname($path));
         });
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
-        ];
     }
 }

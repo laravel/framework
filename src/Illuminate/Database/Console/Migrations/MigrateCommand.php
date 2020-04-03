@@ -18,6 +18,7 @@ class MigrateCommand extends BaseCommand
                 {--force : Force the operation to run when in production}
                 {--path=* : The path(s) to the migrations files to be executed}
                 {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
+                {--schema-path= : The path to a schema dump file}
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
                 {--step : Force the migrations to be run so they can be rolled back individually}';
@@ -96,7 +97,7 @@ class MigrateCommand extends BaseCommand
             ]));
         }
 
-        if (! $this->migrator->hasRunAnyMigrations()) {
+        if (! $this->migrator->hasRunAnyMigrations() && ! $this->option('pretend')) {
             $this->loadSchemaState();
         }
     }
@@ -110,7 +111,7 @@ class MigrateCommand extends BaseCommand
     {
         $connection = $this->migrator->resolveConnection($this->option('database'));
 
-        $path = database_path('migrations/schema/'.$connection->getName().'-schema.sql');
+        $path = $this->option('schema-path') ?: database_path('migrations/schema/'.$connection->getName().'-schema.sql');
 
         if (! file_exists($path)) {
             return;
@@ -118,10 +119,16 @@ class MigrateCommand extends BaseCommand
 
         $this->line('<info>Loading stored database schema:</info> '.trim(str_replace(base_path(), '', $path), '/'));
 
+        $startTime = microtime(true);
+
         $this->migrator->deleteRepository();
 
         $connection->getSchemaState()->handleOutputUsing(function ($type, $buffer) {
             $this->output->write($buffer);
         })->load($path);
+
+        $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
+
+        $this->line('<info>Loaded stored database schema.</info> ('.$runTime.'ms)');
     }
 }

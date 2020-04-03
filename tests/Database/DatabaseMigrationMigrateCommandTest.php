@@ -24,6 +24,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
@@ -43,6 +44,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
@@ -61,6 +63,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
@@ -78,6 +81,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
@@ -95,6 +99,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
