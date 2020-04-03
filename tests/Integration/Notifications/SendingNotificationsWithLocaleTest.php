@@ -6,6 +6,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Foundation\Testing\Assert;
 use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -150,7 +151,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
             app('swift.transport')->messages()[0]->getBody()
         );
 
-        $this->assertRegExp('/dans (1|un) jour/',
+        Assert::assertMatchesRegularExpression('/dans (1|un) jour/',
             app('swift.transport')->messages()[0]->getBody()
         );
 

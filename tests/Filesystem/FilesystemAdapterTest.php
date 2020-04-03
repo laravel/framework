@@ -6,6 +6,7 @@ use GuzzleHttp\Psr7\Stream;
 use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Foundation\Testing\Assert;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
@@ -145,7 +146,7 @@ class FilesystemAdapterTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertTrue($filesystemAdapter->delete('file.txt'));
-        $this->assertFileNotExists($this->tempDir.'/file.txt');
+        Assert::assertFileDoesNotExist($this->tempDir.'/file.txt');
     }
 
     public function testDeleteReturnsFalseWhenFileNotFound()
@@ -179,7 +180,7 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->move('/foo/foo.txt', '/foo/foo2.txt');
 
-        $this->assertFileNotExists($this->tempDir.'/foo/foo.txt');
+        Assert::assertFileDoesNotExist($this->tempDir.'/foo/foo.txt');
 
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
         $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
