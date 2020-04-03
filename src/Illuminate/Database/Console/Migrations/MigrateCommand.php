@@ -3,6 +3,8 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
@@ -40,16 +42,25 @@ class MigrateCommand extends BaseCommand
     protected $migrator;
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
      * Create a new migration command instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator  $migrator
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public function __construct(Migrator $migrator)
+    public function __construct(Migrator $migrator, Dispatcher $dispatcher)
     {
         parent::__construct();
 
         $this->migrator = $migrator;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -135,6 +146,8 @@ class MigrateCommand extends BaseCommand
         })->load($path);
 
         $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
+
+        $this->dispatcher->dispatch(new SchemaLoaded($connection, $path));
 
         $this->line('<info>Loaded stored database schema.</info> ('.$runTime.'ms)');
     }

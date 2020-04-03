@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
+use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
 use Mockery as m;
@@ -19,7 +21,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
-        $command = new MigrateCommand($migrator = m::mock(Migrator::class));
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -38,7 +40,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testMigrationsCanBeRunWithStoredSchema()
     {
-        $command = new MigrateCommand($migrator = m::mock(Migrator::class));
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -53,6 +55,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $connection->shouldReceive('getSchemaState')->andReturn($schemaState = m::mock(stdClass::class));
         $schemaState->shouldReceive('handleOutputUsing')->andReturnSelf();
         $schemaState->shouldReceive('load')->once()->with(__DIR__.'/stubs/schema.sql');
+        $dispatcher->shouldReceive('dispatch')->once()->with(m::type(SchemaLoaded::class));
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
@@ -63,7 +66,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testMigrationRepositoryCreatedWhenNecessary()
     {
-        $params = [$migrator = m::mock(Migrator::class)];
+        $params = [$migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class)];
         $command = $this->getMockBuilder(MigrateCommand::class)->setMethods(['call'])->setConstructorArgs($params)->getMock();
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -83,7 +86,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testTheCommandMayBePretended()
     {
-        $command = new MigrateCommand($migrator = m::mock(Migrator::class));
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -101,7 +104,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testTheDatabaseMayBeSet()
     {
-        $command = new MigrateCommand($migrator = m::mock(Migrator::class));
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -119,7 +122,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testStepMayBeSet()
     {
-        $command = new MigrateCommand($migrator = m::mock(Migrator::class));
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
