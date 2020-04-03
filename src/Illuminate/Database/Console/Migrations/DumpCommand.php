@@ -36,7 +36,7 @@ class DumpCommand extends Command
      */
     public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
     {
-        $this->dumper(
+        $this->schemaState(
             $connection = $connections->connection($database = $this->input->getOption('database'))
         )->dump($path = $this->path($connection));
 
@@ -46,25 +46,17 @@ class DumpCommand extends Command
     }
 
     /**
-     * Create a dumper instance for the given connection.
+     * Create a schema state instance for the given connection.
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return mixed
      */
-    protected function dumper(Connection $connection)
+    protected function schemaState(Connection $connection)
     {
-        $driver = $connection->getDriverName();
-
-        $output = function ($type, $buffer) {
-            $this->output->write($buffer);
-        };
-
-        switch ($driver) {
-            case 'mysql':
-                return (new MySqlSchemaState($connection))->handleOutputUsing($output);
-            default:
-                throw new InvalidArgumentException("Schema dumps not supported for database driver [{$driver}].");
-        }
+        return $connection->getSchemaState(new Filesystem)
+                ->handleOutputUsing(function ($type, $buffer) {
+                    $this->output->write($buffer);
+                });
     }
 
     /**
