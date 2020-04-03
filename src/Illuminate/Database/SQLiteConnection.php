@@ -80,7 +80,7 @@ class SQLiteConnection extends Connection
      */
     public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
     {
-        throw new RuntimeException("Schema dumping is not supported when using SQLite.");
+        throw new RuntimeException('Schema dumping is not supported when using SQLite.');
     }
 
     /**
