@@ -260,10 +260,8 @@ class DatabaseConnectionTest extends TestCase
 
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->setMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
-        $pdo->method('commit')->will($this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')));
+        $pdo->expects($this->exactly(3))->method('commit')->will($this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')));
         $pdo->expects($this->exactly(3))->method('beginTransaction');
-        $pdo->expects($this->never())->method('rollBack');
-        $pdo->expects($this->exactly(3))->method('commit');
         $mock->transaction(function () {
         }, 3);
     }
