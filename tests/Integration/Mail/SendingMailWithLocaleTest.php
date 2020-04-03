@@ -5,12 +5,12 @@ namespace Illuminate\Tests\Integration\Mail;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\LocaleUpdated;
-use Illuminate\Testing\Assert;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
+use Illuminate\Testing\Assert;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 

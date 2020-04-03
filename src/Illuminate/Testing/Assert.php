@@ -10,7 +10,6 @@ use PHPUnit\Framework\Constraint\FileExists;
 use PHPUnit\Framework\Constraint\LogicalNot;
 use PHPUnit\Framework\Constraint\RegularExpression;
 use PHPUnit\Framework\InvalidArgumentException;
-use PHPUnit\Runner\Version;
 use PHPUnit\Util\InvalidArgumentHelper;
 
 /**
