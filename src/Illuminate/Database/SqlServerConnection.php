@@ -98,7 +98,7 @@ class SqlServerConnection extends Connection
      */
     public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
     {
-        throw new RuntimeException("Schema dumping is not supported when using SQL Server.");
+        throw new RuntimeException('Schema dumping is not supported when using SQL Server.');
     }
 
     /**
