@@ -4,6 +4,8 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\SqlServerConnection;
 
 class MigrateCommand extends BaseCommand
 {
@@ -110,6 +112,11 @@ class MigrateCommand extends BaseCommand
     protected function loadSchemaState()
     {
         $connection = $this->migrator->resolveConnection($this->option('database'));
+
+        if ($connection instanceof SQLiteConnection ||
+            $connection instanceof SqlServerConnection) {
+            return;
+        }
 
         $path = $this->option('schema-path') ?: database_path('migrations/schema/'.$connection->getName().'-schema.sql');
 
