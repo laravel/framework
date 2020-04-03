@@ -50,7 +50,7 @@ class DumpCommand extends Command
      */
     protected function schemaState(Connection $connection)
     {
-        return $connection->getSchemaState(new Filesystem)
+        return $connection->getSchemaState()
                 ->handleOutputUsing(function ($type, $buffer) {
                     $this->output->write($buffer);
                 });

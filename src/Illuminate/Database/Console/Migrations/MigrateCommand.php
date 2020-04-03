@@ -95,5 +95,33 @@ class MigrateCommand extends BaseCommand
                 '--database' => $this->option('database'),
             ]));
         }
+
+        if (! $this->migrator->hasRunAnyMigrations()) {
+            $this->loadSchemaState();
+        }
+    }
+
+    /**
+     * Load the schema state to seed the initial database schema structure.
+     *
+     * @return void
+     */
+    protected function loadSchemaState()
+    {
+        $connection = $this->migrator->resolveConnection($this->option('database'));
+
+        $path = database_path('migrations/schema/'.$connection->getName().'-schema.sql');
+
+        if (! file_exists($path)) {
+            return;
+        }
+
+        $this->line('<info>Loading stored database schema:</info> '.trim(str_replace(base_path(), '', $path), '/'));
+
+        $this->migrator->deleteRepository();
+
+        $connection->getSchemaState()->handleOutputUsing(function ($type, $buffer) {
+            $this->output->write($buffer);
+        })->load($path);
     }
 }
