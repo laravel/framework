@@ -6,7 +6,7 @@ use GuzzleHttp\Psr7\Stream;
 use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\FilesystemAdapter;
-use Illuminate\Foundation\Testing\Assert;
+use Illuminate\Testing\Assert;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
