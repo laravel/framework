@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Schema;
 
-class MySqlSchemaState extends SchemaState
+class PostgresSchemaState extends SchemaState
 {
     /**
      * Dump the database's schema into a file.
@@ -13,29 +13,12 @@ class MySqlSchemaState extends SchemaState
     public function dump($path)
     {
         $this->makeProcess(
-            $this->baseDumpCommand().' --routines --result-file=$LARAVEL_LOAD_PATH --no-data'
+            $this->baseDumpCommand().' --no-owner --file=$LARAVEL_LOAD_PATH --schema-only'
         )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
 
-        $this->removeAutoIncrementingState($path);
-
         $this->appendMigrationData($path);
-    }
-
-    /**
-     * Remove the auto-incrementing state from the given schema dump.
-     *
-     * @param  string  $path
-     * @return void
-     */
-    protected function removeAutoIncrementingState(string $path)
-    {
-        $this->files->put($path, preg_replace(
-            '/\s+AUTO_INCREMENT=[0-9]+/iu',
-            '',
-            $this->files->get($path)
-        ));
     }
 
     /**
@@ -47,12 +30,17 @@ class MySqlSchemaState extends SchemaState
     protected function appendMigrationData(string $path)
     {
         with($process = $this->makeProcess(
-            $this->baseDumpCommand().' migrations --no-create-info --skip-extended-insert --skip-routines --compact'
+            $this->baseDumpCommand().' --table=migrations --data-only --inserts'
         ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
 
-        $this->files->append($path, $process->getOutput());
+        $migrations = collect(preg_split("/\r\n|\n|\r/", $process->getOutput()))->filter(function ($line) {
+            return preg_match('/^\s*(--|SELECT\s|SET\s)/iu', $line) === 0 &&
+                   strlen($line) > 0;
+        })->all();
+
+        $this->files->append($path, implode(PHP_EOL, $migrations).PHP_EOL);
     }
 
     /**
@@ -63,7 +51,7 @@ class MySqlSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $process = $this->makeProcess('mysql --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD --database=$LARAVEL_LOAD_DATABASE < $LARAVEL_LOAD_PATH');
+        $process = $this->makeProcess('PGPASSWORD=$LARAVEL_LOAD_PASSWORD psql --file=$LARAVEL_LOAD_PATH --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE');
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
@@ -77,7 +65,7 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        return 'mysqldump --set-gtid-purged=OFF --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
+        return 'PGPASSWORD=%LARAVEL_LOAD_PASSWORD pg_dump --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER $LARAVEL_LOAD_DATABASE';
     }
 
     /**

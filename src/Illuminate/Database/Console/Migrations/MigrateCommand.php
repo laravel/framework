@@ -117,7 +117,7 @@ class MigrateCommand extends BaseCommand
             return;
         }
 
-        $this->line('<info>Loading stored database schema:</info> '.trim(str_replace(base_path(), '', $path), '/'));
+        $this->line('<info>Loading stored database schema:</info> '.$path);
 
         $startTime = microtime(true);
 
