@@ -1,16 +1,13 @@
 <?php
 
-namespace Illuminate\Database\Console\Migrations;
+namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\SchemaDumped;
-use Illuminate\Database\Schema\MySqlDumper;
-use Illuminate\Database\Schema\MySqlSchemaState;
 use Illuminate\Filesystem\Filesystem;
-use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 
 class DumpCommand extends Command
@@ -20,7 +17,7 @@ class DumpCommand extends Command
      *
      * @var string
      */
-    protected $name = 'migrate:dump';
+    protected $name = 'schema:dump';
 
     /**
      * The console command description.

@@ -26,7 +26,6 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected $commands = [
         'Migrate' => 'command.migrate',
-        'MigrateDump' => 'command.migrate.dump',
         'MigrateFresh' => 'command.migrate.fresh',
         'MigrateInstall' => 'command.migrate.install',
         'MigrateRefresh' => 'command.migrate.refresh',
@@ -119,18 +118,6 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     {
         $this->app->singleton('command.migrate', function ($app) {
             return new MigrateCommand($app['migrator']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerMigrateDumpCommand()
-    {
-        $this->app->singleton('command.migrate.dump', function () {
-            return new DumpCommand;
         });
     }
 
