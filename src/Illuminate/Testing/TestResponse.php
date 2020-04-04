@@ -100,9 +100,9 @@ class TestResponse implements ArrayAccess
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertTrue(
-            201 === $actual,
-            'Response status code ['.$actual.'] does not match expected 201 status code.'
+        PHPUnit::assertSame(
+            201, $actual,
+            "Response status code [{$actual}] does not match expected 201 status code."
         );
 
         return $this;
@@ -162,9 +162,9 @@ class TestResponse implements ArrayAccess
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertTrue(
-            401 === $actual,
-            'Response status code ['.$actual.'] is not an unauthorized status code.'
+        PHPUnit::assertSame(
+            401, $actual,
+            "Response status code [{$actual}] is not an unauthorized status code."
         );
 
         return $this;
@@ -180,8 +180,8 @@ class TestResponse implements ArrayAccess
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertTrue(
-            $actual === $status,
+        PHPUnit::assertSame(
+            $actual, $status,
             "Expected status code {$status} but received {$actual}."
         );
 

@@ -569,7 +569,7 @@ class RedisConnectionTest extends TestCase
                 }
 
                 foreach ($returnedKeys as $returnedKey) {
-                    $this->assertTrue(in_array($returnedKey, $initialKeys));
+                    $this->assertContains($returnedKey, $initialKeys);
                 }
             } while ($iterator > 0);
 
