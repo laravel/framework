@@ -9,6 +9,7 @@ interface Castable
      *
      * @param  array  $arguments
      * @return string
+     * @return string|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|\Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes
      */
     public static function castUsing(array $arguments);
 }
