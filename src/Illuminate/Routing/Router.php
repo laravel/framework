@@ -672,10 +672,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function runRouteWithinStack(Route $route, Request $request)
     {
-        $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
-                                $this->container->make('middleware.disable') === true;
-
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
+        $middleware = $this->shouldSkipMiddleware() ? [] : $this->gatherRouteMiddleware($route);
 
         return (new Pipeline($this->container))
                         ->send($request)
@@ -685,6 +682,17 @@ class Router implements BindingRegistrar, RegistrarContract
                                 $request, $route->run()
                             );
                         });
+    }
+
+    /**
+     * Determine if middleware has been disabled.
+     *
+     * @return bool
+     */
+    protected function shouldSkipMiddleware()
+    {
+        return $this->container->bound('middleware.disable') &&
+               $this->container->make('middleware.disable') === true;
     }
 
     /**

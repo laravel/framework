@@ -134,9 +134,11 @@ class Kernel implements KernelContract
 
         $this->bootstrap();
 
+        $middleware = $this->app->shouldSkipMiddleware() ? [] : $this->middleware;
+
         return (new Pipeline($this->app))
                     ->send($request)
-                    ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
+                    ->through($middleware)
                     ->then($this->dispatchToRouter());
     }
 
