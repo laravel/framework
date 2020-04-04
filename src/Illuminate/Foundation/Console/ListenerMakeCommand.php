@@ -47,12 +47,20 @@ class ListenerMakeCommand extends GeneratorCommand
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 
-        $stub = str_replace(
-            'DummyEvent', class_basename($event), parent::buildClass($name)
-        );
+        $eventName = class_basename($event);
+        $fullEvent = trim($event, '\\');
+
+        $replace = [
+            'DummyEvent' => $eventName,
+            '{{ event }}' => $eventName,
+            '{{event}}' => $eventName,
+            'DummyFullEvent' => $fullEvent,
+            '{{ fullEvent }}' => $fullEvent,
+            '{{fullEvent}}' => $fullEvent,
+        ];
 
         return str_replace(
-            'DummyFullEvent', trim($event, '\\'), $stub
+            array_keys($replace), array_values($replace), parent::buildClass($name)
         );
     }
 
@@ -65,13 +73,26 @@ class ListenerMakeCommand extends GeneratorCommand
     {
         if ($this->option('queued')) {
             return $this->option('event')
-                        ? __DIR__.'/stubs/listener-queued.stub'
-                        : __DIR__.'/stubs/listener-queued-duck.stub';
+                        ? $this->resolveStubPath('/stubs/listener-queued.stub')
+                        : $this->resolveStubPath('/stubs/listener-queued-duck.stub');
         }
 
         return $this->option('event')
-                    ? __DIR__.'/stubs/listener.stub'
-                    : __DIR__.'/stubs/listener-duck.stub';
+                    ? $this->resolveStubPath('/stubs/listener.stub')
+                    : $this->resolveStubPath('/stubs/listener-duck.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
