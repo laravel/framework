@@ -13,13 +13,90 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSqsQueueTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    /**
+     * @var \Mockery\MockInterface
+     */
+    protected $sqs;
+
+    /**
+     * @var string
+     */
+    protected $account;
+
+    /**
+     * @var string
+     */
+    protected $queueName;
+
+    /**
+     * @var string
+     */
+    protected $baseUrl;
+
+    /**
+     * @var string
+     */
+    protected $prefix;
+
+    /**
+     * @var string
+     */
+    protected $queueUrl;
+
+    /**
+     * @var string
+     */
+    protected $mockedJob;
+
+    /**
+     * @var array
+     */
+    protected $mockedData;
+
+    /**
+     * @var mixed
+     */
+    protected $mockedPayload;
+
+    /**
+     * @var int
+     */
+    protected $mockedDelay;
+
+    /**
+     * @var string
+     */
+    protected $mockedMessageId;
+
+    /**
+     * @var string
+     */
+    protected $mockedReceiptHandle;
+
+    /**
+     * @var \Aws\Result
+     */
+    protected $mockedSendMessageResponseModel;
+
+    /**
+     * @var \Aws\Result
+     */
+    protected $mockedReceiveMessageResponseModel;
+
+    /**
+     * @var \Aws\Result
+     */
+    protected $mockedReceiveEmptyMessageResponseModel;
+
+    /**
+     * @var \Aws\Result
+     */
+    protected $mockedQueueAttributesResponseModel;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Use Mockery to mock the SqsClient
         $this->sqs = m::mock(SqsClient::class);
 
@@ -68,9 +145,16 @@ class QueueSqsQueueTest extends TestCase
         ]);
     }
 
+    protected function tearDown(): void
+    {
+        m::close();
+
+        parent::tearDown();
+    }
+
     public function testPopProperlyPopsJobOffOfSqs()
     {
-        $queue = $this->getMockBuilder(SqsQueue::class)->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->setContainer(m::mock(Container::class));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveMessageResponseModel);
@@ -80,7 +164,7 @@ class QueueSqsQueueTest extends TestCase
 
     public function testPopProperlyHandlesEmptyMessage()
     {
-        $queue = $this->getMockBuilder(SqsQueue::class)->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->setContainer(m::mock(Container::class));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveEmptyMessageResponseModel);
@@ -91,7 +175,7 @@ class QueueSqsQueueTest extends TestCase
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()
     {
         $now = Carbon::now();
-        $queue = $this->getMockBuilder(SqsQueue::class)->setMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('secondsUntil')->with($now)->willReturn(5);
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
@@ -102,7 +186,7 @@ class QueueSqsQueueTest extends TestCase
 
     public function testDelayedPushProperlyPushesJobOntoSqs()
     {
-        $queue = $this->getMockBuilder(SqsQueue::class)->setMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('secondsUntil')->with($this->mockedDelay)->willReturn($this->mockedDelay);
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
@@ -113,7 +197,7 @@ class QueueSqsQueueTest extends TestCase
 
     public function testPushProperlyPushesJobOntoSqs()
     {
-        $queue = $this->getMockBuilder(SqsQueue::class)->setMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
@@ -123,7 +207,7 @@ class QueueSqsQueueTest extends TestCase
 
     public function testSizeProperlyReadsSqsQueueSize()
     {
-        $queue = $this->getMockBuilder(SqsQueue::class)->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('getQueueAttributes')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateNumberOfMessages']])->andReturn($this->mockedQueueAttributesResponseModel);
         $size = $queue->size($this->queueName);

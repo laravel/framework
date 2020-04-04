@@ -19,7 +19,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
     public function testPushProperlyPushesJobOntoDatabase()
     {
-        $queue = $this->getMockBuilder(DatabaseQueue::class)->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();
+        $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();
         $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
@@ -36,7 +36,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     public function testDelayedPushProperlyPushesJobOntoDatabase()
     {
         $queue = $this->getMockBuilder(
-            DatabaseQueue::class)->setMethods(
+            DatabaseQueue::class)->onlyMethods(
             ['currentTime'])->setConstructorArgs(
             [$database = m::mock(Connection::class), 'table', 'default']
         )->getMock();
@@ -89,7 +89,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     public function testBulkBatchPushesOntoDatabase()
     {
         $database = m::mock(Connection::class);
-        $queue = $this->getMockBuilder(DatabaseQueue::class)->setMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
+        $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
         $queue->expects($this->any())->method('currentTime')->willReturn('created');
         $queue->expects($this->any())->method('availableAt')->willReturn('available');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));

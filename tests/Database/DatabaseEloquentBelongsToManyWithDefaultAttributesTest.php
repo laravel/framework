@@ -13,17 +13,19 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testWithPivotValueMethodSetsWhereConditionsForFetching()
     {
-        $relation = $this->getMockBuilder(BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(BelongsToMany::class)->onlyMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivotValue(['is_admin' => 1]);
     }
 
     public function testWithPivotValueMethodSetsDefaultArgumentsForInsertion()
     {
-        $relation = $this->getMockBuilder(BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(BelongsToMany::class)->onlyMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivotValue(['is_admin' => 1]);
 
         $query = m::mock(stdClass::class);

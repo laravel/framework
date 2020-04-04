@@ -22,6 +22,8 @@ class DatabaseEloquentHasOneTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testHasOneWithDefault()
@@ -99,7 +101,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     public function testMakeMethodDoesNotSaveNewModel()
     {
         $relation = $this->getRelation();
-        $instance = $this->getMockBuilder(Model::class)->setMethods(['save', 'newInstance', 'setAttribute'])->getMock();
+        $instance = $this->getMockBuilder(Model::class)->onlyMethods(['save', 'newInstance', 'setAttribute'])->getMock();
         $relation->getRelated()->shouldReceive('newInstance')->with(['name' => 'taylor'])->andReturn($instance);
         $instance->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
         $instance->expects($this->never())->method('save');
@@ -110,7 +112,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     public function testSaveMethodSetsForeignKeyOnModel()
     {
         $relation = $this->getRelation();
-        $mockModel = $this->getMockBuilder(Model::class)->setMethods(['save'])->getMock();
+        $mockModel = $this->getMockBuilder(Model::class)->onlyMethods(['save'])->getMock();
         $mockModel->expects($this->once())->method('save')->willReturn(true);
         $result = $relation->save($mockModel);
 
@@ -121,7 +123,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     public function testCreateMethodProperlyCreatesNewModel()
     {
         $relation = $this->getRelation();
-        $created = $this->getMockBuilder(Model::class)->setMethods(['save', 'getKey', 'setAttribute'])->getMock();
+        $created = $this->getMockBuilder(Model::class)->onlyMethods(['save', 'getKey', 'setAttribute'])->getMock();
         $created->expects($this->once())->method('save')->willReturn(true);
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
         $created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
