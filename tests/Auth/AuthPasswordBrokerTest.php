@@ -35,7 +35,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         $mocks = $this->getMocks();
         $mocks['tokens'] = m::mock(TestTokenRepositoryInterface::class);
-        $broker = $this->getMockBuilder(PasswordBroker::class)->addMethods(['emailResetLink','getUri'])->setConstructorArgs(array_values($mocks))->getMock();
+        $broker = $this->getMockBuilder(PasswordBroker::class)->addMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(true);
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
