@@ -16,7 +16,9 @@ class HostValidator implements ValidatorInterface
      */
     public function matches(Route $route, Request $request)
     {
-        if (is_null($hostRegex = $route->getCompiled()->getHostRegex())) {
+        $hostRegex = $route->getCompiled()->getHostRegex();
+
+        if (is_null($hostRegex)) {
             return true;
         }
 
