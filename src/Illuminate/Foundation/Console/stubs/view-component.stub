@@ -1,10 +1,10 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Illuminate\View\Component;
 
-class DummyClass extends Component
+class {{ class }} extends Component
 {
     /**
      * Create a new component instance.
@@ -23,6 +23,6 @@ class DummyClass extends Component
      */
     public function render()
     {
-        return DummyView;
+        return {{ view }};
     }
 }

@@ -77,18 +77,20 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
+        $view = 'view(\'components.'.$this->getView().'\')';
+
         if ($this->option('inline')) {
-            return str_replace(
-                'DummyView',
-                "<<<'blade'\n<div>\n    ".Inspiring::quote()."\n</div>\nblade",
-                parent::buildClass($name)
-            );
+            $view = "<<<'blade'\n<div>\n    " . Inspiring::quote() . "\n</div>\nblade";
         }
 
+        $replace = [
+            'DummyView' => $view,
+            '{{ view }}' => $view,
+            '{{view}}' => $view,
+        ];
+
         return str_replace(
-            'DummyView',
-            'view(\'components.'.$this->getView().'\')',
-            parent::buildClass($name)
+            array_keys($replace), array_values($replace), parent::buildClass($name)
         );
     }
 
@@ -113,7 +115,20 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/view-component.stub';
+        return $this->resolveStubPath('/stubs/view-component.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
