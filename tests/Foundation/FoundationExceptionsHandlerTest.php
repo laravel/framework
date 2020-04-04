@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
@@ -207,6 +208,22 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger->shouldNotReceive('error');
 
         $this->handler->report(new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
+    }
+
+    public function testCustomRedirectPathForAuthenticationException()
+    {
+        $handler = new class($this->container) extends Handler {
+            protected function unauthenticatedRedirectPath($request)
+            {
+                return '/custom/login';
+            }
+        };
+
+        $redirector = m::mock(Redirector::class);
+        $this->container->instance('redirect', $redirector);
+        $redirector->shouldReceive('guest')->once()->with('/custom/login');
+
+        $handler->render(Request::create('/'), new AuthenticationException);
     }
 }
 
