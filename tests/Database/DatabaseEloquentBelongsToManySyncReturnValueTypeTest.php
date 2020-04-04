@@ -85,7 +85,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
         $changes = $user->articles()->sync($articleIDs);
 
         collect($changes['attached'])->map(function ($id) {
-            $this->assertTrue(gettype($id) === (new BelongsToManySyncTestTestArticle)->getKeyType());
+            $this->assertSame(gettype($id), (new BelongsToManySyncTestTestArticle)->getKeyType());
         });
     }
 

@@ -455,7 +455,7 @@ class RoutingRouteTest extends TestCase
         $router->get('foo/{team}/{post}', [
             'middleware' => SubstituteBindings::class,
             'uses' => function (?RoutingTestUserModel $userFromContainer, RoutingTestTeamModel $team, $postId) {
-                $this->assertSame(null, $userFromContainer);
+                $this->assertNull($userFromContainer);
                 $this->assertInstanceOf(RoutingTestTeamModel::class, $team);
                 $this->assertSame('bar', $team->value);
                 $this->assertSame('baz', $postId);
