@@ -24,6 +24,13 @@ class RouteAction
         if (is_null($action)) {
             return static::missingAction($uri);
         }
+        
+        // If the action is an array and $action[1] (the method) is not set, we
+        // can set it to __invoke allowing for use of invokable controllers
+        // using tuple notation like Route::get('/', [WelcomeController::class]);
+        if (is_array($action) && !isset($action[1])) {
+            $action[1] = '__invoke';
+        }
 
         // If the action is already a Closure instance, we will just set that instance
         // as the "uses" property, because there is nothing else we need to do when
