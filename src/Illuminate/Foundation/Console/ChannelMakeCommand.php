@@ -35,10 +35,16 @@ class ChannelMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
+        $dummyUser = class_basename($this->userProviderModel());
+
+        $replace = [
+            'DummyUser' => $dummyUser,
+            '{{ user }}' => $dummyUser,
+            '{{user}}' => $dummyUser,
+        ];
+
         return str_replace(
-            'DummyUser',
-            class_basename($this->userProviderModel()),
-            parent::buildClass($name)
+            array_keys($replace), array_values($replace), parent::buildClass($name)
         );
     }
 
@@ -49,7 +55,20 @@ class ChannelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/channel.stub';
+        return $this->resolveStubPath('/stubs/channel.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
