@@ -37,13 +37,26 @@ class ExceptionMakeCommand extends GeneratorCommand
     {
         if ($this->option('render')) {
             return $this->option('report')
-                ? __DIR__.'/stubs/exception-render-report.stub'
-                : __DIR__.'/stubs/exception-render.stub';
+                ? $this->resolveStubPath('/stubs/exception-render-report.stub')
+                : $this->resolveStubPath('/stubs/exception-render.stub');
         }
 
         return $this->option('report')
-            ? __DIR__.'/stubs/exception-report.stub'
-            : __DIR__.'/stubs/exception.stub';
+            ? $this->resolveStubPath('/stubs/exception-report.stub')
+            : $this->resolveStubPath('/stubs/exception.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**

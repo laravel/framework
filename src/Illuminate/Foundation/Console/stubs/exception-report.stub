@@ -1,10 +1,10 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Exception;
 
-class DummyClass extends Exception
+class {{ class }} extends Exception
 {
     /**
      * Report the exception.
