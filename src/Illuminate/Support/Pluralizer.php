@@ -66,7 +66,7 @@ class Pluralizer
      */
     public static function plural($value, $count = 2)
     {
-        if ((int) abs($count) === 1 || static::uncountable($value)) {
+        if ((int) abs($count) === 1 || (int) abs($count) === 0 || static::uncountable($value)) {
             return $value;
         }
 
