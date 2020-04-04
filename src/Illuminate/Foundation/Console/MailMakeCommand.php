@@ -57,7 +57,7 @@ class MailMakeCommand extends GeneratorCommand
             $this->files->makeDirectory(dirname($path), 0755, true);
         }
 
-        $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
+        $this->files->put($path, file_get_contents($this->resolveStubPath('/stubs/markdown.stub')));
     }
 
     /**
@@ -71,7 +71,17 @@ class MailMakeCommand extends GeneratorCommand
         $class = parent::buildClass($name);
 
         if ($this->option('markdown')) {
-            $class = str_replace('DummyView', $this->option('markdown'), $class);
+            $view = $this->option('markdown');
+
+            $replace = [
+                'DummyView' => $view,
+                '{{ view }}' => $view,
+                '{{view}}' => $view,
+            ];
+
+            $class = str_replace(
+                array_keys($replace), array_values($replace), $class
+            );
         }
 
         return $class;
@@ -85,8 +95,21 @@ class MailMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->option('markdown')
-                        ? __DIR__.'/stubs/markdown-mail.stub'
-                        : __DIR__.'/stubs/mail.stub';
+                        ? $this->resolveStubPath('/stubs/markdown-mail.stub')
+                        : $this->resolveStubPath('/stubs/mail.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
