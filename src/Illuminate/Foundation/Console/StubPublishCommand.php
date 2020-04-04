@@ -47,6 +47,7 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Database/Migrations/stubs/migration.update.stub') => $stubsPath.'/migration.update.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/channel.stub') => $stubsPath.'/channel.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/console.stub') => $stubsPath.'/console.stub',
+            realpath(__DIR__.'/../../Foundation/Console/stubs/event.stub') => $stubsPath.'/event.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/mail.stub') => $stubsPath.'/mail.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/markdown-mail.stub') => $stubsPath.'/markdown-mail.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/markdown-notification.stub') => $stubsPath.'/markdown-notification.stub',
