@@ -19,9 +19,9 @@ class CacheFileStoreTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
+
+        parent::tearDown();
     }
 
     public function testNullIsReturnedIfFileDoesntExist()
@@ -51,7 +51,7 @@ class CacheFileStoreTest extends TestCase
         $files = $this->mockFilesystem();
         $contents = '0000000000';
         $files->expects($this->once())->method('get')->willReturn($contents);
-        $store = $this->getMockBuilder(FileStore::class)->setMethods(['forget'])->setConstructorArgs([$files, __DIR__])->getMock();
+        $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['forget'])->setConstructorArgs([$files, __DIR__])->getMock();
         $store->expects($this->once())->method('forget');
         $value = $store->get('foo');
         $this->assertNull($value);
@@ -69,7 +69,7 @@ class CacheFileStoreTest extends TestCase
     public function testStoreItemProperlyStoresValues()
     {
         $files = $this->mockFilesystem();
-        $store = $this->getMockBuilder(FileStore::class)->setMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
+        $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
         $store->expects($this->once())->method('expiration')->with($this->equalTo(10))->willReturn(1111111111);
         $contents = '1111111111'.serialize('Hello World');
         $hash = sha1('foo');

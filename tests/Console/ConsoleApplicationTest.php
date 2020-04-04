@@ -15,6 +15,8 @@ class ConsoleApplicationTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testAddSetsLaravelInstance()
@@ -82,7 +84,7 @@ class ConsoleApplicationTest extends TestCase
         $app = m::mock(ApplicationContract::class, ['version' => '6.0']);
         $events = m::mock(Dispatcher::class, ['dispatch' => null]);
 
-        return $this->getMockBuilder(Application::class)->setMethods($methods)->setConstructorArgs([
+        return $this->getMockBuilder(Application::class)->onlyMethods($methods)->setConstructorArgs([
             $app, $events, 'test-version',
         ])->getMock();
     }

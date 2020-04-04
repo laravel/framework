@@ -15,6 +15,8 @@ class DatabaseEloquentHasManyTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testMakeMethodDoesNotSaveNewModel()
@@ -269,7 +271,7 @@ class DatabaseEloquentHasManyTest extends TestCase
 
     protected function expectNewModel($relation, $attributes = null)
     {
-        $model = $this->getMockBuilder(Model::class)->setMethods(['setAttribute', 'save'])->getMock();
+        $model = $this->getMockBuilder(Model::class)->onlyMethods(['setAttribute', 'save'])->getMock();
         $relation->getRelated()->shouldReceive('newInstance')->with($attributes)->andReturn($model);
         $model->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
 

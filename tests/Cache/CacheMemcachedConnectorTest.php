@@ -13,6 +13,8 @@ class CacheMemcachedConnectorTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testServersAreAddedCorrectly()
@@ -103,7 +105,7 @@ class CacheMemcachedConnectorTest extends TestCase
 
     protected function connectorMock()
     {
-        return $this->getMockBuilder(MemcachedConnector::class)->setMethods(['createMemcachedInstance'])->getMock();
+        return $this->getMockBuilder(MemcachedConnector::class)->onlyMethods(['createMemcachedInstance'])->getMock();
     }
 
     protected function connect(
