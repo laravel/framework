@@ -80,7 +80,7 @@ class ComponentMakeCommand extends GeneratorCommand
         $view = 'view(\'components.'.$this->getView().'\')';
 
         if ($this->option('inline')) {
-            $view = "<<<'blade'\n<div>\n    " . Inspiring::quote() . "\n</div>\nblade";
+            $view = "<<<'blade'\n<div>\n    ".Inspiring::quote()."\n</div>\nblade";
         }
 
         $replace = [
