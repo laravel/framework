@@ -1616,6 +1616,23 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('1|test-slug', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
     }
 
+    public function testParentChildImplicitBindingsProperlyCamelCased()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{user}/{test_team:id}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $user, RoutingTestTeamModel $testTeam) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $user);
+                $this->assertInstanceOf(RoutingTestTeamModel::class, $testTeam);
+
+                return $user->value.'|'.$testTeam->value;
+            },
+        ]);
+
+        $this->assertSame('1|4', $router->dispatch(Request::create('foo/1/4', 'GET'))->getContent());
+    }
+
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
     {
         $router = $this->getRouter();
@@ -2122,6 +2139,11 @@ class RoutingTestUserModel extends Model
     public function posts()
     {
         return new RoutingTestPostModel;
+    }
+
+    public function testTeams()
+    {
+        return new RoutingTestTeamModel;
     }
 
     public function getRouteKeyName()
