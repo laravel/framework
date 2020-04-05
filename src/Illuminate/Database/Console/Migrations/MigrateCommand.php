@@ -124,14 +124,12 @@ class MigrateCommand extends BaseCommand
     {
         $connection = $this->migrator->resolveConnection($this->option('database'));
 
+        // First, we will make sure that the connection supports schema loading and that
+        // the schema file exists before we proceed any further. If not, we will just
+        // continue with the standard migration operation as normal without errors.
         if ($connection instanceof SQLiteConnection ||
-            $connection instanceof SqlServerConnection) {
-            return;
-        }
-
-        $path = $this->option('schema-path') ?: database_path('migrations/schema/'.$connection->getName().'-schema.sql');
-
-        if (! file_exists($path)) {
+            $connection instanceof SqlServerConnection ||
+            ! file_exists($path = $this->schemaPath($connection))) {
             return;
         }
 
@@ -139,6 +137,9 @@ class MigrateCommand extends BaseCommand
 
         $startTime = microtime(true);
 
+        // Since the schema file will create the "migrations" table and reload it to its
+        // proper state, we need to delete it here so we don't get an error that this
+        // table already exists when the stored database schema file gets executed.
         $this->migrator->deleteRepository();
 
         $connection->getSchemaState()->handleOutputUsing(function ($type, $buffer) {
@@ -147,8 +148,24 @@ class MigrateCommand extends BaseCommand
 
         $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
 
-        $this->dispatcher->dispatch(new SchemaLoaded($connection, $path));
+        // Finally, we will fire an event that this schema has been loaded so developers
+        // can perform any post schema load tasks that are necessary in listeners for
+        // this event, which may seed the database tables with some necessary data.
+        $this->dispatcher->dispatch(
+            new SchemaLoaded($connection, $path)
+        );
 
         $this->line('<info>Loaded stored database schema.</info> ('.$runTime.'ms)');
+    }
+
+    /**
+     * Get the path to the stored schema for the given connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    protected function schemaPath($connection)
+    {
+        return $this->option('schema-path') ?: database_path('migrations/schema/'.$connection->getName().'-schema.sql');
     }
 }
