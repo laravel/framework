@@ -478,6 +478,20 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertSame('foo', $this->collection()->match($request)->getName());
     }
 
+    public function testRootTrailingSlashIsTrimmedWhenMatchingCachedRoutes()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', 'foo', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $request = Request::create('http://example.com//foo');
+
+        // Access to request path info before matching route
+        $request->getPathInfo();
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
+    }
+
     /**
      * Create a new Route object.
      *

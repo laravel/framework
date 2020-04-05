@@ -157,7 +157,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
         $parts = explode('?', $request->server->get('REQUEST_URI'), 2);
 
         $trimmedRequest->server->set(
-            'REQUEST_URI', rtrim($parts[0], '/').(isset($parts[1]) ? '?'.$parts[1] : '')
+            'REQUEST_URI', trim($parts[0], '/').(isset($parts[1]) ? '?'.$parts[1] : '')
         );
 
         return $trimmedRequest;
