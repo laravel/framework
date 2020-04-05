@@ -127,7 +127,9 @@ class FactoryBuilder
      */
     public function states($states)
     {
-        $this->activeStates = is_array($states) ? $states : func_get_args();
+        $states = is_array($states) ? $states : func_get_args();
+        
+        $this->activeStates = array_merge($this->activeStates, $states);
 
         return $this;
     }

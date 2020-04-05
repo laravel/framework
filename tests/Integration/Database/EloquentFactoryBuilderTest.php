@@ -99,6 +99,8 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->state(FactoryBuildableServer::class, 'inline', ['status' => 'inline']);
 
+        $factory->state(FactoryBuildableServer::class, 'memory', ['tags' => ['Memory']]);
+
         $app->singleton(Factory::class, function ($app) use ($factory) {
             return $factory;
         });
@@ -214,6 +216,20 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $this->assertSame('active', $server->status);
         $this->assertSame('inline', $inlineServer->status);
+    }
+
+    public function testCreatingModelsWithMultipleStates()
+    {
+        $server = factory(FactoryBuildableServer::class)->create();
+
+        $mergedServer = factory(FactoryBuildableServer::class)
+            ->state('inline')
+            ->state('memory')
+            ->create();
+
+        $this->assertSame('active', $server->status);
+        $this->assertSame('inline', $mergedServer->status);
+        $this->assertSame(['Memory'], $mergedServer->tags);
     }
 
     public function testCreatingModelsWithRelationships()
