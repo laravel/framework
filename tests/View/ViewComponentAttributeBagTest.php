@@ -43,7 +43,7 @@ class ViewComponentAttributeBagTest extends TestCase
 
         $bag = (new ComponentAttributeBag)
             ->merge([
-                'test-escaped' => '<tag attr="attr">'
+                'test-escaped' => '<tag attr="attr">',
             ]);
 
         $this->assertSame('test-escaped="&lt;tag attr=&quot;attr&quot;&gt;"', (string) $bag);
