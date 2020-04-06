@@ -5,6 +5,7 @@ namespace Illuminate\Testing;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Arr;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -181,7 +182,37 @@ class PendingCommand
             );
         }
 
+        $this->verifyExpectations();
+
         return $exitCode;
+    }
+
+    /**
+     * Determine if expected questions / choices / outputs are fulfilled.
+     *
+     * @return void
+     */
+    protected function verifyExpectations()
+    {
+        if (count($this->test->expectedQuestions)) {
+            $this->test->fail('Question "'.Arr::first($this->test->expectedQuestions)[0].'" was not asked.');
+        }
+
+        if (count($this->test->expectedChoices) > 0) {
+            foreach ($this->test->expectedChoices as $question => $answers) {
+                $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
+
+                $this->test->{$assertion}(
+                    $answers['expected'],
+                    $answers['actual'],
+                    'Question "'.$question.'" has different options.'
+                );
+            }
+        }
+
+        if (count($this->test->expectedOutput)) {
+            $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
+        }
     }
 
     /**
