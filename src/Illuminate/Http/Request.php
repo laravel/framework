@@ -140,7 +140,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function path()
     {
-        $pattern = trim($this->getPathInfo(), '/');
+        $pattern = rtrim($this->getPathInfo(), '/');
 
         return $pattern == '' ? '/' : $pattern;
     }
