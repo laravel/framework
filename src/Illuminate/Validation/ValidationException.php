@@ -53,6 +53,7 @@ class ValidationException extends Exception
      */
     public function __construct($validator, $response = null, $errorBag = 'default')
     {
+        // Do not send in a PR to add the "trans" helper to this constructor. Thanks.
         parent::__construct('The given data was invalid.');
 
         $this->response = $response;
