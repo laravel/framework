@@ -951,7 +951,7 @@ class Container implements ArrayAccess, ContainerContract
         // is optional, and if it is we will return the optional parameter value as
         // the value of the dependency, similarly to how we do this with scalars.
         catch (BindingResolutionException $e) {
-            if ($parameter->isOptional()) {
+            if ($parameter->isDefaultValueAvailable()) {
                 return $parameter->getDefaultValue();
             }
 
