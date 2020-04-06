@@ -13,8 +13,6 @@ class DatabaseEloquentPivotTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-
-        parent::tearDown();
     }
 
     public function testPropertiesAreSetCorrectly()
@@ -113,7 +111,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testDeleteMethodDeletesModelByKeys()
     {
-        $pivot = $this->getMockBuilder(Pivot::class)->onlyMethods(['newQueryWithoutRelationships'])->getMock();
+        $pivot = $this->getMockBuilder(Pivot::class)->setMethods(['newQueryWithoutRelationships'])->getMock();
         $pivot->setPivotKeys('foreign', 'other');
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';

@@ -12,95 +12,8 @@ use stdClass;
 
 class QueueSqsJobTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    protected $key;
-
-    /**
-     * @var string
-     */
-    protected $secret;
-
-    /**
-     * @var string
-     */
-    protected $service;
-
-    /**
-     * @var string
-     */
-    protected $region;
-
-    /**
-     * @var string
-     */
-    protected $account;
-
-    /**
-     * @var string
-     */
-    protected $queueName;
-
-    /**
-     * @var string
-     */
-    protected $baseUrl;
-
-    /**
-     * @var int
-     */
-    protected $releaseDelay;
-
-    /**
-     * @var string
-     */
-    protected $queueUrl;
-
-    /**
-     * @var \Mockery\MockInterface
-     */
-    protected $mockedSqsClient;
-
-    /**
-     * @var \Mockery\MockInterface
-     */
-    protected $mockedContainer;
-
-    /**
-     * @var string
-     */
-    protected $mockedJob;
-
-    /**
-     * @var array
-     */
-    protected $mockedData;
-
-    /**
-     * @var mixed
-     */
-    protected $mockedPayload;
-
-    /**
-     * @var string
-     */
-    protected $mockedMessageId;
-
-    /**
-     * @var string
-     */
-    protected $mockedReceiptHandle;
-
-    /**
-     * @var array
-     */
-    protected $mockedJobData;
-
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->key = 'AMAZONSQSKEY';
         $this->secret = 'AmAz0n+SqSsEcReT+aLpHaNuM3R1CsTr1nG';
         $this->service = 'sqs';
@@ -112,9 +25,10 @@ class QueueSqsJobTest extends TestCase
 
         // This is how the modified getQueue builds the queueUrl
         $this->queueUrl = $this->baseUrl.'/'.$this->account.'/'.$this->queueName;
+
         // Get a mock of the SqsClient
         $this->mockedSqsClient = $this->getMockBuilder(SqsClient::class)
-            ->addMethods(['deleteMessage'])
+            ->setMethods(['deleteMessage'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -125,6 +39,7 @@ class QueueSqsJobTest extends TestCase
         $this->mockedData = ['data'];
         $this->mockedPayload = json_encode(['job' => $this->mockedJob, 'data' => $this->mockedData, 'attempts' => 1]);
         $this->mockedMessageId = 'e3cd03ee-59a3-4ad8-b0aa-ee2e3808ac81';
+        $this->mockedReceiptHandle = '0NNAq8PwvXuWv5gMtS9DJ8qEdyiUwbAjpp45w2m6M4SJ1Y+PxCh7R930NRB8ylSacEmoSnW18bgd4nK\/O6ctE+VFVul4eD23mA07vVoSnPI4F\/voI1eNCp6Iax0ktGmhlNVzBwaZHEr91BRtqTRM3QKd2ASF8u+IQaSwyl\/DGK+P1+dqUOodvOVtExJwdyDLy1glZVgm85Yw9Jf5yZEEErqRwzYz\/qSigdvW4sm2l7e4phRol\/+IjMtovOyH\/ukueYdlVbQ4OshQLENhUKe7RNN5i6bE\/e5x9bnPhfj2gbM';
 
         $this->mockedJobData = [
             'Body' => $this->mockedPayload,
@@ -138,8 +53,6 @@ class QueueSqsJobTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-
-        parent::tearDown();
     }
 
     public function testFireProperlyCallsTheJobHandler()
@@ -153,10 +66,10 @@ class QueueSqsJobTest extends TestCase
     public function testDeleteRemovesTheJobFromSqs()
     {
         $this->mockedSqsClient = $this->getMockBuilder(SqsClient::class)
-            ->addMethods(['deleteMessage'])
+            ->setMethods(['deleteMessage'])
             ->disableOriginalConstructor()
             ->getMock();
-        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->mockedSqsClient, $this->queueName, $this->account])->getMock();
+        $queue = $this->getMockBuilder(SqsQueue::class)->setMethods(['getQueue'])->setConstructorArgs([$this->mockedSqsClient, $this->queueName, $this->account])->getMock();
         $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
         $job->getSqs()->expects($this->once())->method('deleteMessage')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
@@ -166,10 +79,10 @@ class QueueSqsJobTest extends TestCase
     public function testReleaseProperlyReleasesTheJobOntoSqs()
     {
         $this->mockedSqsClient = $this->getMockBuilder(SqsClient::class)
-            ->addMethods(['changeMessageVisibility'])
+            ->setMethods(['changeMessageVisibility'])
             ->disableOriginalConstructor()
             ->getMock();
-        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->mockedSqsClient, $this->queueName, $this->account])->getMock();
+        $queue = $this->getMockBuilder(SqsQueue::class)->setMethods(['getQueue'])->setConstructorArgs([$this->mockedSqsClient, $this->queueName, $this->account])->getMock();
         $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
         $job->getSqs()->expects($this->once())->method('changeMessageVisibility')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay]);

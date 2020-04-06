@@ -13,8 +13,6 @@ class DatabaseMigrationCreatorTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-
-        parent::tearDown();
     }
 
     public function testBasicCreateMethodStoresMigrationFile()
@@ -100,7 +98,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $customStubs = 'stubs';
 
         return $this->getMockBuilder(MigrationCreator::class)
-            ->onlyMethods(['getDatePrefix'])
+            ->setMethods(['getDatePrefix'])
             ->setConstructorArgs([$files, $customStubs])
             ->getMock();
     }

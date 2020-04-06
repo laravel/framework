@@ -14,8 +14,6 @@ class ContainerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
-
-        parent::tearDown();
     }
 
     public function testContainerSingleton()
@@ -417,7 +415,7 @@ class ContainerTest extends TestCase
     public function testMakeWithMethodIsAnAliasForMakeMethod()
     {
         $mock = $this->getMockBuilder(Container::class)
-                     ->onlyMethods(['make'])
+                     ->setMethods(['make'])
                      ->getMock();
 
         $mock->expects($this->once())

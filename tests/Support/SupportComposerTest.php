@@ -13,8 +13,6 @@ class SupportComposerTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-
-        parent::tearDown();
     }
 
     public function testDumpAutoloadRunsTheCorrectCommand()
@@ -61,7 +59,7 @@ class SupportComposerTest extends TestCase
         $process->shouldReceive('run')->once();
 
         $composer = $this->getMockBuilder(Composer::class)
-            ->onlyMethods(['getProcess'])
+            ->setMethods(['getProcess'])
             ->setConstructorArgs([$files, $directory])
             ->getMock();
         $composer->expects($this->once())

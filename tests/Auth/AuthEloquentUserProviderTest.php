@@ -14,8 +14,6 @@ class AuthEloquentUserProviderTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-
-        parent::tearDown();
     }
 
     public function testRetrieveByIDReturnsUser()
@@ -128,7 +126,7 @@ class AuthEloquentUserProviderTest extends TestCase
     {
         $hasher = m::mock(Hasher::class);
 
-        return $this->getMockBuilder(EloquentUserProvider::class)->onlyMethods(['createModel'])->setConstructorArgs([$hasher, 'foo'])->getMock();
+        return $this->getMockBuilder(EloquentUserProvider::class)->setMethods(['createModel'])->setConstructorArgs([$hasher, 'foo'])->getMock();
     }
 }
 

@@ -22,8 +22,6 @@ class MailableQueuedTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-
-        parent::tearDown();
     }
 
     public function testQueuedMailableSent()
@@ -31,7 +29,7 @@ class MailableQueuedTest extends TestCase
         $queueFake = new QueueFake(new Application);
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
-            ->onlyMethods(['createMessage', 'to'])
+            ->setMethods(['createMessage', 'to'])
             ->getMock();
         $mailer->setQueue($queueFake);
         $mailable = new MailableQueableStub;
@@ -45,7 +43,7 @@ class MailableQueuedTest extends TestCase
         $queueFake = new QueueFake(new Application);
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
-            ->onlyMethods(['createMessage'])
+            ->setMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
         $mailable = new MailableQueableStub;
@@ -74,7 +72,7 @@ class MailableQueuedTest extends TestCase
         $queueFake = new QueueFake($app);
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
-            ->onlyMethods(['createMessage'])
+            ->setMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
         $mailable = new MailableQueableStub;

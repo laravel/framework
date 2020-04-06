@@ -16,8 +16,6 @@ class DatabaseMigrationRepositoryTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-
-        parent::tearDown();
     }
 
     public function testGetRanMigrationsListMigrationsByPackage()
@@ -37,7 +35,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber()
     {
-        $repo = $this->getMockBuilder(DatabaseMigrationRepository::class)->onlyMethods(['getLastBatchNumber'])->setConstructorArgs([
+        $repo = $this->getMockBuilder(DatabaseMigrationRepository::class)->setMethods(['getLastBatchNumber'])->setConstructorArgs([
             $resolver = m::mock(ConnectionResolverInterface::class), 'migrations',
         ])->getMock();
         $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
@@ -83,7 +81,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     public function testGetNextBatchNumberReturnsLastBatchNumberPlusOne()
     {
-        $repo = $this->getMockBuilder(DatabaseMigrationRepository::class)->onlyMethods(['getLastBatchNumber'])->setConstructorArgs([
+        $repo = $this->getMockBuilder(DatabaseMigrationRepository::class)->setMethods(['getLastBatchNumber'])->setConstructorArgs([
             m::mock(ConnectionResolverInterface::class), 'migrations',
         ])->getMock();
         $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
