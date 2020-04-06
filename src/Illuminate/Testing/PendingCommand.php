@@ -188,7 +188,7 @@ class PendingCommand
     }
 
     /**
-     * Verify if expected questions/choices/outputs aren't fulfilled.
+     * Determine if expected questions / choices / outputs are fulfilled.
      *
      * @return void
      */
