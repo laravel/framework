@@ -4091,6 +4091,41 @@ class SupportCollectionTest extends TestCase
         ], $data->all());
     }
 
+    public function testUntilUsingValue()
+    {
+        $data = new Collection([1, 2, 3, 4]);
+
+        $data = $data->until(3);
+
+        $this->assertSame([1, 2], $data->toArray());
+    }
+
+    public function testUntilUsingCallback()
+    {
+        $data = new Collection([1, 2, 3, 4]);
+
+        $data = $data->until(function ($item) {
+            return $item >= 3;
+        });
+
+        $this->assertSame([1, 2], $data->toArray());
+    }
+
+    public function testUntilReturnsAllItemsForUnmetValue()
+    {
+        $data = new Collection([1, 2, 3, 4]);
+
+        $actual = $data->until(99);
+
+        $this->assertSame($data->toArray(), $actual->toArray());
+
+        $actual = $data->until(function ($item) {
+            return $item >= 99;
+        });
+
+        $this->assertSame($data->toArray(), $actual->toArray());
+    }
+
     /**
      * Provides each collection class, respectively.
      *
