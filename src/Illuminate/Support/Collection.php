@@ -1333,4 +1333,30 @@ class Collection implements ArrayAccess, Enumerable
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Take items in the collection until condition is met.
+     *
+     * @param  mixed  $key
+     * @return static
+     */
+    public function until($value)
+    {
+        $passed = [];
+
+        $callback = $this->useAsCallable($value) ? $value :
+            function ($item) use ($value) {
+                return $item === $value;
+            };
+
+        foreach ($this as $key => $item) {
+            if ($callback($item, $key)) {
+                break;
+            }
+
+            $passed[$key] = $item;
+        }
+
+        return new static($passed);
+    }
 }
