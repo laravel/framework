@@ -18,7 +18,8 @@ class DumpCommand extends Command
      */
     protected $signature = 'schema:dump
                 {--database= : The database connection to use}
-                {--path= : The path where the schema dump file should be stored}';
+                {--path= : The path where the schema dump file should be stored}
+                {--prune : Delete all existing migration files}';
 
     /**
      * The console command description.
@@ -41,6 +42,12 @@ class DumpCommand extends Command
         $dispatcher->dispatch(new SchemaDumped($connection, $path));
 
         $this->info('Database schema dumped successfully.');
+
+        if ($this->option('prune')) {
+            (new Filesystem)->deleteDirectory(
+                database_path('migrations'), $preserve = true
+            );
+        }
     }
 
     /**
@@ -64,7 +71,7 @@ class DumpCommand extends Command
      */
     protected function path(Connection $connection)
     {
-        return tap($this->option('path') ?: database_path('migrations/schema/'.$connection->getName().'-schema.sql'), function ($path) {
+        return tap($this->option('path') ?: database_path('schema/'.$connection->getName().'-schema.sql'), function ($path) {
             (new Filesystem)->ensureDirectoryExists(dirname($path));
         });
     }
