@@ -15,6 +15,8 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testBasicMigrationsCallMigratorWithProperArguments()
@@ -38,7 +40,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     public function testMigrationRepositoryCreatedWhenNecessary()
     {
         $params = [$migrator = m::mock(Migrator::class)];
-        $command = $this->getMockBuilder(MigrateCommand::class)->setMethods(['call'])->setConstructorArgs($params)->getMock();
+        $command = $this->getMockBuilder(MigrateCommand::class)->onlyMethods(['call'])->setConstructorArgs($params)->getMock();
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);

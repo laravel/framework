@@ -17,6 +17,8 @@ class DatabaseConnectorTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testOptionResolution()
@@ -31,7 +33,7 @@ class DatabaseConnectorTest extends TestCase
      */
     public function testMySqlConnectCallsCreateConnectionWithProperArguments($dsn, $config)
     {
-        $connector = $this->getMockBuilder(MySqlConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(MySqlConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
@@ -56,7 +58,7 @@ class DatabaseConnectorTest extends TestCase
     {
         $dsn = 'pgsql:host=foo;dbname=bar;port=111';
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'charset' => 'utf8'];
-        $connector = $this->getMockBuilder(PostgresConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
@@ -71,7 +73,7 @@ class DatabaseConnectorTest extends TestCase
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
         $config = ['host' => 'foo', 'database' => 'bar', 'schema' => 'public', 'charset' => 'utf8'];
-        $connector = $this->getMockBuilder(PostgresConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
@@ -87,7 +89,7 @@ class DatabaseConnectorTest extends TestCase
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
         $config = ['host' => 'foo', 'database' => 'bar', 'schema' => ['public', 'user'], 'charset' => 'utf8'];
-        $connector = $this->getMockBuilder(PostgresConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
@@ -103,7 +105,7 @@ class DatabaseConnectorTest extends TestCase
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
         $config = ['host' => 'foo', 'database' => 'bar', 'charset' => 'utf8', 'application_name' => 'Laravel App'];
-        $connector = $this->getMockBuilder(PostgresConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
@@ -119,7 +121,7 @@ class DatabaseConnectorTest extends TestCase
     {
         $dsn = 'sqlite::memory:';
         $config = ['database' => ':memory:'];
-        $connector = $this->getMockBuilder(SQLiteConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(SQLiteConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
@@ -132,7 +134,7 @@ class DatabaseConnectorTest extends TestCase
     {
         $dsn = 'sqlite:'.__DIR__;
         $config = ['database' => __DIR__];
-        $connector = $this->getMockBuilder(SQLiteConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(SQLiteConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
@@ -145,7 +147,7 @@ class DatabaseConnectorTest extends TestCase
     {
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111];
         $dsn = $this->getDsn($config);
-        $connector = $this->getMockBuilder(SqlServerConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(SqlServerConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
@@ -158,7 +160,7 @@ class DatabaseConnectorTest extends TestCase
     {
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'readonly' => true, 'charset' => 'utf-8', 'pooling' => false, 'appname' => 'baz'];
         $dsn = $this->getDsn($config);
-        $connector = $this->getMockBuilder(SqlServerConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(SqlServerConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
@@ -175,7 +177,7 @@ class DatabaseConnectorTest extends TestCase
 
         $config = ['odbc' => true, 'odbc_datasource_name' => 'server=localhost;database=test;'];
         $dsn = $this->getDsn($config);
-        $connector = $this->getMockBuilder(SqlServerConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder(SqlServerConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);

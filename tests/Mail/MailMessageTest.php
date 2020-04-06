@@ -31,6 +31,8 @@ class MailMessageTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testFromMethod()
@@ -101,7 +103,7 @@ class MailMessageTest extends TestCase
     public function testBasicAttachment()
     {
         $swift = m::mock(stdClass::class);
-        $message = $this->getMockBuilder(Message::class)->setMethods(['createAttachmentFromPath'])->setConstructorArgs([$swift])->getMock();
+        $message = $this->getMockBuilder(Message::class)->onlyMethods(['createAttachmentFromPath'])->setConstructorArgs([$swift])->getMock();
         $attachment = m::mock(stdClass::class);
         $message->expects($this->once())->method('createAttachmentFromPath')->with($this->equalTo('foo.jpg'))->willReturn($attachment);
         $swift->shouldReceive('attach')->once()->with($attachment);
@@ -113,7 +115,7 @@ class MailMessageTest extends TestCase
     public function testDataAttachment()
     {
         $swift = m::mock(stdClass::class);
-        $message = $this->getMockBuilder(Message::class)->setMethods(['createAttachmentFromData'])->setConstructorArgs([$swift])->getMock();
+        $message = $this->getMockBuilder(Message::class)->onlyMethods(['createAttachmentFromData'])->setConstructorArgs([$swift])->getMock();
         $attachment = m::mock(stdClass::class);
         $message->expects($this->once())->method('createAttachmentFromData')->with($this->equalTo('foo'), $this->equalTo('name'))->willReturn($attachment);
         $swift->shouldReceive('attach')->once()->with($attachment);
