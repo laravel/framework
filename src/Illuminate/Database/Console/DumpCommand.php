@@ -47,6 +47,8 @@ class DumpCommand extends Command
             (new Filesystem)->deleteDirectory(
                 database_path('migrations'), $preserve = true
             );
+
+            $this->info('Migrations pruned successfully.');
         }
     }
 
