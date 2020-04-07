@@ -485,7 +485,7 @@ class Route
      */
     public function bindingFieldFor($parameter)
     {
-        if (is_integer($parameter)) {
+        if (is_int($parameter)) {
             return array_values($this->bindingFields)[$parameter] ?? null;
         }
 
