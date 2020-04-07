@@ -73,6 +73,9 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith('Malmö', 'Malmö'));
         $this->assertFalse(Str::startsWith('Jönköping', 'Jonko'));
         $this->assertFalse(Str::startsWith('Malmö', 'Malmo'));
+        $this->assertTrue(Str::startsWith('你好', '你'));
+        $this->assertFalse(Str::startsWith('你好', '好'));
+        $this->assertFalse(Str::startsWith('你好', 'a'));
     }
 
     public function testEndsWith()
@@ -100,6 +103,9 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith('Malmö', 'mö'));
         $this->assertFalse(Str::endsWith('Jönköping', 'oping'));
         $this->assertFalse(Str::endsWith('Malmö', 'mo'));
+        $this->assertTrue(Str::endsWith('你好', '好'));
+        $this->assertFalse(Str::endsWith('你好', '你'));
+        $this->assertFalse(Str::endsWith('你好', 'a'));
     }
 
     public function testStrBefore()

@@ -1,6 +1,28 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.4.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.5.0...7.x)
+
+
+## [v7.5.0 (2020-04-07)](https://github.com/laravel/framework/compare/v7.4.0...v7.5.0)
+
+### Added
+- Added `assertNotSent()` and `assertNothingSent()` methods to  `Illuminate\Http\Client\Factory` ([#32197](https://github.com/laravel/framework/pull/32197))
+- Added enum support for `renameColumn()` ([#32205](https://github.com/laravel/framework/pull/32205))
+- Support returning an instance of a caster ([#32225](https://github.com/laravel/framework/pull/32225))
+
+### Fixed
+- Prevent long URLs from breaking email layouts ([#32189](https://github.com/laravel/framework/pull/32189))
+- Fixed camel casing relationship ([#32217](https://github.com/laravel/framework/pull/32217))
+- Fixed merging boolean or null attributes in Blade components ([#32245](https://github.com/laravel/framework/pull/32245))
+- Fixed Console expectation assertion order ([#32258](https://github.com/laravel/framework/pull/32258))
+- Fixed `route` helper with custom binding key ([#32264](https://github.com/laravel/framework/pull/32264))
+- Fixed double slashes matching in UriValidator (fix inconsistencies between cached and none cached routes) ([#32260](https://github.com/laravel/framework/pull/32260))
+- Fixed setting mail header ([#32272](https://github.com/laravel/framework/pull/32272))
+
+### Optimization
+- Optimize `Container::resolve()` method ([#32194](https://github.com/laravel/framework/pull/32194))
+- Optimize performance for `data_get()` method ([#32192](https://github.com/laravel/framework/pull/32192))
+- Optimize `Str::startsWith()` ([#32243](https://github.com/laravel/framework/pull/32243))
 
 
 ## [v7.4.0 (2020-03-31)](https://github.com/laravel/framework/compare/v7.3.0...v7.4.0)
