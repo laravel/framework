@@ -4091,18 +4091,24 @@ class SupportCollectionTest extends TestCase
         ], $data->all());
     }
 
-    public function testUntilUsingValue()
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUntilUsingValue($collection)
     {
-        $data = new Collection([1, 2, 3, 4]);
+        $data = new $collection([1, 2, 3, 4]);
 
         $data = $data->until(3);
 
         $this->assertSame([1, 2], $data->toArray());
     }
 
-    public function testUntilUsingCallback()
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUntilUsingCallback($collection)
     {
-        $data = new Collection([1, 2, 3, 4]);
+        $data = new $collection([1, 2, 3, 4]);
 
         $data = $data->until(function ($item) {
             return $item >= 3;
@@ -4111,9 +4117,12 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([1, 2], $data->toArray());
     }
 
-    public function testUntilReturnsAllItemsForUnmetValue()
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUntilReturnsAllItemsForUnmetValue($collection)
     {
-        $data = new Collection([1, 2, 3, 4]);
+        $data = new $collection([1, 2, 3, 4]);
 
         $actual = $data->until(99);
 
@@ -4124,6 +4133,24 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertSame($data->toArray(), $actual->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUntilCanBeProxied($collection)
+    {
+        $data = new $collection([
+            new TestSupportCollectionHigherOrderItem('Adam'),
+            new TestSupportCollectionHigherOrderItem('Taylor'),
+            new TestSupportCollectionHigherOrderItem('Jason'),
+        ]);
+
+        $actual = $data->until->is('Jason');
+
+        $this->assertCount(2, $actual);
+        $this->assertSame('Adam', $actual->get(0)->name);
+        $this->assertSame('Taylor', $actual->get(1)->name);
     }
 
     /**
@@ -4152,6 +4179,11 @@ class TestSupportCollectionHigherOrderItem
     public function uppercase()
     {
         return $this->name = strtoupper($this->name);
+    }
+
+    public function is($name)
+    {
+        return $this->name === $name;
     }
 }
 
