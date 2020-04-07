@@ -8,6 +8,7 @@
 ### Added
 - Added `assertNotSent()` and `assertNothingSent()` methods to  `Illuminate\Http\Client\Factory` ([#32197](https://github.com/laravel/framework/pull/32197))
 - Added enum support for `renameColumn()` ([#32205](https://github.com/laravel/framework/pull/32205))
+- Support returning an instance of a caster ([#32225](https://github.com/laravel/framework/pull/32225))
 
 ### Fixed
 - Prevent long URLs from breaking email layouts ([#32189](https://github.com/laravel/framework/pull/32189))
@@ -22,9 +23,6 @@
 - Optimize `Container::resolve()` method ([#32194](https://github.com/laravel/framework/pull/32194))
 - Optimize performance for `data_get()` method ([#32192](https://github.com/laravel/framework/pull/32192))
 - Optimize `Str::startsWith()` ([#32243](https://github.com/laravel/framework/pull/32243))
-
-### TODO
-- Support returning an instance of a caster ([#32225](https://github.com/laravel/framework/pull/32225))
 
 
 ## [v7.4.0 (2020-03-31)](https://github.com/laravel/framework/compare/v7.3.0...v7.4.0)
