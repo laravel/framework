@@ -480,16 +480,14 @@ class Route
     /**
      * Get the binding field for the given parameter.
      *
-     * @param  string  $parameter
+     * @param  string|int  $parameter
      * @return string|null
      */
     public function bindingFieldFor($parameter)
     {
-        if (is_int($parameter)) {
-            return array_values($this->bindingFields)[$parameter] ?? null;
-        }
+        $fields = is_int($parameter) ? array_values($this->bindingFields) : $this->bindingFields;
 
-        return $this->bindingFields[$parameter] ?? null;
+        return $fields[$parameter] ?? null;
     }
 
     /**
