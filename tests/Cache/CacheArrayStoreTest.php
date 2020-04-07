@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheArrayStoreTest extends TestCase
 {
@@ -198,7 +199,7 @@ class CacheArrayStoreTest extends TestCase
     public function testValuesAreNotStoredByReference()
     {
         $store = new ArrayStore($serialize = true);
-        $object = new \stdClass;
+        $object = new stdClass;
         $object->foo = true;
 
         $store->put('object', $object, 10);
@@ -210,7 +211,7 @@ class CacheArrayStoreTest extends TestCase
     public function testValuesAreStoredByReferenceIfSerializationIsDisabled()
     {
         $store = new ArrayStore;
-        $object = new \stdClass;
+        $object = new stdClass;
         $object->foo = true;
 
         $store->put('object', $object, 10);

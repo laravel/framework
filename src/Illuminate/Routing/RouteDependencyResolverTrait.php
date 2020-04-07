@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use ReflectionFunctionAbstract;
 use ReflectionMethod;
 use ReflectionParameter;
+use stdClass;
 
 trait RouteDependencyResolverTrait
 {
@@ -41,7 +42,7 @@ trait RouteDependencyResolverTrait
 
         $values = array_values($parameters);
 
-        $skippableValue = new \stdClass;
+        $skippableValue = new stdClass;
 
         foreach ($reflector->getParameters() as $key => $parameter) {
             $instance = $this->transformDependency($parameter, $parameters, $skippableValue);

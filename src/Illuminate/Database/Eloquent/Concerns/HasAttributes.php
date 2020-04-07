@@ -1417,7 +1417,7 @@ trait HasAttributes
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
         if ($value !== null
-            && \in_array($key, $this->getDates(), false)) {
+            && in_array($key, $this->getDates(), false)) {
             return $this->asDateTime($value);
         }
 

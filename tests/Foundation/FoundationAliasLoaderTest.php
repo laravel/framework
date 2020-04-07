@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Foundation\AliasLoader;
 use PHPUnit\Framework\TestCase;
+use some_alias_foo;
+use some_alias_foo_bar;
 
 class FoundationAliasLoaderTest extends TestCase
 {
@@ -43,7 +45,7 @@ class FoundationAliasLoaderTest extends TestCase
 
         $result = $loader->load('some_alias_foo_bar');
 
-        $this->assertInstanceOf(FoundationAliasLoaderStub::class, new \some_alias_foo_bar);
+        $this->assertInstanceOf(FoundationAliasLoaderStub::class, new some_alias_foo_bar);
         $this->assertTrue($result);
 
         $result2 = $loader->load('bar');
@@ -57,7 +59,7 @@ class FoundationAliasLoaderTest extends TestCase
 
         $result = $loader->load('some_alias_foo');
 
-        $fooObj = new \some_alias_foo;
+        $fooObj = new some_alias_foo;
         $this->assertInstanceOf(FoundationAliasLoaderStub::class, $fooObj);
         $this->assertTrue($result);
     }
