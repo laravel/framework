@@ -9,6 +9,7 @@ use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
@@ -337,7 +338,11 @@ class Builder
      */
     protected function parseSub($query)
     {
-        if ($query instanceof self || $query instanceof EloquentBuilder) {
+        if ($query instanceof EloquentBuilder) {
+            $query = $query->toBase();
+        }
+        if ($query instanceof self) {
+            $query->removeSubqueryOrderOnSqlServer();
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
             return [$query, []];
@@ -1392,6 +1397,8 @@ class Builder
         // in the array of where clauses for the "main" parent query instance.
         call_user_func($callback, $query = $this->forSubQuery());
 
+        $query->removeSubqueryOrderOnSqlServer();
+
         $this->wheres[] = compact(
             'type', 'column', 'operator', 'query', 'boolean'
         );
@@ -1467,6 +1474,8 @@ class Builder
     public function addWhereExistsQuery(self $query, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotExists' : 'Exists';
+
+        $query->removeSubqueryOrderOnSqlServer();
 
         $this->wheres[] = compact('type', 'query', 'boolean');
 
@@ -2037,6 +2046,29 @@ class Builder
     }
 
     /**
+     * Determine if a "limit" or "offset" clause is specified
+     * @param $query
+     * @return bool
+     */
+    protected function isLimitOrOffsetSpecified() : bool {
+        return $this->unions
+            ? isset($this->unionLimit) || isset($this->unionOffset)
+            : isset($this->limit) || isset($this->offset);
+    }
+
+    /**
+     * Remove "order" clauses in order to make the query usable as a subquery in SQL server
+     * @return $this
+     */
+    protected function removeSubqueryOrderOnSqlServer()
+    {
+        if ($this->getGrammar() instanceof SqlServerGrammar && !$this->isLimitOrOffsetSpecified()) {
+            $this->reorder();
+        }
+        return $this;
+    }
+
+    /**
      * Get an array with all orders with a given column removed.
      *
      * @param  string  $column
@@ -2060,9 +2092,15 @@ class Builder
      */
     public function union($query, $all = false)
     {
+        if (empty($this->unions)) {
+            $this->removeSubqueryOrderOnSqlServer();
+        }
+
         if ($query instanceof Closure) {
             call_user_func($query, $query = $this->newQuery());
         }
+
+        $query->removeSubqueryOrderOnSqlServer();
 
         $this->unions[] = compact('query', 'all');
 

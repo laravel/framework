@@ -847,6 +847,20 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->union($this->getSqlServerBuilder()->select('name')->from('users')->where('id', '=', 2));
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $expectedSql = 'select * from (select [name] from [users] where [id] < ?) as [temp_table] union select * from (select [name] from [users] where [id] > ?) as [temp_table]';
+        $builder->select('name')->from('users')->where('id', '<', 100)->orderBy('gender');
+        $builder->union($this->getSqlServerBuilder()->select('name')->from('users')->where('id', '>', 1000)->orderBy('gender'));
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals([0 => 100, 1 => 1000], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $expectedSql = 'select * from (select top 3 [name] from [users] where [id] < ? order by [gender] asc) as [temp_table] union select * from (select top 4 [name] from [users] where [id] > ? order by [gender] asc) as [temp_table]';
+        $builder->select('name')->from('users')->where('id', '<', 100)->orderBy('gender')->limit(3);
+        $builder->union($this->getSqlServerBuilder()->select('name')->from('users')->where('id', '>', 1000)->orderBy('gender')->limit(4));
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals([0 => 100, 1 => 1000], $builder->getBindings());
     }
 
     public function testUnionAlls()
@@ -1421,6 +1435,67 @@ class DatabaseQueryBuilderTest extends TestCase
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertSame('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+    }
+
+    public function testWhereExistsRemoveOrderOnSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('orders')->whereExists(
+            function (Builder $q) {
+                $q->from('products')->whereColumn('id', '=', 'product_id')->orderBy('id');
+            }
+        );
+        $this->assertSame('select * from [orders] where exists (select * from [products] where [id] = [product_id])', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('orders')->whereExists(
+            function (Builder $q) {
+                $q->from('products')->whereColumn('id', '=', 'product_id')->orderBy('id')->limit(10);
+            }
+        );
+        $this->assertSame('select * from [orders] where exists (select top 10 * from [products] where [id] = [product_id] order by [id] asc)', $builder->toSql());
+    }
+
+    public function testWhereInRemoveOrderOnSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('orders')->whereIn(
+            'type',
+            function (Builder $q) {
+                $q->from('products')->select('type')->whereColumn('id', '=', 'product_id')->orderBy('type');
+            }
+        );
+        $this->assertSame('select * from [orders] where [type] in (select [type] from [products] where [id] = [product_id])', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('orders')->whereIn(
+            'type',
+            function (Builder $q) {
+                $q->from('products')->select('type')->whereColumn('id', '=', 'product_id')->orderBy('type')->limit(3);
+            }
+        );
+        $this->assertSame('select * from [orders] where [type] in (select top 3 [type] from [products] where [id] = [product_id] order by [type] asc)', $builder->toSql());
+    }
+
+    public function testWhereSubRemoveOrderOnSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('orders')->where(
+            'type',
+            function (Builder $q) {
+                $q->from('products')->select('type')->whereColumn('id', '=', 'product_id')->orderBy('type');
+            }
+        );
+        $this->assertSame('select * from [orders] where [type] = (select [type] from [products] where [id] = [product_id])', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('orders')->where(
+            'type',
+            function (Builder $q) {
+                $q->from('products')->select('type')->whereColumn('id', '=', 'product_id')->orderBy('type')->limit(1);
+            }
+        );
+        $this->assertSame('select * from [orders] where [type] = (select top 1 [type] from [products] where [id] = [product_id] order by [type] asc)', $builder->toSql());
     }
 
     public function testBasicJoins()
@@ -3564,6 +3639,23 @@ SQL;
         $this->expectException(InvalidArgumentException::class);
         $builder = $this->getBuilder();
         $builder->fromSub(['invalid'], 'sessions')->where('bar', '<', '10');
+    }
+
+    public function testFromSubRemoveOrdersOnSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->fromSub(function ($query) {
+            $query->select(['user_id', new Raw('max(last_seen_at) as last_seen_at')])->from('user_sessions')->where('foo', '=', '1')->groupBy('user_id')->orderBy('user_id');
+        }, 'sessions')->where('user_id', '<', 10);
+        $this->assertSame('select * from (select [user_id], max(last_seen_at) as last_seen_at from [user_sessions] where [foo] = ? group by [user_id]) as [sessions] where [user_id] < ?', $builder->toSql());
+        $this->assertEquals(['1', 10], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->fromSub(function ($query) {
+            $query->select(['user_id', new Raw('max(last_seen_at) as last_seen_at')])->from('user_sessions')->where('foo', '=', '1')->groupBy('user_id')->orderBy('user_id')->limit(3);
+        }, 'sessions')->where('user_id', '<', 10);
+        $this->assertSame('select * from (select top 3 [user_id], max(last_seen_at) as last_seen_at from [user_sessions] where [foo] = ? group by [user_id] order by [user_id] asc) as [sessions] where [user_id] < ?', $builder->toSql());
+        $this->assertEquals(['1', 10], $builder->getBindings());
     }
 
     public function testFromSubWithPrefix()
