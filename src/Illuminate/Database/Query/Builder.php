@@ -2058,7 +2058,8 @@ class Builder
     }
 
     /**
-     * Remove "order" clauses in order to make the query usable as a subquery in SQL server
+     * Remove "order" clauses in order to make the query usable as a subquery in SQL server.
+     *
      * @return $this
      */
     protected function removeSubqueryOrderOnSqlServer()
