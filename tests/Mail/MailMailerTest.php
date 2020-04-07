@@ -36,6 +36,7 @@ class MailMailerTest extends TestCase
         $message->shouldReceive('setFrom')->never();
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
+        $message->shouldReceive('getContentType')->once()->andReturn('');
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
         $mailer->send('foo', ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
@@ -57,6 +58,7 @@ class MailMailerTest extends TestCase
         $message->shouldReceive('setFrom')->never();
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
+        $message->shouldReceive('getContentType')->once()->andReturn('');
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
         $mailer->send(['html' => new HtmlString('rendered.view'), 'text' => new HtmlString('rendered.text')], ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
@@ -77,6 +79,7 @@ class MailMailerTest extends TestCase
         $message->shouldReceive('setFrom')->never();
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
+        $message->shouldReceive('getContentType')->once()->andReturn('');
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
         $mailer->html('rendered.view', function ($m) {
             $_SERVER['__mailer.test'] = $m;
@@ -99,6 +102,7 @@ class MailMailerTest extends TestCase
         $message->shouldReceive('setFrom')->never();
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
+        $message->shouldReceive('getContentType')->once()->andReturn('');
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
         $mailer->send(['foo', 'bar'], ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
@@ -121,6 +125,7 @@ class MailMailerTest extends TestCase
         $message->shouldReceive('setFrom')->never();
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
+        $message->shouldReceive('getContentType')->once()->andReturn('');
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
         $mailer->send(['html' => 'foo', 'text' => 'bar'], ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
