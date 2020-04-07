@@ -2047,7 +2047,6 @@ class Builder
 
     /**
      * Determine if a "limit" or "offset" clause is specified
-     * @param $query
      * @return bool
      */
     protected function isLimitOrOffsetSpecified() : bool {
