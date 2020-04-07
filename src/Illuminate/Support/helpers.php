@@ -1,11 +1,12 @@
 <?php
 
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
-use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Str;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HigherOrderTapProxy;
 
 if (! function_exists('append_config')) {
     /**
@@ -551,5 +552,18 @@ if (! function_exists('with')) {
     function with($value, callable $callback = null)
     {
         return is_null($callback) ? $value : $callback($value);
+    }
+}
+
+if (! function_exists('str')) {
+    /**
+     * Create a new Str instance
+     *
+     * @param  string  $string
+     * @return \Illuminate\Support\Stringable
+     */
+    function str($string)
+    {
+        return Str::of($string);
     }
 }

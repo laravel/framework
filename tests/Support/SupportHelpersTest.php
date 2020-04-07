@@ -10,6 +10,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
+use Illuminate\Support\Str;
 
 class SupportHelpersTest extends TestCase
 {
@@ -562,6 +563,13 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(10, with(5, function ($five) {
             return $five + 5;
         }));
+    }
+
+    public function testStr()
+    {
+        $this->assertEquals(Str::of('string'), str('string'));
+
+        $this->assertEquals(Str::of('string')->plural(), str('string')->plural());
     }
 
     public function testEnv()
