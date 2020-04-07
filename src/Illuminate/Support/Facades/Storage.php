@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 
 /**
  * @method static \Illuminate\Contracts\Filesystem\Filesystem disk(string $name = null)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem cloud()
  * @method static bool exists(string $path)
  * @method static string get(string $path)
  * @method static resource|null readStream(string $path)
