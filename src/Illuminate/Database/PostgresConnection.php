@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use PDO;
 use Doctrine\DBAL\Driver\PDOPgSql\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
