@@ -334,18 +334,18 @@ class RedisQueueIntegrationTest extends TestCase
     {
         $this->setQueue($driver);
 
-        //push a job into queue
+        // push a job into queue
         $job = new RedisQueueIntegrationTestJob(30);
         $this->queue->push($job);
 
-        //pop and release the job
+        // pop and release the job
         /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
         $before = $this->currentTime();
         $redisJob->release(1000);
         $after = $this->currentTime();
 
-        //check the content of delayed queue
+        // check the content of delayed queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
 
         $results = $this->redis[$driver]->connection()->zrangebyscore('queues:default:delayed', -INF, INF, ['withscores' => true]);
@@ -362,7 +362,7 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals(1, $decoded->attempts);
         $this->assertEquals($job, unserialize($decoded->data->command));
 
-        //check if the queue has no ready item yet
+        // check if the queue has no ready item yet
         $this->assertNull($this->queue->pop());
     }
 

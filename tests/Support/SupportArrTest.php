@@ -143,23 +143,23 @@ class SupportArrTest extends TestCase
     {
         $array = [100, 200, 300];
 
-        //Callback is null and array is empty
+        // Callback is null and array is empty
         $this->assertNull(Arr::first([], null));
         $this->assertSame('foo', Arr::first([], null, 'foo'));
         $this->assertSame('bar', Arr::first([], null, function () {
             return 'bar';
         }));
 
-        //Callback is null and array is not empty
+        // Callback is null and array is not empty
         $this->assertEquals(100, Arr::first($array));
 
-        //Callback is not null and array is not empty
+        // Callback is not null and array is not empty
         $value = Arr::first($array, function ($value) {
             return $value >= 150;
         });
         $this->assertEquals(200, $value);
 
-        //Callback is not null, array is not empty but no satisfied item
+        // Callback is not null, array is not empty but no satisfied item
         $value2 = Arr::first($array, function ($value) {
             return $value > 300;
         });
@@ -674,17 +674,17 @@ class SupportArrTest extends TestCase
         Arr::set($array, 'products.desk.price', 200);
         $this->assertEquals(['products' => ['desk' => ['price' => 200]]], $array);
 
-        //No key is given
+        // No key is given
         $array = ['products' => ['desk' => ['price' => 100]]];
         Arr::set($array, null, ['price' => 300]);
         $this->assertSame(['price' => 300], $array);
 
-        //The key doesn't exist at the depth
+        // The key doesn't exist at the depth
         $array = ['products' => 'desk'];
         Arr::set($array, 'products.desk.price', 200);
         $this->assertSame(['products' => ['desk' => ['price' => 200]]], $array);
 
-        //No corresponding key exists
+        // No corresponding key exists
         $array = ['products'];
         Arr::set($array, 'products.desk.price', 200);
         $this->assertSame(['products', 'products' => ['desk' => ['price' => 200]]], $array);
@@ -701,7 +701,7 @@ class SupportArrTest extends TestCase
         Arr::set($array, 'products.desk.price', 200);
         $this->assertSame(['products' => ['desk' => ['price' => 200]]], $array);
 
-        //Override
+        // Override
         $array = ['products' => 'table'];
         Arr::set($array, 'products.desk.price', 300);
         $this->assertSame(['products' => ['desk' => ['price' => 300]]], $array);

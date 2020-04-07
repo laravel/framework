@@ -259,7 +259,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::is('foo/bar/baz', $valueObject));
         $this->assertTrue(Str::is($patternObject, $valueObject));
 
-        //empty patterns
+        // empty patterns
         $this->assertFalse(Str::is([], 'test'));
     }
 

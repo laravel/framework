@@ -23,11 +23,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testBelongsToWithDefault()
     {
-        $relation = $this->getRelation()->withDefault(); //belongsTo relationships
+        $relation = $this->getRelation()->withDefault();
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentBelongsToModelStub;  //ie Blog
+        $newModel = new EloquentBelongsToModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 

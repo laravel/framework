@@ -307,7 +307,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable($valueObject)->is('foo/bar/baz'));
         $this->assertTrue($this->stringable($valueObject)->is($patternObject));
 
-        //empty patterns
+        // empty patterns
         $this->assertFalse($this->stringable('test')->is([]));
     }
 
