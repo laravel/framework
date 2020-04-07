@@ -59,6 +59,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->withHeaders([
             'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
         ])->post('http://foo.com/json', [
             'name' => 'Taylor',
         ]);
@@ -67,6 +68,7 @@ class HttpClientTest extends TestCase
             return $request->url() === 'http://foo.com/json' &&
                    $request->hasHeader('Content-Type', 'application/json') &&
                    $request->hasHeader('X-Test-Header', 'foo') &&
+                   $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
                    $request['name'] === 'Taylor';
         });
     }
