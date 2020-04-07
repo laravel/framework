@@ -6,7 +6,6 @@ use NamespacedDummyModel;
 
 class DummyClass
 {
-
     /**
      * Handle the DocDummyModel "retrieved" event.
      *
