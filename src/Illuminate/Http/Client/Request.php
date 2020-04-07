@@ -66,15 +66,9 @@ class Request implements ArrayAccess
             return  ! empty($this->request->getHeaders()[$key]);
         }
         
-        $result = true;
-
         $value = is_array($value) ? $value : [$value];
         
-        foreach ($value as $headerValue) {
-            $result = $result && in_array($headerValue, $this->headers()[$key]);
-        }
-
-        return $result;
+        return empty(array_diff($value, $this->headers()[$key]));
     }
 
     /**
