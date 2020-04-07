@@ -485,6 +485,10 @@ class Route
      */
     public function bindingFieldFor($parameter)
     {
+        if(is_numeric($parameter)) {
+            return array_values($this->bindingFields)[$parameter] ?? null;
+        }
+
         return $this->bindingFields[$parameter] ?? null;
     }
 
