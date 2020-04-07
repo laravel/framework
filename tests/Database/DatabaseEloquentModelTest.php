@@ -1800,7 +1800,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('foo', $model->getCasts());
 
         $model->mergeCasts(['foo' => 'date']);
-        $this->assertEquals($castCount + 1, count($model->getCasts()));
+        $this->assertCount($castCount + 1, $model->getCasts());
         $this->assertArrayHasKey('foo', $model->getCasts());
     }
 

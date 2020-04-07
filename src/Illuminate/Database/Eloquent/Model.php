@@ -1520,7 +1520,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function resolveChildRouteBinding($childType, $value, $field)
     {
-        return $this->{Str::plural($childType)}()->where($field, $value)->first();
+        return $this->{Str::plural(Str::camel($childType))}()->where($field, $value)->first();
     }
 
     /**

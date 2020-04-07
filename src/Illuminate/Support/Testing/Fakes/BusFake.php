@@ -83,8 +83,8 @@ class BusFake implements QueueingDispatcher
         $count = $this->dispatched($command)->count() +
                  $this->dispatchedAfterResponse($command)->count();
 
-        PHPUnit::assertTrue(
-            $count === $times,
+        PHPUnit::assertSame(
+            $times, $count,
             "The expected [{$command}] job was pushed {$count} times instead of {$times} times."
         );
     }
@@ -133,8 +133,10 @@ class BusFake implements QueueingDispatcher
      */
     public function assertDispatchedAfterResponseTimes($command, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->dispatchedAfterResponse($command)->count()) === $times,
+        $count = $this->dispatchedAfterResponse($command)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
             "The expected [{$command}] job was pushed {$count} times instead of {$times} times."
         );
     }
@@ -148,8 +150,8 @@ class BusFake implements QueueingDispatcher
      */
     public function assertNotDispatchedAfterResponse($command, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->dispatchedAfterResponse($command, $callback)->count() === 0,
+        PHPUnit::assertCount(
+            0, $this->dispatchedAfterResponse($command, $callback),
             "The unexpected [{$command}] job was dispatched for after sending the response."
         );
     }

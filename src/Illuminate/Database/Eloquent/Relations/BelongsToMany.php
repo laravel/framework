@@ -345,7 +345,7 @@ class BelongsToMany extends Relation
      * Set a where clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  string|null  $operator
+     * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
@@ -377,7 +377,7 @@ class BelongsToMany extends Relation
      * Set an "or where" clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  string|null  $operator
+     * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
      */

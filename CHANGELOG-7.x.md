@@ -2,6 +2,20 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v7.4.0...7.x)
 
+### Added
+- Added `assertNotSent()` and `assertNothingSent()` methods to  `Illuminate\Http\Client\Factory` ([#32197](https://github.com/laravel/framework/pull/32197))
+
+### Fixed
+- Prevent long URLs from breaking email layouts ([#32189](https://github.com/laravel/framework/pull/32189))
+- Fixed camel casing relationship ([#32217](https://github.com/laravel/framework/pull/32217))
+
+### Optimization
+- Optimize `Container::resolve()` method ([#32194](https://github.com/laravel/framework/pull/32194))
+- Optimize performance for `data_get()` method ([#32192](https://github.com/laravel/framework/pull/32192))
+
+### TODO
+- Support returning an instance of a caster ([#32225](https://github.com/laravel/framework/pull/32225))
+
 
 ## [v7.4.0 (2020-03-31)](https://github.com/laravel/framework/compare/v7.3.0...v7.4.0)
 
