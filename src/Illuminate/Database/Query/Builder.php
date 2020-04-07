@@ -2046,10 +2046,12 @@ class Builder
     }
 
     /**
-     * Determine if a "limit" or "offset" clause is specified
+     * Determine if a "limit" or "offset" clause is specified.
+     *
      * @return bool
      */
-    protected function isLimitOrOffsetSpecified() : bool {
+    protected function isLimitOrOffsetSpecified()
+    {
         return $this->unions
             ? isset($this->unionLimit) || isset($this->unionOffset)
             : isset($this->limit) || isset($this->offset);
