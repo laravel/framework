@@ -9,7 +9,7 @@ trait ConfirmableTrait
      *
      * @var string
      */
-    protected $environmentToConfirm = 'Production';
+    public $environmentToConfirm = 'Production';
 
     /**
      * Confirm before proceeding with the action.
