@@ -257,8 +257,12 @@ class Arr
             // clean up before each pass
             $array = &$original;
 
-            while (count($parts) > 1) {
-                $part = array_shift($parts);
+            foreach ($parts as $i => $part) {
+                if (count($parts) === 1) {
+                    break;
+                }
+
+                unset($parts[$i]);
 
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
@@ -267,7 +271,7 @@ class Arr
                 }
             }
 
-            unset($array[array_shift($parts)]);
+            unset($array[current($parts)]);
         }
     }
 
