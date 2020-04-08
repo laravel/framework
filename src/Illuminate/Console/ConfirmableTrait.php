@@ -23,7 +23,7 @@ trait ConfirmableTrait
     public function confirmToProceed($warning = null, $callback = null)
     {
         if ($warning === null) {
-            $warning = "Application In {$this->environmentToConfirm}!";
+        $warning = sprintf('Application In %s', ucfirst($this->environmentToConfirm));
         }
 
         $callback = is_null($callback) ? $this->getDefaultConfirmCallback() : $callback;
