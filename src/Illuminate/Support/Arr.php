@@ -271,7 +271,7 @@ class Arr
                 }
             }
 
-            unset($array[current($parts)]);
+            unset($array[reset($parts)]);
         }
     }
 
