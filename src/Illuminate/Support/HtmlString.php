@@ -7,7 +7,7 @@ use Illuminate\Contracts\Support\Htmlable;
 class HtmlString implements Htmlable
 {
     /**
-     * The HTML string.
+     * The underlying string value.
      *
      * @var string
      */
@@ -16,7 +16,7 @@ class HtmlString implements Htmlable
     /**
      * Create a new HTML string instance.
      *
-     * @param  string  $html
+     * @param  string  $value
      * @return void
      */
     public function __construct($value = '')
@@ -25,7 +25,7 @@ class HtmlString implements Htmlable
     }
 
     /**
-     * Get the HTML string.
+     * Get the raw string value.
      *
      * @return string
      */
@@ -35,7 +35,7 @@ class HtmlString implements Htmlable
     }
 
     /**
-     * Get the HTML string.
+     * Get the raw string value.
      *
      * @return string
      */
