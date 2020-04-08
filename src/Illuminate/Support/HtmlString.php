@@ -11,7 +11,7 @@ class HtmlString implements Htmlable
      *
      * @var string
      */
-    protected $html;
+    protected $value;
 
     /**
      * Create a new HTML string instance.
@@ -19,9 +19,9 @@ class HtmlString implements Htmlable
      * @param  string  $html
      * @return void
      */
-    public function __construct($html = '')
+    public function __construct($value = '')
     {
-        $this->html = (string) $html;
+        $this->value = (string) $value;
     }
 
     /**
@@ -31,7 +31,7 @@ class HtmlString implements Htmlable
      */
     public function toHtml()
     {
-        return (string) $this->html;
+        return (string) $this->value;
     }
 
     /**
