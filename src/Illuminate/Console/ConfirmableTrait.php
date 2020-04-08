@@ -20,9 +20,9 @@ trait ConfirmableTrait
      * @param  \Closure|bool|null  $callback
      * @return bool
      */
-    public function confirmToProceed($warning, $callback = null)
+    public function confirmToProceed($warning = null, $callback = null)
     {
-        if ($warning === null){
+        if ($warning === null) {
             $warning = "Application In {$this->environmentToConfirm}!";
         }
 
