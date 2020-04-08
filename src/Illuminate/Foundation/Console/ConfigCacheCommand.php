@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use LogicException;
@@ -10,6 +11,8 @@ use Throwable;
 
 class ConfigCacheCommand extends Command
 {
+    use ConfirmableTrait;
+
     /**
      * The console command name.
      *
@@ -30,6 +33,13 @@ class ConfigCacheCommand extends Command
      * @var \Illuminate\Filesystem\Filesystem
      */
     protected $files;
+
+    /**
+     * The environment this command should be executed in.
+     *
+     * @var string
+     */
+    protected $environmentToConfirm = 'Local';
 
     /**
      * Create a new config cache command instance.
