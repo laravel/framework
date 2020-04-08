@@ -530,6 +530,28 @@ class Stringable
     }
 
     /**
+     * Left trim the string of the given characters.
+     *
+     * @param  string  $characters
+     * @return static
+     */
+    public function leftTrim($characters = null)
+    {
+        return new static(ltrim(...array_merge([$this->value], func_get_args())));
+    }
+
+    /**
+     * Right trim the string of the given characters.
+     *
+     * @param  string  $characters
+     * @return static
+     */
+    public function rightTrim($characters = null)
+    {
+        return new static(rtrim(...array_merge([$this->value], func_get_args())));
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @return static
