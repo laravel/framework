@@ -236,6 +236,16 @@ class Stringable
     }
 
     /**
+     * Determine if the given string is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @return static
