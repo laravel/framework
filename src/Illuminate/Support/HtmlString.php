@@ -7,35 +7,35 @@ use Illuminate\Contracts\Support\Htmlable;
 class HtmlString implements Htmlable
 {
     /**
-     * The HTML string.
+     * The underlying string value.
      *
      * @var string
      */
-    protected $html;
+    protected $value;
 
     /**
      * Create a new HTML string instance.
      *
-     * @param  string  $html
+     * @param  string  $value
      * @return void
      */
-    public function __construct($html)
+    public function __construct($value = '')
     {
-        $this->html = $html;
+        $this->value = (string) $value;
     }
 
     /**
-     * Get the HTML string.
+     * Get the raw string value.
      *
      * @return string
      */
     public function toHtml()
     {
-        return $this->html;
+        return (string) $this->value;
     }
 
     /**
-     * Get the HTML string.
+     * Get the raw string value.
      *
      * @return string
      */
