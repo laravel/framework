@@ -351,25 +351,20 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function addContent($message, $view, $plain, $raw, $data)
     {
-        $header = $message->getContentType();
-
         if (isset($view)) {
-            $message->setBody(
-                $this->renderView($view, $data),
-                $header && $header !== 'text/plain' ? $header : 'text/html'
-            );
+            $message->setBody($this->renderView($view, $data), 'text/html');
         }
 
         if (isset($plain)) {
             $method = isset($view) ? 'addPart' : 'setBody';
 
-            $message->$method($this->renderView($plain, $data), $header ?: 'text/plain');
+            $message->$method($this->renderView($plain, $data), 'text/plain');
         }
 
         if (isset($raw)) {
             $method = (isset($view) || isset($plain)) ? 'addPart' : 'setBody';
 
-            $message->$method($raw, $header ?: 'text/plain');
+            $message->$method($raw, 'text/plain');
         }
     }
 
