@@ -45,7 +45,7 @@ class ConfigCacheCommand extends Command
         parent::__construct();
 
         $this->files = $files;
-        $this->environmentToConfirm = 'Local';
+        $this->environmentToConfirm = 'local';
     }
 
     /**
