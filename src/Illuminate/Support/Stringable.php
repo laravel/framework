@@ -535,7 +535,7 @@ class Stringable
      * @param  string  $characters
      * @return static
      */
-    public function leftTrim($characters = null)
+    public function ltrim($characters = null)
     {
         return new static(ltrim(...array_merge([$this->value], func_get_args())));
     }
@@ -546,7 +546,7 @@ class Stringable
      * @param  string  $characters
      * @return static
      */
-    public function rightTrim($characters = null)
+    public function rtrim($characters = null)
     {
         return new static(rtrim(...array_merge([$this->value], func_get_args())));
     }
