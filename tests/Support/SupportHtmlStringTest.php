@@ -7,17 +7,22 @@ use PHPUnit\Framework\TestCase;
 
 class SupportHtmlStringTest extends TestCase
 {
+    /**
+     * @param  string  $string
+     * @return \Illuminate\Support\HtmlString
+     */
+    protected function htmlstring($string = '')
+    {
+        return new HtmlString($string);
+    }
+
     public function testToHtml()
     {
-        $str = '<h1>foo</h1>';
-        $html = new HtmlString('<h1>foo</h1>');
-        $this->assertEquals($str, $html->toHtml());
+        $this->assertSame('<h1>foo</h1>', $this->htmlstring('<h1>foo</h1>')->toHtml());
     }
 
     public function testToString()
     {
-        $str = '<h1>foo</h1>';
-        $html = new HtmlString('<h1>foo</h1>');
-        $this->assertEquals($str, (string) $html);
+        $this->assertSame('<h1>foo</h1>', (string) $this->htmlstring('<h1>foo</h1>'));
     }
 }
