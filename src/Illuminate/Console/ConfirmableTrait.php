@@ -16,7 +16,7 @@ trait ConfirmableTrait
      *
      * This method only asks for confirmation in production.
      *
-     * @param  string  $warning
+     * @param  string|null  $warning
      * @param  \Closure|bool|null  $callback
      * @return bool
      */
