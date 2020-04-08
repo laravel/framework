@@ -714,10 +714,9 @@ trait EnumeratesValues
     {
         $passed = [];
 
-        $callback = $this->useAsCallable($value) ? $value :
-            function ($item) use ($value) {
-                return $item === $value;
-            };
+        $callback = $this->useAsCallable($value) ? $value : function ($item) use ($value) {
+            return $item === $value;
+        };
 
         foreach ($this as $key => $item) {
             if ($callback($item, $key)) {
