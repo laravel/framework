@@ -34,7 +34,6 @@ class HtmlString implements Htmlable
         return $this->html;
     }
 
-
     /**
      * Determine if the given HTML string is empty.
      *
