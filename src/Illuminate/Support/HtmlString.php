@@ -51,6 +51,6 @@ class HtmlString implements Htmlable
      */
     public function __toString()
     {
-        return (string) $this->toHtml();
+        return $this->toHtml();
     }
 }
