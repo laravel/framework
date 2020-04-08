@@ -39,7 +39,7 @@ class ConfigCacheCommand extends Command
      *
      * @var string
      */
-    public $environmentToConfirm = 'Local';
+    protected $environmentToConfirm = 'Local';
 
     /**
      * Create a new config cache command instance.

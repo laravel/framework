@@ -5,24 +5,18 @@ namespace Illuminate\Console;
 trait ConfirmableTrait
 {
     /**
-     * The environment this command should be executed in.
-     *
-     * @var string
-     */
-    public $environmentToConfirm = 'Production';
-
-    /**
      * Confirm before proceeding with the action.
      *
      * This method only asks for confirmation in production.
      *
-     * @param  string  $warning
-     * @param  \Closure|bool|null  $callback
+     * @param string             $warning
+     * @param \Closure|bool|null $callback
+     *
      * @return bool
      */
     public function confirmToProceed($warning, $callback = null)
     {
-        if ($warning === null){
+        if ($warning === null) {
             $warning = "Application In {$this->environmentToConfirm}!";
         }
 
@@ -39,7 +33,7 @@ trait ConfirmableTrait
 
             $confirmed = $this->confirm('Do you really wish to run this command?');
 
-            if (! $confirmed) {
+            if (!$confirmed) {
                 $this->comment('Command Canceled!');
 
                 return false;
@@ -56,6 +50,10 @@ trait ConfirmableTrait
      */
     protected function getDefaultConfirmCallback()
     {
+        if ($this->environmentToConfirm === null) {
+            $this->environmentToConfirm = 'Production';
+        }
+
         return function () {
             return $this->getLaravel()->environment() === strtolower($this->environmentToConfirm);
         };
