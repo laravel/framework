@@ -35,13 +35,6 @@ class ConfigCacheCommand extends Command
     protected $files;
 
     /**
-     * The environment this command should be executed in.
-     *
-     * @var string
-     */
-    public $environmentToConfirm = 'Local';
-
-    /**
      * Create a new config cache command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -52,6 +45,7 @@ class ConfigCacheCommand extends Command
         parent::__construct();
 
         $this->files = $files;
+        $this->environmentToConfirm = 'Local';
     }
 
     /**
