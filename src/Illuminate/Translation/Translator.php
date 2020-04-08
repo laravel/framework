@@ -61,7 +61,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function __construct(Loader $loader, $locale)
     {
         $this->loader = $loader;
-        $this->locale = $locale;
+
+        $this->setLocale($locale);
     }
 
     /**
