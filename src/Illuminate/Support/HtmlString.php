@@ -42,7 +42,7 @@ class HtmlString implements Htmlable
     public function isEmpty()
     {
         return empty($this->html);
-    }    
+    }
 
     /**
      * Get the HTML string.
