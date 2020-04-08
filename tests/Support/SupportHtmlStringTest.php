@@ -16,6 +16,11 @@ class SupportHtmlStringTest extends TestCase
         return new HtmlString($string);
     }
 
+    public function testConstruct()
+    {
+        $this->assertSame('', (string) new HtmlString());
+    }
+
     public function testToHtml()
     {
         $this->assertSame('<h1>foo</h1>', $this->htmlstring('<h1>foo</h1>')->toHtml());
