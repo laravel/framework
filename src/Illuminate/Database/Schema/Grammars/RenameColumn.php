@@ -5,8 +5,11 @@ namespace Illuminate\Database\Schema\Grammars;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\TableDiff;
+use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Types\EnumType;
 use Illuminate\Support\Fluent;
 
 class RenameColumn
@@ -22,9 +25,15 @@ class RenameColumn
      */
     public static function compile(Grammar $grammar, Blueprint $blueprint, Fluent $command, Connection $connection)
     {
+        $method = Type::hasType('enum') ? 'overrideType' : 'addType';
+        Type::$method(
+            'enum',
+            $connection->getDriverName() === 'mysql' ? EnumType::class : StringType::class
+        );
+
         $schema = $connection->getDoctrineSchemaManager();
         $databasePlatform = $schema->getDatabasePlatform();
-        $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
+        $databasePlatform->registerDoctrineTypeMapping('enum', 'enum');
 
         $column = $connection->getDoctrineColumn(
             $grammar->getTablePrefix().$blueprint->getTable(), $command->from
@@ -63,7 +72,9 @@ class RenameColumn
     protected static function setRenamedColumns(TableDiff $tableDiff, Fluent $command, Column $column)
     {
         $tableDiff->renamedColumns = [
-            $command->from => new Column($command->to, $column->getType(), $column->toArray()),
+            $command->from => new Column($command->to, $column->getType(), array_merge($column->toArray(), [
+                'customSchemaOptions' => $column->getCustomSchemaOptions(),
+            ])),
         ];
 
         return $tableDiff;

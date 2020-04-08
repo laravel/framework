@@ -5,9 +5,11 @@ namespace Illuminate\Database\Schema\Grammars;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Types\EnumType;
 use Illuminate\Support\Fluent;
 use RuntimeException;
 
@@ -33,9 +35,15 @@ class ChangeColumn
             ));
         }
 
+        $method = Type::hasType('enum') ? 'overrideType' : 'addType';
+        Type::$method(
+            'enum',
+            $connection->getDriverName() === 'mysql' ? EnumType::class : StringType::class
+        );
+
         $schema = $connection->getDoctrineSchemaManager();
         $databasePlatform = $schema->getDatabasePlatform();
-        $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
+        $databasePlatform->registerDoctrineTypeMapping('enum', 'enum');
 
         $tableDiff = static::getChangedDiff(
             $grammar, $blueprint, $schema
@@ -130,6 +138,10 @@ class ChangeColumn
                 'collation' => '',
                 'charset' => '',
             ];
+        }
+
+        if ($fluent['type'] === 'enum') {
+            $options['customSchemaOptions']['allowedOptions'] = $fluent['allowed'];
         }
 
         return $options;
