@@ -2575,6 +2575,10 @@ class ValidationValidatorTest extends TestCase
             ['https://laravel.com#'],
             ['https://laravel.com#fragment'],
             ['https://laravel.com/#fragment'],
+            ['https://domain1'],
+            ['https://domain12/'],
+            ['https://domain12#fragment'],
+            ['https://domain1/path'],
         ];
     }
 
