@@ -58,13 +58,11 @@ class Factory implements ArrayAccess
      * Create a new factory container.
      *
      * @param  \Faker\Generator  $faker
-     * @param  string|null  $pathToFactories
+     * @param  string  $pathToFactories
      * @return static
      */
-    public static function construct(Faker $faker, $pathToFactories = null)
+    public static function construct(Faker $faker, $pathToFactories)
     {
-        $pathToFactories = $pathToFactories ?: database_path('factories');
-
         return (new static($faker))->load($pathToFactories);
     }
 
