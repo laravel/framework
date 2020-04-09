@@ -41,7 +41,7 @@ class HtmlString implements Htmlable
      */
     public function isEmpty()
     {
-        return empty($this->html);
+        return $this->html === '';
     }
 
     /**
