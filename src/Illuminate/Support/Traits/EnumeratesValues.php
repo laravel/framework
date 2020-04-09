@@ -36,6 +36,7 @@ use Traversable;
  * @property-read HigherOrderCollectionProxy $sortByDesc
  * @property-read HigherOrderCollectionProxy $sum
  * @property-read HigherOrderCollectionProxy $unique
+ * @property-read HigherOrderCollectionProxy $until
  */
 trait EnumeratesValues
 {
@@ -47,7 +48,7 @@ trait EnumeratesValues
     protected static $proxies = [
         'average', 'avg', 'contains', 'each', 'every', 'filter', 'first',
         'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
-        'reject', 'some', 'sortBy', 'sortByDesc', 'sum', 'unique',
+        'reject', 'some', 'sortBy', 'sortByDesc', 'sum', 'unique', 'until',
     ];
 
     /**
@@ -701,6 +702,31 @@ trait EnumeratesValues
     public function uniqueStrict($key = null)
     {
         return $this->unique($key, true);
+    }
+
+    /**
+     * Take items in the collection until condition is met.
+     *
+     * @param  mixed  $key
+     * @return static
+     */
+    public function until($value)
+    {
+        $passed = [];
+
+        $callback = $this->useAsCallable($value) ? $value : function ($item) use ($value) {
+            return $item === $value;
+        };
+
+        foreach ($this as $key => $item) {
+            if ($callback($item, $key)) {
+                break;
+            }
+
+            $passed[$key] = $item;
+        }
+
+        return new static($passed);
     }
 
     /**

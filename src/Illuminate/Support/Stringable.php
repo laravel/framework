@@ -236,6 +236,16 @@ class Stringable
     }
 
     /**
+     * Determine if the given string is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @return static
@@ -527,6 +537,28 @@ class Stringable
     public function trim($characters = null)
     {
         return new static(trim(...array_merge([$this->value], func_get_args())));
+    }
+
+    /**
+     * Left trim the string of the given characters.
+     *
+     * @param  string  $characters
+     * @return static
+     */
+    public function ltrim($characters = null)
+    {
+        return new static(ltrim(...array_merge([$this->value], func_get_args())));
+    }
+
+    /**
+     * Right trim the string of the given characters.
+     *
+     * @param  string  $characters
+     * @return static
+     */
+    public function rtrim($characters = null)
+    {
+        return new static(rtrim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
