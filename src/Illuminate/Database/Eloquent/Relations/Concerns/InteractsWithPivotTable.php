@@ -225,7 +225,7 @@ trait InteractsWithPivotTable
             $this->relatedPivotKey => $this->parseId($id),
         ], true);
 
-        $pivot->timestamps = in_array($this->updatedAt(), $this->pivotColumns);
+        $pivot->timestamps = $updated && in_array($this->updatedAt(), $this->pivotColumns);
 
         $pivot->fill($attributes)->save();
 
