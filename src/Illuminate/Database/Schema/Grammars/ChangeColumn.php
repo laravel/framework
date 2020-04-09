@@ -159,6 +159,9 @@ class ChangeColumn
             case 'binary':
                 $type = 'blob';
                 break;
+            case 'uuid':
+                $type = 'guid';
+                break;
         }
 
         return Type::getType($type);
