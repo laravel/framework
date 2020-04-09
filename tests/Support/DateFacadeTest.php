@@ -76,7 +76,6 @@ class DateFacadeTest extends TestCase
         $this->assertSame('fr', Date::now()->locale);
         DateFactory::use(Carbon::class);
         $this->assertSame('en', Date::now()->locale);
-        include_once __DIR__.'/Fixtures/CustomDateClass.php';
         DateFactory::use(CustomDateClass::class);
         $this->assertInstanceOf(CustomDateClass::class, Date::now());
         $this->assertInstanceOf(Carbon::class, Date::now()->getOriginal());
