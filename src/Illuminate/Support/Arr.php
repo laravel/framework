@@ -256,12 +256,12 @@ class Arr
 
             // clean up before each pass
             $array = &$original;
-            
+
             foreach ($parts as $i => $part) {
                 if (count($parts) === 1) {
                     break;
                 }
-                
+
                 unset($parts[$i]);
 
                 if (isset($array[$part]) && is_array($array[$part])) {
