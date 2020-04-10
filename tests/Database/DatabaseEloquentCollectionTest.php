@@ -12,7 +12,7 @@ use stdClass;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
-    protected function tearDown(): void
+    protected function tearDown() : void
     {
         m::close();
     }
@@ -26,13 +26,13 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testGettingMaxItemsFromCollection()
     {
-        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $c = new Collection([(object)['foo' => 10], (object)['foo' => 20]]);
         $this->assertEquals(20, $c->max('foo'));
     }
 
     public function testGettingMinItemsFromCollection()
     {
-        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $c = new Collection([(object)['foo' => 10], (object)['foo' => 20]]);
         $this->assertEquals(10, $c->min('foo'));
     }
 
@@ -114,10 +114,12 @@ class DatabaseEloquentCollectionTest extends TestCase
         $mockModel2->shouldReceive('getKey')->andReturn(2);
         $c = new Collection([$mockModel1, $mockModel2]);
 
-        $this->assertTrue($c->contains(function ($model) {
+        $this->assertTrue($c->contains(function ($model)
+        {
             return $model->getKey() < 2;
         }));
-        $this->assertFalse($c->contains(function ($model) {
+        $this->assertFalse($c->contains(function ($model)
+        {
             return $model->getKey() > 2;
         }));
     }
@@ -209,7 +211,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c = new Collection([$one, $two]);
 
-        $cAfterMap = $c->map(function ($item) {
+        $cAfterMap = $c->map(function ($item)
+        {
             return $item;
         });
 
@@ -222,7 +225,8 @@ class DatabaseEloquentCollectionTest extends TestCase
         $one = m::mock(Model::class);
         $two = m::mock(Model::class);
 
-        $c = (new Collection([$one, $two]))->map(function ($item) {
+        $c = (new Collection([$one, $two]))->map(function ($item)
+        {
             return 'not-a-model';
         });
 
@@ -387,6 +391,16 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals([], $c[0]->getHidden());
     }
 
+    public function testAppendsAddsTestOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->makeVisible('test');
+        $c = $c->append('test');
+
+        $this->assertEquals(['test' => 'test'], $c[0]->toArray());
+
+    }
+
     public function testNonModelRelatedMethods()
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
@@ -419,7 +433,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Queueing collections with multiple model types is not supported.');
 
-        $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
+        $c = new Collection([new TestEloquentCollectionModel, (object)['id' => 'something']]);
         $c->getQueueableClass();
     }
 
@@ -434,4 +448,9 @@ class TestEloquentCollectionModel extends Model
 {
     protected $visible = ['visible'];
     protected $hidden = ['hidden'];
+
+    public function getTestAttribute()
+    {
+        return "test";
+    }
 }
