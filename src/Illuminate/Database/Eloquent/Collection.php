@@ -399,6 +399,17 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Append an attribute across the entire collection.
+     *
+     * @param $attributes
+     * @return $this
+     */
+    public function append($attributes)
+    {
+        return $this->each->append($attributes);
+    }
+
+    /**
      * Get a dictionary keyed by primary keys.
      *
      * @param  \ArrayAccess|array|null  $items
