@@ -592,7 +592,7 @@ class RedisConnectionTest extends TestCase
             do {
                 [$iterator, $returnedMembers] = $redis->zscan('set', $iterator);
 
-                if (!is_array($returnedMembers)) {
+                if (! is_array($returnedMembers)) {
                     $returnedMembers = [$returnedMembers];
                 }
 
