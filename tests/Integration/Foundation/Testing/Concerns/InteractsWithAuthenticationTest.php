@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Testing\Concerns;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Orchestra\Testbench\TestCase;
 
 class InteractsWithAuthenticationTest extends TestCase
 {

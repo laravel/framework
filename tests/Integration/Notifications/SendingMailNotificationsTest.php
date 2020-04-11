@@ -2,17 +2,17 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Mockery;
-use Illuminate\Mail\Markdown;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
+use Illuminate\Mail\Markdown;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Schema;
+use Mockery;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

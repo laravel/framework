@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console\Presets;
 
-use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 
 class Vue extends Preset
 {

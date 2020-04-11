@@ -3,8 +3,8 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Encryption\Encrypter;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Encryption\Encrypter;
 
 class KeyGenerateCommand extends Command
 {

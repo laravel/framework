@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Mockery as m;
 use Illuminate\Mail\Message;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class MailMessageTest extends TestCase

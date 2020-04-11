@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Seeder;
 use Mockery as m;
 use Mockery\Mock;
-use Illuminate\Database\Seeder;
 use PHPUnit\Framework\TestCase;
 
 class TestSeeder extends Seeder

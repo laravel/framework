@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Schema;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Eloquent\Model;
+use Orchestra\Testbench\TestCase;
+use Schema;
 
 /**
  * @group integration

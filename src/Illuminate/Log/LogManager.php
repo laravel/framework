@@ -3,18 +3,18 @@
 namespace Illuminate\Log;
 
 use Closure;
-use Throwable;
 use Illuminate\Support\Str;
-use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
-use Monolog\Logger as Monolog;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Logger as Monolog;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 class LogManager implements LoggerInterface
 {

@@ -2,11 +2,11 @@
 
 namespace Illuminate\Foundation\Auth;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Cache\RateLimiter;
 use Illuminate\Auth\Events\Lockout;
+use Illuminate\Cache\RateLimiter;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 trait ThrottlesLogins

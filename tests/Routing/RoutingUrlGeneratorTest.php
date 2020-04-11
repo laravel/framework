@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
-use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Routing\UrlGenerator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class RoutingUrlGeneratorTest extends TestCase

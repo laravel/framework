@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Log;
 
-use ReflectionProperty;
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
+use Monolog\Formatter\HtmlFormatter;
+use Monolog\Formatter\NormalizerFormatter;
+use Monolog\Handler\LogEntriesHandler;
+use Monolog\Handler\NewRelicHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger as Monolog;
 use Orchestra\Testbench\TestCase;
-use Monolog\Handler\StreamHandler;
-use Monolog\Formatter\HtmlFormatter;
-use Monolog\Handler\NewRelicHandler;
-use Monolog\Handler\LogEntriesHandler;
-use Monolog\Formatter\NormalizerFormatter;
+use ReflectionProperty;
 
 class LogManagerTest extends TestCase
 {

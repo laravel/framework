@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Queue;
 
 use Exception;
+use Illuminate\Container\Container;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
 
 class QueueSyncQueueTest extends TestCase
 {

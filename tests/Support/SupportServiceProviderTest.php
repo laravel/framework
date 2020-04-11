@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\ServiceProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\ServiceProvider;
 
 class SupportServiceProviderTest extends TestCase
 {

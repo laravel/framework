@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseMigratorIntegrationTest extends TestCase
 {

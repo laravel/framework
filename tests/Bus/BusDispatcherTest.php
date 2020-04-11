@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Bus;
 
-use Mockery as m;
 use Illuminate\Bus\Dispatcher;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
+use Illuminate\Container\Container;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class BusDispatcherTest extends TestCase
 {

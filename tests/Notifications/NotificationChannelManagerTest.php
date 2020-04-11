@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\ChannelManager;
-use Illuminate\Contracts\Bus\Dispatcher as Bus;
+use Illuminate\Notifications\Notification;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class NotificationChannelManagerTest extends TestCase
 {

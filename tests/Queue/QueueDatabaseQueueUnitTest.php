@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Queue;
 
-use stdClass;
 use Mockery as m;
-use ReflectionClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use stdClass;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {

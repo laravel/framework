@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\Console\CacheTableCommand;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Cache\Console\CacheTableCommand;
 
 class CacheTableCommandTest extends TestCase
 {

@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
-use Mockery as m;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\CacheEventMutex;
 use Illuminate\Console\Scheduling\CacheSchedulingMutex;
+use Illuminate\Console\Scheduling\Event;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class CacheSchedulingMutexTest extends TestCase
 {

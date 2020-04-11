@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Mockery as m;
 use Illuminate\Mail\Mailer;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class MailMailerTest extends TestCase
 {

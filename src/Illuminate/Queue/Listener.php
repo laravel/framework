@@ -4,8 +4,8 @@ namespace Illuminate\Queue;
 
 use Closure;
 use Illuminate\Support\ProcessUtils;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class Listener
 {

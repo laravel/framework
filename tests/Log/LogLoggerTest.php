@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Log;
 
-use Mockery as m;
 use Illuminate\Log\Logger;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class LogLoggerTest extends TestCase

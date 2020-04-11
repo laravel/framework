@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\View;
 
-use Mockery as m;
 use Illuminate\View\View;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class ViewTest extends TestCase

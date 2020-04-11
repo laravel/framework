@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
-use Orchestra\Testbench\TestCase;
+use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

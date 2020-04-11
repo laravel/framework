@@ -3,18 +3,18 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
-use stdClass;
-use Exception;
-use Mockery as m;
-use ReflectionClass;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\InteractsWithTime;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use stdClass;
 
 class DatabaseEloquentModelTest extends TestCase
 {

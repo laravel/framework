@@ -2,9 +2,9 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use Nexmo\Client as NexmoClient;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\NexmoMessage;
+use Illuminate\Notifications\Notification;
+use Nexmo\Client as NexmoClient;
 
 class NexmoSmsChannel
 {

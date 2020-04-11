@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Events;
 
 use Exception;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class EventsDispatcherTest extends TestCase
 {

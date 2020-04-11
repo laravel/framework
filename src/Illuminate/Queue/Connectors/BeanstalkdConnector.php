@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Connectors;
 
+use Illuminate\Queue\BeanstalkdQueue;
 use Pheanstalk\Connection;
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\PheanstalkInterface;
-use Illuminate\Queue\BeanstalkdQueue;
 
 class BeanstalkdConnector implements ConnectorInterface
 {

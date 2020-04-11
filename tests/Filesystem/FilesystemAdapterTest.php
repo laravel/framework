@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use PHPUnit\Framework\TestCase;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Adapter\Local;
-use Illuminate\Filesystem\FilesystemAdapter;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\FilesystemAdapter;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FilesystemAdapterTest extends TestCase
 {

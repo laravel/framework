@@ -5,8 +5,8 @@ namespace Illuminate\Foundation\Bootstrap;
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidFileException;
 use Dotenv\Exception\InvalidPathException;
-use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Foundation\Application;
+use Symfony\Component\Console\Input\ArgvInput;
 
 class LoadEnvironmentVariables
 {

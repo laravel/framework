@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Failed;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Support\Carbon;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface
 {

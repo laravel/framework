@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Queue\Events\JobFailed;
 
 /**
  * @group integration

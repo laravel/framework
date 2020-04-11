@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentGlobalScopesTest extends TestCase
 {
