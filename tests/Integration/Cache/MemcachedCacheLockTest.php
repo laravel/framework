@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
-use Memcached;
 use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
+use Memcached;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

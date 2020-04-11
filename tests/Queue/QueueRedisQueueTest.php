@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Mockery as m;
-use Illuminate\Queue\Queue;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Queue\RedisQueue;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Queue\Queue;
+use Illuminate\Queue\RedisQueue;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class QueueRedisQueueTest extends TestCase
 {

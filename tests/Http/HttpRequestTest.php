@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Http;
 
-use Mockery as m;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Http\UploadedFile;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends TestCase
 {

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Foundation\EnvironmentDetector;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\EnvironmentDetector;
 
 class FoundationEnvironmentDetectorTest extends TestCase
 {

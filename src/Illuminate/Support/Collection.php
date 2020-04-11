@@ -2,19 +2,19 @@
 
 namespace Illuminate\Support;
 
-use stdClass;
-use Countable;
-use Exception;
 use ArrayAccess;
-use Traversable;
 use ArrayIterator;
 use CachingIterator;
-use JsonSerializable;
-use IteratorAggregate;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Jsonable;
-use Symfony\Component\VarDumper\VarDumper;
+use Countable;
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Traits\Macroable;
+use IteratorAggregate;
+use JsonSerializable;
+use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
+use Traversable;
 
 /**
  * @property-read HigherOrderCollectionProxy $average

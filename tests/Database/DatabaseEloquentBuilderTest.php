@@ -3,19 +3,19 @@
 namespace Illuminate\Tests\Database;
 
 use Closure;
-use stdClass;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
-use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Database\Query\Builder as BaseBuilder;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {

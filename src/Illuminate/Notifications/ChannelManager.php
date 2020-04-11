@@ -2,12 +2,12 @@
 
 namespace Illuminate\Notifications;
 
-use InvalidArgumentException;
-use Illuminate\Support\Manager;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
-use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Support\Manager;
+use InvalidArgumentException;
 
 class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {

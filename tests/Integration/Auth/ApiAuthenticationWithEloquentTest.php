@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Auth\ApiAuthenticationWithEloquentTest;
 
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Database\QueryException;
 
 class ApiAuthenticationWithEloquentTest extends TestCase
 {

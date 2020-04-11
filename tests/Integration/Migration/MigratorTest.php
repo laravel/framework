@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Migration;
 
-use PDOException;
 use Orchestra\Testbench\TestCase;
+use PDOException;
 
 class MigratorTest extends TestCase
 {

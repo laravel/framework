@@ -2,8 +2,8 @@
 
 namespace Illuminate\Hashing;
 
-use Illuminate\Support\Manager;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\Manager;
 
 class HashManager extends Manager implements Hasher
 {

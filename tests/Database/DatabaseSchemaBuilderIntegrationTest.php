@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\Facade;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBuilderIntegrationTest extends TestCase
 {

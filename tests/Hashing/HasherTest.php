@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Hashing;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Hashing\Argon2IdHasher;
 use Illuminate\Hashing\ArgonHasher;
 use Illuminate\Hashing\BcryptHasher;
-use Illuminate\Hashing\Argon2IdHasher;
+use PHPUnit\Framework\TestCase;
 
 class HasherTest extends TestCase
 {

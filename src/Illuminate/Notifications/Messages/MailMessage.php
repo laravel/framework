@@ -2,8 +2,8 @@
 
 namespace Illuminate\Notifications\Messages;
 
-use Traversable;
 use Illuminate\Contracts\Support\Arrayable;
+use Traversable;
 
 class MailMessage extends SimpleMessage
 {

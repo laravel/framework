@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Composer;
+use Illuminate\Cache\Console\CacheTableCommand;
+use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
-use Illuminate\Cache\Console\CacheTableCommand;
+use Illuminate\Support\Composer;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
-use Illuminate\Database\Migrations\MigrationCreator;
 
 class CacheTableCommandTest extends TestCase
 {

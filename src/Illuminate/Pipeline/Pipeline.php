@@ -3,11 +3,11 @@
 namespace Illuminate\Pipeline;
 
 use Closure;
-use RuntimeException;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Request;
+use RuntimeException;
 
 class Pipeline implements PipelineContract
 {

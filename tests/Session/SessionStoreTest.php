@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Session;
 
-use Mockery as m;
-use ReflectionClass;
-use SessionHandlerInterface;
-use Illuminate\Session\Store;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
+use Illuminate\Session\Store;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase

@@ -3,11 +3,11 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Session\SessionManager;
 use Illuminate\Contracts\Session\Session;
+use Illuminate\Http\Request;
 use Illuminate\Session\CookieSessionHandler;
+use Illuminate\Session\SessionManager;
+use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 

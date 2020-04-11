@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Auth;
 
-use stdClass;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
-use Illuminate\Container\Container;
-use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Container\Container;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class AuthAccessGateTest extends TestCase
 {

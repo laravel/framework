@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Auth;
 
-use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Http\Request;
 
 trait VerifiesEmails
 {

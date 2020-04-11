@@ -2,11 +2,11 @@
 
 namespace Illuminate\Queue;
 
-use Pheanstalk\Pheanstalk;
-use Pheanstalk\Job as PheanstalkJob;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Pheanstalk\Contract\PheanstalkInterface;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Pheanstalk\Job as PheanstalkJob;
+use Pheanstalk\Pheanstalk;
 
 class BeanstalkdQueue extends Queue implements QueueContract
 {

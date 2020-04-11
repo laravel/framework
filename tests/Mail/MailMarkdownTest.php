@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Mockery as m;
-use Illuminate\View\Factory;
 use Illuminate\Mail\Markdown;
+use Illuminate\View\Factory;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase

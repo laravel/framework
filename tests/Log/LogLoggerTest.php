@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Log;
 
-use Mockery as m;
-use Illuminate\Log\Logger;
-use Monolog\Logger as Monolog;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Events\MessageLogged;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Log\Logger;
+use Mockery as m;
+use Monolog\Logger as Monolog;
+use PHPUnit\Framework\TestCase;
 
 class LogLoggerTest extends TestCase
 {

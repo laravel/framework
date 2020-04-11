@@ -2,27 +2,27 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Tests\Integration\Http\Fixtures\Post;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
-use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
-use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
-use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
-use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

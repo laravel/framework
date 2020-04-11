@@ -3,17 +3,17 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
+use Illuminate\Validation\Factory as ValidationFactory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\Redirector;
-use Illuminate\Container\Container;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Validation\Factory as ValidationFactory;
-use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 
 class FoundationFormRequestTest extends TestCase
 {

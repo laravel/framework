@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 {
@@ -286,9 +286,9 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
                                  ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
                                  ->posts()->createMany([
-                ['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
-                ['title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
-            ]);
+                                     ['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                                     ['title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+                                 ]);
     }
 
     protected function seedDataExtended()
@@ -319,9 +319,9 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughDefaultTestCountry::create(['id' => 1, 'name' => 'United States of America'])
                                  ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com'])
                                  ->posts()->createMany([
-                ['title' => 'A title', 'body' => 'A body'],
-                ['title' => 'Another title', 'body' => 'Another body'],
-            ]);
+                                     ['title' => 'A title', 'body' => 'A body'],
+                                     ['title' => 'Another title', 'body' => 'Another body'],
+                                 ]);
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Exceptions;
 
-use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Whoops\Handler\PrettyPageHandler;
 
 class WhoopsHandler

@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ValidateSignature;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

@@ -3,11 +3,11 @@
 namespace Illuminate\Queue;
 
 use Exception;
-use Throwable;
-use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Jobs\SyncJob;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 class SyncQueue extends Queue implements QueueContract
 {

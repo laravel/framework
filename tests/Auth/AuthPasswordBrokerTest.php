@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Mockery as m;
-use Illuminate\Support\Arr;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Auth\Passwords\PasswordBroker;
-use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
+use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Support\Arr;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class AuthPasswordBrokerTest extends TestCase
 {

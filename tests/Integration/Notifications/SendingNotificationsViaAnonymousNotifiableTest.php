@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
+use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
-use Illuminate\Auth\Events\Login;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Auth\Events\Attempting;
+use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Auth\Events\Attempting;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Auth\EloquentUserProvider;
-use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

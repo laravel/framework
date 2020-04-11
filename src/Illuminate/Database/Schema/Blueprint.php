@@ -2,13 +2,13 @@
 
 namespace Illuminate\Database\Schema;
 
-use Closure;
 use BadMethodCallException;
-use Illuminate\Support\Fluent;
+use Closure;
 use Illuminate\Database\Connection;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\Schema\Grammars\Grammar;
+use Illuminate\Database\SQLiteConnection;
+use Illuminate\Support\Fluent;
+use Illuminate\Support\Traits\Macroable;
 
 class Blueprint
 {

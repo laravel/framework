@@ -2,10 +2,10 @@
 
 namespace Illuminate\Support\Traits;
 
+use BadMethodCallException;
 use Closure;
 use ReflectionClass;
 use ReflectionMethod;
-use BadMethodCallException;
 
 trait Macroable
 {

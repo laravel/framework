@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class EventTest extends TestCase
 {

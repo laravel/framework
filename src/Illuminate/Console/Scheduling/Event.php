@@ -4,13 +4,13 @@ namespace Illuminate\Console\Scheduling;
 
 use Closure;
 use Cron\CronExpression;
+use GuzzleHttp\Client as HttpClient;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use GuzzleHttp\Client as HttpClient;
-use Illuminate\Contracts\Mail\Mailer;
-use Symfony\Component\Process\Process;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Container\Container;
+use Symfony\Component\Process\Process;
 
 class Event
 {

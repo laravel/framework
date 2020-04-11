@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Support\ServiceProvider;
 
 class MigrationServiceProvider extends ServiceProvider
 {

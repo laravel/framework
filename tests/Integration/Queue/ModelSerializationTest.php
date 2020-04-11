@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Schema;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Queue\SerializesModels;
+use Orchestra\Testbench\TestCase;
+use Schema;
 
 /**
  * @group integration

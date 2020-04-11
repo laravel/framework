@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use stdClass;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
+use stdClass;
 
 class FoundationHelpersTest extends TestCase
 {

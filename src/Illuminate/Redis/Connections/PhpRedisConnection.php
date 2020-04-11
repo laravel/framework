@@ -2,9 +2,9 @@
 
 namespace Illuminate\Redis\Connections;
 
-use Redis;
 use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
+use Redis;
 
 /**
  * @mixin \Redis

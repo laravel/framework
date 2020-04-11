@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\View\FileViewFinder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\View\FileViewFinder;
-use Illuminate\Filesystem\Filesystem;
 
 class ViewFileViewFinderTest extends TestCase
 {

@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Mockery as m;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Session\Store;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Session\Store;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class RoutingRedirectorTest extends TestCase

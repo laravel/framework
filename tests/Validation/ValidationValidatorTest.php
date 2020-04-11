@@ -3,24 +3,24 @@
 namespace Illuminate\Tests\Validation;
 
 use DateTime;
-use Mockery as m;
 use DateTimeImmutable;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
+use Illuminate\Contracts\Validation\ImplicitRule;
+use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Validation\Validator;
-use Illuminate\Translation\Translator;
 use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
+use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Validation\ValidationData;
+use Illuminate\Validation\Validator;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
-use Illuminate\Contracts\Validation\ImplicitRule;
-use Illuminate\Validation\PresenceVerifierInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
 class ValidationValidatorTest extends TestCase
 {

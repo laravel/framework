@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Command;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Console\Kernel;
+use Orchestra\Testbench\TestCase;
 
 class ConsoleApplicationTest extends TestCase
 {

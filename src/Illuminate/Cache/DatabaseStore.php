@@ -4,11 +4,11 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Support\InteractsWithTime;
-use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\PostgresConnection;
+use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
 
 class DatabaseStore implements Store
 {

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Filesystem\Filesystem;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\Migrations\MigrationCreator;
 
 class DatabaseMigrationCreatorTest extends TestCase
 {

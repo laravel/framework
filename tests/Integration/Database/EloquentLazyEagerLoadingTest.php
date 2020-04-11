@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Database\EloquentLazyEagerLoadingTest;
 
 use DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**

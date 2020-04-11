@@ -2,22 +2,22 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Cookie\CookieJar;
-use Illuminate\Auth\Events\Login;
-use Illuminate\Auth\SessionGuard;
-use Illuminate\Auth\Events\Failed;
-use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
-use Illuminate\Contracts\Session\Session;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Session\Session;
+use Illuminate\Cookie\CookieJar;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Encryption\Encrypter;
 
 class AuthGuardTest extends TestCase
 {

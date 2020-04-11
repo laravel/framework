@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
+use Doctrine\DBAL\Schema\SqliteSchemaManager;
+use Illuminate\Database\Capsule\Manager;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Capsule\Manager;
-use Illuminate\Database\Schema\Blueprint;
-use Doctrine\DBAL\Schema\SqliteSchemaManager;
-use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 
 class DatabaseSQLiteSchemaGrammarTest extends TestCase
 {

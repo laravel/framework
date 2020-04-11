@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Composer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Composer;
-use Illuminate\Filesystem\Filesystem;
 
 class FoundationComposerTest extends TestCase
 {

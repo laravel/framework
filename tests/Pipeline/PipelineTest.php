@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Pipeline;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Pipeline\Pipeline;
+use PHPUnit\Framework\TestCase;
 
 class PipelineTest extends TestCase
 {

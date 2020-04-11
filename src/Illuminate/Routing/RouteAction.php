@@ -2,9 +2,9 @@
 
 namespace Illuminate\Routing;
 
-use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LogicException;
 use UnexpectedValueException;
 
 class RouteAction
