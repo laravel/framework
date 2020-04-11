@@ -1,6 +1,44 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.5.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.5.2...7.x)
+
+### Added
+- Added `Collection::until()` method ([#32262](https://github.com/laravel/framework/pull/32262))
+- Added `HtmlString::isEmpty()` method ([#32289](https://github.com/laravel/framework/pull/32289))
+- Added `Illuminate\Support\Stringable::isNotEmpty()` method ([#32293](https://github.com/laravel/framework/pull/32293))
+- Added `ltrim()` and `rtrim()` methods to `Illuminate\Support\Stringable` class ([#32288](https://github.com/laravel/framework/pull/32288))
+
+### Fixed
+- Fixed `Illuminate\Support\HtmlString::isEmpty()` method ([#32300](https://github.com/laravel/framework/pull/32300))
+
+### Changed
+- Added default value to `HtmlString` constructor ([#32290](https://github.com/laravel/framework/pull/32290))
+
+### TODO
+- call setlocale ([1c6a504](https://github.com/laravel/framework/commit/1c6a50424c5558782a55769a226ab834484282e1))
+- Use a map to prevent unnecessary array access ([#32296](https://github.com/laravel/framework/pull/32296))
+- Prevent timestamp update when pivot is not dirty ([#32311](https://github.com/laravel/framework/pull/32311))
+- Add support for the new composer installed.json format ([#32310](https://github.com/laravel/framework/pull/32310))
+- Fix CURRENT_TIMESTAMP precision bug ([#32298](https://github.com/laravel/framework/pull/32298))
+- ValidatesAttributes::validateUrl use Symfony/Validator 5.0.7 regex ([#32315](https://github.com/laravel/framework/pull/32315))
+- Add uuid change support in migrations ([#32316](https://github.com/laravel/framework/pull/32316))
+- Allow store resource into postgresql bytea ([#32319](https://github.com/laravel/framework/pull/32319))
+
+
+## [v7.5.2 (2020-04-08)](https://github.com/laravel/framework/compare/v7.5.1...v7.5.2)
+
+### Fixed
+- Prevent insecure characters in locale ([c248521](https://github.com/laravel/framework/commit/c248521f502c74c6cea7b0d221639d4aa752d5db))
+
+### Optimization
+- Optimize `Arr::set()` method ([#32282](https://github.com/laravel/framework/pull/32282))
+
+
+## [v7.5.1 (2020-04-07)](https://github.com/laravel/framework/compare/v7.5.0...v7.5.1)
+
+### Fixed
+- Fixed Check a request header with an array value in `Illuminate\Http\Client\Request::hasHeader()` ([#32274](https://github.com/laravel/framework/pull/32274))
+- Fixed setting mail header ([#32272](https://github.com/laravel/framework/pull/32272))
 
 
 ## [v7.5.0 (2020-04-07)](https://github.com/laravel/framework/compare/v7.4.0...v7.5.0)

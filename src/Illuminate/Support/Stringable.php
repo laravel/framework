@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable
 {
@@ -598,6 +599,30 @@ class Stringable
     public function words($words = 100, $end = '...')
     {
         return new static(Str::words($this->value, $words, $end));
+    }
+
+    /**
+     * Dump the string.
+     *
+     * @return $this
+     */
+    public function dump()
+    {
+        VarDumper::dump($this->value);
+
+        return $this;
+    }
+
+    /**
+     * Dump the string and end the script.
+     *
+     * @return void
+     */
+    public function dd()
+    {
+        $this->dump();
+
+        die(1);
     }
 
     /**
