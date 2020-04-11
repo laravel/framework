@@ -401,7 +401,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Append an attribute across the entire collection.
      *
-     * @param $attributes
+     * @param  array|string  $attributes
      * @return $this
      */
     public function append($attributes)
