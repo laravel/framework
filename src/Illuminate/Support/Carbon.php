@@ -2,9 +2,9 @@
 
 namespace Illuminate\Support;
 
-use JsonSerializable;
 use Carbon\Carbon as BaseCarbon;
 use Illuminate\Support\Traits\Macroable;
+use JsonSerializable;
 
 class Carbon extends BaseCarbon implements JsonSerializable
 {

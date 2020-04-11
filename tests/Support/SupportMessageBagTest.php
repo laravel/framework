@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class SupportMessageBagTest extends TestCase
 {

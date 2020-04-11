@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Foundation\Application;
+use League\Flysystem\Adapter\Ftp;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use League\Flysystem\Adapter\Ftp;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Application;
-use Illuminate\Filesystem\FilesystemManager;
 
 class FilesystemTest extends TestCase
 {

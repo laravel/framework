@@ -2,20 +2,20 @@
 
 namespace Illuminate\Mail;
 
-use ReflectionClass;
-use ReflectionProperty;
 use BadMethodCallException;
-use Illuminate\Support\Str;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Queue\Factory as Queue;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
-use Illuminate\Container\Container;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Contracts\Queue\Factory as Queue;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
-use Illuminate\Contracts\Mail\Mailable as MailableContract;
-use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use ReflectionClass;
+use ReflectionProperty;
 
 class Mailable implements MailableContract, Renderable
 {

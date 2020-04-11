@@ -5,8 +5,8 @@ namespace Illuminate\Cache;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Support\InteractsWithTime;
 
 class DatabaseStore implements Store
 {

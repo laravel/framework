@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use JsonSerializable;
-use Illuminate\Http\Response;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
-use PHPUnit\Framework\AssertionFailedError;
 use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Http\Response;
+use JsonSerializable;
+use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase
@@ -269,9 +269,9 @@ class FoundationTestResponseTest extends TestCase
     {
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
-                    'foo' => [],
-                    'bar' => ['one', 'two'],
-                ]]
+                'foo' => [],
+                'bar' => ['one', 'two'],
+            ]]
             ));
         });
 
@@ -293,9 +293,9 @@ class FoundationTestResponseTest extends TestCase
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
-                    'foo' => [],
-                    'bar' => ['one', 'two'],
-                ]]
+                'foo' => [],
+                'bar' => ['one', 'two'],
+            ]]
             ));
         });
 
@@ -310,9 +310,9 @@ class FoundationTestResponseTest extends TestCase
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
-                    'foo' => [],
-                    'bar' => ['one', 'two'],
-                ]]
+                'foo' => [],
+                'bar' => ['one', 'two'],
+            ]]
             ));
         });
 

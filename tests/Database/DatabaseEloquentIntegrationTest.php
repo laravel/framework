@@ -3,20 +3,20 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use ReflectionObject;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Pagination\AbstractPaginator as Paginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Tests\Integration\Database\Post;
 use Illuminate\Tests\Integration\Database\User;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Pagination\AbstractPaginator as Paginator;
+use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 
 class DatabaseEloquentIntegrationTest extends TestCase
 {

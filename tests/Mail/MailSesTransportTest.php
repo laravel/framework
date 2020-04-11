@@ -3,12 +3,12 @@
 namespace Illuminate\Tests\Mail;
 
 use Aws\Ses\SesClient;
-use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
-use Illuminate\Mail\TransportManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Transport\SesTransport;
+use Illuminate\Mail\TransportManager;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
 
 class MailSesTransportTest extends TestCase
 {

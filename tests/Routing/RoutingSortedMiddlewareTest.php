@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Routing;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\SortedMiddleware;
+use PHPUnit\Framework\TestCase;
 
 class RoutingSortedMiddlewareTest extends TestCase
 {

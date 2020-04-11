@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Notifications\Channels\SlackWebhookChannel;
+use Illuminate\Notifications\Messages\SlackMessage;
+use Illuminate\Notifications\Notification;
 use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\SlackMessage;
-use Illuminate\Notifications\Channels\SlackWebhookChannel;
 
 class NotificationSlackChannelTest extends TestCase
 {
@@ -214,8 +214,8 @@ class NotificationSlackChannelTestNotification extends Notification
                                    ->content('Attachment Content')
                                    ->fallback('Attachment Fallback')
                                    ->fields([
-                                        'Project' => 'Laravel',
-                                    ])
+                                       'Project' => 'Laravel',
+                                   ])
                                     ->footer('Laravel')
                                     ->footerIcon('https://laravel.com/fake.png')
                                     ->markdown(['text'])
@@ -241,8 +241,8 @@ class NotificationSlackChannelTestNotificationWithImageIcon extends Notification
                                    ->content('Attachment Content')
                                    ->fallback('Attachment Fallback')
                                    ->fields([
-                                        'Project' => 'Laravel',
-                                    ])
+                                       'Project' => 'Laravel',
+                                   ])
                                     ->footer('Laravel')
                                     ->footerIcon('https://laravel.com/fake.png')
                                     ->markdown(['text'])
@@ -261,8 +261,8 @@ class NotificationSlackChannelWithoutOptionalFieldsTestNotification extends Noti
                         $attachment->title('Laravel', 'https://laravel.com')
                                    ->content('Attachment Content')
                                    ->fields([
-                                        'Project' => 'Laravel',
-                                    ]);
+                                       'Project' => 'Laravel',
+                                   ]);
                     });
     }
 }

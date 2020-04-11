@@ -2,11 +2,11 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use PHPUnit\Framework\Assert as PHPUnit;
-use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
+use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 class NotificationFake implements NotificationFactory, NotificationDispatcher
 {

@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Mail\Mailable;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Testing\Fakes\MailFake;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingMailFakeTest extends TestCase
 {

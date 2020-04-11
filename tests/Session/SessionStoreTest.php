@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Session;
 
 use Mockery as m;
-use ReflectionClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class SessionStoreTest extends TestCase
 {

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Notifications\Messages\NexmoMessage;
+use Illuminate\Notifications\Notification;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\NexmoMessage;
 
 class NotificationNexmoChannelTest extends TestCase
 {

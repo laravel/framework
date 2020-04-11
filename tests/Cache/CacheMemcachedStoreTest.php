@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\MemcachedStore;
 use Memcached;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cache\MemcachedStore;
 
 class CacheMemcachedStoreTest extends TestCase
 {

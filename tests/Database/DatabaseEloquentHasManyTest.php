@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use stdClass;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use stdClass;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {

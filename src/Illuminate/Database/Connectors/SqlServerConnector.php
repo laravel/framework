@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Connectors;
 
-use PDO;
 use Illuminate\Support\Arr;
+use PDO;
 
 class SqlServerConnector extends Connector implements ConnectorInterface
 {

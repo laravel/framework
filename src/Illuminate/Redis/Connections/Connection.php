@@ -3,8 +3,8 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
-use Illuminate\Redis\Limiters\DurationLimiterBuilder;
 use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
+use Illuminate\Redis\Limiters\DurationLimiterBuilder;
 
 /**
  * @mixin \Predis\Client

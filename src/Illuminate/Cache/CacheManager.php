@@ -3,10 +3,10 @@
 namespace Illuminate\Cache;
 
 use Closure;
-use InvalidArgumentException;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use InvalidArgumentException;
 
 /**
  * @mixin \Illuminate\Contracts\Cache\Repository

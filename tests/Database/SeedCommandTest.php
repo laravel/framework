@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery;
-use Illuminate\Database\Seeder;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Console\Seeds\SeedCommand;
+use Illuminate\Database\Seeder;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class SeedCommandTest extends TestCase
 {

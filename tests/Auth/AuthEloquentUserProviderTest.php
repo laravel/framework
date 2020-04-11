@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Auth;
 
+use Illuminate\Auth\EloquentUserProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\EloquentUserProvider;
 
 class AuthEloquentUserProviderTest extends TestCase
 {

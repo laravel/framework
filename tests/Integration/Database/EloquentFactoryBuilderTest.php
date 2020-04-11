@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Faker\Generator;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

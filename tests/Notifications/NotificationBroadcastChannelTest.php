@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Notifications\Channels\BroadcastChannel;
+use Illuminate\Notifications\Notification;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class NotificationBroadcastChannelTest extends TestCase
 {

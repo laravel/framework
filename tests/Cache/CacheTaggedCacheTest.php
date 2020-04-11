@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Cache;
 
-use DateTime;
 use DateInterval;
+use DateTime;
+use Illuminate\Cache\ArrayStore;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cache\ArrayStore;
 
 class CacheTaggedCacheTest extends TestCase
 {

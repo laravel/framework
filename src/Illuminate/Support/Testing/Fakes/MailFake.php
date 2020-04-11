@@ -2,10 +2,10 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
-use PHPUnit\Framework\Assert as PHPUnit;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Mailer
 {

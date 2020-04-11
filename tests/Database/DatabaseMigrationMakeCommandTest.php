@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 
 class DatabaseMigrationMakeCommandTest extends TestCase
 {

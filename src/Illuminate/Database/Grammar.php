@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Traits\Macroable;
 
 abstract class Grammar
 {

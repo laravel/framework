@@ -3,15 +3,15 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
-use Mockery as m;
-use Psr\Log\LoggerInterface;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Exceptions\Handler;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {

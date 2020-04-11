@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Cache;
 
 use Exception;
+use Illuminate\Cache\DatabaseStore;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cache\DatabaseStore;
 
 class CacheDatabaseStoreTest extends TestCase
 {

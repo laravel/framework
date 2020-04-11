@@ -2,8 +2,8 @@
 
 namespace Illuminate\Redis;
 
-use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
+use InvalidArgumentException;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection

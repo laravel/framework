@@ -3,9 +3,9 @@
 namespace Illuminate\Auth\Middleware;
 
 use Closure;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as Auth;
+use Illuminate\Database\Eloquent\Model;
 
 class Authorize
 {

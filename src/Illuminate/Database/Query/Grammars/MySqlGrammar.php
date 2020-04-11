@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
+use Illuminate\Support\Arr;
 
 class MySqlGrammar extends Grammar
 {

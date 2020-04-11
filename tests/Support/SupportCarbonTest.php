@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\Carbon as BaseCarbon;
 use DateTime;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
-use Carbon\Carbon as BaseCarbon;
 
 class SupportCarbonTest extends TestCase
 {

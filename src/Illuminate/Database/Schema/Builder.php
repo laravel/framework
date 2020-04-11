@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
-use LogicException;
 use Illuminate\Database\Connection;
+use LogicException;
 
 class Builder
 {

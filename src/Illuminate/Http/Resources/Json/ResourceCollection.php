@@ -2,9 +2,9 @@
 
 namespace Illuminate\Http\Resources\Json;
 
-use IteratorAggregate;
-use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Http\Resources\CollectsResources;
+use Illuminate\Pagination\AbstractPaginator;
+use IteratorAggregate;
 
 class ResourceCollection extends JsonResource implements IteratorAggregate
 {

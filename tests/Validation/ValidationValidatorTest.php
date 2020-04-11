@@ -3,17 +3,17 @@
 namespace Illuminate\Tests\Validation;
 
 use DateTime;
-use Mockery as m;
 use DateTimeImmutable;
+use Illuminate\Contracts\Validation\ImplicitRule;
+use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Validation\Validator;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
-use Illuminate\Contracts\Validation\ImplicitRule;
 
 class ValidationValidatorTest extends TestCase
 {

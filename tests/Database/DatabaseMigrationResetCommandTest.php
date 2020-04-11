@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Console\Migrations\ResetCommand;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Database\Console\Migrations\ResetCommand;
 
 class DatabaseMigrationResetCommandTest extends TestCase
 {

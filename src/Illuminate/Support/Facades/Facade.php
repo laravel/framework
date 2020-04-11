@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 use Mockery;
-use RuntimeException;
 use Mockery\MockInterface;
+use RuntimeException;
 
 abstract class Facade
 {

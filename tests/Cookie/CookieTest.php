@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Cookie;
 
+use Illuminate\Cookie\CookieJar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\Request;
 
 class CookieTest extends TestCase

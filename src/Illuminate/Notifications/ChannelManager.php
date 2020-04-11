@@ -2,15 +2,15 @@
 
 namespace Illuminate\Notifications;
 
-use InvalidArgumentException;
-use Illuminate\Support\Manager;
-use Nexmo\Client as NexmoClient;
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
-use Nexmo\Client\Credentials\Basic as NexmoCredentials;
-use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Support\Manager;
+use InvalidArgumentException;
+use Nexmo\Client as NexmoClient;
+use Nexmo\Client\Credentials\Basic as NexmoCredentials;
 
 class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {

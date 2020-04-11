@@ -3,8 +3,8 @@
 namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Str;
 
 class RouteBinding
 {
