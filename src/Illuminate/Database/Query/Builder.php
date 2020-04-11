@@ -2486,7 +2486,7 @@ class Builder
     /**
      * Retrieve the "count" result of the query.
      *
-     * @param  array|Closure|\Illuminate\Database\Query\Builder|string  $columns
+     * @param  array|\Closure|\Illuminate\Database\Query\Builder|string  $columns
      * @return int
      */
     public function count($columns = '*')
@@ -2497,7 +2497,7 @@ class Builder
     /**
      * Retrieve the minimum value of a given column.
      *
-     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function min($column)
@@ -2508,7 +2508,7 @@ class Builder
     /**
      * Retrieve the maximum value of a given column.
      *
-     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function max($column)
@@ -2519,7 +2519,7 @@ class Builder
     /**
      * Retrieve the sum of the values of a given column.
      *
-     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function sum($column)
@@ -2532,7 +2532,7 @@ class Builder
     /**
      * Retrieve the average of the values of a given column.
      *
-     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function avg($column)
@@ -2543,7 +2543,7 @@ class Builder
     /**
      * Alias for the "avg" method.
      *
-     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function average($column)
@@ -2626,7 +2626,7 @@ class Builder
     /**
      * Add an aggregate column to the query.
      *
-     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return void
      */
     protected function addAggregate($column)
