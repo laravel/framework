@@ -4,12 +4,9 @@
 
 ### Added
 - Added `Collection::until()` method ([#32262](https://github.com/laravel/framework/pull/32262))
-- Added `HtmlString::isEmpty()` method ([#32289](https://github.com/laravel/framework/pull/32289))
+- Added `HtmlString::isEmpty()` method ([#32289](https://github.com/laravel/framework/pull/32289), [#32300](https://github.com/laravel/framework/pull/32300))
 - Added `Illuminate\Support\Stringable::isNotEmpty()` method ([#32293](https://github.com/laravel/framework/pull/32293))
 - Added `ltrim()` and `rtrim()` methods to `Illuminate\Support\Stringable` class ([#32288](https://github.com/laravel/framework/pull/32288))
-
-### Fixed
-- Fixed `Illuminate\Support\HtmlString::isEmpty()` method ([#32300](https://github.com/laravel/framework/pull/32300))
 
 ### Changed
 - Added default value to `HtmlString` constructor ([#32290](https://github.com/laravel/framework/pull/32290))
