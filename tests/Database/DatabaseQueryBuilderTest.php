@@ -1878,6 +1878,102 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $results);
     }
 
+    public function testAggregateWithRaw()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(is_admin or null) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->count(new Raw('is_admin or null'));
+        $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select max(char_length(name)) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->max(new Raw('char_length(name)'));
+        $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select min(char_length(name)) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->min(new Raw('char_length(name)'));
+        $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select sum(credit + debit) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->sum(new Raw('credit + debit'));
+        $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select avg(char_length(name)) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->avg(new Raw('char_length(name)'));
+        $this->assertEquals(1, $results);
+    }
+
+    public function testAggregateWithSubquery()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(select * from "logins" where "user_id" = "users"."id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->count(function ($query) {
+            return $query->from('logins')->whereColumn('user_id', 'users.id');
+        });
+        $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select max(select "created_at" from "logins" where "user_id" = "users"."id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->max(function ($query) {
+            return $query->select('created_at')->from('logins')->whereColumn('user_id', 'users.id');
+        });
+        $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select min(select "created_at" from "logins" where "user_id" = "users"."id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->min(function ($query) {
+            return $query->select('created_at')->from('logins')->whereColumn('user_id', 'users.id');
+        });
+        $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select sum(select "total" from "orders" where "user_id" = "users"."id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->sum(function ($query) {
+            return $query->select('total')->from('orders')->whereColumn('user_id', 'users.id');
+        });
+        $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select avg(select "rating" from "reviews" where "status" = ? and "user_id" = "users"."id") as aggregate from "users"', ['approved'], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->avg(function ($query) {
+            return $query->select('rating')->from('reviews')->where('status', 'approved')->whereColumn('user_id', 'users.id');
+        });
+        $this->assertEquals(1, $results);
+    }
+
     public function testSqlServerExists()
     {
         $builder = $this->getSqlServerBuilder();

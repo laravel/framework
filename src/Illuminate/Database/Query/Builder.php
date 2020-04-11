@@ -54,6 +54,7 @@ class Builder
      */
     public $bindings = [
         'select' => [],
+        'aggregate' => [],
         'from' => [],
         'join' => [],
         'where' => [],
@@ -2485,7 +2486,7 @@ class Builder
     /**
      * Retrieve the "count" result of the query.
      *
-     * @param  string  $columns
+     * @param  array|Closure|\Illuminate\Database\Query\Builder|string  $columns
      * @return int
      */
     public function count($columns = '*')
@@ -2496,7 +2497,7 @@ class Builder
     /**
      * Retrieve the minimum value of a given column.
      *
-     * @param  string  $column
+     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function min($column)
@@ -2507,7 +2508,7 @@ class Builder
     /**
      * Retrieve the maximum value of a given column.
      *
-     * @param  string  $column
+     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function max($column)
@@ -2518,7 +2519,7 @@ class Builder
     /**
      * Retrieve the sum of the values of a given column.
      *
-     * @param  string  $column
+     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function sum($column)
@@ -2531,7 +2532,7 @@ class Builder
     /**
      * Retrieve the average of the values of a given column.
      *
-     * @param  string  $column
+     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function avg($column)
@@ -2542,7 +2543,7 @@ class Builder
     /**
      * Alias for the "avg" method.
      *
-     * @param  string  $column
+     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
      * @return mixed
      */
     public function average($column)
@@ -2562,7 +2563,7 @@ class Builder
         $results = $this->cloneWithout($this->unions ? [] : ['columns'])
                         ->cloneWithoutBindings($this->unions ? [] : ['select'])
                         ->setAggregate($function, $columns)
-                        ->get($columns);
+                        ->get();
 
         if (! $results->isEmpty()) {
             return array_change_key_case((array) $results[0])['aggregate'];
@@ -2607,7 +2608,11 @@ class Builder
      */
     protected function setAggregate($function, $columns)
     {
-        $this->aggregate = compact('function', 'columns');
+        $this->aggregate = ['function' => $function, 'columns' => []];
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->addAggregate($column);
+        }
 
         if (empty($this->groups)) {
             $this->orders = null;
@@ -2616,6 +2621,25 @@ class Builder
         }
 
         return $this;
+    }
+
+    /**
+     * Add an aggregate column to the query.
+     *
+     * @param  Closure|\Illuminate\Database\Query\Builder|string  $column
+     * @return void
+     */
+    protected function addAggregate($column)
+    {
+        if ($this->isQueryable($column)) {
+            [$query, $bindings] = $this->createSub($column);
+
+            $column = new Expression($query);
+
+            $this->addBinding($bindings, 'aggregate');
+        }
+
+        $this->aggregate['columns'][] = $column;
     }
 
     /**
