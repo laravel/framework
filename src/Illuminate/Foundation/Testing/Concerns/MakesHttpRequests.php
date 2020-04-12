@@ -489,11 +489,7 @@ trait MakesHttpRequests
             $uri = substr($uri, 1);
         }
 
-        if (! Str::startsWith($uri, 'http')) {
-            $uri = config('app.url').'/'.$uri;
-        }
-
-        return trim($uri, '/');
+        return trim(url($uri), '/');
     }
 
     /**
