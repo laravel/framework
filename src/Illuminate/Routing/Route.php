@@ -932,7 +932,7 @@ class Route
     }
 
     /**
-     * Set which middleware(s) to skip
+     * Set which middleware(s) to skip.
      *
      * @param  array|string|null $middleware
      * @return $this|array
