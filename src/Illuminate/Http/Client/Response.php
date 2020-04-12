@@ -48,7 +48,7 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Get the JSON decoded body of the response.
+     * Get the JSON decoded body of the response as an array.
      *
      * @return array
      */
@@ -59,6 +59,16 @@ class Response implements ArrayAccess
         }
 
         return $this->decoded;
+    }
+
+    /**
+     * Get the JSON decoded body of the response as an object.
+     *
+     * @return object
+     */
+    public function object()
+    {
+        return json_decode($this->body(), false);
     }
 
     /**
