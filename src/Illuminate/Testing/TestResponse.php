@@ -6,6 +6,7 @@ use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -1155,7 +1156,7 @@ class TestResponse implements ArrayAccess
      * @param \Illuminate\Http\Resources\Json\JsonResource $resource
      * @return $this
      */
-    public function assertResource(\Illuminate\Http\Resources\Json\JsonResource $resource)
+    public function assertResource(JsonResource $resource)
     {
         return $this->assertJson($resource->response()->getData(true));
     }

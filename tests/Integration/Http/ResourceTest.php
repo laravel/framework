@@ -68,6 +68,43 @@ class ResourceTest extends TestCase
         $this->assertSame('{"id":5,"title":"Test Title","custom":true}', $resource->toJson());
     }
 
+    public function testResponseContainsResource()
+    {
+        $resource = new PostResource(new Post([
+            'id' => 5,
+            'title' => 'Test Title',
+            'abstract' => 'Test abstract',
+        ]));
+
+        Route::get('/', function () use ($resource) {
+            return $resource;
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertResource($resource);
+    }
+
+    public function testResponseContainsCollection()
+    {
+        $collection = PostResource::collection(collect([
+            new Post(['id' => 1, 'title' => 'Test title 1']),
+            new Post(['id' => 2, 'title' => 'Test title 2']),
+        ]));
+
+        Route::get('/', function () use ($collection) {
+            return $collection;
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertResource($collection);
+    }
+
     public function testAnObjectsMayBeConvertedToJson()
     {
         Route::get('/', function () {
