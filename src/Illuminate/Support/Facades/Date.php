@@ -87,7 +87,7 @@ use Illuminate\Support\DateFactory;
  */
 class Date extends Facade
 {
-    const DEFAULT_FACADE = DateFactory::class;
+    public const DEFAULT_FACADE = DateFactory::class;
 
     /**
      * Get the registered name of the component.

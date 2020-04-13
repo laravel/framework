@@ -88,7 +88,7 @@ class DateFactory
      *
      * @var string
      */
-    const DEFAULT_CLASS_NAME = Carbon::class;
+    public const DEFAULT_CLASS_NAME = Carbon::class;
 
     /**
      * The type (class) of dates that should be created.

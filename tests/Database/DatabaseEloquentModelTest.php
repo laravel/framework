@@ -2494,7 +2494,7 @@ class EloquentModelWithoutTimestamps extends Model
 class EloquentModelWithUpdatedAtNull extends Model
 {
     protected $table = 'stub';
-    const UPDATED_AT = null;
+    public const UPDATED_AT = null;
 }
 
 class UnsavedModel extends Model

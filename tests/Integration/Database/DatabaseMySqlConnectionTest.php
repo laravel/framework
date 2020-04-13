@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Schema;
 
 class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
 {
-    const TABLE = 'player';
-    const FLOAT_COL = 'float_col';
-    const JSON_COL = 'json_col';
-    const FLOAT_VAL = 0.2;
+    public const TABLE = 'player';
+    public const FLOAT_COL = 'float_col';
+    public const JSON_COL = 'json_col';
+    public const FLOAT_VAL = 0.2;
 
     protected function setUp(): void
     {

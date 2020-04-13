@@ -12,7 +12,7 @@ class TinyInteger extends Type
      *
      * @var string
      */
-    const NAME = 'tinyinteger';
+    public const NAME = 'tinyinteger';
 
     /**
      * Gets the SQL declaration snippet for a field of this type.

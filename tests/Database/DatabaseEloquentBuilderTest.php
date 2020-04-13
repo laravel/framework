@@ -1436,7 +1436,7 @@ class EloquentBuilderTestModelSelfRelatedStub extends Model
 
 class EloquentBuilderTestStubWithoutTimestamp extends Model
 {
-    const UPDATED_AT = null;
+    public const UPDATED_AT = null;
 
     protected $table = 'table';
 }
