@@ -8,17 +8,20 @@ class PostgresSchemaState extends SchemaState
      * Dump the database's schema into a file.
      *
      * @param  string  $path
+     * @param  bool  $includeData
      * @return void
      */
-    public function dump($path)
+    public function dump($path, bool $includeData = false)
     {
         $this->makeProcess(
-            $this->baseDumpCommand().' --no-owner --file=$LARAVEL_LOAD_PATH --schema-only'
+            $this->baseDumpCommand($includeData).' --no-owner --file=$LARAVEL_LOAD_PATH'
         )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
 
-        $this->appendMigrationData($path);
+        if (!$includeData) {
+            $this->appendMigrationData($path);
+        }
     }
 
     /**
@@ -30,7 +33,7 @@ class PostgresSchemaState extends SchemaState
     protected function appendMigrationData(string $path)
     {
         with($process = $this->makeProcess(
-            $this->baseDumpCommand().' --table=migrations --data-only --inserts'
+            $this->baseDumpCommand(true).' --table=migrations --data-only --inserts'
         ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
@@ -63,9 +66,15 @@ class PostgresSchemaState extends SchemaState
      *
      * @return string
      */
-    protected function baseDumpCommand()
+    protected function baseDumpCommand($includeData)
     {
-        return 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD pg_dump --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER $LARAVEL_LOAD_DATABASE';
+        $cmd = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD pg_dump --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER $LARAVEL_LOAD_DATABASE';
+
+        if (!$includeData) {
+            $cmd .= ' --schema-only';
+        }
+
+        return $cmd;
     }
 
     /**

@@ -63,9 +63,10 @@ abstract class SchemaState
      * Dump the database's schema into a file.
      *
      * @param  string  $path
+     * @param  bool    $includeData
      * @return void
      */
-    abstract public function dump($path);
+    abstract public function dump($path, bool $includeData);
 
     /**
      * Load the given schema file into the database.

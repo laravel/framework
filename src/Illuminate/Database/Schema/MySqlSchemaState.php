@@ -8,19 +8,25 @@ class MySqlSchemaState extends SchemaState
      * Dump the database's schema into a file.
      *
      * @param  string  $path
+     * @param  bool  $includeData
      * @return void
      */
-    public function dump($path)
+    public function dump($path, bool $includeData = false)
     {
         $this->makeProcess(
-            $this->baseDumpCommand().' --routines --result-file=$LARAVEL_LOAD_PATH --no-data'
-        )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
-        ]));
+            $this->baseDumpCommand($includeData) . ' --routines --result-file=$LARAVEL_LOAD_PATH',
+            )->mustRun(
+                $this->output,
+                array_merge($this->baseVariables($this->connection->getConfig()), [
+                'LARAVEL_LOAD_PATH' => $path,
+            ]),
+                );
 
-        $this->removeAutoIncrementingState($path);
+        if (!$includeData) {
+            $this->removeAutoIncrementingState($path);
 
-        $this->appendMigrationData($path);
+            $this->appendMigrationData($path, $includeData);
+        }
     }
 
     /**
@@ -31,11 +37,7 @@ class MySqlSchemaState extends SchemaState
      */
     protected function removeAutoIncrementingState(string $path)
     {
-        $this->files->put($path, preg_replace(
-            '/\s+AUTO_INCREMENT=[0-9]+/iu',
-            '',
-            $this->files->get($path)
-        ));
+        $this->files->put($path, preg_replace('/\s+AUTO_INCREMENT=[0-9]+/iu', '', $this->files->get($path)));
     }
 
     /**
@@ -46,11 +48,17 @@ class MySqlSchemaState extends SchemaState
      */
     protected function appendMigrationData(string $path)
     {
-        with($process = $this->makeProcess(
-            $this->baseDumpCommand().' migrations --no-create-info --skip-extended-insert --skip-routines --compact'
-        ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
-            //
-        ]));
+        with(
+            $process = $this->makeProcess(
+                $this->baseDumpCommand(true) .
+                    ' migrations --no-create-info --skip-extended-insert --skip-routines --compact',
+                ),
+            )->mustRun(
+                null,
+                array_merge($this->baseVariables($this->connection->getConfig()), [
+                //
+            ]),
+                );
 
         $this->files->append($path, $process->getOutput());
     }
@@ -63,21 +71,34 @@ class MySqlSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $process = $this->makeProcess('mysql --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD --database=$LARAVEL_LOAD_DATABASE < $LARAVEL_LOAD_PATH');
+        $process = $this->makeProcess(
+            'mysql --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD --database=$LARAVEL_LOAD_DATABASE < $LARAVEL_LOAD_PATH',
+            );
 
-        $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
-        ]));
+        $process->mustRun(
+            null,
+            array_merge($this->baseVariables($this->connection->getConfig()), [
+                'LARAVEL_LOAD_PATH' => $path,
+            ]),
+            );
     }
 
     /**
      * Get the base dump command arguments for MySQL as a string.
      *
+     * @param  bool  $includeData
      * @return string
      */
-    protected function baseDumpCommand()
+    protected function baseDumpCommand(bool $includeData)
     {
-        return 'mysqldump --set-gtid-purged=OFF --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
+        $cmd =
+            'mysqldump --set-gtid-purged=OFF --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
+
+        if (!$includeData) {
+            $cmd .= ' --no-data';
+        }
+
+        return $cmd;
     }
 
     /**
