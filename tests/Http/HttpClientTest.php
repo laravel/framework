@@ -31,6 +31,23 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->ok());
     }
 
+    public function testResponseBodyCasting()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+        $this->assertSame('{"result":{"foo":"bar"}}', (string) $response);
+        $this->assertIsArray($response->json());
+        $this->assertSame(['foo' => 'bar'], $response->json()['result']);
+        $this->assertSame(['foo' => 'bar'], $response['result']);
+        $this->assertIsObject($response->object());
+        $this->assertSame('bar', $response->object()->result->foo);
+    }
+
     public function testUrlsCanBeStubbedByPath()
     {
         $this->factory->fake([

@@ -48,17 +48,27 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Get the JSON decoded body of the response.
+     * Get the JSON decoded body of the response as an array.
      *
      * @return array
      */
     public function json()
     {
         if (! $this->decoded) {
-            $this->decoded = json_decode((string) $this->response->getBody(), true);
+            $this->decoded = json_decode($this->body(), true);
         }
 
         return $this->decoded;
+    }
+
+    /**
+     * Get the JSON decoded body of the response as an object.
+     *
+     * @return object
+     */
+    public function object()
+    {
+        return json_decode($this->body(), false);
     }
 
     /**
