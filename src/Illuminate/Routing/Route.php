@@ -932,6 +932,29 @@ class Route
     }
 
     /**
+     * Set which middleware(s) to skip.
+     *
+     * @param  array|string|null $middleware
+     * @return $this|array
+     */
+    public function skipMiddleware($middleware = null)
+    {
+        if (is_null($middleware)) {
+            return (array) ($this->action['skip_middleware'] ?? []);
+        }
+
+        if (is_string($middleware)) {
+            $middleware = func_get_args();
+        }
+
+        $this->action['skip_middleware'] = array_merge(
+            (array) ($this->action['skip_middleware'] ?? []), $middleware
+        );
+
+        return $this;
+    }
+
+    /**
      * Get the middleware for the route's controller.
      *
      * @return array
