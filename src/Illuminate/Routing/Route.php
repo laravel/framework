@@ -932,29 +932,6 @@ class Route
     }
 
     /**
-     * Set which middleware(s) to skip.
-     *
-     * @param  array|string|null $middleware
-     * @return $this|array
-     */
-    public function skipMiddleware($middleware = null)
-    {
-        if (is_null($middleware)) {
-            return (array) ($this->action['skip_middleware'] ?? []);
-        }
-
-        if (is_string($middleware)) {
-            $middleware = func_get_args();
-        }
-
-        $this->action['skip_middleware'] = array_merge(
-            (array) ($this->action['skip_middleware'] ?? []), $middleware
-        );
-
-        return $this;
-    }
-
-    /**
      * Get the middleware for the route's controller.
      *
      * @return array
@@ -968,6 +945,31 @@ class Route
         return $this->controllerDispatcher()->getMiddleware(
             $this->getController(), $this->getControllerMethod()
         );
+    }
+
+    /**
+     * Specify middleware that should be removed from the given route.
+     *
+     * @param  array|string  $middleware
+     * @return $this|array
+     */
+    public function withoutMiddleware($middleware)
+    {
+        $this->action['excluded_middleware'] = array_merge(
+            (array) ($this->action['excluded_middleware'] ?? []), Arr::wrap($middleware)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get the middleware should be removed from the route.
+     *
+     * @return array
+     */
+    public function excludedMiddleware()
+    {
+        return (array) ($this->action['excluded_middleware'] ?? []);
     }
 
     /**

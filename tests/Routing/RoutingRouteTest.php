@@ -200,7 +200,7 @@ class RoutingRouteTest extends TestCase
 
         $router->get('foo/bar', ['middleware' => 'web', function () {
             return 'hello';
-        }])->skipMiddleware(RoutingTestMiddlewareGroupTwo::class);
+        }])->withoutMiddleware(RoutingTestMiddlewareGroupTwo::class);
 
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
