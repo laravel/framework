@@ -18,7 +18,6 @@ class BoundMethod
      * @param  string|null  $defaultMethod
      * @return mixed
      *
-     * @throws \ReflectionException
      * @throws \InvalidArgumentException
      */
     public static function call($container, $callback, array $parameters = [], $defaultMethod = null)
@@ -110,8 +109,6 @@ class BoundMethod
      * @param  callable|string  $callback
      * @param  array  $parameters
      * @return array
-     *
-     * @throws \ReflectionException
      */
     protected static function getMethodDependencies($container, $callback, array $parameters = [])
     {
@@ -129,8 +126,6 @@ class BoundMethod
      *
      * @param  callable|string  $callback
      * @return \ReflectionFunctionAbstract
-     *
-     * @throws \ReflectionException
      */
     protected static function getCallReflector($callback)
     {

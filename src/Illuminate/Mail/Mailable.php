@@ -224,8 +224,6 @@ class Mailable implements MailableContract, Renderable
      * Render the mailable into a view.
      *
      * @return string
-     *
-     * @throws \ReflectionException
      */
     public function render()
     {
@@ -242,8 +240,6 @@ class Mailable implements MailableContract, Renderable
      * Build the view for the message.
      *
      * @return array|string
-     *
-     * @throws \ReflectionException
      */
     protected function buildView()
     {
@@ -271,8 +267,6 @@ class Mailable implements MailableContract, Renderable
      * Build the Markdown view for the message.
      *
      * @return array
-     *
-     * @throws \ReflectionException
      */
     protected function buildMarkdownView()
     {
@@ -294,8 +288,6 @@ class Mailable implements MailableContract, Renderable
      * Build the view data for the message.
      *
      * @return array
-     *
-     * @throws \ReflectionException
      */
     public function buildViewData()
     {

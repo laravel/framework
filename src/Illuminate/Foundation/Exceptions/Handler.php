@@ -95,6 +95,7 @@ class Handler implements ExceptionHandlerContract
      * @return void
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     public function report(Throwable $e)
     {

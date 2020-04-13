@@ -34,8 +34,6 @@ trait Macroable
      * @param  object  $mixin
      * @param  bool  $replace
      * @return void
-     *
-     * @throws \ReflectionException
      */
     public static function mixin($mixin, $replace = true)
     {

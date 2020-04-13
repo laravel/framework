@@ -310,8 +310,6 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function authorize($ability, $arguments = [])
     {
@@ -346,8 +344,6 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array|mixed  $arguments
      * @return mixed
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function raw($ability, $arguments = [])
     {
@@ -432,8 +428,6 @@ class Gate implements GateContract
      *
      * @param  callable  $callback
      * @return bool
-     *
-     * @throws \ReflectionException
      */
     protected function callbackAllowsGuests($callback)
     {
@@ -616,8 +610,6 @@ class Gate implements GateContract
      *
      * @param  object|string  $class
      * @return mixed
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function resolvePolicy($class)
     {

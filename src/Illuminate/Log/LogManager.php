@@ -344,7 +344,6 @@ class LogManager implements LoggerInterface
      * @return \Psr\Log\LoggerInterface
      *
      * @throws \InvalidArgumentException
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function createMonologDriver(array $config)
     {

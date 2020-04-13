@@ -13,8 +13,6 @@ trait AuthorizesRequests
      * @param  mixed  $ability
      * @param  mixed|array  $arguments
      * @return \Illuminate\Auth\Access\Response
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function authorize($ability, $arguments = [])
     {
@@ -30,8 +28,6 @@ trait AuthorizesRequests
      * @param  mixed  $ability
      * @param  mixed|array  $arguments
      * @return \Illuminate\Auth\Access\Response
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function authorizeForUser($user, $ability, $arguments = [])
     {

@@ -177,8 +177,6 @@ class AuthenticateMiddlewareTest extends TestCase
      *
      * @param  string  ...$guards
      * @return void
-     *
-     * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function authenticate(...$guards)
     {

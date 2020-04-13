@@ -121,6 +121,7 @@ class FoundationFormRequestTest extends TestCase
      * @param  string  $class
      * @param  \Closure  $excecutor
      * @return \Exception
+     * @throws \Exception
      */
     protected function catchException($class, $excecutor)
     {

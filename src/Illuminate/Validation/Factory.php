@@ -128,8 +128,6 @@ class Factory implements FactoryContract
      * @param  array  $messages
      * @param  array  $customAttributes
      * @return array
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function validate(array $data, array $rules, array $messages = [], array $customAttributes = [])
     {

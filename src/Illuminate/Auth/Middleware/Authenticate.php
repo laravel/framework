@@ -34,8 +34,6 @@ class Authenticate implements AuthenticatesRequests
      * @param  \Closure  $next
      * @param  string[]  ...$guards
      * @return mixed
-     *
-     * @throws \Illuminate\Auth\AuthenticationException
      */
     public function handle($request, Closure $next, ...$guards)
     {
@@ -50,8 +48,6 @@ class Authenticate implements AuthenticatesRequests
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $guards
      * @return void
-     *
-     * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function authenticate($request, array $guards)
     {

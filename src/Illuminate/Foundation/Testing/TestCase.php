@@ -142,6 +142,7 @@ abstract class TestCase extends BaseTestCase
      * Clean up the testing environment before the next test.
      *
      * @return void
+     * @throws \Throwable
      */
     protected function tearDown(): void
     {
