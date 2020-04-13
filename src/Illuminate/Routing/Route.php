@@ -948,6 +948,31 @@ class Route
     }
 
     /**
+     * Specify middleware that should be removed from the given route.
+     *
+     * @param  array|string  $middleware
+     * @return $this|array
+     */
+    public function withoutMiddleware($middleware)
+    {
+        $this->action['excluded_middleware'] = array_merge(
+            (array) ($this->action['excluded_middleware'] ?? []), Arr::wrap($middleware)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get the middleware should be removed from the route.
+     *
+     * @return array
+     */
+    public function excludedMiddleware()
+    {
+        return (array) ($this->action['excluded_middleware'] ?? []);
+    }
+
+    /**
      * Get the dispatcher for the route's controller.
      *
      * @return \Illuminate\Routing\Contracts\ControllerDispatcher
