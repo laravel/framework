@@ -360,11 +360,11 @@ class BelongsToMany extends Relation
     /**
      * Set a "where between" clause for a pivot table column.
      *
-     * @param   string  $column
-     * @param   array   $values
-     * @param   string  $boolean
-     * @param   bool    $not
-     * @return  BelongsToMany
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
      */
     public function wherePivotBetween($column, array $values, $boolean = 'and', $not = false)
     {
@@ -374,9 +374,9 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where between" clause for a pivot table column.
      *
-     * @param   string  $column
-     * @param   array   $values
-     * @return BelongsToMany
+     * @param  string  $column
+     * @param  array  $values
+     * @return $this
      */
     public function orWherePivotBetween($column, array $values)
     {
@@ -386,10 +386,10 @@ class BelongsToMany extends Relation
     /**
      * Set a "where pivot not between" clause for a pivot table column.
      *
-     * @param $column
-     * @param array $values
-     * @param string $boolean
-     * @return BelongsToMany
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @return $this
      */
     public function wherePivotNotBetween($column, array $values, $boolean = 'and')
     {
@@ -399,9 +399,9 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where not between" clause for a pivot table column.
      *
-     * @param   string  $column
-     * @param   array   $values
-     * @return BelongsToMany
+     * @param  string  $column
+     * @param  array  $values
+     * @return $this
      */
     public function orWherePivotNotBetween($column, array $values)
     {
