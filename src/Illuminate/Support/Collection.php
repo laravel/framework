@@ -1293,7 +1293,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function offsetExists($key)
     {
-		return isset($this->items[$key]);
+        return isset($this->items[$key]);
     }
 
     /**
