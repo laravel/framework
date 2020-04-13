@@ -416,6 +416,8 @@ if (! function_exists('elixir')) {
      * @return string
      *
      * @throws \InvalidArgumentException
+     *
+     * @deprecated Use Laravel Mix instead.
      */
     function elixir($file, $buildDirectory = 'build')
     {
