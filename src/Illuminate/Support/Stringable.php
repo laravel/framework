@@ -370,8 +370,8 @@ class Stringable
     /**
      * Replace the given value in the given string.
      *
-     * @param  string  $search
-     * @param  string  $replace
+     * @param  string|string[]  $search
+     * @param  string|string[]  $replace
      * @return static
      */
     public function replace($search, $replace)
