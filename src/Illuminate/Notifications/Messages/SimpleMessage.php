@@ -29,11 +29,11 @@ class SimpleMessage
     public $greeting;
 
     /**
-     * The notification's salutation.
+     * The notification's valediction.
      *
      * @var string
      */
-    public $salutation;
+    public $valediction;
 
     /**
      * The "intro" lines of the notification.
@@ -127,14 +127,14 @@ class SimpleMessage
     }
 
     /**
-     * Set the salutation of the notification.
+     * Set the valediction of the notification.
      *
-     * @param  string  $salutation
+     * @param  string  $valediction
      * @return $this
      */
-    public function salutation($salutation)
+    public function valediction($valediction)
     {
-        $this->salutation = $salutation;
+        $this->valediction = $valediction;
 
         return $this;
     }
@@ -214,7 +214,7 @@ class SimpleMessage
             'level' => $this->level,
             'subject' => $this->subject,
             'greeting' => $this->greeting,
-            'salutation' => $this->salutation,
+            'valediction' => $this->valediction,
             'introLines' => $this->introLines,
             'outroLines' => $this->outroLines,
             'actionText' => $this->actionText,

@@ -39,9 +39,9 @@
 
 @endforeach
 
-{{-- Salutation --}}
-@if (! empty($salutation))
-{{ $salutation }}
+{{-- Valediction --}}
+@if (! empty($valediction))
+{{ $valediction }}
 @else
 @lang('Regards'),<br>
 {{ config('app.name') }}
