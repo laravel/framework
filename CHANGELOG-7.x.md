@@ -1,25 +1,46 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.5.2...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.6.1...7.x)
+
+
+## [v7.6.1 (2020-04-14)](https://github.com/laravel/framework/compare/v7.6.0...v7.6.1)
+
+### Fixed
+- Fixed `Illuminate\Testing\TestResponse::offsetExists()` ([#32377](https://github.com/laravel/framework/pull/32377))
+
+
+## [v7.6.0 (2020-04-14)](https://github.com/laravel/framework/compare/v7.5.2...v7.6.0)
 
 ### Added
 - Added `Collection::until()` method ([#32262](https://github.com/laravel/framework/pull/32262))
 - Added `HtmlString::isEmpty()` method ([#32289](https://github.com/laravel/framework/pull/32289), [#32300](https://github.com/laravel/framework/pull/32300))
 - Added `Illuminate\Support\Stringable::isNotEmpty()` method ([#32293](https://github.com/laravel/framework/pull/32293))
 - Added `ltrim()` and `rtrim()` methods to `Illuminate\Support\Stringable` class ([#32288](https://github.com/laravel/framework/pull/32288))
+- Added ability to skip a middleware ([#32347](https://github.com/laravel/framework/pull/32347), [412261c](https://github.com/laravel/framework/commit/412261c180a0ffb561078b7f0647f2a0a5c46c8d))
+- Added `Illuminate\Http\Client\Response::object()` method ([#32341](https://github.com/laravel/framework/pull/32341))
+- Set component alias name ([#32346](https://github.com/laravel/framework/pull/32346))
+- Added `Illuminate\Database\Eloquent\Collection::append()` method ([#32324](https://github.com/laravel/framework/pull/32324))
+- Added "between" clauses for BelongsToMany pivot columns ([#32364](https://github.com/laravel/framework/pull/32364))
+- Support `retryAfter()` method option on Queued Listeners ([#32370](https://github.com/laravel/framework/pull/32370))
+- Added support for the new composer installed.json format ([#32310](https://github.com/laravel/framework/pull/32310))
+- Added `uuid` change support in migrations ([#32316](https://github.com/laravel/framework/pull/32316))
+- Allowed store resource into postgresql bytea ([#32319](https://github.com/laravel/framework/pull/32319))
+
+### Fixed
+- Fixed `*scan` methods for phpredis ([#32336](https://github.com/laravel/framework/pull/32336))
+- Fixed `Illuminate\Auth\Notifications\ResetPassword::toMail()` ([#32345](https://github.com/laravel/framework/pull/32345))
+- Call setLocale in `Illuminate\Translation\Translator::__construct()` ([1c6a504](https://github.com/laravel/framework/commit/1c6a50424c5558782a55769a226ab834484282e1))
+- Used a map to prevent unnecessary array access in `Illuminate\Http\Resources\Json\PaginatedResourceResponse::toResponse()` ([#32296](https://github.com/laravel/framework/pull/32296))
+- Prevent timestamp update when pivot is not dirty ([#32311](https://github.com/laravel/framework/pull/32311))
+- Fixed CURRENT_TIMESTAMP precision bug in `Illuminate\Database\Schema\Grammars\MySqlGrammar` ([#32298](https://github.com/laravel/framework/pull/32298))
 
 ### Changed
 - Added default value to `HtmlString` constructor ([#32290](https://github.com/laravel/framework/pull/32290))
+- Used `BindingResolutionException` to signal problem with container resolution ([#32349](https://github.com/laravel/framework/pull/32349))
+- `Illuminate\Validation\Concerns\ValidatesAttributes.php ::validateUrl()` use Symfony/Validator 5.0.7 regex ([#32315](https://github.com/laravel/framework/pull/32315))
 
-### TODO
-- call setlocale ([1c6a504](https://github.com/laravel/framework/commit/1c6a50424c5558782a55769a226ab834484282e1))
-- Use a map to prevent unnecessary array access ([#32296](https://github.com/laravel/framework/pull/32296))
-- Prevent timestamp update when pivot is not dirty ([#32311](https://github.com/laravel/framework/pull/32311))
-- Add support for the new composer installed.json format ([#32310](https://github.com/laravel/framework/pull/32310))
-- Fix CURRENT_TIMESTAMP precision bug ([#32298](https://github.com/laravel/framework/pull/32298))
-- ValidatesAttributes::validateUrl use Symfony/Validator 5.0.7 regex ([#32315](https://github.com/laravel/framework/pull/32315))
-- Add uuid change support in migrations ([#32316](https://github.com/laravel/framework/pull/32316))
-- Allow store resource into postgresql bytea ([#32319](https://github.com/laravel/framework/pull/32319))
+### Depreciated
+- Depreciate the `elixir` function ([#32366](https://github.com/laravel/framework/pull/32366))
 
 
 ## [v7.5.2 (2020-04-08)](https://github.com/laravel/framework/compare/v7.5.1...v7.5.2)
