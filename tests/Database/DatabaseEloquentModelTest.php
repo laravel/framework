@@ -13,6 +13,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Fillable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\Model;
@@ -951,6 +952,21 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $model->fillable(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => 'bar']);
+        $this->assertSame('foo', $model->name);
+        $this->assertSame('bar', $model->age);
+    }
+
+    public function testFillableInterface()
+    {
+        $fillable = new class implements Fillable {
+            public function all()
+            {
+                return ['name' => 'foo', 'age' => 'bar'];
+            }
+        };
+
+        $model = new EloquentModelStub;
+        $model->fill($fillable);
         $this->assertSame('foo', $model->name);
         $this->assertSame('bar', $model->age);
     }

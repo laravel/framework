@@ -399,7 +399,7 @@ class Validator implements ValidatorContract
     /**
      * Get the attributes and values that were validated.
      *
-     * @return array
+     * @return Validated
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -421,7 +421,7 @@ class Validator implements ValidatorContract
             }
         }
 
-        return $results;
+        return new Validated($results);
     }
 
     /**

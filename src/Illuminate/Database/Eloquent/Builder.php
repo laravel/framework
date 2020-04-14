@@ -758,10 +758,10 @@ class Builder
     /**
      * Save a new model and return the instance.
      *
-     * @param  array  $attributes
+     * @param  array|Fillable  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function create(array $attributes = [])
+    public function create($attributes = [])
     {
         return tap($this->newModelInstance($attributes), function ($instance) {
             $instance->save();
@@ -1083,7 +1083,7 @@ class Builder
     /**
      * Create a new instance of the model being queried.
      *
-     * @param  array  $attributes
+     * @param  array|Fillable  $attributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function newModelInstance($attributes = [])
