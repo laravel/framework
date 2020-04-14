@@ -2195,7 +2195,7 @@ class Builder
         } elseif (! isset($results[0])) {
             return 0;
         } elseif (is_object($results[0])) {
-            return (int) $results[0]->aggregate;
+            return (int) (property_exists($results[0], 'aggregate') ? $results[0]->aggregate : $results[0]->AGGREGATE);   // to solve the Oracle issue: auto-convert field to uppercase 
         }
 
         return (int) array_change_key_case((array) $results[0])['aggregate'];
