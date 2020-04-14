@@ -7,5 +7,4 @@ use Illuminate\Support\Collection;
 
 class Validated extends Collection implements Fillable
 {
-
 }
