@@ -3,21 +3,9 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Database\Eloquent\Fillable;
+use Illuminate\Support\Collection;
 
-class Validated implements Fillable
+class Validated extends Collection implements Fillable
 {
-    /**
-     * @var array
-     */
-    private $data;
 
-    public function __construct(array $data)
-    {
-        $this->data = $data;
-    }
-
-    public function all()
-    {
-        return $this->data;
-    }
 }
