@@ -27,6 +27,13 @@ class Response implements ArrayAccess
     protected $decoded;
 
     /**
+     * Cookies of response.
+     *
+     * @var \GuzzleHttp\Cookie\CookieJarInterface
+     */
+    public $cookies;
+
+    /**
      * Create a new response instance.
      *
      * @param  \Psr\Http\Message\MessageInterface  $response
@@ -171,7 +178,7 @@ class Response implements ArrayAccess
      */
     public function cookies()
     {
-        return $this->cookies;
+        return array_column($this->cookies->toArray(), 'Value', 'Name');
     }
 
     /**
