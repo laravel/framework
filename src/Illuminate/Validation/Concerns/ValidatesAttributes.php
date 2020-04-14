@@ -57,7 +57,10 @@ trait ValidatesAttributes
 
         if ($url = parse_url($value, PHP_URL_HOST)) {
             try {
-                return count(dns_get_record($url, DNS_A | DNS_AAAA)) > 0;
+                return (bool) dns_get_record(
+                    idn_to_ascii($url, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46),
+                    DNS_A | DNS_AAAA
+                );
             } catch (Exception $e) {
                 return false;
             }

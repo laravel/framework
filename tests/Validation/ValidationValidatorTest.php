@@ -2630,6 +2630,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => ['fdsfs', 'fdsfds']], ['x' => 'active_url']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['x' => 'http://invalid.invalid'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://invalid/invalid'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'active_url']);
         $this->assertTrue($v->passes());
 
@@ -2637,6 +2643,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => 'http://www.google.com/about'], ['x' => 'active_url']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://täst.de'], ['x' => 'active_url']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://öbb.at/en'], ['x' => 'active_url']);
         $this->assertTrue($v->passes());
     }
 
