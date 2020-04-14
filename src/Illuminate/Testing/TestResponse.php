@@ -1263,7 +1263,7 @@ class TestResponse implements ArrayAccess
     public function offsetExists($offset)
     {
         return $this->responseHasView()
-                    ? isset($this->original->gatherData()[$key])
+                    ? isset($this->original->gatherData()[$offset])
                     : isset($this->json()[$offset]);
     }
 
