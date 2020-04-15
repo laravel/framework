@@ -167,7 +167,7 @@ class Response implements ArrayAccess
     /**
      * Get the response cookies.
      *
-     * @return array
+     * @return \GuzzleHttp\Cookie\CookieJar
      */
     public function cookies()
     {
