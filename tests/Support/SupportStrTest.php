@@ -424,6 +424,20 @@ class SupportStrTest extends TestCase
         $this->assertEmpty(Str::substr('Б', 2));
     }
 
+    public function testSubstrCount()
+    {
+        $this->assertSame(3, Str::substrCount('laravelPHPFramework', 'a'));
+        $this->assertSame(0, Str::substrCount('laravelPHPFramework', 'z'));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'l', 2));
+        $this->assertSame(0, Str::substrCount('laravelPHPFramework', 'z', 2));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'k', -1));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'k', -1));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', 1, 2));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', 1, 2));
+        $this->assertSame(3, Str::substrCount('laravelPHPFramework', 'a', 1, -2));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', -10, -3));
+    }
+
     public function testUcfirst()
     {
         $this->assertSame('Laravel', Str::ucfirst('laravel'));
