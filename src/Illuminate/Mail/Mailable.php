@@ -806,7 +806,7 @@ class Mailable implements MailableContract, Renderable
             'name' => $name ?? basename($path),
             'options' => $options,
         ])->unique(function ($file) {
-            return $file['disk'].$file['path'];
+            return $file['name'].$file['disk'].$file['path'];
         })->all();
 
         return $this;
