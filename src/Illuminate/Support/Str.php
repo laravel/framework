@@ -86,7 +86,6 @@ class Str
         return substr($subject, $position + strlen($search));
     }
 
-
     /**
      * Transliterate a UTF-8 value to ASCII.
      *
@@ -731,5 +730,4 @@ class Str
     {
         static::$uuidFactory = null;
     }
-
 }

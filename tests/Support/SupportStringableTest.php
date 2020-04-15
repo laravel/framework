@@ -477,6 +477,4 @@ class SupportStringableTest extends TestCase
         $this->assertSame(3, $this->stringable('laravelPHPFramework')->substrCount('a', 1, -2));
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
     }
-
-
 }
