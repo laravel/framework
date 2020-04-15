@@ -645,6 +645,24 @@ class Str
     }
 
     /**
+     * Returns the number of substring occurrences.
+     *
+     * @param  string  $haystack
+     * @param  string  $needle
+     * @param  int  $offset
+     * @param  int|null  $length
+     * @return int
+     */
+    public static function substrCount($haystack, $needle, $offset = 0, $length = null)
+    {
+        if (! is_null($length)) {
+            return substr_count($haystack, $needle, $offset, $length);
+        } else {
+            return substr_count($haystack, $needle, $offset);
+        }
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string

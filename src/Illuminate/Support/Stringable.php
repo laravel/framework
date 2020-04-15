@@ -530,6 +530,19 @@ class Stringable
     }
 
     /**
+     * Returns the number of substring occurrences.
+     *
+     * @param  string  $needle
+     * @param  int|null  $offset
+     * @param  int|null  $length
+     * @return int
+     */
+    public function substrCount($needle, $offset = null, $length = null)
+    {
+        return Str::substrCount($this->value, $needle, $offset, $length);
+    }
+
+    /**
      * Trim the string of the given characters.
      *
      * @param  string  $characters
