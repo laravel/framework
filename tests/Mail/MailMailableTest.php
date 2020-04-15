@@ -101,6 +101,48 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
     }
 
+    public function testItIgnoresDuplicatedRawAttachments()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->attachData('content1', 'report-1.txt');
+        $this->assertCount(1, $mailable->rawAttachments);
+
+        $mailable->attachData('content2', 'report-2.txt');
+        $this->assertCount(2, $mailable->rawAttachments);
+
+        $mailable->attachData('content1', 'report-1.txt');
+        $mailable->attachData('content2', 'report-2.txt');
+        $this->assertCount(2, $mailable->rawAttachments);
+
+        $mailable->attachData('content1', 'report-3.txt');
+        $mailable->attachData('content2', 'report-4.txt');
+        $this->assertCount(4, $mailable->rawAttachments);
+
+        $this->assertSame([
+            [
+                'data' => 'content1',
+                'name' => 'report-1.txt',
+                'options' => [],
+            ],
+            [
+                'data' => 'content2',
+                'name' => 'report-2.txt',
+                'options' => [],
+            ],
+            [
+                'data' => 'content1',
+                'name' => 'report-3.txt',
+                'options' => [],
+            ],
+            [
+                'data' => 'content2',
+                'name' => 'report-4.txt',
+                'options' => [],
+            ],
+        ], $mailable->rawAttachments);
+    }
+
     public function testMailableBuildsViewData()
     {
         $mailable = new WelcomeMailableStub;
