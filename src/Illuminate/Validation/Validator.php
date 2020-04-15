@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
@@ -364,7 +365,7 @@ class Validator implements ValidatorContract
     /**
      * Run the validator's rules against its data.
      *
-     * @return array
+     * @return \Illuminate\Validation\Validated
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -381,7 +382,7 @@ class Validator implements ValidatorContract
      * Run the validator's rules against its data.
      *
      * @param  string  $errorBag
-     * @return array
+     * @return \Illuminate\Validation\Validated
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -399,13 +400,13 @@ class Validator implements ValidatorContract
     /**
      * Get the attributes and values that were validated.
      *
-     * @return Validated
+     * @return \Illuminate\Validation\Validated
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function validated()
     {
-        if ($this->invalid()) {
+        if ($this->invalid()->isNotEmpty()) {
             throw new ValidationException($this);
         }
 
@@ -732,7 +733,7 @@ class Validator implements ValidatorContract
     /**
      * Returns the data which was valid.
      *
-     * @return array
+     * @return \Illuminate\Validation\Validated
      */
     public function valid()
     {
@@ -740,15 +741,15 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        return array_diff_key(
+        return new Validated(array_diff_key(
             $this->data, $this->attributesThatHaveMessages()
-        );
+        ));
     }
 
     /**
      * Returns the data which was invalid.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function invalid()
     {
@@ -768,7 +769,7 @@ class Validator implements ValidatorContract
             Arr::set($result, $key, $failure);
         }
 
-        return $result;
+        return new Collection($result);
     }
 
     /**
@@ -866,7 +867,7 @@ class Validator implements ValidatorContract
     /**
      * Get the data under validation.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function attributes()
     {
@@ -876,11 +877,11 @@ class Validator implements ValidatorContract
     /**
      * Get the data under validation.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function getData()
     {
-        return $this->data;
+        return new Collection($this->data);
     }
 
     /**

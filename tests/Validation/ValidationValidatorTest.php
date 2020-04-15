@@ -4385,70 +4385,63 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans,
-            [
-                ['name' => 'John'],
-                ['name' => null],
-                ['name' => ''],
-            ],
-            [
-                '*.name' => 'required',
-            ]);
+        $v = new Validator($trans, [
+            ['name' => 'John'],
+            ['name' => null],
+            ['name' => ''],
+        ], [
+            '*.name' => 'required',
+        ]);
 
-        $this->assertEquals($v->invalid(), [
+        $expected = [
             1 => ['name' => null],
             2 => ['name' => ''],
-        ]);
+        ];
+        $this->assertEquals($expected, $v->invalid()->all());
 
-        $v = new Validator($trans,
-            [
-                'name' => '',
-            ],
-            [
-                'name' => 'required',
-            ]);
-
-        $this->assertEquals($v->invalid(), [
+        $v = new Validator($trans, [
             'name' => '',
+        ], [
+            'name' => 'required',
         ]);
+
+        $this->assertEquals(['name' => ''], $v->invalid()->all());
     }
 
     public function testValidMethod()
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans,
-            [
-                ['name' => 'John'],
-                ['name' => null],
-                ['name' => ''],
-                ['name' => 'Doe'],
-            ],
-            [
-                '*.name' => 'required',
-            ]);
+        $v = new Validator($trans, [
+            ['name' => 'John'],
+            ['name' => null],
+            ['name' => ''],
+            ['name' => 'Doe'],
+        ], [
+            '*.name' => 'required',
+        ]);
 
-        $this->assertEquals($v->valid(), [
+        $expected = [
             0 => ['name' => 'John'],
             3 => ['name' => 'Doe'],
+        ];
+        $this->assertEquals($expected, $v->valid()->all());
+
+        $v = new Validator($trans, [
+            'name' => 'Carlos',
+            'age' => 'unknown',
+            'gender' => 'male',
+        ], [
+            'name' => 'required',
+            'gender' => 'in:male,female',
+            'age' => 'required|int',
         ]);
 
-        $v = new Validator($trans,
-            [
-                'name' => 'Carlos',
-                'age' => 'unknown',
-                'gender' => 'male',
-            ],
-            [
-                'name' => 'required',
-                'gender' => 'in:male,female',
-                'age' => 'required|int',
-            ]);
-
-        $this->assertEquals($v->valid(), [
+        $expected = [
             'name' => 'Carlos',
             'gender' => 'male',
-        ]);
+        ];
+        $this->assertEquals($expected, $v->valid()->all());
     }
 
     public function testNestedInvalidMethod()
@@ -4471,12 +4464,14 @@ class ValidationValidatorTest extends TestCase
                 'regex:/[A-F]{3}[0-9]{3}/',
             ],
         ]);
-        $this->assertEquals($v->invalid(), [
+
+        $expected = [
             'testinvalid' => '',
             'records' => [
                 3 => 'ADCD23',
             ],
-        ]);
+        ];
+        $this->assertEquals($expected, $v->invalid()->all());
     }
 
     public function testMultipleFileUploads()
@@ -5195,8 +5190,8 @@ class ValidationValidatorTest extends TestCase
         );
         $this->assertTrue($validator->passes());
         $this->assertSame(['cat' => 'Tom'], $validator->validated()->all());
-        $this->assertSame(['cat' => 'Tom'], $validator->valid());
-        $this->assertSame([], $validator->invalid());
+        $this->assertSame(['cat' => 'Tom'], $validator->valid()->all());
+        $this->assertSame([], $validator->invalid()->all());
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
@@ -5204,8 +5199,8 @@ class ValidationValidatorTest extends TestCase
             ['cat' => 'required|string', 'mouse' => 'exclude_if:cat,Felix|required|string']
         );
         $this->assertTrue($validator->fails());
-        $this->assertSame(['cat' => 'Tom'], $validator->valid());
-        $this->assertSame(['mouse' => null], $validator->invalid());
+        $this->assertSame(['cat' => 'Tom'], $validator->valid()->all());
+        $this->assertSame(['mouse' => null], $validator->invalid()->all());
     }
 
     public function testValidateFailsWithAsterisksAsDataKeys()

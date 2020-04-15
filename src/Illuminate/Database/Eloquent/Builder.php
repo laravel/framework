@@ -758,7 +758,7 @@ class Builder
     /**
      * Save a new model and return the instance.
      *
-     * @param  array|Fillable  $attributes
+     * @param  array|\Illuminate\Support\ApprovedBag  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
     public function create($attributes = [])
@@ -1083,7 +1083,7 @@ class Builder
     /**
      * Create a new instance of the model being queried.
      *
-     * @param  array|Fillable  $attributes
+     * @param  array|\Illuminate\Support\ApprovedBag  $attributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function newModelInstance($attributes = [])

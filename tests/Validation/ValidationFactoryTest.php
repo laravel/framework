@@ -22,7 +22,7 @@ class ValidationFactoryTest extends TestCase
         $factory = new Factory($translator);
         $validator = $factory->make(['foo' => 'bar'], ['baz' => 'boom']);
         $this->assertEquals($translator, $validator->getTranslator());
-        $this->assertEquals(['foo' => 'bar'], $validator->getData());
+        $this->assertEquals(['foo' => 'bar'], $validator->getData()->all());
         $this->assertEquals(['baz' => ['boom']], $validator->getRules());
 
         $presence = m::mock(PresenceVerifierInterface::class);
@@ -90,7 +90,7 @@ class ValidationFactoryTest extends TestCase
 
         $this->assertTrue($_SERVER['__validator.factory']);
         $this->assertEquals($translator, $validator->getTranslator());
-        $this->assertEquals(['foo' => 'bar'], $validator->getData());
+        $this->assertEquals(['foo' => 'bar'], $validator->getData()->all());
         $this->assertEquals(['baz' => ['boom']], $validator->getRules());
         unset($_SERVER['__validator.factory']);
     }

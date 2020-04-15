@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Support\ApprovedBag;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -157,7 +158,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Create a new Eloquent model instance.
      *
-     * @param  array|Fillable  $attributes
+     * @param  array|\Illuminate\Support\ApprovedBag  $attributes
      * @return void
      */
     public function __construct($attributes = [])
@@ -332,17 +333,15 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array|Fillable  $attributes
+     * @param  array|\Illuminate\Support\ApprovedBag  $attributes
      * @return $this
      *
      * @throws \Illuminate\Database\Eloquent\MassAssignmentException
      */
     public function fill($attributes)
     {
-        if ($attributes instanceof Fillable) {
-            $this->forceFill($attributes->all());
-
-            return $this;
+        if ($attributes instanceof ApprovedBag) {
+            return $this->forceFill($attributes->all());
         }
 
         $totallyGuarded = $this->totallyGuarded();
@@ -408,20 +407,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Create a new instance of the given model.
      *
-     * @param  array|Fillable  $attributes
+     * @param  array|\Illuminate\Support\ApprovedBag  $attributes
      * @param  bool  $exists
      * @return static
      */
     public function newInstance($attributes = [], $exists = false)
     {
-        if ($attributes === null) {
-            $attributes = [];
-        }
-
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
         // hydration of new objects via the Eloquent query builder instances.
-        $model = new static($attributes);
+        $model = new static($attributes ?: []);
 
         $model->exists = $exists;
 
@@ -628,7 +623,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Update the model in the database.
      *
-     * @param  array|Fillable  $attributes
+     * @param  array|\Illuminate\Support\ApprovedBag  $attributes
      * @param  array  $options
      * @return bool
      */

@@ -13,7 +13,6 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Fillable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Support\ApprovedBag;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\InteractsWithTime;
@@ -956,9 +956,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('bar', $model->age);
     }
 
-    public function testFillableInterface()
+    public function testApprovedBag()
     {
-        $fillable = new class implements Fillable {
+        $approved = new class implements ApprovedBag {
             public function all()
             {
                 return ['name' => 'foo', 'age' => 'bar'];
@@ -966,7 +966,7 @@ class DatabaseEloquentModelTest extends TestCase
         };
 
         $model = new EloquentModelStub;
-        $model->fill($fillable);
+        $model->fill($approved);
         $this->assertSame('foo', $model->name);
         $this->assertSame('bar', $model->age);
     }
