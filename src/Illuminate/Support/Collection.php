@@ -1029,11 +1029,14 @@ class Collection implements ArrayAccess, Enumerable
 
     /**
      * Chunk the collection into chunks of the given size.
+     * If the $preserveKeys parameter is set to false, the returned
+     * collection will not contain the keys of the original collection.
      *
      * @param  int  $size
+     * @param bool $preserveKeys
      * @return static
      */
-    public function chunk($size)
+    public function chunk($size, $preserveKeys=true)
     {
         if ($size <= 0) {
             return new static;
@@ -1041,7 +1044,7 @@ class Collection implements ArrayAccess, Enumerable
 
         $chunks = [];
 
-        foreach (array_chunk($this->items, $size, true) as $chunk) {
+        foreach (array_chunk($this->items, $size, $preserveKeys) as $chunk) {
             $chunks[] = new static($chunk);
         }
 
