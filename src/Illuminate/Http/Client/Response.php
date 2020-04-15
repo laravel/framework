@@ -13,6 +13,13 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Cookies of response.
+     *
+     * @var \GuzzleHttp\Cookie\CookieJarInterface
+     */
+    public $cookies;
+
+    /**
      * The underlying PSR response.
      *
      * @var \Psr\Http\Message\ResponseInterface
@@ -171,7 +178,7 @@ class Response implements ArrayAccess
      */
     public function cookies()
     {
-        return $this->cookies;
+        return $this->cookies->toArray();
     }
 
     /**

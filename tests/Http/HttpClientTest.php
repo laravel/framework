@@ -252,10 +252,9 @@ class HttpClientTest extends TestCase
             ['foo' => 'bar'], 'https://laravel.com'
         )->get('https://laravel.com');
 
-        $this->assertCount(1, $response->cookies()->toArray());
+        $this->assertCount(1, $response->cookies());
 
-        /** @var \GuzzleHttp\Cookie\CookieJarInterface $responseCookies */
-        $responseCookie = $response->cookies()->toArray()[0];
+        $responseCookie = $response->cookies()[0];
 
         $this->assertSame('foo', $responseCookie['Name']);
         $this->assertSame('bar', $responseCookie['Value']);
