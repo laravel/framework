@@ -947,6 +947,39 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
     }
 
+    public function testRestoreMethodWithoutSoftDeletes()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->sync([$tag->id, $tag2->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+
+        $post->tags()->sync([$tag->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+
+        $output = $post->tags()->restore([$tag2->id]);
+
+        $this->assertEquals(0, $output);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+    }
+
     public function testRestoreMethodWithCustomPivotClass()
     {
         $post = Post::create(['title' => Str::random()]);
