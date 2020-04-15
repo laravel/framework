@@ -486,7 +486,7 @@ trait InteractsWithPivotTable
     {
         if ($this->using && ! empty($ids) && empty($this->pivotWheres) && empty($this->pivotWhereIns)) {
             $results = $this->restoreUsingCustomClass($ids);
-        } else if ($this->withSoftDeletes) {
+        } elseif ($this->withSoftDeletes) {
             $query = $this->newPivotQuery();
 
             // If associated IDs were passed to the method we will only restore those
