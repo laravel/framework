@@ -1036,7 +1036,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param bool $preserveKeys
      * @return static
      */
-    public function chunk($size, $preserveKeys=true)
+    public function chunk($size, $preserveKeys = true)
     {
         if ($size <= 0) {
             return new static;
