@@ -2579,6 +2579,7 @@ class ValidationValidatorTest extends TestCase
             ['https://domain12/'],
             ['https://domain12#fragment'],
             ['https://domain1/path'],
+            ['https://domain.com/path/%2528failed%2526?param=1#fragment'],
         ];
     }
 
