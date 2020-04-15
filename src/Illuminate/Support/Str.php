@@ -655,7 +655,7 @@ class Str
      */
     public static function substrCount($haystack, $needle, $offset = 0, $length = null)
     {
-        if ($length) {
+        if (! is_null($length)) {
             return substr_count($haystack, $needle, $offset, $length);
         } else {
             return substr_count($haystack, $needle, $offset);
