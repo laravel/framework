@@ -4683,7 +4683,7 @@ class ValidationValidatorTest extends TestCase
         });
         $data = $v->validate();
 
-        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data->all());
     }
 
     public function testValidateReturnsValidatedDataNestedRules()
@@ -4698,7 +4698,7 @@ class ValidationValidatorTest extends TestCase
         });
         $data = $v->validate();
 
-        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $data);
+        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $data->all());
     }
 
     public function testValidateReturnsValidatedDataNestedChildRules()
@@ -4711,7 +4711,7 @@ class ValidationValidatorTest extends TestCase
         });
         $data = $v->validate();
 
-        $this->assertEquals(['nested' => ['foo' => 'bar']], $data);
+        $this->assertEquals(['nested' => ['foo' => 'bar']], $data->all());
     }
 
     public function testValidateReturnsValidatedDataNestedArrayRules()
@@ -4724,7 +4724,7 @@ class ValidationValidatorTest extends TestCase
         });
         $data = $v->validate();
 
-        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $data);
+        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $data->all());
     }
 
     public function testValidateAndValidatedData()
@@ -4738,8 +4738,8 @@ class ValidationValidatorTest extends TestCase
         $data = $v->validate();
         $validatedData = $v->validated();
 
-        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
-        $this->assertEquals($data, $validatedData);
+        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data->all());
+        $this->assertEquals($data->all(), $validatedData->all());
     }
 
     public function testValidatedNotValidateTwiceData()
@@ -4754,7 +4754,7 @@ class ValidationValidatorTest extends TestCase
         $data = $v->validate();
         $v->validated();
 
-        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data->all());
         $this->assertEquals(1, $validateCount);
     }
 
@@ -5036,7 +5036,7 @@ class ValidationValidatorTest extends TestCase
 
         $this->assertTrue($passes, $message ?? '');
 
-        $this->assertSame($expectedValidatedData, $validator->validated());
+        $this->assertSame($expectedValidatedData, $validator->validated()->all());
     }
 
     public function providesFailingExcludeIfData()
@@ -5159,7 +5159,7 @@ class ValidationValidatorTest extends TestCase
             ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
         );
         $this->assertTrue($validator->passes());
-        $this->assertSame(['cat' => 'Felix'], $validator->validated());
+        $this->assertSame(['cat' => 'Felix'], $validator->validated()->all());
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
@@ -5167,7 +5167,7 @@ class ValidationValidatorTest extends TestCase
             ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
         );
         $this->assertTrue($validator->passes());
-        $this->assertSame(['cat' => 'Felix'], $validator->validated());
+        $this->assertSame(['cat' => 'Felix'], $validator->validated()->all());
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
@@ -5175,7 +5175,7 @@ class ValidationValidatorTest extends TestCase
             ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
         );
         $this->assertTrue($validator->passes());
-        $this->assertSame(['cat' => 'Tom', 'mouse' => 'Jerry'], $validator->validated());
+        $this->assertSame(['cat' => 'Tom', 'mouse' => 'Jerry'], $validator->validated()->all());
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
@@ -5194,7 +5194,7 @@ class ValidationValidatorTest extends TestCase
             ['cat' => 'required|string', 'mouse' => 'exclude_if:cat,Tom|required|string']
         );
         $this->assertTrue($validator->passes());
-        $this->assertSame(['cat' => 'Tom'], $validator->validated());
+        $this->assertSame(['cat' => 'Tom'], $validator->validated()->all());
         $this->assertSame(['cat' => 'Tom'], $validator->valid());
         $this->assertSame([], $validator->invalid());
 

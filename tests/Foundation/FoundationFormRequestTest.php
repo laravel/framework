@@ -34,7 +34,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['name' => 'specified'], $request->validated());
+        $this->assertEquals(['name' => 'specified'], $request->validated()->all());
     }
 
     public function testValidatedMethodReturnsTheValidatedDataNestedRules()
@@ -45,7 +45,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $request->validated());
+        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $request->validated()->all());
     }
 
     public function testValidatedMethodReturnsTheValidatedDataNestedChildRules()
@@ -56,7 +56,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['nested' => ['foo' => 'bar']], $request->validated());
+        $this->assertEquals(['nested' => ['foo' => 'bar']], $request->validated()->all());
     }
 
     public function testValidatedMethodReturnsTheValidatedDataNestedArrayRules()
@@ -67,7 +67,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $request->validated());
+        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $request->validated()->all());
     }
 
     public function testValidatedMethodNotValidateTwice()

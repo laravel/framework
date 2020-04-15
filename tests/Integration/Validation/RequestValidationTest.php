@@ -17,7 +17,7 @@ class RequestValidationTest extends TestCase
 
         $validated = $request->validate(['name' => 'string']);
 
-        $this->assertSame(['name' => 'Taylor'], $validated);
+        $this->assertSame(['name' => 'Taylor'], $validated->all());
     }
 
     public function testValidateMacroWhenItFails()
@@ -35,7 +35,7 @@ class RequestValidationTest extends TestCase
 
         $validated = $request->validateWithBag('some_bag', ['name' => 'string']);
 
-        $this->assertSame(['name' => 'Taylor'], $validated);
+        $this->assertSame(['name' => 'Taylor'], $validated->all());
     }
 
     public function testValidateWithBagMacroWhenItFails()
