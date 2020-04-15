@@ -486,11 +486,11 @@ trait InteractsWithPivotTable
     {
         if ($this->using && ! empty($ids) && empty($this->pivotWheres) && empty($this->pivotWhereIns)) {
             $results = $this->restoreUsingCustomClass($ids);
-        } else {
+        } else if ($this->withSoftDeletes) {
             $query = $this->newPivotQuery();
 
             // If associated IDs were passed to the method we will only restore those
-            // associations, otherwise all of the association ties will be broken.
+            // associations, otherwise all of the association ties will be restored.
             // We'll return the numbers of affected rows when we do the restores.
             if (! is_null($ids)) {
                 $ids = $this->parseIds($ids);
@@ -505,19 +505,17 @@ trait InteractsWithPivotTable
             // Once we have all of the conditions set on the statement, we are ready
             // to run the restore on the pivot table. Then, if the touch parameter
             // is true, we will go ahead and touch all related models to sync.
-            if ($this->withSoftDeletes) {
-                $attributes = [
-                    $this->deletedAt() => null,
-                ];
+            $attributes = [
+                $this->deletedAt() => null,
+            ];
 
-                if ($this->hasPivotColumn($this->updatedAt())) {
-                    $attributes[$this->updatedAt()] = now();
-                }
-
-                $results = $query->update($attributes);
-            } else {
-                $results = $query->delete();
+            if ($this->hasPivotColumn($this->updatedAt())) {
+                $attributes[$this->updatedAt()] = now();
             }
+
+            $results = $query->update($attributes);
+        } else {
+            return 0;
         }
 
         if ($touch) {
