@@ -196,7 +196,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->singleton(Mix::class);
 
         $this->singleton(PackageManifest::class, function () {
-            return  new PackageManifest(
+            return new PackageManifest(
                 new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
             );
         });
