@@ -171,6 +171,23 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has an unauthorized status code.
+     *
+     * @return $this
+     */
+    public function assertUnprocessableEntity()
+    {
+        $actual = $this->getStatusCode();
+
+        PHPUnit::assertSame(
+            422, $actual,
+            "Response status code [{$actual}] is not an unprocessable entity status code."
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given status code.
      *
      * @param  int  $status
