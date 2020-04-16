@@ -469,15 +469,15 @@ class PendingRequest
             try {
                 $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
 
-                // Attempt to parse query string on url if no request data found
-                $urlStr = Str::of($url);
-                if (! $laravelData && $method === 'GET' && $urlStr->contains('?')) {
-                    $laravelData = (string) $urlStr->after('?');
+                $urlString = Str::of($url);
+
+                if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
+                    $laravelData = (string) $urlString->after('?');
                 }
 
-                // If found data is a string then treat it as query parameters and parse them to an array
                 if (is_string($laravelData)) {
                     parse_str($laravelData, $parsedData);
+
                     $laravelData = is_array($parsedData) ? $parsedData : [];
                 }
 

@@ -86,7 +86,7 @@ class Request implements ArrayAccess
      */
     public function header($key)
     {
-        return Arr::get($this->headers(), $key, [null]);
+        return Arr::get($this->headers(), $key, []);
     }
 
     /**
@@ -195,7 +195,8 @@ class Request implements ArrayAccess
      */
     public function isJson()
     {
-        return Str::contains($this->header('Content-Type')[0], 'json');
+        return $this->hasHeader('Content-Type') &&
+               Str::contains($this->header('Content-Type')[0], 'json');
     }
 
     /**
@@ -205,7 +206,8 @@ class Request implements ArrayAccess
      */
     public function isMultipart()
     {
-        return Str::startsWith($this->header('Content-Type')[0], 'multipart');
+        return $this->hasHeader('Content-Type') &&
+               Str::contains($this->header('Content-Type')[0], 'multipart');
     }
 
     /**
