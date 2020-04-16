@@ -543,6 +543,16 @@ class Stringable
     }
 
     /**
+     * return a string value.
+     *
+     * @return string
+     */
+    public function toString()
+    {
+        return $this->value;
+    }
+
+    /**
      * Trim the string of the given characters.
      *
      * @param  string  $characters
