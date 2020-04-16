@@ -136,7 +136,7 @@ class Kernel implements KernelContract
 
         return (new Pipeline($this->app))
                     ->send($request)
-                    ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
+                    ->through($this->gatherGlobalMiddleware($request))
                     ->then($this->dispatchToRouter());
     }
 
@@ -207,6 +207,25 @@ class Kernel implements KernelContract
                 $instance->terminate($request, $response);
             }
         }
+    }
+
+    /**
+     * Gather the glboal route middleware for the given request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function gatherGlobalMiddleware($request)
+    {
+        if ($this->app->shouldSkipMiddleware()) {
+            return [];
+        }
+
+        if ($route = $this->router->getRoutes()->match($request)) {
+            return array_diff($this->middleware, $route->excludedMiddleware());
+        }
+
+        return $this->middleware;
     }
 
     /**
