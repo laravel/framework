@@ -45,7 +45,7 @@ class FileLock extends Lock
     }
 
     /**
-     * Get file content if exists.
+     * Get lock file content if exists.
      *
      * @return string|null
      */
@@ -59,6 +59,21 @@ class FileLock extends Lock
     }
 
     /**
+     * Write the lock file.
+     *
+     * @return bool
+     */
+    private function writeLockFile($now)
+    {
+        $this->store->getFilesystem()->put($this->path, json_encode([
+            'owner' => $this->owner,
+            'expiresAt' => $this->seconds === 0 ? null : $now->copy()->addSeconds($this->seconds),
+        ]), true);
+
+        return true;
+    }
+
+    /**
      * Attempt to acquire the lock.
      *
      * @return bool
@@ -67,18 +82,18 @@ class FileLock extends Lock
     {
         $now = Carbon::now();
         $content = $this->getLockFileContent();
-        $expiration = is_null($content) || is_null($content->expiresAt) ? $now->copy() : Carbon::parse($content->expiresAt);
+
+        if (is_null($content)) {
+            return $this->writeLockFile($now);
+        }
+
+        $expiration = is_null($content->expiresAt) ? $now->copy()->addSecond() : Carbon::parse($content->expiresAt);
 
         if ($expiration->isFuture()) {
             return false;
         }
 
-        $this->store->getFilesystem()->put($this->path, json_encode([
-            'owner' => $this->owner,
-            'expiresAt' => $this->seconds === 0 ? null : $now->copy()->addSeconds($this->seconds),
-        ]), true);
-
-        return true;
+        return $this->writeLockFile($now);
     }
 
     /**
