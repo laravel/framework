@@ -127,6 +127,24 @@ class HttpClientTest extends TestCase
         $this->factory->assertNothingSent();
     }
 
+    public function testRequestCount()
+    {
+        $this->factory->fake();
+        $this->factory->assertSentCount(0);
+
+        $this->factory->post('http://foo.com/form', [
+            'name' => 'Taylor',
+        ]);
+
+        $this->factory->assertSentCount(1);
+
+        $this->factory->post('http://foo.com/form', [
+            'name' => 'Jim',
+        ]);
+
+        $this->factory->assertSentCount(2);
+    }
+
     public function testCanSendMultipartData()
     {
         $this->factory->fake();
