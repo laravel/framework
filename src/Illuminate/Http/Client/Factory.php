@@ -219,6 +219,17 @@ class Factory
     }
 
     /**
+     * Assert how many requests have been recorded.
+     *
+     * @param $count
+     * @return void
+     */
+    public function assertSentCount($count)
+    {
+        PHPUnit::assertCount($count, $this->recorded);
+    }
+
+    /**
      * Assert that every created response sequence is empty.
      *
      * @return void
