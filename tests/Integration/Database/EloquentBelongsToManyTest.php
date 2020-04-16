@@ -866,7 +866,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
     }
 
-    public function testWithTrashedMethod()
+    public function testWithTrashedPivotsMethod()
     {
         $post = Post::create(['title' => Str::random()]);
 
@@ -886,11 +886,11 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals(
             Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
-            $post->tagsWithSoftDeletes()->withTrashed()->pluck('name')
+            $post->tagsWithSoftDeletes()->withTrashedPivots()->pluck('name')
         );
     }
 
-    public function testOnlyTrashedMethod()
+    public function testOnlyTrashedPivotsMethod()
     {
         $post = Post::create(['title' => Str::random()]);
 
@@ -910,7 +910,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals(
             Tag::whereIn('id', [$tag2->id])->pluck('name'),
-            $post->tagsWithSoftDeletes()->onlyTrashed()->pluck('name')
+            $post->tagsWithSoftDeletes()->onlyTrashedPivots()->pluck('name')
         );
     }
 
@@ -934,7 +934,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals(
             Tag::whereIn('id', [$tag2->id])->pluck('name'),
-            $post->tagsWithSoftDeletes()->onlyTrashed()->pluck('name')
+            $post->tagsWithSoftDeletes()->onlyTrashedPivots()->pluck('name')
         );
 
         $output = $post->tagsWithSoftDeletes()->restore([$tag2->id]);
@@ -1000,7 +1000,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals(
             Tag::whereIn('id', [$tag2->id])->pluck('name'),
-            $post->tagsWithCustomPivotSoftDeletes()->onlyTrashed()->pluck('name')
+            $post->tagsWithCustomPivotSoftDeletes()->onlyTrashedPivots()->pluck('name')
         );
 
         $output = $post->tagsWithCustomPivotSoftDeletes()->restore([$tag2->id]);
@@ -1033,7 +1033,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals(
             Tag::whereIn('id', [$tag2->id, $tag4->id])->pluck('name'),
-            $post->tagsWithSoftDeletes()->withTrashed()->pluck('name')
+            $post->tagsWithSoftDeletes()->withTrashedPivots()->pluck('name')
         );
     }
 
@@ -1057,7 +1057,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals(
             Tag::whereIn('id', [$tag->id, $tag3->id])->pluck('name'),
-            $post->tagsWithSoftDeletes()->withTrashed()->pluck('name')
+            $post->tagsWithSoftDeletes()->withTrashedPivots()->pluck('name')
         );
     }
 

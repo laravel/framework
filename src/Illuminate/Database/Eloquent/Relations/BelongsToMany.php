@@ -11,9 +11,9 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 /**
- * @method self withoutTrashed() Show only non-trashed records
- * @method self withTrashed() Show all records
- * @method self onlyTrashed() Show only trashed records
+ * @method self withoutTrashedPivots() Show only non-trashed records
+ * @method self withTrashedPivots() Show all records
+ * @method self onlyTrashedPivots() Show only trashed records
  * @method int forceDetach(\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids, bool  $touch) Show only trashed records
  * @method int syncWithForceDetaching(mixed  $ids) Show only trashed records
  */
@@ -1107,7 +1107,7 @@ class BelongsToMany extends Relation
 
         $this->pivotDeletedAt = $deletedAt;
 
-        $this->macro('withoutTrashed', function () {
+        $this->macro('withoutTrashedPivots', function () {
             $this->query->withGlobalScope('withoutTrashed', function (Builder $query) {
                 $query->whereNull(
                     $this->getQualifiedDeletedAtColumnName()
@@ -1117,13 +1117,13 @@ class BelongsToMany extends Relation
             return $this;
         });
 
-        $this->macro('withTrashed', function () {
+        $this->macro('withTrashedPivots', function () {
             $this->query->withoutGlobalScopes(['withoutTrashed', 'onlyTrashed']);
 
             return $this;
         });
 
-        $this->macro('onlyTrashed', function () {
+        $this->macro('onlyTrashedPivots', function () {
             $this->query->withGlobalScope('onlyTrashed', function (Builder $query) {
                 $query->whereNotNull(
                     $this->getQualifiedDeletedAtColumnName()
@@ -1149,7 +1149,7 @@ class BelongsToMany extends Relation
             });
         });
 
-        return $this->withPivot($this->deletedAt())->withoutTrashed();
+        return $this->withPivot($this->deletedAt())->withoutTrashedPivots();
     }
 
     /**
