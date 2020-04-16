@@ -37,7 +37,7 @@ class CacheFileLockTest extends TestCase
         // Release the lock
         $lock->release();
 
-        // Lock should be should be available after a release
+        // Lock should be available after a release
         $this->assertTrue($lock->acquire());
 
         // Release the lock at the end of the test
