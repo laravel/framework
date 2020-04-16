@@ -41,7 +41,7 @@ class FileLock extends Lock
         parent::__construct($name, $seconds, $owner);
 
         $this->store = $store;
-        $this->path = $this->store->getDirectory() . '/' . $this->name . $this->extension;
+        $this->path = $this->store->getDirectory().'/'.$this->name.$this->extension;
     }
 
     /**
@@ -54,8 +54,6 @@ class FileLock extends Lock
         if ($this->exists()) {
             return json_decode($this->store->getFilesystem()->get($this->path));
         }
-
-        return null;
     }
 
     /**
