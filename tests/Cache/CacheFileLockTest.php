@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Illuminate\Cache\FileStore;
 use Illuminate\Cache\FileLock;
+use Illuminate\Cache\FileStore;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
