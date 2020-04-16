@@ -61,6 +61,7 @@ class FileLock extends Lock
     /**
      * Write the lock file.
      *
+     * @param  \Illuminate\Support\Carbon $now
      * @return bool
      */
     private function writeLockFile($now)
