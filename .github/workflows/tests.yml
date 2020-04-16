@@ -58,6 +58,5 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
         env:
-          CI: ${{ secrets.CI }}
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
