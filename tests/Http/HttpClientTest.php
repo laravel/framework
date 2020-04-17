@@ -164,6 +164,21 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSenseMultipartDataWithSimplifiedParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'foo' => 'data'
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'foo';
+        });
+    }
+
     public function testFilesCanBeAttached()
     {
         $this->factory->fake();

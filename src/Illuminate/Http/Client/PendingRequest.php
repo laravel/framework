@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
@@ -458,8 +459,21 @@ class PendingRequest
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
 
         if (isset($options[$this->bodyFormat])) {
+            $params = $options[$this->bodyFormat];
+
+            if ($this->bodyFormat === 'multipart' && Arr::isAssoc($params)) {
+                unset($params);
+
+                foreach ($options[$this->bodyFormat] as $key => $value) {
+                    $params[] = [
+                        'name' => $key,
+                        'contents' => $value
+                    ];
+                }
+            }
+
             $options[$this->bodyFormat] = array_merge(
-                $options[$this->bodyFormat], $this->pendingFiles
+                $params, $this->pendingFiles
             );
         }
 
