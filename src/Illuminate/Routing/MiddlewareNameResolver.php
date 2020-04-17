@@ -23,7 +23,7 @@ class MiddlewareNameResolver
             return $name;
         }
 
-        if (is_object($name)) {
+        if ($name instanceof Middleware) {
             return $name;
         }
 
