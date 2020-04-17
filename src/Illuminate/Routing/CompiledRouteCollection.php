@@ -297,9 +297,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             ->setFallback($attributes['fallback'])
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
-            ->setBindingFields($attributes['bindingFields'])
-            ->setRouter($this->router)
-            ->setContainer($this->container);
+            ->setBindingFields($attributes['bindingFields']);
     }
 
     /**
