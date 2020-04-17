@@ -467,7 +467,7 @@ class PendingRequest
                 foreach ($options[$this->bodyFormat] as $key => $value) {
                     $params[] = [
                         'name' => $key,
-                        'contents' => $value
+                        'contents' => $value,
                     ];
                 }
             }
