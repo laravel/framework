@@ -175,22 +175,32 @@ class PackageManifest
      */
     protected function write(array $manifest)
     {
-        function isWritablePath($sPath)
-        {
-            $fullPath = $sPath.'test.file';
-            $isOK = false;
-            $fp = @fopen($fullPath, "w");
-            if($fp !== false) {
-                $isOK = true;
+        function win_is_writable( $path ) {
+            if ( '/' === $path[ strlen( $path ) - 1 ] ) {
+                // If it looks like a directory, check a random file within the directory.
+                return win_is_writable( $path . uniqid( mt_rand() ) . '.tmp' );
+            } elseif ( is_dir( $path ) ) {
+                // If it's a directory (and not a file), check a random file within the directory.
+                return win_is_writable( $path . '/' . uniqid( mt_rand() ) . '.tmp' );
             }
-            @fclose($fp);
-            @unlink($fullPath);
 
-            return $isOK;
+            // Check tmp file for read/write capabilities.
+            $should_delete_tmp_file = ! file_exists( $path );
 
+            $f = @fopen( $path, 'a' );
+            if ( false === $f ) {
+                return false;
+            }
+            fclose( $f );
+
+            if ( $should_delete_tmp_file ) {
+                unlink( $path );
+            }
+
+            return true;
         }
 
-        if(!isWritablePath(dirname($this->manifestPath))) {
+        if(!win_is_writable(dirname($this->manifestPath))) {
             throw new Exception('The '.dirname($this->manifestPath).' directory must be present and writable.');
         }
 
