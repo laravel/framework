@@ -175,7 +175,24 @@ class PackageManifest
      */
     protected function write(array $manifest)
     {
-        if (! is_writable(dirname($this->manifestPath))) {
+        function isWritablePath($sPath)
+        {
+            $fullPath = $sPath.'test.file';
+            $isOK = false;
+            $fp = @fopen($fullPath, "w");
+            if($fp !== false)
+            {
+                $isOK = true;
+            }
+            @fclose($fp);
+            @unlink($fullPath);
+
+            return $isOK;
+
+        }
+
+        if(!isWritablePath(dirname($this->manifestPath)))
+        {
             throw new Exception('The '.dirname($this->manifestPath).' directory must be present and writable.');
         }
 
