@@ -24,6 +24,7 @@ class Grammar extends BaseGrammar
      * @var array
      */
     protected $selectComponents = [
+        'comment',
         'aggregate',
         'columns',
         'from',
@@ -1247,5 +1248,15 @@ class Grammar extends BaseGrammar
     public function getOperators()
     {
         return $this->operators;
+    }
+
+     /**
+     * Compile comment
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $comment
+     * @return string
+     */
+    public function compileComment(Builder $query, $comment) {
+        return '-- '.$comment.PHP_EOL;
     }
 }

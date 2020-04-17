@@ -3043,6 +3043,18 @@ class Builder
     }
 
     /**
+     * Add comment to the query
+     * 
+     * @param  string  $comment
+     * @return $this
+     */
+    public function comment($comment) 
+    {
+        $this->comment = $comment;
+        return $this;
+    }
+
+    /**
      * Clone the query without the given properties.
      *
      * @param  array  $properties
