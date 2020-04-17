@@ -169,7 +169,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->asMultipart()->post('http://foo.com/multipart', [
-            'foo' => 'data'
+            'foo' => 'data',
         ]);
 
         $this->factory->assertSent(function (Request $request) {
