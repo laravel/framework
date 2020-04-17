@@ -217,7 +217,6 @@ class HttpClientTest extends TestCase
                 $request[1]['contents'] === 'data' &&
                 $request[1]['headers']['X-Test-Header'] === 'foo';
         });
-
     }
 
     public function testItCanSendToken()

@@ -635,7 +635,6 @@ class PendingRequest
         return $this;
     }
 
-
     /**
      * Parse multipart form data to allow for ['key' => 'value'] post data.
      *
