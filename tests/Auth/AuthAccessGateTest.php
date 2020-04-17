@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Container\Container;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
