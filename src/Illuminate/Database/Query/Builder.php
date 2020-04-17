@@ -3073,14 +3073,15 @@ class Builder
     }
 
     /**
-     * Add comment to the query
+     * Add comment to the query.
      *
      * @param  string  $comment
      * @return $this
      */
-    function comment($comment)
+    public function comment($comment)
     {
         $this->comment = $comment;
+
         return $this;
     }
 

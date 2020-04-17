@@ -1109,7 +1109,7 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile comment to SQL
+     * Compile comment to SQL.
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $comment
      * @return string
@@ -1117,7 +1117,7 @@ class Grammar extends BaseGrammar
     public function compileComment(Builder $query, $comment)
     {
         return '-- '.$comment.PHP_EOL;
-    }	    
+    }
 
     /**
      * Wrap a value in keyword identifiers.
