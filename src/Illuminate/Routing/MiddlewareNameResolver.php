@@ -23,6 +23,10 @@ class MiddlewareNameResolver
             return $name;
         }
 
+        if (is_object($name)) {
+            return $name;
+        }
+
         if (isset($map[$name]) && $map[$name] instanceof Closure) {
             return $map[$name];
         }

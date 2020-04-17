@@ -915,6 +915,23 @@ class RoutingRouteTest extends TestCase
         ], $router->gatherRouteMiddleware($route));
     }
 
+    public function testMiddlewareAsInstantiatedObject()
+    {
+        $middleware = [
+            new ExampleMiddlewareWithConstructorParam('test')
+        ];
+
+        $router = $this->getRouter();
+
+        $router->get('foo', ['middleware' => $middleware, 'uses' => function () {
+            return 'done';
+        }]);
+
+        $response = $router->dispatch(Request::create('foo', 'GET'));
+
+        $this->assertEquals('test', $response->headers->get('from-middleware'));
+    }
+
     public function testModelBinding()
     {
         $router = $this->getRouter();
@@ -2262,5 +2279,25 @@ class ExampleMiddleware implements ExampleMiddlewareContract
     public function handle($request, Closure $next)
     {
         return $next($request);
+    }
+}
+
+class ExampleMiddlewareWithConstructorParam
+{
+    private $testParam;
+
+    public function __construct(string $testParam)
+    {
+        $this->testParam = $testParam;
+    }
+
+    public function handle($request, $next)
+    {
+        /** @var \Illuminate\Http\Response $response */
+        $response = $next($request);
+
+        $response->headers->set('from-middleware', $this->testParam);
+
+        return $response;
     }
 }
