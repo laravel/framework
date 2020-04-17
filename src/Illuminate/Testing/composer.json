@@ -1,0 +1,42 @@
+{
+    "name": "illuminate/testing",
+    "description": "The Illuminate Testing package.",
+    "license": "MIT",
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5",
+        "illuminate/contracts": "^7.0",
+        "illuminate/support": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Testing\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "7.x-dev"
+        }
+    },
+    "suggest": {
+        "illuminate/console": "Required to assert console commands (^7.0).",
+        "illuminate/database": "Required to assert databases (^7.0).",
+        "illuminate/http": "Required to assert responses (^7.0).",
+        "mockery/mockery": "Required to use mocking (^1.3.1).",
+        "phpunit/phpunit": "Required to use assertions and run tests (^8.4|^9.0)."
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

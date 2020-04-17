@@ -39,6 +39,7 @@ class ResourceTest extends TestCase
             return new PostResource(new Post([
                 'id' => 5,
                 'title' => 'Test Title',
+                'abstract' => 'Test abstract',
             ]));
         });
 
@@ -54,6 +55,17 @@ class ResourceTest extends TestCase
                 'title' => 'Test Title',
             ],
         ]);
+    }
+
+    public function testResourcesMayBeConvertedToJsonWithToJsonMethod()
+    {
+        $resource = new PostResource(new Post([
+            'id' => 5,
+            'title' => 'Test Title',
+            'abstract' => 'Test abstract',
+        ]));
+
+        $this->assertSame('{"id":5,"title":"Test Title","custom":true}', $resource->toJson());
     }
 
     public function testAnObjectsMayBeConvertedToJson()

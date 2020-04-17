@@ -1,13 +1,12 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration
@@ -89,6 +88,26 @@ class QueryBuilderTest extends DatabaseTestCase
                 $query->selectRaw("'Fake Post' as title");
             }, 'posts')->first()->title
         );
+    }
+
+    public function testWhereValueSubQuery()
+    {
+        $subQuery = function ($query) {
+            $query->selectRaw("'Sub query value'");
+        };
+
+        $this->assertTrue(DB::table('posts')->where($subQuery, 'Sub query value')->exists());
+        $this->assertFalse(DB::table('posts')->where($subQuery, 'Does not match')->exists());
+        $this->assertTrue(DB::table('posts')->where($subQuery, '!=', 'Does not match')->exists());
+    }
+
+    public function testWhereValueSubQueryBuilder()
+    {
+        $subQuery = DB::table('posts')->selectRaw("'Sub query value'");
+
+        $this->assertTrue(DB::table('posts')->where($subQuery, 'Sub query value')->exists());
+        $this->assertFalse(DB::table('posts')->where($subQuery, 'Does not match')->exists());
+        $this->assertTrue(DB::table('posts')->where($subQuery, '!=', 'Does not match')->exists());
     }
 
     public function testWhereDate()

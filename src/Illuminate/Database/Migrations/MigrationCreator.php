@@ -17,6 +17,13 @@ class MigrationCreator
     protected $files;
 
     /**
+     * The custom app stubs directory.
+     *
+     * @var string
+     */
+    protected $customStubPath;
+
+    /**
      * The registered post create hooks.
      *
      * @var array
@@ -27,11 +34,13 @@ class MigrationCreator
      * Create a new migration creator instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  string  $customStubPath
      * @return void
      */
-    public function __construct(Filesystem $files)
+    public function __construct(Filesystem $files, $customStubPath)
     {
         $this->files = $files;
+        $this->customStubPath = $customStubPath;
     }
 
     /**
@@ -101,15 +110,20 @@ class MigrationCreator
     protected function getStub($table, $create)
     {
         if (is_null($table)) {
-            return $this->files->get($this->stubPath().'/blank.stub');
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.stub')
+                            ? $customPath
+                            : $this->stubPath().'/migration.stub';
+        } elseif ($create) {
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create.stub')
+                            ? $customPath
+                            : $this->stubPath().'/migration.create.stub';
+        } else {
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update.stub')
+                            ? $customPath
+                            : $this->stubPath().'/migration.update.stub';
         }
 
-        // We also have stubs for creating new tables and modifying existing tables
-        // to save the developer some typing when they are creating a new tables
-        // or modifying existing tables. We'll grab the appropriate stub here.
-        $stub = $create ? 'create.stub' : 'update.stub';
-
-        return $this->files->get($this->stubPath()."/{$stub}");
+        return $this->files->get($stub);
     }
 
     /**
@@ -122,13 +136,19 @@ class MigrationCreator
      */
     protected function populateStub($name, $stub, $table)
     {
-        $stub = str_replace('DummyClass', $this->getClassName($name), $stub);
+        $stub = str_replace(
+            ['DummyClass', '{{ class }}', '{{class}}'],
+            $this->getClassName($name), $stub
+        );
 
         // Here we will replace the table place-holders with the table specified by
         // the developer, which is useful for quickly creating a tables creation
         // or update migration from the console instead of typing it manually.
         if (! is_null($table)) {
-            $stub = str_replace('DummyTable', $table, $stub);
+            $stub = str_replace(
+                ['DummyTable', '{{ table }}', '{{table}}'],
+                $table, $stub
+            );
         }
 
         return $stub;

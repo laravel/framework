@@ -42,19 +42,6 @@ trait HidesAttributes
     }
 
     /**
-     * Add hidden attributes for the model.
-     *
-     * @param  array|string|null  $attributes
-     * @return void
-     */
-    public function addHidden($attributes = null)
-    {
-        $this->hidden = array_merge(
-            $this->hidden, is_array($attributes) ? $attributes : func_get_args()
-        );
-    }
-
-    /**
      * Get the visible attributes for the model.
      *
      * @return array
@@ -78,30 +65,19 @@ trait HidesAttributes
     }
 
     /**
-     * Add visible attributes for the model.
-     *
-     * @param  array|string|null  $attributes
-     * @return void
-     */
-    public function addVisible($attributes = null)
-    {
-        $this->visible = array_merge(
-            $this->visible, is_array($attributes) ? $attributes : func_get_args()
-        );
-    }
-
-    /**
      * Make the given, typically hidden, attributes visible.
      *
-     * @param  array|string  $attributes
+     * @param  array|string|null  $attributes
      * @return $this
      */
     public function makeVisible($attributes)
     {
-        $this->hidden = array_diff($this->hidden, (array) $attributes);
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        $this->hidden = array_diff($this->hidden, $attributes);
 
         if (! empty($this->visible)) {
-            $this->addVisible($attributes);
+            $this->visible = array_merge($this->visible, $attributes);
         }
 
         return $this;
@@ -110,16 +86,14 @@ trait HidesAttributes
     /**
      * Make the given, typically visible, attributes hidden.
      *
-     * @param  array|string  $attributes
+     * @param  array|string|null  $attributes
      * @return $this
      */
     public function makeHidden($attributes)
     {
-        $attributes = (array) $attributes;
-
-        $this->visible = array_diff($this->visible, $attributes);
-
-        $this->hidden = array_unique(array_merge($this->hidden, $attributes));
+        $this->hidden = array_merge(
+            $this->hidden, is_array($attributes) ? $attributes : func_get_args()
+        );
 
         return $this;
     }

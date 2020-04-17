@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Mail;
 use Aws\Ses\SesClient;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
+use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\SesTransport;
-use Illuminate\Mail\TransportManager;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Swift_Message;
@@ -17,6 +17,7 @@ class MailSesTransportTest extends TestCase
     public function testGetTransport()
     {
         $container = new Container();
+
         $container->singleton('config', function () {
             return new Repository([
                 'services.ses' => [
@@ -27,12 +28,12 @@ class MailSesTransportTest extends TestCase
             ]);
         });
 
-        $manager = new TransportManager($container);
+        $manager = new MailManager($container);
 
-        /** @var SesTransport $transport */
-        $transport = $manager->driver('ses');
+        /** @var \Illuminate\Mail\Transport\SesTransport $transport */
+        $transport = $manager->createTransport(['transport' => 'ses']);
 
-        /** @var SesClient $ses */
+        /** @var \Aws\Ses\SesClient $ses */
         $ses = $transport->ses();
 
         $this->assertSame('us-east-1', $ses->getRegion());
@@ -77,11 +78,6 @@ class sendRawEmailMock
         $this->getResponse = $responseValue;
     }
 
-    /**
-     * Mock the get() call for the sendRawEmail response.
-     * @param  [type] $key [description]
-     * @return [type]      [description]
-     */
     public function get($key)
     {
         return $this->getResponse;

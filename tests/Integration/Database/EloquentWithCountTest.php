@@ -64,6 +64,16 @@ class EloquentWithCountTest extends DatabaseTestCase
         $result = Model1::withCount('allFours')->first();
         $this->assertEquals(1, $result->all_fours_count);
     }
+
+    public function testSortingScopes()
+    {
+        $one = Model1::create();
+        $one->twos()->create();
+
+        $result = Model1::withCount('twos')->toSql();
+
+        $this->assertSame('select "one".*, (select count(*) from "two" where "one"."id" = "two"."one_id") as "twos_count" from "one"', $result);
+    }
 }
 
 class Model1 extends Model
@@ -94,6 +104,15 @@ class Model2 extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
     protected $withCount = ['threes'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('app', function ($builder) {
+            $builder->latest();
+        });
+    }
 
     public function threes()
     {

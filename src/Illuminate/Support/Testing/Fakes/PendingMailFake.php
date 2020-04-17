@@ -26,7 +26,7 @@ class PendingMailFake extends PendingMail
      */
     public function send(Mailable $mailable)
     {
-        return $this->sendNow($mailable);
+        return $this->mailer->send($this->fill($mailable));
     }
 
     /**
@@ -34,10 +34,11 @@ class PendingMailFake extends PendingMail
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable;
      * @return mixed
+     * @deprecated Use send() instead.
      */
     public function sendNow(Mailable $mailable)
     {
-        return $this->mailer->send($this->fill($mailable));
+        return $this->send($mailable);
     }
 
     /**

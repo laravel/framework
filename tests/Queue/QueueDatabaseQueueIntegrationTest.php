@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 class QueueDatabaseQueueIntegrationTest extends TestCase
 {
     /**
-     * @var DatabaseQueue The queue instance.
+     * @var \Illuminate\Queue\DatabaseQueue
      */
     protected $queue;
 
@@ -23,7 +23,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     protected $table;
 
     /**
-     * @var Container The IOC container.
+     * @var \Illuminate\Container\Container
      */
     protected $container;
 

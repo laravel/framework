@@ -34,7 +34,7 @@ class CacheArrayStoreTest extends TestCase
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
     }
 
-    public function testItemsCanExpire(): void
+    public function testItemsCanExpire()
     {
         Carbon::setTestNow(Carbon::now());
         $store = new ArrayStore;
@@ -72,6 +72,19 @@ class CacheArrayStoreTest extends TestCase
         $result = $store->increment('foo');
         $this->assertEquals(1, $result);
         $this->assertEquals(1, $store->get('foo'));
+    }
+
+    public function testExpiredKeysAreIncrementedLikeNonExistingKeys()
+    {
+        Carbon::setTestNow(Carbon::now());
+        $store = new ArrayStore;
+
+        $store->put('foo', 999, 10);
+        Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
+        $result = $store->increment('foo');
+
+        $this->assertEquals(1, $result);
+        Carbon::setTestNow(null);
     }
 
     public function testValuesCanBeDecremented()
@@ -180,6 +193,30 @@ class CacheArrayStoreTest extends TestCase
         $wannabeOwner->forceRelease();
 
         $this->assertTrue($wannabeOwner->acquire());
+    }
+
+    public function testValuesAreNotStoredByReference()
+    {
+        $store = new ArrayStore($serialize = true);
+        $object = new \stdClass;
+        $object->foo = true;
+
+        $store->put('object', $object, 10);
+        $object->bar = true;
+
+        $this->assertObjectNotHasAttribute('bar', $store->get('object'));
+    }
+
+    public function testValuesAreStoredByReferenceIfSerializationIsDisabled()
+    {
+        $store = new ArrayStore;
+        $object = new \stdClass;
+        $object->foo = true;
+
+        $store->put('object', $object, 10);
+        $object->bar = true;
+
+        $this->assertObjectHasAttribute('bar', $store->get('object'));
     }
 
     public function testReleasingLockAfterAlreadyForceReleasedByAnotherOwnerFails()

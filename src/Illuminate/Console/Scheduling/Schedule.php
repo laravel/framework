@@ -251,11 +251,11 @@ class Schedule
      */
     public function useCache($store)
     {
-        if ($this->eventMutex instanceof CacheEventMutex) {
+        if ($this->eventMutex instanceof CacheAware) {
             $this->eventMutex->useStore($store);
         }
 
-        if ($this->schedulingMutex instanceof CacheSchedulingMutex) {
+        if ($this->schedulingMutex instanceof CacheAware) {
             $this->schedulingMutex->useStore($store);
         }
 

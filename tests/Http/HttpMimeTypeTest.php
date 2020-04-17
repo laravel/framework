@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Http;
 
 use Illuminate\Http\Testing\MimeType;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\MimeTypesInterface;
 
 class HttpMimeTypeTest extends TestCase
 {
@@ -27,16 +28,14 @@ class HttpMimeTypeTest extends TestCase
         $this->assertSame('application/octet-stream', MimeType::get('bar'));
     }
 
-    public function testGetAllMimeTypes()
+    public function testMimeTypeSymfonyInstance()
     {
-        $this->assertIsArray(MimeType::get());
-        $this->assertArrayHasKey('jpg', MimeType::get());
-        $this->assertSame('image/jpeg', MimeType::get()['jpg']);
+        $this->assertInstanceOf(MimeTypesInterface::class, MimeType::getMimeTypes());
     }
 
     public function testSearchExtensionFromMimeType()
     {
-        $this->assertSame('mov', MimeType::search('video/quicktime'));
+        $this->assertSame('qt', MimeType::search('video/quicktime'));
         $this->assertNull(MimeType::search('foo/bar'));
     }
 }

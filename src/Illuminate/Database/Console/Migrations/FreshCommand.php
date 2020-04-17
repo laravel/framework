@@ -27,12 +27,12 @@ class FreshCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
         if (! $this->confirmToProceed()) {
-            return;
+            return 1;
         }
 
         $database = $this->input->getOption('database');
@@ -55,6 +55,8 @@ class FreshCommand extends Command
         if ($this->needsSeeding()) {
             $this->runSeeder($database);
         }
+
+        return 0;
     }
 
     /**

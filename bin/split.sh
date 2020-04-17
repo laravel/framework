@@ -3,7 +3,7 @@
 set -e
 set -x
 
-CURRENT_BRANCH="6.x"
+CURRENT_BRANCH="7.x"
 
 function split()
 {
@@ -43,6 +43,7 @@ remote redis git@github.com:illuminate/redis.git
 remote routing git@github.com:illuminate/routing.git
 remote session git@github.com:illuminate/session.git
 remote support git@github.com:illuminate/support.git
+remote testing git@github.com:illuminate/testing.git
 remote translation git@github.com:illuminate/translation.git
 remote validation git@github.com:illuminate/validation.git
 remote view git@github.com:illuminate/view.git
@@ -72,6 +73,7 @@ split 'src/Illuminate/Redis' redis
 split 'src/Illuminate/Routing' routing
 split 'src/Illuminate/Session' session
 split 'src/Illuminate/Support' support
+split 'src/Illuminate/Testing' testing
 split 'src/Illuminate/Translation' translation
 split 'src/Illuminate/Validation' validation
 split 'src/Illuminate/View' view

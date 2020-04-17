@@ -16,22 +16,22 @@ use Symfony\Component\Console\Output\NullOutput;
 class ClearCommandTest extends TestCase
 {
     /**
-     * @var ClearCommandTestStub
+     * @var \Illuminate\Tests\Cache\ClearCommandTestStub
      */
     private $command;
 
     /**
-     * @var CacheManager|m\Mock
+     * @var \Illuminate\Cache\CacheManager|\Mockery\MockInterface
      */
     private $cacheManager;
 
     /**
-     * @var Filesystem|m\Mock
+     * @var \Illuminate\Filesystem\Filesystem|\Mockery\MockInterface
      */
     private $files;
 
     /**
-     * @var Repository|m\Mock
+     * @var \Illuminate\Contracts\Cache\Repository|\Mockery\MockInterface
      */
     private $cacheRepository;
 
@@ -150,6 +150,6 @@ class ClearCommandTestStub extends ClearCommand
 {
     public function call($command, array $arguments = [])
     {
-        //
+        return 0;
     }
 }

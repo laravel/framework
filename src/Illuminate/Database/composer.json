@@ -15,11 +15,12 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2.5",
         "ext-json": "*",
-        "illuminate/container": "^6.0",
-        "illuminate/contracts": "^6.0",
-        "illuminate/support": "^6.0"
+        "illuminate/container": "^7.0",
+        "illuminate/contracts": "^7.0",
+        "illuminate/support": "^7.0",
+        "symfony/console": "^5.0"
     },
     "autoload": {
         "psr-4": {
@@ -28,17 +29,17 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.x-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "suggest": {
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (^1.9.1).",
-        "illuminate/console": "Required to use the database commands (^6.0).",
-        "illuminate/events": "Required to use the observers with Eloquent (^6.0).",
-        "illuminate/filesystem": "Required to use the migrations (^6.0).",
-        "illuminate/pagination": "Required to paginate the result set (^6.0).",
-        "symfony/finder": "Required to use Eloquent model factories (^4.3.4)."
+        "illuminate/console": "Required to use the database commands (^7.0).",
+        "illuminate/events": "Required to use the observers with Eloquent (^7.0).",
+        "illuminate/filesystem": "Required to use the migrations (^7.0).",
+        "illuminate/pagination": "Required to paginate the result set (^7.0).",
+        "symfony/finder": "Required to use Eloquent model factories (^5.0)."
     },
     "config": {
         "sort-packages": true

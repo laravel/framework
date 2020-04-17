@@ -1108,6 +1108,35 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
+    public function testReorder()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('name');
+        $this->assertSame('select * from "users" order by "name" asc', $builder->toSql());
+        $builder->reorder();
+        $this->assertSame('select * from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('name');
+        $this->assertSame('select * from "users" order by "name" asc', $builder->toSql());
+        $builder->reorder('email', 'desc');
+        $this->assertSame('select * from "users" order by "email" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('first');
+        $builder->union($this->getBuilder()->select('*')->from('second'));
+        $builder->orderBy('name');
+        $this->assertSame('(select * from "first") union (select * from "second") order by "name" asc', $builder->toSql());
+        $builder->reorder();
+        $this->assertSame('(select * from "first") union (select * from "second")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByRaw('?', [true]);
+        $this->assertEquals([true], $builder->getBindings());
+        $builder->reorder();
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testOrderBySubQueries()
     {
         $expected = 'select * from "users" order by (select "created_at" from "logins" where "user_id" = "users"."id" limit 1)';

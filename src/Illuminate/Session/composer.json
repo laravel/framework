@@ -14,13 +14,13 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2.5",
         "ext-json": "*",
-        "illuminate/contracts": "^6.0",
-        "illuminate/filesystem": "^6.0",
-        "illuminate/support": "^6.0",
-        "symfony/finder": "^4.3.4",
-        "symfony/http-foundation": "^4.3.4"
+        "illuminate/contracts": "^7.0",
+        "illuminate/filesystem": "^7.0",
+        "illuminate/support": "^7.0",
+        "symfony/finder": "^5.0",
+        "symfony/http-foundation": "^5.0"
     },
     "autoload": {
         "psr-4": {
@@ -29,11 +29,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.x-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the session:table command (^6.0)."
+        "illuminate/console": "Required to use the session:table command (^7.0)."
     },
     "config": {
         "sort-packages": true

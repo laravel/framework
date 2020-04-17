@@ -59,39 +59,39 @@ class EloquentModelStringCastingTest extends TestCase
      */
     public function testSavingCastedAttributesToDatabase()
     {
-        /** @var StringCasts $model */
+        /** @var \Illuminate\Tests\Integration\Database\StringCasts $model */
         $model = StringCasts::create([
             'array_attributes' => ['key1'=>'value1'],
             'json_attributes' => ['json_key'=>'json_value'],
             'object_attributes' => ['json_key'=>'json_value'],
         ]);
-        $this->assertSame('{"key1":"value1"}', $model->getOriginal('array_attributes'));
-        $this->assertSame(['key1'=>'value1'], $model->getAttribute('array_attributes'));
+        $this->assertSame(['key1' => 'value1'], $model->getOriginal('array_attributes'));
+        $this->assertSame(['key1' => 'value1'], $model->getAttribute('array_attributes'));
 
-        $this->assertSame('{"json_key":"json_value"}', $model->getOriginal('json_attributes'));
-        $this->assertSame(['json_key'=>'json_value'], $model->getAttribute('json_attributes'));
+        $this->assertSame(['json_key' => 'json_value'], $model->getOriginal('json_attributes'));
+        $this->assertSame(['json_key' => 'json_value'], $model->getAttribute('json_attributes'));
 
-        $this->assertSame('{"json_key":"json_value"}', $model->getOriginal('object_attributes'));
         $stdClass = new stdClass;
         $stdClass->json_key = 'json_value';
+        $this->assertEquals($stdClass, $model->getOriginal('object_attributes'));
         $this->assertEquals($stdClass, $model->getAttribute('object_attributes'));
     }
 
     public function testSavingCastedEmptyAttributesToDatabase()
     {
-        /** @var StringCasts $model */
+        /** @var \Illuminate\Tests\Integration\Database\StringCasts $model */
         $model = StringCasts::create([
             'array_attributes' => [],
             'json_attributes' => [],
             'object_attributes' => [],
         ]);
-        $this->assertSame('[]', $model->getOriginal('array_attributes'));
+        $this->assertSame([], $model->getOriginal('array_attributes'));
         $this->assertSame([], $model->getAttribute('array_attributes'));
 
-        $this->assertSame('[]', $model->getOriginal('json_attributes'));
+        $this->assertSame([], $model->getOriginal('json_attributes'));
         $this->assertSame([], $model->getAttribute('json_attributes'));
 
-        $this->assertSame('[]', $model->getOriginal('object_attributes'));
+        $this->assertSame([], $model->getOriginal('object_attributes'));
         $this->assertSame([], $model->getAttribute('object_attributes'));
     }
 

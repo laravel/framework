@@ -3,15 +3,15 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Routing\Route fallback(\Closure|array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route get(string $uri, \Closure|array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route post(string $uri, \Closure|array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route put(string $uri, \Closure|array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route delete(string $uri, \Closure|array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route patch(string $uri, \Closure|array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route options(string $uri, \Closure|array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route any(string $uri, \Closure|array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route match(array|string $methods, string $uri, \Closure|array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route fallback(array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route get(string $uri, array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route post(string $uri, array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route put(string $uri, array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route delete(string $uri, array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route patch(string $uri, array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route options(string $uri, array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route any(string $uri, array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route match(array|string $methods, string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
  * @method static \Illuminate\Routing\RouteRegistrar where(array  $where)
  * @method static \Illuminate\Routing\PendingResourceRegistration resource(string $name, string $controller, array $options = [])
@@ -35,6 +35,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route current()
  * @method static string|null currentRouteName()
  * @method static string|null currentRouteAction()
+ * @method static \Illuminate\Routing\Route getCurrentRoute()
  *
  * @see \Illuminate\Routing\Router
  */

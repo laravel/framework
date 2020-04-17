@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentBelongsToTest extends TestCase
 {
@@ -22,11 +23,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testBelongsToWithDefault()
     {
-        $relation = $this->getRelation()->withDefault(); //belongsTo relationships
+        $relation = $this->getRelation()->withDefault();
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentBelongsToModelStub;  //ie Blog
+        $newModel = new EloquentBelongsToModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -131,7 +132,10 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', null);
+
+        // Always set relation when we received Model
         $parent->shouldReceive('setRelation')->once()->with('relation', null);
+
         $relation->dissociate();
     }
 
@@ -141,8 +145,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
-        $parent->shouldReceive('isDirty')->once()->andReturn(true);
+
+        // Always unset relation when we received id, regardless of dirtiness
+        $parent->shouldReceive('isDirty')->never();
         $parent->shouldReceive('unsetRelation')->once()->with($relation->getRelationName());
+
         $relation->associate(1);
     }
 

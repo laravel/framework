@@ -28,9 +28,14 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->db = $db = new DB;
 
         $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
         ]);
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ], 'sqlite2');
 
         $db->setAsGlobal();
 
@@ -52,6 +57,13 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         if (! $repository->repositoryExists()) {
             $repository->createRepository();
+        }
+
+        $repository2 = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations');
+        $repository2->setSource('sqlite2');
+
+        if (! $repository2->repositoryExists()) {
+            $repository2->createRepository();
         }
     }
 
@@ -169,5 +181,46 @@ class DatabaseMigratorIntegrationTest extends TestCase
         ];
 
         $this->assertEquals($expected, $migrationsFilesFullPaths);
+    }
+
+    public function testConnectionPriorToMigrationIsNotChangedAfterMigration()
+    {
+        $this->migrator->setConnection('default');
+        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->assertSame('default', $this->migrator->getConnection());
+    }
+
+    public function testConnectionPriorToMigrationIsNotChangedAfterRollback()
+    {
+        $this->migrator->setConnection('default');
+        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->rollback([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->assertSame('default', $this->migrator->getConnection());
+    }
+
+    public function testConnectionPriorToMigrationIsNotChangedWhenNoOutstandingMigrationsExist()
+    {
+        $this->migrator->setConnection('default');
+        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->setConnection('default');
+        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->assertSame('default', $this->migrator->getConnection());
+    }
+
+    public function testConnectionPriorToMigrationIsNotChangedWhenNothingToRollback()
+    {
+        $this->migrator->setConnection('default');
+        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->rollback([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->rollback([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->assertSame('default', $this->migrator->getConnection());
+    }
+
+    public function testConnectionPriorToMigrationIsNotChangedAfterMigrateReset()
+    {
+        $this->migrator->setConnection('default');
+        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->reset([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->assertSame('default', $this->migrator->getConnection());
     }
 }

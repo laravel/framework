@@ -145,6 +145,23 @@ class MailMailerTest extends TestCase
         });
     }
 
+    public function testGlobalReturnPathIsRespectedOnAllMessages()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMailer();
+        $view = m::mock(stdClass::class);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $this->setSwiftMailer($mailer);
+        $mailer->alwaysReturnPath('taylorotwell@gmail.com');
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
+            $this->assertSame('taylorotwell@gmail.com', $message->getReturnPath());
+        });
+        $mailer->send('foo', ['data'], function ($m) {
+            //
+        });
+    }
+
     public function testFailedRecipientsAreAppendedAndCanBeRetrieved()
     {
         unset($_SERVER['__mailer.test']);
@@ -196,7 +213,7 @@ class MailMailerTest extends TestCase
 
     protected function getMailer($events = null)
     {
-        return new Mailer(m::mock(Factory::class), m::mock(Swift_Mailer::class), $events);
+        return new Mailer('smtp', m::mock(Factory::class), m::mock(Swift_Mailer::class), $events);
     }
 
     public function setSwiftMailer($mailer)
@@ -212,7 +229,7 @@ class MailMailerTest extends TestCase
 
     protected function getMocks()
     {
-        return [m::mock(Factory::class), m::mock(Swift_Mailer::class)];
+        return ['smtp', m::mock(Factory::class), m::mock(Swift_Mailer::class)];
     }
 }
 

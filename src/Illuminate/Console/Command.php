@@ -127,11 +127,11 @@ class Command extends SymfonyCommand
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return mixed
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->laravel->call([$this, 'handle']);
+        return (int) $this->laravel->call([$this, 'handle']);
     }
 
     /**
@@ -170,7 +170,7 @@ class Command extends SymfonyCommand
     /**
      * {@inheritdoc}
      */
-    public function setHidden($hidden)
+    public function setHidden(bool $hidden)
     {
         parent::setHidden($this->hidden = $hidden);
 

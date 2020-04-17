@@ -14,12 +14,13 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2.5",
         "ext-json": "*",
         "ext-mbstring": "*",
         "doctrine/inflector": "^1.1",
-        "illuminate/contracts": "^6.0",
-        "nesbot/carbon": "^2.0"
+        "illuminate/contracts": "^7.0",
+        "nesbot/carbon": "^2.17",
+        "voku/portable-ascii": "^1.4.8"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
@@ -34,16 +35,16 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.x-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "suggest": {
-        "illuminate/filesystem": "Required to use the composer class (^6.0).",
+        "illuminate/filesystem": "Required to use the composer class (^7.0).",
         "moontoast/math": "Required to use ordered UUIDs (^1.1).",
-        "ramsey/uuid": "Required to use Str::uuid() (^3.7).",
-        "symfony/process": "Required to use the composer class (^4.3.4).",
-        "symfony/var-dumper": "Required to use the dd function (^4.3.4).",
-        "vlucas/phpdotenv": "Required to use the Env class and env helper (^3.3)."
+        "ramsey/uuid": "Required to use Str::uuid() (^3.7|^4.0).",
+        "symfony/process": "Required to use the composer class (^5.0).",
+        "symfony/var-dumper": "Required to use the dd function (^5.0).",
+        "vlucas/phpdotenv": "Required to use the Env class and env helper (^4.0)."
     },
     "config": {
         "sort-packages": true

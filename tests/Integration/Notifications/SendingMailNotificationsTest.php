@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
+use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\Eloquent\Model;
@@ -44,7 +45,9 @@ class SendingMailNotificationsTest extends TestCase
             'prefix' => '',
         ]);
 
+        $this->mailFactory = m::mock(MailFactory::class);
         $this->mailer = m::mock(Mailer::class);
+        $this->mailFactory->shouldReceive('mailer')->andReturn($this->mailer);
         $this->markdown = m::mock(Markdown::class);
 
         $app->extend(Markdown::class, function () {
@@ -53,6 +56,10 @@ class SendingMailNotificationsTest extends TestCase
 
         $app->extend(Mailer::class, function () {
             return $this->mailer;
+        });
+
+        $app->extend(MailFactory::class, function () {
+            return $this->mailFactory;
         });
     }
 
@@ -285,7 +292,8 @@ class TestMailNotification extends Notification
             ->bcc('bcc@deepblue.com', 'bcc')
             ->from('jack@deepblue.com', 'Jacques Mayol')
             ->replyTo('jack@deepblue.com', 'Jacques Mayol')
-            ->line('The introduction to the notification.');
+            ->line('The introduction to the notification.')
+            ->mailer('foo');
     }
 }
 

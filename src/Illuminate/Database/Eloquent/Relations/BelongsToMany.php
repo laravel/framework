@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -135,7 +136,7 @@ class BelongsToMany extends Relation
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
      * @param  string  $relatedKey
-     * @param  string  $relationName
+     * @param  string|null  $relationName
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $table, $foreignPivotKey,
@@ -344,7 +345,7 @@ class BelongsToMany extends Relation
      * Set a where clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  string|null  $operator
+     * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
@@ -354,6 +355,57 @@ class BelongsToMany extends Relation
         $this->pivotWheres[] = func_get_args();
 
         return $this->where($this->table.'.'.$column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Set a "where between" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function wherePivotBetween($column, array $values, $boolean = 'and', $not = false)
+    {
+        return $this->whereBetween($this->table.'.'.$column, $values, $boolean, $not);
+    }
+
+    /**
+     * Set a "or where between" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return $this
+     */
+    public function orWherePivotBetween($column, array $values)
+    {
+        return $this->wherePivotBetween($column, $values, 'or');
+    }
+
+    /**
+     * Set a "where pivot not between" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function wherePivotNotBetween($column, array $values, $boolean = 'and')
+    {
+        return $this->wherePivotBetween($column, $values, $boolean, true);
+    }
+
+    /**
+     * Set a "or where not between" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return $this
+     */
+    public function orWherePivotNotBetween($column, array $values)
+    {
+        return $this->wherePivotBetween($column, $values, 'or', true);
     }
 
     /**
@@ -376,7 +428,7 @@ class BelongsToMany extends Relation
      * Set an "or where" clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  string|null  $operator
+     * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
      */
@@ -531,7 +583,11 @@ class BelongsToMany extends Relation
      */
     public function find($id, $columns = ['*'])
     {
-        return is_array($id) ? $this->findMany($id, $columns) : $this->where(
+        if (is_array($id) || $id instanceof Arrayable) {
+            return $this->findMany($id, $columns);
+        }
+
+        return $this->where(
             $this->getRelated()->getQualifiedKeyName(), '=', $this->parseId($id)
         )->first($columns);
     }
@@ -539,13 +595,19 @@ class BelongsToMany extends Relation
     /**
      * Find multiple related models by their primary keys.
      *
-     * @param  mixed  $ids
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function findMany($ids, $columns = ['*'])
     {
-        return empty($ids) ? $this->getRelated()->newCollection() : $this->whereIn(
+        $ids = $ids instanceof Arrayable ? $ids->toArray() : $ids;
+
+        if (empty($ids)) {
+            return $this->getRelated()->newCollection();
+        }
+
+        return $this->whereIn(
             $this->getRelated()->getQualifiedKeyName(), $this->parseIds($ids)
         )->get($columns);
     }
@@ -562,6 +624,8 @@ class BelongsToMany extends Relation
     public function findOrFail($id, $columns = ['*'])
     {
         $result = $this->find($id, $columns);
+
+        $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
             if (count($result) === count(array_unique($id))) {

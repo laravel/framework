@@ -2,11 +2,11 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 trait InteractsWithExceptionHandling
 {
@@ -84,12 +84,12 @@ trait InteractsWithExceptionHandling
             /**
              * Report or log an exception.
              *
-             * @param  \Exception  $e
+             * @param  \Throwable  $e
              * @return void
              *
              * @throws \Exception
              */
-            public function report(Exception $e)
+            public function report(Throwable $e)
             {
                 //
             }
@@ -97,10 +97,10 @@ trait InteractsWithExceptionHandling
             /**
              * Determine if the exception should be reported.
              *
-             * @param  \Exception  $e
+             * @param  \Throwable  $e
              * @return bool
              */
-            public function shouldReport(Exception $e)
+            public function shouldReport(Throwable $e)
             {
                 return false;
             }
@@ -109,12 +109,12 @@ trait InteractsWithExceptionHandling
              * Render an exception into an HTTP response.
              *
              * @param  \Illuminate\Http\Request  $request
-             * @param  \Exception  $e
+             * @param  \Throwable  $e
              * @return \Symfony\Component\HttpFoundation\Response
              *
-             * @throws \Exception
+             * @throws \Throwable
              */
-            public function render($request, Exception $e)
+            public function render($request, Throwable $e)
             {
                 foreach ($this->except as $class) {
                     if ($e instanceof $class) {
@@ -135,12 +135,12 @@ trait InteractsWithExceptionHandling
              * Render an exception to the console.
              *
              * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-             * @param  \Exception  $e
+             * @param  \Throwable  $e
              * @return void
              */
-            public function renderForConsole($output, Exception $e)
+            public function renderForConsole($output, Throwable $e)
             {
-                (new ConsoleApplication)->renderException($e, $output);
+                (new ConsoleApplication)->renderThrowable($e, $output);
             }
         });
 

@@ -86,6 +86,10 @@ trait DatabaseRule
             return $this->using($column);
         }
 
+        if (is_null($value)) {
+            return $this->whereNull($column);
+        }
+
         $this->wheres[] = compact('column', 'value');
 
         return $this;

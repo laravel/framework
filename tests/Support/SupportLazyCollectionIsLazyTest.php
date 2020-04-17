@@ -897,6 +897,17 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testSortDescIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->sortDesc();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sortDesc()->all();
+        });
+    }
+
     public function testSortByIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

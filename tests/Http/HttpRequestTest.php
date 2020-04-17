@@ -360,7 +360,7 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->filled('name'));
         $this->assertTrue($request->filled('name', 'email'));
 
-        //test arrays within query string
+        // test arrays within query string
         $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz']]);
         $this->assertTrue($request->filled('foo'));
 

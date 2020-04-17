@@ -138,11 +138,22 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('pivot')) {
-            return __DIR__.'/stubs/pivot.model.stub';
-        }
+        return $this->option('pivot')
+                    ? $this->resolveStubPath('/stubs/model.pivot.stub')
+                    : $this->resolveStubPath('/stubs/model.stub');
+    }
 
-        return __DIR__.'/stubs/model.stub';
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
