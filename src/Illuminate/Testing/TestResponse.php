@@ -1180,6 +1180,20 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * dump the json content from the response
+     *
+     * @param null $key
+     *
+     * @return $this
+     */
+    public function dumpJson($key = null)
+    {
+        dump($this->json($key));
+
+        return $this;
+    }
+
+    /**
      * Dump the headers from the response.
      *
      * @return $this
