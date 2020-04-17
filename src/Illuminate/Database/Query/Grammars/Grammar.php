@@ -24,6 +24,7 @@ class Grammar extends BaseGrammar
      * @var array
      */
     protected $selectComponents = [
+        'comment',
         'aggregate',
         'columns',
         'from',
