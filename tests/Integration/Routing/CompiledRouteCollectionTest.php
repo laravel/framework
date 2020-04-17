@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Routing;
+namespace Illuminate\Tests\Integration\Routing;
 
 use ArrayIterator;
 use Illuminate\Http\Request;

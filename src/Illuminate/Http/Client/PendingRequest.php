@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
 class PendingRequest
@@ -466,8 +467,22 @@ class PendingRequest
 
         return retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {
+                $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
+
+                $urlString = Str::of($url);
+
+                if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
+                    $laravelData = (string) $urlString->after('?');
+                }
+
+                if (is_string($laravelData)) {
+                    parse_str($laravelData, $parsedData);
+
+                    $laravelData = is_array($parsedData) ? $parsedData : [];
+                }
+
                 return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
-                    'laravel_data' => $options[$this->bodyFormat] ?? [],
+                    'laravel_data' => $laravelData,
                     'on_stats' => function ($transferStats) {
                         $this->transferStats = $transferStats;
                     },

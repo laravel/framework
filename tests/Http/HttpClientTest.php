@@ -127,6 +127,24 @@ class HttpClientTest extends TestCase
         $this->factory->assertNothingSent();
     }
 
+    public function testRequestCount()
+    {
+        $this->factory->fake();
+        $this->factory->assertSentCount(0);
+
+        $this->factory->post('http://foo.com/form', [
+            'name' => 'Taylor',
+        ]);
+
+        $this->factory->assertSentCount(1);
+
+        $this->factory->post('http://foo.com/form', [
+            'name' => 'Jim',
+        ]);
+
+        $this->factory->assertSentCount(2);
+    }
+
     public function testCanSendMultipartData()
     {
         $this->factory->fake();
@@ -269,7 +287,8 @@ class HttpClientTest extends TestCase
         $this->factory->get('http://foo.com/get', ['foo' => 'bar']);
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo=bar';
+            return $request->url() === 'http://foo.com/get?foo=bar'
+                && $request['foo'] === 'bar';
         });
     }
 
@@ -280,7 +299,8 @@ class HttpClientTest extends TestCase
         $this->factory->get('http://foo.com/get', 'foo=bar');
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo=bar';
+            return $request->url() === 'http://foo.com/get?foo=bar'
+                && $request['foo'] === 'bar';
         });
     }
 
@@ -291,7 +311,9 @@ class HttpClientTest extends TestCase
         $this->factory->get('http://foo.com/get?foo=bar&page=1');
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo=bar&page=1';
+            return $request->url() === 'http://foo.com/get?foo=bar&page=1'
+                && $request['foo'] === 'bar'
+                && $request['page'] === '1';
         });
     }
 
@@ -302,7 +324,10 @@ class HttpClientTest extends TestCase
         $this->factory->get('http://foo.com/get?foo;bar;1;5;10&page=1');
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo;bar;1;5;10&page=1';
+            return $request->url() === 'http://foo.com/get?foo;bar;1;5;10&page=1'
+                && ! isset($request['foo'])
+                && ! isset($request['bar'])
+                && $request['page'] === '1';
         });
     }
 
@@ -313,7 +338,8 @@ class HttpClientTest extends TestCase
         $this->factory->get('http://foo.com/get?foo=bar&page=1', ['hello' => 'world']);
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?hello=world';
+            return $request->url() === 'http://foo.com/get?hello=world'
+                && $request['hello'] === 'world';
         });
     }
 
@@ -324,7 +350,8 @@ class HttpClientTest extends TestCase
         $this->factory->get('http://foo.com/get', ['foo;bar; space test' => 'laravel']);
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo%3Bbar%3B%20space%20test=laravel';
+            return $request->url() === 'http://foo.com/get?foo%3Bbar%3B%20space%20test=laravel'
+                && $request['foo;bar; space test'] === 'laravel';
         });
     }
 }
