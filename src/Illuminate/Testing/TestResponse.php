@@ -1180,7 +1180,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * dump the json content from the response
+     * Dump the json content from the response.
      *
      * @param null $key
      *
