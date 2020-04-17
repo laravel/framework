@@ -89,7 +89,7 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
     {
         DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
 
-        $this->assertSame(!$expected, DB::table(self::TABLE)->whereNotNull(self::JSON_COL.'->'.$key)->exists());
+        $this->assertSame(! $expected, DB::table(self::TABLE)->whereNotNull(self::JSON_COL.'->'.$key)->exists());
     }
 
     public function jsonWhereNullDataProvider(): array

@@ -245,7 +245,8 @@ class MySqlGrammar extends Grammar
         return 'json_extract('.$field.$path.')';
     }
 
-    protected function whereNull(Builder $query, $where) {
+    protected function whereNull(Builder $query, $where)
+    {
         if ($this->isJsonSelector($where['column'])) {
             // In MySQL json_extract() returns different values
             // * key not exist => SQL NULL
@@ -264,7 +265,8 @@ class MySqlGrammar extends Grammar
         return parent::whereNull($query, $where);
     }
 
-    protected function whereNotNull(Builder $query, $where) {
+    protected function whereNotNull(Builder $query, $where)
+    {
         if ($this->isJsonSelector($where['column'])) {
             [$field, $path] = $this->wrapJsonFieldAndPath($where['column']);
 
