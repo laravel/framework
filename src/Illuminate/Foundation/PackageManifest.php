@@ -180,8 +180,7 @@ class PackageManifest
             $fullPath = $sPath.'test.file';
             $isOK = false;
             $fp = @fopen($fullPath, "w");
-            if($fp !== false)
-            {
+            if($fp !== false) {
                 $isOK = true;
             }
             @fclose($fp);
@@ -191,8 +190,7 @@ class PackageManifest
 
         }
 
-        if(!isWritablePath(dirname($this->manifestPath)))
-        {
+        if(!isWritablePath(dirname($this->manifestPath))) {
             throw new Exception('The '.dirname($this->manifestPath).' directory must be present and writable.');
         }
 
