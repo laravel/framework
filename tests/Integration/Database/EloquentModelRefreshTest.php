@@ -66,7 +66,7 @@ class EloquentModelRefreshTest extends DatabaseTestCase
             $table->bigInteger('related_id');
         });
 
-        $post  = AsPivotPost::create(['title' => 'parent']);
+        $post = AsPivotPost::create(['title' => 'parent']);
         $child = AsPivotPost::create(['title' => 'child']);
 
         $post->children()->attach($child->getKey());
@@ -97,7 +97,7 @@ class Post extends Model
 
 class AsPivotPost extends Post
 {
-    public function children() 
+    public function children()
     {
         return $this
             ->belongsToMany(static::class, (new AsPivotPostPivot())->getTable(), 'foreign_id', 'related_id')
