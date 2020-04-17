@@ -566,11 +566,11 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Wrap the given closure such that its dependencies will be injected when executed.
      *
-     * @param  \Closure  $callback
+     * @param  callable|string  $callback
      * @param  array  $parameters
      * @return \Closure
      */
-    public function wrap(Closure $callback, array $parameters = [])
+    public function wrap($callback, array $parameters = [])
     {
         return function () use ($callback, $parameters) {
             return $this->call($callback, $parameters);

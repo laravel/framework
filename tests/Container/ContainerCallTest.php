@@ -157,6 +157,12 @@ class ContainerCallTest extends TestCase
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertSame('taylor', $result[1]);
+
+        $wrapped = $container->wrap(ContainerTestCallStub::class.'@work', ['test' => 'me']);
+        $result = $wrapped();
+
+        $this->assertInstanceOf(Closure::class, $wrapped);
+        $this->assertSame('me', $result[0]);
     }
 
     public function testCallWithCallableObject()
