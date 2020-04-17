@@ -3612,6 +3612,15 @@ SQL;
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
+    public function testComment() {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->comment('This is a test comment');
+        $this->assertSame('-- This is a test comment'.PHP_EOL.' select * from "users"', $builder->toSql());
+
+        $builder->select('*')->from('users')->comment('This is a test comment')->comment('This overwrites comment');
+        $this->assertSame('-- This overwrites comment'.PHP_EOL.' select * from "users"', $builder->toSql());
+    }
+
     protected function getBuilder()
     {
         $grammar = new Grammar;
