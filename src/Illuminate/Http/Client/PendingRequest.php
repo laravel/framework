@@ -458,6 +458,10 @@ class PendingRequest
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
 
         if (isset($options[$this->bodyFormat])) {
+            if ($this->bodyFormat === 'multipart') {
+                $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
+            }
+
             $options[$this->bodyFormat] = array_merge(
                 $options[$this->bodyFormat], $this->pendingFiles
             );
@@ -629,5 +633,26 @@ class PendingRequest
         $this->stubCallbacks = collect($callback);
 
         return $this;
+    }
+
+
+    /**
+     * Parse multipart form data to allow for ['key' => 'value'] post data.
+     *
+     * @param array $data
+     *
+     * @return array|array[]
+     */
+    protected function parseMultipartBodyFormat(array $data)
+    {
+        return array_map(function ($value, $key) {
+            // If the value is an array Guzzle with throw an InvalidArgumentException,
+            // so this use case is the original way of sending data, e.g. [['name' => 'name', 'contents' => 'content']]
+            if (is_array($value)) {
+                return $value;
+            }
+
+            return ['name' => $key, 'contents' => $value];
+        }, $data, array_keys($data));
     }
 }
