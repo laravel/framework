@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
+use Illuminate\Routing\Middleware;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\Route;
@@ -2282,7 +2283,7 @@ class ExampleMiddleware implements ExampleMiddlewareContract
     }
 }
 
-class ExampleMiddlewareWithConstructorParam
+class ExampleMiddlewareWithConstructorParam extends Middleware
 {
     private $testParam;
 
