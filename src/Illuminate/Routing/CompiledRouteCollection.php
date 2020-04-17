@@ -293,7 +293,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             ), '/');
         }
 
-        return (new Route($attributes['methods'], $baseUri == '' ? '/' : $baseUri, $attributes['action']))
+        return $this->router->newRoute($attributes['methods'], $baseUri == '' ? '/' : $baseUri, $attributes['action'])
             ->setFallback($attributes['fallback'])
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
