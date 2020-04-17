@@ -1012,6 +1012,18 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testJsonWhereNullMysql() {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNull('items->id');
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is null OR json_type(json_extract(`items`, \'$."id"\')) = \'NULL\')', $builder->toSql());
+    }
+
+    public function testJsonWhereNotNullMysql() {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotNull('items->id');
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is not null AND json_type(json_extract(`items`, \'$."id"\')) != \'NULL\')', $builder->toSql());
+    }
+
     public function testArrayWhereNulls()
     {
         $builder = $this->getBuilder();
