@@ -116,7 +116,12 @@ class AuthAccessGateTest extends TestCase
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyThatAllowsGuests::class);
 
         $this->assertTrue($gate->check('edit', new AccessGateTestDummy));
-        $this->assertFalse($gate->check('update', new AccessGateTestDummy));
+        try {
+            $gate->check('update', new AccessGateTestDummy);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(\Illuminate\Auth\AuthenticationException::class, $e);
+        }
+        
         $this->assertTrue($_SERVER['__laravel.testBefore']);
 
         $gate = $this->getBasicGate();
@@ -140,7 +145,11 @@ class AuthAccessGateTest extends TestCase
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNonGuestBefore::class);
 
         $this->assertTrue($gate->check('edit', new AccessGateTestDummy));
-        $this->assertFalse($gate->check('update', new AccessGateTestDummy));
+        try {
+            $gate->check('update', new AccessGateTestDummy);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(\Illuminate\Auth\AuthenticationException::class, $e);
+        }
         $this->assertFalse($_SERVER['__laravel.testBefore']);
 
         unset($_SERVER['__laravel.testBefore']);

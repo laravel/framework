@@ -348,6 +348,7 @@ class Gate implements GateContract
      * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Auth\AuthenticationException
      */
     public function raw($ability, $arguments = [])
     {
@@ -688,6 +689,8 @@ class Gate implements GateContract
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $arguments
      * @return mixed
+     * 
+     * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function callPolicyMethod($policy, $method, $user, array $arguments)
     {
@@ -704,6 +707,10 @@ class Gate implements GateContract
 
         if ($this->canBeCalledWithUser($user, $policy, $method)) {
             return $policy->{$method}($user, ...$arguments);
+        }
+
+        if (!$user) {
+            throw new \Illuminate\Auth\AuthenticationException();
         }
     }
 
