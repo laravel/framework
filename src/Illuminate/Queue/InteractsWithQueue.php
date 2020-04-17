@@ -73,4 +73,14 @@ trait InteractsWithQueue
 
         return $this;
     }
+
+    /**
+     * Get the base queue job instance.
+     *
+     * @return \Illuminate\Contracts\Queue\Job
+     */
+    public function getJob()
+    {
+        return $this->job;
+    }
 }
