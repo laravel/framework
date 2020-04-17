@@ -3612,7 +3612,8 @@ SQL;
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
-    public function testComment() {
+    public function testComment()
+    {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->comment('This is a test comment');
         $this->assertSame('-- This is a test comment'.PHP_EOL.' select * from "users"', $builder->toSql());
