@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LogicException;
 
@@ -66,9 +67,15 @@ class Request implements ArrayAccess
             return ! empty($this->request->getHeaders()[$key]);
         }
 
+        $headers = $this->headers();
+
+        if (! Arr::has($headers, $key)) {
+            return false;
+        }
+
         $value = is_array($value) ? $value : [$value];
 
-        return empty(array_diff($value, $this->headers()[$key]));
+        return empty(array_diff($value, $headers[$key]));
     }
 
     /**
@@ -79,7 +86,7 @@ class Request implements ArrayAccess
      */
     public function header($key)
     {
-        return $this->headers()[$key];
+        return Arr::get($this->headers(), $key, []);
     }
 
     /**
@@ -188,7 +195,8 @@ class Request implements ArrayAccess
      */
     public function isJson()
     {
-        return Str::contains($this->header('Content-Type')[0], 'json');
+        return $this->hasHeader('Content-Type') &&
+               Str::contains($this->header('Content-Type')[0], 'json');
     }
 
     /**
@@ -198,7 +206,8 @@ class Request implements ArrayAccess
      */
     public function isMultipart()
     {
-        return Str::startsWith($this->header('Content-Type')[0], 'multipart');
+        return $this->hasHeader('Content-Type') &&
+               Str::contains($this->header('Content-Type')[0], 'multipart');
     }
 
     /**
