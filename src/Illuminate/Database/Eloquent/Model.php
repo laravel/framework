@@ -10,6 +10,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
@@ -1151,7 +1152,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         );
 
         $this->load(collect($this->relations)->reject(function ($relation) {
-            return $relation instanceof Pivot;
+            return $relation instanceof Pivot
+                || in_array(AsPivot::class, class_uses_recursive($relation), true);
         })->keys()->all());
 
         $this->syncOriginal();
