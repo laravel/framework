@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Access;
 
 use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
@@ -710,7 +711,7 @@ class Gate implements GateContract
         }
 
         if (! $user) {
-            throw new \Illuminate\Auth\AuthenticationException();
+            throw new AuthenticationException();
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -119,7 +120,7 @@ class AuthAccessGateTest extends TestCase
         try {
             $gate->check('update', new AccessGateTestDummy);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\Illuminate\Auth\AuthenticationException::class, $e);
+            $this->assertInstanceOf(AuthenticationException::class, $e);
         }
 
         $this->assertTrue($_SERVER['__laravel.testBefore']);
@@ -148,7 +149,7 @@ class AuthAccessGateTest extends TestCase
         try {
             $gate->check('update', new AccessGateTestDummy);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\Illuminate\Auth\AuthenticationException::class, $e);
+            $this->assertInstanceOf(AuthenticationException::class, $e);
         }
         $this->assertFalse($_SERVER['__laravel.testBefore']);
 
