@@ -121,7 +121,7 @@ class AuthAccessGateTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf(\Illuminate\Auth\AuthenticationException::class, $e);
         }
-        
+
         $this->assertTrue($_SERVER['__laravel.testBefore']);
 
         $gate = $this->getBasicGate();

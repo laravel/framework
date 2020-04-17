@@ -689,7 +689,7 @@ class Gate implements GateContract
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $arguments
      * @return mixed
-     * 
+     *
      * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function callPolicyMethod($policy, $method, $user, array $arguments)
@@ -709,7 +709,7 @@ class Gate implements GateContract
             return $policy->{$method}($user, ...$arguments);
         }
 
-        if (!$user) {
+        if (! $user) {
             throw new \Illuminate\Auth\AuthenticationException();
         }
     }
