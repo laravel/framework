@@ -482,7 +482,7 @@ class Builder
     {
         [$query, $bindings] = $this->createSub($query);
 
-        $expression = '('.$query.') as '.$this->grammar->wrapTable($as);
+        $expression = '('.$query.') '.$this->grammar->wrapTable($as);
 
         $this->addBinding($bindings, 'join');
 
