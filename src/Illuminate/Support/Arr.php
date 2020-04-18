@@ -390,6 +390,22 @@ class Arr
     }
 
     /**
+     * Run a map over each of the items.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function map($array, callable $callback)
+    {
+        $keys = array_keys($array);
+
+        $items = array_map($callback, $array, $keys);
+
+        return array_combine($keys, $items);
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array

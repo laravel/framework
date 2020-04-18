@@ -424,6 +424,15 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
     }
 
+    public function testMap()
+    {
+        $array = ['first' => 'taylor', 'last' => 'otwell'];
+        $array = Arr::map($array, function ($item, $key) {
+            return $key.'-'.strrev($item);
+        });
+        $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $array);
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
