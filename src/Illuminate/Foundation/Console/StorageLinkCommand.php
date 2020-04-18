@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class StorageLinkCommand extends Command
 {
@@ -32,9 +32,8 @@ class StorageLinkCommand extends Command
             if (file_exists($link)) {
                 $this->error("The [$link] link already exists.");
             } else {
-                if (! $this->option('absolute') && DIRECTORY_SEPARATOR == '/') {
-                    // Utilize Symfony's Request to find the relative path
-                    $target = Request::create($link)->getRelativeUriForPath($target);
+                if (! $this->option('absolute')) {
+                    $target = (new SymfonyFilesystem)->makePathRelative($target, dirname($link));
                 }
 
                 $this->laravel->make('files')->link($target, $link);
