@@ -446,6 +446,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('Мама мыла раму', Str::ucfirst('мама мыла раму'));
     }
 
+    public function testLcfirst()
+    {
+        $this->assertSame('laravel', Str::lcfirst('Laravel'));
+        $this->assertSame('laravel Framework', Str::lcfirst('Laravel Framework'));
+        $this->assertSame('mAMA', Str::lcfirst('MAMA'));
+        $this->assertSame('mама мыла раму', Str::lcfirst('Mама мыла раму'));
+    }
+
     public function testUuid()
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());

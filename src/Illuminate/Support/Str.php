@@ -674,6 +674,17 @@ class Str
     }
 
     /**
+     * Make a string's first character lowercase.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function lcfirst($string)
+    {
+        return static::lower(static::substr($string, 0, 1)).static::substr($string, 1);
+    }
+
+    /**
      * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface

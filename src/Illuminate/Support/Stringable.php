@@ -586,6 +586,16 @@ class Stringable
     }
 
     /**
+     * Make a string's first character lowercase.
+     *
+     * @return static
+     */
+    public function lcfirst()
+    {
+        return new static(Str::lcfirst($this->value));
+    }
+
+    /**
      * Execute the given callback if the string is empty.
      *
      * @param  callable  $callback
