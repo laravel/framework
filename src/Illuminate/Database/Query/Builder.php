@@ -3113,6 +3113,12 @@ class Builder
             return $this->dynamicWhere($method, $parameters);
         }
 
+        if (Str::startsWith($method, 'firstWhere')) {
+            $method = Str::of($method)->after('first', $method)->lcfirst();
+
+            return $this->dynamicWhere($method, $parameters)->first();
+        }
+
         static::throwBadMethodCallException($method);
     }
 }

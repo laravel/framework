@@ -2848,6 +2848,19 @@ SQL;
         $this->assertCount(2, $builder->wheres);
     }
 
+    public function testDynamicFirstWhere()
+    {
+        $builder = $this->getMockQueryBuilder();
+
+        $builder->getConnection()->shouldReceive('select');
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturn([]);
+        $builder->shouldReceive('first')->andReturn(['foo' => 'bar']);
+        $result = $builder->firstWhereFooAndBar('baz', 'qux');
+
+        $this->assertCount(2, $builder->wheres);
+        $this->assertEquals(['foo' => 'bar'], $result);
+    }
+
     public function testBuilderThrowsExpectedExceptionWithUndefinedMethod()
     {
         $this->expectException(BadMethodCallException::class);
