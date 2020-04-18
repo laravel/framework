@@ -424,6 +424,77 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
     }
 
+    public function testMapWithKeys()
+    {
+        $array = [
+            ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
+            ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
+            ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
+        ];
+        $array = Arr::mapWithKeys($array, function ($pokemon) {
+            return [$pokemon['name'] => $pokemon['type']];
+        });
+        $this->assertEquals(
+            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $array
+        );
+    }
+
+    public function testMapWithKeysIntegerKeys()
+    {
+        $array = [
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 3, 'name' => 'B'],
+            ['id' => 2, 'name' => 'C'],
+        ];
+        $array = Arr::mapWithKeys($array, function ($item) {
+            return [$item['id'] => $item];
+        });
+        $this->assertSame(
+            [1, 3, 2],
+            array_keys($array)
+        );
+    }
+
+    public function testMapWithKeysMultipleRows()
+    {
+        $array = [
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 3, 'name' => 'C'],
+        ];
+        $array = Arr::mapWithKeys($array, function ($item) {
+            return [$item['id'] => $item['name'], $item['name'] => $item['id']];
+        });
+        $this->assertSame(
+            [
+                1 => 'A',
+                'A' => 1,
+                2 => 'B',
+                'B' => 2,
+                3 => 'C',
+                'C' => 3,
+            ],
+            $array
+        );
+    }
+
+    public function testMapWithKeysCallbackKey()
+    {
+        $array = [
+            3 => ['id' => 1, 'name' => 'A'],
+            5 => ['id' => 3, 'name' => 'B'],
+            4 => ['id' => 2, 'name' => 'C'],
+        ];
+        $array = Arr::mapWithKeys($array, function ($item, $key) {
+            return [$key => $item['id']];
+        });
+        $this->assertSame(
+            [3, 5, 4],
+            array_keys($array)
+        );
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
