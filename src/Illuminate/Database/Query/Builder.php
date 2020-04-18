@@ -482,8 +482,12 @@ class Builder
     {
         [$query, $bindings] = $this->createSub($query);
 
-        $expression = '('.$query.') as '.$this->grammar->wrapTable($as);
-
+        if ( config('database.default') === 'oracle' ) {
+            $expression = '('.$query.') '.$this->grammar->wrapTable($as); 
+        } else {
+            $expression = '('.$query.') as '.$this->grammar->wrapTable($as);
+        }
+        
         $this->addBinding($bindings, 'join');
 
         return $this->join(new Expression($expression), $first, $operator, $second, $type, $where);
