@@ -686,7 +686,9 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardCallTo($this->getCollection(), $method, $parameters);
+        $result = $this->forwardCallTo($this->getCollection(), $method, $parameters);
+
+        return $result instanceof Collection ? $this->setCollection($result) : $result;
     }
 
     /**
