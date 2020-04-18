@@ -1,6 +1,34 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.6.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.6.2...7.x)
+
+### Added
+- Added ArrayAccess support for Http client get requests ([#32401](https://github.com/laravel/framework/pull/32401))
+- Added `Illuminate\Http\Client\Factory::assertSentCount()` ([#32407](https://github.com/laravel/framework/pull/32407))
+- Added `Illuminate\Database\Schema\Blueprint::rawIndex()` ([#32411](https://github.com/laravel/framework/pull/32411))
+- Added getGrammar into passthru in Eloquent builder ([#32412](https://github.com/laravel/framework/pull/32412))
+
+### Fixed
+- Fixed `MorphPivot::delete()` for models with primary key ([#32421](https://github.com/laravel/framework/pull/32421))
+
+### Changed
+- Re-use `Router::newRoute()` inside `CompiledRouteCollection` ([#32416](https://github.com/laravel/framework/pull/32416))
+- Make `Illuminate\Queue\InteractsWithQueue.php::$job` public ([2e272ee](https://github.com/laravel/framework/commit/2e272ee6df6ac22675a4645cac8b581017aac53f))
+
+
+## [v7.6.2 (2020-04-15)](https://github.com/laravel/framework/compare/v7.6.1...v7.6.2)
+
+### Added
+- Added `substrCount()` method to `Stringable` and `Str` ([#32393](https://github.com/laravel/framework/pull/32393))
+
+### Fixed
+- Fixed Lazyload `PackageManifest` ([#32391](https://github.com/laravel/framework/pull/32391))
+- Fixed email validator ([#32388](https://github.com/laravel/framework/pull/32388))
+- Fixed `Illuminate\Mail\Mailable::attachFromStorageDisk()` ([#32394](https://github.com/laravel/framework/pull/32394))
+
+### Changed
+- Changed `Illuminate\Translation\Translator::setLocale()` ([e78d24f](https://github.com/laravel/framework/commit/e78d24f31b84cd81c30b5d8837731d77ec089761), [a0094a5](https://github.com/laravel/framework/commit/a0094a57717b1f4c3e2a6feb978cc14f2c4690ff))
+- Changed `Illuminate\Mail\Mailable::attachData()` ([#32392](https://github.com/laravel/framework/pull/32392))
 
 
 ## [v7.6.1 (2020-04-14)](https://github.com/laravel/framework/compare/v7.6.0...v7.6.1)
