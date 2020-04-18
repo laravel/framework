@@ -228,6 +228,18 @@ class Arr
     }
 
     /**
+     * Map an array and flatten the result by a single level.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function flatMap($array, callable $callback)
+    {
+        return Collection::make($array)->flatMap($callback)->all();
+    }
+
+    /**
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array

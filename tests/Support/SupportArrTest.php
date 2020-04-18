@@ -246,6 +246,18 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], Arr::flatten($array, 2));
     }
 
+    public function testFlatMap()
+    {
+        $array = [
+            ['name' => 'taylor', 'hobbies' => ['programming', 'basketball']],
+            ['name' => 'adam', 'hobbies' => ['music', 'powerlifting']],
+        ];
+        $hobbies = Arr::flatMap($array, function ($person) {
+            return $person['hobbies'];
+        });
+        $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $hobbies);
+    }
+
     public function testGet()
     {
         $array = ['products.desk' => ['price' => 100]];
