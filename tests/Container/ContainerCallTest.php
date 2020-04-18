@@ -175,7 +175,7 @@ class ContainerCallTest extends TestCase
         $this->expectExceptionMessage('Unresolvable dependency resolving [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
 
         $container = new Container;
-        $container->call(ContainerTestCallStub::class . '@unresolvable');
+        $container->call(ContainerTestCallStub::class.'@unresolvable');
     }
 }
 
