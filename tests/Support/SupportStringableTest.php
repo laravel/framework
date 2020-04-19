@@ -24,6 +24,7 @@ class SupportStringableTest extends TestCase
 
     public function testIsEmpty()
     {
+        $this->assertTrue($this->stringable('')->isEmpty());
         $this->assertFalse($this->stringable('A')->isEmpty());
         $this->assertFalse($this->stringable('0')->isEmpty());
     }
