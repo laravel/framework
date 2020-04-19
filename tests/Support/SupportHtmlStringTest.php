@@ -7,17 +7,29 @@ use PHPUnit\Framework\TestCase;
 
 class SupportHtmlStringTest extends TestCase
 {
+    /**
+     * @param  string  $string
+     * @return \Illuminate\Support\HtmlString
+     */
+    protected function htmlString($string = '')
+    {
+        return new HtmlString($string);
+    }
+
+    public function testIsEmpty()
+    {
+        $this->assertTrue($this->htmlString('')->isEmpty());
+        $this->assertFalse($this->htmlString('A')->isEmpty());
+        $this->assertFalse($this->htmlString('0')->isEmpty());
+    }
+
     public function testToHtml()
     {
-        $str = '<h1>foo</h1>';
-        $html = new HtmlString('<h1>foo</h1>');
-        $this->assertEquals($str, $html->toHtml());
+        $this->assertSame('<h1>foo</h1>', $this->htmlString('<h1>foo</h1>')->toHtml());
     }
 
     public function testToString()
     {
-        $str = '<h1>foo</h1>';
-        $html = new HtmlString('<h1>foo</h1>');
-        $this->assertEquals($str, (string) $html);
+        $this->assertSame('<h1>foo</h1>', (string) $this->htmlString('<h1>foo</h1>'));
     }
 }
