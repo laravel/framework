@@ -286,11 +286,7 @@ class MailMessage extends SimpleMessage implements Renderable
         }
 
         foreach ($key as $arrayKey => $arrayValue) {
-            if (method_exists($this, $arrayKey)) {
-                $this->{$arrayKey}($arrayValue);
-            } else {
-                Arr::set($this->data, $arrayKey, $arrayValue);
-            }
+            Arr::set($this->data, $arrayKey, $arrayValue);
         }
     }
 
