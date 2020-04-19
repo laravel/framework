@@ -471,19 +471,7 @@ class PendingRequest
 
         return retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {
-                $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
-
-                $urlString = Str::of($url);
-
-                if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
-                    $laravelData = (string) $urlString->after('?');
-                }
-
-                if (is_string($laravelData)) {
-                    parse_str($laravelData, $parsedData);
-
-                    $laravelData = is_array($parsedData) ? $parsedData : [];
-                }
+                $laravelData = $this->parseRequestData($method, $url, $options);
 
                 return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
                     'laravel_data' => $laravelData,
@@ -502,6 +490,46 @@ class PendingRequest
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
         }, $this->retryDelay ?? 100);
+    }
+
+    /**
+     * Parse multi-part form data.
+     *
+     * @param  array  $data
+     * @return array|array[]
+     */
+    protected function parseMultipartBodyFormat(array $data)
+    {
+        return collect($data)->map(function ($value, $key) {
+            return is_array($value) ? $value : ['name' => $key, 'contents' => $value];
+        })->values()->all();
+    }
+
+    /**
+     * Get the request data as an array so that we can attach it to the request for convenient assertions.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return array
+     */
+    protected function parseRequestData($method, $url, array $options)
+    {
+        $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
+
+        $urlString = Str::of($url);
+
+        if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
+            $laravelData = (string) $urlString->after('?');
+        }
+
+        if (is_string($laravelData)) {
+            parse_str($laravelData, $parsedData);
+
+            $laravelData = is_array($parsedData) ? $parsedData : [];
+        }
+
+        return $laravelData;
     }
 
     /**
@@ -633,25 +661,5 @@ class PendingRequest
         $this->stubCallbacks = collect($callback);
 
         return $this;
-    }
-
-    /**
-     * Parse multipart form data to allow for ['key' => 'value'] post data.
-     *
-     * @param array $data
-     *
-     * @return array|array[]
-     */
-    protected function parseMultipartBodyFormat(array $data)
-    {
-        return array_map(function ($value, $key) {
-            // If the value is an array Guzzle with throw an InvalidArgumentException,
-            // so this use case is the original way of sending data, e.g. [['name' => 'name', 'contents' => 'content']]
-            if (is_array($value)) {
-                return $value;
-            }
-
-            return ['name' => $key, 'contents' => $value];
-        }, $data, array_keys($data));
     }
 }
