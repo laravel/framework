@@ -135,7 +135,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
      * @param  array  $config
      * @return string
      */
-    protected function getDsn(array $config)
+    public function getDsn(array $config)
     {
         // First we will create the basic DSN setup as well as the port if it is in
         // in the configuration options. This will give us the basic DSN we will

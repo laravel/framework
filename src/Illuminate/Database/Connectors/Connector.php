@@ -61,7 +61,7 @@ class Connector
      * @param  array  $options
      * @return \PDO
      */
-    protected function createPdoConnection($dsn, $username, $password, $options)
+    public function createPdoConnection($dsn, $username, $password, $options)
     {
         if (class_exists(PDOConnection::class) && ! $this->isPersistentConnection($options)) {
             return new PDOConnection($dsn, $username, $password, $options);

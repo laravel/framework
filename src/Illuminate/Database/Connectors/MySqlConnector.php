@@ -90,7 +90,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
      * @param  array  $config
      * @return string
      */
-    protected function getDsn(array $config)
+    public function getDsn(array $config)
     {
         return $this->hasSocket($config)
                             ? $this->getSocketDsn($config)
