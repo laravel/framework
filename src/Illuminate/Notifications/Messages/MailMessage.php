@@ -289,6 +289,7 @@ class MailMessage extends SimpleMessage implements Renderable
         foreach ($key as $arrayKey => $arrayValue) {
             Arr::set($this->viewData, $arrayKey, $arrayValue);
         }
+
         return $this;
     }
 
