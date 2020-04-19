@@ -320,7 +320,7 @@ trait ValidatesAttributes
      * @param  array  $parameters
      * @return bool
      */
-    public function validateArray($attribute, $value, $parameters)
+    public function validateArray($attribute, $value, $parameters = [])
     {
         if (! is_array($value)) {
             return false;
