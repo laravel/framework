@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Mail\Markdown;
+use Illuminate\Support\Arr;
 use Traversable;
 
 class MailMessage extends SimpleMessage implements Renderable
@@ -267,13 +268,27 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
-     * Get the data array for the mail message.
+     * Get/set the data array for the mail message.
      *
-     * @return array
+     * If an array is passed as the key, we will assume you want to set an array of values.
+     *
+     * @param  array|string|null  $key
+     * @param  mixed  $value
+     * @return mixed
      */
-    public function data()
+    public function data($key = null, $value = null)
     {
-        return array_merge($this->toArray(), $this->viewData);
+        if (is_null($key)) {
+            return array_merge($this->toArray(), $this->viewData);
+        }
+
+        if (! is_array($key)) {
+            $key = [$key => $value];
+        }
+
+        foreach ($key as $arrayKey => $arrayValue) {
+            Arr::set($this->viewData, $arrayKey, $arrayValue);
+        }
     }
 
     /**

@@ -86,4 +86,17 @@ class NotificationMailMessageTest extends TestCase
 
         $this->assertSame([$callback], $message->callbacks);
     }
+
+    public function testData() {
+        $message = new MailMessage();
+        $expect = $message->data();
+        $message->data('scalar', 'test');
+        $expect['scalar'] = 'test';
+        $this->assertEquals($expect, $message->data());
+
+        $message->data(['array1' => 1, 'array2' => 2]);
+        $expect['array1'] = 1;
+        $expect['array2'] = 2;
+        $this->assertEquals($expect, $message->data());
+    }
 }
