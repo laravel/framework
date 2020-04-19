@@ -46,7 +46,7 @@ class CreateCommand extends Command
 
         $pdo = $connector->createPdoConnection($dsnWithoudDbName, $username, $password, $connector->getOptions($config));
 
-        $pdo->exec('CREATE DATABASE `' . $config['database'] .'`');
+        $pdo->exec('CREATE DATABASE `'.$config['database'].'`');
 
         $this->info('Database created successfully!');
     }
