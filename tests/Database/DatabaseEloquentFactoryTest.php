@@ -191,10 +191,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $user = FactoryTestUserFactory::new()
                         ->hasAttached(
-                            FactoryTestRoleFactory::times(4)->afterCreating(function ($role, $user) {
-                                $_SERVER['__test.role.creating-role'] = $role;
-                                $_SERVER['__test.role.creating-user'] = $user;
-                            }),
+                            FactoryTestRoleFactory::times(4),
                             new Sequence(['admin' => 'Y'], ['admin' => 'N']),
                             'roles'
                         )
