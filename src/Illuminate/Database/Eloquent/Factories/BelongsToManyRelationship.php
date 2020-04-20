@@ -50,9 +50,11 @@ class BelongsToManyRelationship
      */
     public function createFor(Model $model)
     {
-        $model->{$this->relationship}()->attach(
-            $this->factory->create([], $model),
-            is_callable($this->pivot) ? call_user_func($this->pivot, $model) : $this->pivot
-        );
+        $this->factory->create([], $model)->each(function ($attachable) use ($model) {
+            $model->{$this->relationship}()->attach(
+                $attachable,
+                is_callable($this->pivot) ? call_user_func($this->pivot, $model) : $this->pivot
+            );
+        });
     }
 }

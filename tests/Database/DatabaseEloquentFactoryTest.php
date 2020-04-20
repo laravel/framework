@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
 
@@ -47,6 +48,18 @@ class DatabaseEloquentFactoryTest extends TestCase
             $table->foreignId('user_id');
             $table->string('title');
             $table->timestamps();
+        });
+
+        $this->schema()->create('roles', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        $this->schema()->create('role_user', function ($table) {
+            $table->foreignId('role_id');
+            $table->foreignId('user_id');
+            $table->string('admin')->default('N');
         });
     }
 
@@ -139,6 +152,65 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestPost::all());
     }
 
+    public function test_belongs_to_many_relationship()
+    {
+        $users = FactoryTestUserFactory::times(3)
+                        ->hasAttached(
+                            FactoryTestRoleFactory::times(3)->afterCreating(function ($role, $user) {
+                                $_SERVER['__test.role.creating-role'] = $role;
+                                $_SERVER['__test.role.creating-user'] = $user;
+                            }),
+                            ['admin' => 'Y'],
+                            'roles'
+                        )
+                        ->create();
+
+        $this->assertCount(9, FactoryTestRole::all());
+
+        $user = FactoryTestUser::latest()->first();
+
+        $this->assertCount(3, $user->roles);
+        $this->assertEquals('Y', $user->roles->first()->pivot->admin);
+
+        $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-role']);
+        $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-user']);
+
+        unset($_SERVER['__test.role.creating-role']);
+        unset($_SERVER['__test.role.creating-user']);
+    }
+
+    public function test_sequences()
+    {
+        $users = FactoryTestUserFactory::times(2)->sequence(
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Abigail Otwell'],
+        )->create();
+
+        $this->assertEquals('Taylor Otwell', $users[0]->name);
+        $this->assertEquals('Abigail Otwell', $users[1]->name);
+
+        $user = FactoryTestUserFactory::new()
+                        ->hasAttached(
+                            FactoryTestRoleFactory::times(4)->afterCreating(function ($role, $user) {
+                                $_SERVER['__test.role.creating-role'] = $role;
+                                $_SERVER['__test.role.creating-user'] = $user;
+                            }),
+                            new Sequence(['admin' => 'Y'], ['admin' => 'N']),
+                            'roles'
+                        )
+                        ->create();
+
+        $this->assertCount(4, $user->roles);
+
+        $this->assertCount(2, $user->roles->filter(function ($role) {
+            return $role->pivot->admin == 'Y';
+        }));
+
+        $this->assertCount(2, $user->roles->filter(function ($role) {
+            return $role->pivot->admin == 'N';
+        }));
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -180,6 +252,11 @@ class FactoryTestUser extends Eloquent
     {
         return $this->hasMany(FactoryTestPost::class, 'user_id');
     }
+
+    public function roles()
+    {
+        return $this->belongsToMany(FactoryTestRole::class, 'role_user', 'user_id', 'role_id')->withPivot('admin');
+    }
 }
 
 class FactoryTestPostFactory extends Factory
@@ -202,5 +279,27 @@ class FactoryTestPost extends Eloquent
     public function user()
     {
         return $this->belongsTo(FactoryTestUser::class, 'user_id');
+    }
+}
+
+class FactoryTestRoleFactory extends Factory
+{
+    protected $model = FactoryTestRole::class;
+
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name,
+        ];
+    }
+}
+
+class FactoryTestRole extends Eloquent
+{
+    protected $table = 'roles';
+
+    public function users()
+    {
+        return $this->belongsToMany(FactoryTestUser::class, 'role_user', 'role_id', 'user_id')->withPivot('admin');
     }
 }
