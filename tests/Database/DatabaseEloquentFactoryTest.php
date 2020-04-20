@@ -136,6 +136,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         }));
 
         $this->assertCount(1, FactoryTestUser::all());
+        $this->assertCount(3, FactoryTestPost::all());
     }
 
     /**
