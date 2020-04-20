@@ -41,6 +41,13 @@ class DatabaseEloquentFactoryTest extends TestCase
             $table->string('name');
             $table->timestamps();
         });
+
+        $this->schema()->create('posts', function ($table) {
+            $table->increments('id');
+            $table->foreignId('user_id');
+            $table->string('title');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -64,6 +71,71 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $users = FactoryTestUserFactory::times(10)->create();
         $this->assertCount(10, $users);
+    }
+
+    public function test_make_creates_unpersisted_model_instance()
+    {
+        $user = FactoryTestUserFactory::new()->make(['name' => 'Taylor Otwell']);
+
+        $this->assertInstanceOf(Eloquent::class, $user);
+        $this->assertEquals('Taylor Otwell', $user->name);
+        $this->assertCount(0, FactoryTestUser::all());
+    }
+
+    public function test_after_creating_and_making_callbacks_are_called()
+    {
+        $user = FactoryTestUserFactory::new()
+                        ->afterMaking(function ($user) {
+                            $_SERVER['__test.user.making'] = $user;
+                        })
+                        ->afterCreating(function ($user) {
+                            $_SERVER['__test.user.creating'] = $user;
+                        })
+                        ->create();
+
+        $this->assertSame($user, $_SERVER['__test.user.making']);
+        $this->assertSame($user, $_SERVER['__test.user.creating']);
+
+        unset($_SERVER['__test.user.making']);
+        unset($_SERVER['__test.user.creating']);
+    }
+
+    public function test_has_many_relationship()
+    {
+        $users = FactoryTestUserFactory::times(10)
+                        ->has(
+                            FactoryTestPostFactory::times(3)
+                                    // Test parents passed to callback...
+                                    ->afterCreating(function ($post, $user) {
+                                        $_SERVER['__test.post.creating-post'] = $post;
+                                        $_SERVER['__test.post.creating-user'] = $user;
+                                    }),
+                            'posts'
+                        )
+                        ->create();
+
+        $this->assertCount(10, FactoryTestUser::all());
+        $this->assertCount(30, FactoryTestPost::all());
+        $this->assertCount(3, FactoryTestUser::latest()->first()->posts);
+
+        $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.creating-post']);
+        $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.creating-user']);
+
+        unset($_SERVER['__test.post.creating-post']);
+        unset($_SERVER['__test.post.creating-user']);
+    }
+
+    public function test_belongs_to_relationship()
+    {
+        $posts = FactoryTestPostFactory::times(3)
+                        ->for(FactoryTestUserFactory::new(['name' => 'Taylor Otwell']), 'user')
+                        ->create();
+
+        $this->assertCount(3, $posts->filter(function ($post) {
+            return $post->user->name == 'Taylor Otwell';
+        }));
+
+        $this->assertCount(1, FactoryTestUser::all());
     }
 
     /**
@@ -102,4 +174,32 @@ class FactoryTestUserFactory extends Factory
 class FactoryTestUser extends Eloquent
 {
     protected $table = 'users';
+
+    public function posts()
+    {
+        return $this->hasMany(FactoryTestPost::class, 'user_id');
+    }
+}
+
+class FactoryTestPostFactory extends Factory
+{
+    protected $model = FactoryTestPost::class;
+
+    public function definition()
+    {
+        return [
+            'user_id' => FactoryTestUserFactory::new(),
+            'title' => $this->faker->name,
+        ];
+    }
+}
+
+class FactoryTestPost extends Eloquent
+{
+    protected $table = 'posts';
+
+    public function user()
+    {
+        return $this->belongsTo(FactoryTestUser::class, 'user_id');
+    }
 }
