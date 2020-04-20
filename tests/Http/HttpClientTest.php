@@ -394,4 +394,37 @@ class HttpClientTest extends TestCase
                 && $request['foo;bar; space test'] === 'laravel';
         });
     }
+
+    public function testCanConfirmManyHeaders()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders([
+                       'X-Test-Header' => 'foo',
+                       'X-Test-ArrayHeader' => ['bar', 'baz'],
+                   ]);
+        });
+    }
+
+    public function testCanConfirmManyHeadersUsingAString()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders('X-Test-Header');
+        });
+    }
 }

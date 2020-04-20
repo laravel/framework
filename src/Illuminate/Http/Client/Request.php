@@ -79,6 +79,27 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Determine if the request has the given headers.
+     *
+     * @param  array|string  $headers
+     * @return bool
+     */
+    public function hasHeaders($headers)
+    {
+        if (is_string($headers)) {
+            $headers = [$headers => null];
+        }
+
+        foreach ($headers as $key => $value) {
+            if (! $this -> hasHeader($key, $value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get the values for the header with the given name.
      *
      * @param  string  $key
