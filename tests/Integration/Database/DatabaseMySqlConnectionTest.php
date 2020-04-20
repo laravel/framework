@@ -95,15 +95,14 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
     public function jsonWhereNullDataProvider(): array
     {
         return [
-            //                                  exists?    key                  json
-            'key not exists'                 => [true,     'invalid'],
-            'key exists and null'            => [true,     'value',             ['value' => null]],
-            'key exists and "null"'          => [false,    'value',             ['value' => 'null']],
-            'key exists and not null'        => [false,    'value',             ['value' => false]],
-            'nested key not exists'          => [true,     'nested->invalid'],
-            'nested key exists and null'     => [true,     'nested->value',     ['nested' => ['value' => null]]],
-            'nested key exists and "null"'   => [false,    'nested->value',     ['nested' => ['value' => 'null']]],
-            'nested key exists and not null' => [false,    'nested->value',     ['nested' => ['value' => false]]],
+            'key not exists' => [true, 'invalid'],
+            'key exists and null' => [true, 'value', ['value' => null]],
+            'key exists and "null"' => [false, 'value', ['value' => 'null']],
+            'key exists and not null' => [false, 'value', ['value' => false]],
+            'nested key not exists' => [true, 'nested->invalid'],
+            'nested key exists and null' => [true, 'nested->value', ['nested' => ['value' => null]]],
+            'nested key exists and "null"' => [false, 'nested->value', ['nested' => ['value' => 'null']]],
+            'nested key exists and not null' => [false, 'nested->value', ['nested' => ['value' => false]]],
         ];
     }
 }
