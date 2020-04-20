@@ -739,7 +739,7 @@ class Container implements ArrayAccess, ContainerContract
      * Get the contextual concrete binding for the given abstract.
      *
      * @param  string  $abstract
-     * @return \Closure|string|null
+     * @return \Closure|string|array|null
      */
     protected function getContextualConcrete($abstract)
     {
@@ -870,9 +870,18 @@ class Container implements ArrayAccess, ContainerContract
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
-            $results[] = is_null($dependency->getClass())
+            $result = is_null($dependency->getClass())
                             ? $this->resolvePrimitive($dependency)
                             : $this->resolveClass($dependency);
+
+            // If this dependency is variadic the result will be an array but they will
+            // need to be unrolled so they look like additional results instead of a
+            // single result representing an array of items.
+            if ($dependency->isVariadic()) {
+                $results = array_merge($results, $result);
+            } else {
+                $results[] = $result;
+            }
         }
 
         return $results;
@@ -944,7 +953,28 @@ class Container implements ArrayAccess, ContainerContract
     protected function resolveClass(ReflectionParameter $parameter)
     {
         try {
-            return $this->make($parameter->getClass()->name);
+            // The default case is handled early and quickly so more complicated
+            // checks that apply only for variadic calls only run in cases
+            // where the parameter is actually variadic.
+            if (! $parameter->isVariadic()) {
+                return $this->make($parameter->getClass()->name);
+            }
+
+            $abstract = $this->getAlias($parameter->getClass()->name);
+            $concrete = $this->getContextualConcrete($abstract);
+
+            // If the concrete for a variadic is not an array we can treat it
+            // like other parameters and will assume making the parameter
+            // will result in an array.
+            if (! is_array($concrete)) {
+                return $this->make($parameter->getClass()->name);
+            }
+
+            // If the concrete for a variadic is an array, we call resolve on
+            // each value in the concrete array.
+            return array_map(function ($abstract) {
+                return $this->resolve($abstract);
+            }, $concrete);
         }
 
         // If we can not resolve the class instance, we will check to see if the value
@@ -953,6 +983,15 @@ class Container implements ArrayAccess, ContainerContract
         catch (BindingResolutionException $e) {
             if ($parameter->isDefaultValueAvailable()) {
                 return $parameter->getDefaultValue();
+            }
+
+            // The "default value" for variadic can never be null but PHP does not
+            // treat these parameters as having a default value. By returning an
+            // empty array for variadic values we can better emulate PHP
+            // runtime which will always result in an empty array if
+            // no values are present.
+            if ($parameter->isVariadic()) {
+                return [];
             }
 
             throw $e;
