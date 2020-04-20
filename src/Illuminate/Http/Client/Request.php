@@ -91,7 +91,7 @@ class Request implements ArrayAccess
         }
 
         foreach ($headers as $key => $value) {
-            if (! $this -> hasHeader($key, $value)) {
+            if (! $this->hasHeader($key, $value)) {
                 return false;
             }
         }
