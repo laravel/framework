@@ -22,6 +22,13 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('ù')->isAscii());
     }
 
+    public function testIsEmpty()
+    {
+        $this->assertTrue($this->stringable('')->isEmpty());
+        $this->assertFalse($this->stringable('A')->isEmpty());
+        $this->assertFalse($this->stringable('0')->isEmpty());
+    }
+
     public function testPluralStudly()
     {
         $this->assertSame('LaraCon', (string) $this->stringable('LaraCon')->pluralStudly(1));

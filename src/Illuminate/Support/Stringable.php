@@ -233,7 +233,7 @@ class Stringable
      */
     public function isEmpty()
     {
-        return empty($this->value);
+        return $this->value === '';
     }
 
     /**

@@ -458,6 +458,10 @@ class PendingRequest
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
 
         if (isset($options[$this->bodyFormat])) {
+            if ($this->bodyFormat === 'multipart') {
+                $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
+            }
+
             $options[$this->bodyFormat] = array_merge(
                 $options[$this->bodyFormat], $this->pendingFiles
             );
@@ -467,19 +471,7 @@ class PendingRequest
 
         return retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {
-                $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
-
-                $urlString = Str::of($url);
-
-                if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
-                    $laravelData = (string) $urlString->after('?');
-                }
-
-                if (is_string($laravelData)) {
-                    parse_str($laravelData, $parsedData);
-
-                    $laravelData = is_array($parsedData) ? $parsedData : [];
-                }
+                $laravelData = $this->parseRequestData($method, $url, $options);
 
                 return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
                     'laravel_data' => $laravelData,
@@ -498,6 +490,46 @@ class PendingRequest
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
         }, $this->retryDelay ?? 100);
+    }
+
+    /**
+     * Parse multi-part form data.
+     *
+     * @param  array  $data
+     * @return array|array[]
+     */
+    protected function parseMultipartBodyFormat(array $data)
+    {
+        return collect($data)->map(function ($value, $key) {
+            return is_array($value) ? $value : ['name' => $key, 'contents' => $value];
+        })->values()->all();
+    }
+
+    /**
+     * Get the request data as an array so that we can attach it to the request for convenient assertions.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return array
+     */
+    protected function parseRequestData($method, $url, array $options)
+    {
+        $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
+
+        $urlString = Str::of($url);
+
+        if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
+            $laravelData = (string) $urlString->after('?');
+        }
+
+        if (is_string($laravelData)) {
+            parse_str($laravelData, $parsedData);
+
+            $laravelData = is_array($parsedData) ? $parsedData : [];
+        }
+
+        return $laravelData;
     }
 
     /**

@@ -640,6 +640,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('raw')->once()->with('bar')->andReturn('foo');
 
         $this->assertSame('foo', $builder->raw('bar'));
+
+        $builder = $this->getBuilder();
+        $grammar = new Grammar();
+        $builder->getQuery()->shouldReceive('getGrammar')->once()->andReturn($grammar);
+        $this->assertSame($grammar, $builder->getGrammar());
     }
 
     public function testQueryScopes()
@@ -852,7 +857,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['larry', '90210', '90220', 'fooside dr', 29], $builder->getBindings());
     }
 
-    public function testHasWithContraintsAndJoinAndHavingInSubquery()
+    public function testHasWithConstraintsAndJoinAndHavingInSubquery()
     {
         $model = new EloquentBuilderTestModelParentStub;
         $builder = $model->where('bar', 'baz');

@@ -179,6 +179,46 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendMultipartDataWithSimplifiedParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'foo' => 'bar',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'foo' &&
+                $request[0]['contents'] === 'bar';
+        });
+    }
+
+    public function testCanSendMultipartDataWithBothSimplifiedAndExtendedParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'foo' => 'bar',
+            [
+                'name' => 'foobar',
+                'contents' => 'data',
+                'headers' => ['X-Test-Header' => 'foo'],
+            ],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'foo' &&
+                $request[0]['contents'] === 'bar' &&
+                $request[1]['name'] === 'foobar' &&
+                $request[1]['contents'] === 'data' &&
+                $request[1]['headers']['X-Test-Header'] === 'foo';
+        });
+    }
+
     public function testItCanSendToken()
     {
         $this->factory->fake();
@@ -352,6 +392,39 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo%3Bbar%3B%20space%20test=laravel'
                 && $request['foo;bar; space test'] === 'laravel';
+        });
+    }
+
+    public function testCanConfirmManyHeaders()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders([
+                       'X-Test-Header' => 'foo',
+                       'X-Test-ArrayHeader' => ['bar', 'baz'],
+                   ]);
+        });
+    }
+
+    public function testCanConfirmManyHeadersUsingAString()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders('X-Test-Header');
         });
     }
 }
