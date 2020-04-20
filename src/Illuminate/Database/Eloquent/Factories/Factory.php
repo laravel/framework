@@ -532,7 +532,7 @@ abstract class Factory
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected function newModel(array $attributes = [])
+    public function newModel(array $attributes = [])
     {
         $model = $this->modelName();
 

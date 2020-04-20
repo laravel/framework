@@ -50,6 +50,14 @@ class DatabaseEloquentFactoryTest extends TestCase
             $table->timestamps();
         });
 
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->foreignId('commentable_id');
+            $table->string('commentable_type');
+            $table->string('body');
+            $table->timestamps();
+        });
+
         $this->schema()->create('roles', function ($table) {
             $table->increments('id');
             $table->string('name');
@@ -150,6 +158,19 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $this->assertCount(1, FactoryTestUser::all());
         $this->assertCount(3, FactoryTestPost::all());
+    }
+
+    public function test_morph_to_relationship()
+    {
+        $posts = FactoryTestCommentFactory::times(3)
+                        ->for(FactoryTestPostFactory::new(['title' => 'Test Title']), 'commentable')
+                        ->create();
+
+        $this->assertEquals('Test Title', FactoryTestPost::first()->title);
+        $this->assertCount(3, FactoryTestPost::first()->comments);
+
+        $this->assertCount(1, FactoryTestPost::all());
+        $this->assertCount(3, FactoryTestComment::all());
     }
 
     public function test_belongs_to_many_relationship()
@@ -276,6 +297,35 @@ class FactoryTestPost extends Eloquent
     public function user()
     {
         return $this->belongsTo(FactoryTestUser::class, 'user_id');
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(FactoryTestComment::class, 'commentable');
+    }
+}
+
+class FactoryTestCommentFactory extends Factory
+{
+    protected $model = FactoryTestComment::class;
+
+    public function definition()
+    {
+        return [
+            'commentable_id' => FactoryTestPostFactory::new(),
+            'commentable_type' => FactoryTestPost::class,
+            'body' => $this->faker->name,
+        ];
+    }
+}
+
+class FactoryTestComment extends Eloquent
+{
+    protected $table = 'comments';
+
+    public function commentable()
+    {
+        return $this->morphTo();
     }
 }
 
