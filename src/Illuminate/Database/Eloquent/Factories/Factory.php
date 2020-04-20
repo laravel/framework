@@ -345,7 +345,7 @@ abstract class Factory
                 $attribute = $attribute($definition);
             }
 
-            if ($attribute instanceof Factory) {
+            if ($attribute instanceof self) {
                 return $attribute->create()->getKey();
             } elseif ($attribute instanceof Model) {
                 return $attribute->getKey();
@@ -367,8 +367,8 @@ abstract class Factory
             'states' => $this->states->concat([
                 is_callable($state) ? $state : function () use ($state) {
                     return $state;
-                }
-            ])
+                },
+            ]),
         ]);
     }
 
@@ -390,12 +390,12 @@ abstract class Factory
      * @param  string|null  $relationship
      * @return static
      */
-    public function has(Factory $factory, $relationship = null)
+    public function has(self $factory, $relationship = null)
     {
         return $this->newInstance([
             'has' => $this->has->concat([new Relationship(
                 $factory, $relationship ?: Str::camel(Str::plural(class_basename($factory->modelName())))
-            )])
+            )]),
         ]);
     }
 
@@ -407,14 +407,14 @@ abstract class Factory
      * @param  string|null  $relationship
      * @return static
      */
-    public function hasAttached(Factory $factory, $pivot = [], $relationship = null)
+    public function hasAttached(self $factory, $pivot = [], $relationship = null)
     {
         return $this->newInstance([
             'has' => $this->has->concat([new BelongsToManyRelationship(
                 $factory,
                 $pivot,
                 $relationship ?: Str::camel(Str::plural(class_basename($factory->modelName())))
-            )])
+            )]),
         ]);
     }
 
@@ -425,7 +425,7 @@ abstract class Factory
      * @param  string|null  $relationship
      * @return static
      */
-    public function for(Factory $factory, $relationship = null)
+    public function for(self $factory, $relationship = null)
     {
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
             $factory,
@@ -546,7 +546,7 @@ abstract class Factory
      */
     public function modelName()
     {
-        $resolver = static::$modelNameResolver ?: function (Factory $factory) {
+        $resolver = static::$modelNameResolver ?: function (self $factory) {
             return 'App\\'.Str::replaceLast('Factory', '', class_basename($factory));
         };
 

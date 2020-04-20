@@ -53,9 +53,9 @@ class BelongsToRelationship
 
         return $relationship instanceof MorphTo ? [
             $relationship->getMorphType() => (new $this->factory->model)->getMorphClass(),
-            $relationship->getForeignKeyName() => $this->resolver()
+            $relationship->getForeignKeyName() => $this->resolver(),
         ] : [
-            $relationship->getForeignKeyName() => $this->resolver()
+            $relationship->getForeignKeyName() => $this->resolver(),
         ];
     }
 
