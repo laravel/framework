@@ -15,6 +15,43 @@ class MySqlGrammar extends Grammar
     protected $operators = ['sounds like'];
 
     /**
+     * Add a "where null" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    protected function whereNull(Builder $query, $where)
+    {
+        if ($this->isJsonSelector($where['column'])) {
+            [$field, $path] = $this->wrapJsonFieldAndPath($where['column']);
+
+            return '(json_extract('.$field.$path.') is null OR json_type(json_extract('.$field.$path.')) = \'NULL\')';
+        }
+
+        return parent::whereNull($query, $where);
+    }
+
+    /**
+     * Add a "where not null" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @return $this
+     */
+    protected function whereNotNull(Builder $query, $where)
+    {
+        if ($this->isJsonSelector($where['column'])) {
+            [$field, $path] = $this->wrapJsonFieldAndPath($where['column']);
+
+            return '(json_extract('.$field.$path.') is not null AND json_type(json_extract('.$field.$path.')) != \'NULL\')';
+        }
+
+        return parent::whereNotNull($query, $where);
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -243,36 +280,5 @@ class MySqlGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_extract('.$field.$path.')';
-    }
-
-    protected function whereNull(Builder $query, $where)
-    {
-        if ($this->isJsonSelector($where['column'])) {
-            // In MySQL json_extract() returns different values
-            // * key not exist => SQL NULL
-            // * value is null => JSON NULL
-            //
-            // These values are not equal so we should use both checks
-            // "is null" and "json_type".
-            //
-            // https://bugs.mysql.com/bug.php?id=85755
-
-            [$field, $path] = $this->wrapJsonFieldAndPath($where['column']);
-
-            return '(json_extract('.$field.$path.') is null OR json_type(json_extract('.$field.$path.')) = \'NULL\')';
-        }
-
-        return parent::whereNull($query, $where);
-    }
-
-    protected function whereNotNull(Builder $query, $where)
-    {
-        if ($this->isJsonSelector($where['column'])) {
-            [$field, $path] = $this->wrapJsonFieldAndPath($where['column']);
-
-            return '(json_extract('.$field.$path.') is not null AND json_type(json_extract('.$field.$path.')) != \'NULL\')';
-        }
-
-        return parent::whereNotNull($query, $where);
     }
 }
