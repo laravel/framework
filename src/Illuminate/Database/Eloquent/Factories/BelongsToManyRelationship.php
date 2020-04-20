@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class BelongsToManyRelationship
 {
+    /**
+     * The related factory instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Factories\Factory
+     */
     protected $factory;
 
     /**
@@ -22,6 +27,14 @@ class BelongsToManyRelationship
      */
     protected $relationship;
 
+    /**
+     * Create a new attached relationship definition.
+     *
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
+     * @param  callable\array  $pivot
+     * @param  string  $relationship
+     * @return void
+     */
     public function __construct(Factory $factory, $pivot, $relationship)
     {
         $this->factory = $factory;

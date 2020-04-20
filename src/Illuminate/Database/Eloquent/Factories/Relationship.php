@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 
 class Relationship
 {
+    /**
+     * The related factory instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Factories\Factory
+     */
     protected $factory;
 
     /**
@@ -18,6 +23,13 @@ class Relationship
      */
     protected $relationship;
 
+    /**
+     * Create a new child relationship instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
+     * @param  string  $relationship
+     * @return void
+     */
     public function __construct(Factory $factory, $relationship)
     {
         $this->factory = $factory;

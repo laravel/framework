@@ -383,6 +383,13 @@ abstract class Factory
         return $this->state(new Sequence(...$sequence));
     }
 
+    /**
+     * Define a child relationship for the model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
+     * @param  string|null  $relationship
+     * @return static
+     */
     public function has(Factory $factory, $relationship = null)
     {
         return $this->newInstance([
@@ -392,6 +399,14 @@ abstract class Factory
         ]);
     }
 
+    /**
+     * Define an attached relationship for the model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
+     * @param  callable|array  $pivot
+     * @param  string|null  $relationship
+     * @return static
+     */
     public function hasAttached(Factory $factory, $pivot = [], $relationship = null)
     {
         return $this->newInstance([
@@ -403,6 +418,13 @@ abstract class Factory
         ]);
     }
 
+    /**
+     * Define a parent relationship for the model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
+     * @param  string|null  $relationship
+     * @return static
+     */
     public function for(Factory $factory, $relationship = null)
     {
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(

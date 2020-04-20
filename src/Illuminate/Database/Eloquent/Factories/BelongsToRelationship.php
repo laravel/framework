@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class BelongsToRelationship
 {
+    /**
+     * The related factory instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Factories\Factory
+     */
     protected $factory;
 
     /**
@@ -23,6 +28,13 @@ class BelongsToRelationship
      */
     protected $resolved;
 
+    /**
+     * Create a new "belongs to" relationship definition.
+     *
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
+     * @param  string  $relationship
+     * @return void
+     */
     public function __construct(Factory $factory, $relationship)
     {
         $this->factory = $factory;
