@@ -71,4 +71,38 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
 
         $this->assertEquals(self::FLOAT_VAL, DB::table(self::TABLE)->value(self::FLOAT_COL));
     }
+
+    /**
+     * @dataProvider jsonWhereNullDataProvider
+     */
+    public function testJsonWhereNull(bool $expected, string $key, array $value = ['value' => 123]): void
+    {
+        DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
+
+        $this->assertSame($expected, DB::table(self::TABLE)->whereNull(self::JSON_COL.'->'.$key)->exists());
+    }
+
+    /**
+     * @dataProvider jsonWhereNullDataProvider
+     */
+    public function testJsonWhereNotNull(bool $expected, string $key, array $value = ['value' => 123]): void
+    {
+        DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
+
+        $this->assertSame(! $expected, DB::table(self::TABLE)->whereNotNull(self::JSON_COL.'->'.$key)->exists());
+    }
+
+    public function jsonWhereNullDataProvider(): array
+    {
+        return [
+            'key not exists' => [true, 'invalid'],
+            'key exists and null' => [true, 'value', ['value' => null]],
+            'key exists and "null"' => [false, 'value', ['value' => 'null']],
+            'key exists and not null' => [false, 'value', ['value' => false]],
+            'nested key not exists' => [true, 'nested->invalid'],
+            'nested key exists and null' => [true, 'nested->value', ['nested' => ['value' => null]]],
+            'nested key exists and "null"' => [false, 'nested->value', ['nested' => ['value' => 'null']]],
+            'nested key exists and not null' => [false, 'nested->value', ['nested' => ['value' => false]]],
+        ];
+    }
 }
