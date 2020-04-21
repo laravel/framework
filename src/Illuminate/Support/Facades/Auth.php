@@ -53,7 +53,7 @@ class Auth extends Facade
     public static function routes(array $options = [])
     {
         if (! array_key_exists(UiServiceProvider::class, static::$app->getLoadedProviders())) {
-            throw new LogicException('Please install the laravel/ui package in order to use the Route::auth() method.');
+            throw new LogicException('Please install the laravel/ui package in order to use the Auth::routes() method.');
         }
 
         static::$app->make('router')->auth($options);
