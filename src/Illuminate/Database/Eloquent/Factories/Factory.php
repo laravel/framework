@@ -584,10 +584,10 @@ abstract class Factory
     public static function factoryForModel(string $modelName)
     {
         $resolver = static::$factoryNameResolver ?: function ($modelName) {
-            return static::$namespace.$modelName.'Factory';
+            return static::$namespace.Str::singular(class_basename($modelName)).'Factory';
         };
 
-        $factory = $resolver(Str::singular(class_basename($modelName)));
+        $factory = $resolver($modelName);
 
         return $factory::new();
     }
