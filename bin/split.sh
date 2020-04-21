@@ -22,6 +22,7 @@ remote auth git@github.com:illuminate/auth.git
 remote broadcasting git@github.com:illuminate/broadcasting.git
 remote bus git@github.com:illuminate/bus.git
 remote cache git@github.com:illuminate/cache.git
+remote collections git@github.com:illuminate/collections.git
 remote config git@github.com:illuminate/config.git
 remote console git@github.com:illuminate/console.git
 remote container git@github.com:illuminate/container.git
@@ -34,6 +35,7 @@ remote filesystem git@github.com:illuminate/filesystem.git
 remote hashing git@github.com:illuminate/hashing.git
 remote http git@github.com:illuminate/http.git
 remote log git@github.com:illuminate/log.git
+remote macroable git@github.com:illuminate/macroable.git
 remote mail git@github.com:illuminate/mail.git
 remote notifications git@github.com:illuminate/notifications.git
 remote pagination git@github.com:illuminate/pagination.git
@@ -52,6 +54,7 @@ split 'src/Illuminate/Auth' auth
 split 'src/Illuminate/Broadcasting' broadcasting
 split 'src/Illuminate/Bus' bus
 split 'src/Illuminate/Cache' cache
+split 'src/Illuminate/Collections' collections
 split 'src/Illuminate/Config' config
 split 'src/Illuminate/Console' console
 split 'src/Illuminate/Container' container
@@ -64,6 +67,7 @@ split 'src/Illuminate/Filesystem' filesystem
 split 'src/Illuminate/Hashing' hashing
 split 'src/Illuminate/Http' http
 split 'src/Illuminate/Log' log
+split 'src/Illuminate/Macroable' macroable
 split 'src/Illuminate/Mail' mail
 split 'src/Illuminate/Notifications' notifications
 split 'src/Illuminate/Pagination' pagination

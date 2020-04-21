@@ -1,16 +1,11 @@
 <?php
 
-namespace Illuminate\Support\Traits;
+namespace Illuminate\Collections;
 
 use CachingIterator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Enumerable;
-use Illuminate\Support\HigherOrderCollectionProxy;
-use Illuminate\Support\HigherOrderWhenProxy;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
@@ -46,9 +41,27 @@ trait EnumeratesValues
      * @var array
      */
     protected static $proxies = [
-        'average', 'avg', 'contains', 'each', 'every', 'filter', 'first',
-        'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
-        'reject', 'some', 'sortBy', 'sortByDesc', 'sum', 'unique', 'until',
+        'average',
+        'avg',
+        'contains',
+        'each',
+        'every',
+        'filter',
+        'first',
+        'flatMap',
+        'groupBy',
+        'keyBy',
+        'map',
+        'max',
+        'min',
+        'partition',
+        'reject',
+        'some',
+        'sortBy',
+        'sortByDesc',
+        'sum',
+        'unique',
+        'until',
     ];
 
     /**
@@ -732,7 +745,7 @@ trait EnumeratesValues
     /**
      * Collect the values into a collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function collect()
     {
