@@ -126,6 +126,11 @@ class DatabaseEloquentFactoryTest extends TestCase
         $users = FactoryTestUserFactory::times(10)
                         ->has(
                             FactoryTestPostFactory::times(3)
+                                    ->state(function ($attributes, $user) {
+                                        $_SERVER['__test.post.state-user'] = $user;
+
+                                        return [];
+                                    })
                                     // Test parents passed to callback...
                                     ->afterCreating(function ($post, $user) {
                                         $_SERVER['__test.post.creating-post'] = $post;
@@ -141,9 +146,11 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.creating-post']);
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.creating-user']);
+        $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.state-user']);
 
         unset($_SERVER['__test.post.creating-post']);
         unset($_SERVER['__test.post.creating-user']);
+        unset($_SERVER['__test.post.state-user']);
     }
 
     public function test_belongs_to_relationship()
