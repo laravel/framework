@@ -672,6 +672,23 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateArrayKeys()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rules = ['user' => 'array:name,username'];
+
+        $v = new Validator($trans, ['user' => ['name' => 'Duilio', 'username' => 'duilio']], $rules);
+        $this->assertTrue($v->passes());
+
+        // The array is valid if there's a missing key.
+        $v = new Validator($trans, ['user' => ['name' => 'Duilio']], $rules);
+        $this->assertTrue($v->passes());
+
+        // But it's not valid if there's an unexpected key.
+        $v = new Validator($trans, ['user' => ['name' => 'Duilio', 'username' => 'duilio', 'is_admin' => true]], $rules);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateFilled()
     {
         $trans = $this->getIlluminateArrayTranslator();
