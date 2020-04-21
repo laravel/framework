@@ -99,6 +99,19 @@ class ValidationException extends Exception
 
         return $this;
     }
+    
+    /**
+     * Set the message to be used for the response.
+     *
+     * @param string $message
+     * @return $this
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+
+        return $this;
+    }
 
     /**
      * Set the error bag on the exception.
