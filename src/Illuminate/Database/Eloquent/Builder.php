@@ -1129,6 +1129,33 @@ class Builder
     }
 
     /**
+     * Parse a list of relations into individuals.
+     *
+     * @param  array  $relations
+     * @return array
+     */
+    protected function parseWithSumRelations(array $relations)
+    {
+        $results = [];
+        
+        foreach ($relations as $name => $constraints) {
+            
+            // If the "name" value is a numeric key, we can assume that no constraints
+            // have been specified. We will just put an empty Closure there so that
+            // we can treat these all the same while we are looping through them.
+            if (is_numeric($name)) {
+                $name = $constraints;
+
+                [$name, $constraints] = [$name, static function () {}];
+            }
+            
+            $results[$name] = $constraints;
+        }
+
+        return $results;
+    }
+
+    /**
      * Create a constraint to select the given columns for the relation.
      *
      * @param  string  $name

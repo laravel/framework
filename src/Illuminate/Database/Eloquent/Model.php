@@ -78,6 +78,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     protected $withCount = [];
 
     /**
+     * The relationship sums that should be eager loaded on every query.
+     *
+     * @var array
+     */
+    protected $withSum = [];
+
+    /**
      * The number of models to return for pagination.
      *
      * @var int
@@ -543,6 +550,21 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         $relations = is_string($relations) ? func_get_args() : $relations;
 
         $this->newCollection([$this])->loadCount($relations);
+
+        return $this;
+    }
+
+    /**
+     * Eager load relation sums on the model.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadSum($relations)
+    {
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
+        $this->newCollection([$this])->loadSum($relations);
 
         return $this;
     }
@@ -1031,7 +1053,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         return $this->newModelQuery()
                     ->with($this->with)
-                    ->withCount($this->withCount);
+                    ->withCount($this->withCount)
+                    ->withSum($this->withSum);
     }
 
     /**

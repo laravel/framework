@@ -412,6 +412,65 @@ trait QueriesRelationships
     }
 
     /**
+     * Add subselect queries to sum of columns in the relations.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function withSum($relations)
+    {
+        if (empty($relations)) {
+            return $this;
+        }
+
+        if (is_null($this->query->columns)) {
+            $this->query->select([$this->query->from.'.*']);
+        }
+
+        $relations = is_array($relations) ? $relations : func_get_args();
+
+        foreach ($this->parseWithSumRelations($relations) as $name => $constraints) {
+
+            $nameExplode = explode(':', $name);
+            $name = $nameExplode[0];
+            $columns = isset($nameExplode[1]) ? explode(',', $nameExplode[1]) : [];
+
+            $relation = $this->getRelationWithoutConstraints($name);
+
+            // Here we will get the relationship sum query and prepare to add it to the main query
+            // as a sub-select. First, we'll get the "has" query and use that to get the relation
+            // sum query. We will normalize the relation name then append _{column}_sum as the name.
+            foreach ($columns as $column) {
+                
+                $query = $relation->getRelationExistenceSumQuery(
+                    $relation->getRelated()->newQuery(), $this, $column
+                );
+
+                $query->callScope($constraints);
+
+                $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
+
+                $query->orders = null;
+
+                $query->setBindings([], 'order');
+
+                if (count($query->columns) > 1) {
+                    $query->columns = [$query->columns[0]];
+
+                    $query->bindings['select'] = [];
+                }
+
+                // Finally we will add the proper result column alias to the query and run the subselect
+                // statement against the query builder. Then we will return the builder instance back
+                // to the developer for further constraint chaining that needs to take place on it.
+                $this->selectSub($query, Str::snake($name.'_'.$column.'_sum'));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Add the "has" condition where clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery

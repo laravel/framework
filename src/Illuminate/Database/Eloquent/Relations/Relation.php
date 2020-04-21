@@ -197,6 +197,20 @@ abstract class Relation
     }
 
     /**
+     * Add the constraints for a relationship sum of column query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationExistenceSumQuery(Builder $query, Builder $parentQuery, $column)
+    {
+        return $this->getRelationExistenceQuery(
+            $query, $parentQuery, new Expression('sum('.$column.')')
+        )->setBindings([], 'select');
+    }
+
+    /**
      * Add the constraints for an internal relationship existence query.
      *
      * Essentially, these queries compare on column names like whereColumn.
