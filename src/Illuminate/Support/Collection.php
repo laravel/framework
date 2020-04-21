@@ -13,7 +13,7 @@ class Collection extends BaseCollection
      */
     public function collect()
     {
-        return new Collection($this->all());
+        return new self($this->all());
     }
 
     /**
