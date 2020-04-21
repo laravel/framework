@@ -430,7 +430,6 @@ trait QueriesRelationships
         $relations = is_array($relations) ? $relations : func_get_args();
 
         foreach ($this->parseWithSumRelations($relations) as $name => $constraints) {
-
             $nameExplode = explode(':', $name);
             $name = $nameExplode[0];
             $columns = isset($nameExplode[1]) ? explode(',', $nameExplode[1]) : [];
@@ -441,7 +440,7 @@ trait QueriesRelationships
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // sum query. We will normalize the relation name then append _{column}_sum as the name.
             foreach ($columns as $column) {
-                
+
                 $query = $relation->getRelationExistenceSumQuery(
                     $relation->getRelated()->newQuery(), $this, $column
                 );
