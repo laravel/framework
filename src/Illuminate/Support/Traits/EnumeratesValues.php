@@ -46,9 +46,27 @@ trait EnumeratesValues
      * @var array
      */
     protected static $proxies = [
-        'average', 'avg', 'contains', 'each', 'every', 'filter', 'first',
-        'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
-        'reject', 'some', 'sortBy', 'sortByDesc', 'sum', 'unique', 'until',
+        'average',
+        'avg',
+        'contains',
+        'each',
+        'every',
+        'filter',
+        'first',
+        'flatMap',
+        'groupBy',
+        'keyBy',
+        'map',
+        'max',
+        'min',
+        'partition',
+        'reject',
+        'some',
+        'sortBy',
+        'sortByDesc',
+        'sum',
+        'unique',
+        'until',
     ];
 
     /**
