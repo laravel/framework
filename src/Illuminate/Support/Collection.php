@@ -4,6 +4,9 @@ namespace Illuminate\Support;
 
 use Illuminate\Collections\Collection as BaseCollection;
 
+/**
+ * @deprecated Will be removed in a future Laravel version.
+ */
 class Collection extends BaseCollection
 {
     /**

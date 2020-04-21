@@ -5,6 +5,9 @@ namespace Illuminate\Support;
 use Closure;
 use Illuminate\Collections\LazyCollection as BaseLazyCollection;
 
+/**
+ * @deprecated Will be removed in a future Laravel version.
+ */
 class LazyCollection extends BaseLazyCollection
 {
     /**
