@@ -128,7 +128,7 @@ abstract class Factory
     }
 
     /**
-     * Define the factory's default state.
+     * Define the model's default state.
      *
      * @return static
      */
