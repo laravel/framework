@@ -103,7 +103,7 @@ class ValidationException extends Exception
     /**
      * Set the message to be used for the response.
      *
-     * @param string $message
+     * @param  string  $message
      * @return $this
      */
     public function setMessage($message)
