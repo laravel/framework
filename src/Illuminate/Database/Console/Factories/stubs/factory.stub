@@ -1,12 +1,21 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use {{ namespacedModel }};
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-$factory->define({{ model }}::class, function (Faker $faker) {
-    return [
-        //
-    ];
-});
+class {{ model }}Factory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return static
+     */
+    public function definition()
+    {
+        return [
+            //
+        ];
+    }
+}
