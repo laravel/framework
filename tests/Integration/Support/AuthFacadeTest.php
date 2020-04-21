@@ -11,7 +11,7 @@ class AuthFacadeTest extends TestCase
     public function testItFailsIfTheUiPackageIsMissing()
     {
         $this->expectExceptionObject(new LogicException(
-            'Please install the laravel/ui package in order to use the Route::auth() method.'
+            'Please install the laravel/ui package in order to use the Auth::routes() method.'
         ));
 
         Auth::routes();
