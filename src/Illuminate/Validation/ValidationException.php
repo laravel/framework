@@ -99,7 +99,7 @@ class ValidationException extends Exception
 
         return $this;
     }
-    
+
     /**
      * Set the message to be used for the response.
      *
