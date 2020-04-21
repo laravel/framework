@@ -317,11 +317,20 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array  $parameters
      * @return bool
      */
-    public function validateArray($attribute, $value)
+    public function validateArray($attribute, $value, $parameters = [])
     {
-        return is_array($value);
+        if (! is_array($value)) {
+            return false;
+        }
+
+        if (empty($parameters)) {
+            return true;
+        }
+
+        return empty(array_diff_key($value, array_fill_keys($parameters, '')));
     }
 
     /**
