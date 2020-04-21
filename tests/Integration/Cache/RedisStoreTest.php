@@ -4,12 +4,12 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Tests\Integration\IntegrationTest;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
-class RedisStoreTest extends IntegrationTest
+class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
 
