@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class StorageLinkCommand extends Command
 {
@@ -11,7 +12,7 @@ class StorageLinkCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'storage:link';
+    protected $signature = 'storage:link {--absolute : Create links using absolute paths}';
 
     /**
      * The console command description.
@@ -31,6 +32,10 @@ class StorageLinkCommand extends Command
             if (file_exists($link)) {
                 $this->error("The [$link] link already exists.");
             } else {
+                if (! $this->option('absolute')) {
+                    $target = (new SymfonyFilesystem)->makePathRelative($target, dirname($link));
+                }
+
                 $this->laravel->make('files')->link($target, $link);
 
                 $this->info("The [$link] link has been connected to [$target].");
