@@ -1,19 +1,35 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.6.2...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.7.0...7.x)
+
+### Added
+- Allow developers to specify accepted keys in array rule ([#32452](https://github.com/laravel/framework/pull/32452))
+
+
+## [v7.7.0 (2020-04-21)](https://github.com/laravel/framework/compare/v7.6.2...v7.7.0)
 
 ### Added
 - Added ArrayAccess support for Http client get requests ([#32401](https://github.com/laravel/framework/pull/32401))
 - Added `Illuminate\Http\Client\Factory::assertSentCount()` ([#32407](https://github.com/laravel/framework/pull/32407))
 - Added `Illuminate\Database\Schema\Blueprint::rawIndex()` ([#32411](https://github.com/laravel/framework/pull/32411))
 - Added getGrammar into passthru in Eloquent builder ([#32412](https://github.com/laravel/framework/pull/32412))
+- Added `--relative` option to `storage:link` command ([#32457](https://github.com/laravel/framework/pull/32457), [24b705e](https://github.com/laravel/framework/commit/24b705e105d22df014bee3aab7ff12272457771e))
+- Added dynamic `column` key for foreign constraints ([#32449](https://github.com/laravel/framework/pull/32449))
+- Added container support for variadic constructor arguments ([#32454](https://github.com/laravel/framework/pull/32454), [1dd6db3](https://github.com/laravel/framework/commit/1dd6db3f2f22b1c65d13b3cbd58561f69aa4b317))
+- Added `Illuminate\Http\Client\Request::hasHeaders()` ([#32462](https://github.com/laravel/framework/pull/32462))
 
 ### Fixed
 - Fixed `MorphPivot::delete()` for models with primary key ([#32421](https://github.com/laravel/framework/pull/32421))
+- Throw exception on missing required parameter on Container call method ([#32439](https://github.com/laravel/framework/pull/32439), [44c2a8d](https://github.com/laravel/framework/commit/44c2a8dc527f87f5a7fc59058df0f874a23449fa))
+- Fixed Http Client multipart request ([#32428](https://github.com/laravel/framework/pull/32428), [1f163d4](https://github.com/laravel/framework/commit/1f163d471b973b237772bb11cdcb994aadd3d530))
+- Fixed `Illuminate\Support\Stringable::isEmpty()` ([#32447](https://github.com/laravel/framework/pull/32447))
+- Fixed `whereNull`/`whereNotNull` for json in MySQL ([#32417](https://github.com/laravel/framework/pull/32417), [d3bb329](https://github.com/laravel/framework/commit/d3bb329ce40e716e8e92aa7c27a929be60511a97))
+- Fixed `Collection::orderBy()` with callable ([#32471](https://github.com/laravel/framework/pull/32471))
 
 ### Changed
 - Re-use `Router::newRoute()` inside `CompiledRouteCollection` ([#32416](https://github.com/laravel/framework/pull/32416))
 - Make `Illuminate\Queue\InteractsWithQueue.php::$job` public ([2e272ee](https://github.com/laravel/framework/commit/2e272ee6df6ac22675a4645cac8b581017aac53f))
+- Catch and report exceptions thrown during schedule run execution ([#32461](https://github.com/laravel/framework/pull/32461))
 
 
 ## [v7.6.2 (2020-04-15)](https://github.com/laravel/framework/compare/v7.6.1...v7.6.2)
