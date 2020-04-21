@@ -92,11 +92,11 @@ abstract class Factory
     protected static $modelNameResolver;
 
     /**
-     * The factory name resolver used by dynamic relationship methods.
+     * The factory name resolver.
      *
      * @var callable
      */
-    protected static $relationshipFactoryNameResolver;
+    protected static $factoryNameResolver;
 
     /**
      * Create a new factory instance.
@@ -576,14 +576,31 @@ abstract class Factory
     }
 
     /**
+     * Get a new factory instance for the given model name.
+     *
+     * @param  string  $modelName
+     * @return static
+     */
+    public static function factoryForModel(string $modelName)
+    {
+        $resolver = static::$factoryNameResolver ?: function ($modelName) {
+            return static::$namespace.$modelName.'Factory';
+        };
+
+        $factory = $resolver(Str::singular(class_basename($modelName)));
+
+        return $factory::new();
+    }
+
+    /**
      * Specify the callback that should be invoked to guess factory names based on dynamic relationship names.
      *
      * @param  callable  $callback
      * @return void
      */
-    public static function guessFactoryNamesForRelationshipsUsing(callable $callback)
+    public static function guessFactoryNamesUsing(callable $callback)
     {
-        static::$relationshipFactoryNameResolver = $callback;
+        static::$factoryNameResolver = $callback;
     }
 
     /**
@@ -609,17 +626,13 @@ abstract class Factory
             static::throwBadMethodCallException($method);
         }
 
-        $resolver = static::$relationshipFactoryNameResolver ?: function ($name) {
-            return static::$namespace.$name.'Factory';
-        };
-
-        $factory = $resolver(Str::singular(Str::substr($method, 3)));
+        $factory = static::factoryForModel(Str::singular(Str::substr($method, 3)));
 
         if (Str::startsWith($method, 'for')) {
-            return $this->for($factory::new()->state($parameters[0] ?? []));
+            return $this->for($factory->state($parameters[0] ?? []));
         } elseif (Str::startsWith($method, 'has')) {
             return $this->has(
-                $factory::new()
+                $factory
                     ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : 1)
                     ->state(is_array($parameters[0] ?? null) ? $parameters[0] : ($parameters[1] ?? []))
             );
