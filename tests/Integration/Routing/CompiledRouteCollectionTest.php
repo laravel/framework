@@ -7,11 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
-use Illuminate\Tests\Integration\IntegrationTest;
+use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class CompiledRouteCollectionTest extends IntegrationTest
+/**
+ * @group integration
+ */
+class CompiledRouteCollectionTest extends TestCase
 {
     /**
      * @var \Illuminate\Routing\RouteCollection
