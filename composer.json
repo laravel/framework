@@ -33,7 +33,6 @@
         "swiftmailer/swiftmailer": "^6.0",
         "symfony/console": "^5.0",
         "symfony/error-handler": "^5.0",
-        "symfony/filesystem": "^5.0",
         "symfony/finder": "^5.0",
         "symfony/http-foundation": "^5.0",
         "symfony/http-kernel": "^5.0",
@@ -138,6 +137,7 @@
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^5.0).",
+        "symfony/filesystem": "Required to create relative storage directory symbolic links (^5.0).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
         "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
     },
