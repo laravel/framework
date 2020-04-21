@@ -121,7 +121,7 @@ trait InteractsWithDatabase
      * @param  array|string  $class
      * @return $this
      */
-    public function seed($class = 'DatabaseSeeder')
+    public function seed($class = 'Database\\Seeders\\DatabaseSeeder')
     {
         foreach (Arr::wrap($class) as $class) {
             $this->artisan('db:seed', ['--class' => $class, '--no-interaction' => true]);

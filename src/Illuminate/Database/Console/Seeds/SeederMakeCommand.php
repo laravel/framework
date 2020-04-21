@@ -30,27 +30,6 @@ class SeederMakeCommand extends GeneratorCommand
     protected $type = 'Seeder';
 
     /**
-     * The Composer instance.
-     *
-     * @var \Illuminate\Support\Composer
-     */
-    protected $composer;
-
-    /**
-     * Create a new command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Support\Composer  $composer
-     * @return void
-     */
-    public function __construct(Filesystem $files, Composer $composer)
-    {
-        parent::__construct($files);
-
-        $this->composer = $composer;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return void
@@ -58,8 +37,6 @@ class SeederMakeCommand extends GeneratorCommand
     public function handle()
     {
         parent::handle();
-
-        $this->composer->dumpAutoloads();
     }
 
     /**
@@ -93,7 +70,11 @@ class SeederMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        return $this->laravel->databasePath().'/seeds/'.$name.'.php';
+        if (is_dir($this->laravel->databasePath().'/seeds')) {
+            return $this->laravel->databasePath().'/seeds/'.$name.'.php';
+        } else {
+            return $this->laravel->databasePath().'/seeders/'.$name.'.php';
+        }
     }
 
     /**
