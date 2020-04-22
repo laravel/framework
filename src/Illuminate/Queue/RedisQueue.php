@@ -79,6 +79,25 @@ class RedisQueue extends Queue implements QueueContract
     }
 
     /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param  array  $jobs
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return void
+     */
+    public function bulk($jobs, $data = '', $queue = null)
+    {
+        $this->getConnection()->pipeline(function () use ($jobs, $data, $queue) {
+            $this->getConnection()->transaction(function () use ($jobs, $data, $queue) {
+                foreach ((array) $jobs as $job) {
+                    $this->push($job, $data, $queue);
+                }
+            });
+        });
+    }
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  object|string  $job
