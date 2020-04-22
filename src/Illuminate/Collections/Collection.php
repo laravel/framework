@@ -1206,6 +1206,32 @@ class Collection implements ArrayAccess, Enumerable
         return new static($this->lazy()->takeWhile($value)->all());
     }
 
+    /*
+     * Get an item and pack it as another collection.
+     *
+     * @param  string  $key
+     * @param  array|null  $allowedKeys
+     * @return static
+     */
+    public function pack($key, array $allowedKeys = null)
+    {
+        return (new static($this->get($key)))->only($allowedKeys);
+    }
+
+    /**
+     * Get an array of items and pack them as individual collections.
+     *
+     * @param  string  $key
+     * @param  array|null  $allowedKeys
+     * @return static
+     */
+    public function packAll($key, array $allowedKeys = null)
+    {
+        return $this->pack($key)->map(function ($item) use ($key, $allowedKeys) {
+            return (new static($item))->only($allowedKeys);
+        });
+    }
+
     /**
      * Transform each item in the collection using a callback.
      *

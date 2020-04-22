@@ -1666,6 +1666,79 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['taylor', 'dayle'], $data->all());
     }
 
+    public function testPackData()
+    {
+        $data = [
+            'settings' => [
+                'registrations' => 1,
+            ],
+        ];
+
+        $collection = new Collection($data);
+
+        $this->assertInstanceOf(Collection::class, $collection->pack('settings'));
+        $this->assertSame(['registrations' => 1], $collection->pack('settings')->all());
+    }
+
+    public function testPackDataWithSpecificKeys()
+    {
+        $data = [
+            'user' => [
+                'name' => 'Duilio',
+                'email' => 'duilio@example.com',
+                'is_admin' => 'true',
+            ],
+        ];
+
+        $collection = new Collection($data);
+
+        $expected = [
+            'name' => 'Duilio',
+            'email' => 'duilio@example.com',
+        ];
+        $this->assertSame($expected, $collection->pack('user', ['name', 'email'])->all());
+    }
+
+    public function testPackAllData()
+    {
+        $data = [
+            'posts' => [
+                ['title' => 'Laravel 8 released!'],
+                ['title' => 'New Collections component'],
+            ]
+        ];
+
+        $collection = new Collection($data);
+
+        $posts = $collection->packAll('posts');
+
+        $this->assertSame(['title' => 'Laravel 8 released!'], $posts->first()->all());
+        $this->assertSame(['title' => 'New Collections component'], $posts->last()->all());
+    }
+
+    public function testPackAllDataWithSpecificKeys()
+    {
+        $data = [
+            'posts' => [
+                [
+                    'id' => 123,
+                    'title' => 'Laravel 8 released!'
+                ],
+                [
+                    'title' => 'New Collections component',
+                    'status' => 'published'
+                ],
+            ]
+        ];
+
+        $collection = new Collection($data);
+
+        $posts = $collection->packAll('posts', ['title']);
+
+        $this->assertSame(['title' => 'Laravel 8 released!'], $posts->first()->all());
+        $this->assertSame(['title' => 'New Collections component'], $posts->last()->all());
+    }
+
     public function testPut()
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
