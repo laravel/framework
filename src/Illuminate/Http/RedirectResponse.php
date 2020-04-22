@@ -157,7 +157,7 @@ class RedirectResponse extends BaseRedirectResponse
         $this->withoutFragmentIdentifier();
 
         // Strip superfluous "#" from the beginning of the fragment identifier
-        $fragmentIdentifier = preg_replace('/^#/', '', $fragmentIdentifier);
+        $fragmentIdentifier = Str::after($fragmentIdentifier, '#');
 
         return $this->setTargetUrl($this->getTargetUrl()."#$fragmentIdentifier");
     }
@@ -169,7 +169,7 @@ class RedirectResponse extends BaseRedirectResponse
      */
     public function withoutFragmentIdentifier()
     {
-        return $this->setTargetUrl(explode('#', $this->getTargetUrl(), 2)[0]);
+        return $this->setTargetUrl(Str::before($this->getTargetUrl(), '#'));
     }
 
     /**
