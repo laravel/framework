@@ -1185,26 +1185,26 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-      * Take items in the collection until the given condition is met.
-      *
-      * @param  mixed  $key
-      * @return static
-      */
-     public function takeUntil($value)
-     {
-         return new static($this->lazy()->takeUntil($value)->all());
-     }
+     * Take items in the collection until the given condition is met.
+     *
+     * @param  mixed  $key
+     * @return static
+     */
+    public function takeUntil($value)
+    {
+        return new static($this->lazy()->takeUntil($value)->all());
+    }
 
-     /**
-      * Take items in the collection while the given condition is met.
-      *
-      * @param  mixed  $key
-      * @return static
-      */
-     public function takeWhile($value)
-     {
-         return new static($this->lazy()->takeWhile($value)->all());
-     }
+    /**
+     * Take items in the collection while the given condition is met.
+     *
+     * @param  mixed  $key
+     * @return static
+     */
+    public function takeWhile($value)
+    {
+        return new static($this->lazy()->takeWhile($value)->all());
+    }
 
     /**
      * Transform each item in the collection using a callback.
