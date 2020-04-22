@@ -415,7 +415,7 @@ class Collection implements ArrayAccess, Enumerable
             return $this->items[$key];
         }
 
-        return value($default);
+        return Util::value($default);
     }
 
     /**
