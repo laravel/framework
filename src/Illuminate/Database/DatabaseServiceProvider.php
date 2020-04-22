@@ -77,12 +77,6 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->app->singleton(FakerGenerator::class, function ($app, $parameters) {
             return FakerFactory::create($parameters['locale'] ?? $app['config']->get('app.faker_locale', 'en_US'));
         });
-
-        $this->app->singleton(EloquentFactory::class, function ($app) {
-            return EloquentFactory::construct(
-                $app->make(FakerGenerator::class), $this->app->databasePath('factories')
-            );
-        });
     }
 
     /**
