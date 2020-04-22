@@ -989,6 +989,40 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testTakeUntilIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->takeUntil(INF);
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->takeUntil(10)->all();
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->takeUntil(function ($item) {
+                return $item === 10;
+            })->all();
+        });
+    }
+
+    public function testTakeWhileIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->takeWhile(0);
+        });
+
+        $this->assertEnumerates(1, function ($collection) {
+            $collection->takeWhile(0)->all();
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->takeWhile(function ($item) {
+                return $item < 10;
+            })->all();
+        });
+    }
+
     public function testTapDoesNotEnumerate()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
@@ -1097,23 +1131,6 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             $collection->unlessNotEmpty(function ($collection) {
                 // Silence is golden!
             });
-        });
-    }
-
-    public function testUntilIsLazy()
-    {
-        $this->assertDoesNotEnumerate(function ($collection) {
-            $collection->until(INF);
-        });
-
-        $this->assertEnumerates(10, function ($collection) {
-            $collection->until(10)->all();
-        });
-
-        $this->assertEnumerates(10, function ($collection) {
-            $collection->until(function ($item) {
-                return $item === 10;
-            })->all();
         });
     }
 

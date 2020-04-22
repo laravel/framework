@@ -737,17 +737,6 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Take items in the collection until the given condition is met.
-     *
-     * @param  mixed  $key
-     * @return static
-     */
-    public function until($value)
-    {
-        return new static($this->lazy()->until($value)->all());
-    }
-
-    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param  int  $step
@@ -1194,6 +1183,28 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         return $this->slice(0, $limit);
+    }
+
+    /**
+     * Take items in the collection until the given condition is met.
+     *
+     * @param  mixed  $key
+     * @return static
+     */
+    public function takeUntil($value)
+    {
+        return new static($this->lazy()->takeUntil($value)->all());
+    }
+
+    /**
+     * Take items in the collection while the given condition is met.
+     *
+     * @param  mixed  $key
+     * @return static
+     */
+    public function takeWhile($value)
+    {
+        return new static($this->lazy()->takeWhile($value)->all());
     }
 
     /**
