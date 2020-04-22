@@ -146,6 +146,33 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
+     * Add fragment identifier to the url.
+     *
+     * @param  string $fragmentIdentifier
+     * @return $this
+     */
+    public function withFragmentIdentifier(string $fragmentIdentifier)
+    {
+        // Remove any existing fragment identifier
+        $this->withoutFragmentIdentifier();
+
+        // Strip superfluous "#" from the beginning of the fragment identifier
+        $fragmentIdentifier = preg_replace('/^#/', '', $fragmentIdentifier);
+
+        return $this->setTargetUrl($this->getTargetUrl() . "#$fragmentIdentifier");
+    }
+
+    /**
+     * Remove any fragment identifier from the response url.
+     *
+     * @return $this
+     */
+    public function withoutFragmentIdentifier()
+    {
+        return $this->setTargetUrl(explode('#', $this->getTargetUrl(), 2)[0]);
+    }
+
+    /**
      * Parse the given errors into an appropriate value.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
