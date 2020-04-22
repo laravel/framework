@@ -1705,7 +1705,7 @@ class SupportCollectionTest extends TestCase
             'posts' => [
                 ['title' => 'Laravel 8 released!'],
                 ['title' => 'New Collections component'],
-            ]
+            ],
         ];
 
         $collection = new Collection($data);
@@ -1722,13 +1722,13 @@ class SupportCollectionTest extends TestCase
             'posts' => [
                 [
                     'id' => 123,
-                    'title' => 'Laravel 8 released!'
+                    'title' => 'Laravel 8 released!',
                 ],
                 [
                     'title' => 'New Collections component',
-                    'status' => 'published'
+                    'status' => 'published',
                 ],
-            ]
+            ],
         ];
 
         $collection = new Collection($data);
