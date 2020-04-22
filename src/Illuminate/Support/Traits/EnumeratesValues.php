@@ -65,6 +65,8 @@ trait EnumeratesValues
         'sortBy',
         'sortByDesc',
         'sum',
+        'takeUntil',
+        'takeWhile',
         'unique',
         'until',
     ];
@@ -720,6 +722,19 @@ trait EnumeratesValues
     public function uniqueStrict($key = null)
     {
         return $this->unique($key, true);
+    }
+
+    /**
+     * Take items in the collection until the given condition is met.
+     *
+     * This is an alias to the "takeUntil" method.
+     *
+     * @param  mixed  $key
+     * @return static
+     */
+    public function until($value)
+    {
+        return $this->takeUntil($value);
     }
 
     /**
