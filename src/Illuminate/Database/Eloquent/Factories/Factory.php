@@ -24,7 +24,7 @@ abstract class Factory
     /**
      * The number of models that should be generated.
      *
-     * @var string
+     * @var int|null
      */
     protected $count;
 
