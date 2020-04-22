@@ -189,29 +189,27 @@ trait Queueable
     }
 
     /**
-     * Return the batch object.
+     * Return the batch.
      *
-     * @return object|null
+     * @return \Illuminate\Queue\ExistingBatch|null
      */
     public function batch()
     {
-        if (! $this->batchId ||
-            ! $batch = app('cache')->get('batch_'.$this->batchId)) {
-            return;
-        }
-
-        return json_decode($batch);
+        return Batch::find($this->batchId);
     }
 
     /**
-     * Remove the batch from the cache store.
+     * Determine if the batch is still active.
      *
-     * @return void
+     * @return bool
      */
-    public function finishBatch()
+    public function batchIsActive()
     {
-        app('cache')->forget('batch_'.$this->batchId.'_counter');
-        app('cache')->forget('batch_'.$this->batchId);
+        if (! $batch = Batch::find($this->batchId)) {
+            return false;
+        }
+
+        return ! $batch->hasFailed();
     }
 
     /**
@@ -225,10 +223,7 @@ trait Queueable
             return;
         }
 
-        // Here we decrement the counter of remaining jobs and invoke the success
-        // callback if there aren't any remaining jobs. We also mark the batch
-        // as finished so it's removed from the cache store.
-        $this->handleFinishedJob($batch);
+        $batch->countJob();
     }
 
     /**
@@ -242,33 +237,6 @@ trait Queueable
             return;
         }
 
-        if ($batch->allowFailure) {
-            return $this->handleFinishedJob($batch);
-        }
-
-        // If the batch doesn't allow failure, we'll mark it as finished to remove
-        // it from store. We'll also call the failure callback if defined.
-        $this->finishBatch();
-
-        if ($batch->failure) {
-            app()->call(unserialize($batch->failure)->getClosure());
-        }
-    }
-
-    /**
-     * Handle a finished batch job.
-     *
-     * @param  object  $batch
-     * @return void
-     */
-    public function handleFinishedJob($batch)
-    {
-        if (app('cache')->decrement('batch_'.$this->batchId.'_counter') == 0) {
-            $this->finishBatch();
-
-            if ($batch->success) {
-                app()->call(unserialize($batch->success)->getClosure());
-            }
-        }
+        $batch->failJob();
     }
 }

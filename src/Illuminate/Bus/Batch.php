@@ -2,6 +2,7 @@
 
 namespace Illuminate\Bus;
 
+use Illuminate\Queue\ExistingBatch;
 use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Str;
 
@@ -127,15 +128,17 @@ class Batch
     /**
      * Dispatch the batch to queue.
      *
-     * @return void
+     * @return string
      */
     public function dispatch()
     {
         $id = Str::uuid();
 
         app('cache')->put('batch_'.$id.'_counter', count($this->jobs), 3600);
+        app('cache')->put('batch_'.$id.'_failed', 0, 3600);
         app('cache')->put('batch_'.$id, json_encode([
             'allowFailure' => $this->allowFailure,
+            'size' => count($this->jobs),
             'success' => $this->callback ? serialize($this->callback) : null,
             'failure' => $this->failureCallback ? serialize($this->failureCallback) : null,
         ]), 3600);
@@ -147,6 +150,23 @@ class Batch
             $job->onQueue($job->queue ?: $this->queue);
 
             dispatch($job);
+        }
+
+        return $id;
+    }
+
+    /**
+     * Find an existing batch.
+     *
+     * @param  string  $id
+     * @return \Illuminate\Queue\ExistingBatch|null
+     */
+    public static function find($id)
+    {
+        try {
+            return new ExistingBatch($id);
+        } catch (\InvalidArgumentException $e) {
+
         }
     }
 }
