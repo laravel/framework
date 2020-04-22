@@ -181,5 +181,4 @@ class Good extends Model
             $builder->where('price', '>', 5);
         });
     }
-
 }
