@@ -40,9 +40,9 @@ class EloquentWithSumTest extends DatabaseTestCase
     public function testBasic()
     {
         $invoive = Invoice::create(['id' => 1, 'name' => 'text_name']);
-        for ($i=1;$i<11;$i++) {
-            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i+1]);
-            Good::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i+1]);
+        for ($i = 1; $i < 11; $i++) {
+            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i + 1]);
+            Good::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i + 1]);
         }
 
         $results = Invoice::withSum('items:price,price2');
@@ -55,13 +55,13 @@ class EloquentWithSumTest extends DatabaseTestCase
     public function testWithConditions()
     {
         $invoive = Invoice::create(['id' => 1, 'name' => 'text_name']);
-        for ($i=1;$i<11;$i++) {
-            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i+1]);
-            Good::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i+1]);
+        for ($i = 1; $i < 11; $i++) {
+            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i + 1]);
+            Good::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i + 1]);
         }
 
         $results = Invoice::withSum(['items:price', 'goods:price,price2' => function (Builder $query) {
-            $query->where('price','>',6);
+            $query->where('price', '>', 6);
         }]);
 
         $this->assertEquals([
@@ -72,8 +72,8 @@ class EloquentWithSumTest extends DatabaseTestCase
     public function testWithSelect()
     {
         $invoive = Invoice::create(['id' => 1, 'name' => 'text_name']);
-        for ($i=1;$i<11;$i++) {
-            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i+1]);
+        for ($i = 1; $i < 11; $i++) {
+            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i + 1]);
         }
 
         $results = Invoice::select(['id'])->withSum('items:price');
@@ -86,40 +86,36 @@ class EloquentWithSumTest extends DatabaseTestCase
     public function testLoadSum()
     {
         $invoive = Invoice::create(['id' => 1, 'name' => 'text_name']);
-        for ($i=1;$i<11;$i++) {
-            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i+1]);
+        for ($i = 1; $i < 11; $i++) {
+            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i + 1]);
         }
 
         $results = Invoice::first();
         $results->loadSum('items:price');
 
-        $this->assertEquals(
-            ['id' => 1, 'name' => 'text_name', 'items_price_sum' => 55]
-        , $results->toArray());
+        $this->assertEquals(['id' => 1, 'name' => 'text_name', 'items_price_sum' => 55], $results->toArray());
     }
 
     public function testLoadSumWithConditions()
     {
         $invoive = Invoice::create(['id' => 1, 'name' => 'text_name']);
-        for ($i=1;$i<11;$i++) {
-            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i+1]);
+        for ($i = 1; $i < 11; $i++) {
+            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i + 1]);
         }
 
         $results = Invoice::first();
-        $results->loadSum(['items:price' => function (Builder $query) {
+        $results->loadSum(['items:price' => function ($query) {
             $query->where('price', '>', 5);
         }]);
 
-        $this->assertEquals(
-            ['id' => 1, 'name' => 'text_name', 'items_price_sum' => 40]
-        , $results->toArray());
+        $this->assertEquals(['id' => 1, 'name' => 'text_name', 'items_price_sum' => 40], $results->toArray());
     }
 
     public function testGlobalScopes()
     {
         $invoive = Invoice::create(['id' => 1, 'name' => 'text_name']);
-        for ($i=1;$i<11;$i++) {
-            Good::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i+1]);
+        for ($i = 1; $i < 11; $i++) {
+            Good::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i + 1]);
         }
 
         $result = Invoice::withSum('goods:price')->first();
@@ -132,8 +128,8 @@ class EloquentWithSumTest extends DatabaseTestCase
     public function testSortingScopes()
     {
         $invoive = Invoice::create(['id' => 1, 'name' => 'text_name']);
-        for ($i=1;$i<11;$i++) {
-            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i+1]);
+        for ($i = 1; $i < 11; $i++) {
+            Item::create(['invoice_id' => $invoive->id, 'price' => $i, 'price2' => $i + 1]);
         }
 
         $result = Invoice::withSum('items:price')->toSql();
