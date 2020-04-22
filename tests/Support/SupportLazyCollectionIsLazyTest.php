@@ -1100,6 +1100,23 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testUntilIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->until(INF);
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->until(10)->all();
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->until(function ($item) {
+                return $item === 10;
+            })->all();
+        });
+    }
+
     public function testUnwrapEnumeratesOne()
     {
         $this->assertEnumeratesOnce(function ($collection) {

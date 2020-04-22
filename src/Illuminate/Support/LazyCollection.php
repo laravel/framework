@@ -738,6 +738,27 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Take items in the collection until the given condition is met.
+     *
+     * @param  mixed  $key
+     * @return static
+     */
+    public function until($value)
+    {
+        $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
+
+        return new static(function () use ($callback) {
+            foreach ($this as $key => $item) {
+                if ($callback($item, $key)) {
+                    break;
+                }
+
+                yield $key => $item;
+            }
+        });
+    }
+
+    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param  int  $step
