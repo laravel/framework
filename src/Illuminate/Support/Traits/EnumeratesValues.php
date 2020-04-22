@@ -969,4 +969,17 @@ trait EnumeratesValues
             return data_get($item, $value);
         };
     }
+
+    /**
+     * Make a function to check an item's equality.
+     *
+     * @param  \Closure|mixed  $value
+     * @return \Closure
+     */
+    protected function equality($value)
+    {
+        return function ($item) use ($value) {
+            return $item === $value;
+        };
+    }
 }
