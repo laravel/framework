@@ -38,6 +38,7 @@ class RoutingRedirectorTest extends TestCase
         $this->url->shouldReceive('to')->with('login', [], null)->andReturn('http://foo.com/login');
         $this->url->shouldReceive('to')->with('http://foo.com/bar', [], null)->andReturn('http://foo.com/bar');
         $this->url->shouldReceive('to')->with('/', [], null)->andReturn('http://foo.com/');
+        $this->url->shouldReceive('to')->with('http://foo.com/bar?signature=secret', [], null)->andReturn('http://foo.com/bar?signature=secret');
 
         $this->session = m::mock(Store::class);
 
@@ -159,6 +160,22 @@ class RoutingRedirectorTest extends TestCase
 
         $response = $this->redirect->home();
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
+    }
+
+    public function testSignedRoute()
+    {
+        $this->url->shouldReceive('signedRoute')->with('home', [], null)->andReturn('http://foo.com/bar?signature=secret');
+
+        $response = $this->redirect->signedRoute('home');
+        $this->assertSame('http://foo.com/bar?signature=secret', $response->getTargetUrl());
+    }
+
+    public function testTemporarySignedRoute()
+    {
+        $this->url->shouldReceive('temporarySignedRoute')->with('home', 10, [])->andReturn('http://foo.com/bar?signature=secret');
+
+        $response = $this->redirect->temporarySignedRoute('home', 10);
+        $this->assertSame('http://foo.com/bar?signature=secret', $response->getTargetUrl());
     }
 
     public function testItSetsValidIntendedUrl()

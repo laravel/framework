@@ -1114,6 +1114,42 @@ class LazyCollection implements Enumerable
     }
 
     /**
+      * Take items in the collection until the given condition is met.
+      *
+      * @param  mixed  $key
+      * @return static
+      */
+     public function takeUntil($value)
+     {
+         $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
+
+         return new static(function () use ($callback) {
+             foreach ($this as $key => $item) {
+                 if ($callback($item, $key)) {
+                     break;
+                 }
+
+                 yield $key => $item;
+             }
+         });
+     }
+
+     /**
+      * Take items in the collection while the given condition is met.
+      *
+      * @param  mixed  $key
+      * @return static
+      */
+     public function takeWhile($value)
+     {
+         $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
+
+         return $this->takeUntil(function ($item, $key) use ($callback) {
+             return ! $callback($item, $key);
+         });
+     }
+
+    /**
      * Pass each item in the collection to the given callback, lazily.
      *
      * @param  callable  $callback

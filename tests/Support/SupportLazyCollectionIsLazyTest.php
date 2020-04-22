@@ -989,6 +989,40 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testTakeUntilIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->takeUntil(INF);
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->takeUntil(10)->all();
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->takeUntil(function ($item) {
+                return $item === 10;
+            })->all();
+        });
+    }
+
+    public function testTakeWhileIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->takeWhile(0);
+        });
+
+        $this->assertEnumerates(1, function ($collection) {
+            $collection->takeWhile(0)->all();
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->takeWhile(function ($item) {
+                return $item < 10;
+            })->all();
+        });
+    }
+
     public function testTapDoesNotEnumerate()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
