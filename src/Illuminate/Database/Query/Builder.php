@@ -12,7 +12,7 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Macroable\Macroable;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;

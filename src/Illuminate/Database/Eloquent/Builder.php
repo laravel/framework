@@ -10,7 +10,7 @@ use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;

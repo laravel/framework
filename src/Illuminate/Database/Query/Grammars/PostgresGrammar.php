@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Str;
 
 class PostgresGrammar extends Grammar

@@ -7,7 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionFunction;

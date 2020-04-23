@@ -3,7 +3,7 @@
 namespace Illuminate\Redis;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\ServiceProvider;
 
 class RedisServiceProvider extends ServiceProvider implements DeferrableProvider

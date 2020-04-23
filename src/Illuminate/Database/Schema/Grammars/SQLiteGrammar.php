@@ -5,7 +5,7 @@ namespace Illuminate\Database\Schema\Grammars;
 use Doctrine\DBAL\Schema\Index;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Fluent;
 use RuntimeException;
 

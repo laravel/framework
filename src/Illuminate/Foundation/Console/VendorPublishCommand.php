@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\Filesystem as Flysystem;

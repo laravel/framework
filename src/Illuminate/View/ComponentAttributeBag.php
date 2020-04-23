@@ -5,7 +5,7 @@ namespace Illuminate\View;
 use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use IteratorAggregate;

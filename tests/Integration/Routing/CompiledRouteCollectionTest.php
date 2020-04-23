@@ -6,7 +6,7 @@ use ArrayIterator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

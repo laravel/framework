@@ -8,7 +8,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoun
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;

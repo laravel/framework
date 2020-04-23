@@ -13,7 +13,7 @@ use Egulias\EmailValidator\Validation\RFCValidation;
 use Egulias\EmailValidator\Validation\SpoofCheckValidation;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;

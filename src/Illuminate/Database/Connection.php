@@ -17,7 +17,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use LogicException;
 use PDO;
 use PDOStatement;

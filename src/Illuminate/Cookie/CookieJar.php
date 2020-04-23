@@ -4,7 +4,7 @@ namespace Illuminate\Cookie;
 
 use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
 use Illuminate\Macroable\Macroable;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 

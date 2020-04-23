@@ -8,7 +8,7 @@ use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use InvalidArgumentException;
 use PDOException;
 

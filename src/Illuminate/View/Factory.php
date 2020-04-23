@@ -7,7 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Macroable\Macroable;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Str;
 use Illuminate\View\Engines\EngineResolver;
 use InvalidArgumentException;

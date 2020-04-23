@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use InvalidArgumentException;
 
 trait HasEvents

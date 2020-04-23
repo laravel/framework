@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use ReflectionClass;
 use ReflectionProperty;
 

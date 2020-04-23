@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use UnexpectedValueException;
 
 class PasswordBroker implements PasswordBrokerContract

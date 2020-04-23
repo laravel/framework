@@ -3,7 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Str;
 use LogicException;
 

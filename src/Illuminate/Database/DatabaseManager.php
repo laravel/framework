@@ -3,7 +3,7 @@
 namespace Illuminate\Database;
 
 use Illuminate\Database\Connectors\ConnectionFactory;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;

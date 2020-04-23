@@ -4,7 +4,7 @@ namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use RuntimeException;
 
 trait Queueable

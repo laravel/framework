@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use InvalidArgumentException;
 
 /**

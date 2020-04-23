@@ -4,7 +4,7 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class EventFake implements Dispatcher

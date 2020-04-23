@@ -11,7 +11,7 @@ use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\SesTransport;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Postmark\ThrowExceptionOnFailurePlugin;
