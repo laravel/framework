@@ -115,8 +115,7 @@ trait RefreshDatabase
      */
     protected function shouldDropViews()
     {
-        return property_exists($this, 'dropViews')
-                            ? $this->dropViews : false;
+        return property_exists($this, 'dropViews') ? $this->dropViews : false;
     }
 
     /**
@@ -126,8 +125,7 @@ trait RefreshDatabase
      */
     protected function shouldDropTypes()
     {
-        return property_exists($this, 'dropTypes')
-                            ? $this->dropTypes : false;
+        return property_exists($this, 'dropTypes') ? $this->dropTypes : false;
     }
 
     /**
@@ -137,7 +135,6 @@ trait RefreshDatabase
      */
     protected function shouldSeed()
     {
-        return property_exists($this, 'seed')
-                            ? $this->seed : false;
+        return property_exists($this, 'seed') ? $this->seed : false;
     }
 }
