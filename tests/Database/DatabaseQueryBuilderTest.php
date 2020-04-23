@@ -3626,8 +3626,8 @@ SQL;
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
-	public function testFromQuestionMarkOperatorOnPostgresqlServer()
-	{
+    public function testFromQuestionMarkOperatorOnPostgresqlServer()
+    {
         $operators = ['?' => '??', '?|' => '??|', '?&' => '??&'];
 
         foreach ($operators as $raw => $operator) {
