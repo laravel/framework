@@ -240,7 +240,7 @@ class RouteListCommand extends Command
             }
         }
 
-        return $results;
+        return array_map('strtolower', $results);
     }
 
     /**
