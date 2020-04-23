@@ -181,8 +181,8 @@ class TestResponse implements ArrayAccess
         $actual = $this->getStatusCode();
 
         PHPUnit::assertSame(
-            $actual, $status,
-            "Expected status code {$status} but received {$actual}."
+            $status, $actual,
+            "Response status code [{$actual}] does not match expected {$status} status code."
         );
 
         return $this;
