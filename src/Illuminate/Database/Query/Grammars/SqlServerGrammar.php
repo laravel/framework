@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Database\Query\Builder;
 use Illuminate\Collections\Arr;
+use Illuminate\Database\Query\Builder;
 
 class SqlServerGrammar extends Grammar
 {

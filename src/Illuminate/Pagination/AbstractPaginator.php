@@ -3,8 +3,8 @@
 namespace Illuminate\Pagination;
 
 use Closure;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Collections\Arr;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;

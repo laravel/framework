@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Collections\Arr;
+use Illuminate\Contracts\Events\Dispatcher;
 use InvalidArgumentException;
 
 trait HasEvents

@@ -4,9 +4,9 @@ namespace Illuminate\Http;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Macroable\Macroable;
-use Illuminate\Collections\Arr;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;

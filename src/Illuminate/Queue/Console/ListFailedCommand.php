@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Console\Command;
 use Illuminate\Collections\Arr;
+use Illuminate\Console\Command;
 
 class ListFailedCommand extends Command
 {

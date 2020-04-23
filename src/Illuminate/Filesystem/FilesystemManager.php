@@ -4,8 +4,8 @@ namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
 use Closure;
-use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Collections\Arr;
+use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Ftp as FtpAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;

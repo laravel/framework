@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Collections\Arr;
+use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;

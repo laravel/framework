@@ -2,10 +2,10 @@
 
 namespace Illuminate\Redis\Connectors;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Redis\Connector;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Redis\Connections\PredisConnection;
-use Illuminate\Collections\Arr;
 use Predis\Client;
 
 /**

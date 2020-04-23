@@ -3,10 +3,10 @@
 namespace Illuminate\Translation;
 
 use Countable;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Macroable\Macroable;
-use Illuminate\Collections\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;

@@ -3,8 +3,8 @@
 namespace Illuminate\Session;
 
 use Closure;
-use Illuminate\Contracts\Session\Session;
 use Illuminate\Collections\Arr;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Str;
 use SessionHandlerInterface;
 use stdClass;
