@@ -731,6 +731,8 @@ trait EnumeratesValues
      *
      * @param  mixed  $key
      * @return static
+     *
+     * @deprecated Use the "takeUntil" method directly.
      */
     public function until($value)
     {
