@@ -17,6 +17,7 @@
         "php": "^7.3",
         "ext-json": "*",
         "illuminate/contracts": "^8.0",
+        "illuminate/macroable": "^8.0",
         "illuminate/filesystem": "^8.0",
         "illuminate/support": "^8.0"
     },

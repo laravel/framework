@@ -9,10 +9,10 @@ use GuzzleHttp\Exception\TransferException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Traits\Macroable;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\Process\Process;
 
