@@ -753,7 +753,7 @@ class Builder
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
-        if (strpos($operator, '?') > -1) {
+        if (strpos($operator, '?') !== false) {
             $operator = str_replace('?', '??', $operator);
         }
 
