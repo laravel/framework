@@ -4,11 +4,14 @@ namespace Illuminate\Collections;
 
 use ArrayIterator;
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Macroable\Macroable;
 use IteratorAggregate;
+use JsonSerializable;
 use stdClass;
 
-class LazyCollection implements Enumerable
+class LazyCollection implements Arrayable, Enumerable, Jsonable, JsonSerializable
 {
     use EnumeratesValues, Macroable;
 

@@ -4,10 +4,13 @@ namespace Illuminate\Collections;
 
 use ArrayAccess;
 use ArrayIterator;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Macroable\Macroable;
+use JsonSerializable;
 use stdClass;
 
-class Collection implements ArrayAccess, Enumerable
+class Collection implements Arrayable, ArrayAccess, Enumerable, Jsonable, JsonSerializable
 {
     use EnumeratesValues, Macroable;
 
