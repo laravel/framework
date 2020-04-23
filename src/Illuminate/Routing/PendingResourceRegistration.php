@@ -2,7 +2,7 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 
 class PendingResourceRegistration
 {

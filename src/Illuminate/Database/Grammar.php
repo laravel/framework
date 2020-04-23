@@ -3,7 +3,7 @@
 namespace Illuminate\Database;
 
 use Illuminate\Database\Query\Expression;
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 
 abstract class Grammar
 {

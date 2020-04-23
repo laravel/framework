@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;

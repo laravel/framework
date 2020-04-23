@@ -19,6 +19,7 @@
         "illuminate/container": "^8.0",
         "illuminate/contracts": "^8.0",
         "illuminate/http": "^8.0",
+        "illuminate/macroable": "^8.0",
         "illuminate/pipeline": "^8.0",
         "illuminate/session": "^8.0",
         "illuminate/support": "^8.0",

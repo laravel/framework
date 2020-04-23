@@ -4,7 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\Store as SessionStore;
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 
 class Redirector
 {
