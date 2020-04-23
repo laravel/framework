@@ -2,7 +2,7 @@
 
 namespace Illuminate\Http\Testing;
 
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Symfony\Component\Mime\MimeTypes;
 
 class MimeType

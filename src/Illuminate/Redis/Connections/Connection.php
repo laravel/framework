@@ -4,10 +4,10 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 use Illuminate\Redis\Limiters\DurationLimiterBuilder;
-use Illuminate\Support\Traits\Macroable;
 
 abstract class Connection
 {

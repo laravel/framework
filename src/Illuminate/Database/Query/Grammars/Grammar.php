@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use RuntimeException;
 

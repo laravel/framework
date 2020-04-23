@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 use PHPUnit\Framework\TestCase;
 
 class SupportMacroableTest extends TestCase

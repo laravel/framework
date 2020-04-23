@@ -15,8 +15,10 @@
     ],
     "require": {
         "php": "^7.3",
+        "illuminate/collections": "^8.0",
         "illuminate/contracts": "^8.0",
         "illuminate/http": "^8.0",
+        "illuminate/macroable": "^8.0",
         "illuminate/queue": "^8.0",
         "illuminate/support": "^8.0"
     },

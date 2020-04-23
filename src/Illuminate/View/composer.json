@@ -16,10 +16,12 @@
     "require": {
         "php": "^7.3",
         "ext-json": "*",
+        "illuminate/collections": "^8.0",
         "illuminate/container": "^8.0",
         "illuminate/contracts": "^8.0",
         "illuminate/events": "^8.0",
         "illuminate/filesystem": "^8.0",
+        "illuminate/macroable": "^8.0",
         "illuminate/support": "^8.0"
     },
     "autoload": {

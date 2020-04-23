@@ -9,7 +9,7 @@ class Util
     /**
      * If the given value is not an array and not null, wrap it in one.
      *
-     * From Arr::wrap() in Illuminate\Support.
+     * From Arr::wrap() in Illuminate\Collections.
      *
      * @param  mixed  $value
      * @return array

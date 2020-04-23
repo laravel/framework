@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
-use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class BusFake implements QueueingDispatcher

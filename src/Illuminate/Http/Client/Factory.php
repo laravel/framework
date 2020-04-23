@@ -5,8 +5,8 @@ namespace Illuminate\Http\Client;
 use Closure;
 use function GuzzleHttp\Promise\promise_for;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class Factory

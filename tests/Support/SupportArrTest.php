@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayObject;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;

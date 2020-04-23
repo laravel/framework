@@ -9,9 +9,9 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\ProcessUtils;
-use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
 class Schedule

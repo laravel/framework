@@ -18,6 +18,7 @@
         "ext-json": "*",
         "psr/log": "^1.0",
         "illuminate/bus": "^8.0",
+        "illuminate/collections": "^8.0",
         "illuminate/contracts": "^8.0",
         "illuminate/queue": "^8.0",
         "illuminate/support": "^8.0"
