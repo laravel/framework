@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Aws\DynamoDb\DynamoDbClient;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
@@ -14,7 +15,6 @@ use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
-use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Opis\Closure\SerializableClosure;

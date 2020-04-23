@@ -3,9 +3,9 @@
 namespace Illuminate\Auth\Access;
 
 use Exception;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ReflectionClass;

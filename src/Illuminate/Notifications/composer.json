@@ -17,6 +17,7 @@
         "php": "^7.3",
         "illuminate/broadcasting": "^8.0",
         "illuminate/bus": "^8.0",
+        "illuminate/collections": "^8.0",
         "illuminate/container": "^8.0",
         "illuminate/contracts": "^8.0",
         "illuminate/filesystem": "^8.0",

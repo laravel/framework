@@ -16,6 +16,7 @@
     "require": {
         "php": "^7.3",
         "ext-json": "*",
+        "illuminate/collections": "^8.0",
         "illuminate/console": "^8.0",
         "illuminate/container": "^8.0",
         "illuminate/contracts": "^8.0",
