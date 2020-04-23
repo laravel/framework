@@ -22,15 +22,24 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     protected $connector;
 
     /**
+     * The connection configuration array.
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
      * Create a new PhpRedis connection.
      *
      * @param  \Redis  $client
      * @param  callable|null  $connector
+     * @param  array  $config
      * @return void
      */
-    public function __construct($client, callable $connector = null)
+    public function __construct($client, callable $connector = null, array $config = [])
     {
         $this->client = $client;
+        $this->config = $config;
         $this->connector = $connector;
     }
 
@@ -476,7 +485,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         }
 
         foreach ($this->client->_masters() as [$host, $port]) {
-            tap(new Redis)->connect($host, $port)->flushDb();
+            $redis = tap(new Redis)->connect($host, $port);
+
+            if (isset($this->config['password']) && ! empty($this->config['password'])) {
+                $redis->auth($this->config['password']);
+            }
+
+            $redis->flushDb();
         }
     }
 
