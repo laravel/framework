@@ -3626,6 +3626,18 @@ SQL;
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
+	public function testFromQuestionMarkOperatorOnPostgresqlServer()
+	{
+        $operators = ['?' => '??', '?|' => '??|', '?&' => '??&'];
+
+        foreach ($operators as $raw => $operator) {
+            $builder = $this->getPostgresBuilder();
+            $builder->where('hstore_name', $raw, 'hstore_key');
+
+            $this->assertSame("select * where \"hstore_name\" {$operator} ?", $builder->toSql());
+        }
+    }
+
     protected function getBuilder()
     {
         $grammar = new Grammar;
