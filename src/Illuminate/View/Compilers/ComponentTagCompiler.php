@@ -189,7 +189,9 @@ class ComponentTagCompiler
 
             $class = AnonymousComponent::class;
         } else {
-            $parameters = $data->all();
+            $parameters = $data
+                ->put('attributes', '['.$this->attributesToString($attributes->all()).']')
+                ->all();
         }
 
         return " @component('{$class}', [".$this->attributesToString($parameters, $escapeBound = false).'])
