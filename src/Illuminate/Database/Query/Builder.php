@@ -753,9 +753,9 @@ class Builder
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
-		if (strpos($operator, '?') > -1) {
-			$operator = str_replace('?', '??', $operator);
-		}
+        if (strpos($operator, '?') > -1) {
+            $operator = str_replace('?', '??', $operator);
+        }
 
         return [$value, $operator];
     }
