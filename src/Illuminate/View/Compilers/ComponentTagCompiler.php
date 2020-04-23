@@ -397,7 +397,7 @@ class ComponentTagCompiler
                                 ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
                                 : "'{$attribute}' => {$value}";
                 })
-                ->implode(',');
+                ->implode(', ');
     }
 
     /**
