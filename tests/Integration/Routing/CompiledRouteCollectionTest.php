@@ -407,6 +407,15 @@ class CompiledRouteCollectionTest extends TestCase
         $this->assertSame('foo/bar', $route->uri());
     }
 
+    public function testRouteWithoutNamespaceIsFound()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['controller' => '\App\FooController']));
+
+        $route = $this->collection()->getByAction('App\FooController');
+
+        $this->assertSame('foo/bar', $route->uri());
+    }
+
     public function testGroupPrefixAndRoutePrefixAreProperlyHandled()
     {
         $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'prefix' => '{locale}'])->prefix('pre'));
