@@ -148,10 +148,10 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Add fragment identifier to the url.
      *
-     * @param  string $fragmentIdentifier
+     * @param  string  $fragmentIdentifier
      * @return $this
      */
-    public function withFragmentIdentifier(string $fragmentIdentifier)
+    public function withFragmentIdentifier($fragmentIdentifier)
     {
         // Remove any existing fragment identifier
         $this->withoutFragmentIdentifier();
