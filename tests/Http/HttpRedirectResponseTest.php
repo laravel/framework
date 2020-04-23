@@ -56,13 +56,13 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
 
-        $response->withFragmentIdentifier('foo');
+        $response->withFragment('foo');
         $this->assertSame('foo', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
 
-        $response->withFragmentIdentifier('#bar');
+        $response->withFragment('#bar');
         $this->assertSame('bar', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
 
-        $response->withoutFragmentIdentifier();
+        $response->withoutFragment();
         $this->assertNull(parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
     }
 
