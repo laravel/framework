@@ -1290,6 +1290,52 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testWhereNotNullIsLazy()
+    {
+        $data = $this->make([['a' => 1], ['a' => null], ['a' => 2], ['a' => 3]]);
+
+        $this->assertDoesNotEnumerateCollection($data, function ($collection) {
+            $collection->whereNotNull('a');
+        });
+
+        $this->assertEnumeratesCollectionOnce($data, function ($collection) {
+            $collection->whereNotNull('a')->all();
+        });
+
+        $data = $this->make([1, null, 2, null, 3]);
+
+        $this->assertDoesNotEnumerateCollection($data, function ($collection) {
+            $collection->whereNotNull();
+        });
+
+        $this->assertEnumeratesCollectionOnce($data, function ($collection) {
+            $collection->whereNotNull()->all();
+        });
+    }
+
+    public function testWhereNullIsLazy()
+    {
+        $data = $this->make([['a' => 1], ['a' => null], ['a' => 2], ['a' => 3]]);
+
+        $this->assertDoesNotEnumerateCollection($data, function ($collection) {
+            $collection->whereNull('a');
+        });
+
+        $this->assertEnumeratesCollectionOnce($data, function ($collection) {
+            $collection->whereNull('a')->all();
+        });
+
+        $data = $this->make([1, null, 2, null, 3]);
+
+        $this->assertDoesNotEnumerateCollection($data, function ($collection) {
+            $collection->whereNull();
+        });
+
+        $this->assertEnumeratesCollectionOnce($data, function ($collection) {
+            $collection->whereNull()->all();
+        });
+    }
+
     public function testWhereStrictIsLazy()
     {
         $data = $this->make([['a' => 1], ['a' => 2], ['a' => 3], ['a' => 4]]);
