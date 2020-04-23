@@ -29,7 +29,7 @@ class EventTest extends TestCase
 
         $commandSeparator = ($isWindows ? '&' : ';');
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
-        $this->assertSame("(php -i > {$quote}{$defaultOutput}{$quote} 2>&1 {$commandSeparator} {$quote}".PHP_BINARY."{$quote} artisan schedule:finish {$scheduleId}) > {$quote}{$defaultOutput}{$quote} 2>&1 &", $event->buildCommand());
+        $this->assertSame("(php -i > {$quote}{$defaultOutput}{$quote} 2>&1 {$commandSeparator} {$quote}".PHP_BINARY."{$quote} artisan schedule:finish {$scheduleId} \"$?\") > {$quote}{$defaultOutput}{$quote} 2>&1 &", $event->buildCommand());
     }
 
     public function testBuildCommandSendOutputTo()

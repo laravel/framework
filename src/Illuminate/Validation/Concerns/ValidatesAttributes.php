@@ -1445,6 +1445,25 @@ trait ValidatesAttributes
     }
 
     /**
+     * Indicate that an attribute should be excluded when another attribute is missing.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateExcludeWithout($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'exclude_without');
+
+        if ($this->anyFailingRequired($parameters)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Prepare the values and the other value for validation.
      *
      * @param  array  $parameters

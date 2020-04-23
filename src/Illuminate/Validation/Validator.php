@@ -166,8 +166,15 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $fileRules = [
-        'File', 'Image', 'Mimes', 'Mimetypes', 'Min',
-        'Max', 'Size', 'Between', 'Dimensions',
+        'Between',
+        'Dimensions',
+        'File',
+        'Image',
+        'Max',
+        'Mimes',
+        'Mimetypes',
+        'Min',
+        'Size',
     ];
 
     /**
@@ -176,8 +183,16 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $implicitRules = [
-        'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout',
-        'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
+        'Accepted',
+        'Filled',
+        'Present',
+        'Required',
+        'RequiredIf',
+        'RequiredUnless',
+        'RequiredWith',
+        'RequiredWithAll',
+        'RequiredWithout',
+        'RequiredWithoutAll',
     ];
 
     /**
@@ -186,10 +201,27 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $dependentRules = [
-        'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
-        'Before', 'After', 'BeforeOrEqual', 'AfterOrEqual', 'Gt', 'Lt', 'Gte', 'Lte',
-        'ExcludeIf', 'ExcludeUnless',
+        'After',
+        'AfterOrEqual',
+        'Before',
+        'BeforeOrEqual',
+        'Confirmed',
+        'Different',
+        'ExcludeIf',
+        'ExcludeUnless',
+        'ExcludeWithout',
+        'Gt',
+        'Gte',
+        'Lt',
+        'Lte',
+        'RequiredIf',
+        'RequiredUnless',
+        'RequiredWith',
+        'RequiredWithAll',
+        'RequiredWithout',
+        'RequiredWithoutAll',
+        'Same',
+        'Unique',
     ];
 
     /**
@@ -197,7 +229,7 @@ class Validator implements ValidatorContract
      *
      * @var array
      */
-    protected $excludeRules = ['ExcludeIf', 'ExcludeUnless'];
+    protected $excludeRules = ['ExcludeIf', 'ExcludeUnless', 'ExcludeWithout'];
 
     /**
      * The size related validation rules.

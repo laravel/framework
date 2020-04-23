@@ -5204,6 +5204,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['mouse' => ['validation.required']], $validator->messages()->toArray());
     }
 
+    public function testExcludeWithout()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['region' => 'South'],
+            [
+                'country' => 'exclude_without:region|nullable|required_with:region|string|min:3',
+                'region' => 'exclude_without:country|nullable|required_with:country|string|min:3',
+            ]
+        );
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['country' => ['validation.required_with']], $validator->messages()->toArray());
+    }
+
     public function testExcludeValuesAreReallyRemoved()
     {
         $validator = new Validator(
