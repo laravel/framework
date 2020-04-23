@@ -263,6 +263,20 @@ class Event
     }
 
     /**
+     * Call all of the "after" callbacks for the event.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  int  $exitCode
+     * @return void
+     */
+    public function callAfterCallbacksWithExitCode(Container $container, $exitCode)
+    {
+        $this->exitCode = (int) $exitCode;
+
+        $this->callAfterCallbacks($container);
+    }
+
+    /**
      * Build the command string.
      *
      * @return string
