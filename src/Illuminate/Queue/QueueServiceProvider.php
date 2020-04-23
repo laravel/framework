@@ -16,8 +16,6 @@ use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use Opis\Closure\SerializableClosure;
 
 class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -33,7 +31,6 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->registerWorker();
         $this->registerListener();
         $this->registerFailedJobServices();
-        $this->registerOpisSecurityKey();
     }
 
     /**
@@ -247,20 +244,6 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             $this->app['config']['app.name'],
             $config['table']
         );
-    }
-
-    /**
-     * Configure Opis Closure signing for security.
-     *
-     * @return void
-     */
-    protected function registerOpisSecurityKey()
-    {
-        if (Str::startsWith($key = $this->app['config']->get('app.key'), 'base64:')) {
-            $key = base64_decode(substr($key, 7));
-        }
-
-        SerializableClosure::setSecretKey($key);
     }
 
     /**
