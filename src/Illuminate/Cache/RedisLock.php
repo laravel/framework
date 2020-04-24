@@ -49,7 +49,7 @@ class RedisLock extends Lock
      */
     public function extend($seconds)
     {
-        return $this->redis->command('expire', [$this->name]);
+        return (bool)$this->redis->expire($this->name);
     }
 
     /**

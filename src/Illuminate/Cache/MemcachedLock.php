@@ -47,7 +47,7 @@ class MemcachedLock extends Lock
      */
     public function extend($seconds)
     {
-        $this->memcached->touch($this->name, $this->seconds);
+        return $this->memcached->touch($this->name, $this->seconds);
     }
 
     /**
