@@ -226,7 +226,6 @@ class Builder
     {
         $this->columns = [];
         $this->bindings['select'] = [];
-
         $columns = is_array($columns) ? $columns : func_get_args();
 
         foreach ($columns as $as => $column) {
