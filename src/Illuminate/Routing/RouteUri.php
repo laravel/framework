@@ -39,7 +39,7 @@ class RouteUri
      */
     public static function parse($uri)
     {
-        preg_match_all('/\{([\w\:]+?)\??\}/', $uri, $matches);
+        preg_match_all('/\{([\w\:\->]+?)\??\}/', $uri, $matches);
 
         $bindingFields = [];
 
