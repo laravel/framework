@@ -214,7 +214,7 @@ class Stringable
     {
         return $this->__toString();
     }
-    
+
     /**
      * Determine if a given string matches a given pattern.
      *
