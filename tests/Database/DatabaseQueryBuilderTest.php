@@ -3024,6 +3024,22 @@ SQL;
         $builder->selectSub(['foo'], 'sub');
     }
 
+    public function testSubSelectResetBindings()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->from('one')->selectSub(function ($query) {
+            $query->from('two')->select('baz')->where('subkey', '=', 'subval');
+        }, 'sub');
+
+        $this->assertEquals('select (select "baz" from "two" where "subkey" = ?) as "sub" from "one"', $builder->toSql());
+        $this->assertEquals(['subval'], $builder->getBindings());
+
+        $builder->select('*');
+
+        $this->assertEquals('select * from "one"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testSqlServerWhereDate()
     {
         $builder = $this->getSqlServerBuilder();
