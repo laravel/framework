@@ -299,6 +299,20 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     }
 
     /**
+     * Generate an array of all attributes that have messages.
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        $attributes = [];
+        foreach ($this->messages as $key => $message) {
+            $attributes[explode('.', $key)[0]] = $key;
+        }
+        return $attributes;
+    }
+
+    /**
      * Get the default message format.
      *
      * @return string

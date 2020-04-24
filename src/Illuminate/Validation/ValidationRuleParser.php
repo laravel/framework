@@ -133,7 +133,9 @@ class ValidationRuleParser
                 foreach ((array) $rules as $rule) {
                     $this->implicitAttributes[$attribute][] = strval($key);
 
-                    $results = $this->mergeRules($results, $key, $rule);
+                    foreach ($this->getRules($key, $rule) as $rKey => $rVal) {
+                        $results[$rKey] = $rVal;
+                    }
                 }
             }
         }
@@ -162,6 +164,26 @@ class ValidationRuleParser
         return $this->mergeRulesForAttribute(
             $results, $attribute, $rules
         );
+    }
+
+    /**
+     * Get rules of a given attribute(s).
+     *
+     * @param  string|array  $attribute
+     * @param  string|array  $rules
+     * @return array
+     */
+    public function getRules($attribute, $rules = [])
+    {
+        if (is_array($attribute)) {
+            $all = [];
+            foreach ((array) $attribute as $innerAttribute => $innerRules) {
+                $all[$innerRules] = head($this->explodeRules([$innerRules]));
+            }
+            return $all;
+        }
+
+        return [$attribute => head($this->explodeRules([$rules]))];
     }
 
     /**

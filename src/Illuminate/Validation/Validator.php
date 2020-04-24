@@ -21,6 +21,13 @@ class Validator implements ValidatorContract
         Concerns\ValidatesAttributes;
 
     /**
+     * Maximum number of translated error messages.
+     *
+     * @var int
+     */
+    public static $maxMessages = 2000;
+
+    /**
      * The Translator implementation.
      *
      * @var \Illuminate\Contracts\Translation\Translator
@@ -96,6 +103,13 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $implicitAttributes = [];
+
+    /**
+     * The dictionary of wildcard attributes with their asterisks expanded.
+     *
+     * @var array
+     */
+    protected $implicitDictionary = [];
 
     /**
      * The callback that should be used to format the attribute.
@@ -520,8 +534,8 @@ class Validator implements ValidatorContract
      */
     protected function getPrimaryAttribute($attribute)
     {
-        foreach ($this->implicitAttributes as $unparsed => $parsed) {
-            if (in_array($attribute, $parsed)) {
+        foreach ($this->implicitDictionary as $unparsed => $parsed) {
+            if (array_key_exists($attribute, $parsed)) {
                 return $unparsed;
             }
         }
@@ -709,9 +723,13 @@ class Validator implements ValidatorContract
             return $this->excludeAttribute($attribute);
         }
 
-        $this->messages->add($attribute, $this->makeReplacements(
-            $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
-        ));
+        if (count($this->failedRules) < static::$maxMessages) {
+            $this->messages->add($attribute, $this->makeReplacements(
+                $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
+            ));
+        } else {
+            $this->messages->add($attribute, 'Invalid');
+        }
 
         $this->failedRules[$attribute][$rule] = $parameters;
     }
@@ -778,9 +796,7 @@ class Validator implements ValidatorContract
      */
     protected function attributesThatHaveMessages()
     {
-        return collect($this->messages()->toArray())->map(function ($message, $key) {
-            return explode('.', $key)[0];
-        })->unique()->flip()->all();
+        return $this->messages()->attributes();
     }
 
     /**
@@ -956,6 +972,11 @@ class Validator implements ValidatorContract
 
         $this->implicitAttributes = array_merge(
             $this->implicitAttributes, $response->implicitAttributes
+        );
+        $this->implicitDictionary = array_merge(
+            $this->implicitDictionary, array_map(function ($value) {
+                return array_flip(array_values($value));
+            }, $response->implicitAttributes)
         );
     }
 
