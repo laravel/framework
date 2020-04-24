@@ -27,4 +27,18 @@ abstract class Migration
     {
         return $this->connection;
     }
+
+    /**
+     * @param string|null $message
+     *
+     * @throws IrreversibleMigrationException
+     */
+    protected function throwIrreversibleMigrationException($message = null)
+    {
+        if ($message === null) {
+            $message = 'This migration is irreversible and cannot be reverted.';
+        }
+
+        throw new IrreversibleMigrationException($message);
+    }
 }
