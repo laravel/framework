@@ -50,13 +50,25 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $team1 = Team::create(['id' => 10, 'owner_id' => $user->id]);
         $team2 = Team::create(['owner_id' => $user->id]);
 
-        $mate1 = User::create(['name' => Str::random(), 'team_id' => $team1->id]);
-        $mate2 = User::create(['name' => Str::random(), 'team_id' => $team2->id]);
+        $mate1 = User::create(['name' => 'John', 'team_id' => $team1->id]);
+        $mate2 = User::create(['name' => 'Jack', 'team_id' => $team2->id, 'slug' => null]);
 
         User::create(['name' => Str::random()]);
 
         $this->assertEquals([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
         $this->assertEquals([$user->id], User::has('teamMates')->pluck('id')->toArray());
+
+        $result = $user->teamMates()->first();
+        $this->assertEquals(
+            $mate1->refresh()->getAttributes() + ['laravel_through_key' => '1'],
+            $result->getAttributes()
+        );
+
+        $result = $user->teamMates()->firstWhere('name', 'Jack');
+        $this->assertEquals(
+            $mate2->refresh()->getAttributes() + ['laravel_through_key' => '1'],
+            $result->getAttributes()
+        );
     }
 
     public function testGlobalScopeColumns()
