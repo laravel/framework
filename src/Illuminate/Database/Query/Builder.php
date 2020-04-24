@@ -225,6 +225,7 @@ class Builder
     public function select($columns = ['*'])
     {
         $this->columns = [];
+        $this->bindings['select'] = [];
 
         $columns = is_array($columns) ? $columns : func_get_args();
 
