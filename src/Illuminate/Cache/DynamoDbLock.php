@@ -47,7 +47,7 @@ class DynamoDbLock extends Lock
      */
     public function extend($seconds)
     {
-        $this->dynamo->
+        // to be implemented
     }
 
     /**
