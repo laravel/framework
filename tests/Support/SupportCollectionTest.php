@@ -2457,7 +2457,7 @@ class SupportCollectionTest extends TestCase
 
     public function sortByUrl(array $value)
     {
-        return $value['rating'];
+        return $value['url'];
     }
 
     /**
