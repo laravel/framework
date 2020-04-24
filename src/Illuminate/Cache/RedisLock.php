@@ -42,13 +42,24 @@ class RedisLock extends Lock
     }
 
     /**
+     * Extend the lock.
+     *
+     * @param int $seconds
+     * @return bool
+     */
+    public function extend($seconds)
+    {
+        return $this->redis->command('expire', [$this->name]);
+    }
+
+    /**
      * Release the lock.
      *
      * @return bool
      */
     public function release()
     {
-        return (bool) $this->redis->eval(LuaScripts::releaseLock(), 1, $this->name, $this->owner);
+        return (bool)$this->redis->eval(LuaScripts::releaseLock(), 1, $this->name, $this->owner);
     }
 
     /**

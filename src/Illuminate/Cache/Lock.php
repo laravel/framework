@@ -59,6 +59,14 @@ abstract class Lock implements LockContract
     abstract public function acquire();
 
     /**
+     * Extend the lock.
+     *
+     * @param int $seconds
+     * @return bool
+     */
+    abstract public function extend($seconds);
+
+    /**
      * Release the lock.
      *
      * @return bool
