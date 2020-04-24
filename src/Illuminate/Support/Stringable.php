@@ -206,6 +206,16 @@ class Stringable
     }
 
     /**
+     * Get the raw string value.
+     *
+     * @return string
+     */
+    public function get()
+    {
+        return $this->__toString();
+    }
+    
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|array  $pattern
