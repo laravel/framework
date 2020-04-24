@@ -78,7 +78,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         $this->app->singleton('migrator', function ($app) {
             $repository = $app['migration.repository'];
 
-            return new Migrator($repository, $app['db'], $app['files'], $app['events']);
+            return new Migrator($app, $repository, $app['db'], $app['files'], $app['events']);
         });
     }
 

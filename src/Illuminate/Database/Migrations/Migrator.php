@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Migrations;
 
 use Illuminate\Collections\Arr;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
@@ -17,6 +18,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrator
 {
+    /**
+     * The container implementation.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
     /**
      * The event dispatcher instance.
      *
@@ -69,17 +77,20 @@ class Migrator
     /**
      * Create a new migrator instance.
      *
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
-    public function __construct(MigrationRepositoryInterface $repository,
+    public function __construct(Container $container,
+                                MigrationRepositoryInterface $repository,
                                 Resolver $resolver,
                                 Filesystem $files,
                                 Dispatcher $dispatcher = null)
     {
+        $this->container = $container;
         $this->files = $files;
         $this->events = $dispatcher;
         $this->resolver = $resolver;
@@ -450,7 +461,7 @@ class Migrator
     {
         $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
 
-        return new $class;
+        return $this->container->make($class);
     }
 
     /**
