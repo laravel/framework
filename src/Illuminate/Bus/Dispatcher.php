@@ -3,7 +3,6 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
