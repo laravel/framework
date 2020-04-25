@@ -325,7 +325,7 @@ class Route
      */
     public function hasParameters()
     {
-        return isset($this->parameters);
+        return ! empty($this->parameters);
     }
 
     /**
