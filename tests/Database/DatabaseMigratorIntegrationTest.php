@@ -45,7 +45,6 @@ class DatabaseMigratorIntegrationTest extends TestCase
         Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
-            $container,
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
             $db->getDatabaseManager(),
             new Filesystem
