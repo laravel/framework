@@ -21,7 +21,7 @@ class Migrator
     /**
      * The container implementation.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Illuminate\Contracts\Container\Container|null
      */
     protected $container;
 
@@ -77,24 +77,24 @@ class Migrator
     /**
      * Create a new migrator instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(Container $container,
-                                MigrationRepositoryInterface $repository,
+    public function __construct(MigrationRepositoryInterface $repository,
                                 Resolver $resolver,
                                 Filesystem $files,
-                                Dispatcher $dispatcher = null)
+                                Dispatcher $dispatcher = null,
+                                ?Container $container = null)
     {
-        $this->container = $container;
         $this->files = $files;
         $this->events = $dispatcher;
         $this->resolver = $resolver;
         $this->repository = $repository;
+        $this->container = $container;
     }
 
     /**
@@ -460,6 +460,10 @@ class Migrator
     public function resolve($file)
     {
         $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
+
+        if (is_null($this->container)) {
+            return new $class;
+        }
 
         return $this->container->make($class);
     }
