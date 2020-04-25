@@ -19,25 +19,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Migrator
 {
     /**
-     * The container implementation.
-     *
-     * @var \Illuminate\Contracts\Container\Container|null
-     */
-    protected $container;
-
-    /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $events;
-
-    /**
      * The migration repository implementation.
      *
      * @var \Illuminate\Database\Migrations\MigrationRepositoryInterface
      */
     protected $repository;
+
+    /**
+     * The connection resolver instance.
+     *
+     * @var \Illuminate\Database\ConnectionResolverInterface
+     */
+    protected $resolver;
 
     /**
      * The filesystem instance.
@@ -47,11 +40,18 @@ class Migrator
     protected $files;
 
     /**
-     * The connection resolver instance.
+     * The event dispatcher instance.
      *
-     * @var \Illuminate\Database\ConnectionResolverInterface
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected $resolver;
+    protected $events;
+
+    /**
+     * The container implementation.
+     *
+     * @var \Illuminate\Contracts\Container\Container|null
+     */
+    protected $container;
 
     /**
      * The name of the default connection.
@@ -88,12 +88,12 @@ class Migrator
                                 Resolver $resolver,
                                 Filesystem $files,
                                 Dispatcher $dispatcher = null,
-                                ?Container $container = null)
+                                Container $container = null)
     {
+        $this->repository = $repository;
+        $this->resolver = $resolver;
         $this->files = $files;
         $this->events = $dispatcher;
-        $this->resolver = $resolver;
-        $this->repository = $repository;
         $this->container = $container;
     }
 
