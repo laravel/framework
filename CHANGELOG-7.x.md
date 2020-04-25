@@ -1,9 +1,48 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.7.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.8.1...7.x)
+
+### Fixed
+- Fixed `firstWhere` behavior for relations ([#32525](https://github.com/laravel/framework/pull/32525))
+
+
+## [v7.8.1 (2020-04-24)](https://github.com/laravel/framework/compare/v7.8.0...v7.8.1)
+
+### Fixed
+- Fixed `Illuminate\Http\Resources\Json\PaginatedResourceResponse::toResponse()` ([d460374](https://github.com/laravel/framework/commit/d4603749c03e03e224de3d867e88458599bb9d58))
+
+
+## [v7.8.0 (2020-04-24)](https://github.com/laravel/framework/compare/v7.7.1...v7.8.0)
+
+### Added
+- Added `signedRoute()` and `temporarySignedRoute()` methods to `Illuminate\Routing\Redirector` ([#32489](https://github.com/laravel/framework/pull/32489))
+- Added `takeUntil` and `takeWhile` collection methods ([#32494](https://github.com/laravel/framework/pull/32494), [#32496](https://github.com/laravel/framework/pull/32496))
+- Added `Illuminate\Container\ContextualBindingBuilder::giveTagged()` ([#32514](https://github.com/laravel/framework/pull/32514))
+- Added methods `withFragment` and `withoutFragment` to `Illuminate\Http\RedirectResponse` ([11d6bef](https://github.com/laravel/framework/commit/11d6befb4ed8b306f7ed40a205539a20d4bebe16), [0099591](https://github.com/laravel/framework/commit/0099591d63c51f9139db957ad42f3e783c1d0d30), [42c67a1](https://github.com/laravel/framework/commit/42c67a156acd6e6d44595e973774ad96fdc03857), [a1e741a](https://github.com/laravel/framework/commit/a1e741a1709b3d4998995b76abd990a6c09a5841))
+- Added `exclude_without` validation rule ([4083ae5](https://github.com/laravel/framework/commit/4083ae57c6371c889de94df526bb849040bb895c))
+
+### Fixed
+- Fixed compiled route actions without a namespace ([#32512](https://github.com/laravel/framework/pull/32512))
+- Reset select bindings when setting select ([#32531](https://github.com/laravel/framework/pull/32531))
+
+### Changed
+- Added warn in `Illuminate/Support/Facades/Auth::routes()` when laravel/ui is not installed ([#32482](https://github.com/laravel/framework/pull/32482))
+- Added auth to each master on `Illuminate\Redis\Connections\PhpRedisConnection::flushdb()` ([837921b](https://github.com/laravel/framework/commit/837921b23311e875a9d22c296a9193a1cd8205cb))
+- Register opis key so it is not tied to a deferred service provider (Illuminate/Encryption/EncryptionServiceProvider.php) ([62d8a07](https://github.com/laravel/framework/commit/62d8a0772553f3dff2d52a3ab062182c5efd75a2))
+- Pass status code to schedule finish ([#32516](https://github.com/laravel/framework/pull/32516))
+- Check route:list --columns option case insensitively ([#32521](https://github.com/laravel/framework/pull/32521))
+
+### Deprecated
+- Deprecate `Illuminate\Support\Traits\EnumeratesValues::until` ([#32517](https://github.com/laravel/framework/pull/32517))
+
+
+## [v7.7.1 (2020-04-21)](https://github.com/laravel/framework/compare/v7.7.0...v7.7.1)
 
 ### Added
 - Allow developers to specify accepted keys in array rule ([#32452](https://github.com/laravel/framework/pull/32452))
+
+### Changed
+- Add check is_object to `Illuminate\Database\Eloquent\Model::refresh()` ([1b0bdb4](https://github.com/laravel/framework/commit/1b0bdb43062a2792befe6fd754140124a8e4dc35))
 
 
 ## [v7.7.0 (2020-04-21)](https://github.com/laravel/framework/compare/v7.6.2...v7.7.0)
