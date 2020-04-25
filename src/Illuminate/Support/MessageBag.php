@@ -309,6 +309,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
         foreach ($this->messages as $key => $message) {
             $attributes[explode('.', $key)[0]] = $key;
         }
+
         return $attributes;
     }
 

@@ -180,6 +180,7 @@ class ValidationRuleParser
             foreach ((array) $attribute as $innerAttribute => $innerRules) {
                 $all[$innerRules] = head($this->explodeRules([$innerRules]));
             }
+
             return $all;
         }
 
