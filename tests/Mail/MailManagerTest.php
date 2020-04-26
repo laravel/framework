@@ -7,12 +7,10 @@ use Orchestra\Testbench\TestCase;
 
 class MailManagerTest extends TestCase
 {
-
     /**
      * @dataProvider emptyTransportConfigDataProvider
-     * @covers \Illuminate\Mail\MailManager::createTransport
      */
-    public function testEmptyTransportConfig(?string $transport)
+    public function testEmptyTransportConfig($transport)
     {
         $this->app['config']->set('mail.mailers.custom_smtp', [
             'transport' => $transport,
@@ -24,18 +22,15 @@ class MailManagerTest extends TestCase
             'timeout' => null,
         ]);
 
-        /** @var MailManager $mailManager */
-        $mailManager = app('mail.manager');
-
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Empty value for \"transport\"-key in \"mail.mailers\"-config found. Please check that every mailer in your config/mail.php has a \"transport\"-key.");
-        $mailManager->mailer("custom_smtp");
+        $this->expectExceptionMessage('Unsupported mail transport []');
+        $this->app['mail.manager']->mailer("custom_smtp");
     }
 
-    public function emptyTransportConfigDataProvider() : array
+    public function emptyTransportConfigDataProvider()
     {
         return [
-          [null], [""], [" "]
+            [null], [""], [" "]
         ];
     }
 }
