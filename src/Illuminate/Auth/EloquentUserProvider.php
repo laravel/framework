@@ -139,9 +139,7 @@ class EloquentUserProvider implements UserProvider
      */
     protected function firstCredentialKey(array $credentials)
     {
-        foreach ($credentials as $key => $value) {
-            return $key;
-        }
+        return array_key_first($credentials) ?? null;
     }
 
     /**
