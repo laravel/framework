@@ -23,7 +23,7 @@ class MailManagerTest extends TestCase
         ]);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unsupported mail transport []');
+        $this->expectExceptionMessage("Unsupported mail transport [{$transport}]");
         $this->app['mail.manager']->mailer("custom_smtp");
     }
 
