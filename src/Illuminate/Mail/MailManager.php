@@ -169,6 +169,14 @@ class MailManager implements FactoryContract
             return call_user_func($this->customCreators[$transport], $config);
         }
 
+        // Check whether $transport is empty or not to avoid calling createTransport() again in an endless loop in
+        // case of misconfiguration a user can do when he/she forgets to set `transport` correctly
+        if(empty(trim((string) $transport))){
+            throw new InvalidArgumentException(
+                "Empty value for \"transport\"-key in \"mail.mailers\"-config found. " .
+                "Please check that every mailer in your config/mail.php has a \"transport\"-key.");
+        }
+
         if (! method_exists($this, $method = 'create'.ucfirst($transport).'Transport')) {
             throw new InvalidArgumentException("Unsupported mail transport [{$config['transport']}].");
         }
