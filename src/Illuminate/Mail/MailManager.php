@@ -162,7 +162,7 @@ class MailManager implements FactoryContract
         // Here we will check if the "transport" key exists and if it doesn't we will
         // assume an application is still using the legacy mail configuration file
         // format and use the "mail.driver" configuration option instead for BC.
-        $transport = (string) $config['transport'] ?? $this->app['config']['mail.driver'];
+        $transport = $config['transport'] ?? $this->app['config']['mail.driver'];
 
         if (isset($this->customCreators[$transport])) {
             return call_user_func($this->customCreators[$transport], $config);
