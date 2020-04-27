@@ -7,6 +7,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Str;
 use Illuminate\View\AnonymousComponent;
+use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
 use ReflectionClass;
 
@@ -16,6 +17,13 @@ use ReflectionClass;
  */
 class ComponentTagCompiler
 {
+    /**
+     * The Blade compiler instance.
+     *
+     * @var \Illuminate\View\Compilers\BladeCompiler
+     */
+    protected $blade;
+
     /**
      * The component class aliases.
      *
@@ -36,8 +44,9 @@ class ComponentTagCompiler
      * @param  array  $aliases
      * @return void
      */
-    public function __construct(array $aliases = [])
+    public function __construct(BladeCompiler $blade, array $aliases = [])
     {
+        $this->blade = $blade;
         $this->aliases = $aliases;
     }
 
@@ -355,7 +364,7 @@ class ComponentTagCompiler
 
                 $this->boundAttributes[$attribute] = true;
             } else {
-                $value = "'".str_replace("'", "\\'", $value)."'";
+                $value = "'".$this->compileAttributeEchos($value)."'";
             }
 
             return [$attribute => $value];
@@ -378,6 +387,34 @@ class ComponentTagCompiler
         /xm";
 
         return preg_replace($pattern, ' bind:$1=', $attributeString);
+    }
+
+    /**
+     * Compile any Blade echo statements that are present in the attribute string.
+     *
+     * These echo statements need to be converted to string concatenation statements.
+     *
+     * @param  string  $attributeString
+     * @return string
+     */
+    protected function compileAttributeEchos(string $attributeString)
+    {
+        $value = $this->blade->compileEchos($attributeString);
+
+        $value = collect(token_get_all($value))->map(function ($token) {
+            if (! is_array($token)) {
+                return $token;
+            }
+
+            return $token[0] === T_INLINE_HTML
+                        ? str_replace("'", "\\'", $token[1])
+                        : $token[1];
+        })->implode('');
+
+        $value = str_replace('<?php echo ', '\'.', $value);
+        $value = str_replace('; ?>', '.\'', $value);
+
+        return $value;
     }
 
     /**
