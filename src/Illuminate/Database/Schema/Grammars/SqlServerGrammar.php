@@ -207,11 +207,11 @@ class SqlServerGrammar extends Grammar
     public function compileDropDefaultConstraint(Blueprint $blueprint, Fluent $command)
     {
         $columns = "'".implode("','", $command->columns)."'";
-
+        $tableName = $this->getTablePrefix().$blueprint->getTable();
         $sql = "DECLARE @sql NVARCHAR(MAX) = '';";
-        $sql .= "SELECT @sql += 'ALTER TABLE [dbo].[{$blueprint->getTable()}] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
+        $sql .= "SELECT @sql += 'ALTER TABLE [dbo].[{$tableName}] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
         $sql .= 'FROM SYS.COLUMNS ';
-        $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$blueprint->getTable()}]') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
+        $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$tableName}]') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
         $sql .= 'EXEC(@sql)';
 
         return $sql;
