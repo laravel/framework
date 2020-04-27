@@ -7,7 +7,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Str;
 use Illuminate\View\AnonymousComponent;
-use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
 use ReflectionClass;
 
