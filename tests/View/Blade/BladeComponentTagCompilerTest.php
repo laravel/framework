@@ -31,11 +31,11 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $this->mockViewFactory();
 
-        $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert type="foo" limit="5" @click="foo" required /><x-alert /></div>');
+        $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert type="foo" limit="5" @click="foo" wire:click="changePlan(\'{{ $plan }}\')" required /><x-alert /></div>');
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withName('alert'); ?>
-<?php \$component->withAttributes(['type' => 'foo','limit' => '5','@click' => 'foo','required' => true]); ?>\n".
+<?php \$component->withAttributes(['type' => 'foo','limit' => '5','@click' => 'foo','wire:click' => 'changePlan(\''.e(\$plan).'\')','required' => true]); ?>\n".
 "@endcomponentClass  @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withName('alert'); ?>
 <?php \$component->withAttributes([]); ?>\n".
