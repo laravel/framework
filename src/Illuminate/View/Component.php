@@ -211,6 +211,7 @@ abstract class Component
             'resolveView',
             'shouldRender',
             'view',
+            'withName',
             'withAttributes',
         ], $this->except);
     }
