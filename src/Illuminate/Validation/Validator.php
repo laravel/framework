@@ -328,8 +328,13 @@ class Validator implements ValidatorContract
                 continue;
             }
 
-            foreach ($rules as $rule) {
-                $this->validateAttribute($attribute, $rule);
+            foreach ($rules as $rule => $message) {
+                if (is_numeric($rule)) {
+                    $rule = $message;
+                    $message = null;
+                }
+
+                $this->validateAttribute($attribute, $rule, $message);
 
                 if ($this->shouldBeExcluded($attribute)) {
                     $this->removeAttribute($attribute);
@@ -463,7 +468,7 @@ class Validator implements ValidatorContract
      * @param  string  $rule
      * @return void
      */
-    protected function validateAttribute($attribute, $rule)
+    protected function validateAttribute($attribute, $rule, $message = null)
     {
         $this->currentRule = $rule;
 
@@ -506,7 +511,7 @@ class Validator implements ValidatorContract
         $method = "validate{$rule}";
 
         if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
-            $this->addFailure($attribute, $rule, $parameters);
+            $this->addFailure($attribute, $rule, $parameters, $message);
         }
     }
 
@@ -729,7 +734,7 @@ class Validator implements ValidatorContract
      * @param  array  $parameters
      * @return void
      */
-    public function addFailure($attribute, $rule, $parameters = [])
+    public function addFailure($attribute, $rule, $parameters = [], $message = null)
     {
         if (! $this->messages) {
             $this->passes();
@@ -742,7 +747,7 @@ class Validator implements ValidatorContract
         }
 
         $this->messages->add($attribute, $this->makeReplacements(
-            $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
+            $message ?: $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
         ));
 
         $this->failedRules[$attribute][$rule] = $parameters;
