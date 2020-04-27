@@ -1029,6 +1029,10 @@ class TestResponse implements ArrayAccess
             if (is_int($key)) {
                 PHPUnit::assertTrue($errors->has($value), "Session missing error: $value");
             } else {
+                if (is_bool($value)) {
+                    $value = (string) $value;
+                }
+
                 PHPUnit::assertContains($value, $errors->get($key, $format));
             }
         }
