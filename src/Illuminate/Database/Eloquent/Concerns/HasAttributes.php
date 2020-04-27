@@ -476,7 +476,7 @@ trait HasAttributes
     protected function mutateAttributeForArray($key, $value)
     {
         $value = $this->isClassCastable($key)
-                    ? $this->getClassCastableAttributeValue($key)
+                    ? $this->getClassCastableAttributeValue($key, $value)
                     : $this->mutateAttribute($key, $value);
 
         return $value instanceof Arrayable ? $value->toArray() : $value;
@@ -540,7 +540,7 @@ trait HasAttributes
         }
 
         if ($this->isClassCastable($key)) {
-            return $this->getClassCastableAttributeValue($key);
+            return $this->getClassCastableAttributeValue($key, $value);
         }
 
         return $value;
@@ -550,9 +550,10 @@ trait HasAttributes
      * Cast the given attribute using a custom cast class.
      *
      * @param  string  $key
+     * @param  mixed  $value
      * @return mixed
      */
-    protected function getClassCastableAttributeValue($key)
+    protected function getClassCastableAttributeValue($key, $value)
     {
         if (isset($this->classCastCache[$key])) {
             return $this->classCastCache[$key];
@@ -560,8 +561,8 @@ trait HasAttributes
             $caster = $this->resolveCasterClass($key);
 
             return $this->classCastCache[$key] = $caster instanceof CastsInboundAttributes
-                ? ($this->attributes[$key] ?? null)
-                : $caster->get($this, $key, $this->attributes[$key] ?? null, $this->attributes);
+                ? $value
+                : $caster->get($this, $key, $value, $this->attributes);
         }
     }
 
