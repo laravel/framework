@@ -77,7 +77,9 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        return 'mysqldump --set-gtid-purged=OFF --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
+        $gtidPurged = $this->connection->isMaria() ? '' : '--set-gtid-purged=OFF';
+
+        return 'mysqldump '.$gtidPurged.' --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
     }
 
     /**
