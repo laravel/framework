@@ -240,6 +240,24 @@ class BusFake implements QueueingDispatcher
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
+     * Queuable jobs will be dispatched to the "sync" queue.
+     *
+     * @param  mixed  $command
+     * @param  mixed  $handler
+     * @return mixed
+     */
+    public function dispatchSync($command, $handler = null)
+    {
+        if ($this->shouldFakeJob($command)) {
+            $this->commands[get_class($command)][] = $command;
+        } else {
+            return $this->dispatcher->dispatchSync($command, $handler);
+        }
+    }
+
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
      * @param  mixed  $command
      * @param  mixed  $handler
      * @return mixed

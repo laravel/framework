@@ -79,7 +79,7 @@ class CallQueuedHandler
         return (new Pipeline($this->container))->send($command)
                 ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
                 ->then(function ($command) use ($job) {
-                    return $this->dispatcher->dispatchDirectly(
+                    return $this->dispatcher->dispatchNow(
                         $command, $this->resolveHandler($job, $command)
                     );
                 });

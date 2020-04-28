@@ -79,11 +79,13 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
+     * Queuable jobs will be dispatched to the "sync" queue.
+     *
      * @param  mixed  $command
      * @param  mixed  $handler
      * @return mixed
      */
-    public function dispatchNow($command, $handler = null)
+    public function dispatchSync($command, $handler = null)
     {
         if ($this->queueResolver &&
             $this->commandShouldBeQueued($command) &&
@@ -91,7 +93,7 @@ class Dispatcher implements QueueingDispatcher
             return $this->dispatchToQueue($command->onConnection('sync'));
         }
 
-        return $this->dispatchDirectly($command, $handler);
+        return $this->dispatchNow($command, $handler);
     }
 
     /**
@@ -101,7 +103,7 @@ class Dispatcher implements QueueingDispatcher
      * @param  mixed  $handler
      * @return mixed
      */
-    public function dispatchDirectly($command, $handler = null)
+    public function dispatchNow($command, $handler = null)
     {
         $uses = class_uses_recursive($command);
 
