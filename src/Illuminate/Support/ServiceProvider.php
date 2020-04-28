@@ -227,6 +227,8 @@ abstract class ServiceProvider
     /**
      * Register Eloquent model factory paths.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @param  array|string  $paths
      * @return void
      */
