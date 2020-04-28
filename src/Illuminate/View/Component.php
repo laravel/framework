@@ -4,6 +4,7 @@ namespace Illuminate\View;
 
 use Closure;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
@@ -182,8 +183,44 @@ abstract class Component
     protected function createVariableFromMethod(ReflectionMethod $method)
     {
         return $method->getNumberOfParameters() === 0
-                        ? $this->{$method->getName()}()
+                        ? $this->createInvokableVariable($method->getName())
                         : Closure::fromCallable([$this, $method->getName()]);
+    }
+
+    /**
+     * Create an invokable, toStringable variable for the given component method.
+     *
+     * @param  string  $method
+     * @return object
+     */
+    protected function createInvokableVariable(string $method)
+    {
+        return new class(function () use ($method) {
+            return $this->{$method}();
+        }) implements DeferringDisplayableValue {
+            protected $callable;
+
+            public function __construct(Closure $callable)
+            {
+                $this->callable = $callable;
+            }
+
+            public function resolveDisplayableValue()
+            {
+                return $this->__invoke();
+            }
+
+            public function __invoke()
+            {
+                return call_user_func($this->callable);
+            }
+
+            public function __toString()
+            {
+                return (string) $this->__invoke();
+            }
+
+        };
     }
 
     /**
