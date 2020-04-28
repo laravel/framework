@@ -164,7 +164,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', ['title' => 'foo'])
 <?php \$component->withName('alert'); ?>
 <?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes),'wire:model' => 'foo']); ?>\n".
-            "@endcomponentClass </div>", trim($result));
+            '@endcomponentClass </div>', trim($result));
     }
 
     public function testComponentsCanHaveAttachedWord()
