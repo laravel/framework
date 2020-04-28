@@ -308,4 +308,52 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
     }
+
+    public function testItEnsuresDroppingMultipleColumnsIsAvailable()
+    {
+        $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+            $table->dropColumn('name');
+            $table->dropColumn('email');
+        });
+    }
+
+    public function testItEnsuresRenamingMultipleColumnsIsAvailable()
+    {
+        $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+            $table->renameColumn('name', 'first_name');
+            $table->renameColumn('name2', 'last_name');
+        });
+    }
+
+    public function testItEnsuresRenamingAndDroppingMultipleColumnsIsAvailable()
+    {
+        $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+            $table->dropColumn('name');
+            $table->renameColumn('name2', 'last_name');
+        });
+    }
+
+    public function testItEnsuresDroppingForeignKeyIsAvailable()
+    {
+        $this->expectExceptionMessage("SQLite doesn't support dropping foreign keys (you would need to re-create the table).");
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+            $table->dropForeign('something');
+        });
+    }
+
+    public function testItAddingForeignKeysIsAvailable()
+    {
+        $this->expectExceptionMessage("SQLite doesn't support adding foreign keys to existing tables.");
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null');
+        });
+    }
 }

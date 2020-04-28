@@ -156,6 +156,12 @@ class Blueprint
                     "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
                 );
             }
+
+            if (! $this->creating() && $this->commandsNamed(['foreign'])->count() > 0) {
+                throw new BadMethodCallException(
+                    "SQLite doesn't support adding foreign keys to existing tables."
+                );
+            }
         }
     }
 
