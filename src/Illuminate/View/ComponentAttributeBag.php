@@ -141,6 +141,15 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function setAttributes(array $attributes)
     {
+        if (isset($attributes['attributes']) &&
+            $attributes['attributes'] instanceof self) {
+            $parentBag = $attributes['attributes'];
+
+            unset($attributes['attributes']);
+
+            $attributes = $parentBag->merge($attributes);
+        }
+
         $this->attributes = $attributes;
     }
 
