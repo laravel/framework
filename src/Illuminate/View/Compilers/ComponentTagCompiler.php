@@ -400,7 +400,23 @@ class ComponentTagCompiler
     {
         $value = $this->blade->compileEchos($attributeString);
 
-        $value = collect(token_get_all($value))->map(function ($token) {
+        $value = $this->escapeSingleQuotesOutsideOfPhpBlocks($value);
+
+        $value = str_replace('<?php echo ', '\'.', $value);
+        $value = str_replace('; ?>', '.\'', $value);
+
+        return $value;
+    }
+
+    /**
+     * Escape the single quotes in the given string that are outside of PHP blocks.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function escapeSingleQuotesOutsideOfPhpBlocks(string $value)
+    {
+        return collect(token_get_all($value))->map(function ($token) {
             if (! is_array($token)) {
                 return $token;
             }
@@ -409,11 +425,6 @@ class ComponentTagCompiler
                         ? str_replace("'", "\\'", $token[1])
                         : $token[1];
         })->implode('');
-
-        $value = str_replace('<?php echo ', '\'.', $value);
-        $value = str_replace('; ?>', '.\'', $value);
-
-        return $value;
     }
 
     /**
