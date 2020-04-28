@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\View;
 
 use Illuminate\View\Component;
+use Illuminate\View\ComponentAttributeBag;
 use PHPUnit\Framework\TestCase;
 
 class ViewComponentTest extends TestCase
@@ -16,6 +17,15 @@ class ViewComponentTest extends TestCase
         $this->assertEquals(10, $variables['votes']);
         $this->assertSame('world', $variables['hello']());
         $this->assertSame('taylor', $variables['hello']('taylor'));
+    }
+
+    public function testAttributeParentInheritance()
+    {
+        $component = new TestViewComponent;
+
+        $component->withAttributes(['class' => 'foo', 'attributes' => new ComponentAttributeBag(['class' => 'bar', 'type' => 'button'])]);
+
+        $this->assertEquals('class="foo bar" type="button"', (string) $component->attributes);
     }
 
     public function testPublicMethodsWithNoArgsAreConvertedToStringableCallablesInvokedAndNotCached()
