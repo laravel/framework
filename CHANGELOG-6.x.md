@@ -1,11 +1,10 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.2...6.x)
+## This CHANGELOG is no longer maintained. 
 
-### Fixed
-- Corrected suggested dependencies ([#32072](https://github.com/laravel/framework/pull/32072), [c01a70e](https://github.com/laravel/framework/commit/c01a70e33198e81d06d4b581e36e25a80acf8a68))
-- Avoid deadlock in test when sharing process group ([#32067](https://github.com/laravel/framework/pull/32067))
+For release notes, see [https://github.com/laravel/framework/releases](https://github.com/laravel/framework/releases)
 
+<hr>
 
 ## [v6.18.2 (2020-03-17)](https://github.com/laravel/framework/compare/v6.18.1...v6.18.2)
 
