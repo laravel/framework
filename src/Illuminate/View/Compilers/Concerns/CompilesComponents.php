@@ -60,10 +60,10 @@ trait CompilesComponents
     public static function compileClassComponentOpening(string $component, string $data, string $hash)
     {
         return implode("\n", [
-            '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
-            '<?php $component = $__env->getContainer()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
-            '<?php if ($component->shouldRender()): ?>',
-            '<?php $__env->startComponent($component->resolveView(), $component->data()); ?>',
+            '<?php if (isset($__component)) { $__componentOriginal'.$hash.' = $__component; } ?>',
+            '<?php $__component = $__env->getContainer()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
+            '<?php if ($__component->shouldRender()): ?>',
+            '<?php $__env->startComponent($__component->resolveView(), $__component->data()); ?>',
         ]);
     }
 
@@ -78,7 +78,7 @@ trait CompilesComponents
 
         return implode("\n", [
             '<?php if (isset($__componentOriginal'.$hash.')): ?>',
-            '<?php $component = $__componentOriginal'.$hash.'; ?>',
+            '<?php $__component = $__componentOriginal'.$hash.'; ?>',
             '<?php unset($__componentOriginal'.$hash.'); ?>',
             '<?php endif; ?>',
             '<?php echo $__env->renderComponent(); ?>',

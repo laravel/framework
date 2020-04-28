@@ -17,10 +17,10 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
     public function testClassComponentsAreCompiled()
     {
-        $this->assertSame('<?php if (isset($component)) { $__componentOriginal35bda42cbf6f9717b161c4f893644ac7a48b0d98 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Test::class, ["foo" => "bar"]); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', ["foo" => "bar"])'));
+        $this->assertSame('<?php if (isset($__component)) { $__componentOriginal35bda42cbf6f9717b161c4f893644ac7a48b0d98 = $__component; } ?>
+<?php $__component = $__env->getContainer()->make(Test::class, ["foo" => "bar"]); ?>
+<?php if ($__component->shouldRender()): ?>
+<?php $__env->startComponent($__component->resolveView(), $__component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', ["foo" => "bar"])'));
     }
 
     public function testEndComponentsAreCompiled()
@@ -28,7 +28,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
         $this->compiler->newComponentHash('foo');
 
         $this->assertSame('<?php if (isset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33)): ?>
-<?php $component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
+<?php $__component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
 <?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
 <?php endif; ?>
 <?php echo $__env->renderComponent(); ?>', $this->compiler->compileString('@endcomponent'));
@@ -39,7 +39,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
         $this->compiler->newComponentHash('foo');
 
         $this->assertSame('<?php if (isset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33)): ?>
-<?php $component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
+<?php $__component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
 <?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
 <?php endif; ?>
 <?php echo $__env->renderComponent(); ?>
