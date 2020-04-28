@@ -2,13 +2,9 @@
 
 namespace Illuminate\View;
 
-use ArrayIterator;
 use Closure;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Support\DeferringDisplayableValue;
-use Illuminate\Support\Enumerable;
 use Illuminate\Support\Str;
-use IteratorAggregate;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -194,53 +190,13 @@ abstract class Component
      * Create an invokable, toStringable variable for the given component method.
      *
      * @param  string  $method
-     * @return object
+     * @return \Illuminate\View\InvokableComponentVariable
      */
     protected function createInvokableVariable(string $method)
     {
-        return new class(function () use ($method) {
+        return new InvokableComponentVariable(function () use ($method) {
             return $this->{$method}();
-        }) implements DeferringDisplayableValue, IteratorAggregate {
-            protected $callable;
-
-            public function __construct(Closure $callable)
-            {
-                $this->callable = $callable;
-            }
-
-            public function resolveDisplayableValue()
-            {
-                return $this->__invoke();
-            }
-
-            public function getIterator()
-            {
-                $result = $this->__invoke();
-
-                return new ArrayIterator($result instanceof Enumerable ? $result->all() : $result);
-            }
-
-            public function __get($key)
-            {
-                return $this->__invoke()->{$key};
-            }
-
-            public function __call($method, $parameters)
-            {
-                return $this->__invoke()->{$method}(...$parameters);
-            }
-
-            public function __invoke()
-            {
-                return call_user_func($this->callable);
-            }
-
-            public function __toString()
-            {
-                return (string) $this->__invoke();
-            }
-
-        };
+        });
     }
 
     /**
