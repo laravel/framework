@@ -11,7 +11,7 @@
 - Register opis key so it is not tied to a deferred service provider ([a4574ea](https://github.com/laravel/framework/commit/a4574ea973bab9bd6a2ba34d36dfb8f9b55d5a4a))
 - Pass status code to schedule finish ([b815dc6](https://github.com/laravel/framework/commit/b815dc6c1b1c595f3241c493255f0fbfd67a6131))
 - Fix firstWhere behavior for relations ([#32525](https://github.com/laravel/framework/pull/32525))
-- Fix boolean value in assertSessionHasErrors ([#32555](https://github.com/laravel/framework/pull/32555))
+- Fixed boolean value in `Illuminate\Foundation\Testing\TestResponse::assertSessionHasErrors()` ([#32555](https://github.com/laravel/framework/pull/32555))
 
 
 ## [v6.18.10 (2020-04-21)](https://github.com/laravel/framework/compare/v6.18.9...v6.18.10)
