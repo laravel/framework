@@ -239,6 +239,7 @@ abstract class Component
             {
                 return (string) $this->__invoke();
             }
+
         };
     }
 
