@@ -27,6 +27,10 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertSame('TAYLOR', $unserializedModel->getAttributes()['uppercase']);
         $this->assertSame('TAYLOR', $unserializedModel->toArray()['uppercase']);
 
+        $model->syncOriginal();
+        $model->uppercase = 'dries';
+        $this->assertEquals('TAYLOR', $model->getOriginal('uppercase'));
+
         $model = new TestEloquentModelWithCustomCast;
 
         $model->address = $address = new Address('110 Kingsbrook St.', 'My Childhood House');
