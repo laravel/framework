@@ -157,6 +157,28 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 '@endcomponentClass', trim($result));
     }
 
+    public function testComponentCanReceiveAttributeBag()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile class="bar" {{ $attributes }} wire:model="foo"></x-profile>');
+
+        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', [])
+<?php \$component->withName('profile'); ?>
+<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes),'wire:model' => 'foo']); ?> @endcomponentClass", trim($result));
+    }
+
+    public function testSelfClosingComponentCanReceiveAttributeBag()
+    {
+        $this->mockViewFactory();
+
+        $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert title="foo" class="bar" {{ $attributes }} wire:model="foo" /></div>');
+
+        $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', ['title' => 'foo'])
+<?php \$component->withName('alert'); ?>
+<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes),'wire:model' => 'foo']); ?>\n".
+            "@endcomponentClass </div>", trim($result));
+    }
+
     public function testComponentsCanHaveAttachedWord()
     {
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile></x-profile>Words');
