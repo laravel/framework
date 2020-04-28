@@ -171,11 +171,11 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $this->mockViewFactory();
 
-        $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert title="foo" class="bar" {{ $attributes }} wire:model="foo" /></div>');
+        $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert title="foo" class="bar" {{ $attributes->merge([\'class\' => \'test\']) }} wire:model="foo" /></div>');
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', ['title' => 'foo'])
 <?php \$component->withName('alert'); ?>
-<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes),'wire:model' => 'foo']); ?>\n".
+<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes->merge(['class' => 'test'])),'wire:model' => 'foo']); ?>\n".
             '@endcomponentClass </div>', trim($result));
     }
 
