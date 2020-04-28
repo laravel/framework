@@ -84,7 +84,7 @@ class DatabaseServiceProvider extends ServiceProvider
             $locale = $parameters['locale'] ?? $app['config']->get('app.faker_locale', 'en_US');
 
             if (! isset(static::$fakers[$locale])) {
-                static::$fakers[$locale] = FakerFactory::create($locale);;
+                static::$fakers[$locale] = FakerFactory::create($locale);
             }
 
             return static::$fakers[$locale];
