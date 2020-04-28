@@ -5,6 +5,7 @@ namespace Illuminate\View\Compilers;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Illuminate\View\AnonymousComponent;
 use InvalidArgumentException;
@@ -41,12 +42,14 @@ class ComponentTagCompiler
      * Create new component tag compiler.
      *
      * @param  array  $aliases
+     * @param  \Illuminate\View\Compilers\BladeCompiler|null
      * @return void
      */
-    public function __construct(BladeCompiler $blade, array $aliases = [])
+    public function __construct(array $aliases = [], ?BladeCompiler $blade = null)
     {
-        $this->blade = $blade;
         $this->aliases = $aliases;
+
+        $this->blade = $blade ?: new BladeCompiler(new Filesystem, sys_get_temp_dir());
     }
 
     /**
