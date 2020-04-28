@@ -1,9 +1,37 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.8.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.9.2...7.x)
+
+
+## [v7.9.2 (2020-04-28)](https://github.com/laravel/framework/compare/v7.9.1...v7.9.2)
+
+### Changed
+- Extract `InvokableComponentVariable` class ([f1ef6e6](https://github.com/laravel/framework/commit/f1ef6e6c40028cdafb95fc53e950b6ef73030458))
+- Changed argument order in `Illuminate\View\Compilers\ComponentTagCompiler::__construct()` ([520544d](https://github.com/laravel/framework/commit/520544dc24772b421410a2528ba01fd47818eeea))
+
+
+## [v7.9.1 (2020-04-28)](https://github.com/laravel/framework/compare/v7.9.0...v7.9.1)
+
+### Added
+- Added more proxy methods to deferred value from `Illuminate\View\Component::createInvokableVariable()` ([08c4012](https://github.com/laravel/framework/commit/08c40123a438e40ad82582fee7ddaa1ff056bb83))
+
+
+## [v7.9.0 (2020-04-28)](https://github.com/laravel/framework/compare/v7.8.1...v7.9.0)
+
+### Added
+- Add pdo try again as lost connection message ([#32544](https://github.com/laravel/framework/pull/32544))
+- Compile Echos Within Blade Component Attributes ([#32558](https://github.com/laravel/framework/pull/32558))
+- Parameterless Component Methods Invokable With & Without Parens ([#32560](https://github.com/laravel/framework/pull/32560))
 
 ### Fixed
 - Fixed `firstWhere` behavior for relations ([#32525](https://github.com/laravel/framework/pull/32525))
+- Added check to avoid endless loop in `MailManager::createTransport()` ([#32549](https://github.com/laravel/framework/pull/32549))
+- Fixed table prefixes with `compileDropDefaultConstraint()` ([#32554](https://github.com/laravel/framework/pull/32554))
+- Fixed boolean value in `Illuminate\Foundation\Testing\TestResponse::assertSessionHasErrors()` ([#32555](https://github.com/laravel/framework/pull/32555))
+- Fixed `Model::getOriginal()` with custom casts ([9e22c7c](https://github.com/laravel/framework/commit/9e22c7cfa629773eab981ccad13080c0f4cb81b2))
+
+### Changed
+- Added `withName` to `Illuminate\View\Component::ignoredMethods()` ([2e9eef2](https://github.com/laravel/framework/commit/2e9eef20a17a8b78493ae775ee95ed11349455d7))
 
 
 ## [v7.8.1 (2020-04-24)](https://github.com/laravel/framework/compare/v7.8.0...v7.8.1)
