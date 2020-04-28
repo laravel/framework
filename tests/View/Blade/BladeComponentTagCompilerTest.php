@@ -268,8 +268,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     protected function compiler($aliases = [])
     {
         return new ComponentTagCompiler(
-            $aliases,
-            new BladeCompiler(new Filesystem, __DIR__)
+            $aliases
         );
     }
 }
