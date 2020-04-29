@@ -134,23 +134,18 @@ class Batch
     {
         $id = Str::uuid();
 
-        app('cache')->put('batch_'.$id.'_counter', count($this->jobs), 3600);
+        app('cache')->put('batch_'.$id.'_size', 0, 3600);
+        app('cache')->put('batch_'.$id.'_pending', 0, 3600);
         app('cache')->put('batch_'.$id.'_failed', 0, 3600);
         app('cache')->put('batch_'.$id, json_encode([
             'allowFailure' => $this->allowFailure,
-            'size' => count($this->jobs),
+            'connection' => $this->connection,
+            'queue' => $this->queue,
             'success' => $this->callback ? serialize($this->callback) : null,
             'failure' => $this->failureCallback ? serialize($this->failureCallback) : null,
         ]), 3600);
 
-        foreach ($this->jobs as $job) {
-            $job->batchId($id);
-
-            $job->onConnection($job->connection ?: $this->connection);
-            $job->onQueue($job->queue ?: $this->queue);
-
-            dispatch($job);
-        }
+        static::find($id)->add($this->jobs);
 
         return $id;
     }
@@ -166,7 +161,7 @@ class Batch
         try {
             return new ExistingBatch($id);
         } catch (\InvalidArgumentException $e) {
-
+            // return null
         }
     }
 }

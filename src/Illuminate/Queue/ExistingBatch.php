@@ -2,9 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Queue\SerializableClosure;
-use Illuminate\Support\Str;
-
 class ExistingBatch
 {
     /**
@@ -44,7 +41,7 @@ class ExistingBatch
      */
     public function size()
     {
-        return $this->data->size;
+        return (int) app('cache')->get('batch_'.$this->id.'_size');
     }
 
     /**
@@ -54,7 +51,7 @@ class ExistingBatch
      */
     public function pending()
     {
-        return app('cache')->get('batch_'.$this->id.'_counter');
+        return (int) app('cache')->get('batch_'.$this->id.'_pending');
     }
 
     /**
@@ -74,7 +71,7 @@ class ExistingBatch
      */
     public function failures()
     {
-        return app('cache')->get('batch_'.$this->id.'_failed');
+        return (int) app('cache')->get('batch_'.$this->id.'_failed');
     }
 
     /**
@@ -100,7 +97,7 @@ class ExistingBatch
 
         $pending = $this->pending();
 
-        return $pending < $this->data->size && $pending > 0;
+        return $pending < $this->size() && $pending > 0;
     }
 
     /**
@@ -110,7 +107,7 @@ class ExistingBatch
      */
     public function hasFailed()
     {
-        return (bool) app('cache')->get('batch_'.$id.'_fail');
+        return (bool) app('cache')->get('batch_'.$this->id.'_fail');
     }
 
     /**
@@ -130,9 +127,10 @@ class ExistingBatch
      */
     public function countJob()
     {
-        if (app('cache')->decrement('batch_'.$this->id.'_counter') == 0
-            && $this->data->success) {
-            app()->call(unserialize($this->data->success)->getClosure());
+        if (! $this->hasFailed() &&
+            app('cache')->decrement('batch_'.$this->id.'_pending') == 0 &&
+            $this->data->success) {
+            app()->call(unserialize($this->data->success)->getClosure(), [$this]);
         }
     }
 
@@ -157,9 +155,30 @@ class ExistingBatch
      */
     public function fail()
     {
-        app('cache')->put('batch_'.$id.'_fail', 1, 3600);
+        app('cache')->put('batch_'.$this->id.'_fail', 1, 3600);
 
-        app()->call(unserialize($this->data->failure)->getClosure());
+        app()->call(unserialize($this->data->failure)->getClosure(), [$this]);
+    }
+
+    /**
+     * Add more jobs to the batch.
+     *
+     * @param  array  $jobs
+     * @return void
+     */
+    public function add($jobs)
+    {
+        app('cache')->increment('batch_'.$this->id.'_size', count($jobs));
+        app('cache')->increment('batch_'.$this->id.'_pending', count($jobs));
+
+        foreach ($jobs as $job) {
+            $job->batchId($this->id);
+
+            $job->onConnection($job->connection ?: $this->data->connection);
+            $job->onQueue($job->queue ?: $this->data->queue);
+
+            dispatch($job);
+        }
     }
 
     /**
@@ -169,7 +188,10 @@ class ExistingBatch
      */
     public function delete()
     {
-        app('cache')->forget('batch_'.$this->id.'_counter');
+        app('cache')->forget('batch_'.$this->id.'_failed');
+        app('cache')->forget('batch_'.$this->id.'_fail');
+        app('cache')->forget('batch_'.$this->id.'_pending');
+        app('cache')->forget('batch_'.$this->id.'_size');
         app('cache')->forget('batch_'.$this->id);
     }
 }
