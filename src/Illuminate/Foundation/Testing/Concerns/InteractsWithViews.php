@@ -41,4 +41,23 @@ trait InteractsWithViews
 
         return new TestView(view(Str::before(basename($tempFile), '.blade.php'), $data));
     }
+
+    /**
+     * Create a new TestView from the given view component.
+     *
+     * @param  string  $view
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @return \Illuminate\Testing\TestView
+     */
+    protected function component(string $viewComponent, array $data = [])
+    {
+        $component = $this->app->make($viewComponent, $data);
+        $view = $component->resolveView();
+
+        if ($view instanceof \Illuminate\View\View) {
+            return new TestView($view->with($component->data()));
+        }
+
+        return new TestView(view($view, $component->data()));
+    }
 }
