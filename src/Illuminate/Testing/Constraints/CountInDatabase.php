@@ -2,13 +2,12 @@
 
 namespace Illuminate\Testing\Constraints;
 
-use ReflectionClass;
 use Illuminate\Database\Connection;
 use PHPUnit\Framework\Constraint\Constraint;
+use ReflectionClass;
 
 class CountInDatabase extends Constraint
 {
-
     /**
      * The database connection.
      *
