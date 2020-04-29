@@ -30,7 +30,7 @@ trait CompilesComponents
         $hash = static::newComponentHash($component);
 
         if (Str::contains($component, ['::class', '\\'])) {
-            return static::compileClassComponentOpening($component, $data, $hash, $alias);
+            return static::compileClassComponentOpening($component, $alias, $data, $hash);
         }
 
         return "<?php \$__env->startComponent{$expression}; ?>";
@@ -58,7 +58,7 @@ trait CompilesComponents
      * @param  string  $hash
      * @return string
      */
-    public static function compileClassComponentOpening(string $component, string $data, string $hash, string $alias)
+    public static function compileClassComponentOpening(string $component, string $alias, string $data, string $hash)
     {
         return implode("\n", [
             '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
