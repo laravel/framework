@@ -34,7 +34,6 @@ class CountInDatabase extends Constraint
      *
      * @param  \Illuminate\Database\Connection  $database
      * @param  int  $expectedCount
-     *
      * @return void
      */
     public function __construct(Connection $database, int $expectedCount)
@@ -54,7 +53,7 @@ class CountInDatabase extends Constraint
     {
         $this->actualCount = $this->database->table($table)->count();
 
-        return  $this->actualCount === $this->expectedCount;
+        return $this->actualCount === $this->expectedCount;
     }
 
     /**
