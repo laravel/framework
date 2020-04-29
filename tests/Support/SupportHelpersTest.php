@@ -564,6 +564,26 @@ class SupportHelpersTest extends TestCase
         }));
     }
 
+    public function testIdx()
+    {
+        $this->assertEquals('foo', idx(null, null, 'foo'));
+        $this->assertEquals('foo', idx(null, 'key', 'foo'));
+
+        $test = ['item', 'one' => 'test', 'two' => null];
+        $this->assertEquals('item', idx($test, 0));
+        $this->assertEquals('test', idx($test, 'one'));
+        $this->assertNull(idx($test, 'two', 'foo'));
+        $this->assertEquals('foo', idx($test, 'bad_key', 'foo'));
+        $this->assertEquals('foo', idx($test, null, 'foo'));
+
+        $test = collect($test);
+        $this->assertEquals('item', idx($test, 0));
+        $this->assertEquals('test', idx($test, 'one'));
+        $this->assertNull(idx($test, 'two', 'foo'));
+        $this->assertEquals('foo', idx($test, 'bad_key', 'foo'));
+        $this->assertEquals('foo', idx($test, null, 'foo'));
+    }
+
     public function testEnv()
     {
         $_SERVER['foo'] = 'bar';

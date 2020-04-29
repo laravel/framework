@@ -558,3 +558,27 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (!function_exists('idx')) {
+    /**
+     * @param ArrayAccess|array|null $arr
+     * @param mixed      $index
+     * @param mixed|null $default
+     *
+     * @return mixed|null
+     */
+    function idx($arr, $index, $default = null)
+    {
+        if ($index === null) {
+            return $default;
+        }
+
+        if (is_array($arr) && array_key_exists($index, $arr)) {
+            return $arr[$index];
+        } elseif ($arr instanceof ArrayAccess && $arr->offsetExists($index)) {
+            return $arr[$index];
+        }
+
+        return $default;
+    }
+}
