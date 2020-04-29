@@ -45,7 +45,7 @@ trait InteractsWithViews
     /**
      * Create a new TestView from the given view component.
      *
-     * @param  string  $view
+     * @param  string  $viewComponent
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return \Illuminate\Testing\TestView
      */
