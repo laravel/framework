@@ -17,7 +17,7 @@ class DummyClass implements CastsAttributes
      */
     public function get($model, $key, $value, $attributes)
     {
-        // Cast the given value
+        return $value;
     }
 
     /**
@@ -31,6 +31,6 @@ class DummyClass implements CastsAttributes
      */
     public function set($model, $key, $value, $attributes)
     {
-        // Prepare the given value for storage.
+        return $value;
     }
 }
