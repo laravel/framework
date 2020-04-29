@@ -559,7 +559,7 @@ if (! function_exists('with')) {
     }
 }
 
-if (!function_exists('idx')) {
+if (! function_exists('idx')) {
     /**
      * @param ArrayAccess|array|null $arr
      * @param mixed      $index
