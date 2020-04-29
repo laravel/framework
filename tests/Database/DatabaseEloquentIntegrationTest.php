@@ -1179,6 +1179,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(EloquentTestItem::class, $item);
     }
 
+    public function testEagerLoadedMorphToRelationsOnAnotherDatabaseConnection()
+    {
+        EloquentTestPost::create(['id' => 1, 'name' => 'Default Connection Post', 'user_id' => 1]);
+        EloquentTestPhoto::create(['id' => 1, 'imageable_type' => EloquentTestPost::class, 'imageable_id' => 1, 'name' => 'Photo']);
+
+        EloquentTestPost::on('second_connection')
+            ->create(['id' => 1, 'name' => 'Second Connection Post', 'user_id' => 1]);
+        EloquentTestPhoto::on('second_connection')
+            ->create(['id' => 1, 'imageable_type' => EloquentTestPost::class, 'imageable_id' => 1, 'name' => 'Photo']);
+
+        $defaultConnectionPost = EloquentTestPhoto::with('imageable')->first()->imageable;
+        $secondConnectionPost = EloquentTestPhoto::on('second_connection')->with('imageable')->first()->imageable;
+
+        $this->assertEquals($defaultConnectionPost->name, 'Default Connection Post');
+        $this->assertEquals($secondConnectionPost->name, 'Second Connection Post');
+    }
+
     public function testBelongsToManyCustomPivot()
     {
         $john = EloquentTestUserWithCustomFriendPivot::create(['id' => 1, 'name' => 'John Doe', 'email' => 'johndoe@example.com']);
