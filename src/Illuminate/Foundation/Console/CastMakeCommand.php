@@ -3,9 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Str;
-use Symfony\Component\Console\Input\InputOption;
 
 class CastMakeCommand extends GeneratorCommand
 {
