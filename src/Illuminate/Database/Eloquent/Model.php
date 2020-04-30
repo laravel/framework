@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
@@ -1522,7 +1523,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function resolveChildRouteBinding($childType, $value, $field)
     {
-        return $this->{Str::plural(Str::camel($childType))}()->where($field, $value)->first();
+        $relationship = $this->{Str::plural(Str::camel($childType))}();
+
+        if ($relationship instanceof HasManyThrough) {
+            return $relationship->where($relationship->getRelated()->getTable().'.'.$field, $value)->first();
+        } else {
+            return $relationship->where($field, $value)->first();
+        }
     }
 
     /**
