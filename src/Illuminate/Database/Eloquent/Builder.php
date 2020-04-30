@@ -1373,8 +1373,8 @@ class Builder
             return call_user_func_array(static::$macros[$method], $parameters);
         }
 
-        if (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
-            return $this->callScope([$this->model, $scope], $parameters);
+        if ($this->model->hasScope($method)) {
+            return $this->callScope([$this->model, 'scope' . ucfirst($method)], $parameters);
         }
 
         if (in_array($method, $this->passthru)) {
