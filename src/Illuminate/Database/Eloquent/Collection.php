@@ -557,9 +557,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function getQueueableRelations()
     {
-        return $this->isEmpty() ? [] : $this->map->getQueueableRelations()->reduce(function ($carry, $item) {
-            return array_intersect($carry ?? $item, $item);
-        });
+        return $this->isEmpty() ? [] : array_intersect(...$this->map->getQueueableRelations()->all());
     }
 
     /**
