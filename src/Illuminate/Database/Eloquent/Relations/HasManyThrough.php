@@ -115,7 +115,9 @@ class HasManyThrough extends Relation
         $query->join($this->throughParent->getTable(), $this->getQualifiedParentKeyName(), '=', $farKey);
 
         if ($this->throughParentSoftDeletes()) {
-            $query->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
+            $query->withGlobalScope('SoftDeletableHasManyThrough', function ($query) {
+                $query->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
+            });
         }
     }
 
@@ -137,6 +139,18 @@ class HasManyThrough extends Relation
     public function throughParentSoftDeletes()
     {
         return in_array(SoftDeletes::class, class_uses_recursive($this->throughParent));
+    }
+
+    /**
+     * Indicate that trashed "through" parents should be included in the query.
+     *
+     * @return $this
+     */
+    public function withTrashedParents()
+    {
+        $this->query->withoutGlobalScope('SoftDeletableHasManyThrough');
+
+        return $this;
     }
 
     /**
