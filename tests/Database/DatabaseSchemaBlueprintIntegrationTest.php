@@ -308,7 +308,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
     }
-    
+
     public function testItEnsuresDroppingMultipleColumnsIsAvailable()
     {
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
