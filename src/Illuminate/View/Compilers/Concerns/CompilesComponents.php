@@ -22,16 +22,16 @@ trait CompilesComponents
      */
     protected function compileComponent($expression)
     {
-        [$component, $data] = strpos($expression, ',') !== false
-                    ? array_map('trim', explode(',', trim($expression, '()'), 2))
-                    : [trim($expression, '()'), ''];
+        [$component, $alias, $data] = strpos($expression, ',') !== false
+                    ? array_map('trim', explode(',', trim($expression, '()'), 3)) + ['', '', '']
+                    : [trim($expression, '()'), '', ''];
 
         $component = trim($component, '\'"');
 
         $hash = static::newComponentHash($component);
 
         if (Str::contains($component, ['::class', '\\'])) {
-            return static::compileClassComponentOpening($component, $data, $hash);
+            return static::compileClassComponentOpening($component, $alias, $data, $hash);
         }
 
         return "<?php \$__env->startComponent{$expression}; ?>";
@@ -54,15 +54,17 @@ trait CompilesComponents
      * Compile a class component opening.
      *
      * @param  string  $component
+     * @param  string  $alias
      * @param  string  $data
      * @param  string  $hash
      * @return string
      */
-    public static function compileClassComponentOpening(string $component, string $data, string $hash)
+    public static function compileClassComponentOpening(string $component, string $alias, string $data, string $hash)
     {
         return implode("\n", [
             '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
             '<?php $component = $__env->getContainer()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
+            '<?php $component->withName('.$alias.'); ?>',
             '<?php if ($component->shouldRender()): ?>',
             '<?php $__env->startComponent($component->resolveView(), $component->data()); ?>',
         ]);

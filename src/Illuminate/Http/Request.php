@@ -294,7 +294,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the client user agent.
      *
-     * @return string
+     * @return string|null
      */
     public function userAgent()
     {

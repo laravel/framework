@@ -203,8 +203,7 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        return " @component('{$class}', [".$this->attributesToString($parameters, $escapeBound = false).'])
-<?php $component->withName(\''.$component.'\'); ?>
+        return " @component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
 <?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
     }
 
