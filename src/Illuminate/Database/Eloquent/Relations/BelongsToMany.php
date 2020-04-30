@@ -14,8 +14,8 @@ use InvalidArgumentException;
  * @method self withoutTrashedPivots() Show only non-trashed records
  * @method self withTrashedPivots() Show all records
  * @method self onlyTrashedPivots() Show only trashed records
- * @method int forceDetach(\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids, bool  $touch) Show only trashed records
- * @method int syncWithForceDetaching(mixed  $ids) Show only trashed records
+ * @method int forceDetach(\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids, bool  $touch) Force detach records
+ * @method int syncWithForceDetaching(mixed  $ids) Sync many-to-many relationship with force detaching
  */
 class BelongsToMany extends Relation
 {
