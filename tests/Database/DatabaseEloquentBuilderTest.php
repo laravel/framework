@@ -836,7 +836,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['larry', '90210', '90220', 'fooside dr', 29], $builder->getBindings());
     }
 
-    public function testHasWithContraintsAndJoinAndHavingInSubquery()
+    public function testHasWithConstraintsAndJoinAndHavingInSubquery()
     {
         $model = new EloquentBuilderTestModelParentStub;
         $builder = $model->where('bar', 'baz');
