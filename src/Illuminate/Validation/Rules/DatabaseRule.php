@@ -65,7 +65,7 @@ trait DatabaseRule
         $model = new $table;
 
         return $model instanceof Model
-                ? $model->getTable()
+                ? trim($model->getConnectionName().'.'.$model->getTable(), '.')
                 : $table;
     }
 
