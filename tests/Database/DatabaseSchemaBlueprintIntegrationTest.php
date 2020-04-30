@@ -60,7 +60,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
             'DROP TABLE users',
-            'CREATE TABLE users (name VARCHAR(255) NOT NULL COLLATE BINARY, age INTEGER NOT NULL COLLATE BINARY)',
+            'CREATE TABLE users (name VARCHAR(255) NOT NULL COLLATE BINARY, age INTEGER NOT NULL)',
             'INSERT INTO users (name, age) SELECT name, age FROM __temp__users',
             'DROP TABLE __temp__users',
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
@@ -266,7 +266,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
             'DROP TABLE users',
-            'CREATE TABLE users (name INTEGER UNSIGNED DEFAULT NULL COLLATE BINARY)',
+            'CREATE TABLE users (name INTEGER UNSIGNED DEFAULT NULL)',
             'INSERT INTO users (name) SELECT name FROM __temp__users',
             'DROP TABLE __temp__users',
             'alter table "users" add constraint "index1" unique ("name")',
@@ -283,7 +283,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
             'DROP TABLE users',
-            'CREATE TABLE users (name INTEGER UNSIGNED DEFAULT NULL COLLATE BINARY)',
+            'CREATE TABLE users (name INTEGER UNSIGNED DEFAULT NULL)',
             'INSERT INTO users (name) SELECT name FROM __temp__users',
             'DROP TABLE __temp__users',
             'create unique index "index1" on "users" ("name")',
@@ -300,7 +300,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
             'DROP TABLE users',
-            'CREATE TABLE users (name INTEGER UNSIGNED DEFAULT NULL COLLATE BINARY)',
+            'CREATE TABLE users (name INTEGER UNSIGNED DEFAULT NULL)',
             'INSERT INTO users (name) SELECT name FROM __temp__users',
             'DROP TABLE __temp__users',
             'create unique index "index1" on "users" ("name")',
