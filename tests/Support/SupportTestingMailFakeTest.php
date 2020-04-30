@@ -14,12 +14,12 @@ use PHPUnit\Framework\TestCase;
 class SupportTestingMailFakeTest extends TestCase
 {
     /**
-     * @var MailFake
+     * @var \Illuminate\Support\Testing\Fakes\MailFake
      */
     private $fake;
 
     /**
-     * @var MailableStub
+     * @var \Illuminate\Tests\Support\MailableStub
      */
     private $mailable;
 

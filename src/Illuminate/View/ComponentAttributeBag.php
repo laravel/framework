@@ -90,7 +90,9 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         $props = [];
 
-        foreach ($keys as $key) {
+        foreach ($keys as $key => $defaultValue) {
+            $key = is_numeric($key) ? $defaultValue : $key;
+
             $props[] = $key;
             $props[] = Str::kebab($key);
         }
@@ -108,15 +110,17 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         $attributes = [];
 
-        foreach ($this->attributes as $key => $value) {
-            if ($value === true) {
-                $attributes[$key] = $key;
-
-                continue;
+        $attributeDefaults = array_map(function ($value) {
+            if (is_null($value) || is_bool($value)) {
+                return $value;
             }
 
+            return e($value);
+        }, $attributeDefaults);
+
+        foreach ($this->attributes as $key => $value) {
             if ($key !== 'class') {
-                $attributes[$key] = $attributeDefaults[$key] ?? $value;
+                $attributes[$key] = $value;
 
                 continue;
             }
@@ -126,7 +130,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             ));
         }
 
-        return new static(array_merge($attributeDefaults, array_filter($attributes)));
+        return new static(array_merge($attributeDefaults, $attributes));
     }
 
     /**
@@ -226,9 +230,15 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         $string = '';
 
         foreach ($this->attributes as $key => $value) {
-            $string .= $value === true
-                    ? ' '.$key
-                    : ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+            if ($value === false || is_null($value)) {
+                continue;
+            }
+
+            if ($value === true) {
+                $value = $key;
+            }
+
+            $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
         }
 
         return trim($string);

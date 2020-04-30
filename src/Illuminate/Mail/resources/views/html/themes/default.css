@@ -227,7 +227,6 @@ img {
     display: inline-block;
     overflow: hidden;
     text-decoration: none;
-    text-decoration: none;
 }
 
 .button-blue,
@@ -281,4 +280,10 @@ img {
 .panel-item p:last-of-type {
     margin-bottom: 0;
     padding-bottom: 0;
+}
+
+/* Utilities */
+
+.break-all {
+    word-break: break-all;
 }

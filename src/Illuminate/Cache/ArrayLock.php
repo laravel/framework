@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class ArrayLock extends Lock
 {
@@ -67,6 +67,10 @@ class ArrayLock extends Lock
      */
     public function release()
     {
+        if (! $this->exists()) {
+            return false;
+        }
+
         if (! $this->isOwnedByCurrentProcess()) {
             return false;
         }

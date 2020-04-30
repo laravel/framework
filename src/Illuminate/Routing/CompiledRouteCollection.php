@@ -5,6 +5,10 @@ namespace Illuminate\Routing;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 
@@ -23,6 +27,13 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * @var array
      */
     protected $attributes = [];
+
+    /**
+     * The dynamically added routes that were added after loading the cached, compiled routes.
+     *
+     * @var \Illuminate\Routing\RouteCollection|null
+     */
+    protected $routes;
 
     /**
      * The router instance used by the route.
@@ -49,6 +60,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
     {
         $this->compiled = $compiled;
         $this->attributes = $attributes;
+        $this->routes = new RouteCollection;
     }
 
     /**
@@ -59,17 +71,31 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function add(Route $route)
     {
-        $name = $route->getName() ?: $this->generateRouteName();
+        return $this->routes->add($route);
+    }
 
-        $this->attributes[$name] = [
-            'methods' => $route->methods(),
-            'uri' => $route->uri(),
-            'action' => $route->getAction() + ['as' => $name],
-        ];
+    /**
+     * Refresh the name look-up table.
+     *
+     * This is done in case any names are fluently defined or if routes are overwritten.
+     *
+     * @return void
+     */
+    public function refreshNameLookups()
+    {
+        //
+    }
 
-        $this->compiled = [];
-
-        return $route;
+    /**
+     * Refresh the action look-up table.
+     *
+     * This is done in case any actions are overwritten with new controllers.
+     *
+     * @return void
+     */
+    public function refreshActionLookups()
+    {
+        //
     }
 
     /**
@@ -78,35 +104,63 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Route
      *
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function match(Request $request)
     {
-        if (empty($this->compiled) && $this->attributes) {
-            $this->recompileRoutes();
-        }
+        $matcher = new CompiledUrlMatcher(
+            $this->compiled, (new RequestContext)->fromRequest(
+                $trimmedRequest = $this->requestWithoutTrailingSlash($request)
+            )
+        );
 
         $route = null;
 
-        $matcher = new CompiledUrlMatcher(
-            $this->compiled, (new RequestContext)->fromRequest($request)
-        );
+        try {
+            if ($result = $matcher->matchRequest($trimmedRequest)) {
+                $route = $this->getByName($result['_route']);
+            }
+        } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
+            try {
+                return $this->routes->match($request);
+            } catch (NotFoundHttpException $e) {
+                //
+            }
+        }
 
-        if ($result = $matcher->matchRequest($request)) {
-            $route = $this->getByName($result['_route']);
+        if ($route && $route->isFallback) {
+            try {
+                $dynamicRoute = $this->routes->match($request);
+
+                if (! $dynamicRoute->isFallback) {
+                    $route = $dynamicRoute;
+                }
+            } catch (NotFoundHttpException | MethodNotAllowedHttpException $e) {
+                //
+            }
         }
 
         return $this->handleMatchedRoute($request, $route);
     }
 
     /**
-     * Recompile the routes from the attributes array.
+     * Get a cloned instance of the given request without any trailing slash on the URI.
      *
-     * @return void
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Request
      */
-    protected function recompileRoutes()
+    protected function requestWithoutTrailingSlash(Request $request)
     {
-        $this->compiled = $this->dumper()->getCompiledRoutes();
+        $trimmedRequest = Request::createFromBase($request);
+
+        $parts = explode('?', $request->server->get('REQUEST_URI'), 2);
+
+        $trimmedRequest->server->set(
+            'REQUEST_URI', rtrim($parts[0], '/').(isset($parts[1]) ? '?'.$parts[1] : '')
+        );
+
+        return $trimmedRequest;
     }
 
     /**
@@ -128,7 +182,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function hasNamedRoute($name)
     {
-        return isset($this->attributes[$name]);
+        return isset($this->attributes[$name]) || $this->routes->hasNamedRoute($name);
     }
 
     /**
@@ -139,7 +193,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getByName($name)
     {
-        return isset($this->attributes[$name]) ? $this->newRoute($this->attributes[$name]) : null;
+        if (isset($this->attributes[$name])) {
+            return $this->newRoute($this->attributes[$name]);
+        }
+
+        return $this->routes->getByName($name);
     }
 
     /**
@@ -151,10 +209,18 @@ class CompiledRouteCollection extends AbstractRouteCollection
     public function getByAction($action)
     {
         $attributes = collect($this->attributes)->first(function (array $attributes) use ($action) {
-            return $attributes['action']['controller'] === $action;
+            if (isset($attributes['action']['controller'])) {
+                return $attributes['action']['controller'] === $action;
+            }
+
+            return $attributes['action']['uses'] === $action;
         });
 
-        return $attributes ? $this->newRoute($attributes) : null;
+        if ($attributes) {
+            return $this->newRoute($attributes);
+        }
+
+        return $this->routes->getByAction($action);
     }
 
     /**
@@ -164,7 +230,13 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutes()
     {
-        return $this->mapAttributesToRoutes()->values()->all();
+        return collect($this->attributes)
+            ->map(function (array $attributes) {
+                return $this->newRoute($attributes);
+            })
+            ->merge($this->routes->getRoutes())
+            ->values()
+            ->all();
     }
 
     /**
@@ -174,7 +246,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutesByMethod()
     {
-        return $this->mapAttributesToRoutes()
+        return collect($this->getRoutes())
             ->groupBy(function (Route $route) {
                 return $route->methods();
             })
@@ -193,21 +265,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutesByName()
     {
-        return $this->mapAttributesToRoutes()->keyBy(function (Route $route) {
-            return $route->getName();
-        })->all();
-    }
-
-    /**
-     * Get all of the routes in the collection.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function mapAttributesToRoutes()
-    {
-        return collect($this->attributes)->map(function (array $attributes) {
-            return $this->newRoute($attributes);
-        });
+        return collect($this->getRoutes())
+            ->keyBy(function (Route $route) {
+                return $route->getName();
+            })
+            ->all();
     }
 
     /**
@@ -218,9 +280,24 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     protected function newRoute(array $attributes)
     {
-        return (new Route($attributes['methods'], $attributes['uri'], $attributes['action']))
-            ->setRouter($this->router)
-            ->setContainer($this->container);
+        if (empty($attributes['action']['prefix'] ?? '')) {
+            $baseUri = $attributes['uri'];
+        } else {
+            $prefix = trim($attributes['action']['prefix'], '/');
+
+            $baseUri = trim(implode(
+                '/', array_slice(
+                    explode('/', trim($attributes['uri'], '/')),
+                    count($prefix !== '' ? explode('/', $prefix) : [])
+                )
+            ), '/');
+        }
+
+        return $this->router->newRoute($attributes['methods'], $baseUri == '' ? '/' : $baseUri, $attributes['action'])
+            ->setFallback($attributes['fallback'])
+            ->setDefaults($attributes['defaults'])
+            ->setWheres($attributes['wheres'])
+            ->setBindingFields($attributes['bindingFields']);
     }
 
     /**

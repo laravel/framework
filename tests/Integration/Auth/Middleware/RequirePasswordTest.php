@@ -16,7 +16,7 @@ class RequirePasswordTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        /** @var Registrar $router */
+        /** @var \Illuminate\Contracts\Routing\Registrar $router */
         $router = $this->app->make(Registrar::class);
 
         $router->get('test-route', function (): Response {
@@ -33,7 +33,7 @@ class RequirePasswordTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        /** @var Registrar $router */
+        /** @var \Illuminate\Contracts\Routing\Registrar $router */
         $router = $this->app->make(Registrar::class);
 
         $router->get('password-confirm', function (): Response {
@@ -54,7 +54,7 @@ class RequirePasswordTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        /** @var Registrar $router */
+        /** @var \Illuminate\Contracts\Routing\Registrar $router */
         $router = $this->app->make(Registrar::class);
 
         $router->get('confirm', function (): Response {
@@ -75,7 +75,7 @@ class RequirePasswordTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        /** @var Registrar $router */
+        /** @var \Illuminate\Contracts\Routing\Registrar $router */
         $router = $this->app->make(Registrar::class);
 
         $router->get('password-confirm', function (): Response {

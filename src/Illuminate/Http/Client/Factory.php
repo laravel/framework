@@ -3,6 +3,8 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use function GuzzleHttp\Promise\promise_for;
+use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -16,7 +18,7 @@ class Factory
     /**
      * The stub callables that will handle requests.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var \Illuminate\Support\Collection
      */
     protected $stubCallbacks;
 
@@ -26,6 +28,13 @@ class Factory
      * @var bool
      */
     protected $recording = false;
+
+    /**
+     * The recorded response array.
+     *
+     * @var array
+     */
+    protected $recorded = [];
 
     /**
      * All created response sequences.
@@ -60,7 +69,7 @@ class Factory
             $headers['Content-Type'] = 'application/json';
         }
 
-        return \GuzzleHttp\Promise\promise_for(new \GuzzleHttp\Psr7\Response($status, $headers, $body));
+        return promise_for(new Psr7Response($status, $headers, $body));
     }
 
     /**
@@ -95,7 +104,7 @@ class Factory
                 $this->stubUrl($url, $callable);
             }
 
-            return;
+            return $this;
         }
 
         $this->stubCallbacks = $this->stubCallbacks->merge(collect([
@@ -180,6 +189,44 @@ class Factory
             $this->recorded($callback)->count() > 0,
             'An expected request was not recorded.'
         );
+    }
+
+    /**
+     * Assert that a request / response pair was not recorded matching a given truth test.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function assertNotSent($callback)
+    {
+        PHPUnit::assertFalse(
+            $this->recorded($callback)->count() > 0,
+            'Unexpected request was recorded.'
+        );
+    }
+
+    /**
+     * Assert that no request / response pair was recorded.
+     *
+     * @return void
+     */
+    public function assertNothingSent()
+    {
+        PHPUnit::assertEmpty(
+            $this->recorded,
+            'Requests were recorded.'
+        );
+    }
+
+    /**
+     * Assert how many requests have been recorded.
+     *
+     * @param $count
+     * @return void
+     */
+    public function assertSentCount($count)
+    {
+        PHPUnit::assertCount($count, $this->recorded);
     }
 
     /**

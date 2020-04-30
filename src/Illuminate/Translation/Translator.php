@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract
 {
@@ -60,7 +61,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function __construct(Loader $loader, $locale)
     {
         $this->loader = $loader;
-        $this->locale = $locale;
+
+        $this->setLocale($locale);
     }
 
     /**
@@ -406,6 +408,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function setLocale($locale)
     {
+        if (Str::contains($locale, ['/', '\\'])) {
+            throw new InvalidArgumentException('Invalid characters present in locale.');
+        }
+
         $this->locale = $locale;
     }
 

@@ -268,6 +268,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create index "geo_coordinates_spatialindex" on "geo" using gist ("coordinates")', $statements[1]);
     }
 
+    public function testAddingRawIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->rawIndex('(function(column))', 'raw_index');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "raw_index" on "users" ((function(column)))', $statements[0]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');
@@ -321,14 +331,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $foreignId = $blueprint->foreignId('foo');
         $blueprint->foreignId('company_id')->constrained();
         $blueprint->foreignId('team_id')->references('id')->on('teams');
+        $blueprint->foreignId('team_column_id')->constrained('teams');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
         $this->assertSame([
-            'alter table "users" add column "foo" bigint not null, add column "company_id" bigint not null, add column "team_id" bigint not null',
+            'alter table "users" add column "foo" bigint not null, add column "company_id" bigint not null, add column "team_id" bigint not null, add column "team_column_id" bigint not null',
             'alter table "users" add constraint "users_company_id_foreign" foreign key ("company_id") references "companies" ("id")',
             'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
+            'alter table "users" add constraint "users_team_column_id_foreign" foreign key ("team_column_id") references "teams" ("id")',
         ], $statements);
     }
 

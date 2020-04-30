@@ -53,9 +53,9 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function writeView()
     {
-        $view = 'components.'.Str::kebab(class_basename($this->argument('name')));
+        $view = $this->getView();
 
-        $path = resource_path('views').'/'.str_replace('.', '/', $view);
+        $path = resource_path('views').'/'.str_replace('.', '/', 'components.'.$view);
 
         if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
@@ -87,9 +87,23 @@ class ComponentMakeCommand extends GeneratorCommand
 
         return str_replace(
             'DummyView',
-            'view(\'components.'.Str::kebab(class_basename($name)).'\')',
+            'view(\'components.'.$this->getView().'\')',
             parent::buildClass($name)
         );
+    }
+
+    /**
+     * Get the view name relative to the components directory.
+     *
+     * @return string view
+     */
+    protected function getView()
+    {
+        return collect(explode('/', $this->argument('name')))
+            ->map(function ($part) {
+                return Str::kebab($part);
+            })
+            ->implode('.');
     }
 
     /**

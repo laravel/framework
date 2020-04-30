@@ -2,13 +2,14 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Illuminate\Contracts\Mail\Factory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class MailFake implements Mailer, MailQueue
+class MailFake implements Factory, Mailer, MailQueue
 {
     /**
      * The mailer currently being used to send a message.
@@ -65,8 +66,10 @@ class MailFake implements Mailer, MailQueue
      */
     protected function assertSentTimes($mailable, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->sent($mailable)->count()) === $times,
+        $count = $this->sent($mailable)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
             "The expected [{$mailable}] mailable was sent {$count} times instead of {$times} times."
         );
     }
@@ -80,8 +83,8 @@ class MailFake implements Mailer, MailQueue
      */
     public function assertNotSent($mailable, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->sent($mailable, $callback)->count() === 0,
+        PHPUnit::assertCount(
+            0, $this->sent($mailable, $callback),
             "The unexpected [{$mailable}] mailable was sent."
         );
     }
@@ -128,8 +131,10 @@ class MailFake implements Mailer, MailQueue
      */
     protected function assertQueuedTimes($mailable, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->queued($mailable)->count()) === $times,
+        $count = $this->queued($mailable)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
             "The expected [{$mailable}] mailable was queued {$count} times instead of {$times} times."
         );
     }
@@ -143,8 +148,8 @@ class MailFake implements Mailer, MailQueue
      */
     public function assertNotQueued($mailable, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->queued($mailable, $callback)->count() === 0,
+        PHPUnit::assertCount(
+            0, $this->queued($mailable, $callback),
             "The unexpected [{$mailable}] mailable was queued."
         );
     }
@@ -307,7 +312,7 @@ class MailFake implements Mailer, MailQueue
      *
      * @param  string|array  $view
      * @param  array  $data
-     * @param  \Closure|string  $callback
+     * @param  \Closure|string|null  $callback
      * @return void
      */
     public function send($view, array $data = [], $callback = null)
@@ -352,7 +357,7 @@ class MailFake implements Mailer, MailQueue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function later($delay, $view, $queue = null)

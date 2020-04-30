@@ -21,6 +21,13 @@ class ResponseSequence
     protected $failWhenEmpty = true;
 
     /**
+     * The response that should be returned when the sequence is empty.
+     *
+     * @var \GuzzleHttp\Promise\PromiseInterface
+     */
+    protected $emptyResponse;
+
+    /**
      * Create a new response sequence.
      *
      * @param  array  $responses
@@ -41,11 +48,7 @@ class ResponseSequence
      */
     public function push($body = '', int $status = 200, array $headers = [])
     {
-        if (is_array($body)) {
-            return $this->pushResponse(
-                Factory::response(json_encode($body), $status, $headers)
-            );
-        }
+        $body = is_array($body) ? json_encode($body) : $body;
 
         return $this->pushResponse(
             Factory::response($body, $status, $headers)
@@ -86,7 +89,7 @@ class ResponseSequence
     /**
      * Push a response to the sequence.
      *
-     * @param  mixed $response
+     * @param  mixed  $response
      * @return $this
      */
     public function pushResponse($response)
@@ -99,13 +102,25 @@ class ResponseSequence
     /**
      * Make the sequence return a default response when it is empty.
      *
+     * @param  \GuzzleHttp\Promise\PromiseInterface|\Closure  $response
+     * @return $this
+     */
+    public function whenEmpty($response)
+    {
+        $this->failWhenEmpty = false;
+        $this->emptyResponse = $response;
+
+        return $this;
+    }
+
+    /**
+     * Make the sequence return a default response when it is empty.
+     *
      * @return $this
      */
     public function dontFailWhenEmpty()
     {
-        $this->failWhenEmpty = false;
-
-        return $this;
+        return $this->whenEmpty(Factory::response());
     }
 
     /**
@@ -126,7 +141,11 @@ class ResponseSequence
     public function __invoke()
     {
         if ($this->failWhenEmpty && count($this->responses) === 0) {
-            throw new OutOfBoundsException('A request was made, but the response sequence is empty');
+            throw new OutOfBoundsException('A request was made, but the response sequence is empty.');
+        }
+
+        if (! $this->failWhenEmpty && count($this->responses) === 0) {
+            return value($this->emptyResponse ?? Factory::response());
         }
 
         return array_shift($this->responses);

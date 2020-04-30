@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
+use Illuminate\Testing\Assert;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
@@ -44,11 +45,6 @@ class SendingMailWithLocaleTest extends TestCase
                 ],
             ],
         ]);
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
     }
 
     public function testMailIsSentWithDefaultLocale()
@@ -91,7 +87,7 @@ class SendingMailWithLocaleTest extends TestCase
 
         Mail::to('test@mail.com')->locale('es')->send(new TimestampTestMail);
 
-        $this->assertRegExp('/nombre (en|dentro de) (un|1) día/',
+        Assert::assertMatchesRegularExpression('/nombre (en|dentro de) (un|1) día/',
             app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
 

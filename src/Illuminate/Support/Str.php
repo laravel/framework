@@ -95,7 +95,7 @@ class Str
      */
     public static function ascii($value, $language = 'en')
     {
-        return ASCII::to_ascii($value, $language);
+        return ASCII::to_ascii((string) $value, $language);
     }
 
     /**
@@ -130,6 +130,23 @@ class Str
         }
 
         return static::substr($subject, 0, $pos);
+    }
+
+    /**
+     * Get the portion of a string between two given values.
+     *
+     * @param  string  $subject
+     * @param  string  $from
+     * @param  string  $to
+     * @return string
+     */
+    public static function between($subject, $from, $to)
+    {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::beforeLast(static::after($subject, $from), $to);
     }
 
     /**
@@ -261,7 +278,7 @@ class Str
      */
     public static function isAscii($value)
     {
-        return ASCII::is_ascii($value);
+        return ASCII::is_ascii((string) $value);
     }
 
     /**
@@ -534,9 +551,23 @@ class Str
      */
     public static function slug($title, $separator = '-', $language = 'en')
     {
-        $language = $language ?? '';
+        $title = $language ? static::ascii($title, $language) : $title;
 
-        return ASCII::to_slugify($title, $separator, $language, [], true);
+        // Convert all dashes/underscores into separator
+        $flip = $separator === '-' ? '_' : '-';
+
+        $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
+
+        // Replace @ with the word 'at'
+        $title = str_replace('@', $separator.'at'.$separator, $title);
+
+        // Remove all characters that are not the separator, letters, numbers, or whitespace.
+        $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', static::lower($title));
+
+        // Replace all separator characters and whitespace by a single separator
+        $title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);
+
+        return trim($title, $separator);
     }
 
     /**
@@ -573,7 +604,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ((string) $needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
+            if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
                 return true;
             }
         }
@@ -611,6 +642,24 @@ class Str
     public static function substr($string, $start, $length = null)
     {
         return mb_substr($string, $start, $length, 'UTF-8');
+    }
+
+    /**
+     * Returns the number of substring occurrences.
+     *
+     * @param  string  $haystack
+     * @param  string  $needle
+     * @param  int  $offset
+     * @param  int|null  $length
+     * @return int
+     */
+    public static function substrCount($haystack, $needle, $offset = 0, $length = null)
+    {
+        if (! is_null($length)) {
+            return substr_count($haystack, $needle, $offset, $length);
+        } else {
+            return substr_count($haystack, $needle, $offset);
+        }
     }
 
     /**
@@ -664,7 +713,7 @@ class Str
     /**
      * Set the callable that will be used to generate UUIDs.
      *
-     * @param  callable  $factory
+     * @param  callable|null  $factory
      * @return void
      */
     public static function createUuidsUsing(callable $factory = null)

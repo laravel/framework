@@ -26,11 +26,18 @@ abstract class Component
     protected static $methodCache = [];
 
     /**
-     * That properties / methods that should not be exposed to the component.
+     * The properties / methods that should not be exposed to the component.
      *
      * @var array
      */
     protected $except = [];
+
+    /**
+     * The component alias name.
+     *
+     * @var string
+     */
+    public $componentName;
 
     /**
      * The component attributes.
@@ -61,9 +68,9 @@ abstract class Component
 
         $factory = Container::getInstance()->make('view');
 
-        return $factory->exists($this->render())
-                    ? $this->render()
-                    : $this->createBladeViewFromString($factory, $this->render());
+        return $factory->exists($view)
+                    ? $view
+                    : $this->createBladeViewFromString($factory, $view);
     }
 
     /**
@@ -81,6 +88,10 @@ abstract class Component
         );
 
         if (! file_exists($viewFile = $directory.'/'.sha1($contents).'.blade.php')) {
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
             file_put_contents($viewFile, $contents);
         }
 
@@ -202,6 +213,19 @@ abstract class Component
             'view',
             'withAttributes',
         ], $this->except);
+    }
+
+    /**
+     * Set the component alias name.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function withName($name)
+    {
+        $this->componentName = $name;
+
+        return $this;
     }
 
     /**

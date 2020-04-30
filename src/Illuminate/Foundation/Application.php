@@ -33,7 +33,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '7.x-dev';
+    const VERSION = '7.6.2';
 
     /**
      * The base path for the Laravel installation.
@@ -148,6 +148,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $namespace;
 
     /**
+     * The prefixes of absolute cache paths for use during normalization.
+     *
+     * @var array
+     */
+    protected $absoluteCachePathPrefixes = [DIRECTORY_SEPARATOR];
+
+    /**
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
@@ -188,9 +195,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->instance(Container::class, $this);
         $this->singleton(Mix::class);
 
-        $this->instance(PackageManifest::class, new PackageManifest(
-            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
-        ));
+        $this->singleton(PackageManifest::class, function () {
+            return new PackageManifest(
+                new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
+            );
+        });
     }
 
     /**
@@ -761,27 +770,47 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Resolve the given type from the container.
      *
-     * (Overriding Container::make)
-     *
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
      */
     public function make($abstract, array $parameters = [])
     {
-        $abstract = $this->getAlias($abstract);
-
-        if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
-            $this->loadDeferredProvider($abstract);
-        }
+        $this->loadDeferredProviderIfNeeded($abstract = $this->getAlias($abstract));
 
         return parent::make($abstract, $parameters);
     }
 
     /**
-     * Determine if the given abstract type has been bound.
+     * Resolve the given type from the container.
      *
-     * (Overriding Container::bound)
+     * @param  string  $abstract
+     * @param  array  $parameters
+     * @param  bool  $raiseEvents
+     * @return mixed
+     */
+    protected function resolve($abstract, $parameters = [], $raiseEvents = true)
+    {
+        $this->loadDeferredProviderIfNeeded($abstract = $this->getAlias($abstract));
+
+        return parent::resolve($abstract, $parameters, $raiseEvents);
+    }
+
+    /**
+     * Load the deferred provider if the given type is a deferred service and the instance has not been loaded.
+     *
+     * @param  string  $abstract
+     * @return void
+     */
+    protected function loadDeferredProviderIfNeeded($abstract)
+    {
+        if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
+            $this->loadDeferredProvider($abstract);
+        }
+    }
+
+    /**
+     * Determine if the given abstract type has been bound.
      *
      * @param  string  $abstract
      * @return bool
@@ -881,7 +910,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * {@inheritdoc}
      */
-    public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(SymfonyRequest $request, int $type = self::MASTER_REQUEST, bool $catch = true)
     {
         return $this[HttpKernelContract::class]->handle(Request::createFromBase($request));
     }
@@ -990,9 +1019,22 @@ class Application extends Container implements ApplicationContract, CachesConfig
             return $this->bootstrapPath($default);
         }
 
-        return Str::startsWith($env, '/')
+        return Str::startsWith($env, $this->absoluteCachePathPrefixes)
                 ? $env
                 : $this->basePath($env);
+    }
+
+    /**
+     * Add new prefix to list of absolute path prefixes.
+     *
+     * @param  string  $prefix
+     * @return $this
+     */
+    public function addAbsoluteCachePathPrefix($prefix)
+    {
+        $this->absoluteCachePathPrefixes[] = $prefix;
+
+        return $this;
     }
 
     /**

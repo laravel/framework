@@ -6,6 +6,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Testing\Assert;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
@@ -110,11 +111,11 @@ class FilesystemTest extends TestCase
 
         $files = new Filesystem;
         $files->delete($this->tempDir.'/file1.txt');
-        $this->assertFileNotExists($this->tempDir.'/file1.txt');
+        Assert::assertFileDoesNotExist($this->tempDir.'/file1.txt');
 
         $files->delete([$this->tempDir.'/file2.txt', $this->tempDir.'/file3.txt']);
-        $this->assertFileNotExists($this->tempDir.'/file2.txt');
-        $this->assertFileNotExists($this->tempDir.'/file3.txt');
+        Assert::assertFileDoesNotExist($this->tempDir.'/file2.txt');
+        Assert::assertFileDoesNotExist($this->tempDir.'/file3.txt');
     }
 
     public function testPrependExistingFiles()
@@ -144,8 +145,8 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo/file.txt', 'Hello World');
         $files = new Filesystem;
         $files->deleteDirectory($this->tempDir.'/foo');
-        $this->assertDirectoryNotExists($this->tempDir.'/foo');
-        $this->assertFileNotExists($this->tempDir.'/foo/file.txt');
+        Assert::assertDirectoryDoesNotExist($this->tempDir.'/foo');
+        Assert::assertFileDoesNotExist($this->tempDir.'/foo/file.txt');
     }
 
     public function testDeleteDirectoryReturnFalseWhenNotADirectory()
@@ -163,7 +164,7 @@ class FilesystemTest extends TestCase
         $files = new Filesystem;
         $files->cleanDirectory($this->tempDir.'/foo');
         $this->assertDirectoryExists($this->tempDir.'/foo');
-        $this->assertFileNotExists($this->tempDir.'/foo/file.txt');
+        Assert::assertFileDoesNotExist($this->tempDir.'/foo/file.txt');
     }
 
     public function testMacro()
@@ -228,7 +229,7 @@ class FilesystemTest extends TestCase
         $this->assertFileExists($this->tempDir.'/tmp2/bar.txt');
         $this->assertDirectoryExists($this->tempDir.'/tmp2/nested');
         $this->assertFileExists($this->tempDir.'/tmp2/nested/baz.txt');
-        $this->assertDirectoryNotExists($this->tempDir.'/tmp');
+        Assert::assertDirectoryDoesNotExist($this->tempDir.'/tmp');
     }
 
     public function testMoveDirectoryMovesEntireDirectoryAndOverwrites()
@@ -249,9 +250,9 @@ class FilesystemTest extends TestCase
         $this->assertFileExists($this->tempDir.'/tmp2/bar.txt');
         $this->assertDirectoryExists($this->tempDir.'/tmp2/nested');
         $this->assertFileExists($this->tempDir.'/tmp2/nested/baz.txt');
-        $this->assertFileNotExists($this->tempDir.'/tmp2/foo2.txt');
-        $this->assertFileNotExists($this->tempDir.'/tmp2/bar2.txt');
-        $this->assertDirectoryNotExists($this->tempDir.'/tmp');
+        Assert::assertFileDoesNotExist($this->tempDir.'/tmp2/foo2.txt');
+        Assert::assertFileDoesNotExist($this->tempDir.'/tmp2/bar2.txt');
+        Assert::assertDirectoryDoesNotExist($this->tempDir.'/tmp');
     }
 
     public function testMoveDirectoryReturnsFalseWhileOverwritingAndUnableToDeleteDestinationDirectory()
@@ -304,7 +305,7 @@ class FilesystemTest extends TestCase
         $files = new Filesystem;
         $files->move($this->tempDir.'/foo.txt', $this->tempDir.'/bar.txt');
         $this->assertFileExists($this->tempDir.'/bar.txt');
-        $this->assertFileNotExists($this->tempDir.'/foo.txt');
+        Assert::assertFileDoesNotExist($this->tempDir.'/foo.txt');
     }
 
     public function testNameReturnsName()
@@ -448,6 +449,8 @@ class FilesystemTest extends TestCase
         $content = str_repeat('123456', 1000000);
         $result = 1;
 
+        posix_setpgid(0, 0);
+
         for ($i = 1; $i <= 20; $i++) {
             $pid = pcntl_fork();
 
@@ -465,7 +468,7 @@ class FilesystemTest extends TestCase
             $result *= $status;
         }
 
-        $this->assertTrue($result === 1);
+        $this->assertSame(1, $result);
     }
 
     public function testRequireOnceRequiresFileProperly()
@@ -530,7 +533,7 @@ class FilesystemTest extends TestCase
             'unsupportedParam' => true,
         ]);
 
-        /** @var Ftp $adapter */
+        /** @var \League\Flysystem\Adapter\Ftp $adapter */
         $adapter = $driver->getAdapter();
         $this->assertEquals(0700, $adapter->getPermPublic());
         $this->assertSame('ftp.example.com', $adapter->getHost());
@@ -545,7 +548,7 @@ class FilesystemTest extends TestCase
     }
 
     /**
-     * @param string $file
+     * @param  string  $file
      * @return int
      */
     private function getFilePermissions($file)

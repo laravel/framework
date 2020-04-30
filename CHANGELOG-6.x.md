@@ -1,12 +1,70 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.16.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.2...6.x)
 
-### TODO
-- Consider mailto: and tel: links in the subcopy actionUrl label. #31522 ([#31523](https://github.com/laravel/framework/pull/31523), [641a7cd](https://github.com/laravel/framework/commit/641a7cda8280ecd3035616d4ce6434434b116624))
-- exclude mariaDB from database queue support for new SKIP LOCKED ([fff96e7](https://github.com/laravel/framework/commit/fff96e7df7de470e162a6b7f6dd528e6fe17aadc))
-- Fix for issue Content Type not specified ([#31533](https://github.com/laravel/framework/pull/31533))
-- MySQL Aurora failover - DetectsLostConnections ([#31539](https://github.com/laravel/framework/pull/31539))
+### Fixed
+- Corrected suggested dependencies ([#32072](https://github.com/laravel/framework/pull/32072), [c01a70e](https://github.com/laravel/framework/commit/c01a70e33198e81d06d4b581e36e25a80acf8a68))
+- Avoid deadlock in test when sharing process group ([#32067](https://github.com/laravel/framework/pull/32067))
+
+
+## [v6.18.2 (2020-03-17)](https://github.com/laravel/framework/compare/v6.18.1...v6.18.2)
+
+### Fixed
+- Fixed scheduler dependency assumptions ([#31894](https://github.com/laravel/framework/pull/31894))
+- Corrected suggested dependencies ([bb0ec42](https://github.com/laravel/framework/commit/bb0ec42b5a55b3ebf3a5a35cc6df01eec290dfa9))
+- Unset `pivotParent` on `Pivot::unsetRelations()` ([#31956](https://github.com/laravel/framework/pull/31956))
+- Fixed `cookie` helper signature , matching match `CookieFactory` ([#31974](https://github.com/laravel/framework/pull/31974))
+
+
+## [v6.18.1 (2020-03-10)](https://github.com/laravel/framework/compare/v6.18.0...v6.18.1)
+
+### Fixed
+- Fixed array lock release behavior ([#31795](https://github.com/laravel/framework/pull/31795))
+- Fixed model restoring right after being soft deleting ([#31719](https://github.com/laravel/framework/pull/31719))
+- Fixed phpredis "zadd" and "exists" on cluster ([#31838](https://github.com/laravel/framework/pull/31838))
+- Fixed "srid" mysql schema ([#31852](https://github.com/laravel/framework/pull/31852))
+- Fixed Microsoft ODBC lost connection handling ([#31879](https://github.com/laravel/framework/pull/31879))
+
+
+## [v6.18.0 (2020-03-03)](https://github.com/laravel/framework/compare/v6.17.1...v6.18.0)
+
+### Added
+- Added `Arr::hasAny()` method ([#31636](https://github.com/laravel/framework/pull/31636))
+
+### Fixed
+- Use correct locale when resolving Faker from the container ([#31615](https://github.com/laravel/framework/pull/31615))
+- Fixed loading deferred providers for binding interfaces and implementations ([#31629](https://github.com/laravel/framework/pull/31629), [1764ff7](https://github.com/laravel/framework/commit/1764ff762966083a12dd2c9b522cec5f1bbda967))
+
+### Changed
+- Make `newPivotQuery()` method public ([#31677](https://github.com/laravel/framework/pull/31677))
+- Allowed easier customization of the queued mailable job ([#31684](https://github.com/laravel/framework/pull/31684))
+- Expose Notification Id within Message Data in `Illuminate\Notifications\Channels\MailChannel` ([#31632](https://github.com/laravel/framework/pull/31632))
+
+
+## [v6.17.1 (2020-02-26)](https://github.com/laravel/framework/compare/v6.17.0...v6.17.1)
+
+### Changed
+- Don`t do chmod in File cache in case if permission not set ([#31593](https://github.com/laravel/framework/pull/31593))
+
+
+## [v6.17.0 (2020-02-25)](https://github.com/laravel/framework/compare/v6.16.0...v6.17.0)
+
+### Added
+- Allowed private-encrypted pusher channels ([#31559](https://github.com/laravel/framework/pull/31559), [ceabaef](https://github.com/laravel/framework/commit/ceabaef88741c0c6a891166cf14eb967fdf4e8ee), [8215e0d](https://github.com/laravel/framework/commit/8215e0dc66bf71a7ff4e9bf260380cf4a26f28a6))
+- Added file `permission` config option for the File cache store ([#31579](https://github.com/laravel/framework/pull/31579))
+- Added `Connection refused` and `running with the --read-only option so it cannot execute this statement` to `DetectsLostConnections` ([#31539](https://github.com/laravel/framework/pull/31539))
+
+### Reverted
+- Reverted ["Fixed memory usage on downloading large files"](https://github.com/laravel/framework/pull/31163) ([#31587](https://github.com/laravel/framework/pull/31587))
+
+### Fixed
+- Fixed issue `Content Type not specified` ([#31533](https://github.com/laravel/framework/pull/31533))
+
+### Changed
+- Allowed `cache` helper to have an optional `expiration` parameter ([#31554](https://github.com/laravel/framework/pull/31554))
+- Allowed passing of strings to `TestResponse::dumpSession()` method ([#31583](https://github.com/laravel/framework/pull/31583))
+- Consider mailto: and tel: links in the subcopy actionUrl label in emails ([#31523](https://github.com/laravel/framework/pull/31523), [641a7cd](https://github.com/laravel/framework/commit/641a7cda8280ecd3035616d4ce6434434b116624))
+- Exclude mariaDB from database queue support for new SKIP LOCKED ([fff96e7](https://github.com/laravel/framework/commit/fff96e7df7de470e162a6b7f6dd528e6fe17aadc))
 
 
 ## [v6.16.0 (2020-02-18)](https://github.com/laravel/framework/compare/v6.15.1...v6.16.0)

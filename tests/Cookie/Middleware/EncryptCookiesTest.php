@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 class EncryptCookiesTest extends TestCase
 {
     /**
-     * @var Router
+     * @var \Illuminate\Routing\Router
      */
     protected $router;
 

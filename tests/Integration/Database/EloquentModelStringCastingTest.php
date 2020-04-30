@@ -59,7 +59,7 @@ class EloquentModelStringCastingTest extends TestCase
      */
     public function testSavingCastedAttributesToDatabase()
     {
-        /** @var StringCasts $model */
+        /** @var \Illuminate\Tests\Integration\Database\StringCasts $model */
         $model = StringCasts::create([
             'array_attributes' => ['key1'=>'value1'],
             'json_attributes' => ['json_key'=>'json_value'],
@@ -79,7 +79,7 @@ class EloquentModelStringCastingTest extends TestCase
 
     public function testSavingCastedEmptyAttributesToDatabase()
     {
-        /** @var StringCasts $model */
+        /** @var \Illuminate\Tests\Integration\Database\StringCasts $model */
         $model = StringCasts::create([
             'array_attributes' => [],
             'json_attributes' => [],

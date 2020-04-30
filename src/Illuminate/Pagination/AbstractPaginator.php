@@ -94,6 +94,13 @@ abstract class AbstractPaginator implements Htmlable
     protected static $currentPageResolver;
 
     /**
+     * The query string resolver callback.
+     *
+     * @var \Closure
+     */
+    protected static $queryStringResolver;
+
+    /**
      * The view factory resolver callback.
      *
      * @var \Closure
@@ -225,6 +232,20 @@ abstract class AbstractPaginator implements Htmlable
     {
         foreach ($keys as $key => $value) {
             $this->addQuery($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add all current query string values to the paginator.
+     *
+     * @return $this
+     */
+    public function withQueryString()
+    {
+        if (isset(static::$queryStringResolver)) {
+            return $this->appends(call_user_func(static::$queryStringResolver));
         }
 
         return $this;
@@ -461,6 +482,17 @@ abstract class AbstractPaginator implements Htmlable
     public static function currentPageResolver(Closure $resolver)
     {
         static::$currentPageResolver = $resolver;
+    }
+
+    /**
+     * Set with query string resolver callback.
+     *
+     * @param  \Closure  $resolver
+     * @return void
+     */
+    public static function queryStringResolver(Closure $resolver)
+    {
+        static::$queryStringResolver = $resolver;
     }
 
     /**

@@ -25,6 +25,7 @@ use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -299,7 +300,7 @@ class ValidationValidatorTest extends TestCase
         $v->messages()->setFormat(':message');
         $this->assertSame('Name is required!', $v->messages()->first('name'));
 
-        //set customAttributes by setter
+        // set customAttributes by setter
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required' => ':attribute is required!'], 'en');
         $customAttributes = ['name' => 'Name'];
@@ -427,7 +428,7 @@ class ValidationValidatorTest extends TestCase
 
     public function testDisplayableValuesAreReplaced()
     {
-        //required_if:foo,bar
+        // required_if:foo,bar
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
         $trans->addLines(['validation.values.color.1' => 'red'], 'en');
@@ -436,7 +437,7 @@ class ValidationValidatorTest extends TestCase
         $v->messages()->setFormat(':message');
         $this->assertSame('The bar field is required when color is red.', $v->messages()->first('bar'));
 
-        //required_if:foo,boolean
+        // required_if:foo,boolean
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
         $trans->addLines(['validation.values.subscribe.false' => 'false'], 'en');
@@ -453,7 +454,7 @@ class ValidationValidatorTest extends TestCase
         $v->messages()->setFormat(':message');
         $this->assertSame('The bar field is required when subscribe is true.', $v->messages()->first('bar'));
 
-        //required_unless:foo,bar
+        // required_unless:foo,bar
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_unless' => 'The :attribute field is required unless :other is in :values.'], 'en');
         $trans->addLines(['validation.values.color.1' => 'red'], 'en');
@@ -462,7 +463,7 @@ class ValidationValidatorTest extends TestCase
         $v->messages()->setFormat(':message');
         $this->assertSame('The bar field is required unless color is in red.', $v->messages()->first('bar'));
 
-        //in:foo,bar,...
+        // in:foo,bar,...
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.in' => ':attribute must be included in :values.'], 'en');
         $trans->addLines(['validation.values.type.5' => 'Short'], 'en');
@@ -472,7 +473,7 @@ class ValidationValidatorTest extends TestCase
         $v->messages()->setFormat(':message');
         $this->assertSame('type must be included in Short, Long.', $v->messages()->first('type'));
 
-        //date_equals:tomorrow
+        // date_equals:tomorrow
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.date_equals' => 'The :attribute must be a date equal to :date.'], 'en');
         $trans->addLines(['validation.values.date.tomorrow' => 'the day after today'], 'en');
@@ -2596,6 +2597,11 @@ class ValidationValidatorTest extends TestCase
             ['https://laravel.com#'],
             ['https://laravel.com#fragment'],
             ['https://laravel.com/#fragment'],
+            ['https://domain1'],
+            ['https://domain12/'],
+            ['https://domain12#fragment'],
+            ['https://domain1/path'],
+            ['https://domain.com/path/%2528failed%2526?param=1#fragment'],
         ];
     }
 
@@ -4328,11 +4334,11 @@ class ValidationValidatorTest extends TestCase
 
         $implicit_no_connection = $v->parseTable(ImplicitTableModel::class);
         $this->assertEquals(null, $implicit_no_connection[0]);
-        $this->assertEquals('implicit_table_models', $implicit_no_connection[1]);
+        $this->assertSame('implicit_table_models', $implicit_no_connection[1]);
 
         $explicit_no_connection = $v->parseTable(ExplicitTableModel::class);
         $this->assertEquals(null, $explicit_no_connection[0]);
-        $this->assertEquals('explicits', $explicit_no_connection[1]);
+        $this->assertSame('explicits', $explicit_no_connection[1]);
 
         $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
         $this->assertEquals(null, $noneloquent_no_connection[0]);
@@ -4340,27 +4346,27 @@ class ValidationValidatorTest extends TestCase
 
         $raw_no_connection = $v->parseTable('table');
         $this->assertEquals(null, $raw_no_connection[0]);
-        $this->assertEquals('table', $raw_no_connection[1]);
+        $this->assertSame('table', $raw_no_connection[1]);
 
         $implicit_connection = $v->parseTable('connection.'.ImplicitTableModel::class);
-        $this->assertEquals('connection', $implicit_connection[0]);
-        $this->assertEquals('implicit_table_models', $implicit_connection[1]);
+        $this->assertSame('connection', $implicit_connection[0]);
+        $this->assertSame('implicit_table_models', $implicit_connection[1]);
 
         $explicit_connection = $v->parseTable('connection.'.ExplicitTableModel::class);
-        $this->assertEquals('connection', $explicit_connection[0]);
-        $this->assertEquals('explicits', $explicit_connection[1]);
+        $this->assertSame('connection', $explicit_connection[0]);
+        $this->assertSame('explicits', $explicit_connection[1]);
 
         $explicit_model_implicit_connection = $v->parseTable(ExplicitTableAndConnectionModel::class);
-        $this->assertEquals('connection', $explicit_model_implicit_connection[0]);
-        $this->assertEquals('explicits', $explicit_model_implicit_connection[1]);
+        $this->assertSame('connection', $explicit_model_implicit_connection[0]);
+        $this->assertSame('explicits', $explicit_model_implicit_connection[1]);
 
         $noneloquent_connection = $v->parseTable('connection.'.NonEloquentModel::class);
-        $this->assertEquals('connection', $noneloquent_connection[0]);
+        $this->assertSame('connection', $noneloquent_connection[0]);
         $this->assertEquals(NonEloquentModel::class, $noneloquent_connection[1]);
 
         $raw_connection = $v->parseTable('connection.table');
-        $this->assertEquals('connection', $raw_connection[0]);
-        $this->assertEquals('table', $raw_connection[1]);
+        $this->assertSame('connection', $raw_connection[0]);
+        $this->assertSame('table', $raw_connection[1]);
     }
 
     public function testUsingSettersWithImplicitRules()

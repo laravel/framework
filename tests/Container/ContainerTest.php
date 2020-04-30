@@ -198,6 +198,15 @@ class ContainerTest extends TestCase
         $this->assertSame($bound, $resolved);
     }
 
+    public function testBindingAnInstanceAsShared()
+    {
+        $container = new Container;
+        $bound = new stdClass;
+        $container->instance('foo', $bound);
+        $object = $container->make('foo');
+        $this->assertSame($bound, $object);
+    }
+
     public function testResolutionOfDefaultParameters()
     {
         $container = new Container;

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
+use Illuminate\Testing\Assert;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -150,7 +151,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
             app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
 
-        $this->assertRegExp('/dans (1|un) jour/',
+        Assert::assertMatchesRegularExpression('/dans (1|un) jour/',
             app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
 

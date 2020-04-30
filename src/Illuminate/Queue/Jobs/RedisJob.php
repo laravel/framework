@@ -110,7 +110,7 @@ class RedisJob extends Job implements JobContract
     /**
      * Get the job identifier.
      *
-     * @return string
+     * @return string|null
      */
     public function getJobId()
     {

@@ -100,9 +100,9 @@ class TestResponse implements ArrayAccess
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertTrue(
-            201 === $actual,
-            'Response status code ['.$actual.'] does not match expected 201 status code.'
+        PHPUnit::assertSame(
+            201, $actual,
+            "Response status code [{$actual}] does not match expected 201 status code."
         );
 
         return $this;
@@ -162,9 +162,9 @@ class TestResponse implements ArrayAccess
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertTrue(
-            401 === $actual,
-            'Response status code ['.$actual.'] is not an unauthorized status code.'
+        PHPUnit::assertSame(
+            401, $actual,
+            "Response status code [{$actual}] is not an unauthorized status code."
         );
 
         return $this;
@@ -180,8 +180,8 @@ class TestResponse implements ArrayAccess
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertTrue(
-            $actual === $status,
+        PHPUnit::assertSame(
+            $actual, $status,
             "Expected status code {$status} but received {$actual}."
         );
 
@@ -390,12 +390,12 @@ class TestResponse implements ArrayAccess
      * Assert that the given string is contained within the response.
      *
      * @param  string  $value
-     * @param  bool  $escaped
+     * @param  bool  $escape
      * @return $this
      */
-    public function assertSee($value, $escaped = true)
+    public function assertSee($value, $escape = true)
     {
-        $value = $escaped ? e($value) : $value;
+        $value = $escape ? e($value) : $value;
 
         PHPUnit::assertStringContainsString((string) $value, $this->getContent());
 
@@ -406,12 +406,12 @@ class TestResponse implements ArrayAccess
      * Assert that the given strings are contained in order within the response.
      *
      * @param  array  $values
-     * @param  bool  $escaped
+     * @param  bool  $escape
      * @return $this
      */
-    public function assertSeeInOrder(array $values, $escaped = true)
+    public function assertSeeInOrder(array $values, $escape = true)
     {
-        $values = $escaped ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map('e', ($values)) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder($this->getContent()));
 
@@ -422,12 +422,12 @@ class TestResponse implements ArrayAccess
      * Assert that the given string is contained within the response text.
      *
      * @param  string  $value
-     * @param  bool  $escaped
+     * @param  bool  $escape
      * @return $this
      */
-    public function assertSeeText($value, $escaped = true)
+    public function assertSeeText($value, $escape = true)
     {
-        $value = $escaped ? e($value) : $value;
+        $value = $escape ? e($value) : $value;
 
         PHPUnit::assertStringContainsString((string) $value, strip_tags($this->getContent()));
 
@@ -438,12 +438,12 @@ class TestResponse implements ArrayAccess
      * Assert that the given strings are contained in order within the response text.
      *
      * @param  array  $values
-     * @param  bool  $escaped
+     * @param  bool  $escape
      * @return $this
      */
-    public function assertSeeTextInOrder(array $values, $escaped = true)
+    public function assertSeeTextInOrder(array $values, $escape = true)
     {
-        $values = $escaped ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map('e', ($values)) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
 
@@ -454,12 +454,12 @@ class TestResponse implements ArrayAccess
      * Assert that the given string is not contained within the response.
      *
      * @param  string  $value
-     * @param  bool  $escaped
+     * @param  bool  $escape
      * @return $this
      */
-    public function assertDontSee($value, $escaped = true)
+    public function assertDontSee($value, $escape = true)
     {
-        $value = $escaped ? e($value) : $value;
+        $value = $escape ? e($value) : $value;
 
         PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
 
@@ -470,12 +470,12 @@ class TestResponse implements ArrayAccess
      * Assert that the given string is not contained within the response text.
      *
      * @param  string  $value
-     * @param  bool  $escaped
+     * @param  bool  $escape
      * @return $this
      */
-    public function assertDontSeeText($value, $escaped = true)
+    public function assertDontSeeText($value, $escape = true)
     {
-        $value = $escaped ? e($value) : $value;
+        $value = $escape ? e($value) : $value;
 
         PHPUnit::assertStringNotContainsString((string) $value, strip_tags($this->getContent()));
 
@@ -1194,15 +1194,17 @@ class TestResponse implements ArrayAccess
     /**
      * Dump the session from the response.
      *
-     * @param  array  $keys
+     * @param  string|array  $keys
      * @return $this
      */
-    public function dumpSession($keys = null)
+    public function dumpSession($keys = [])
     {
-        if (is_array($keys)) {
-            dump($this->session()->only($keys));
-        } else {
+        $keys = (array) $keys;
+
+        if (empty($keys)) {
             dump($this->session()->all());
+        } else {
+            dump($this->session()->only($keys));
         }
 
         return $this;
@@ -1261,7 +1263,7 @@ class TestResponse implements ArrayAccess
     public function offsetExists($offset)
     {
         return $this->responseHasView()
-                    ? isset($this->original->gatherData()[$key])
+                    ? isset($this->original->gatherData()[$offset])
                     : isset($this->json()[$offset]);
     }
 

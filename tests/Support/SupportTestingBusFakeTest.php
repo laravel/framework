@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
@@ -17,7 +17,7 @@ class SupportTestingBusFakeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->fake = new BusFake(m::mock(Dispatcher::class));
+        $this->fake = new BusFake(m::mock(QueueingDispatcher::class));
     }
 
     protected function tearDown(): void
@@ -198,7 +198,7 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreClass()
     {
-        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher = m::mock(QueueingDispatcher::class);
 
         $job = new BusJobStub;
         $dispatcher->shouldReceive('dispatch')->once()->with($job);
@@ -222,7 +222,7 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreCallback()
     {
-        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher = m::mock(QueueingDispatcher::class);
 
         $job = new BusJobStub;
         $dispatcher->shouldReceive('dispatch')->once()->with($job);

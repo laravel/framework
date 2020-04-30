@@ -14,17 +14,17 @@ use PHPUnit\Framework\TestCase;
 class CacheSchedulingMutexTest extends TestCase
 {
     /**
-     * @var CacheSchedulingMutex
+     * @var \Illuminate\Console\Scheduling\CacheSchedulingMutex
      */
     protected $cacheMutex;
 
     /**
-     * @var Event
+     * @var \Illuminate\Console\Scheduling\Event
      */
     protected $event;
 
     /**
-     * @var Carbon
+     * @var \Illuminate\Support\Carbon
      */
     protected $time;
 

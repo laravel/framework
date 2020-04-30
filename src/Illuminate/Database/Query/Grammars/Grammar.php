@@ -85,10 +85,7 @@ class Grammar extends BaseGrammar
         $sql = [];
 
         foreach ($this->selectComponents as $component) {
-            // To compile the query, we'll spin through each component of the query and
-            // see if that component exists. If it does we'll just call the compiler
-            // function for the component which is responsible for making the SQL.
-            if (isset($query->$component) && ! is_null($query->$component)) {
+            if (isset($query->$component)) {
                 $method = 'compile'.ucfirst($component);
 
                 $sql[$component] = $this->$method($query, $query->$component);

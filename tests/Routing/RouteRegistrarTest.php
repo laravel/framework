@@ -60,6 +60,17 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['seven'], $this->getRoute()->middleware());
     }
 
+    public function testWithoutMiddlewareRegistration()
+    {
+        $this->router->middleware(['one', 'two'])->get('users', function () {
+            return 'all-users';
+        })->withoutMiddleware('one');
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+
+        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+    }
+
     public function testCanRegisterGetRouteWithClosureAction()
     {
         $this->router->middleware('get-middleware')->get('users', function () {

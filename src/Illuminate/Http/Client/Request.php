@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LogicException;
 
@@ -36,7 +37,7 @@ class Request implements ArrayAccess
     /**
      * Get the request method.
      *
-     * @return strign
+     * @return string
      */
     public function method()
     {
@@ -62,19 +63,30 @@ class Request implements ArrayAccess
      */
     public function hasHeader($key, $value = null)
     {
-        return is_null($value)
-                    ? ! empty($this->request->getHeaders()[$key])
-                    : in_array($value, $this->headers()[$key]);
+        if (is_null($value)) {
+            return ! empty($this->request->getHeaders()[$key]);
+        }
+
+        $headers = $this->headers();
+
+        if (! Arr::has($headers, $key)) {
+            return false;
+        }
+
+        $value = is_array($value) ? $value : [$value];
+
+        return empty(array_diff($value, $headers[$key]));
     }
 
     /**
      * Get the values for the header with the given name.
      *
+     * @param  string  $key
      * @return array
      */
     public function header($key)
     {
-        return $this->headers()[$key];
+        return Arr::get($this->headers(), $key, []);
     }
 
     /**
@@ -183,7 +195,8 @@ class Request implements ArrayAccess
      */
     public function isJson()
     {
-        return Str::contains($this->header('Content-Type')[0], 'json');
+        return $this->hasHeader('Content-Type') &&
+               Str::contains($this->header('Content-Type')[0], 'json');
     }
 
     /**
@@ -193,7 +206,8 @@ class Request implements ArrayAccess
      */
     public function isMultipart()
     {
-        return Str::startsWith($this->header('Content-Type')[0], 'multipart');
+        return $this->hasHeader('Content-Type') &&
+               Str::contains($this->header('Content-Type')[0], 'multipart');
     }
 
     /**

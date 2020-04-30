@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable
 {
@@ -26,34 +27,6 @@ class Stringable
     {
         $this->value = (string) $value;
     }
-
-    /**
-     * The cache of snake-cased words.
-     *
-     * @var array
-     */
-    protected static $snakeCache = [];
-
-    /**
-     * The cache of camel-cased words.
-     *
-     * @var array
-     */
-    protected static $camelCache = [];
-
-    /**
-     * The cache of studly-cased words.
-     *
-     * @var array
-     */
-    protected static $studlyCache = [];
-
-    /**
-     * The callback that should be used to generate UUIDs.
-     *
-     * @var callable
-     */
-    protected static $uuidFactory;
 
     /**
      * Return the remainder of a string after the first occurrence of a given value.
@@ -133,6 +106,18 @@ class Stringable
     }
 
     /**
+     * Get the portion of a string between two given values.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return static
+     */
+    public function between($from, $to)
+    {
+        return new static(Str::between($this->value, $from, $to));
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @return static
@@ -148,7 +133,7 @@ class Stringable
      * @param  string|array  $needles
      * @return bool
      */
-    public function contains($haystack, $needles)
+    public function contains($needles)
     {
         return Str::contains($this->value, $needles);
     }
@@ -252,6 +237,16 @@ class Stringable
     }
 
     /**
+     * Determine if the given string is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @return static
@@ -315,7 +310,7 @@ class Stringable
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern
-     * @return static|null
+     * @return \Illuminate\Support\Collection
      */
     public function matchAll($pattern)
     {
@@ -336,7 +331,7 @@ class Stringable
      */
     public function parseCallback($default = null)
     {
-        return Str::parseCallback($this->value);
+        return Str::parseCallback($this->value, $default);
     }
 
     /**
@@ -375,8 +370,8 @@ class Stringable
     /**
      * Replace the given value in the given string.
      *
-     * @param  string  $search
-     * @param  string  $replace
+     * @param  string|string[]  $search
+     * @param  string|string[]  $replace
      * @return static
      */
     public function replace($search, $replace)
@@ -432,9 +427,9 @@ class Stringable
     {
         if ($replace instanceof Closure) {
             return new static(preg_replace_callback($pattern, $replace, $this->value, $limit));
-        } else {
-            return new static(preg_replace($pattern, $replace, $this->value, $limit));
         }
+
+        return new static(preg_replace($pattern, $replace, $this->value, $limit));
     }
 
     /**
@@ -535,6 +530,19 @@ class Stringable
     }
 
     /**
+     * Returns the number of substring occurrences.
+     *
+     * @param  string  $needle
+     * @param  int|null  $offset
+     * @param  int|null  $length
+     * @return int
+     */
+    public function substrCount($needle, $offset = null, $length = null)
+    {
+        return Str::substrCount($this->value, $needle, $offset, $length);
+    }
+
+    /**
      * Trim the string of the given characters.
      *
      * @param  string  $characters
@@ -542,7 +550,29 @@ class Stringable
      */
     public function trim($characters = null)
     {
-        return new static(trim($this->value, $characters));
+        return new static(trim(...array_merge([$this->value], func_get_args())));
+    }
+
+    /**
+     * Left trim the string of the given characters.
+     *
+     * @param  string  $characters
+     * @return static
+     */
+    public function ltrim($characters = null)
+    {
+        return new static(ltrim(...array_merge([$this->value], func_get_args())));
+    }
+
+    /**
+     * Right trim the string of the given characters.
+     *
+     * @param  string  $characters
+     * @return static
+     */
+    public function rtrim($characters = null)
+    {
+        return new static(rtrim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -582,6 +612,30 @@ class Stringable
     public function words($words = 100, $end = '...')
     {
         return new static(Str::words($this->value, $words, $end));
+    }
+
+    /**
+     * Dump the string.
+     *
+     * @return $this
+     */
+    public function dump()
+    {
+        VarDumper::dump($this->value);
+
+        return $this;
+    }
+
+    /**
+     * Dump the string and end the script.
+     *
+     * @return void
+     */
+    public function dd()
+    {
+        $this->dump();
+
+        die(1);
     }
 
     /**

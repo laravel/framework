@@ -399,6 +399,17 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Append an attribute across the entire collection.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function append($attributes)
+    {
+        return $this->each->append($attributes);
+    }
+
+    /**
      * Get a dictionary keyed by primary keys.
      *
      * @param  \ArrayAccess|array|null  $items
@@ -424,7 +435,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get an array with the values of a given key.
      *
-     * @param  string  $value
+     * @param  string|array  $value
      * @param  string|null  $key
      * @return \Illuminate\Support\Collection
      */
@@ -446,7 +457,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Zip the collection together with one or more arrays.
      *
-     * @param  mixed ...$items
+     * @param  mixed  ...$items
      * @return \Illuminate\Support\Collection
      */
     public function zip($items)

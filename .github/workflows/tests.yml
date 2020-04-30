@@ -30,7 +30,7 @@ jobs:
         php: [7.2, 7.3, 7.4]
         stability: [prefer-lowest, prefer-stable]
 
-    name: P${{ matrix.php }} - S${{ matrix.stability }}
+    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
@@ -53,14 +53,10 @@ jobs:
         uses: niden/actions-memcached@v7
 
       - name: Install dependencies
-        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-suggest
-
-      - name: Start MySQL
-        run: sudo /etc/init.d/mysql start
+        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
         env:
-          CI: ${{ secrets.CI }}
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root

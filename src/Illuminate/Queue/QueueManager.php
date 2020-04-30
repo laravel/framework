@@ -169,7 +169,7 @@ class QueueManager implements FactoryContract, MonitorContract
     protected function getConnector($driver)
     {
         if (! isset($this->connectors[$driver])) {
-            throw new InvalidArgumentException("No connector for [$driver]");
+            throw new InvalidArgumentException("No connector for [$driver].");
         }
 
         return call_user_func($this->connectors[$driver]);
