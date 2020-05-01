@@ -37,6 +37,33 @@ class SupportReflectsClosuresTest extends TestCase
         });
     }
 
+    public function testItReturnsTheFirstParameterType()
+    {
+        $type = ReflectsClosuresClass::reflectFirst(function (ExampleParameter $a) {
+            //
+        });
+
+        $this->assertInstanceOf($type, new ExampleParameter);
+    }
+
+    public function testItThrowsWhenNoParameters()
+    {
+        $this->expectException(RuntimeException::class);
+
+        ReflectsClosuresClass::reflectFirst(function () {
+            //
+        });
+    }
+
+    public function testItThrowsWhenNoFirstParameterType()
+    {
+        $this->expectException(RuntimeException::class);
+
+        ReflectsClosuresClass::reflectFirst(function ($a, ExampleParameter $b) {
+            //
+        });
+    }
+
     private function assertParameterTypes($expected, $closure)
     {
         $types = ReflectsClosuresClass::reflect($closure);
@@ -51,7 +78,12 @@ class ReflectsClosuresClass
 
     public static function reflect($closure)
     {
-        return (new static)->closureParameterTypes($closure);
+        return (new static)->parameterTypes($closure);
+    }
+
+    public static function reflectFirst($closure)
+    {
+        return (new static)->firstParameterType($closure);
     }
 }
 
