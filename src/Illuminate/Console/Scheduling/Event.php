@@ -501,7 +501,7 @@ class Event
     /**
      * Register a callback that uses the output after the job runs.
      *
-     * @param  Closure $callback
+     * @param  \Closure  $callback
      * @param  bool  $onlyIfOutputExists
      * @return $this
      */
@@ -516,7 +516,7 @@ class Event
      * Register a callback that uses the output after the job runs if the given condition is true.
      *
      * @param  bool  $value
-     * @param  Closure $callback
+     * @param  \Closure  $callback
      * @param  bool  $onlyIfOutputExists
      * @return $this
      */
@@ -530,7 +530,7 @@ class Event
     /**
      * Register a callback that uses the output if the operation succeeds.
      *
-     * @param  Closure $callback
+     * @param  \Closure  $callback
      * @param  bool  $onlyIfOutputExists
      * @return $this
      */
@@ -544,7 +544,7 @@ class Event
     /**
      * Register a callback that uses the output if the operation fails.
      *
-     * @param  Closure $callback
+     * @param  \Closure  $callback
      * @param  bool  $onlyIfOutputExists
      * @return $this
      */
@@ -558,9 +558,9 @@ class Event
     /**
      * Get the callback that provides output.
      *
-     * @param  Closure $callback
+     * @param  \Closure  $callback
      * @param  bool  $onlyIfOutputExists
-     * @return Closure
+     * @return \Closure
      */
     protected function withOutputCallback(Closure $callback, $onlyIfOutputExists = false)
     {
