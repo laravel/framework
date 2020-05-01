@@ -190,19 +190,6 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
-     * Disconnect the given disk and remove from local cache.
-     *
-     * @param  string|null  $name
-     * @return void
-     */
-    public function purge($name = null)
-    {
-        $name = $name ?? $this->getDefaultDriver();
-
-        unset($this->drivers[$name]);
-    }
-
-    /**
      * Call a custom driver creator.
      *
      * @param  array  $config
@@ -305,6 +292,19 @@ class BroadcastManager implements FactoryContract
     public function setDefaultDriver($name)
     {
         $this->app['config']['broadcasting.default'] = $name;
+    }
+
+    /**
+     * Disconnect the given disk and remove from local cache.
+     *
+     * @param  string|null  $name
+     * @return void
+     */
+    public function purge($name = null)
+    {
+        $name = $name ?? $this->getDefaultDriver();
+
+        unset($this->drivers[$name]);
     }
 
     /**
