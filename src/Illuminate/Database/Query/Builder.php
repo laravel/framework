@@ -2261,7 +2261,7 @@ class Builder
             return [(object) ['aggregate' => $this->newQuery()
                         ->from(new Expression('('.$clone->toSql().') as '.$this->grammar->wrap('aggregate_table')))
                         ->mergeBindings($clone)
-                        ->count(['*']), ]];
+                        ->count($columns), ]];
         }
 
         $without = $this->unions ? ['orders', 'limit', 'offset'] : ['columns', 'orders', 'limit', 'offset'];
