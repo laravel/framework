@@ -499,6 +499,83 @@ class Event
     }
 
     /**
+     * Register a callback that uses the output after the job runs.
+     *
+     * @param  Closure $callback
+     * @param  bool  $onlyIfOutputExists
+     * @return $this
+     */
+    public function thenWithOutput(Closure $callback, $onlyIfOutputExists = false)
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        return $this->then($this->withOutputCallback($callback, $onlyIfOutputExists));
+    }
+
+    /**
+     * Register a callback that uses the output after the job runs if the given condition is true.
+     *
+     * @param  bool  $value
+     * @param  Closure $callback
+     * @param  bool  $onlyIfOutputExists
+     * @return $this
+     */
+    public function thenIfWithOutput($value, Closure $callback, $onlyIfOutputExists = false)
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        return $value ? $this->then($this->withOutputCallback($callback, $onlyIfOutputExists)) : $this;
+    }
+
+    /**
+     * Register a callback that uses the output if the operation succeeds.
+     *
+     * @param  Closure $callback
+     * @param  bool  $onlyIfOutputExists
+     * @return $this
+     */
+    public function onSuccessWithOutput(Closure $callback, $onlyIfOutputExists = false)
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        return $this->onSuccess($this->withOutputCallback($callback, $onlyIfOutputExists));
+    }
+
+    /**
+     * Register a callback that uses the output if the operation fails.
+     *
+     * @param  Closure $callback
+     * @param  bool  $onlyIfOutputExists
+     * @return $this
+     */
+    public function onFailureWithOutput(Closure $callback, $onlyIfOutputExists = false)
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        return $this->onFailure($this->withOutputCallback($callback, $onlyIfOutputExists));
+    }
+
+    /**
+     * Get the callback that provides output.
+     *
+     * @param  Closure $callback
+     * @param  bool  $onlyIfOutputExists
+     * @return Closure
+     */
+    protected function withOutputCallback(Closure $callback, $onlyIfOutputExists = false)
+    {
+        return function () use ($callback, $onlyIfOutputExists) {
+            $text = file_exists($this->output) ? file_get_contents($this->output) : '';
+
+            if ($onlyIfOutputExists && empty($text)) {
+                return;
+            }
+
+            return $callback($text);
+        };
+    }
+
+    /**
      * Register a callback to ping a given URL before the job runs.
      *
      * @param  string  $url
