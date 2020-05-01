@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestView;
+use Illuminate\View\View;
 
 trait InteractsWithViews
 {
@@ -43,21 +44,20 @@ trait InteractsWithViews
     }
 
     /**
-     * Create a new TestView from the given view component.
+     * Render the given view component.
      *
-     * @param  string  $viewComponent
+     * @param  string  $componentClass
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return \Illuminate\Testing\TestView
      */
-    protected function component(string $viewComponent, array $data = [])
+    protected function component(string $componentClass, array $data = [])
     {
-        $component = $this->app->make($viewComponent, $data);
+        $component = $this->app->make($componentClass, $data);
+
         $view = $component->resolveView();
 
-        if ($view instanceof \Illuminate\View\View) {
-            return new TestView($view->with($component->data()));
-        }
-
-        return new TestView(view($view, $component->data()));
+        return $view instanceof View
+                ? new TestView($view->with($component->data()))
+                : new TestView(view($view, $component->data()));
     }
 }
