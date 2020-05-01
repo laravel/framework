@@ -49,7 +49,8 @@ class StartSession
 
         $session = $this->getSession($request);
 
-        if ($this->manager->shouldBlock()) {
+        if ($this->manager->shouldBlock() ||
+            ($request->route() && $request->route()->locksFor())) {
             return $this->handleRequestWhileBlocking($request, $session, $next);
         } else {
             return $this->handleStatefulRequest($request, $session, $next);
@@ -66,12 +67,20 @@ class StartSession
      */
     protected function handleRequestWhileBlocking(Request $request, $session, Closure $next)
     {
+        $lockFor = $request->route() && $request->route()->locksFor()
+                        ? $request->route()->locksFor()
+                        : 10;
+
         $lock = $this->cache->driver()
-                    ->lock('session:'.$session->getId(), 10)
+                    ->lock('session:'.$session->getId(), $lockFor)
                     ->betweenBlockedAttemptsSleepFor(50);
 
         try {
-            $lock->block(10);
+            $lock->block(
+                ! is_null($request->route()->waitsFor())
+                        ? $request->route()->waitsFor()
+                        : 10
+            );
 
             return $this->handleStatefulRequest($request, $session, $next);
         } finally {
