@@ -922,10 +922,7 @@ class Builder
             // Next we'll pass the scope callback to the callScope method which will take
             // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
-            $builder = $builder->callScope(
-                [$this->model, 'scope'.ucfirst($scope)],
-                (array) $parameters
-            );
+            $builder = $builder->callNamedScope($scope, (array) $parameters);
         }
 
         return $builder;
@@ -976,7 +973,7 @@ class Builder
      * @param  array  $parameters
      * @return mixed
      */
-    protected function callScope(callable $scope, $parameters = [])
+    protected function callScope(callable $scope, array $parameters = [])
     {
         array_unshift($parameters, $this);
 
@@ -995,6 +992,20 @@ class Builder
         }
 
         return $result;
+    }
+
+    /**
+     * Apply the given named scope on the current builder instance.
+     *
+     * @param  string  $scope
+     * @param  array  $parameters
+     * @return mixed
+     */
+    protected function callNamedScope($scope, array $parameters = [])
+    {
+        return $this->callScope(function () use ($scope, $parameters) {
+            return $this->model->callNamedScope($scope, $parameters);
+        });
     }
 
     /**
@@ -1385,7 +1396,7 @@ class Builder
         }
 
         if ($this->hasScope($method)) {
-            return $this->callScope([$this->model, 'scope'.ucfirst($method)], $parameters);
+            return $this->callNamedScope($method, $parameters);
         }
 
         if (in_array($method, $this->passthru)) {
