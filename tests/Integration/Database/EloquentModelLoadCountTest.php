@@ -90,6 +90,18 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
 
         $this->assertEquals(0, $model->deletedrelated_count);
     }
+
+    public function testCountCanBeAccessedAsProperty()
+    {
+        $model = BaseModel::first();
+
+        \DB::enableQueryLog();
+
+        $this->assertEquals(2, $model->related1_count);
+        $this->assertCount(1, \DB::getQueryLog());
+        $this->assertEquals(1, $model->related2_count);
+        $this->assertCount(2, \DB::getQueryLog());
+    }
 }
 
 class BaseModel extends Model

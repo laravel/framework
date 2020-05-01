@@ -366,6 +366,12 @@ trait HasAttributes
             return;
         }
 
+        // If the attribute being accessed is a relation count we
+        // will run the withCount method and return the count.
+        if ($this->isRelationCount($key)) {
+            return $this->loadRelationCountAndReturnIt($key);
+        }
+
         return $this->getRelationValue($key);
     }
 
@@ -1493,5 +1499,29 @@ trait HasAttributes
         preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches);
 
         return $matches[1];
+    }
+
+    /**
+     * Determine if the property being accessed is a relation count.
+     *
+     * @param  string  $key
+     * @return boolean
+     */
+    public function isRelationCount($key)
+    {
+        return Str::endsWith($key, '_count') && ! method_exists(self::class, Str::before($key, '_count'));
+    }
+
+    /**
+     * Load a relationship count and returns it.
+     *
+     * @param  string $key
+     * @return mixed
+     */
+    public function loadRelationCountAndReturnIt($key)
+    {
+        $this->loadCount(Str::before($key, '_count'));
+
+        return $this->getAttribute($key);
     }
 }
