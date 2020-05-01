@@ -12,7 +12,7 @@ trait ReflectsClosures
     /**
      * Get the class names / types of the parameters of the given Closure.
      *
-     * @param  Closure  $closure
+     * @param  \Closure  $closure
      * @return array
      *
      * @throws \ReflectionException
@@ -33,21 +33,21 @@ trait ReflectsClosures
     /**
      * Get the class name of the first parameter of the given Closure.
      *
-     * @param  Closure  $closure
+     * @param  \Closure  $closure
      * @return string
      *
-     * @throws \ReflectionException|\RunTimeException
+     * @throws \ReflectionException|\RuntimeException
      */
     protected function firstClosureParameterType(Closure $closure)
     {
         $types = $this->closureParameterTypes($closure);
 
         if (! $types) {
-            throw new RunTimeException('The given Closure has no parameters.');
+            throw new RuntimeException('The given Closure has no parameters.');
         }
 
         if ($types[0] === null) {
-            throw new RunTimeException('The first parameter of the given Closure is missing a type hint.');
+            throw new RuntimeException('The first parameter of the given Closure is missing a type hint.');
         }
 
         return $types[0];
