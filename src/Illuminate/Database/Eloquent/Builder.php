@@ -1328,6 +1328,17 @@ class Builder
     }
 
     /**
+     * Determine if the given model has a scope.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function hasScope($name)
+    {
+        return $this->model && $this->model->hasScope($name);
+    }
+
+    /**
      * Dynamically access builder proxies.
      *
      * @param  string  $key
@@ -1373,8 +1384,8 @@ class Builder
             return call_user_func_array(static::$macros[$method], $parameters);
         }
 
-        if (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
-            return $this->callScope([$this->model, $scope], $parameters);
+        if ($this->hasScope($method)) {
+            return $this->callScope([$this->model, 'scope'.ucfirst($method)], $parameters);
         }
 
         if (in_array($method, $this->passthru)) {
