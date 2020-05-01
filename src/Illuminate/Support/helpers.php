@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Obj;
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
@@ -108,6 +109,19 @@ if (! function_exists('collect')) {
     function collect($value = null)
     {
         return new Collection($value);
+    }
+}
+
+if (! function_exists('object')) {
+    /**
+     * Create an object helper instance from the given value.
+     *
+     * @param  array|object  $value
+     * @return \Illuminate\Support\Obj
+     */
+    function object($value)
+    {
+        return new Obj($value);
     }
 }
 
