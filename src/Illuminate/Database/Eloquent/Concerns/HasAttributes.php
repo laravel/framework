@@ -1505,7 +1505,7 @@ trait HasAttributes
      * Determine if the property being accessed is a relation count.
      *
      * @param  string  $key
-     * @return boolean
+     * @return bool
      */
     public function isRelationCount($key)
     {
