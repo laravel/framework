@@ -55,9 +55,9 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             return;
         }
 
-       if ($notification instanceof Closure) {
-           [$notification, $callback] = [$this->firstParameterType($notification), $notification];
-       }
+        if ($notification instanceof Closure) {
+            [$notification, $callback] = [$this->firstParameterType($notification), $notification];
+        }
 
         if (is_numeric($callback)) {
             return $this->assertSentToTimes($notifiable, $notification, $callback);

@@ -23,7 +23,7 @@ trait ReflectsClosures
 
         return array_map(function (ReflectionParameter $parameter) {
             if ($parameter->isVariadic()) {
-                return null;
+                return;
             }
 
             return $parameter->getClass()->name ?? null;
