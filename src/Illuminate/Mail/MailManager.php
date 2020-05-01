@@ -232,6 +232,10 @@ class MailManager implements FactoryContract
             $transport->setTimeout($config['timeout']);
         }
 
+        if (isset($config['auth_mode'])) {
+            $transport->setAuthMode($config['auth_mode']);
+        }
+
         return $transport;
     }
 
