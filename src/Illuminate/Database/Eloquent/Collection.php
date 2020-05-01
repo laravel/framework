@@ -563,7 +563,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $relations = $this->map->getQueueableRelations()->all();
 
-        return count($relations) <= 1 ? $relations : array_intersect(...$relations);
+        return $relations === [[]] ? [] : array_intersect(...$relations);
     }
 
     /**
