@@ -74,21 +74,29 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
     {
         $model = BaseModel::first();
 
-        $this->assertEquals(null, $model->deletedrelated_count);
+        \DB::enableQueryLog();
 
         $model->loadCount('deletedrelated');
 
+        $this->assertCount(1, \DB::getQueryLog());
+
         $this->assertEquals(1, $model->deletedrelated_count);
+
+        \DB::disableQueryLog();
 
         DeletedRelated::first()->delete();
 
         $model = BaseModel::first();
 
-        $this->assertEquals(null, $model->deletedrelated_count);
+        \DB::enableQueryLog();
+
+        $this->assertEquals(0, $model->deletedrelated_count);
+        $this->assertCount(2, \DB::getQueryLog());
 
         $model->loadCount('deletedrelated');
 
         $this->assertEquals(0, $model->deletedrelated_count);
+        $this->assertCount(3, \DB::getQueryLog());
     }
 
     public function testCountCanBeAccessedAsProperty()
