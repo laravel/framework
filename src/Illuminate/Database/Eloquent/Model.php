@@ -1114,7 +1114,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @param  string  $scope
      * @return bool
      */
-    public function hasScope($scope)
+    public function hasNamedScope($scope)
     {
         return method_exists($this, 'scope'.ucfirst($scope));
     }

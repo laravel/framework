@@ -896,9 +896,9 @@ class Builder
      * @param  string  $name
      * @return bool
      */
-    public function hasScope($name)
+    public function hasNamedScope($name)
     {
-        return $this->model && $this->model->hasScope($name);
+        return $this->model && $this->model->hasNamedScope($name);
     }
 
     /**
@@ -1395,7 +1395,7 @@ class Builder
             return call_user_func_array(static::$macros[$method], $parameters);
         }
 
-        if ($this->hasScope($method)) {
+        if ($this->hasNamedScope($method)) {
             return $this->callNamedScope($method, $parameters);
         }
 
