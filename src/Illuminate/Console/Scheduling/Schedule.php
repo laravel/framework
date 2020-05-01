@@ -11,6 +11,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\ProcessUtils;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -198,7 +199,11 @@ class Schedule
     protected function compileParameters(array $parameters)
     {
         return collect($parameters)->map(function ($value, $key) {
-            if (is_array($value)) {
+            if (is_array($value) && Str::startsWith($key, '--')) {
+                return collect($value)->map(function ($value) use ($key) {
+                    return $key.'='.ProcessUtils::escapeArgument($value);
+                })->implode(' ');
+            } elseif (is_array($value)) {
                 $value = collect($value)->map(function ($value) {
                     return ProcessUtils::escapeArgument($value);
                 })->implode(' ');
