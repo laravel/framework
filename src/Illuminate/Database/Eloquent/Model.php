@@ -592,7 +592,11 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return $query->{$method}($column, $amount, $extra);
         }
 
-        $this->incrementOrDecrementAttributeValue($column, $amount, $extra, $method);
+        if (Str::contains($column, '->')) {
+            $this->incrementOrDecrementJsonAttributeValue($column, $amount, $extra, $method);
+        } else {
+            $this->incrementOrDecrementAttributeValue($column, $amount, $extra, $method);
+        }
 
         return $query->where(
             $this->getKeyName(), $this->getKey()
@@ -611,6 +615,32 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method)
     {
         $this->{$column} = $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
+
+        $this->forceFill($extra);
+
+        $this->syncOriginalAttribute($column);
+    }
+
+    /**
+     * Increment the underlying JSON attribute value and sync with original.
+     *
+     * @param  string  $column
+     * @param  float|int  $amount
+     * @param  array  $extra
+     * @param  string  $method
+     * @return void
+     */
+    protected function incrementOrDecrementJsonAttributeValue($column, $amount, $extra, $method)
+    {
+        [$column, $path] = explode('.', str_replace('->', '.', $column), 2);
+
+        $original = $this->{$column};
+
+        $value = Arr::get($original, $path);
+
+        Arr::set($original, $path, $value + ($method === 'increment' ? $amount : -$amount));
+
+        $this->{$column} = $original;
 
         $this->forceFill($extra);
 

@@ -1584,6 +1584,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(4, $model->foo);
         $this->assertEquals(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
+
+        $model->inventory = ['quantity' => 4];
+        $model->publicIncrement('inventory->quantity', 6);
+        $this->assertEquals(10, $model->inventory['quantity']);
     }
 
     public function testRelationshipTouchOwnersIsPropagated()
