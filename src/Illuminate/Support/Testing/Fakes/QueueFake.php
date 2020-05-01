@@ -3,12 +3,16 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use BadMethodCallException;
+use Closure;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class QueueFake extends QueueManager implements Queue
 {
+    use ReflectsClosures;
+
     /**
      * All of the jobs that have been pushed.
      *
@@ -25,6 +29,10 @@ class QueueFake extends QueueManager implements Queue
      */
     public function assertPushed($job, $callback = null)
     {
+        if ($job instanceof Closure) {
+            [$job, $callback] = [$this->firstParameterType($job), $job];
+        }
+
         if (is_numeric($callback)) {
             return $this->assertPushedTimes($job, $callback);
         }
@@ -62,6 +70,10 @@ class QueueFake extends QueueManager implements Queue
      */
     public function assertPushedOn($queue, $job, $callback = null)
     {
+        if ($job instanceof Closure) {
+            [$job, $callback] = [$this->firstParameterType($job), $job];
+        }
+
         return $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
             if ($pushedQueue !== $queue) {
                 return false;
@@ -180,6 +192,10 @@ class QueueFake extends QueueManager implements Queue
      */
     public function assertNotPushed($job, $callback = null)
     {
+        if ($job instanceof Closure) {
+            [$job, $callback] = [$this->firstParameterType($job), $job];
+        }
+
         PHPUnit::assertCount(
             0, $this->pushed($job, $callback),
             "The unexpected [{$job}] job was pushed."
