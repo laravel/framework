@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
 use Exception;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
@@ -9,11 +10,12 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class NotificationFake implements NotificationDispatcher, NotificationFactory
 {
-    use Macroable;
+    use Macroable, ReflectsClosures;
 
     /**
      * All of the notifications that have been sent.
@@ -33,7 +35,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      * Assert if a notification was sent based on a truth-test callback.
      *
      * @param  mixed  $notifiable
-     * @param  string  $notification
+     * @param  string|\Closure  $notification
      * @param  callable|null  $callback
      * @return void
      *
@@ -51,6 +53,10 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             }
 
             return;
+        }
+
+        if ($notification instanceof Closure) {
+            [$notification, $callback] = [$this->firstParameterType($notification), $notification];
         }
 
         if (is_numeric($callback)) {
@@ -85,7 +91,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      * Determine if a notification was sent based on a truth-test callback.
      *
      * @param  mixed  $notifiable
-     * @param  string  $notification
+     * @param  string|\Closure  $notification
      * @param  callable|null  $callback
      * @return void
      *
@@ -103,6 +109,10 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             }
 
             return;
+        }
+
+        if ($notification instanceof Closure) {
+            [$notification, $callback] = [$this->firstParameterType($notification), $notification];
         }
 
         PHPUnit::assertCount(
