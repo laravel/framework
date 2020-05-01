@@ -101,6 +101,10 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
         $this->assertCount(1, \DB::getQueryLog());
         $this->assertEquals(1, $model->related2_count);
         $this->assertCount(2, \DB::getQueryLog());
+
+        // to make sure we are not running a query again
+        $this->assertEquals(2, $model->related1_count);
+        $this->assertCount(2, \DB::getQueryLog());
     }
 }
 
