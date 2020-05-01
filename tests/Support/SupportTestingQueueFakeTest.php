@@ -43,6 +43,15 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class);
     }
 
+    public function testAssertPushedWithClosure()
+    {
+        $this->fake->push($this->job);
+
+        $this->fake->assertPushed(function (JobStub $job) {
+            return true;
+        });
+    }
+
     public function testQueueSize()
     {
         $this->assertEquals(0, $this->fake->size());
@@ -54,12 +63,26 @@ class SupportTestingQueueFakeTest extends TestCase
 
     public function testAssertNotPushed()
     {
+        $this->fake->push($this->job);
+
+        try {
+            $this->fake->assertNotPushed(JobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.'));
+        }
+    }
+
+    public function testAssertNotPushedWithClosure()
+    {
         $this->fake->assertNotPushed(JobStub::class);
 
         $this->fake->push($this->job);
 
         try {
-            $this->fake->assertNotPushed(JobStub::class);
+            $this->fake->assertNotPushed(function (JobStub $job) {
+                return true;
+            });
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.'));
@@ -78,6 +101,24 @@ class SupportTestingQueueFakeTest extends TestCase
         }
 
         $this->fake->assertPushedOn('foo', JobStub::class);
+    }
+
+    public function testAssertPushedOnWithClosure()
+    {
+        $this->fake->push($this->job, '', 'foo');
+
+        try {
+            $this->fake->assertPushedOn('bar', function (JobStub $job) {
+                return true;
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+        }
+
+        $this->fake->assertPushedOn('foo', function (JobStub $job) {
+            return true;
+        });
     }
 
     public function testAssertPushedTimes()

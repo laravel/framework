@@ -2,15 +2,19 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
 use Illuminate\Contracts\Mail\Factory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Factory, Mailer, MailQueue
 {
+    use ReflectsClosures;
+
     /**
      * The mailer currently being used to send a message.
      *
@@ -35,12 +39,16 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Assert if a mailable was sent based on a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|int|null  $callback
      * @return void
      */
     public function assertSent($mailable, $callback = null)
     {
+        if ($mailable instanceof Closure) {
+            [$mailable, $callback] = [$this->firstClosureParameterType($mailable), $mailable];
+        }
+
         if (is_numeric($callback)) {
             return $this->assertSentTimes($mailable, $callback);
         }
@@ -106,12 +114,16 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Assert if a mailable was queued based on a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|int|null  $callback
      * @return void
      */
     public function assertQueued($mailable, $callback = null)
     {
+        if ($mailable instanceof Closure) {
+            [$mailable, $callback] = [$this->firstClosureParameterType($mailable), $mailable];
+        }
+
         if (is_numeric($callback)) {
             return $this->assertQueuedTimes($mailable, $callback);
         }

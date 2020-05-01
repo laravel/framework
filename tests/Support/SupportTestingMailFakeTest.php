@@ -154,6 +154,24 @@ class SupportTestingMailFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('The following mailables were queued unexpectedly: Illuminate\Tests\Support\MailableStub'));
         }
     }
+
+    public function testAssertQueuedWithClosure()
+    {
+        $this->fake->to($user = new LocalizedRecipientStub)->queue($this->mailable);
+
+        $this->fake->assertQueued(function (MailableStub $mail) use ($user) {
+            return $mail->hasTo($user);
+        });
+    }
+
+    public function testAssertSentWithClosure()
+    {
+        $this->fake->to($user = new LocalizedRecipientStub)->send($this->mailable);
+
+        $this->fake->assertSent(function (MailableStub $mail) use ($user) {
+            return $mail->hasTo($user);
+        });
+    }
 }
 
 class MailableStub extends Mailable implements MailableContract

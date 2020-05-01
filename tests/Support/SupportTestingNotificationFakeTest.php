@@ -51,6 +51,15 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->assertSentTo($this->user, NotificationStub::class);
     }
 
+    public function testAssertSentToClosure()
+    {
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->assertSentTo($this->user, function (NotificationStub $notification) {
+            return true;
+        });
+    }
+
     public function testAssertNotSentTo()
     {
         $this->fake->assertNotSentTo($this->user, NotificationStub::class);
@@ -59,6 +68,20 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         try {
             $this->fake->assertNotSentTo($this->user, NotificationStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.'));
+        }
+    }
+
+    public function testAssertNotSentToClosure()
+    {
+        $this->fake->send($this->user, new NotificationStub);
+
+        try {
+            $this->fake->assertNotSentTo($this->user, function (NotificationStub $notification) {
+                return true;
+            });
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.'));
