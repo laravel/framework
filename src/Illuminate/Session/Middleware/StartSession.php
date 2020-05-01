@@ -3,6 +3,7 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
@@ -24,11 +25,13 @@ class StartSession
      * Create a new session middleware.
      *
      * @param  \Illuminate\Session\SessionManager  $manager
+     * @param  \Illuminate\Contracts\Cache\Factory  $cache
      * @return void
      */
-    public function __construct(SessionManager $manager)
+    public function __construct(SessionManager $manager, CacheFactory $cache)
     {
         $this->manager = $manager;
+        $this->cache = $cache;
     }
 
     /**
@@ -44,11 +47,53 @@ class StartSession
             return $next($request);
         }
 
+        $session = $this->getSession($request);
+
+        if ($this->manager->shouldBlock()) {
+            return $this->handleRequestWhileBlocking($request, $session, $next);
+        } else {
+            return $this->handleStatefulRequest($request, $session, $next);
+        }
+    }
+
+    /**
+     * Handle the given request within session state.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    protected function handleRequestWhileBlocking(Request $request, $session, Closure $next)
+    {
+        $lock = $this->cache->driver()
+                    ->lock('session:'.$session->getId(), 10)
+                    ->betweenBlockedAttemptsSleepFor(50);
+
+        try {
+            $lock->block(10);
+
+            return $this->handleStatefulRequest($request, $session, $next);
+        } finally {
+            optional($lock)->release();
+        }
+    }
+
+    /**
+     * Handle the given request within session state.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    protected function handleStatefulRequest(Request $request, $session, Closure $next)
+    {
         // If a session driver has been configured, we will need to start the session here
         // so that the data is ready for an application. Note that the Laravel sessions
         // do not make use of PHP "native" sessions in any way since they are crappy.
         $request->setLaravelSession(
-            $session = $this->startSession($request)
+            $this->startSession($request, $session)
         );
 
         $this->collectGarbage($session);
@@ -71,11 +116,12 @@ class StartSession
      * Start the session for the given request.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Session\Session  $session
      * @return \Illuminate\Contracts\Session\Session
      */
-    protected function startSession(Request $request)
+    protected function startSession(Request $request, $session)
     {
-        return tap($this->getSession($request), function ($session) use ($request) {
+        return tap($session, function ($session) use ($request) {
             $session->setRequestOnHandler($request);
 
             $session->start();

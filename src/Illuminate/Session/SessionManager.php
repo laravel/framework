@@ -203,6 +203,16 @@ class SessionManager extends Manager
     }
 
     /**
+     * Determine if requests for the same session should wait for each to finish before executing.
+     *
+     * @return bool
+     */
+    public function shouldBlock()
+    {
+        return $this->config->get('session.block', false);
+    }
+
+    /**
      * Get the session configuration.
      *
      * @return array
