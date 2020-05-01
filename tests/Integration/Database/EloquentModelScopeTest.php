@@ -11,20 +11,20 @@ class EloquentModelScopeTest extends DatabaseTestCase
 {
     public function testModelHasScope()
     {
-        $model = new TestModel1;
+        $model = new TestScopeModel1;
 
         $this->assertTrue($model->hasScope("exists"));
     }
 
     public function testModelDoesNotHaveScope()
     {
-        $model = new TestModel1;
+        $model = new TestScopeModel1;
 
         $this->assertFalse($model->hasScope("doesNotExist"));
     }
 }
 
-class TestModel1 extends Model
+class TestScopeModel1 extends Model
 {
     public function scopeExists()
     {
