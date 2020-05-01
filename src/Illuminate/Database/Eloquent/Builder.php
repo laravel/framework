@@ -1330,10 +1330,10 @@ class Builder
     /**
      * Determine if the given model has a scope.
      *
-     * @param string $method
+     * @param  string  $name
      * @return bool
      */
-    public function hasScope(string $name)
+    public function hasScope($name)
     {
         return $this->model && $this->model->hasScope($name);
     }
