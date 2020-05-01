@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestView;
+use Illuminate\View\View;
 
 trait InteractsWithViews
 {
@@ -40,5 +41,23 @@ trait InteractsWithViews
         file_put_contents($tempFile, $template);
 
         return new TestView(view(Str::before(basename($tempFile), '.blade.php'), $data));
+    }
+
+    /**
+     * Render the given view component.
+     *
+     * @param  string  $componentClass
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @return \Illuminate\Testing\TestView
+     */
+    protected function component(string $componentClass, array $data = [])
+    {
+        $component = $this->app->make($componentClass, $data);
+
+        $view = $component->resolveView();
+
+        return $view instanceof View
+                ? new TestView($view->with($component->data()))
+                : new TestView(view($view, $component->data()));
     }
 }
