@@ -3,10 +3,25 @@
 namespace Illuminate\Database\Concerns;
 
 use Closure;
+use Illuminate\Database\Transaction;
+use PDOException;
 use Throwable;
 
 trait ManagesTransactions
 {
+	/**
+	 * Begin a new transaction and return it's handle for manual control.
+	 *
+	 * @return Transaction
+	 */
+	public function newTransaction(): Transaction
+	{
+		$transaction = new Transaction($this);
+		$transaction->begin();
+
+		return $transaction;
+	}
+
     /**
      * Execute a Closure within a transaction.
      *
@@ -19,7 +34,7 @@ trait ManagesTransactions
     public function transaction(Closure $callback, $attempts = 1)
     {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
-            $this->beginTransaction();
+            $transaction = $this->newTransaction();
 
             // We'll simply execute the given callback within a try / catch block and if we
             // catch any exception we can rollback this transaction so that none of this
@@ -33,14 +48,14 @@ trait ManagesTransactions
             // exception back out and let the developer handle an uncaught exceptions.
             catch (Throwable $e) {
                 $this->handleTransactionException(
-                    $e, $currentAttempt, $attempts
+					$transaction, $e, $currentAttempt, $attempts
                 );
 
                 continue;
             }
 
             try {
-                $this->commit();
+                $transaction->commit();
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
@@ -56,6 +71,7 @@ trait ManagesTransactions
     /**
      * Handle an exception encountered when running a transacted statement.
      *
+	 * @param  Transaction  $transaction
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
@@ -63,25 +79,15 @@ trait ManagesTransactions
      *
      * @throws \Throwable
      */
-    protected function handleTransactionException(Throwable $e, $currentAttempt, $maxAttempts)
+    protected function handleTransactionException(Transaction $transaction, Throwable $e, $currentAttempt, $maxAttempts)
     {
-        // On a deadlock, MySQL rolls back the entire transaction so we can't just
-        // retry the query. We have to throw this exception all the way out and
-        // let the developer handle it in another way. We will decrement too.
-        if ($this->causedByConcurrencyError($e) &&
-            $this->transactions > 1) {
-            $this->transactions--;
-
-            throw $e;
-        }
-
         // If there was an exception we will rollback this transaction and then we
         // can check if we have exceeded the maximum attempt count for this and
         // if we haven't we will return and try this query again in our loop.
-        $this->rollBack();
+        $transaction->rollBack();
 
-        if ($this->causedByConcurrencyError($e) &&
-            $currentAttempt < $maxAttempts) {
+        // Return (and re-run the transaction) if we still need to retry.
+        if ($this->causedByConcurrencyError($e) && $currentAttempt < $maxAttempts) {
             return;
         }
 
@@ -168,9 +174,17 @@ trait ManagesTransactions
      */
     public function commit()
     {
-        if ($this->transactions == 1) {
-            $this->getPdo()->commit();
-        }
+    	try {
+			if ($this->transactions == 1) {
+				$this->getPdo()->commit();
+			}
+		} catch (PDOException $e) {
+			if ($this->causedByDeadlock($e)) {
+				$this->transactions = 0;
+			}
+
+			throw $e;
+		}
 
         $this->transactions = max(0, $this->transactions - 1);
 
@@ -189,7 +203,7 @@ trait ManagesTransactions
      */
     protected function handleCommitTransactionException(Throwable $e, $currentAttempt, $maxAttempts)
     {
-        $this->transactions--;
+        $this->transactions = max($this->transactions - 1, 0);
 
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {

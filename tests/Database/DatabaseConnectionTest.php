@@ -22,6 +22,7 @@ use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionObject;
 use stdClass;
 
 class DatabaseConnectionTest extends TestCase
@@ -275,9 +276,13 @@ class DatabaseConnectionTest extends TestCase
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->setMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
         $pdo->expects($this->exactly(3))->method('beginTransaction');
-        $pdo->expects($this->exactly(3))->method('rollBack');
+        $pdo->expects($this->exactly(0))->method('rollBack');
         $pdo->expects($this->never())->method('commit');
-        $mock->transaction(function () {
+        $mock->transaction(function () use ($mock) {
+        	$transactions = (new ReflectionObject($mock))->getProperty('transactions');
+        	$transactions->setAccessible(true);
+        	$transactions->setValue($mock, 0);
+
             throw new QueryException('', [], new Exception('Deadlock found when trying to get lock'));
         }, 3);
     }

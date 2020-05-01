@@ -139,12 +139,14 @@ interface ConnectionInterface
      */
     public function commit();
 
-    /**
-     * Rollback the active database transaction.
-     *
-     * @return void
-     */
-    public function rollBack();
+	/**
+	 * Rollback the active database transaction.
+	 *
+	 * @param int|null $toLevel
+	 *
+	 * @return void
+	 */
+    public function rollBack(int $toLevel = null);
 
     /**
      * Get the number of active transactions.

@@ -717,6 +717,12 @@ class Connection implements ConnectionInterface
      */
     protected function handleQueryException(QueryException $e, $query, $bindings, Closure $callback)
     {
+    	if ($this->causedByDeadlock($e)) {
+    		$this->transactions = 0;
+
+    		throw $e;
+		}
+
         if ($this->transactions >= 1) {
             throw $e;
         }
