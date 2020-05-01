@@ -213,6 +213,16 @@ class SessionManager extends Manager
     }
 
     /**
+     * Get the name of the cache store / driver that should be used to acquire session locks.
+     *
+     * @return string|null
+     */
+    public function blockDriver()
+    {
+        return $this->config->get('session.block_store');
+    }
+
+    /**
      * Get the session configuration.
      *
      * @return array

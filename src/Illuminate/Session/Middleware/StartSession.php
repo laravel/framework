@@ -71,7 +71,7 @@ class StartSession
                         ? $request->route()->locksFor()
                         : 10;
 
-        $lock = $this->cache->driver()
+        $lock = $this->cache->driver($this->manager->blockDriver())
                     ->lock('session:'.$session->getId(), $lockFor)
                     ->betweenBlockedAttemptsSleepFor(50);
 
