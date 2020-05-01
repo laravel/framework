@@ -1335,7 +1335,7 @@ class Builder
      */
     public function hasScope(string $name)
     {
-        return $this->model->hasScope($name);
+        return $this->model && $this->model->hasScope($name);
     }
 
     /**
