@@ -1003,9 +1003,9 @@ class Builder
      */
     protected function callNamedScope($scope, array $parameters = [])
     {
-        return $this->callScope(function () use ($scope, $parameters) {
+        return $this->callScope(function (...$parameters) use ($scope) {
             return $this->model->callNamedScope($scope, $parameters);
-        });
+        }, $parameters);
     }
 
     /**
