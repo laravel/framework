@@ -2257,7 +2257,7 @@ class Builder
     {
         if ($this->groups || $this->havings) {
             return [(object) ['aggregate' => $this->newQuery()
-                        ->from(new Expression('('.$this->toSql().') as '.$this->grammar->wrap('aggregate_table')))
+                        ->from(new Expression('('.$this->cloneForPaginationCount()->toSql().') as '.$this->grammar->wrap('aggregate_table')))
                         ->mergeBindings($this)
                         ->count(['*']), ]];
         }
@@ -2268,6 +2268,17 @@ class Builder
                     ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
                     ->setAggregate('count', $this->withoutSelectAliases($columns))
                     ->get()->all();
+    }
+
+    /**
+     * Clone the existing query instance for usage in a pagination subquery.
+     *
+     * @return self
+     */
+    protected function cloneForPaginationCount()
+    {
+        return $this->cloneWithout(['orders', 'limit', 'offset'])
+                    ->cloneWithoutBindings(['order']);
     }
 
     /**
