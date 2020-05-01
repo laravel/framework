@@ -5,10 +5,13 @@ namespace Illuminate\Support\Testing\Fakes;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class EventFake implements Dispatcher
 {
+    use ReflectsClosures;
+
     /**
      * The original event dispatcher.
      *
@@ -53,6 +56,10 @@ class EventFake implements Dispatcher
      */
     public function assertDispatched($event, $callback = null)
     {
+        if ($event instanceof Closure) {
+            [$event, $callback] = [$this->firstParameterType($event), $event];
+        }
+
         if (is_int($callback)) {
             return $this->assertDispatchedTimes($event, $callback);
         }
@@ -89,6 +96,10 @@ class EventFake implements Dispatcher
      */
     public function assertNotDispatched($event, $callback = null)
     {
+        if ($event instanceof Closure) {
+            [$event, $callback] = [$this->firstParameterType($event), $event];
+        }
+
         PHPUnit::assertCount(
             0, $this->dispatched($event, $callback),
             "The unexpected [{$event}] event was dispatched."
