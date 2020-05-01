@@ -893,12 +893,12 @@ class Builder
     /**
      * Determine if the given model has a scope.
      *
-     * @param  string  $name
+     * @param  string  $scope
      * @return bool
      */
-    public function hasNamedScope($name)
+    public function hasNamedScope($scope)
     {
-        return $this->model && $this->model->hasNamedScope($name);
+        return $this->model && $this->model->hasNamedScope($scope);
     }
 
     /**
