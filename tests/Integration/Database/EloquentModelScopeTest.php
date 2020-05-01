@@ -13,14 +13,14 @@ class EloquentModelScopeTest extends DatabaseTestCase
     {
         $model = new TestScopeModel1;
 
-        $this->assertTrue($model->hasScope("exists"));
+        $this->assertTrue($model->hasScope('exists'));
     }
 
     public function testModelDoesNotHaveScope()
     {
         $model = new TestScopeModel1;
 
-        $this->assertFalse($model->hasScope("doesNotExist"));
+        $this->assertFalse($model->hasScope('doesNotExist'));
     }
 }
 

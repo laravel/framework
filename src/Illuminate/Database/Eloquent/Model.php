@@ -333,13 +333,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
     /**
      * Determine if the given model has a scope.
-     * 
+     *
      * @param string $method
      * @return bool
      */
     public function hasScope(string $method)
     {
-        return method_exists($this, 'scope' . ucfirst($method));
+        return method_exists($this, 'scope'.ucfirst($method));
     }
 
     /**

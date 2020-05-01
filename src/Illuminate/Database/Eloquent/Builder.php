@@ -1329,7 +1329,7 @@ class Builder
 
     /**
      * Determine if the given model has a scope.
-     * 
+     *
      * @param string $method
      * @return bool
      */
@@ -1385,7 +1385,7 @@ class Builder
         }
 
         if ($this->hasScope($method)) {
-            return $this->callScope([$this->model, 'scope' . ucfirst($method)], $parameters);
+            return $this->callScope([$this->model, 'scope'.ucfirst($method)], $parameters);
         }
 
         if (in_array($method, $this->passthru)) {
