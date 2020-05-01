@@ -78,12 +78,12 @@ class ReflectsClosuresClass
 
     public static function reflect($closure)
     {
-        return (new static)->parameterTypes($closure);
+        return (new static)->closureParameterTypes($closure);
     }
 
     public static function reflectFirst($closure)
     {
-        return (new static)->firstParameterType($closure);
+        return (new static)->firstClosureParameterType($closure);
     }
 }
 

@@ -46,7 +46,7 @@ class MailFake implements Factory, Mailer, MailQueue
     public function assertSent($mailable, $callback = null)
     {
         if ($mailable instanceof Closure) {
-            [$mailable, $callback] = [$this->firstParameterType($mailable), $mailable];
+            [$mailable, $callback] = [$this->firstClosureParameterType($mailable), $mailable];
         }
 
         if (is_numeric($callback)) {
@@ -121,7 +121,7 @@ class MailFake implements Factory, Mailer, MailQueue
     public function assertQueued($mailable, $callback = null)
     {
         if ($mailable instanceof Closure) {
-            [$mailable, $callback] = [$this->firstParameterType($mailable), $mailable];
+            [$mailable, $callback] = [$this->firstClosureParameterType($mailable), $mailable];
         }
 
         if (is_numeric($callback)) {

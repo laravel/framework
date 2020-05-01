@@ -10,14 +10,14 @@ use RuntimeException;
 trait ReflectsClosures
 {
     /**
-     * Get the class types of the parameters of the given closure.
+     * Get the class names / types of the parameters of the given Closure.
      *
      * @param  Closure  $closure
      * @return array
      *
      * @throws \ReflectionException
      */
-    protected function parameterTypes(Closure $closure)
+    protected function closureParameterTypes(Closure $closure)
     {
         $reflection = new ReflectionFunction($closure);
 
@@ -31,23 +31,23 @@ trait ReflectsClosures
     }
 
     /**
-     * Get the class of the first parameter of the given closure.
+     * Get the class name of the first parameter of the given Closure.
      *
      * @param  Closure  $closure
      * @return string
      *
      * @throws \ReflectionException|\RunTimeException
      */
-    protected function firstParameterType(Closure $closure)
+    protected function firstClosureParameterType(Closure $closure)
     {
-        $types = $this->parameterTypes($closure);
+        $types = $this->closureParameterTypes($closure);
 
         if (! $types) {
-            throw new RunTimeException('The given closure has no parameters');
+            throw new RunTimeException('The given Closure has no parameters.');
         }
 
         if ($types[0] === null) {
-            throw new RunTimeException('The first parameter of the given closure has no class type hint');
+            throw new RunTimeException('The first parameter of the given Closure is missing a type hint.');
         }
 
         return $types[0];

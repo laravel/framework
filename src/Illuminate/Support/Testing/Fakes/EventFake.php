@@ -57,7 +57,7 @@ class EventFake implements Dispatcher
     public function assertDispatched($event, $callback = null)
     {
         if ($event instanceof Closure) {
-            [$event, $callback] = [$this->firstParameterType($event), $event];
+            [$event, $callback] = [$this->firstClosureParameterType($event), $event];
         }
 
         if (is_int($callback)) {
@@ -97,7 +97,7 @@ class EventFake implements Dispatcher
     public function assertNotDispatched($event, $callback = null)
     {
         if ($event instanceof Closure) {
-            [$event, $callback] = [$this->firstParameterType($event), $event];
+            [$event, $callback] = [$this->firstClosureParameterType($event), $event];
         }
 
         PHPUnit::assertCount(

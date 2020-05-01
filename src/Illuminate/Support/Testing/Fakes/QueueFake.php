@@ -30,7 +30,7 @@ class QueueFake extends QueueManager implements Queue
     public function assertPushed($job, $callback = null)
     {
         if ($job instanceof Closure) {
-            [$job, $callback] = [$this->firstParameterType($job), $job];
+            [$job, $callback] = [$this->firstClosureParameterType($job), $job];
         }
 
         if (is_numeric($callback)) {
@@ -71,7 +71,7 @@ class QueueFake extends QueueManager implements Queue
     public function assertPushedOn($queue, $job, $callback = null)
     {
         if ($job instanceof Closure) {
-            [$job, $callback] = [$this->firstParameterType($job), $job];
+            [$job, $callback] = [$this->firstClosureParameterType($job), $job];
         }
 
         return $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
@@ -193,7 +193,7 @@ class QueueFake extends QueueManager implements Queue
     public function assertNotPushed($job, $callback = null)
     {
         if ($job instanceof Closure) {
-            [$job, $callback] = [$this->firstParameterType($job), $job];
+            [$job, $callback] = [$this->firstClosureParameterType($job), $job];
         }
 
         PHPUnit::assertCount(

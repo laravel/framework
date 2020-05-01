@@ -56,7 +56,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
         }
 
         if ($notification instanceof Closure) {
-            [$notification, $callback] = [$this->firstParameterType($notification), $notification];
+            [$notification, $callback] = [$this->firstClosureParameterType($notification), $notification];
         }
 
         if (is_numeric($callback)) {
@@ -112,7 +112,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
         }
 
         if ($notification instanceof Closure) {
-            [$notification, $callback] = [$this->firstParameterType($notification), $notification];
+            [$notification, $callback] = [$this->firstClosureParameterType($notification), $notification];
         }
 
         PHPUnit::assertCount(

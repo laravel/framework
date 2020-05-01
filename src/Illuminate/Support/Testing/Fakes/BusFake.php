@@ -64,7 +64,7 @@ class BusFake implements QueueingDispatcher
     public function assertDispatched($command, $callback = null)
     {
         if ($command instanceof Closure) {
-            [$command, $callback] = [$this->firstParameterType($command), $command];
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
 
         if (is_numeric($callback)) {
@@ -106,7 +106,7 @@ class BusFake implements QueueingDispatcher
     public function assertNotDispatched($command, $callback = null)
     {
         if ($command instanceof Closure) {
-            [$command, $callback] = [$this->firstParameterType($command), $command];
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
 
         PHPUnit::assertTrue(
@@ -126,7 +126,7 @@ class BusFake implements QueueingDispatcher
     public function assertDispatchedAfterResponse($command, $callback = null)
     {
         if ($command instanceof Closure) {
-            [$command, $callback] = [$this->firstParameterType($command), $command];
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
 
         if (is_numeric($callback)) {
@@ -166,7 +166,7 @@ class BusFake implements QueueingDispatcher
     public function assertNotDispatchedAfterResponse($command, $callback = null)
     {
         if ($command instanceof Closure) {
-            [$command, $callback] = [$this->firstParameterType($command), $command];
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
 
         PHPUnit::assertCount(
