@@ -332,17 +332,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
-     * Determine if the given model has a scope.
-     *
-     * @param  string  $method
-     * @return bool
-     */
-    public function hasScope($method)
-    {
-        return method_exists($this, 'scope'.ucfirst($method));
-    }
-
-    /**
      * Fill the model with an array of attributes.
      *
      * @param  array  $attributes
@@ -1117,6 +1106,17 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
                       : Pivot::fromAttributes($parent, $attributes, $table, $exists);
+    }
+
+    /**
+     * Determine if the model has a given scope.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    public function hasScope($method)
+    {
+        return method_exists($this, 'scope'.ucfirst($method));
     }
 
     /**

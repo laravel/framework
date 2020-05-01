@@ -891,6 +891,17 @@ class Builder
     }
 
     /**
+     * Determine if the given model has a scope.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function hasScope($name)
+    {
+        return $this->model && $this->model->hasScope($name);
+    }
+
+    /**
      * Call the given local model scopes.
      *
      * @param  array|string  $scopes
@@ -1325,17 +1336,6 @@ class Builder
     public static function hasGlobalMacro($name)
     {
         return isset(static::$macros[$name]);
-    }
-
-    /**
-     * Determine if the given model has a scope.
-     *
-     * @param  string  $name
-     * @return bool
-     */
-    public function hasScope($name)
-    {
-        return $this->model && $this->model->hasScope($name);
     }
 
     /**
