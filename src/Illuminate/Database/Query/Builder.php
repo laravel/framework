@@ -2256,9 +2256,11 @@ class Builder
     protected function runPaginationCountQuery($columns = ['*'])
     {
         if ($this->groups || $this->havings) {
+            $clone = $this->cloneForPaginationCount();
+
             return [(object) ['aggregate' => $this->newQuery()
-                        ->from(new Expression('('.$this->cloneForPaginationCount()->toSql().') as '.$this->grammar->wrap('aggregate_table')))
-                        ->mergeBindings($this)
+                        ->from(new Expression('('.$clone->toSql().') as '.$this->grammar->wrap('aggregate_table')))
+                        ->mergeBindings($clone)
                         ->count(['*']), ]];
         }
 
