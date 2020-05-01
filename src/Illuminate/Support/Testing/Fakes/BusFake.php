@@ -57,7 +57,7 @@ class BusFake implements QueueingDispatcher
     /**
      * Assert if a job was dispatched based on a truth-test callback.
      *
-     * @param  string  $command
+     * @param  string|\Closure  $command
      * @param  callable|int|null  $callback
      * @return void
      */
@@ -99,7 +99,7 @@ class BusFake implements QueueingDispatcher
     /**
      * Determine if a job was dispatched based on a truth-test callback.
      *
-     * @param  string  $command
+     * @param  string|\Closure  $command
      * @param  callable|null  $callback
      * @return void
      */
@@ -119,7 +119,7 @@ class BusFake implements QueueingDispatcher
     /**
      * Assert if a job was dispatched after the response was sent based on a truth-test callback.
      *
-     * @param  string  $command
+     * @param  string|\Closure  $command
      * @param  callable|int|null  $callback
      * @return void
      */
@@ -159,7 +159,7 @@ class BusFake implements QueueingDispatcher
     /**
      * Determine if a job was dispatched based on a truth-test callback.
      *
-     * @param  string  $command
+     * @param  string|\Closure  $command
      * @param  callable|null  $callback
      * @return void
      */

@@ -39,7 +39,7 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Assert if a mailable was sent based on a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|int|null  $callback
      * @return void
      */
@@ -114,7 +114,7 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Assert if a mailable was queued based on a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|int|null  $callback
      * @return void
      */

@@ -50,7 +50,7 @@ class EventFake implements Dispatcher
     /**
      * Assert if an event was dispatched based on a truth-test callback.
      *
-     * @param  string  $event
+     * @param  string|\Closure  $event
      * @param  callable|int|null  $callback
      * @return void
      */
@@ -90,7 +90,7 @@ class EventFake implements Dispatcher
     /**
      * Determine if an event was dispatched based on a truth-test callback.
      *
-     * @param  string  $event
+     * @param  string|\Closure  $event
      * @param  callable|null  $callback
      * @return void
      */

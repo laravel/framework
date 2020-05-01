@@ -35,7 +35,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      * Assert if a notification was sent based on a truth-test callback.
      *
      * @param  mixed  $notifiable
-     * @param  string  $notification
+     * @param  string|\Closure  $notification
      * @param  callable|null  $callback
      * @return void
      *
@@ -91,7 +91,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      * Determine if a notification was sent based on a truth-test callback.
      *
      * @param  mixed  $notifiable
-     * @param  string  $notification
+     * @param  string|\Closure  $notification
      * @param  callable|null  $callback
      * @return void
      *

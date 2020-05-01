@@ -23,7 +23,7 @@ class QueueFake extends QueueManager implements Queue
     /**
      * Assert if a job was pushed based on a truth-test callback.
      *
-     * @param  string  $job
+     * @param  string|\Closure  $job
      * @param  callable|int|null  $callback
      * @return void
      */
@@ -64,7 +64,7 @@ class QueueFake extends QueueManager implements Queue
      * Assert if a job was pushed based on a truth-test callback.
      *
      * @param  string  $queue
-     * @param  string  $job
+     * @param  string|\Closure  $job
      * @param  callable|null  $callback
      * @return void
      */
@@ -186,7 +186,7 @@ class QueueFake extends QueueManager implements Queue
     /**
      * Determine if a job was pushed based on a truth-test callback.
      *
-     * @param  string  $job
+     * @param  string|\Closure  $job
      * @param  callable|null  $callback
      * @return void
      */
