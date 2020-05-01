@@ -61,7 +61,7 @@ class DatabaseLock extends Lock
             $this->connection->table($this->table)->insert([
                 'id' => $this->name,
                 'owner' => $this->owner,
-                'expires_at' => $this->expiresAt()
+                'expires_at' => $this->expiresAt(),
             ]);
 
             $acquired = true;
@@ -71,9 +71,9 @@ class DatabaseLock extends Lock
                 ->where(function ($query) {
                     return $query->where('owner', $this->owner)->orWhere('expires_at', '<=', time());
                 })->update([
-                'owner' => $this->owner,
-                'expires_at' => $this->expiresAt()
-            ]);
+                    'owner' => $this->owner,
+                    'expires_at' => $this->expiresAt(),
+                ]);
 
             $acquired = $updated >= 1;
         }
