@@ -616,7 +616,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function include($path, $alias = null)
     {
-         $this->aliasInclude($path, $alias);
+        $this->aliasInclude($path, $alias);
     }
 
     /**

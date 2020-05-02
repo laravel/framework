@@ -61,7 +61,8 @@ class EventFake implements Dispatcher
         }
 
         if (is_int($callback)) {
-             $this->assertDispatchedTimes($event, $callback);
+            $this->assertDispatchedTimes($event, $callback);
+
             return;
         }
 

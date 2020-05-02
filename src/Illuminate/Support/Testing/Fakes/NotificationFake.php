@@ -60,7 +60,8 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
         }
 
         if (is_numeric($callback)) {
-             $this->assertSentToTimes($notifiable, $notification, $callback);
+            $this->assertSentToTimes($notifiable, $notification, $callback);
+
             return;
         }
 
@@ -211,7 +212,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      */
     public function send($notifiables, $notification)
     {
-         $this->sendNow($notifiables, $notification);
+        $this->sendNow($notifiables, $notification);
     }
 
     /**

@@ -41,7 +41,7 @@ class Hub implements HubContract
      */
     public function defaults(Closure $callback)
     {
-         $this->pipeline('default', $callback);
+        $this->pipeline('default', $callback);
     }
 
     /**

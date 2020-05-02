@@ -489,7 +489,8 @@ class Validator implements ValidatorContract
         if ($value instanceof UploadedFile && ! $value->isValid() &&
             $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
         ) {
-             $this->addFailure($attribute, 'uploaded', []);
+            $this->addFailure($attribute, 'uploaded', []);
+
             return;
         }
 
@@ -505,7 +506,7 @@ class Validator implements ValidatorContract
                 return;
             }
 
-            return null;
+            return;
         }
 
         $method = "validate{$rule}";
@@ -743,7 +744,8 @@ class Validator implements ValidatorContract
         $attribute = str_replace('__asterisk__', '*', $attribute);
 
         if (in_array($rule, $this->excludeRules)) {
-             $this->excludeAttribute($attribute);
+            $this->excludeAttribute($attribute);
+
             return;
         }
 

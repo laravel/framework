@@ -193,10 +193,12 @@ class VendorPublishCommand extends Command
     protected function publishItem($from, $to)
     {
         if ($this->files->isFile($from)) {
-             $this->publishFile($from, $to);
+            $this->publishFile($from, $to);
+
             return;
         } elseif ($this->files->isDirectory($from)) {
-             $this->publishDirectory($from, $to);
+            $this->publishDirectory($from, $to);
+
             return;
         }
 

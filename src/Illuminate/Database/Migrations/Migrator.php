@@ -357,7 +357,8 @@ class Migrator
         $this->note("<comment>Rolling back:</comment> {$name}");
 
         if ($pretend) {
-             $this->pretendToRun($instance, 'down');
+            $this->pretendToRun($instance, 'down');
+
             return;
         }
 

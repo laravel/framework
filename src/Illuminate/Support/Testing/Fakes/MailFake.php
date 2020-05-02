@@ -50,7 +50,8 @@ class MailFake implements Factory, Mailer, MailQueue
         }
 
         if (is_numeric($callback)) {
-             $this->assertSentTimes($mailable, $callback);
+            $this->assertSentTimes($mailable, $callback);
+
             return;
         }
 
@@ -126,7 +127,8 @@ class MailFake implements Factory, Mailer, MailQueue
         }
 
         if (is_numeric($callback)) {
-             $this->assertQueuedTimes($mailable, $callback);
+            $this->assertQueuedTimes($mailable, $callback);
+
             return;
         }
 

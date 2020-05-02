@@ -32,8 +32,9 @@ class EventListCommand extends Command
         $events = $this->getEvents();
 
         if (empty($events)) {
-             $this->error("Your application doesn't have any events matching the given criteria.");
-             return;
+            $this->error("Your application doesn't have any events matching the given criteria.");
+
+            return;
         }
 
         $this->table(['Event', 'Listeners'], $events);

@@ -935,8 +935,9 @@ class TestResponse implements ArrayAccess
     protected function ensureResponseHasView()
     {
         if (! $this->responseHasView()) {
-             PHPUnit::fail('The response is not a view.');
-             return;
+            PHPUnit::fail('The response is not a view.');
+
+            return;
         }
 
         return $this;

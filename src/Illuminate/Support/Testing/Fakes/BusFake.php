@@ -68,7 +68,8 @@ class BusFake implements QueueingDispatcher
         }
 
         if (is_numeric($callback)) {
-             $this->assertDispatchedTimes($command, $callback);
+            $this->assertDispatchedTimes($command, $callback);
+
             return;
         }
 
@@ -131,7 +132,8 @@ class BusFake implements QueueingDispatcher
         }
 
         if (is_numeric($callback)) {
-             $this->assertDispatchedAfterResponseTimes($command, $callback);
+            $this->assertDispatchedAfterResponseTimes($command, $callback);
+
             return;
         }
 

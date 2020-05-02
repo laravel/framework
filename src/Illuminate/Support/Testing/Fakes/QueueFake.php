@@ -34,7 +34,8 @@ class QueueFake extends QueueManager implements Queue
         }
 
         if (is_numeric($callback)) {
-             $this->assertPushedTimes($job, $callback);
+            $this->assertPushedTimes($job, $callback);
+
             return;
         }
 

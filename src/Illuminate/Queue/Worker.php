@@ -496,7 +496,7 @@ class Worker
      */
     protected function failJob($job, Throwable $e)
     {
-         $job->fail($e);
+        $job->fail($e);
     }
 
     /**
