@@ -45,6 +45,9 @@ class DatabaseQueryBuilderTest extends TestCase
             $this->assertSame('select * from "users"', $sql);
         });
         $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertSame('select * from "users"', $sql);
+        });
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
             $this->assertSame('select "foo", "bar" from "users"', $sql);
         });
         $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
@@ -52,6 +55,9 @@ class DatabaseQueryBuilderTest extends TestCase
         });
 
         $builder->from('users')->get();
+        $this->assertNull($builder->columns);
+
+        $builder->from('users')->get(null);
         $this->assertNull($builder->columns);
 
         $builder->from('users')->get(['foo', 'bar']);

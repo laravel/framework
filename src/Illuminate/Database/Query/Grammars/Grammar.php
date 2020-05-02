@@ -54,7 +54,7 @@ class Grammar extends BaseGrammar
         // can build the query and concatenate all the pieces together as one.
         $original = $query->columns;
 
-        if (is_null($query->columns)) {
+        if (empty($query->columns)) {
             $query->columns = ['*'];
         }
 
