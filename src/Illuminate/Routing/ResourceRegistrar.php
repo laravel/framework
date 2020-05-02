@@ -122,7 +122,7 @@ class ResourceRegistrar
             $me->resource($name, $controller, $options);
         };
 
-        return $this->router->group(compact('prefix'), $callback);
+         $this->router->group(compact('prefix'), $callback);
     }
 
     /**

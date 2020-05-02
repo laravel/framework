@@ -50,7 +50,8 @@ class MailFake implements Factory, Mailer, MailQueue
         }
 
         if (is_numeric($callback)) {
-            return $this->assertSentTimes($mailable, $callback);
+             $this->assertSentTimes($mailable, $callback);
+            return;
         }
 
         $message = "The expected [{$mailable}] mailable was not sent.";
@@ -125,7 +126,8 @@ class MailFake implements Factory, Mailer, MailQueue
         }
 
         if (is_numeric($callback)) {
-            return $this->assertQueuedTimes($mailable, $callback);
+             $this->assertQueuedTimes($mailable, $callback);
+            return;
         }
 
         PHPUnit::assertTrue(

@@ -60,7 +60,9 @@ class ResetCommand extends BaseCommand
             // start trying to rollback and re-run all of the migrations. If it's not
             // present we'll just bail out with an info message for the developers.
             if (! $this->migrator->repositoryExists()) {
-                return $this->comment('Migration table not found.');
+                $this->comment('Migration table not found.');
+
+                return;
             }
 
             $this->migrator->setOutput($this->output)->reset(

@@ -1426,7 +1426,9 @@ class Builder
         }
 
         if ($method === 'mixin') {
-            return static::registerMixin($parameters[0], $parameters[1] ?? true);
+            static::registerMixin($parameters[0], $parameters[1] ?? true);
+
+            return;
         }
 
         if (! static::hasGlobalMacro($method)) {

@@ -53,7 +53,8 @@ class CallQueuedHandler
                 $job, unserialize($data['command'])
             );
         } catch (ModelNotFoundException $e) {
-            return $this->handleModelNotFound($job, $e);
+             $this->handleModelNotFound($job, $e);
+            return;
         }
 
         $this->dispatchThroughMiddleware($job, $command);
@@ -151,10 +152,10 @@ class CallQueuedHandler
         }
 
         if ($shouldDelete) {
-            return $job->delete();
+            $job->delete();
+        } else {
+            $job->fail($e);
         }
-
-        return $job->fail($e);
     }
 
     /**

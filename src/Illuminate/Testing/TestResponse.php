@@ -930,12 +930,13 @@ class TestResponse implements ArrayAccess
     /**
      * Ensure that the response has a view as its original content.
      *
-     * @return $this
+     * @return $this|void
      */
     protected function ensureResponseHasView()
     {
         if (! $this->responseHasView()) {
-            return PHPUnit::fail('The response is not a view.');
+             PHPUnit::fail('The response is not a view.');
+             return;
         }
 
         return $this;

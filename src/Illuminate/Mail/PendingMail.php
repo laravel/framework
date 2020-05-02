@@ -119,7 +119,7 @@ class PendingMail
      */
     public function send(MailableContract $mailable)
     {
-        return $this->mailer->send($this->fill($mailable));
+         $this->mailer->send($this->fill($mailable));
     }
 
     /**
@@ -131,7 +131,7 @@ class PendingMail
      */
     public function sendNow(MailableContract $mailable)
     {
-        return $this->mailer->send($this->fill($mailable));
+         $this->mailer->send($this->fill($mailable));
     }
 
     /**

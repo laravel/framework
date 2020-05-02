@@ -489,7 +489,8 @@ class Validator implements ValidatorContract
         if ($value instanceof UploadedFile && ! $value->isValid() &&
             $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
         ) {
-            return $this->addFailure($attribute, 'uploaded', []);
+             $this->addFailure($attribute, 'uploaded', []);
+            return;
         }
 
         // If we have made it this far we will make sure the attribute is validatable and if it is
@@ -498,9 +499,13 @@ class Validator implements ValidatorContract
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
         if ($rule instanceof RuleContract) {
-            return $validatable
-                    ? $this->validateUsingCustomRule($attribute, $value, $rule)
-                    : null;
+            if ($validatable) {
+                $this->validateUsingCustomRule($attribute, $value, $rule);
+
+                return;
+            }
+
+            return null;
         }
 
         $method = "validate{$rule}";
@@ -738,7 +743,8 @@ class Validator implements ValidatorContract
         $attribute = str_replace('__asterisk__', '*', $attribute);
 
         if (in_array($rule, $this->excludeRules)) {
-            return $this->excludeAttribute($attribute);
+             $this->excludeAttribute($attribute);
+            return;
         }
 
         $this->messages->add($attribute, $this->makeReplacements(

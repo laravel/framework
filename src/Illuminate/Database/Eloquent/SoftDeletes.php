@@ -67,7 +67,7 @@ trait SoftDeletes
             return $this->setKeysForSaveQuery($this->newModelQuery())->forceDelete();
         }
 
-        return $this->runSoftDelete();
+        $this->runSoftDelete();
     }
 
     /**
