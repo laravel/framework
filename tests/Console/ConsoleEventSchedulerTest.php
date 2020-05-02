@@ -59,6 +59,9 @@ class ConsoleEventSchedulerTest extends TestCase
         $schedule->exec('path/to/command', ['--title' => 'A "real" test']);
         $schedule->exec('path/to/command', [['one', 'two']]);
         $schedule->exec('path/to/command', ['-1 minute']);
+        $schedule->exec('path/to/command', ['foo' => ['bar', 'baz']]);
+        $schedule->exec('path/to/command', ['--foo' => ['bar', 'baz']]);
+        $schedule->exec('path/to/command', ['-F' => ['bar', 'baz']]);
 
         $events = $schedule->events();
         $this->assertSame('path/to/command', $events[0]->command);
@@ -69,6 +72,9 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertSame("path/to/command --title={$escape}A {$escapeReal}real{$escapeReal} test{$escape}", $events[5]->command);
         $this->assertSame("path/to/command {$escape}one{$escape} {$escape}two{$escape}", $events[6]->command);
         $this->assertSame("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
+        $this->assertSame("path/to/command {$escape}bar{$escape} {$escape}baz{$escape}", $events[8]->command);
+        $this->assertSame("path/to/command --foo={$escape}bar{$escape} --foo={$escape}baz{$escape}", $events[9]->command);
+        $this->assertSame("path/to/command -F {$escape}bar{$escape} -F {$escape}baz{$escape}", $events[10]->command);
     }
 
     public function testExecCreatesNewCommandWithTimezone()

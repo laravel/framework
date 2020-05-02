@@ -199,20 +199,42 @@ class Schedule
     protected function compileParameters(array $parameters)
     {
         return collect($parameters)->map(function ($value, $key) {
-            if (is_array($value) && Str::startsWith($key, '--')) {
-                return collect($value)->map(function ($value) use ($key) {
-                    return $key.'='.ProcessUtils::escapeArgument($value);
-                })->implode(' ');
-            } elseif (is_array($value)) {
-                $value = collect($value)->map(function ($value) {
-                    return ProcessUtils::escapeArgument($value);
-                })->implode(' ');
-            } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
+            if (is_array($value)) {
+                return $this->compileArrayInput($key, $value);
+            }
+
+            if (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
                 $value = ProcessUtils::escapeArgument($value);
             }
 
             return is_numeric($key) ? $value : "{$key}={$value}";
         })->implode(' ');
+    }
+
+    /**
+     * Compile array input for a command.
+     *
+     * @param  string|int  $key
+     * @param  array  $value
+     * @return string
+     */
+    public function compileArrayInput($key, $value)
+    {
+        $value = collect($value)->map(function ($value) {
+            return ProcessUtils::escapeArgument($value);
+        });
+
+        if (Str::startsWith($key, '--')) {
+            $value = $value->map(function ($value) use ($key) {
+                return "{$key}={$value}";
+            });
+        } elseif (Str::startsWith($key, '-')) {
+            $value = $value->map(function ($value) use ($key) {
+                return "{$key} {$value}";
+            });
+        }
+
+        return $value->implode(' ');
     }
 
     /**
