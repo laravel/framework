@@ -502,8 +502,6 @@ class Validator implements ValidatorContract
         if ($rule instanceof RuleContract) {
             if ($validatable) {
                 $this->validateUsingCustomRule($attribute, $value, $rule);
-
-                return;
             }
 
             return;
