@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Database\Eloquent\CastNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -141,6 +142,24 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertInstanceOf(ValueObject::class, $model->value_object_caster_with_caster_instance);
     }
+
+    public function testGetFromUndefinedCast()
+    {
+        $this->expectException(CastNotFoundException::class);
+
+        $model = new TestEloquentModelWithCustomCast;
+        $model->undefined_cast_column;
+    }
+
+    public function testSetToUndefinedCast()
+    {
+        $this->expectException(CastNotFoundException::class);
+
+        $model = new TestEloquentModelWithCustomCast;
+        $this->assertTrue($model->hasCast('undefined_cast_column'));
+
+        $model->undefined_cast_column = 'Glāžšķūņu rūķīši';
+    }
 }
 
 class TestEloquentModelWithCustomCast extends Model
@@ -166,6 +185,7 @@ class TestEloquentModelWithCustomCast extends Model
         'value_object_with_caster' => ValueObject::class,
         'value_object_caster_with_argument' => ValueObject::class.':argument',
         'value_object_caster_with_caster_instance' => ValueObjectWithCasterInstance::class,
+        'undefined_cast_column' => UndefinedCast::class,
     ];
 }
 

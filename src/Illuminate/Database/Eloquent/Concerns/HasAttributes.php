@@ -8,6 +8,7 @@ use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\CastNotFoundException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
@@ -1050,9 +1051,21 @@ trait HasAttributes
      */
     protected function isClassCastable($key)
     {
-        return array_key_exists($key, $this->getCasts()) &&
-                class_exists($class = $this->parseCasterClass($this->getCasts()[$key])) &&
-                ! in_array($class, static::$primitiveCastTypes);
+        if (! array_key_exists($key, $this->getCasts())) {
+            return false;
+        }
+
+        $castType = $this->parseCasterClass($this->getCasts()[$key]);
+
+        if (in_array($castType, static::$primitiveCastTypes)) {
+            return false;
+        }
+
+        if (class_exists($castType)) {
+            return true;
+        }
+
+        throw CastNotFoundException::make($this->getModel(), $key, $castType);
     }
 
     /**
