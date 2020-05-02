@@ -8,7 +8,7 @@ use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\CastNotFoundException;
+use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
@@ -1065,7 +1065,7 @@ trait HasAttributes
             return true;
         }
 
-        throw CastNotFoundException::make($this->getModel(), $key, $castType);
+        throw InvalidCastException::make($this->getModel(), $key, $castType);
     }
 
     /**

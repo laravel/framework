@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
-use Illuminate\Database\Eloquent\CastNotFoundException;
+use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -145,7 +145,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
     public function testGetFromUndefinedCast()
     {
-        $this->expectException(CastNotFoundException::class);
+        $this->expectException(InvalidCastException::class);
 
         $model = new TestEloquentModelWithCustomCast;
         $model->undefined_cast_column;
@@ -153,7 +153,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
     public function testSetToUndefinedCast()
     {
-        $this->expectException(CastNotFoundException::class);
+        $this->expectException(InvalidCastException::class);
 
         $model = new TestEloquentModelWithCustomCast;
         $this->assertTrue($model->hasCast('undefined_cast_column'));

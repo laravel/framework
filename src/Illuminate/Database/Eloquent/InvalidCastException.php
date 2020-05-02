@@ -4,12 +4,12 @@ namespace Illuminate\Database\Eloquent;
 
 use RuntimeException;
 
-class CastNotFoundException extends RuntimeException
+class InvalidCastException extends RuntimeException
 {
     /**
      * The name of the affected Eloquent model.
      *
-     * @var string
+     * @var object
      */
     public $model;
 
@@ -30,7 +30,7 @@ class CastNotFoundException extends RuntimeException
     /**
      * Create a new exception instance.
      *
-     * @param  mixed  $model
+     * @param  object  $model
      * @param  string  $column
      * @param  string  $castType
      * @return static
