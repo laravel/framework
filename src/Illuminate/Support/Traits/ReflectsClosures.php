@@ -4,7 +4,6 @@ namespace Illuminate\Support\Traits;
 
 use Closure;
 use ReflectionFunction;
-use ReflectionParameter;
 use RuntimeException;
 
 trait ReflectsClosures
