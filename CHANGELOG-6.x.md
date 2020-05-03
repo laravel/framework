@@ -12,6 +12,7 @@
 - Filtering null's in `hasMorph()` ([#32614](https://github.com/laravel/framework/pull/32614))
 - Fixed `Illuminate\Console\Scheduling\Schedule::compileParameters()` ([cfc3ac9](https://github.com/laravel/framework/commit/cfc3ac9c8b0a593d264ae722ab90601fa4882d0e), [36e215d](https://github.com/laravel/framework/commit/36e215dd39cd757a8ffc6b17794de60476b2289d))
 - Fixed bug with model name in `Illuminate\Database\Eloquent\RelationNotFoundException::make()` ([f72a166](https://github.com/laravel/framework/commit/f72a1662ab64cc543c532941b1ab1279001af8e9))
+- Fixed `Illuminate\Foundation\Testing\TestResponse::assertJsonCount()` not accepting falsey keys ([#32655](https://github.com/laravel/framework/pull/32655))
 
 ### Changed
 - Changed `Illuminate/Database/Eloquent/Relations/Concerns/AsPivot::fromRawAttributes()` ([6c502c1](https://github.com/laravel/framework/commit/6c502c1135082e8b25f2720931b19d36eeec8f41))
