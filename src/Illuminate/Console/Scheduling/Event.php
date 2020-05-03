@@ -812,12 +812,12 @@ class Event
      */
     protected function withOutputCallback(Closure $callback, $onlyIfOutputExists = false)
     {
-        return function (Container $container) use ($callback, $onlyIfOutputExists) {
+        return function () use ($callback, $onlyIfOutputExists) {
             $output = $this->output && file_exists($this->output) ? file_get_contents($this->output) : '';
 
             return $onlyIfOutputExists && empty($output)
                             ? null
-                            : $container->call($callback, ['output' => $output]);
+                            : $callback($output);
         };
     }
 
