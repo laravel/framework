@@ -210,6 +210,34 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve a value if the key exists.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    protected function whenKeyExists($key, $value = null, $default = null)
+    {
+        if (func_num_args() < 3) {
+            $default = new MissingValue;
+        }
+
+        if (! array_key_exists(
+            $key,
+            (is_array($this->resource) ? $this->resource : $this->resource->toArray())
+        )) {
+            return value($default);
+        }
+
+        if (func_num_args() === 1) {
+            $value = $this->resource->{$key};
+        }
+
+        return value($value);
+    }
+
+    /**
      * Transform the given value if it is present.
      *
      * @param  mixed  $value
