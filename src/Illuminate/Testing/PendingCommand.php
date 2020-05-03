@@ -57,6 +57,20 @@ class PendingCommand
     protected $hasExecuted = false;
 
     /**
+     * Determine whether to dump command output after execution.
+     *
+     * @var bool
+     */
+    protected $shouldDumpOutput = false;
+
+    /**
+     * Buffer of the actual command output.
+     *
+     * @var array
+     */
+    protected $actualOutput = [];
+
+    /**
      * Create a new pending console command run.
      *
      * @param  \PHPUnit\Framework\TestCase  $test
@@ -145,6 +159,28 @@ class PendingCommand
     }
 
     /**
+     * Dump the commands output after execution.
+     *
+     * @return $this
+     */
+    public function dumpOutput()
+    {
+        $this->shouldDumpOutput = true;
+
+        return $this;
+    }
+
+    /**
+     * Get the commands actual output.
+     *
+     * @return array
+     */
+    public function getActualOutput()
+    {
+        return $this->actualOutput;
+    }
+
+    /**
      * Execute the command.
      *
      * @return int
@@ -183,6 +219,10 @@ class PendingCommand
         }
 
         $this->verifyExpectations();
+
+        if ($this->shouldDumpOutput) {
+            dump($this->getActualOutput());
+        }
 
         return $exitCode;
     }
@@ -237,8 +277,10 @@ class PendingCommand
 
                     return $argument->getQuestion() == $question[0];
                 }))
-                ->andReturnUsing(function () use ($question, $i) {
+                ->andReturnUsing(function ($str) use ($question, $i) {
                     unset($this->test->expectedQuestions[$i]);
+
+                    $this->actualOutput[] = $str;
 
                     return $question[1];
                 });
@@ -265,7 +307,9 @@ class PendingCommand
                 ->once()
                 ->ordered()
                 ->with($output, Mockery::any())
-                ->andReturnUsing(function () use ($i) {
+                ->andReturnUsing(function ($str) use ($i) {
+                    $this->actualOutput[] = $str;
+
                     unset($this->test->expectedOutput[$i]);
                 });
         }
