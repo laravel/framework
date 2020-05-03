@@ -1065,7 +1065,7 @@ trait HasAttributes
             return true;
         }
 
-        throw InvalidCastException::make($this->getModel(), $key, $castType);
+        throw new InvalidCastException($this->getModel(), $key, $castType);
     }
 
     /**
