@@ -218,11 +218,11 @@ class PendingCommand
             );
         }
 
-        $this->verifyExpectations();
-
         if ($this->shouldDumpOutput) {
             dump($this->getActualOutput());
         }
+
+        $this->verifyExpectations();
 
         return $exitCode;
     }
