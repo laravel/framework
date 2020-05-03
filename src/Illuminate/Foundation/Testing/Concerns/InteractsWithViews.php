@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestView;
 use Illuminate\View\View;
@@ -32,7 +32,7 @@ trait InteractsWithViews
     {
         $tempDirectory = sys_get_temp_dir();
 
-        if (! in_array($tempDirectory, View::getFinder()->getPaths())) {
+        if (! in_array($tempDirectory, ViewFacade::getFinder()->getPaths())) {
             View::addLocation(sys_get_temp_dir());
         }
 
