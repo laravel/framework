@@ -485,11 +485,7 @@ trait MakesHttpRequests
      */
     protected function prepareUrlForRequest($uri)
     {
-        if (Str::startsWith($uri, '/')) {
-            $uri = substr($uri, 1);
-        }
-
-        return trim(url($uri), '/');
+        return url(trim($uri, '/'));
     }
 
     /**
