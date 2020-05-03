@@ -13,12 +13,14 @@ use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Stringable;
+use Illuminate\Support\Traits\ReflectsClosures;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\Process\Process;
 
 class Event
 {
-    use Macroable, ManagesFrequencies;
+    use Macroable, ManagesFrequencies, ReflectsClosures;
 
     /**
      * The command string.
@@ -726,9 +728,29 @@ class Event
      */
     public function then(Closure $callback)
     {
+        $parameters = $this->closureParameterTypes($callback);
+
+        if (Arr::get($parameters, 'output') === Stringable::class) {
+            return $this->thenWithOutput($callback);
+        }
+
         $this->afterCallbacks[] = $callback;
 
         return $this;
+    }
+
+    /**
+     * Register a callback that uses the output after the job runs.
+     *
+     * @param  \Closure  $callback
+     * @param  bool  $onlyIfOutputExists
+     * @return $this
+     */
+    public function thenWithOutput(Closure $callback, $onlyIfOutputExists = false)
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        return $this->then($this->withOutputCallback($callback, $onlyIfOutputExists));
     }
 
     /**
@@ -739,11 +761,31 @@ class Event
      */
     public function onSuccess(Closure $callback)
     {
+        $parameters = $this->closureParameterTypes($callback);
+
+        if (Arr::get($parameters, 'output') === Stringable::class) {
+            return $this->onSuccessWithOutput($callback);
+        }
+
         return $this->then(function (Container $container) use ($callback) {
             if (0 === $this->exitCode) {
                 $container->call($callback);
             }
         });
+    }
+
+    /**
+     * Register a callback that uses the output if the operation succeeds.
+     *
+     * @param  \Closure  $callback
+     * @param  bool  $onlyIfOutputExists
+     * @return $this
+     */
+    public function onSuccessWithOutput(Closure $callback, $onlyIfOutputExists = false)
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        return $this->onSuccess($this->withOutputCallback($callback, $onlyIfOutputExists));
     }
 
     /**
@@ -754,11 +796,49 @@ class Event
      */
     public function onFailure(Closure $callback)
     {
+        $parameters = $this->closureParameterTypes($callback);
+
+        if (Arr::get($parameters, 'output') === Stringable::class) {
+            return $this->onFailureWithOutput($callback);
+        }
+
         return $this->then(function (Container $container) use ($callback) {
             if (0 !== $this->exitCode) {
                 $container->call($callback);
             }
         });
+    }
+
+    /**
+     * Register a callback that uses the output if the operation fails.
+     *
+     * @param  \Closure  $callback
+     * @param  bool  $onlyIfOutputExists
+     * @return $this
+     */
+    public function onFailureWithOutput(Closure $callback, $onlyIfOutputExists = false)
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        return $this->onFailure($this->withOutputCallback($callback, $onlyIfOutputExists));
+    }
+
+    /**
+     * Get a callback that provides output.
+     *
+     * @param  \Closure  $callback
+     * @param  bool  $onlyIfOutputExists
+     * @return \Closure
+     */
+    protected function withOutputCallback(Closure $callback, $onlyIfOutputExists = false)
+    {
+        return function (Container $container) use ($callback, $onlyIfOutputExists) {
+            $output = $this->output && file_exists($this->output) ? file_get_contents($this->output) : '';
+
+            return $onlyIfOutputExists && empty($output)
+                            ? null
+                            : $container->call($callback, ['output' => new Stringable($output)]);
+        };
     }
 
     /**
