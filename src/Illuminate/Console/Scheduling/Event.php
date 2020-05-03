@@ -13,12 +13,13 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReflectsClosures;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\Process\Process;
 
 class Event
 {
-    use Macroable, ManagesFrequencies;
+    use Macroable, ManagesFrequencies, ReflectsClosures;
 
     /**
      * The command string.
@@ -812,12 +813,12 @@ class Event
      */
     protected function withOutputCallback(Closure $callback, $onlyIfOutputExists = false)
     {
-        return function () use ($callback, $onlyIfOutputExists) {
+        return function (Container $container) use ($callback, $onlyIfOutputExists) {
             $output = $this->output && file_exists($this->output) ? file_get_contents($this->output) : '';
 
             return $onlyIfOutputExists && empty($output)
                             ? null
-                            : $callback($output);
+                            : $container->call($callback, ['output' => $output]);
         };
     }
 

@@ -78,7 +78,7 @@ class ReflectsClosuresClass
 
     public static function reflect($closure)
     {
-        return (new static)->closureParameterTypes($closure);
+        return array_values((new static)->closureParameterTypes($closure));
     }
 
     public static function reflectFirst($closure)

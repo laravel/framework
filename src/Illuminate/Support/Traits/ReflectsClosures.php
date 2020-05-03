@@ -21,13 +21,13 @@ trait ReflectsClosures
     {
         $reflection = new ReflectionFunction($closure);
 
-        return array_map(function (ReflectionParameter $parameter) {
+        return collect($reflection->getParameters())->mapWithKeys(function ($parameter) {
             if ($parameter->isVariadic()) {
-                return;
+                return [$parameter->getName() => null];
             }
 
-            return $parameter->getClass()->name ?? null;
-        }, $reflection->getParameters());
+            return [$parameter->getName() => $parameter->getClass()->name ?? null];
+        })->all();
     }
 
     /**
@@ -40,7 +40,7 @@ trait ReflectsClosures
      */
     protected function firstClosureParameterType(Closure $closure)
     {
-        $types = $this->closureParameterTypes($closure);
+        $types = array_values($this->closureParameterTypes($closure));
 
         if (! $types) {
             throw new RuntimeException('The given Closure has no parameters.');
