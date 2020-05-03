@@ -9,7 +9,7 @@ class InvalidCastException extends RuntimeException
     /**
      * The name of the affected Eloquent model.
      *
-     * @var object
+     * @var string
      */
     public $model;
 
@@ -41,7 +41,7 @@ class InvalidCastException extends RuntimeException
 
         $instance = new static("Call to undefined cast [{$castType}] on column [{$column}] in model [{$class}].");
 
-        $instance->model = $model;
+        $instance->model = $class;
         $instance->column = $column;
         $instance->castType = $castType;
 
