@@ -73,7 +73,7 @@ abstract class GeneratorCommand extends Command
 
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
-        $this->info($this->type.' created successfully.');
+        $this->info("Created {$this->type}: {$this->getLink($path)}");
     }
 
     /**
@@ -132,6 +132,19 @@ abstract class GeneratorCommand extends Command
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
         return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
+    }
+
+    /**
+     * Get a short link to the destination class path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    protected function getLink($path)
+    {
+        $link = Str::after($path, $this->laravel->basePath());
+
+        return Str::replaceFirst('/', '', $link);
     }
 
     /**
