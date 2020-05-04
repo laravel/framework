@@ -226,7 +226,7 @@ class DatabaseEloquentCollectionTest extends TestCase
             return 'not-a-model';
         });
 
-        $this->assertEquals(BaseCollection::class, get_class($c));
+        $this->assertIsBaseCollection($c);
     }
 
     public function testCollectionDiffsWithGivenCollection()
@@ -399,13 +399,37 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testNonModelRelatedMethods()
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
+        $this->assertIsBaseCollection($a->pluck('foo'));
+        $this->assertIsBaseCollection($a->keys());
+        $this->assertIsBaseCollection($a->collapse());
+        $this->assertIsBaseCollection($a->flatten());
+        $this->assertIsBaseCollection($a->zip(['a', 'b'], ['c', 'd']));
+        $this->assertIsBaseCollection($a->crossJoin(['d' => 'e']));
+        $this->assertIsBaseCollection($a->partition('foo', 'bar'));
+        $this->assertIsBaseCollection($a->groupBy('foo'));
+        $this->assertIsBaseCollection($a->mapToDictionary(function () { return ['bar' => 'baz']; }));
+
         $b = new Collection(['a', 'b', 'c']);
-        $this->assertEquals(BaseCollection::class, get_class($a->pluck('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($a->keys()));
-        $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
-        $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
-        $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
-        $this->assertEquals(BaseCollection::class, get_class($b->flip()));
+        $this->assertIsBaseCollection($b->flip());
+
+        $this->assertIsBaseCollection(Collection::times(3));
+        $this->assertIsBaseCollection(Collection::times(3, function ($i) { return $i; }));
+        $this->assertIsEloquentCollection(Collection::times(0)); // TODO not sure if this should be a base collection
+        $this->assertIsEloquentCollection(Collection::times(3, function () { return new TestEloquentCollectionModel; }));
+
+        $m = new Collection([new TestEloquentCollectionModel]);
+        $this->assertIsBaseCollection($m->concat($b));
+        $this->assertIsEloquentCollection($m->concat($m));
+    }
+
+    protected function assertIsBaseCollection(BaseCollection $collection)
+    {
+        $this->assertEquals(BaseCollection::class, get_class($collection));
+    }
+
+    protected function assertIsEloquentCollection(BaseCollection $collection)
+    {
+        $this->assertEquals(Collection::class, get_class($collection));
     }
 
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()
