@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Traits;
 
 use CachingIterator;
+use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -61,6 +62,8 @@ trait EnumeratesValues
         'min',
         'partition',
         'reject',
+        'skipUntil',
+        'skipWhile',
         'some',
         'sortBy',
         'sortByDesc',
@@ -965,13 +968,26 @@ trait EnumeratesValues
     /**
      * Make a function to check an item's equality.
      *
-     * @param  \Closure|mixed  $value
+     * @param  mixed  $value
      * @return \Closure
      */
     protected function equality($value)
     {
         return function ($item) use ($value) {
             return $item === $value;
+        };
+    }
+
+    /**
+     * Make a function using another function, by negating its result.
+     *
+     * @param  \Closure  $callback
+     * @return \Closure
+     */
+    protected function negate(Closure $callback)
+    {
+        return function (...$params) use ($callback) {
+            return ! $callback(...$params);
         };
     }
 }
