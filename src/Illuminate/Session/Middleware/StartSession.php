@@ -3,7 +3,6 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
