@@ -23,7 +23,7 @@ class StartSession
     /**
      * The callback that can resolve an instance of the cache factory.
      *
-     * @var callable
+     * @var callable|null
      */
     protected $cacheFactoryResolver;
 
@@ -31,7 +31,7 @@ class StartSession
      * Create a new session middleware.
      *
      * @param  \Illuminate\Session\SessionManager  $manager
-     * @param  callable  $cacheFactoryResolver
+     * @param  callable|null  $cacheFactoryResolver
      * @return void
      */
     public function __construct(SessionManager $manager, callable $cacheFactoryResolver = null)
