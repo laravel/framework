@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Traits;
 
 use CachingIterator;
+use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -981,7 +982,7 @@ trait EnumeratesValues
      * @param  \Closure  $callback
      * @return \Closure
      */
-    protected function negate($callback)
+    protected function negate(Closure $callback)
     {
         return function (...$params) use ($callback) {
             return ! $callback(...$params);
