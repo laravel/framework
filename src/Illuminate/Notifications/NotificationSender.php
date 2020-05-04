@@ -189,11 +189,13 @@ class NotificationSender
                 if (! is_null($this->locale)) {
                     $notification->locale = $this->locale;
                 }
+                
+                $queue = (isset($notification->onQueues[$channel])) ? $notification->onQueues[$channel] : $notification->queue;
 
                 $this->bus->dispatch(
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
                             ->onConnection($notification->connection)
-                            ->onQueue($notification->queue)
+                            ->onQueue($queue)
                             ->delay($notification->delay)
                             ->through(
                                 array_merge(
