@@ -399,8 +399,8 @@ class ComponentTagCompiler
     protected function parseAttributeBag(string $attributeString)
     {
         $pattern = "/
-        (?:^|\s+)     # start of the string or whitespace between attributes
-        \{\{\s*(\\\$attributes(?:[^}]+?(?<!\s))?)\s*\}\} # exact match of attributes variable being echoed
+            (?:^|\s+)                                        # start of the string or whitespace between attributes
+            \{\{\s*(\\\$attributes(?:[^}]+?(?<!\s))?)\s*\}\} # exact match of attributes variable being echoed
         /x";
 
         return preg_replace($pattern, ' :attributes="$1"', $attributeString);
