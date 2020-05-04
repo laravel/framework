@@ -22,16 +22,23 @@ class StartSession
     protected $manager;
 
     /**
+     * The callback that can resolve an instance of the cache factory.
+     *
+     * @var callable
+     */
+    protected $cacheFactoryResolver;
+
+    /**
      * Create a new session middleware.
      *
      * @param  \Illuminate\Session\SessionManager  $manager
-     * @param  \Illuminate\Contracts\Cache\Factory  $cache
+     * @param  callable  $cacheFactoryResolver
      * @return void
      */
-    public function __construct(SessionManager $manager, CacheFactory $cache)
+    public function __construct(SessionManager $manager, callable $cacheFactoryResolver = null)
     {
         $this->manager = $manager;
-        $this->cache = $cache;
+        $this->cacheFactoryResolver = $cacheFactoryResolver;
     }
 
     /**
@@ -71,7 +78,7 @@ class StartSession
                         ? $request->route()->locksFor()
                         : 10;
 
-        $lock = $this->cache->driver($this->manager->blockDriver())
+        $lock = $this->cache($this->manager->blockDriver())
                     ->lock('session:'.$session->getId(), $lockFor)
                     ->betweenBlockedAttemptsSleepFor(50);
 
@@ -270,5 +277,16 @@ class StartSession
         $config = $config ?: $this->manager->getSessionConfig();
 
         return ! is_null($config['driver'] ?? null);
+    }
+
+    /**
+     * Resolve the given cache driver.
+     *
+     * @param  string  $cache
+     * @return \Illuminate\Cache\Store
+     */
+    protected function cache($driver)
+    {
+        return call_user_func($this->cacheFactoryResolver)->driver($driver);
     }
 }
