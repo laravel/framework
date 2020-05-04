@@ -36,18 +36,40 @@ class DatabaseStore implements Store
     protected $prefix;
 
     /**
+     * The name of the cache locks table.
+     *
+     * @var string
+     */
+    protected $lockTable;
+
+    /**
+     * A array representation of the lock lottery odds.
+     *
+     * @var array
+     */
+    protected $lockLottery;
+
+    /**
      * Create a new database store.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  string  $table
      * @param  string  $prefix
+     * @param  string  $lockTable
+     * @param  array  $lockLottery
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, $table, $prefix = '')
+    public function __construct(ConnectionInterface $connection,
+                                $table,
+                                $prefix = '',
+                                $lockTable = 'cache_locks',
+                                $lockLottery = [2, 100])
     {
         $this->table = $table;
         $this->prefix = $prefix;
         $this->connection = $connection;
+        $this->lockTable = $lockTable;
+        $this->lockLottery = $lockLottery;
     }
 
     /**
@@ -203,6 +225,38 @@ class DatabaseStore implements Store
     public function forever($key, $value)
     {
         return $this->put($key, $value, 315360000);
+    }
+
+    /**
+     * Get a lock instance.
+     *
+     * @param  string  $name
+     * @param  int  $seconds
+     * @param  string|null  $owner
+     * @return \Illuminate\Contracts\Cache\Lock
+     */
+    public function lock($name, $seconds = 0, $owner = null)
+    {
+        return new DatabaseLock(
+            $this->connection,
+            $this->lockTable,
+            $this->prefix.$name,
+            $seconds,
+            $owner,
+            $this->lockLottery
+        );
+    }
+
+    /**
+     * Restore a lock instance using the owner identifier.
+     *
+     * @param  string  $name
+     * @param  string  $owner
+     * @return \Illuminate\Contracts\Cache\Lock
+     */
+    public function restoreLock($name, $owner)
+    {
+        return $this->lock($name, 0, $owner);
     }
 
     /**

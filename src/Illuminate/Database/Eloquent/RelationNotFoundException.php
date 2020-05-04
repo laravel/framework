@@ -23,7 +23,7 @@ class RelationNotFoundException extends RuntimeException
     /**
      * Create a new exception instance.
      *
-     * @param  mixed  $model
+     * @param  object  $model
      * @param  string  $relation
      * @return static
      */
@@ -33,7 +33,7 @@ class RelationNotFoundException extends RuntimeException
 
         $instance = new static("Call to undefined relationship [{$relation}] on model [{$class}].");
 
-        $instance->model = $model;
+        $instance->model = $class;
         $instance->relation = $relation;
 
         return $instance;

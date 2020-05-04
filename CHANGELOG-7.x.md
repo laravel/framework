@@ -2,6 +2,35 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v7.9.2...7.x)
 
+### Added
+- Added `artisan make:cast` command ([#32594](https://github.com/laravel/framework/pull/32594))
+- Added `Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase::assertDatabaseCount()` ([#32597](https://github.com/laravel/framework/pull/32597))
+- Allow configuring the auth_mode for SMTP mail driver ([#32616](https://github.com/laravel/framework/pull/32616))
+- Added `hasNamedScope()` function to the Base Model ([#32622](https://github.com/laravel/framework/pull/32622), [#32631](https://github.com/laravel/framework/pull/32631))
+- Allow doing truth-test assertions with just a closure ([#32626](https://github.com/laravel/framework/pull/32626), [f69ad90](https://github.com/laravel/framework/commit/f69ad90b9d508b59a017d0e412d8228e71230a51), [22d6fca](https://github.com/laravel/framework/commit/22d6fcafba610364aabb2b8e5c385edf56ae0156))
+- Run pagination count as subquery for group by and havings ([#32624](https://github.com/laravel/framework/pull/32624))
+
+### Fixed
+- Prevents a memory leak in Faker ([2228233](https://github.com/laravel/framework/commit/222823377c936ab4cceeb1fa42db84821c04bff6))
+- Fixed setting component name and attributes ([#32599](https://github.com/laravel/framework/pull/32599), [f8ff3ca](https://github.com/laravel/framework/commit/f8ff3cae1ebf2865ef7263b88559c581d48cde6e))
+- Fixed `Illuminate\Foundation\Testing\TestResponse::assertSessionHasInput()` ([f0639fd](https://github.com/laravel/framework/commit/f0639fda45fc2874986fe409d944dde21d42c6f3))
+- Set relation connection on eager loaded MorphTo ([#32602](https://github.com/laravel/framework/pull/32602))
+- Filtering null's in `hasMorph()` ([#32614](https://github.com/laravel/framework/pull/32614))
+- Fixed `Illuminate\Foundation\Console\EventMakeCommand::alreadyExists()` ([7bba4bf](https://github.com/laravel/framework/commit/7bba4bfbedb85ee252464aa932414d5517240722))
+- Fixed `Illuminate\Console\Scheduling\Schedule::compileParameters()` ([cfc3ac9](https://github.com/laravel/framework/commit/cfc3ac9c8b0a593d264ae722ab90601fa4882d0e), [36e215d](https://github.com/laravel/framework/commit/36e215dd39cd757a8ffc6b17794de60476b2289d))
+- Fixed bug with model name in `Illuminate\Database\Eloquent\RelationNotFoundException::make()` ([f72a166](https://github.com/laravel/framework/commit/f72a1662ab64cc543c532941b1ab1279001af8e9))
+
+### Changed
+- Changed `Illuminate/Database/Eloquent/Relations/Concerns/AsPivot::fromRawAttributes()` ([6c502c1](https://github.com/laravel/framework/commit/6c502c1135082e8b25f2720931b19d36eeec8f41))
+- Restore оnly common relations ([#32613](https://github.com/laravel/framework/pull/32613), [d82f78b](https://github.com/laravel/framework/commit/d82f78b13631c4a04b9595099da0022ca3d8b94e), [48e4d60](https://github.com/laravel/framework/commit/48e4d602d4f8fe9304e8998c5893206f67504dbf))
+- Use single space if plain email is empty in `Illuminate\Mail\Mailer::addContent()` ([0557622](https://github.com/laravel/framework/commit/055762286132d545cbc064dce645562c0d51532f))
+- Remove wasted file read when loading package manifest in `Illuminate\Foundation\PackageManifest::getManifest()` ([#32646](https://github.com/laravel/framework/pull/32646))
+
+### TODO
+- Allow trashed through parents to be included in has many through queries ([#32609](https://github.com/laravel/framework/pull/32609))
+- Character and collation not needed for some columns on change ([fccdf7c](https://github.com/laravel/framework/commit/fccdf7c42d5ceb50985b3e8243d7ba650de996d6))
+- Use table name when resolving has many through / one relationships ([8d69454](https://github.com/laravel/framework/commit/8d69454575267840643289b8de27d615cfe4bb62))
+
 
 ## [v7.9.2 (2020-04-28)](https://github.com/laravel/framework/compare/v7.9.1...v7.9.2)
 
