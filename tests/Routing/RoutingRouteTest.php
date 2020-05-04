@@ -1717,6 +1717,23 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('hello', $router->dispatch(Request::create('foo/bar2', 'GET'))->getContent());
     }
 
+    public function testGroupNamespaceCanBeIgnoredForActionClasses()
+    {
+        $router = $this->getRouter();
+
+        $router->namespace('App\Http\Controllers')->group(function ($router) {
+            $router->get('foo/bar', ActionStub::class);
+        });
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $router->namespace('Illuminate\Tests\Routing')->group(function ($router) {
+            $router->get('foo/bar2', 'ActionStub');
+        });
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar2', 'GET'))->getContent());
+    }
+
     public function testResponseIsReturned()
     {
         $router = $this->getRouter();
