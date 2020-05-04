@@ -62,6 +62,8 @@ trait EnumeratesValues
         'min',
         'partition',
         'reject',
+        'skipUntil',
+        'skipWhile',
         'some',
         'sortBy',
         'sortByDesc',
