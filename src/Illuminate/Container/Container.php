@@ -495,15 +495,15 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @throws \LogicException
      */
-    public function alias($abstract, $alias)
+    public function alias($alias, $abstract)
     {
         if ($alias === $abstract) {
             throw new LogicException("[{$abstract}] is aliased to itself.");
         }
 
-        $this->aliases[$alias] = $abstract;
+        $this->aliases[$abstract] = $alias;
 
-        $this->abstractAliases[$abstract][] = $alias;
+        $this->abstractAliases[$alias][] = $abstract;
     }
 
     /**
