@@ -24,7 +24,7 @@ class DatabaseLock extends Lock
     /**
      * The prune probability odds.
      *
-     * @var string
+     * @var array
      */
     protected $lottery;
 
