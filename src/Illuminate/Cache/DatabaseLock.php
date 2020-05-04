@@ -133,6 +133,6 @@ class DatabaseLock extends Lock
      */
     protected function getCurrentOwner()
     {
-        return optional($this->connection->table($this->table)->where('id', $this->name)->first())->token;
+        return optional($this->connection->table($this->table)->where('id', $this->name)->first())->owner;
     }
 }
