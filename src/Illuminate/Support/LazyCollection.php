@@ -948,6 +948,44 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Skip items in the collection until the given condition is met.
+     *
+     * @param  mixed  $value
+     * @return static
+     */
+    public function skipUntil($value)
+    {
+        $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
+
+        return $this->skipWhile($this->negate($callback));
+    }
+
+    /**
+     * Skip items in the collection while the given condition is met.
+     *
+     * @param  mixed  $value
+     * @return static
+     */
+    public function skipWhile($value)
+    {
+        $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
+
+        return new static(function () use ($callback) {
+            $iterator = $this->getIterator();
+
+            while ($iterator->valid() && $callback($iterator->current(), $iterator->key())) {
+                $iterator->next();
+            }
+
+            while ($iterator->valid()) {
+                yield $iterator->key() => $iterator->current();
+
+                $iterator->next();
+            }
+        });
+    }
+
+    /**
      * Get a slice of items from the enumerable.
      *
      * @param  int  $offset
@@ -1145,9 +1183,7 @@ class LazyCollection implements Enumerable
     {
         $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
 
-        return $this->takeUntil(function ($item, $key) use ($callback) {
-            return ! $callback($item, $key);
-        });
+        return $this->takeUntil($this->negate($callback));
     }
 
     /**
