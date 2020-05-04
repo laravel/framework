@@ -979,6 +979,28 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Skip items in the collection until the given condition is met.
+     *
+     * @param  mixed  $value
+     * @return static
+     */
+    public function skipUntil($value)
+    {
+        return new static($this->lazy()->skipUntil($value)->all());
+    }
+
+    /**
+     * Skip items in the collection while the given condition is met.
+     *
+     * @param  mixed  $value
+     * @return static
+     */
+    public function skipWhile($value)
+    {
+        return new static($this->lazy()->skipWhile($value)->all());
+    }
+
+    /**
      * Slice the underlying collection array.
      *
      * @param  int  $offset

@@ -965,13 +965,26 @@ trait EnumeratesValues
     /**
      * Make a function to check an item's equality.
      *
-     * @param  \Closure|mixed  $value
+     * @param  mixed  $value
      * @return \Closure
      */
     protected function equality($value)
     {
         return function ($item) use ($value) {
             return $item === $value;
+        };
+    }
+
+    /**
+     * Make a function using another function, by negating its result.
+     *
+     * @param  \Closure  $callback
+     * @return \Closure
+     */
+    protected function negate($callback)
+    {
+        return function (...$params) use ($callback) {
+            return ! $callback(...$params);
         };
     }
 }
