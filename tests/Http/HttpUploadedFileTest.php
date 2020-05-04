@@ -23,8 +23,8 @@ class HttpUploadedFileTest extends TestCase
     public function testUploadedFileHashName()
     {
         $fileWithoutExtension = new UploadedFile(
-            __DIR__.'/fixtures/test.txt',
-            'test.txt',
+            __DIR__.'/fixtures/test',
+            'test',
             null,
             null,
             true
@@ -54,7 +54,7 @@ class HttpUploadedFileTest extends TestCase
             true
         );
 
-        $this->assertRegExp('/^[a-z0-9]{40}.txt$/i', $fileWithoutExtension->hashName());
+        $this->assertRegExp('/^[a-z0-9]{40}$/i', $fileWithoutExtension->hashName());
         $this->assertRegExp('/^[a-z0-9]{40}.txt$/i', $fileWithKnownExtension->hashName());
         $this->assertRegExp('/^[a-z0-9]{40}.txt$/i', $fileWithWrongExtension->hashName());
         $this->assertRegExp('/^[a-z0-9]{40}.unknown/i', $fileWithUnknownExtension->hashName());

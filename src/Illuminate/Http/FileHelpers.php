@@ -34,8 +34,10 @@ trait FileHelpers
             $this->hashName = Str::random(40);
         }
 
-        $extension = $this->guessExtension() ?? $this->getClientOriginalExtension();
+        if ($extension = $this->guessExtension() ?? $this->getClientOriginalExtension()) {
+            $extension = '.'.$extension;
+        }
 
-        return $this->hashName.'.'.$extension;
+        return $this->hashName.$extension;
     }
 }
