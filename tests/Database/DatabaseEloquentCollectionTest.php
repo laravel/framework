@@ -407,15 +407,21 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertIsBaseCollection($a->crossJoin(['d' => 'e']));
         $this->assertIsBaseCollection($a->partition('foo', 'bar'));
         $this->assertIsBaseCollection($a->groupBy('foo'));
-        $this->assertIsBaseCollection($a->mapToDictionary(function () { return ['bar' => 'baz']; }));
+        $this->assertIsBaseCollection($a->mapToDictionary(function () {
+            return ['bar' => 'baz'];
+        }));
 
         $b = new Collection(['a', 'b', 'c']);
         $this->assertIsBaseCollection($b->flip());
 
         $this->assertIsBaseCollection(Collection::times(3));
-        $this->assertIsBaseCollection(Collection::times(3, function ($i) { return $i; }));
+        $this->assertIsBaseCollection(Collection::times(3, function ($i) {
+            return $i;
+        }));
         $this->assertIsEloquentCollection(Collection::times(0)); // TODO not sure if this should be a base collection
-        $this->assertIsEloquentCollection(Collection::times(3, function () { return new TestEloquentCollectionModel; }));
+        $this->assertIsEloquentCollection(Collection::times(3, function () {
+            return new TestEloquentCollectionModel;
+        }));
 
         $m = new Collection([new TestEloquentCollectionModel]);
         $this->assertIsBaseCollection($m->concat($b));
