@@ -227,38 +227,6 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Merge the collection with the given items.
-     *
-     * @param  \ArrayAccess|array  $items
-     * @return static
-     */
-    public function merge($items)
-    {
-        $dictionary = $this->getDictionary();
-
-        foreach ($items as $item) {
-            $dictionary[$item->getKey()] = $item;
-        }
-
-        return new static(array_values($dictionary));
-    }
-
-    /**
-     * Run a map over each of the items.
-     *
-     * @param  callable  $callback
-     * @return \Illuminate\Support\Collection|static
-     */
-    public function map(callable $callback)
-    {
-        $result = parent::map($callback);
-
-        return $result->contains(function ($item) {
-            return ! $item instanceof Model;
-        }) ? $result->toBase() : $result;
-    }
-
-    /**
      * Reload a fresh model instance from the database for all the entities.
      *
      * @param  array|string  $with
@@ -429,86 +397,6 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * The following methods are intercepted to always return base collections.
-     */
-
-    /**
-     * Get an array with the values of a given key.
-     *
-     * @param  string|array  $value
-     * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
-     */
-    public function pluck($value, $key = null)
-    {
-        return $this->toBase()->pluck($value, $key);
-    }
-
-    /**
-     * Get the keys of the collection items.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function keys()
-    {
-        return $this->toBase()->keys();
-    }
-
-    /**
-     * Zip the collection together with one or more arrays.
-     *
-     * @param  mixed  ...$items
-     * @return \Illuminate\Support\Collection
-     */
-    public function zip($items)
-    {
-        return call_user_func_array([$this->toBase(), 'zip'], func_get_args());
-    }
-
-    /**
-     * Collapse the collection of items into a single array.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function collapse()
-    {
-        return $this->toBase()->collapse();
-    }
-
-    /**
-     * Get a flattened array of the items in the collection.
-     *
-     * @param  int  $depth
-     * @return \Illuminate\Support\Collection
-     */
-    public function flatten($depth = INF)
-    {
-        return $this->toBase()->flatten($depth);
-    }
-
-    /**
-     * Flip the items in the collection.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function flip()
-    {
-        return $this->toBase()->flip();
-    }
-
-    /**
-     * Pad collection to the specified length with a value.
-     *
-     * @param  int  $size
-     * @param  mixed  $value
-     * @return \Illuminate\Support\Collection
-     */
-    public function pad($size, $value)
-    {
-        return $this->toBase()->pad($size, $value);
-    }
-
-    /**
      * Get the comparison function to detect duplicates.
      *
      * @param  bool  $strict
@@ -599,5 +487,260 @@ class Collection extends BaseCollection implements QueueableCollection
         });
 
         return $connection;
+    }
+
+    /**
+     * We can not be sure the result of the following methods only holds models.
+     */
+
+    /**
+     * Convert to base collection if not solely filled with models.
+     *
+     * @param  static  $maybeEloquent
+     * @return \Illuminate\Support\Collection|static
+     */
+    protected static function maybeToBase($maybeEloquent)
+    {
+        return $maybeEloquent->contains(function ($item) {
+            return ! $item instanceof Model;
+        }) ? $maybeEloquent->toBase() : $maybeEloquent;
+    }
+
+    /**
+     * Push all of the given items onto the collection.
+     *
+     * @param  iterable  $source
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function concat($source)
+    {
+        return static::maybeToBase(parent::concat(...func_get_args()));
+    }
+
+    /**
+     * Run a map over each of the items.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function map(callable $callback)
+    {
+        return static::maybeToBase(parent::map(...func_get_args()));
+    }
+
+    /**
+     * Merge the collection with the given items.
+     *
+     * @param  \ArrayAccess|array  $items
+     * @return static
+     */
+    public function merge($items)
+    {
+        $dictionary = $this->getDictionary();
+
+        foreach ($items as $index => $item) {
+            $key = $item instanceof Model ? $item->getKey() : $index;
+            $dictionary[$key] = $item;
+        }
+
+        $result = array_values($dictionary);
+
+        return static::maybeToBase(new static($result));
+    }
+
+    /**
+     * Pad collection to the specified length with a value.
+     *
+     * @param  int  $size
+     * @param  mixed  $value
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function pad($size, $value)
+    {
+        return self::maybeToBase(parent::pad(...func_get_args()));
+    }
+
+    /**
+     * Replace the collection items with the given items.
+     *
+     * @param  mixed  $items
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function replace($items)
+    {
+        return self::maybeToBase(parent::replace(...func_get_args()));
+    }
+
+    /**
+     * Recursively replace the collection items with the given items.
+     *
+     * @param  mixed  $items
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function replaceRecursive($items)
+    {
+        return self::maybeToBase(parent::replaceRecursive(...func_get_args()));
+    }
+
+    /**
+     * Create a new collection by invoking the callback a given amount of times.
+     *
+     * @param  int  $number
+     * @param  callable|null  $callback
+     * @return \Illuminate\Support\Collection|static
+     */
+    public static function times($number, callable $callback = null)
+    {
+        return self::maybeToBase(parent::times(...func_get_args()));
+    }
+
+    /**
+     * Union the collection with the given items.
+     *
+     * @param  mixed  $items
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function union($items)
+    {
+        return static::maybeToBase(parent::union(...func_get_args()));
+    }
+
+    /**
+     * The following methods are intercepted to always return base collections.
+     */
+
+    /**
+     * Chunk the collection into chunks of the given size.
+     *
+     * @param  int  $size
+     * @return \Illuminate\Support\Collection
+     */
+    public function chunk($size)
+    {
+        return $this->toBase()->chunk(...func_get_args());
+    }
+
+    /**
+     * Collapse the collection of items into a single array.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function collapse()
+    {
+        return $this->toBase()->collapse();
+    }
+
+    /**
+     * Cross join with the given lists, returning all possible permutations.
+     *
+     * @param  mixed  ...$lists
+     * @return \Illuminate\Support\Collection
+     */
+    public function crossJoin(...$lists)
+    {
+        return $this->toBase()->crossJoin(...func_get_args());
+    }
+
+    /**
+     * Get a flattened array of the items in the collection.
+     *
+     * @param  int  $depth
+     * @return \Illuminate\Support\Collection
+     */
+    public function flatten($depth = INF)
+    {
+        return $this->toBase()->flatten(...func_get_args());
+    }
+
+    /**
+     * Flip the items in the collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function flip()
+    {
+        return $this->toBase()->flip();
+    }
+
+    /**
+     * Group an associative array by a field or using a callback.
+     *
+     * @param  array|callable|string  $groupBy
+     * @param  bool  $preserveKeys
+     * @return \Illuminate\Support\Collection
+     */
+    public function groupBy($groupBy, $preserveKeys = false)
+    {
+        return $this->toBase()->groupBy(...func_get_args());
+    }
+
+    /**
+     * Get the keys of the collection items.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function keys()
+    {
+        return $this->toBase()->keys();
+    }
+
+    /**
+     * Run a dictionary map over the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Support\Collection
+     */
+    public function mapToDictionary(callable $callback)
+    {
+        return $this->toBase()->mapToDictionary(...func_get_args());
+    }
+
+    /**
+     * Partition the collection into two arrays using the given callback or key.
+     *
+     * @param  callable|string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Support\Collection
+     */
+    public function partition($key, $operator = null, $value = null)
+    {
+        return $this->toBase()->partition(...func_get_args());
+    }
+
+    /**
+     * Get an array with the values of a given key.
+     *
+     * @param  string|array  $value
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function pluck($value, $key = null)
+    {
+        return $this->toBase()->pluck(...func_get_args());
+    }
+
+    /**
+     * Split a collection into a certain number of groups.
+     *
+     * @param  int  $numberOfGroups
+     * @return \Illuminate\Support\Collection
+     */
+    public function split($numberOfGroups)
+    {
+        return $this->toBase()->split(...func_get_args());
+    }
+
+    /**
+     * Zip the collection together with one or more arrays.
+     *
+     * @param  mixed  ...$items
+     * @return \Illuminate\Support\Collection
+     */
+    public function zip($items)
+    {
+        return $this->toBase()->zip(...func_get_args());
     }
 }
