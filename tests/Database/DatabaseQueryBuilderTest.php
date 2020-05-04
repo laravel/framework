@@ -2355,6 +2355,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from [users] where [email] = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->delete();
         $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete top (1) from [users] where [email] = ?', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
+        $this->assertEquals(1, $result);
     }
 
     public function testDeleteWithJoinMethod()
