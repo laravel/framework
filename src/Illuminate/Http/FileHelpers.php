@@ -14,16 +14,6 @@ trait FileHelpers
     protected $hashName = null;
 
     /**
-     * Get the fully qualified path to the file.
-     *
-     * @return string
-     */
-    public function path()
-    {
-        return $this->getRealPath();
-    }
-
-    /**
      * Get the file's extension.
      *
      * @return string
@@ -36,21 +26,16 @@ trait FileHelpers
     /**
      * Get a filename for the file.
      *
-     * @param  string|null  $path
      * @return string
      */
-    public function hashName($path = null)
+    public function hashName()
     {
-        if ($path) {
-            $path = rtrim($path, '/').'/';
+        if (! $this->hashName) {
+            $this->hashName = Str::random(40);
         }
 
-        $hash = $this->hashName ?: $this->hashName = Str::random(40);
+        $extension = $this->guessExtension() ?? $this->getClientOriginalExtension();
 
-        if ($extension = $this->guessExtension()) {
-            $extension = '.'.$extension;
-        }
-
-        return $path.$hash.$extension;
+        return $this->hashName.'.'.$extension;
     }
 }
