@@ -1183,9 +1183,7 @@ class LazyCollection implements Enumerable
     {
         $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
 
-        return $this->takeUntil(function ($item, $key) use ($callback) {
-            return ! $callback($item, $key);
-        });
+        return $this->takeUntil($this->negate($callback));
     }
 
     /**
