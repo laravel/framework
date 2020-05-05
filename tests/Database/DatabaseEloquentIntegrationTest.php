@@ -292,8 +292,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testCountForPaginationWithGroupingAndSubSelects()
     {
         $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        $user2 = EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
         EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
         EloquentTestUser::create(['id' => 4, 'email' => 'foo@gmail.com']);
 
