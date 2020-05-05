@@ -1,6 +1,15 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.11...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.13...6.x)
+
+
+## [v6.18.13 (2020-05-05)](https://github.com/laravel/framework/compare/v6.18.12...v6.18.13)
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Collection::getQueueableRelations()` ([7b32460](https://github.com/laravel/framework/commit/7b32469420258e9e52b24b2ffa7f491e79a3a870))
+
+
+## [v6.18.12 (2020-05-05)](https://github.com/laravel/framework/compare/v6.18.11...v6.18.12)
 
 ### Added
 - Add pdo try again as lost connection message ([#32605](https://github.com/laravel/framework/pull/32605))
@@ -19,10 +28,8 @@
 - Restore оnly common relations ([#32613](https://github.com/laravel/framework/pull/32613), [d82f78b](https://github.com/laravel/framework/commit/d82f78b13631c4a04b9595099da0022ca3d8b94e), [48e4d60](https://github.com/laravel/framework/commit/48e4d602d4f8fe9304e8998c5893206f67504dbf))
 - Use single space if plain email is empty in `Illuminate\Mail\Mailer::addContent()` ([0557622](https://github.com/laravel/framework/commit/055762286132d545cbc064dce645562c0d51532f))
 - Remove wasted file read when loading package manifest in `Illuminate\Foundation\PackageManifest::getManifest()` ([#32646](https://github.com/laravel/framework/pull/32646))
-
-### TODO
-- Cache Faker instances ([#32585](https://github.com/laravel/framework/pull/32585))
-- Character and collation not needed for some columns on change ([fccdf7c](https://github.com/laravel/framework/commit/fccdf7c42d5ceb50985b3e8243d7ba650de996d6))
+- Cache `FakerGenerator` instances ([#32585](https://github.com/laravel/framework/pull/32585))
+- Do not change `character` and `collation` for some columns on change ([fccdf7c](https://github.com/laravel/framework/commit/fccdf7c42d5ceb50985b3e8243d7ba650de996d6))
 
 
 ## [v6.18.11 (2020-04-28)](https://github.com/laravel/framework/compare/v6.18.10...v6.18.11)
