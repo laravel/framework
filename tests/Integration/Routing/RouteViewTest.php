@@ -18,6 +18,7 @@ class RouteViewTest extends TestCase
         View::addLocation(__DIR__.'/Fixtures');
 
         $this->assertStringContainsString('Test bar', $this->get('/route')->getContent());
+        $this->assertSame(200, $this->get('/route')->status());
     }
 
     public function testRouteViewWithParams()
@@ -28,5 +29,32 @@ class RouteViewTest extends TestCase
 
         $this->assertStringContainsString('Test bar', $this->get('/route/value1/value2')->getContent());
         $this->assertStringContainsString('Test bar', $this->get('/route/value1')->getContent());
+    }
+
+    public function testRouteViewWithStatus()
+    {
+        Route::view('route', 'view', ['foo' => 'bar'], 418);
+
+        View::addLocation(__DIR__.'/Fixtures');
+
+        $this->assertSame(418, $this->get('/route')->status());
+    }
+
+    public function testRouteViewWithHeaders()
+    {
+        Route::view('route', 'view', ['foo' => 'bar'], 418, ['Framework' => 'Laravel']);
+
+        View::addLocation(__DIR__.'/Fixtures');
+
+        $this->assertSame('Laravel', $this->get('/route')->headers->get('Framework'));
+    }
+
+    public function testRouteViewOverloadingStatusWithHeaders()
+    {
+        Route::view('route', 'view', ['foo' => 'bar'], ['Framework' => 'Laravel']);
+
+        View::addLocation(__DIR__.'/Fixtures');
+
+        $this->assertSame('Laravel', $this->get('/route')->headers->get('Framework'));
     }
 }
