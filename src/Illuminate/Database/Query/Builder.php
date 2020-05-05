@@ -207,11 +207,9 @@ class Builder
      * @param  \Illuminate\Database\Query\Processors\Processor|null  $processor
      * @return void
      */
-    public function __construct(
-        ConnectionInterface $connection,
-        Grammar $grammar = null,
-        Processor $processor = null
-    )
+    public function __construct(ConnectionInterface $connection,
+                                Grammar $grammar = null,
+                                Processor $processor = null)
     {
         $this->connection = $connection;
         $this->grammar = $grammar ?: $connection->getQueryGrammar();
@@ -255,8 +253,7 @@ class Builder
         [$query, $bindings] = $this->createSub($query);
 
         return $this->selectRaw(
-            '('.$query.') as '.$this->grammar->wrap($as),
-            $bindings
+            '('.$query.') as '.$this->grammar->wrap($as), $bindings
         );
     }
 
@@ -649,9 +646,7 @@ class Builder
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         // If the columns is actually a Closure instance, we will assume the developer
@@ -709,11 +704,7 @@ class Builder
         // in our array and add the query binding to our array of bindings that
         // will be bound to each SQL statements when it is finally executed.
         $this->wheres[] = compact(
-            'type',
-            'column',
-            'operator',
-            'value',
-            'boolean'
+            'type', 'column', 'operator', 'value', 'boolean'
         );
 
         if (! $value instanceof Expression) {
@@ -803,9 +794,7 @@ class Builder
     public function orWhere($column, $operator = null, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->where($column, $operator, $value, 'or');
@@ -842,11 +831,7 @@ class Builder
         $type = 'Column';
 
         $this->wheres[] = compact(
-            'type',
-            'first',
-            'operator',
-            'second',
-            'boolean'
+            'type', 'first', 'operator', 'second', 'boolean'
         );
 
         return $this;
@@ -1133,9 +1118,7 @@ class Builder
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         if ($value instanceof DateTimeInterface) {
@@ -1156,9 +1139,7 @@ class Builder
     public function orWhereDate($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->whereDate($column, $operator, $value, 'or');
@@ -1176,9 +1157,7 @@ class Builder
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         if ($value instanceof DateTimeInterface) {
@@ -1199,9 +1178,7 @@ class Builder
     public function orWhereTime($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->whereTime($column, $operator, $value, 'or');
@@ -1219,9 +1196,7 @@ class Builder
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         if ($value instanceof DateTimeInterface) {
@@ -1246,9 +1221,7 @@ class Builder
     public function orWhereDay($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->whereDay($column, $operator, $value, 'or');
@@ -1266,9 +1239,7 @@ class Builder
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         if ($value instanceof DateTimeInterface) {
@@ -1293,9 +1264,7 @@ class Builder
     public function orWhereMonth($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->whereMonth($column, $operator, $value, 'or');
@@ -1313,9 +1282,7 @@ class Builder
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         if ($value instanceof DateTimeInterface) {
@@ -1336,9 +1303,7 @@ class Builder
     public function orWhereYear($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->whereYear($column, $operator, $value, 'or');
@@ -1428,11 +1393,7 @@ class Builder
         call_user_func($callback, $query = $this->forSubQuery());
 
         $this->wheres[] = compact(
-            'type',
-            'column',
-            'operator',
-            'query',
-            'boolean'
+            'type', 'column', 'operator', 'query', 'boolean'
         );
 
         $this->addBinding($query->getBindings(), 'where');
@@ -1626,9 +1587,7 @@ class Builder
         $type = 'JsonLength';
 
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
@@ -1651,9 +1610,7 @@ class Builder
     public function orWhereJsonLength($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->whereJsonLength($column, $operator, $value, 'or');
@@ -1671,10 +1628,7 @@ class Builder
         $finder = substr($method, 5);
 
         $segments = preg_split(
-            '/(And|Or)(?=[A-Z])/',
-            $finder,
-            -1,
-            PREG_SPLIT_DELIM_CAPTURE
+            '/(And|Or)(?=[A-Z])/', $finder, -1, PREG_SPLIT_DELIM_CAPTURE
         );
 
         // The connector variable will determine which connector will be used for the
@@ -1775,9 +1729,7 @@ class Builder
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         // If the given operator is not found in the list of valid operators we will
@@ -1807,9 +1759,7 @@ class Builder
     public function orHaving($column, $operator = null, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->having($column, $operator, $value, 'or');
@@ -2225,9 +2175,7 @@ class Builder
     protected function runSelect()
     {
         return $this->connection->select(
-            $this->toSql(),
-            $this->getBindings(),
-            ! $this->useWritePdo
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
         );
     }
 
@@ -2363,9 +2311,7 @@ class Builder
 
         return new LazyCollection(function () {
             yield from $this->connection->cursor(
-                $this->toSql(),
-                $this->getBindings(),
-                ! $this->useWritePdo
+                $this->toSql(), $this->getBindings(), ! $this->useWritePdo
             );
         });
     }
@@ -2400,8 +2346,7 @@ class Builder
             is_null($key) ? [$column] : [$column, $key],
             function () {
                 return $this->processor->processSelect(
-                    $this,
-                    $this->runSelect()
+                    $this, $this->runSelect()
                 );
             }
         );
@@ -2509,9 +2454,7 @@ class Builder
     public function exists()
     {
         $results = $this->connection->select(
-            $this->grammar->compileExists($this),
-            $this->getBindings(),
-            ! $this->useWritePdo
+            $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
         );
 
         // If the results has rows, we will get the row and see if the exists column is a
@@ -2914,8 +2857,7 @@ class Builder
         }
 
         return $this->connection->delete(
-            $this->grammar->compileDelete($this),
-            $this->cleanBindings(
+            $this->grammar->compileDelete($this), $this->cleanBindings(
                 $this->grammar->prepareBindingsForDelete($this->bindings)
             )
         );
