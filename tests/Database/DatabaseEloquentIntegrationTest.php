@@ -289,6 +289,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(3, $query->getCountForPagination());
     }
 
+    public function testCountForPaginationWithGroupingAndSubSelects()
+    {
+        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user2 = EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::create(['id' => 4, 'email' => 'foo@gmail.com']);
+
+        $user1->friends()->create(['id' => 5, 'email' => 'friend@gmail.com']);
+
+        $query = EloquentTestUser::select([
+            'id',
+            'friends_count' => EloquentTestUser::whereColumn('friend_id', 'user_id')->count(),
+        ])->groupBy('email')->getQuery();
+
+        $this->assertEquals(4, $query->getCountForPagination());
+    }
+
     public function testFirstOrCreate()
     {
         $user1 = EloquentTestUser::firstOrCreate(['email' => 'taylorotwell@gmail.com']);
