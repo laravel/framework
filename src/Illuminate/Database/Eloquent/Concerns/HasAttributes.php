@@ -1211,6 +1211,23 @@ trait HasAttributes
     }
 
     /**
+     * Get a subset of the model's attributes.
+     *
+     * @param  array|mixed  $attributes
+     * @return array
+     */
+    public function except($attributes)
+    {
+        $results = $this->getAttributes();
+
+        foreach (is_array($attributes) ? $attributes : func_get_args() as $attribute) {
+            unset($results[$attribute]);
+        }
+
+        return $results;
+    }
+
+    /**
      * Sync the original attributes with the current.
      *
      * @return $this
