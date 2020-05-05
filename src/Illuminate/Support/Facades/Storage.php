@@ -27,6 +27,8 @@ use Illuminate\Filesystem\Filesystem;
  * @method static array allDirectories(string|null $directory = null)
  * @method static bool makeDirectory(string $path)
  * @method static bool deleteDirectory(string $directory)
+ * @method static string url(string $path)
+ * @method static string temporaryUrl(string $path, \DateTimeInterface $expiration, array $options = [])
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertExists(string|array $path)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertMissing(string|array $path)
  *
