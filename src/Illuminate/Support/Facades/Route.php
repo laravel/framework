@@ -29,7 +29,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Router|\Illuminate\Routing\RouteRegistrar group(\Closure|string|array $attributes, \Closure|string $routes)
  * @method static \Illuminate\Routing\Route redirect(string $uri, string $destination, int $status = 302)
  * @method static \Illuminate\Routing\Route permanentRedirect(string $uri, string $destination)
- * @method static \Illuminate\Routing\Route view(string $uri, string $view, array $data = [])
+ * @method static \Illuminate\Routing\Route view(string $uri, string $view, array $data = [], int $status = 200, array $headers = [])
  * @method static void bind(string $key, string|callable $binder)
  * @method static void model(string $key, string $class, \Closure|null $callback = null)
  * @method static \Illuminate\Routing\Route current()

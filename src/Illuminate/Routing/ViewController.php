@@ -2,38 +2,38 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Contracts\Routing\ResponseFactory;
 
 class ViewController extends Controller
 {
     /**
-     * The view factory implementation.
+     * The response factory implementation.
      *
-     * @var \Illuminate\Contracts\View\Factory
+     * @var \Illuminate\Contracts\Routing\ResponseFactory
      */
-    protected $view;
+    protected $response;
 
     /**
      * Create a new controller instance.
      *
-     * @param  \Illuminate\Contracts\View\Factory  $view
+     * @param  \Illuminate\Contracts\Routing\ResponseFactory  $response
      * @return void
      */
-    public function __construct(ViewFactory $view)
+    public function __construct(ResponseFactory $response)
     {
-        $this->view = $view;
+        $this->response = $response;
     }
 
     /**
      * Invoke the controller method.
      *
      * @param  array  $args
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Http\Response
      */
     public function __invoke(...$args)
     {
-        [$view, $data] = array_slice($args, -2);
+        [$view, $data, $status, $headers] = array_slice($args, -4);
 
-        return $this->view->make($view, $data);
+        return $this->response->view($view, $data, $status, $headers);
     }
 }
