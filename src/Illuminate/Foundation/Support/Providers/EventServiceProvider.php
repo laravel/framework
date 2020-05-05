@@ -23,6 +23,13 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [];
 
     /**
+     * Models to observe.
+     *
+     * @var array
+     */
+    protected $observers = [];
+
+    /**
      * Register the application's event listeners.
      *
      * @return void
@@ -40,6 +47,10 @@ class EventServiceProvider extends ServiceProvider
 
             foreach ($this->subscribe as $subscriber) {
                 Event::subscribe($subscriber);
+            }
+
+            foreach ($this->observers as $model => $observers) {
+                $model::observe($observers);
             }
         });
     }
