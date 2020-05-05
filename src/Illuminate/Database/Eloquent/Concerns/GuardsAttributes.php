@@ -49,7 +49,7 @@ trait GuardsAttributes
 
         return $this;
     }
-    
+
     /**
      * Merge new fillable attributes with existing fillable attributes on the model.
      *
@@ -59,10 +59,10 @@ trait GuardsAttributes
     public function mergeFillable(array $fillable)
     {
         $this->fillable = array_merge($this->fillable, $fillable);
-        
+
         return $this;
     }
-    
+
     /**
      * Merge new guarded attributes with existing guarded attributes on the model.
      *
@@ -72,7 +72,7 @@ trait GuardsAttributes
     public function mergeGuarded(array $guarded)
     {
         $this->guarded = array_merge($this->guarded, $guarded);
-        
+
         return $this;
     }
 
