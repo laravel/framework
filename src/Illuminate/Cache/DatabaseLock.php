@@ -59,27 +59,27 @@ class DatabaseLock extends Lock
 
         try {
             $this->connection->table($this->table)->insert([
-                'id' => $this->name,
+                'key' => $this->name,
                 'owner' => $this->owner,
-                'expires_at' => $this->expiresAt(),
+                'expiration' => $this->expiresAt(),
             ]);
 
             $acquired = true;
         } catch (QueryException $e) {
             $updated = $this->connection->table($this->table)
-                ->where('id', $this->name)
+                ->where('key', $this->name)
                 ->where(function ($query) {
-                    return $query->where('owner', $this->owner)->orWhere('expires_at', '<=', time());
+                    return $query->where('owner', $this->owner)->orWhere('expiration', '<=', time());
                 })->update([
                     'owner' => $this->owner,
-                    'expires_at' => $this->expiresAt(),
+                    'expiration' => $this->expiresAt(),
                 ]);
 
             $acquired = $updated >= 1;
         }
 
         if (random_int(1, $this->lottery[1]) <= $this->lottery[0]) {
-            $this->connection->table($this->table)->where('expires_at', '<=', time())->delete();
+            $this->connection->table($this->table)->where('expiration', '<=', time())->delete();
         }
 
         return $acquired;
@@ -104,7 +104,7 @@ class DatabaseLock extends Lock
     {
         if ($this->isOwnedByCurrentProcess()) {
             $this->connection->table($this->table)
-                        ->where('id', $this->name)
+                        ->where('key', $this->name)
                         ->where('owner', $this->owner)
                         ->delete();
 
@@ -122,7 +122,7 @@ class DatabaseLock extends Lock
     public function forceRelease()
     {
         $this->connection->table($this->table)
-                    ->where('id', $this->name)
+                    ->where('key', $this->name)
                     ->delete();
     }
 
@@ -133,6 +133,6 @@ class DatabaseLock extends Lock
      */
     protected function getCurrentOwner()
     {
-        return optional($this->connection->table($this->table)->where('id', $this->name)->first())->owner;
+        return optional($this->connection->table($this->table)->where('key', $this->name)->first())->owner;
     }
 }

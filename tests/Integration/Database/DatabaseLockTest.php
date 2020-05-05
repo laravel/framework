@@ -17,9 +17,9 @@ class DatabaseLockTest extends DatabaseTestCase
         parent::setUp();
 
         Schema::create('cache_locks', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('key')->primary();
             $table->string('owner');
-            $table->integer('expires_at');
+            $table->integer('expiration');
         });
     }
 
@@ -55,7 +55,7 @@ class DatabaseLockTest extends DatabaseTestCase
     {
         $lock = Cache::driver('database')->lock('foo');
         $this->assertTrue($lock->get());
-        DB::table('cache_locks')->update(['expires_at' => now()->subDays(1)->getTimestamp()]);
+        DB::table('cache_locks')->update(['expiration' => now()->subDays(1)->getTimestamp()]);
 
         $otherLock = Cache::driver('database')->lock('foo');
         $this->assertTrue($otherLock->get());
