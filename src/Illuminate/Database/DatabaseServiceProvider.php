@@ -89,7 +89,7 @@ class DatabaseServiceProvider extends ServiceProvider
             }
 
             static::$fakers[$locale]->unique(true);
-            
+
             return static::$fakers[$locale];
         });
 
