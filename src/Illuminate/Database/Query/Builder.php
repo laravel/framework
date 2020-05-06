@@ -2280,7 +2280,8 @@ class Builder
      */
     protected function cloneForPaginationCount()
     {
-        return $this->cloneWithout(['orders', 'limit', 'offset'])
+        return $this->select($this->from.'.*')
+                    ->cloneWithout(['orders', 'limit', 'offset'])
                     ->cloneWithoutBindings(['order']);
     }
 
