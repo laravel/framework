@@ -1,6 +1,15 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.9.2...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.10.1...7.x)
+
+
+## [v7.10.1 (2020-05-05)](https://github.com/laravel/framework/compare/v7.10.0...v7.10.1)
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Collection::getQueueableRelations()` ([7b32460](https://github.com/laravel/framework/commit/7b32469420258e9e52b24b2ffa7f491e79a3a870))
+
+
+## [v7.10.0 (2020-05-05)](https://github.com/laravel/framework/compare/v7.9.2...v7.10.0)
 
 ### Added
 - Added `artisan make:cast` command ([#32594](https://github.com/laravel/framework/pull/32594))
@@ -9,6 +18,12 @@
 - Added `hasNamedScope()` function to the Base Model ([#32622](https://github.com/laravel/framework/pull/32622), [#32631](https://github.com/laravel/framework/pull/32631))
 - Allow doing truth-test assertions with just a closure ([#32626](https://github.com/laravel/framework/pull/32626), [f69ad90](https://github.com/laravel/framework/commit/f69ad90b9d508b59a017d0e412d8228e71230a51), [22d6fca](https://github.com/laravel/framework/commit/22d6fcafba610364aabb2b8e5c385edf56ae0156))
 - Run pagination count as subquery for group by and havings ([#32624](https://github.com/laravel/framework/pull/32624))
+- Added Callbacks with Output to Console Schedule ([#32633](https://github.com/laravel/framework/pull/32633), [35a7883](https://github.com/laravel/framework/commit/35a788316a0bc20295abe048a1bc1aa34a729ec7), [8d8d620](https://github.com/laravel/framework/commit/8d8d62024188c870df9dec1eeac428089f44c18e))
+- Added `Cache::lock()` support for the database cache driver ([#32639](https://github.com/laravel/framework/pull/32639), [573831b](https://github.com/laravel/framework/commit/573831b5028aa440f555d1072672db5069f306d1))
+- Same-session ID request concurrency limiting ([#32636](https://github.com/laravel/framework/pull/32636))
+- Add `skipUntil` and `skipWhile` methods to the collections ([#32672](https://github.com/laravel/framework/pull/32672), [#32676](https://github.com/laravel/framework/pull/32676))
+- Support delete with limit on sqlsrv ([f16d325](https://github.com/laravel/framework/commit/f16d3256f93be71935ed86951e58f90b83912feb))
+- Added `mergeFillable()` and `mergeGuarded()` to `Model` ([#32679](https://github.com/laravel/framework/pull/32679))
 
 ### Fixed
 - Prevents a memory leak in Faker ([2228233](https://github.com/laravel/framework/commit/222823377c936ab4cceeb1fa42db84821c04bff6))
@@ -19,16 +34,14 @@
 - Fixed `Illuminate\Foundation\Console\EventMakeCommand::alreadyExists()` ([7bba4bf](https://github.com/laravel/framework/commit/7bba4bfbedb85ee252464aa932414d5517240722))
 - Fixed `Illuminate\Console\Scheduling\Schedule::compileParameters()` ([cfc3ac9](https://github.com/laravel/framework/commit/cfc3ac9c8b0a593d264ae722ab90601fa4882d0e), [36e215d](https://github.com/laravel/framework/commit/36e215dd39cd757a8ffc6b17794de60476b2289d))
 - Fixed bug with model name in `Illuminate\Database\Eloquent\RelationNotFoundException::make()` ([f72a166](https://github.com/laravel/framework/commit/f72a1662ab64cc543c532941b1ab1279001af8e9))
+- Allow trashed through parents to be included in has many through queries ([#32609](https://github.com/laravel/framework/pull/32609))
 
 ### Changed
 - Changed `Illuminate/Database/Eloquent/Relations/Concerns/AsPivot::fromRawAttributes()` ([6c502c1](https://github.com/laravel/framework/commit/6c502c1135082e8b25f2720931b19d36eeec8f41))
 - Restore оnly common relations ([#32613](https://github.com/laravel/framework/pull/32613), [d82f78b](https://github.com/laravel/framework/commit/d82f78b13631c4a04b9595099da0022ca3d8b94e), [48e4d60](https://github.com/laravel/framework/commit/48e4d602d4f8fe9304e8998c5893206f67504dbf))
 - Use single space if plain email is empty in `Illuminate\Mail\Mailer::addContent()` ([0557622](https://github.com/laravel/framework/commit/055762286132d545cbc064dce645562c0d51532f))
 - Remove wasted file read when loading package manifest in `Illuminate\Foundation\PackageManifest::getManifest()` ([#32646](https://github.com/laravel/framework/pull/32646))
-
-### TODO
-- Allow trashed through parents to be included in has many through queries ([#32609](https://github.com/laravel/framework/pull/32609))
-- Character and collation not needed for some columns on change ([fccdf7c](https://github.com/laravel/framework/commit/fccdf7c42d5ceb50985b3e8243d7ba650de996d6))
+- Do not change `character` and `collation` for some columns on change ([fccdf7c](https://github.com/laravel/framework/commit/fccdf7c42d5ceb50985b3e8243d7ba650de996d6))
 - Use table name when resolving has many through / one relationships ([8d69454](https://github.com/laravel/framework/commit/8d69454575267840643289b8de27d615cfe4bb62))
 
 

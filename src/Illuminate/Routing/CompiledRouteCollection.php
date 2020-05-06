@@ -297,7 +297,8 @@ class CompiledRouteCollection extends AbstractRouteCollection
             ->setFallback($attributes['fallback'])
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
-            ->setBindingFields($attributes['bindingFields']);
+            ->setBindingFields($attributes['bindingFields'])
+            ->block($attributes['lockSeconds'] ?? null, $attributes['waitSeconds'] ?? null);
     }
 
     /**

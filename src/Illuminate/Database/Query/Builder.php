@@ -2258,10 +2258,15 @@ class Builder
         if ($this->groups || $this->havings) {
             $clone = $this->cloneForPaginationCount();
 
-            return [(object) ['aggregate' => $this->newQuery()
-                        ->from(new Expression('('.$clone->toSql().') as '.$this->grammar->wrap('aggregate_table')))
-                        ->mergeBindings($clone)
-                        ->count(['*']), ]];
+            if (is_null($clone->columns) && ! empty($this->joins)) {
+                $clone->select($this->from.'.*');
+            }
+
+            return $this->newQuery()
+                ->from(new Expression('('.$clone->toSql().') as '.$this->grammar->wrap('aggregate_table')))
+                ->mergeBindings($clone)
+                ->setAggregate('count', $this->withoutSelectAliases($columns))
+                ->get()->all();
         }
 
         $without = $this->unions ? ['orders', 'limit', 'offset'] : ['columns', 'orders', 'limit', 'offset'];

@@ -850,6 +850,40 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testSkipUntilIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->skipUntil(INF);
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->skipUntil(10)->first();
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->skipUntil(function ($item) {
+                return $item === 10;
+            })->first();
+        });
+    }
+
+    public function testSkipWhileIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->skipWhile(1);
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->skipWhile(1)->first();
+        });
+
+        $this->assertEnumerates(10, function ($collection) {
+            $collection->skipWhile(function ($item) {
+                return $item < 10;
+            })->first();
+        });
+    }
+
     public function testSliceIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

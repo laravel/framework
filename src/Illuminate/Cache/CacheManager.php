@@ -214,7 +214,11 @@ class CacheManager implements FactoryContract
 
         return $this->repository(
             new DatabaseStore(
-                $connection, $config['table'], $this->getPrefix($config)
+                $connection,
+                $config['table'],
+                $this->getPrefix($config),
+                $config['lock_table'] ?? 'cache_locks',
+                $config['lock_lottery'] ?? [2, 100]
             )
         );
     }
