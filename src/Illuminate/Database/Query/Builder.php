@@ -256,6 +256,24 @@ class Builder
             '('.$query.') as '.$this->grammar->wrap($as), $bindings
         );
     }
+    
+    /**
+     * Add a subselect exists expression to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
+     * @param  string  $as
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function selectExists($query, $as)
+    {
+        [$query, $bindings] = $this->createSub($query);
+
+        return $this->selectRaw(
+            'EXISTS('.$query.') as '.$this->grammar->wrap($as), $bindings
+        );
+    }
 
     /**
      * Add a new "raw" select expression to the query.
