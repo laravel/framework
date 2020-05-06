@@ -55,6 +55,17 @@ abstract class Controller
     }
 
     /**
+     * Return the controllers class and action as an array.
+     *
+     * @param string $action
+     * @return array
+     */
+    public static function action($action)
+    {
+        return [static::class, $action];
+    }
+
+    /**
      * Handle calls to missing methods on the controller.
      *
      * @param  string  $method
