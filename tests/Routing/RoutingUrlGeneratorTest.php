@@ -685,7 +685,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testControllerActionHelper()
     {
-        list($class, $action) = DummyController::action('index');
+        [$class, $action] = DummyController::action('index');
 
         $this->assertEquals('Illuminate\\Tests\\Routing\\DummyController', $class);
         $this->assertEquals('index', $action);
