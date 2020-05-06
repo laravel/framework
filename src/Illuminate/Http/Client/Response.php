@@ -165,6 +165,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Determine if the response indicates a client or server error occurred.
+     *
+     * @return bool
+     */
+    public function failed()
+    {
+        return $this->serverError() || $this->clientError();
+    }
+
+    /**
      * Get the response cookies.
      *
      * @return \GuzzleHttp\Cookie\CookieJar
