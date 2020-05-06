@@ -145,6 +145,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Determine if the response indicates a client or server error occurred.
+     *
+     * @return bool
+     */
+    public function failed()
+    {
+        return $this->serverError() || $this->clientError();
+    }
+
+    /**
      * Determine if the response indicates a client error occurred.
      *
      * @return bool
@@ -162,16 +172,6 @@ class Response implements ArrayAccess
     public function serverError()
     {
         return $this->status() >= 500;
-    }
-
-    /**
-     * Determine if the response indicates a client or server error occurred.
-     *
-     * @return bool
-     */
-    public function failed()
-    {
-        return $this->serverError() || $this->clientError();
     }
 
     /**
