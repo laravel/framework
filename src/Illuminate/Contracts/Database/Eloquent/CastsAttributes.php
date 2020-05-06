@@ -11,7 +11,7 @@ interface CastsAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @param  array  $attributes
-     * @return string|array
+     * @return mixed
      */
     public function get($model, string $key, $value, array $attributes);
 
@@ -22,7 +22,7 @@ interface CastsAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @param  array  $attributes
-     * @return array
+     * @return string|array
      */
     public function set($model, string $key, $value, array $attributes);
 }
