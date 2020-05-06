@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Routing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
@@ -681,6 +682,14 @@ class RoutingUrlGeneratorTest extends TestCase
 
         Request::create($url->signedRoute('foo', ['signature' => 'bar']));
     }
+
+    public function testControllerActionHelper()
+    {
+        list($class, $action) = DummyController::action('index');
+
+        $this->assertEquals('Illuminate\\Tests\\Routing\\DummyController', $class);
+        $this->assertEquals('index', $action);
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
@@ -714,5 +723,13 @@ class InvokableActionStub
     public function __invoke()
     {
         return 'hello';
+    }
+}
+
+class DummyController extends Controller
+{
+    public function index()
+    {
+        // empty
     }
 }
