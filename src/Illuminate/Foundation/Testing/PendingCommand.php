@@ -131,10 +131,10 @@ class PendingCommand
     {
         $this->hasExecuted = true;
 
-        $this->mockConsoleOutput();
+        $mock = $this->mockConsoleOutput();
 
         try {
-            $exitCode = $this->app[Kernel::class]->call($this->command, $this->parameters);
+            $exitCode = $this->app[Kernel::class]->call($this->command, $this->parameters, $mock);
         } catch (NoMatchingExpectationException $e) {
             if ($e->getMethodName() === 'askQuestion') {
                 $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
@@ -156,7 +156,7 @@ class PendingCommand
     /**
      * Mock the application's console output.
      *
-     * @return void
+     * @return \Mockery\MockInterface
      */
     protected function mockConsoleOutput()
     {
@@ -181,6 +181,8 @@ class PendingCommand
         $this->app->bind(OutputStyle::class, function () use ($mock) {
             return $mock;
         });
+
+        return $mock;
     }
 
     /**
