@@ -8,9 +8,22 @@ use Egulias\EmailValidator\Validation\EmailValidation;
 class FilterEmailValidation implements EmailValidation
 {
     /**
-     * @var int
+     * The flags to pass to the filter_var function.
+     *
+     * @var int|null
      */
     protected $flags;
+
+    /**
+     * Create a new validation instance.
+     *
+     * @param  int  $flags
+     * @return void
+     */
+    public function __construct($flags = null)
+    {
+        $this->flags = $flags;
+    }
 
     /**
      * Create a new instance which allows any unicode characters in local-part.
@@ -23,16 +36,6 @@ class FilterEmailValidation implements EmailValidation
     }
 
     /**
-     * FilterEmailValidation constructor.
-     *
-     * @param int $flags
-     */
-    public function __construct($flags = 0)
-    {
-        $this->flags = $flags;
-    }
-
-    /**
      * Returns true if the given email is valid.
      *
      * @param  string  $email
@@ -41,7 +44,9 @@ class FilterEmailValidation implements EmailValidation
      */
     public function isValid($email, EmailLexer $emailLexer)
     {
-        return filter_var($email, FILTER_VALIDATE_EMAIL, $this->flags) !== false;
+        return is_null($this->flags)
+                    ? filter_var($email, FILTER_VALIDATE_EMAIL) !== false
+                    : filter_var($email, FILTER_VALIDATE_EMAIL, $this->flags) !== false;
     }
 
     /**
