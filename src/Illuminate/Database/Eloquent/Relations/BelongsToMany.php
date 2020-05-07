@@ -514,7 +514,7 @@ class BelongsToMany extends Relation
      */
     public function wherePivotNull($column, $boolean = 'and', $not = false)
     {
-        return $this->wherePivot($column, $not ? '!=' : '==', 'null', $boolean);
+        return $this->whereNull($this->table.'.'.$column, $boolean, $not);
     }
 
     /**
