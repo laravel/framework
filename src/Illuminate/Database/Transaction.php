@@ -94,6 +94,14 @@ class Transaction
 	}
 
 	/**
+	 * Level of this transaction.
+	 */
+	public function level(): int
+	{
+		return $this->level;
+	}
+
+	/**
 	 * Assert it hasn't been closed yet.
 	 *
 	 * @return void

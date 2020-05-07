@@ -81,6 +81,13 @@ trait ManagesTransactions
      */
     protected function handleTransactionException(Transaction $transaction, Throwable $e, $currentAttempt, $maxAttempts)
     {
+		// On a deadlock, MySQL rolls back the entire transaction so we can't just
+		// retry the query. We have to throw this exception all the way out and
+		// let the developer handle it in another way. We will decrement too.
+		if ($this->causedBydeadlock($e) && $transaction->level() > 1) {
+			throw $e;
+		}
+
         // If there was an exception we will rollback this transaction and then we
         // can check if we have exceeded the maximum attempt count for this and
         // if we haven't we will return and try this query again in our loop.
