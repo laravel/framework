@@ -193,6 +193,25 @@ class Stringable
     {
         return collect(explode($delimiter, $this->value, $limit));
     }
+    
+    /**
+     * Split string by a regular expression.
+     *
+     * @param  string  $pattern
+     * @param  int  $limit
+     * @param  int  $flags
+     * @return \Illuminate\Support\Collection
+     */
+    public function split($pattern, $limit = -1, $flags = 0)
+    {
+        $keywords = preg_split($pattern, $this->value, $limit, $flags);
+
+        if(! $keywords) {
+            return collect();
+        }
+
+        return collect($keywords);
+    }
 
     /**
      * Cap a string with a single instance of a given value.
