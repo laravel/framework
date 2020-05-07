@@ -45,6 +45,7 @@ class RouteUri
 
         foreach ($matches[0] as $match) {
             if (strpos($match, ':') === false) {
+                $bindingFields[trim($match, '{}?')] = null;
                 continue;
             }
 
