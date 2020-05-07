@@ -189,6 +189,7 @@ class ChangeColumn
         return in_array($type, [
             'bigInteger',
             'binary',
+            'boolean',
             'date',
             'decimal',
             'double',
