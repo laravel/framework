@@ -204,8 +204,8 @@ class ThrottleRequests
                                   ?Response $response = null)
     {
         if ($response &&
-            $response->headers->get('X-RateLimit-Remaining') &&
-            $response->headers->get('X-RateLimit-Remaining') <= $remainingAttempts) {
+            ! is_null($response->headers->get('X-RateLimit-Remaining')) &&
+            (int) $response->headers->get('X-RateLimit-Remaining') <= (int) $remainingAttempts) {
             return [];
         }
 
