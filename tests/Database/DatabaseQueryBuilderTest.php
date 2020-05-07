@@ -761,7 +761,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereIntegerInRaw('id', ['1a', 2]);
         $this->assertSame('select * from "users" where "id" = ? or "id" in (1, 2)', $builder->toSql());
-        $this->assertEquals([], $builder->getBindings());
+        $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
     public function testWhereIntegerNotInRaw()
@@ -777,7 +777,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereIntegerNotInRaw('id', ['1a', 2]);
         $this->assertSame('select * from "users" where "id" = ? or "id" not in (1, 2)', $builder->toSql());
-        $this->assertEquals([], $builder->getBindings());
+        $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
     public function testEmptyWhereIntegerInRaw()
