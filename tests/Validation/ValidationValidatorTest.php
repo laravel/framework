@@ -2353,6 +2353,32 @@ class ValidationValidatorTest extends TestCase
     {
         $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar'], ['x' => 'email:filter']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'example@example.com'], ['x' => 'email:filter']);
+        $this->assertTrue($v->passes());
+
+        // Unicode characters are not allowed
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'exämple@example.com'], ['x' => 'email:filter']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'exämple@exämple.com'], ['x' => 'email:filter']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateEmailWithFilterUnicodeCheck()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar'], ['x' => 'email:filter_unicode']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'example@example.com'], ['x' => 'email:filter_unicode']);
+        $this->assertTrue($v->passes());
+
+        // Any unicode characters are allowed only in local-part
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'exämple@example.com'], ['x' => 'email:filter_unicode']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'exämple@exämple.com'], ['x' => 'email:filter_unicode']);
+        $this->assertFalse($v->passes());
     }
 
     /**
