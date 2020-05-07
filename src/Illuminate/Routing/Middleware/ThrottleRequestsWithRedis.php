@@ -3,6 +3,7 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
 
@@ -32,11 +33,14 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     /**
      * Create a new request throttler.
      *
+     * @param  \Illuminate\Cache\RateLimiter  $limiter
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @return void
      */
-    public function __construct(Redis $redis)
+    public function __construct(RateLimiter $limiter, Redis $redis)
     {
+        parent::__construct($limiter);
+
         $this->redis = $redis;
     }
 
@@ -45,19 +49,15 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
+     * @param  string  $key
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
-     * @param  string  $prefix
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
-    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
+    protected function handleRequest($request, Closure $next, $key, $maxAttempts, $decayMinutes)
     {
-        $key = $prefix.$this->resolveRequestSignature($request);
-
-        $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
-
         if ($this->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
             throw $this->buildException($key, $maxAttempts);
         }
@@ -65,7 +65,8 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
         $response = $next($request);
 
         return $this->addHeaders(
-            $response, $maxAttempts,
+            $response,
+            $maxAttempts,
             $this->calculateRemainingAttempts($key, $maxAttempts)
         );
     }
@@ -101,11 +102,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      */
     protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
     {
-        if (is_null($retryAfter)) {
-            return $this->remaining;
-        }
-
-        return 0;
+        return is_null($retryAfter) ? $this->remaining : 0;
     }
 
     /**

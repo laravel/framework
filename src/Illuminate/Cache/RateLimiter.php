@@ -42,11 +42,22 @@ class RateLimiter
      * @param  \Closure  $callback
      * @return $this
      */
-    public function for($name, Closure $callback)
+    public function for(string $name, Closure $callback)
     {
         $this->limiters[$name] = $callback;
 
         return $this;
+    }
+
+    /**
+     * Get the given named rate limiter.
+     *
+     * @param  string  $name
+     * @return \Closure
+     */
+    public function limiter(string $name)
+    {
+        return $this->limiters[$name] ?? null;
     }
 
     /**

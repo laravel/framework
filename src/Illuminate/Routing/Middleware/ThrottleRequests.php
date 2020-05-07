@@ -46,10 +46,43 @@ class ThrottleRequests
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
     {
-        $key = $prefix.$this->resolveRequestSignature($request);
+        if (is_string($maxAttempts)
+            && func_num_args() === 3
+            && ! is_null($limiter = $this->limiter->limiter($maxAttempts))) {
+            $limit = call_user_func($limiter, $request);
 
-        $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
+            return $this->handleRequest(
+                $request,
+                $next,
+                md5($maxAttempts.$limit->key),
+                $limit->maxAttempts,
+                $limit->decayMinutes
+            );
+        }
 
+        return $this->handleRequest(
+            $request,
+            $next,
+            $prefix.$this->resolveRequestSignature($request),
+            $this->resolveMaxAttempts($request, $maxAttempts),
+            $decayMinutes
+        );
+    }
+
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string  $key
+     * @param  int|string  $maxAttempts
+     * @param  float|int  $decayMinutes
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
+     */
+    protected function handleRequest($request, Closure $next, $key, $maxAttempts, $decayMinutes)
+    {
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
             throw $this->buildException($key, $maxAttempts);
         }
@@ -59,7 +92,8 @@ class ThrottleRequests
         $response = $next($request);
 
         return $this->addHeaders(
-            $response, $maxAttempts,
+            $response,
+            $maxAttempts,
             $this->calculateRemainingAttempts($key, $maxAttempts)
         );
     }
@@ -96,9 +130,7 @@ class ThrottleRequests
     {
         if ($user = $request->user()) {
             return sha1($user->getAuthIdentifier());
-        }
-
-        if ($route = $request->route()) {
+        } elseif ($route = $request->route()) {
             return sha1($route->getDomain().'|'.$request->ip());
         }
 
@@ -116,15 +148,11 @@ class ThrottleRequests
     {
         $retryAfter = $this->getTimeUntilNextRetry($key);
 
-        $headers = $this->getHeaders(
+        return new ThrottleRequestsException('Too Many Attempts.', null, $this->getHeaders(
             $maxAttempts,
             $this->calculateRemainingAttempts($key, $maxAttempts, $retryAfter),
             $retryAfter
-        );
-
-        return new ThrottleRequestsException(
-            'Too Many Attempts.', null, $headers
-        );
+        ));
     }
 
     /**
@@ -150,7 +178,7 @@ class ThrottleRequests
     protected function addHeaders(Response $response, $maxAttempts, $remainingAttempts, $retryAfter = null)
     {
         $response->headers->add(
-            $this->getHeaders($maxAttempts, $remainingAttempts, $retryAfter)
+            $this->getHeaders($maxAttempts, $remainingAttempts, $retryAfter, $response)
         );
 
         return $response;
@@ -162,10 +190,20 @@ class ThrottleRequests
      * @param  int  $maxAttempts
      * @param  int  $remainingAttempts
      * @param  int|null  $retryAfter
+     * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @return array
      */
-    protected function getHeaders($maxAttempts, $remainingAttempts, $retryAfter = null)
+    protected function getHeaders($maxAttempts,
+                                  $remainingAttempts,
+                                  $retryAfter = null,
+                                  ?Response $response = null)
     {
+        if ($response &&
+            $response->headers->get('X-RateLimit-Remaining') &&
+            $response->headers->get('X-RateLimit-Remaining') <= $remainingAttempts) {
+            return [];
+        }
+
         $headers = [
             'X-RateLimit-Limit' => $maxAttempts,
             'X-RateLimit-Remaining' => $remainingAttempts,
@@ -189,10 +227,6 @@ class ThrottleRequests
      */
     protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
     {
-        if (is_null($retryAfter)) {
-            return $this->limiter->retriesLeft($key, $maxAttempts);
-        }
-
-        return 0;
+        return is_null($retryAfter) ? $this->limiter->retriesLeft($key, $maxAttempts) : 0;
     }
 }
