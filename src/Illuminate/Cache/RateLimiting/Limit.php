@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Cache;
+namespace Illuminate\Cache\RateLimiting;
 
 class Limit
 {

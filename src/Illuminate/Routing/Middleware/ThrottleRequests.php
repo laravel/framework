@@ -4,6 +4,7 @@ namespace Illuminate\Routing\Middleware;
 
 use Closure;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
@@ -51,7 +52,11 @@ class ThrottleRequests
             && ! is_null($limiter = $this->limiter->limiter($maxAttempts))) {
             $limit = call_user_func($limiter, $request);
 
-            return $this->handleRequest(
+            if ($limit instanceof Response) {
+                return $limit;
+            }
+
+            return $limit instanceof Unlimited ? $next($request) : $this->handleRequest(
                 $request,
                 $next,
                 md5($maxAttempts.$limit->key),
