@@ -193,7 +193,7 @@ class Stringable
     {
         return collect(explode($delimiter, $this->value, $limit));
     }
-    
+
     /**
      * Split string by a regular expression.
      *
@@ -206,7 +206,7 @@ class Stringable
     {
         $keywords = preg_split($pattern, $this->value, $limit, $flags);
 
-        if(! $keywords) {
+        if (! $keywords) {
             return collect();
         }
 
