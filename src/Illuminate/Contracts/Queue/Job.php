@@ -37,10 +37,10 @@ interface Job
      *
      * Accepts a delay specified in seconds.
      *
-     * @param  int  $delay
+     * @param  int  $backoff
      * @return void
      */
-    public function release($delay = 0);
+    public function release($backoff = 0);
 
     /**
      * Determine if the job was released back into the queue.
