@@ -132,7 +132,7 @@ abstract class Queue
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
             'maxExceptions' => $job->maxExceptions ?? null,
-            'delay' => $this->getJobRetryDelay($job),
+            'delay' => $this->getJobBackoff($job),
             'timeout' => $job->timeout ?? null,
             'timeoutAt' => $this->getJobExpiration($job),
             'data' => [
@@ -162,18 +162,18 @@ abstract class Queue
     }
 
     /**
-     * Get the retry delay for an object-based queue handler.
+     * Get the backoff for an object-based queue handler.
      *
      * @param  mixed  $job
      * @return mixed
      */
-    public function getJobRetryDelay($job)
+    public function getJobBackoff($job)
     {
-        if (! method_exists($job, 'retryAfter') && ! isset($job->retryAfter)) {
+        if (! method_exists($job, 'backoff') && ! isset($job->backoff)) {
             return;
         }
 
-        $delay = $job->retryAfter ?? $job->retryAfter();
+        $delay = $job->backoff ?? $job->backoff();
 
         return $delay instanceof DateTimeInterface
                         ? $this->secondsUntil($delay) : $delay;
