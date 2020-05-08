@@ -272,7 +272,7 @@ abstract class Job
      */
     public function backoff()
     {
-        return $this->payload()['delay'] ?? null;
+        return $this->payload()['backoff'] ?? $this->payload()['delay'] ?? null;
     }
 
     /**
@@ -292,7 +292,7 @@ abstract class Job
      */
     public function retryUntil()
     {
-        return $this->payload()['timeoutAt'] ?? null;
+        return $this->payload()['retryUntil'] ?? $this->payload()['timeoutAt'] ?? null;
     }
 
     /**

@@ -132,9 +132,9 @@ abstract class Queue
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
             'maxExceptions' => $job->maxExceptions ?? null,
-            'delay' => $this->getJobBackoff($job),
+            'backoff' => $this->getJobBackoff($job),
             'timeout' => $job->timeout ?? null,
-            'timeoutAt' => $this->getJobExpiration($job),
+            'retryUntil' => $this->getJobExpiration($job),
             'data' => [
                 'commandName' => $job,
                 'command' => $job,
@@ -213,7 +213,7 @@ abstract class Queue
             'job' => $job,
             'maxTries' => null,
             'maxExceptions' => null,
-            'delay' => null,
+            'backoff' => null,
             'timeout' => null,
             'data' => $data,
         ]);
