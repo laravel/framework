@@ -62,7 +62,7 @@ class ThrottleRequests
                     'key' => $prefix.$this->resolveRequestSignature($request),
                     'maxAttempts' => $this->resolveMaxAttempts($request, $maxAttempts),
                     'decayMinutes' => $decayMinutes,
-                ]
+                ],
             ]
         );
     }
@@ -95,7 +95,7 @@ class ThrottleRequests
                 return (object) [
                     'key' => md5($limiterName.$limit->key),
                     'maxAttempts' => $limit->maxAttempts,
-                    'decayMinutes' => $limit->decayMinutes
+                    'decayMinutes' => $limit->decayMinutes,
                 ];
             })->all()
         );
