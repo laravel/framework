@@ -6,7 +6,6 @@ use Doctrine\Inflector\CachedWordInflector;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\English;
 use Doctrine\Inflector\RulesetInflector;
-use Illuminate\Validation\Rules\In;
 
 class Pluralizer
 {
