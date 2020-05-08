@@ -33,10 +33,44 @@ class Limit
      * @param  int  $decayMinutes
      * @return void
      */
-    public function __construct($key, int $maxAttempts, int $decayMinutes = 1)
+    public function __construct($key = '', int $maxAttempts = 60, int $decayMinutes = 1)
     {
         $this->key = $key;
         $this->maxAttempts = $maxAttempts;
         $this->decayMinutes = $decayMinutes;
+    }
+
+    /**
+     * Create a new rate limit.
+     *
+     * @param  int  $maxAttempts
+     * @return static
+     */
+    public static function perMinute($maxAttempts)
+    {
+        return new static('', $maxAttempts);
+    }
+
+    /**
+     * Create a new unlimited rate limit.
+     *
+     * @return static
+     */
+    public static function none()
+    {
+        return new Unlimited;
+    }
+
+    /**
+     * Set the key of the rate limit.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function by($key)
+    {
+        $this->key = $key;
+
+        return $this;
     }
 }
