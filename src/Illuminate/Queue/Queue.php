@@ -173,10 +173,10 @@ abstract class Queue
             return;
         }
 
-        $delay = $job->backoff ?? $job->backoff();
+        $backoff = $job->backoff ?? $job->backoff();
 
-        return $delay instanceof DateTimeInterface
-                        ? $this->secondsUntil($delay) : $delay;
+        return $backoff instanceof DateTimeInterface
+                        ? $this->secondsUntil($backoff) : $backoff;
     }
 
     /**

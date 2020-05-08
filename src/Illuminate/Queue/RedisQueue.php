@@ -273,16 +273,16 @@ class RedisQueue extends Queue implements QueueContract
      *
      * @param  string  $queue
      * @param  \Illuminate\Queue\Jobs\RedisJob  $job
-     * @param  int  $delay
+     * @param  int  $backoff
      * @return void
      */
-    public function deleteAndRelease($queue, $job, $delay)
+    public function deleteAndRelease($queue, $job, $backoff)
     {
         $queue = $this->getQueue($queue);
 
         $this->getConnection()->eval(
             LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved',
-            $job->getReservedJob(), $this->availableAt($delay)
+            $job->getReservedJob(), $this->availableAt($backoff)
         );
     }
 

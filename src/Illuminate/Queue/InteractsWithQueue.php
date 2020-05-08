@@ -51,13 +51,13 @@ trait InteractsWithQueue
     /**
      * Release the job back into the queue.
      *
-     * @param  int  $delay
+     * @param  int  $backoff
      * @return void
      */
-    public function release($delay = 0)
+    public function release($backoff = 0)
     {
         if ($this->job) {
-            return $this->job->release($delay);
+            return $this->job->release($backoff);
         }
     }
 

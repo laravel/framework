@@ -254,10 +254,10 @@ class QueueWorkerTest extends TestCase
         });
 
         $job->attempts = 1;
-        $job->delaySeconds = 10;
+        $job->backoff = 10;
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
-        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 3, 'maxTries' => 0]));
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 3, 'maxTries' => 0]));
 
         $this->assertEquals(10, $job->releaseAfter);
     }
@@ -424,7 +424,7 @@ class WorkerFakeJob implements QueueJobContract
     public $maxTries;
     public $maxExceptions;
     public $uuid;
-    public $delaySeconds;
+    public $backoff;
     public $timeoutAt;
     public $attempts = 0;
     public $failedWith;
@@ -471,9 +471,9 @@ class WorkerFakeJob implements QueueJobContract
         return $this->uuid;
     }
 
-    public function delaySeconds()
+    public function backoff()
     {
-        return $this->delaySeconds;
+        return $this->backoff;
     }
 
     public function timeoutAt()

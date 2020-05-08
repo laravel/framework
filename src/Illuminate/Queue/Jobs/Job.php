@@ -121,10 +121,10 @@ abstract class Job
     /**
      * Release the job back into the queue.
      *
-     * @param  int  $delay
+     * @param  int  $backoff
      * @return void
      */
-    public function release($delay = 0)
+    public function release($backoff = 0)
     {
         $this->released = true;
     }
@@ -266,11 +266,11 @@ abstract class Job
     }
 
     /**
-     * Get the number of seconds to delay a failed job before retrying it.
+     * Get the number of seconds before a released job will be available.
      *
      * @return int|null
      */
-    public function delaySeconds()
+    public function backoff()
     {
         return $this->payload()['delay'] ?? null;
     }

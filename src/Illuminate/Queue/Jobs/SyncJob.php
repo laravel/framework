@@ -41,12 +41,12 @@ class SyncJob extends Job implements JobContract
     /**
      * Release the job back into the queue.
      *
-     * @param  int  $delay
+     * @param  int  $backoff
      * @return void
      */
-    public function release($delay = 0)
+    public function release($backoff = 0)
     {
-        parent::release($delay);
+        parent::release($backoff);
     }
 
     /**
