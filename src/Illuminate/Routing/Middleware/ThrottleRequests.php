@@ -5,6 +5,7 @@ namespace Illuminate\Routing\Middleware;
 use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
+use Illuminate\Collections\Arr;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
@@ -50,27 +51,19 @@ class ThrottleRequests
         if (is_string($maxAttempts)
             && func_num_args() === 3
             && ! is_null($limiter = $this->limiter->limiter($maxAttempts))) {
-            $limit = call_user_func($limiter, $request);
-
-            if ($limit instanceof Response) {
-                return $limit;
-            }
-
-            return $limit instanceof Unlimited ? $next($request) : $this->handleRequest(
-                $request,
-                $next,
-                md5($maxAttempts.$limit->key),
-                $limit->maxAttempts,
-                $limit->decayMinutes
-            );
+            return $this->handleRequestUsingNamedLimiter($request, $next, $maxAttempts, $limiter);
         }
 
         return $this->handleRequest(
             $request,
             $next,
-            $prefix.$this->resolveRequestSignature($request),
-            $this->resolveMaxAttempts($request, $maxAttempts),
-            $decayMinutes
+            [
+                (object) [
+                    'key' => $prefix.$this->resolveRequestSignature($request),
+                    'maxAttempts' => $this->resolveMaxAttempts($request, $maxAttempts),
+                    'decayMinutes' => $decayMinutes,
+                ]
+            ]
         );
     }
 
@@ -79,28 +72,66 @@ class ThrottleRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string  $key
-     * @param  int|string  $maxAttempts
-     * @param  float|int  $decayMinutes
+     * @param  string  $limiterName
+     * @param  \Closure  $limiter
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
-    protected function handleRequest($request, Closure $next, $key, $maxAttempts, $decayMinutes)
+    protected function handleRequestUsingNamedLimiter($request, Closure $next, $limiterName, Closure $limiter)
     {
-        if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
-            throw $this->buildException($key, $maxAttempts);
+        $limiterResponse = call_user_func($limiter, $request);
+
+        if ($limiterResponse instanceof Response) {
+            return $limit;
+        } elseif ($limiterResponse instanceof Unlimited) {
+            return $next($request);
         }
 
-        $this->limiter->hit($key, $decayMinutes * 60);
+        return $this->handleRequest(
+            $request,
+            $next,
+            collect(Arr::wrap($limiterResponse))->map(function ($limit) use ($limiterName) {
+                return (object) [
+                    'key' => md5($limiterName.$limit->key),
+                    'maxAttempts' => $limit->maxAttempts,
+                    'decayMinutes' => $limit->decayMinutes
+                ];
+            })->all()
+        );
+    }
+
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  array  $limits
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
+     */
+    protected function handleRequest($request, Closure $next, array $limits)
+    {
+        foreach ($limits as $limit) {
+            if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
+                throw $this->buildException($limit->key, $limit->maxAttempts);
+            }
+
+            $this->limiter->hit($limit->key, $limit->decayMinutes * 60);
+        }
 
         $response = $next($request);
 
-        return $this->addHeaders(
-            $response,
-            $maxAttempts,
-            $this->calculateRemainingAttempts($key, $maxAttempts)
-        );
+        foreach ($limits as $limit) {
+            $response = $this->addHeaders(
+                $response,
+                $limit->maxAttempts,
+                $this->calculateRemainingAttempts($limit->key, $limit->maxAttempts)
+            );
+        }
+
+        return $response;
     }
 
     /**
