@@ -51,7 +51,7 @@ class CallQueuedListener implements ShouldQueue
      *
      * @var int
      */
-    public $timeoutAt;
+    public $retryUntil;
 
     /**
      * The number of seconds the job can run before timing out.

@@ -421,13 +421,13 @@ class Worker
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
-        $timeoutAt = $job->timeoutAt();
+        $retryUntil = $job->retryUntil();
 
-        if ($timeoutAt && Carbon::now()->getTimestamp() <= $timeoutAt) {
+        if ($retryUntil && Carbon::now()->getTimestamp() <= $retryUntil) {
             return;
         }
 
-        if (! $timeoutAt && ($maxTries === 0 || $job->attempts() <= $maxTries)) {
+        if (! $retryUntil && ($maxTries === 0 || $job->attempts() <= $maxTries)) {
             return;
         }
 
@@ -449,7 +449,7 @@ class Worker
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
-        if ($job->timeoutAt() && $job->timeoutAt() <= Carbon::now()->getTimestamp()) {
+        if ($job->retryUntil() && $job->retryUntil() <= Carbon::now()->getTimestamp()) {
             $this->failJob($job, $e);
         }
 

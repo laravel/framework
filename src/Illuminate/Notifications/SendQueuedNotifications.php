@@ -138,11 +138,11 @@ class SendQueuedNotifications implements ShouldQueue
      */
     public function retryUntil()
     {
-        if (! method_exists($this->notification, 'retryUntil') && ! isset($this->notification->timeoutAt)) {
+        if (! method_exists($this->notification, 'retryUntil') && ! isset($this->notification->retryUntil)) {
             return;
         }
 
-        return $this->notification->timeoutAt ?? $this->notification->retryUntil();
+        return $this->notification->retryUntil ?? $this->notification->retryUntil();
     }
 
     /**

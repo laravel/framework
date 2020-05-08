@@ -168,7 +168,7 @@ class QueueWorkerTest extends TestCase
             throw $e;
         });
 
-        $job->timeoutAt = now()->addSeconds(1)->getTimestamp();
+        $job->retryUntil = now()->addSeconds(1)->getTimestamp();
 
         $job->attempts = 0;
 
@@ -212,7 +212,7 @@ class QueueWorkerTest extends TestCase
             $job->attempts++;
         });
 
-        $job->timeoutAt = Carbon::now()->addSeconds(2)->getTimestamp();
+        $job->retryUntil = Carbon::now()->addSeconds(2)->getTimestamp();
 
         $job->attempts = 1;
 
@@ -425,7 +425,7 @@ class WorkerFakeJob implements QueueJobContract
     public $maxExceptions;
     public $uuid;
     public $backoff;
-    public $timeoutAt;
+    public $retryUntil;
     public $attempts = 0;
     public $failedWith;
     public $failed = false;
@@ -476,9 +476,9 @@ class WorkerFakeJob implements QueueJobContract
         return $this->backoff;
     }
 
-    public function timeoutAt()
+    public function retryUntil()
     {
-        return $this->timeoutAt;
+        return $this->retryUntil;
     }
 
     public function delete()
