@@ -17,18 +17,18 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected $redis;
 
     /**
-     * The timestamp of the end of the current duration.
+     * The timestamp of the end of the current duration by key.
      *
-     * @var int
+     * @var array
      */
-    public $decaysAt;
+    public $decaysAt = [];
 
     /**
-     * The number of remaining slots.
+     * The number of remaining slots by key.
      *
-     * @var int
+     * @var array
      */
-    public $remaining;
+    public $remaining = [];
 
     /**
      * Create a new request throttler.
