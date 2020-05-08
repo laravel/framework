@@ -41,6 +41,11 @@ class QueuedListenersTestEvent
 
 class QueuedListenersTestListenerShouldQueue implements ShouldQueue
 {
+    public function handle()
+    {
+        //
+    }
+
     public function shouldQueue()
     {
         return true;
@@ -49,6 +54,11 @@ class QueuedListenersTestListenerShouldQueue implements ShouldQueue
 
 class QueuedListenersTestListenerShouldNotQueue implements ShouldQueue
 {
+    public function handle()
+    {
+        //
+    }
+
     public function shouldQueue()
     {
         return false;
