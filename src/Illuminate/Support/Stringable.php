@@ -195,7 +195,7 @@ class Stringable
     }
 
     /**
-     * Split string by a regular expression.
+     * Split a string using a regular expression.
      *
      * @param  string  $pattern
      * @param  int  $limit
@@ -204,13 +204,9 @@ class Stringable
      */
     public function split($pattern, $limit = -1, $flags = 0)
     {
-        $keywords = preg_split($pattern, $this->value, $limit, $flags);
+        $segments = preg_split($pattern, $this->value, $limit, $flags);
 
-        if (! $keywords) {
-            return collect();
-        }
-
-        return collect($keywords);
+        return ! empty($segments) ? collect($segments) : collect();
     }
 
     /**
