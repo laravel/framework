@@ -445,12 +445,18 @@ class Dispatcher implements DispatcherContract
     protected function createQueuedHandlerCallable($class, $method)
     {
         return function () use ($class, $method) {
-            $arguments = array_map(function ($a) {
-                return is_object($a) ? clone $a : $a;
-            }, func_get_args());
+            $arguments = func_get_args();
 
             if ($this->handlerWantsToBeQueued($class, $arguments)) {
+                $arguments = array_map(function ($a) {
+                    return is_object($a) ? clone $a : $a;
+                }, $arguments);
+
                 $this->queueHandler($class, $method, $arguments);
+            } else {
+                call_user_func_array(
+                    [$this->container->make($class), $method], $arguments
+                );
             }
         };
     }

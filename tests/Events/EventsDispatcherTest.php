@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Events;
 
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -374,6 +375,17 @@ class EventsDispatcherTest extends TestCase
         unset($_SERVER['__event.test1']);
         unset($_SERVER['__event.test2']);
     }
+
+    public function testReturningFalseFromListenerThatImplementsShouldQueueExecutesTheListenerSynchronously()
+    {
+        $d = new Dispatcher;
+        $d->listen(AnotherEvent::class, SynchronousShouldQueueListener::class);
+        $d->dispatch($e = new AnotherEvent, ['foo']);
+
+        $this->assertSame($e, $_SERVER['__event.test.shouldqueue']);
+
+        unset($_SERVER['__event.test.shouldqueue']);
+    }
 }
 
 class ExampleEvent
@@ -389,4 +401,17 @@ interface SomeEventInterface
 class AnotherEvent implements SomeEventInterface
 {
     //
+}
+
+class SynchronousShouldQueueListener implements ShouldQueue
+{
+    public function handle($arg)
+    {
+        $_SERVER['__event.test.shouldqueue'] = $arg;
+    }
+
+    public function shouldQueue()
+    {
+        return false;
+    }
 }
