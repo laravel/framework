@@ -399,7 +399,7 @@ class Worker
                 $job->release(
                     method_exists($job, 'delaySeconds') && ! is_null($job->delaySeconds())
                                 ? $job->delaySeconds()
-                                : $options->delay
+                                : $options->backoff
                 );
             }
         }

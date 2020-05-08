@@ -40,7 +40,7 @@ class QueueListenerTest extends TestCase
     {
         $listener = new Listener(__DIR__);
         $options = new ListenerOptions;
-        $options->delay = 1;
+        $options->backoff = 1;
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
@@ -56,7 +56,7 @@ class QueueListenerTest extends TestCase
     {
         $listener = new Listener(__DIR__);
         $options = new ListenerOptions('test');
-        $options->delay = 1;
+        $options->backoff = 1;
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
@@ -72,7 +72,7 @@ class QueueListenerTest extends TestCase
     {
         $listener = new Listener(__DIR__);
         $options = new ListenerOptions('test');
-        $options->delay = 1;
+        $options->backoff = 1;
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess(null, 'queue', $options);

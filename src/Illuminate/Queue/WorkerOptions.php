@@ -9,7 +9,7 @@ class WorkerOptions
      *
      * @var int
      */
-    public $delay;
+    public $backoff;
 
     /**
      * The maximum amount of RAM the worker may consume.
@@ -56,7 +56,7 @@ class WorkerOptions
     /**
      * Create a new worker options instance.
      *
-     * @param  int  $delay
+     * @param  int  $backoff
      * @param  int  $memory
      * @param  int  $timeout
      * @param  int  $sleep
@@ -65,9 +65,9 @@ class WorkerOptions
      * @param  bool  $stopWhenEmpty
      * @return void
      */
-    public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1, $force = false, $stopWhenEmpty = false)
+    public function __construct($backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1, $force = false, $stopWhenEmpty = false)
     {
-        $this->delay = $delay;
+        $this->backoff = $backoff;
         $this->sleep = $sleep;
         $this->force = $force;
         $this->memory = $memory;

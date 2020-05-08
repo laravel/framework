@@ -152,7 +152,7 @@ class Listener
             $connection,
             '--once',
             "--queue={$queue}",
-            "--delay={$options->delay}",
+            "--delay={$options->backoff}",
             "--memory={$options->memory}",
             "--sleep={$options->sleep}",
             "--tries={$options->maxTries}",

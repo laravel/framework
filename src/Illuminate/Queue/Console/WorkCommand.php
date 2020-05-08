@@ -25,7 +25,8 @@ class WorkCommand extends Command
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
                             {--stop-when-empty : Stop when the queue is empty}
-                            {--delay=0 : The number of seconds to delay failed jobs}
+                            {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
+                            {--backoff=0 : The number of seconds before a released job will be available}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
                             {--sleep=3 : Number of seconds to sleep when no job is available}
@@ -120,8 +121,12 @@ class WorkCommand extends Command
      */
     protected function gatherWorkerOptions()
     {
+        $backoff = $this->hasOption('backoff')
+                    ? $this->option('backoff')
+                    : $this->option('delay');
+
         return new WorkerOptions(
-            $this->option('delay'), $this->option('memory'),
+            $backoff, $this->option('memory'),
             $this->option('timeout'), $this->option('sleep'),
             $this->option('tries'), $this->option('force'),
             $this->option('stop-when-empty')
