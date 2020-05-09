@@ -122,15 +122,21 @@ class Pluralizer
         return $value;
     }
 
-    protected static function inflector()
+    public static function inflector()
     {
-        return new Inflector(
-            new CachedWordInflector(new RulesetInflector(
-                English\Rules::getSingularRuleset()
-            )),
-            new CachedWordInflector(new RulesetInflector(
-                English\Rules::getPluralRuleset()
-            ))
-        );
+        static $inflector;
+
+        if ($inflector === null) {
+            $inflector = new Inflector(
+                new CachedWordInflector(new RulesetInflector(
+                    English\Rules::getSingularRuleset()
+                )),
+                new CachedWordInflector(new RulesetInflector(
+                    English\Rules::getPluralRuleset()
+                ))
+            );
+        }
+
+        return $inflector;
     }
 }
