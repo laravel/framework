@@ -431,13 +431,14 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
-     * Create a new instance of the given model. 
+     * Create a new instance of the given model.
      *
      * @param  array  $attributes
      * @param  bool  $fillWithAttributes if true will fill with $attributes
      * @return static
      */
-    protected function newMorphInstance(array $attributes, $fillAttributes = true) {
+    protected function newMorphInstance(array $attributes, $fillAttributes = true)
+    {
         return new static($fillAttributes ? $attributes : []);
     }
 
