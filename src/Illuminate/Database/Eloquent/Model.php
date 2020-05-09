@@ -407,14 +407,15 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      *
      * @param  array  $attributes
      * @param  bool  $exists
+     * @param  bool  $fillWithAttributes if true will fill with $attributes
      * @return static
      */
-    public function newInstance($attributes = [], $exists = false)
+    public function newInstance($attributes = [], $exists = false, $fillAttributes = true)
     {
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
         // hydration of new objects via the Eloquent query builder instances.
-        $model = new static((array) $attributes);
+        $model = $this->newMorphInstance((array) $attributes, $fillAttributes);
 
         $model->exists = $exists;
 
@@ -430,6 +431,17 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
+     * Create a new instance of the given model. 
+     *
+     * @param  array  $attributes
+     * @param  bool  $fillWithAttributes if true will fill with $attributes
+     * @return static
+     */
+    protected function newMorphInstance(array $attributes, $fillAttributes = true) {
+        return new static($fillAttributes ? $attributes : []);
+    }
+
+    /**
      * Create a new model instance that is existing.
      *
      * @param  array  $attributes
@@ -438,7 +450,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function newFromBuilder($attributes = [], $connection = null)
     {
-        $model = $this->newInstance([], true);
+        $model = $this->newInstance($attributes, true, false);
 
         $model->setRawAttributes((array) $attributes, true);
 
