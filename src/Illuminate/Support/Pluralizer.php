@@ -122,6 +122,11 @@ class Pluralizer
         return $value;
     }
 
+    /**
+     * Get the inflector instance.
+     *
+     * @return \Doctrine\Inflector\Inflector
+     */
     public static function inflector()
     {
         static $inflector;
