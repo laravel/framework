@@ -20,7 +20,7 @@ trait SelfMorphModel
     public static function getMorphType($className = null)
     {
         $className = $className ? $className : static::class;
-        
+
         return array_search($className, self::$morphTypes);
     }
 
