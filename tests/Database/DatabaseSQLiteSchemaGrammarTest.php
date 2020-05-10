@@ -126,6 +126,42 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertFalse($schema->hasColumn('users', 'name'));
     }
 
+    public function testDropColumns()
+    {
+        if (! class_exists(SqliteSchemaManager::class)) {
+            $this->markTestSkipped('Doctrine should be installed to run dropColumn tests');
+        }
+
+        $db = new Manager;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => 'prefix_',
+        ]);
+
+        $schema = $db->getConnection()->getSchemaBuilder();
+
+        $schema->create('users', function (Blueprint $table) {
+            $table->string('email');
+            $table->string('name');
+            $table->string('gender');
+        });
+
+        
+        $this->assertTrue($schema->hasTable('users'));
+        $this->assertTrue($schema->hasColumn('users', 'name'));
+        $this->assertTrue($schema->hasColumn('users', 'gender'));
+
+        $schema->table('users', function (Blueprint $table) {
+            $table->dropColumn('name');
+            $table->dropColumn('gender');
+        });
+
+        $this->assertFalse($schema->hasColumn('users', 'name'));
+        $this->assertFalse($schema->hasColumn('users', 'gender'));
+    }
+
     public function testDropSpatialIndex()
     {
         $this->expectException(RuntimeException::class);
