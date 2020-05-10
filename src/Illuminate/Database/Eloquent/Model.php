@@ -410,7 +410,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @param  bool  $fillWithAttributes if true will fill with $attributes
      * @return static
      */
-    public function newInstance($attributes = [], $exists = false, $fillAttributes = true)
+    protected function newInstanceFillWithAttributes($attributes = [], $exists = false, $fillAttributes = true)
     {
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
@@ -443,6 +443,18 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
+     * Create a new instance of the given model.
+     *
+     * @param  array  $attributes
+     * @param  bool  $exists
+     * @return static
+     */
+    public function newInstance($attributes = [], $exists = false)
+    {
+        return $this->newInstanceFillWithAttributes($attributes, $exists, true);
+    }
+
+    /**
      * Create a new model instance that is existing.
      *
      * @param  array  $attributes
@@ -451,7 +463,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function newFromBuilder($attributes = [], $connection = null)
     {
-        $model = $this->newInstance($attributes, true, false);
+        $model = $this->newInstanceFillWithAttributes($attributes, true, false);
 
         $model->setRawAttributes((array) $attributes, true);
 
