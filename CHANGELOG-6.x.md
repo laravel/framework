@@ -2,6 +2,15 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.18.13...6.x)
 
+### Added
+- Added SSL SYSCALL EOF as a lost connection message ([#32697](https://github.com/laravel/framework/pull/32697))
+
+### Fixed
+- Fixed `FakerGenerator` Unique caching issue ([#32703](https://github.com/laravel/framework/pull/32703))
+- Added boolean to types that don't need character options ([#32716](https://github.com/laravel/framework/pull/32716))
+- Fixed `Illuminate\Foundation\Testing\PendingCommand` that do not resolve 'OutputStyle::class' from the container ([#32687](https://github.com/laravel/framework/pull/32687))
+- Clear resolved event facade on `Illuminate\Foundation\Testing\Concerns\MocksApplicationServices::withoutEvents()` ([d1e7f85](https://github.com/laravel/framework/commit/d1e7f85dfd79abbe4f5e01818f620f6ecc67de4d))
+
 
 ## [v6.18.13 (2020-05-05)](https://github.com/laravel/framework/compare/v6.18.12...v6.18.13)
 
