@@ -140,12 +140,11 @@ class Blueprint
     protected function ensureCommandsAreValid(Connection $connection)
     {
         if ($connection instanceof SQLiteConnection) {
-
             if ($this->commandsNamed(['dropColumn'])->count() > 1) {
                 // make separete dropColumn as one supportable array
                 $arrayColumns = [];
                 foreach ($this->commands as $key => $command) {
-                    if($command->name == 'dropColumn') {
+                    if ($command->name == 'dropColumn') {
                         $arrayColumns[] = $command->columns;
                         unset($this->commands[$key]);
                     }
@@ -164,12 +163,12 @@ class Blueprint
                 return new Fluent();
             }
 
-            // Fix new added not null columns to table
-            if(!$this->creating()) {
+            // Fix Cannot add a NOT NULL column with default value NULL
+            if (!$this->creating()) {
                 foreach ($this->columns as $key => $column) {
-                    if(!isset($column['change'])) {
-                        if(!isset($column['nullable'])) {
-                            $this->columns[$key]['nullable'] = true;  
+                    if (!isset($column['change'])) {
+                        if (!isset($column['nullable'])) {
+                            $this->columns[$key]['nullable'] = true;
                         }
                     }
                 }
@@ -1327,7 +1326,8 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type, compact('index', 'columns', 'algorithm')
+            $type,
+            compact('index', 'columns', 'algorithm')
         );
     }
 
