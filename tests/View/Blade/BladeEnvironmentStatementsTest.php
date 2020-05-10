@@ -21,11 +21,11 @@ boom
 
     public function testProductionStatementsAreCompiled()
     {
-        $string = "@production
+        $string = '@production
 breeze
 @else
 boom
-@endproduction";
+@endproduction';
         $expected = "<?php if(app()->environment('production')): ?>
 breeze
 <?php else: ?>
