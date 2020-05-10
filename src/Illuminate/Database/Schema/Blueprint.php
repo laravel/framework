@@ -140,16 +140,39 @@ class Blueprint
     protected function ensureCommandsAreValid(Connection $connection)
     {
         if ($connection instanceof SQLiteConnection) {
-            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1) {
+
+            if ($this->commandsNamed(['dropColumn'])->count() > 1) {
+                // make separete dropColumn as one supportable array
+                $arrayColumns = [];
+                foreach ($this->commands as $key => $command) {
+                    if($command->name == 'dropColumn'){
+                        $arrayColumns[] = $command->columns;
+                        unset($this->commands[$key]);
+                    }
+                }
+                $this->dropColumn(collect($arrayColumns)->flatten()->toArray());
+            }
+
+            if ($this->commandsNamed(['renameColumn'])->count() > 1) {
                 throw new BadMethodCallException(
-                    "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
+                    "SQLite doesn't support multiple calls to renameColumn in a single modification."
                 );
             }
 
+            // Ignore Droping foreign key
             if ($this->commandsNamed(['dropForeign'])->count() > 0) {
-                throw new BadMethodCallException(
-                    "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
-                );
+                return new Fluent();
+            }
+
+            // Fix new added not null columns to table
+            if(!$this->creating()){
+                foreach ($this->columns as $key => $column) {
+                    if(!isset($column['change'])){
+                        if(!isset($column['nullable'])){
+                            $this->columns[$key]['nullable'] =true;  
+                        }
+                    }
+                }
             }
         }
     }
