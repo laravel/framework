@@ -1,6 +1,36 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.10.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.10.3...7.x)
+
+### Added
+- Added support for FILTER_FLAG_EMAIL_UNICODE via "email:filter_unicode" in email validator ([#32711](https://github.com/laravel/framework/pull/32711), [43a1ed1](https://github.com/laravel/framework/commit/43a1ed1ee272b77547d292af7d337c745cccd48a))
+- Added `Illuminate\Support\Stringable::split()` ([#32713](https://github.com/laravel/framework/pull/32713), [19c5054](https://github.com/laravel/framework/commit/19c5054eff4d00d234cd928db1e085aaa14c4692))
+- Added `orWhereIntegerInRaw()` and `orWhereIntegerNotInRaw()` to `Illuminate\Database\Query\Builder` ([#32710](https://github.com/laravel/framework/pull/32710))
+- Added `Illuminate\Cache\DatabaseStore::add()` ([7fc452b](https://github.com/laravel/framework/commit/7fc452bd8d6cebd7e7a0c6cd057aea7d4e9a7fc0))
+
+### Fixed
+- Fixed belongsToMany child relationship solving ([c5e88be](https://github.com/laravel/framework/commit/c5e88be082bc690961889812360cd6c5ba983117))
+- Allow overriding the MySQL server version for strict mode ([#32708](https://github.com/laravel/framework/pull/32708))
+- Added boolean to types that don't need character options ([#32716](https://github.com/laravel/framework/pull/32716))
+- Fixed `Illuminate\Foundation\Testing\PendingCommand` that do not resolve 'OutputStyle::class' from the container ([#32687](https://github.com/laravel/framework/pull/32687))
+- Clear resolved event facade on `Illuminate\Foundation\Testing\Concerns\MocksApplicationServices::withoutEvents()` ([d1e7f85](https://github.com/laravel/framework/commit/d1e7f85dfd79abbe4f5e01818f620f6ecc67de4d))
+
+
+## [v7.10.3 (2020-05-06)](https://github.com/laravel/framework/compare/v7.10.2...v7.10.3)
+
+### Added
+- Added `Illuminate\Http\Client\Response::failed()` ([#32699](https://github.com/laravel/framework/pull/32699))
+- Added SSL SYSCALL EOF as a lost connection message ([#32697](https://github.com/laravel/framework/pull/32697))
+
+### Fixed
+- Fixed `FakerGenerator` Unique caching issue ([#32703](https://github.com/laravel/framework/pull/32703))
+- Set/reset the select to from.* in `Illuminate/Database/Query/Builder::runPaginationCountQuery()` ([858f454](https://github.com/laravel/framework/commit/858f4544d5672bf277686bdb112b1ce055416413), [98a242e](https://github.com/laravel/framework/commit/98a242e21041462054b965e587c250ac7be4f912))
+
+
+## [v7.10.2 (2020-05-06)](https://github.com/laravel/framework/compare/v7.10.1...v7.10.2)
+
+### Fixed
+- Updated `Illuminate\Database\Query\Builder::runPaginationCountQuery()`  to support groupBy and sub-selects ([#32688](https://github.com/laravel/framework/pull/32688))
 
 
 ## [v7.10.1 (2020-05-05)](https://github.com/laravel/framework/compare/v7.10.0...v7.10.1)
