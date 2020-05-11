@@ -252,7 +252,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * @param  callable  $callback
      * @return mixed
      */
-    public function usingConnection(string $name, callable $callback)
+    public function usingConnection($name, callable $callback)
     {
         $previousName = $this->getDefaultConnection();
 
