@@ -78,6 +78,13 @@ class BelongsToMany extends Relation
     protected $pivotWhereIns = [];
 
     /**
+     * Any pivot table restrictions for whereNull clauses.
+     *
+     * @var array
+     */
+    protected $pivotWhereNulls = [];
+
+    /**
      * The default values for the pivot columns.
      *
      * @var array
@@ -514,6 +521,8 @@ class BelongsToMany extends Relation
      */
     public function wherePivotNull($column, $boolean = 'and', $not = false)
     {
+        $this->pivotWhereNulls[] = func_get_args();
+
         return $this->whereNull($this->table.'.'.$column, $boolean, $not);
     }
 
