@@ -5,7 +5,7 @@ namespace Illuminate\Queue;
 class WorkerOptions
 {
     /**
-     * The number of seconds to wait before retrying a job that encountered an uncaught exception
+     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
      * @var int
      */
