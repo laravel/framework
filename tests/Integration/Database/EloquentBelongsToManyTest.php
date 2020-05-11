@@ -52,7 +52,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         Schema::create('posts_tags', function (Blueprint $table) {
             $table->integer('post_id');
             $table->integer('tag_id');
-            $table->string('flag')->default('');
+            $table->string('flag')->default('')->nullable();
             $table->timestamps();
         });
 
@@ -763,6 +763,40 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $relationTags = $post->tags()->wherePivotIn('flag', ['foo'])->orWherePivotNotIn('flag', ['baz'])->get();
         $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag1->id, $tag2->id]);
+    }
+
+    public function testWherePivotNullMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => null],
+        ]);
+
+        $relationTag = $post->tagsWithExtraPivot()->wherePivotNull('flag')->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag2->getAttributes());
+    }
+
+    public function testWherePivotNotNullMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => null],
+        ]);
+
+        $relationTag = $post->tagsWithExtraPivot()->wherePivotNotNull('flag')->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag1->getAttributes());
     }
 
     public function testCanUpdateExistingPivot()
