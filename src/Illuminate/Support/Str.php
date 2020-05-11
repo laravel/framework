@@ -603,13 +603,10 @@ class Str
 
     public static function startCase($value)
     {
-        //       return Str::of($input)
-        // ->studly()
-        // ->replaceMatches("([A-Z])", " $0")
-        // ->trim()
-        // ->__toString();
         $value = static::studly($value);
-        $value = preg_replace("([A-Z])", " $0", $value, -1);
+
+        $value = preg_replace('([A-Z])', ' $0', $value, -1);
+        
         $value = trim($value);
 
         return $value;
