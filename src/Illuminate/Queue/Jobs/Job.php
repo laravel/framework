@@ -266,7 +266,7 @@ abstract class Job
     }
 
     /**
-     * The number of seconds to wait before retrying a job that encountered an uncaught exception
+     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
      * @return int|null
      */
