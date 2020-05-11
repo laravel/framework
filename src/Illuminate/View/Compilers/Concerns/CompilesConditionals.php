@@ -48,6 +48,47 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the env statements into valid PHP.
+     *
+     * @param  string  $environment
+     * @return string
+     */
+    protected function compileEnv($environment)
+    {
+        return "<?php if(app()->environment{$environment}): ?>";
+    }
+
+    /**
+     * Compile the end-env statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndEnv()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the production statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileProduction()
+    {
+        return "<?php if(app()->environment('production')): ?>";
+    }
+
+    /**
+     * Compile the end-production statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndProduction()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
      * Compile the if-guest statements into valid PHP.
      *
      * @param  string|null  $guard
