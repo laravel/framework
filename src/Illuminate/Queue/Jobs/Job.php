@@ -266,7 +266,7 @@ abstract class Job
     }
 
     /**
-     * Get the number of seconds before a released job will be available.
+     * The number of seconds to wait before retrying a job that encountered an uncaught exception
      *
      * @return int|null
      */
