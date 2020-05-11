@@ -567,6 +567,22 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
+     * Eager load relationship counts on the polymorphic relation of a model.
+     *
+     * @param  string $relation
+     * @param  array  $relations
+     * @return $this
+     */
+    public function loadMorphCount($relation, $relations)
+    {
+        $className = get_class($this->{$relation});
+
+        $this->{$relation}->loadCount($relations[$className] ?? []);
+
+        return $this;
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
