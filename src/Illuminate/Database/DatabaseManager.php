@@ -246,19 +246,21 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * Set the database connection for the callback execution.
+     * Set the default database connection for the callback execution.
      *
      * @param  string  $name
      * @param  callable  $callback
-     * @return void
+     * @return mixed
      */
     public function usingConnection(string $name, callable $callback)
     {
         $previousName = $this->getDefaultConnection();
 
         $this->setDefaultConnection($name);
-        $callback();
-        $this->setDefaultConnection($previousName);
+
+        return tap($callback(), function () use ($previousName) {
+            $this->setDefaultConnection($previousName);
+        });
     }
 
     /**
