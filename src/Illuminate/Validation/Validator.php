@@ -250,7 +250,7 @@ class Validator implements ValidatorContract
                 $value = $this->parseData($value);
             }
 
-            $key = str_replace(['.', '*'], ['->', '__asterisk__'], $key);
+            $key = str_replace('*', '__asterisk__', $key);
 
             $newData[$key] = $value;
         }
@@ -288,8 +288,6 @@ class Validator implements ValidatorContract
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
         foreach ($this->rules as $attribute => $rules) {
-            $attribute = str_replace('\.', '->', $attribute);
-
             if ($this->shouldBeExcluded($attribute)) {
                 $this->removeAttribute($attribute);
 
