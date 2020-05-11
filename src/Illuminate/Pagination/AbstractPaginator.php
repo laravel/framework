@@ -292,6 +292,20 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Load a set of relationship counts onto the mixed relationship collection.
+     *
+     * @param  string  $relation
+     * @param  array  $relations
+     * @return $this
+     */
+    public function loadMorphCount($relation, $relations)
+    {
+        $this->getCollection()->loadMorphCount($relation, $relations);
+
+        return $this;
+    }
+
+    /**
      * Get the slice of items being paginated.
      *
      * @return array
