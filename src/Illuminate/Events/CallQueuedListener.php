@@ -40,18 +40,18 @@ class CallQueuedListener implements ShouldQueue
     public $tries;
 
     /**
-     * The number of seconds to wait before retrying the job.
+     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
      * @var int
      */
-    public $retryAfter;
+    public $backoff;
 
     /**
      * The timestamp indicating when the job should timeout.
      *
      * @var int
      */
-    public $timeoutAt;
+    public $retryUntil;
 
     /**
      * The number of seconds the job can run before timing out.
