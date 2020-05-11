@@ -353,7 +353,8 @@ class SupportStringableTest extends TestCase
 
     public function testLimit()
     {
-        $this->assertSame('Laravel is...',
+        $this->assertSame(
+            'Laravel is...',
             (string) $this->stringable('Laravel is a free, open source PHP web application framework.')->limit(10)
         );
         $this->assertSame('这是一...', (string) $this->stringable('这是一段中文')->limit(6));
@@ -454,6 +455,19 @@ class SupportStringableTest extends TestCase
         $this->assertSame('fooBar', (string) $this->stringable('foo_bar')->camel()); // test cache
         $this->assertSame('fooBarBaz', (string) $this->stringable('Foo-barBaz')->camel());
         $this->assertSame('fooBarBaz', (string) $this->stringable('foo-bar_baz')->camel());
+    }
+
+    public function testStartCase()
+    {
+        $this->assertSame('Laravel Php Framework', (string) $this->stringable('Laravel_Php_framework')->startCase());
+        $this->assertSame('Laravel Php Framework', (string) $this->stringable('Laravel_php_framework')->startCase());
+        $this->assertSame('Laravel Php Framework', (string) $this->stringable('Laravel-php_framework')->startCase());
+        $this->assertSame('Laravel Php Framework', (string) $this->stringable('Laravel  -_-  php   -_-   framework   ')->startCase());
+
+        $this->assertSame('Foo Bar', (string) $this->stringable('FooBar')->startCase());
+        $this->assertSame('Foo Bar', (string) $this->stringable('foo_bar')->startCase());
+        $this->assertSame('Foo Bar Baz', (string) $this->stringable('Foo-barBaz')->startCase());
+        $this->assertSame('Foo Bar Baz', (string) $this->stringable('foo-bar_baz')->startCase());
     }
 
     public function testSubstr()

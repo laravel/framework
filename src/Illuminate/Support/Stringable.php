@@ -459,6 +459,17 @@ class Stringable
     }
 
     /**
+     * Convert the given string to start case.
+     *
+     * @param  string  $prefix
+     * @return static
+     */
+    public function startCase()
+    {
+        return new static(Str::startCase($this->value));
+    }
+
+    /**
      * Convert the given string to upper-case.
      *
      * @return static

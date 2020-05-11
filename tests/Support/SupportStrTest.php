@@ -409,6 +409,19 @@ class SupportStrTest extends TestCase
         $this->assertSame('fooBarBaz', Str::camel('foo-bar_baz'));
     }
 
+    public function testStartCase()
+    {
+        $this->assertSame('Laravel Php Framework', Str::startCase('Laravel_php_framework'));
+        $this->assertSame('Laravel Php Framework', Str::startCase('Laravel-php-framework'));
+        $this->assertSame('Laravel Php Framework', Str::startCase('Laravel  -_-  php   -_-   framework   '));
+
+        $this->assertSame('Foo Bar', Str::startCase('FooBar'));
+        $this->assertSame('Foo Bar', Str::startCase('foo_bar'));
+        $this->assertSame('Foo Bar', Str::startCase('foo_bar')); // test cache
+        $this->assertSame('Foo Bar Baz', Str::startCase('Foo-barBaz'));
+        $this->assertSame('Foo Bar Baz', Str::startCase('foo-bar_baz'));
+    }
+
     public function testSubstr()
     {
         $this->assertSame('Ё', Str::substr('БГДЖИЛЁ', -1));
