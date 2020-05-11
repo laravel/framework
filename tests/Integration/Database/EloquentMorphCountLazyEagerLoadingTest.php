@@ -44,7 +44,7 @@ class EloquentMorphCountLazyEagerLoadingTest extends DatabaseTestCase
         $comment = Comment::first();
 
         $comment->loadMorphCount('commentable', [
-            Post::class => ['likes']
+            Post::class => ['likes'],
         ]);
 
         $this->assertTrue($comment->relationLoaded('commentable'));
