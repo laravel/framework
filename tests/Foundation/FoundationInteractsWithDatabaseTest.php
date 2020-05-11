@@ -110,6 +110,13 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseCount($this->table, 1);
     }
 
+    public function testAssertTableEntriesCountWithData()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseCount($this->table, 1, $this->data);
+    }
+
     public function testAssertTableEntriesCountWrong()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -117,6 +124,16 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->mockCountBuilder(1);
 
         $this->assertDatabaseCount($this->table, 3);
+    }
+
+    public function testAssertTableEntriesCountWrongWithData()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that table [products] matches expected entries count of 0. Entries found: 1.');
+
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseCount($this->table, 0, $this->data);
     }
 
     public function testAssertDeletedPassesWhenDoesNotFindResults()

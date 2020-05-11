@@ -30,17 +30,26 @@ class CountInDatabase extends Constraint
     protected $actualCount;
 
     /**
+     * The data that will be used to narrow the search in the database table.
+     *
+     * @var array
+     */
+    protected $data;
+
+    /**
      * Create a new constraint instance.
      *
      * @param  \Illuminate\Database\Connection  $database
      * @param  int  $expectedCount
      * @return void
      */
-    public function __construct(Connection $database, int $expectedCount)
+    public function __construct(Connection $database, int $expectedCount, array $data = [])
     {
         $this->expectedCount = $expectedCount;
 
         $this->database = $database;
+
+        $this->data = $data;
     }
 
     /**
@@ -51,7 +60,7 @@ class CountInDatabase extends Constraint
      */
     public function matches($table): bool
     {
-        $this->actualCount = $this->database->table($table)->count();
+        $this->actualCount = $this->getActualCount($table);
 
         return $this->actualCount === $this->expectedCount;
     }
@@ -68,6 +77,23 @@ class CountInDatabase extends Constraint
             "table [%s] matches expected entries count of %s. Entries found: %s.\n",
             $table, $this->expectedCount, $this->actualCount
         );
+    }
+
+    /**
+     * Get the table count.
+     *
+     * @param  string  $table
+     * @return int
+     */
+    protected function getActualCount(string $table): ?int
+    {
+        $query = $this->database->table($table);
+
+        if ($this->data) {
+            $query->where($this->data);
+        }
+
+        return $query->count();
     }
 
     /**
