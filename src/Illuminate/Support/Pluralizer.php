@@ -131,7 +131,7 @@ class Pluralizer
     {
         static $inflector;
 
-        if ($inflector === null) {
+        if (is_null($inflector)) {
             $inflector = new Inflector(
                 new CachedWordInflector(new RulesetInflector(
                     English\Rules::getSingularRuleset()
