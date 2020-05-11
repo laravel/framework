@@ -79,7 +79,7 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile the end-env statements into valid PHP.
+     * Compile the end-production statements into valid PHP.
      *
      * @return string
      */
