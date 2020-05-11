@@ -103,6 +103,7 @@ class PolicyMakeCommand extends GeneratorCommand
             'DummyUser' => $dummyUser,
             '{{ user }}' => $dummyUser,
             '{{user}}' => $dummyUser,
+            '$user' => '$'.Str::camel($dummyUser),
         ];
 
         $stub = str_replace(
