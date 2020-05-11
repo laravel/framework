@@ -521,6 +521,22 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
+     * Eager load relationships on the polymorphic relation of a model.
+     *
+     * @param  string $relation
+     * @param  array  $relations
+     * @return $this
+     */
+    public function loadMorph($relation, $relations)
+    {
+        $className = get_class($this->{$relation});
+
+        $this->{$relation}->load($relations[$className] ?? []);
+
+        return $this;
+    }
+
+    /**
      * Eager load relations on the model if they are not already eager loaded.
      *
      * @param  array|string  $relations
@@ -546,6 +562,22 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         $relations = is_string($relations) ? func_get_args() : $relations;
 
         $this->newCollection([$this])->loadCount($relations);
+
+        return $this;
+    }
+
+    /**
+     * Eager load relationship counts on the polymorphic relation of a model.
+     *
+     * @param  string $relation
+     * @param  array  $relations
+     * @return $this
+     */
+    public function loadMorphCount($relation, $relations)
+    {
+        $className = get_class($this->{$relation});
+
+        $this->{$relation}->loadCount($relations[$className] ?? []);
 
         return $this;
     }

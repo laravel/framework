@@ -190,10 +190,16 @@ class NotificationSender
                     $notification->locale = $this->locale;
                 }
 
+                $queue = $notification->queue;
+
+                if (method_exists($notification, 'viaQueues')) {
+                    $queue = $notification->viaQueues()[$channel] ?? null;
+                }
+
                 $this->bus->dispatch(
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
                             ->onConnection($notification->connection)
-                            ->onQueue($notification->queue)
+                            ->onQueue($queue)
                             ->delay($notification->delay)
                             ->through(
                                 array_merge(
