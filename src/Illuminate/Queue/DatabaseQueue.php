@@ -139,12 +139,12 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  string  $queue
      * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
-     * @param  int  $backoff
+     * @param  int  $delay
      * @return mixed
      */
-    public function release($queue, $job, $backoff)
+    public function release($queue, $job, $delay)
     {
-        return $this->pushToDatabase($queue, $job->payload, $backoff, $job->attempts);
+        return $this->pushToDatabase($queue, $job->payload, $delay, $job->attempts);
     }
 
     /**
@@ -152,14 +152,14 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  string|null  $queue
      * @param  string  $payload
-     * @param  \DateTimeInterface|\DateInterval|int  $backoff
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  int  $attempts
      * @return mixed
      */
-    protected function pushToDatabase($queue, $payload, $backoff = 0, $attempts = 0)
+    protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {
         return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
-            $this->getQueue($queue), $payload, $this->availableAt($backoff), $attempts
+            $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
         ));
     }
 

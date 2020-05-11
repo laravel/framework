@@ -45,16 +45,16 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * Release the job back into the queue.
      *
-     * @param  int  $backoff
+     * @param  int  $delay
      * @return void
      */
-    public function release($backoff = 0)
+    public function release($delay = 0)
     {
-        parent::release($backoff);
+        parent::release($delay);
 
         $priority = Pheanstalk::DEFAULT_PRIORITY;
 
-        $this->pheanstalk->release($this->job, $priority, $backoff);
+        $this->pheanstalk->release($this->job, $priority, $delay);
     }
 
     /**

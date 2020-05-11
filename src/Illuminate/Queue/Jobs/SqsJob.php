@@ -44,17 +44,17 @@ class SqsJob extends Job implements JobContract
     /**
      * Release the job back into the queue.
      *
-     * @param  int  $backoff
+     * @param  int  $delay
      * @return void
      */
-    public function release($backoff = 0)
+    public function release($delay = 0)
     {
-        parent::release($backoff);
+        parent::release($delay);
 
         $this->sqs->changeMessageVisibility([
             'QueueUrl' => $this->queue,
             'ReceiptHandle' => $this->job['ReceiptHandle'],
-            'VisibilityTimeout' => $backoff,
+            'VisibilityTimeout' => $delay,
         ]);
     }
 
