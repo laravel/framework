@@ -214,7 +214,7 @@ class Validator implements ValidatorContract
     protected $numericRules = ['Numeric', 'Integer'];
 
     /**
-     * The placeholder for dots in rule keys.
+     * The current placeholder for dots in rule keys.
      *
      * @var string
      */
@@ -234,6 +234,7 @@ class Validator implements ValidatorContract
                                 array $messages = [], array $customAttributes = [])
     {
         $this->dotPlaceholder = Str::random();
+
         $this->initialRules = $rules;
         $this->translator = $translator;
         $this->customMessages = $messages;
@@ -258,7 +259,11 @@ class Validator implements ValidatorContract
                 $value = $this->parseData($value);
             }
 
-            $key = str_replace(['.', '*'], [$this->dotPlaceholder, '__asterisk__'], $key);
+            $key = str_replace(
+                ['.', '*'],
+                [$this->dotPlaceholder, '__asterisk__'],
+                $key
+            );
 
             $newData[$key] = $value;
         }
