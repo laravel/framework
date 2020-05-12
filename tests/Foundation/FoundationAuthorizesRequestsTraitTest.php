@@ -29,9 +29,11 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
             return true;
         });
 
-        $response = (new FoundationTestAuthorizeTraitClass)->authorize('baz');
+        $authorizeResponse = (new FoundationTestAuthorizeTraitClass)->authorize('baz');
+        $checkResponse = (new FoundationTestAuthorizeTraitClass)->check('baz');
 
-        $this->assertInstanceOf(Response::class, $response);
+        $this->assertInstanceOf(Response::class, $authorizeResponse);
+        $this->assertTrue($checkResponse);
         $this->assertTrue($_SERVER['_test.authorizes.trait']);
     }
 

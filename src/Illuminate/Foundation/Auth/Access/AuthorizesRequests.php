@@ -41,6 +41,20 @@ trait AuthorizesRequests
     }
 
     /**
+     * Check if a given action allowed for the current user.
+     *
+     * @param  mixed  $ability
+     * @param  mixed|array  $arguments
+     * @return bool
+     */
+    public function check($ability, $arguments = [])
+    {
+        [$ability, $arguments] = $this->parseAbilityAndArguments($ability, $arguments);
+
+        return app(Gate::class)->check($ability, $arguments);
+    }
+
+    /**
      * Guesses the ability's name if it wasn't provided.
      *
      * @param  mixed  $ability
