@@ -1164,12 +1164,20 @@ trait HasAttributes
     /**
      * Get the model's original attribute values.
      *
-     * @param  string|null  $key
+     * @param  string|array|null  $key
      * @param  mixed  $default
      * @return mixed|array
      */
     public function getOriginal($key = null, $default = null)
     {
+        if (is_array($key)) {
+            return collect($this->original)->filter(function($item, $key) {
+                return in_array($key, array_keys($this->changes));
+            })->mapWithKeys(function ($value, $key) {
+                return [$key => $this->transformModelValue($key, $value)];
+            })->all();
+        }
+
         if ($key) {
             return $this->transformModelValue(
                 $key, Arr::get($this->original, $key, $default)
