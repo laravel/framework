@@ -184,6 +184,24 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Determine if all items exist in the collection.
+     *
+     * @param  mixed $needles
+     *
+     * @return bool
+     */
+    public function containsAll($needles)
+    {
+        foreach ($this->getArrayableItems($needles) as $needle) {
+            if (! $this->contains($needle)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Cross join with the given lists, returning all possible permutations.
      *
      * @param  mixed  ...$lists
