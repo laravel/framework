@@ -412,7 +412,11 @@ class Kernel implements KernelContract
      */
     protected function renderException($request, Throwable $e)
     {
-        return $this->app[ExceptionHandler::class]->render($request, $e);
+        try {
+            return $this->app[ExceptionHandler::class]->render($request, $e);
+        } catch (Throwable $renderFailed) {
+            throw $e;
+        }
     }
 
     /**
