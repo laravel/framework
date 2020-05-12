@@ -4,10 +4,10 @@ namespace Illuminate\Tests\Queue;
 
 use Aws\Result;
 use Aws\Sqs\SqsClient;
+use Carbon\Carbon;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
-use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 

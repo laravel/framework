@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Cookie;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Response;
 use Illuminate\Session\NullSessionHandler;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;

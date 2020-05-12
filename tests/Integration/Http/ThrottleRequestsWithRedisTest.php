@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 use Throwable;

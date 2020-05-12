@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Carbon\Carbon;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\GlobalLimit;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Routing\Middleware\ThrottleRequests;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 use Throwable;

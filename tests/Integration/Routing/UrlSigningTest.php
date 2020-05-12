@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ValidateSignature;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Orchestra\Testbench\TestCase;

@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayObject;
-use Illuminate\Collections\Arr;
 use Carbon\Carbon;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;

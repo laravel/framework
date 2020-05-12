@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
+use Carbon\Carbon;
 use Carbon\Carbon as BaseCarbon;
 use DateTime;
 use DateTimeInterface;
-use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class SupportCarbonTest extends TestCase

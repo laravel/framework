@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 

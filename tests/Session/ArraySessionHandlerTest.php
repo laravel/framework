@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Session;
 
-use Illuminate\Session\ArraySessionHandler;
 use Carbon\Carbon;
+use Illuminate\Session\ArraySessionHandler;
 use PHPUnit\Framework\TestCase;
 use SessionHandlerInterface;
 

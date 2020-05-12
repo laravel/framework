@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 

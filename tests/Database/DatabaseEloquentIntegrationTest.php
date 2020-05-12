@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Carbon\Carbon;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -17,7 +18,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;

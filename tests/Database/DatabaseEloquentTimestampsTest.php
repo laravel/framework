@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Carbon\Carbon;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentTimestampsTest extends TestCase

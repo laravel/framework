@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Carbon\Carbon;
 use Illuminate\Container\Container;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
-use Carbon\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Mockery as m;

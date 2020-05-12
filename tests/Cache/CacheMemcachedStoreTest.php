@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Illuminate\Cache\MemcachedStore;
 use Carbon\Carbon;
+use Illuminate\Cache\MemcachedStore;
 use Memcached;
 use PHPUnit\Framework\TestCase;
 use stdClass;

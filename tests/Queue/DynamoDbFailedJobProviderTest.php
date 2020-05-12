@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Queue;
 
 use Aws\DynamoDb\DynamoDbClient;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;

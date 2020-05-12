@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Carbon\Carbon;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -21,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
-use Carbon\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\InteractsWithTime;
 use InvalidArgumentException;

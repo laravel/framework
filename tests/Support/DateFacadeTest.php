@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\Factory;
 use DateTime;
-use Carbon\Carbon;
 use Illuminate\Support\DateFactory;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Tests\Support\Fixtures\CustomDateClass;

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Http\Middleware;
 
+use Carbon\Carbon;
 use Illuminate\Http\Middleware\SetCacheHeaders as Cache;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Carbon\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

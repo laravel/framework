@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Cache;
 
 use ArrayIterator;
+use Carbon\Carbon;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -12,7 +13,6 @@ use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
-use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 

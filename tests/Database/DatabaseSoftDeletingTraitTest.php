@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;

@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Carbon\Carbon;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\DatabaseQueue;
-use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class QueueDatabaseQueueIntegrationTest extends TestCase
