@@ -1171,7 +1171,7 @@ trait HasAttributes
     public function getOriginal($key = null, $default = null)
     {
         if (is_array($key)) {
-            return collect($this->original)->filter(function($item, $key) {
+            return collect($this->original)->filter(function ($item, $key) {
                 return in_array($key, array_keys($this->changes));
             })->mapWithKeys(function ($value, $key) {
                 return [$key => $this->transformModelValue($key, $value)];
