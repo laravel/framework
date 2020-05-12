@@ -195,8 +195,8 @@ class Gate implements GateContract
             }
 
             return isset($method)
-                    ? $policy->{$method}(...func_get_args())
-                    : $policy(...func_get_args());
+                ? $policy->{$method}(...$arguments)
+                : $policy(...$arguments);
         };
     }
 
@@ -715,7 +715,9 @@ class Gate implements GateContract
      */
     protected function formatAbilityToMethod($ability)
     {
-        return strpos($ability, '-') !== false ? Str::camel($ability) : $ability;
+        return false !== strpos($ability, '-')
+            ? Str::camel($ability)
+            : $ability;
     }
 
     /**
