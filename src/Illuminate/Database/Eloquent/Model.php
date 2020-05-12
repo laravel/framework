@@ -631,7 +631,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
         if ($this->fireModelEvent('updating') === false) {
             return false;
-        };
+        }
 
         return tap($query->where(
             $this->getKeyName(), $this->getKey()
