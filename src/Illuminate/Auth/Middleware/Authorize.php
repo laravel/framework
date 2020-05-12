@@ -56,11 +56,11 @@ class Authorize
     {
         if (is_null($models)) {
             return [];
+        } else {
+            return collect($models)->map(function ($model) use ($request) {
+                return $model instanceof Model ? $model : $this->getModel($request, $model);
+            })->all();
         }
-
-        return collect($models)->map(function ($model) use ($request) {
-            return $model instanceof Model ? $model : $this->getModel($request, $model);
-        })->all();
     }
 
     /**
