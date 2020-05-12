@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 
 class ChannelMakeCommand extends GeneratorCommand
 {
@@ -35,9 +36,19 @@ class ChannelMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        return str_replace(
+        $toReplace = [
             'DummyUser',
+            '$user',
+        ];
+
+        $replacementContent = [
             class_basename($this->userProviderModel()),
+            '$'.Str::camel(class_basename($this->userProviderModel())),
+        ];
+
+        return str_replace(
+            $toReplace,
+            $replacementContent,
             parent::buildClass($name)
         );
     }
