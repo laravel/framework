@@ -8,7 +8,7 @@ interface Factory
      * Get a guard instance by name.
      *
      * @param  string|null  $name
-     * @return  \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
      */
     public function guard($name = null);
 
