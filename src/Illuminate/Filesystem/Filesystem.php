@@ -5,7 +5,7 @@ namespace Illuminate\Filesystem;
 use ErrorException;
 use FilesystemIterator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 use Symfony\Component\Finder\Finder;
 
 class Filesystem
@@ -49,7 +49,7 @@ class Filesystem
             return $lock ? $this->sharedGet($path) : file_get_contents($path);
         }
 
-        throw new FileNotFoundException("File does not exist at path {$path}");
+        throw new FileNotFoundException("File does not exist at path {$path}.");
     }
 
     /**
@@ -95,7 +95,7 @@ class Filesystem
             return require $path;
         }
 
-        throw new FileNotFoundException("File does not exist at path {$path}");
+        throw new FileNotFoundException("File does not exist at path {$path}.");
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Illuminate\Container;
 
 use Closure;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use InvalidArgumentException;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -169,6 +170,10 @@ class BoundMethod
             $dependencies[] = $container->make($parameter->getClass()->name);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
+        } elseif (! $parameter->isOptional() && ! array_key_exists($parameter->name, $parameters)) {
+            $message = "Unable to resolve dependency [{$parameter}] in class {$parameter->getDeclaringClass()->getName()}";
+
+            throw new BindingResolutionException($message);
         }
     }
 

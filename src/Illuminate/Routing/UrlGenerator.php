@@ -3,14 +3,14 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
@@ -21,7 +21,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * The route collection.
      *
-     * @var \Illuminate\Routing\RouteCollection
+     * @var \Illuminate\Routing\RouteCollectionInterface
      */
     protected $routes;
 
@@ -112,12 +112,12 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Create a new URL Generator instance.
      *
-     * @param  \Illuminate\Routing\RouteCollection  $routes
+     * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
      * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $assetRoot
      * @return void
      */
-    public function __construct(RouteCollection $routes, Request $request, $assetRoot = null)
+    public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null)
     {
         $this->routes = $routes;
         $this->assetRoot = $assetRoot;
@@ -705,10 +705,10 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the route collection.
      *
-     * @param  \Illuminate\Routing\RouteCollection  $routes
+     * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
      * @return $this
      */
-    public function setRoutes(RouteCollection $routes)
+    public function setRoutes(RouteCollectionInterface $routes)
     {
         $this->routes = $routes;
 

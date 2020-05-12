@@ -12,11 +12,32 @@ use ReflectionProperty;
 abstract class Component
 {
     /**
-     * That properties / methods that should not be exposed to the component.
+     * The cache of public property names, keyed by class.
+     *
+     * @var array
+     */
+    protected static $propertyCache = [];
+
+    /**
+     * The cache of public method names, keyed by class.
+     *
+     * @var array
+     */
+    protected static $methodCache = [];
+
+    /**
+     * The properties / methods that should not be exposed to the component.
      *
      * @var array
      */
     protected $except = [];
+
+    /**
+     * The component alias name.
+     *
+     * @var string
+     */
+    public $componentName;
 
     /**
      * The component attributes.
@@ -47,9 +68,9 @@ abstract class Component
 
         $factory = Container::getInstance()->make('view');
 
-        return $factory->exists($this->render())
-                    ? $this->render()
-                    : $this->createBladeViewFromString($factory, $this->render());
+        return $factory->exists($view)
+                    ? $view
+                    : $this->createBladeViewFromString($factory, $view);
     }
 
     /**
@@ -67,6 +88,10 @@ abstract class Component
         );
 
         if (! file_exists($viewFile = $directory.'/'.sha1($contents).'.blade.php')) {
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
             file_put_contents($viewFile, $contents);
         }
 
@@ -85,25 +110,67 @@ abstract class Component
     {
         $this->attributes = $this->attributes ?: new ComponentAttributeBag;
 
-        $class = new ReflectionClass($this);
+        return array_merge($this->extractPublicProperties(), $this->extractPublicMethods());
+    }
 
-        $publicProperties = collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(function (ReflectionProperty $property) {
-                return $this->shouldIgnore($property->getName());
-            })
-            ->mapWithKeys(function (ReflectionProperty $property) {
-                return [$property->getName() => $this->{$property->getName()}];
-            });
+    /**
+     * Extract the public properties for the component.
+     *
+     * @return array
+     */
+    protected function extractPublicProperties()
+    {
+        $class = get_class($this);
 
-        $publicMethods = collect($class->getMethods(ReflectionMethod::IS_PUBLIC))
-            ->reject(function (ReflectionMethod $method) {
-                return $this->shouldIgnore($method->getName());
-            })
-            ->mapWithKeys(function (ReflectionMethod $method) {
-                return [$method->getName() => $this->createVariableFromMethod($method)];
-            });
+        if (! isset(static::$propertyCache[$class])) {
+            $reflection = new ReflectionClass($this);
 
-        return $publicProperties->merge($publicMethods)->all();
+            static::$propertyCache[$class] = collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
+                ->reject(function (ReflectionProperty $property) {
+                    return $this->shouldIgnore($property->getName());
+                })
+                ->map(function (ReflectionProperty $property) {
+                    return $property->getName();
+                })->all();
+        }
+
+        $values = [];
+
+        foreach (static::$propertyCache[$class] as $property) {
+            $values[$property] = $this->{$property};
+        }
+
+        return $values;
+    }
+
+    /**
+     * Extract the public methods for the component.
+     *
+     * @return array
+     */
+    protected function extractPublicMethods()
+    {
+        $class = get_class($this);
+
+        if (! isset(static::$methodCache[$class])) {
+            $reflection = new ReflectionClass($this);
+
+            static::$methodCache[$class] = collect($reflection->getMethods(ReflectionMethod::IS_PUBLIC))
+                ->reject(function (ReflectionMethod $method) {
+                    return $this->shouldIgnore($method->getName());
+                })
+                ->map(function (ReflectionMethod $method) {
+                    return $method->getName();
+                });
+        }
+
+        $values = [];
+
+        foreach (static::$methodCache[$class] as $method) {
+            $values[$method] = $this->createVariableFromMethod(new ReflectionMethod($this, $method));
+        }
+
+        return $values;
     }
 
     /**
@@ -115,8 +182,21 @@ abstract class Component
     protected function createVariableFromMethod(ReflectionMethod $method)
     {
         return $method->getNumberOfParameters() === 0
-                        ? $this->{$method->getName()}()
+                        ? $this->createInvokableVariable($method->getName())
                         : Closure::fromCallable([$this, $method->getName()]);
+    }
+
+    /**
+     * Create an invokable, toStringable variable for the given component method.
+     *
+     * @param  string  $method
+     * @return \Illuminate\View\InvokableComponentVariable
+     */
+    protected function createInvokableVariable(string $method)
+    {
+        return new InvokableComponentVariable(function () use ($method) {
+            return $this->{$method}();
+        });
     }
 
     /**
@@ -144,8 +224,22 @@ abstract class Component
             'resolveView',
             'shouldRender',
             'view',
+            'withName',
             'withAttributes',
         ], $this->except);
+    }
+
+    /**
+     * Set the component alias name.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function withName($name)
+    {
+        $this->componentName = $name;
+
+        return $this;
     }
 
     /**

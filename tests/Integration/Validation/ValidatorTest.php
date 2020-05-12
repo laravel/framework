@@ -46,7 +46,7 @@ class ValidatorTest extends DatabaseTestCase
 
         $validator->passes();
 
-        $this->assertEquals('name at line 1 must be a string!', $validator->getMessageBag()->all()[0]);
+        $this->assertSame('name at line 1 must be a string!', $validator->getMessageBag()->all()[0]);
     }
 
     protected function getValidator(array $data, array $rules)

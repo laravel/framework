@@ -289,6 +289,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(3, $query->getCountForPagination());
     }
 
+    public function testCountForPaginationWithGroupingAndSubSelects()
+    {
+        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::create(['id' => 4, 'email' => 'foo@gmail.com']);
+
+        $user1->friends()->create(['id' => 5, 'email' => 'friend@gmail.com']);
+
+        $query = EloquentTestUser::select([
+            'id',
+            'friends_count' => EloquentTestUser::whereColumn('friend_id', 'user_id')->count(),
+        ])->groupBy('email')->getQuery();
+
+        $this->assertEquals(4, $query->getCountForPagination());
+    }
+
     public function testFirstOrCreate()
     {
         $user1 = EloquentTestUser::firstOrCreate(['email' => 'taylorotwell@gmail.com']);
@@ -1187,6 +1205,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
 
         $this->assertInstanceOf(EloquentTestItem::class, $item);
+    }
+
+    public function testEagerLoadedMorphToRelationsOnAnotherDatabaseConnection()
+    {
+        EloquentTestPost::create(['id' => 1, 'name' => 'Default Connection Post', 'user_id' => 1]);
+        EloquentTestPhoto::create(['id' => 1, 'imageable_type' => EloquentTestPost::class, 'imageable_id' => 1, 'name' => 'Photo']);
+
+        EloquentTestPost::on('second_connection')
+            ->create(['id' => 1, 'name' => 'Second Connection Post', 'user_id' => 1]);
+        EloquentTestPhoto::on('second_connection')
+            ->create(['id' => 1, 'imageable_type' => EloquentTestPost::class, 'imageable_id' => 1, 'name' => 'Photo']);
+
+        $defaultConnectionPost = EloquentTestPhoto::with('imageable')->first()->imageable;
+        $secondConnectionPost = EloquentTestPhoto::on('second_connection')->with('imageable')->first()->imageable;
+
+        $this->assertEquals($defaultConnectionPost->name, 'Default Connection Post');
+        $this->assertEquals($secondConnectionPost->name, 'Second Connection Post');
     }
 
     public function testBelongsToManyCustomPivot()

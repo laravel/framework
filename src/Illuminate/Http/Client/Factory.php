@@ -3,8 +3,10 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use function GuzzleHttp\Promise\promise_for;
+use GuzzleHttp\Psr7\Response as Psr7Response;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class Factory
@@ -16,9 +18,9 @@ class Factory
     /**
      * The stub callables that will handle requests.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var \Illuminate\Support\Collection
      */
-    protected $expectations;
+    protected $stubCallbacks;
 
     /**
      * Indicates if the factory is recording requests and responses.
@@ -28,13 +30,27 @@ class Factory
     protected $recording = false;
 
     /**
+     * The recorded response array.
+     *
+     * @var array
+     */
+    protected $recorded = [];
+
+    /**
+     * All created response sequences.
+     *
+     * @var array
+     */
+    protected $responseSequences = [];
+
+    /**
      * Create a new factory instance.
      *
      * @return void
      */
     public function __construct()
     {
-        $this->expectations = collect();
+        $this->stubCallbacks = collect();
     }
 
     /**
@@ -53,7 +69,7 @@ class Factory
             $headers['Content-Type'] = 'application/json';
         }
 
-        return \GuzzleHttp\Promise\promise_for(new \GuzzleHttp\Psr7\Response($status, $headers, $body));
+        return promise_for(new Psr7Response($status, $headers, $body));
     }
 
     /**
@@ -62,9 +78,9 @@ class Factory
      * @param  array  $responses
      * @return \Illuminate\Http\Client\ResponseSequence
      */
-    public static function sequence(array $responses)
+    public function sequence(array $responses = [])
     {
-        return new ResponseSequence($responses);
+        return $this->responseSequences[] = new ResponseSequence($responses);
     }
 
     /**
@@ -88,10 +104,10 @@ class Factory
                 $this->stubUrl($url, $callable);
             }
 
-            return;
+            return $this;
         }
 
-        $this->expectations = $this->expectations->merge(collect([
+        $this->stubCallbacks = $this->stubCallbacks->merge(collect([
             $callback instanceof Closure
                     ? $callback
                     : function () use ($callback) {
@@ -100,6 +116,19 @@ class Factory
         ]));
 
         return $this;
+    }
+
+    /**
+     * Register a response sequence for the given URL pattern.
+     *
+     * @param  string  $url
+     * @return \Illuminate\Http\Client\ResponseSequence
+     */
+    public function fakeSequence($url = '*')
+    {
+        return tap($this->sequence(), function ($sequence) use ($url) {
+            $this->fake([$url => $sequence]);
+        });
     }
 
     /**
@@ -163,6 +192,59 @@ class Factory
     }
 
     /**
+     * Assert that a request / response pair was not recorded matching a given truth test.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function assertNotSent($callback)
+    {
+        PHPUnit::assertFalse(
+            $this->recorded($callback)->count() > 0,
+            'Unexpected request was recorded.'
+        );
+    }
+
+    /**
+     * Assert that no request / response pair was recorded.
+     *
+     * @return void
+     */
+    public function assertNothingSent()
+    {
+        PHPUnit::assertEmpty(
+            $this->recorded,
+            'Requests were recorded.'
+        );
+    }
+
+    /**
+     * Assert how many requests have been recorded.
+     *
+     * @param $count
+     * @return void
+     */
+    public function assertSentCount($count)
+    {
+        PHPUnit::assertCount($count, $this->recorded);
+    }
+
+    /**
+     * Assert that every created response sequence is empty.
+     *
+     * @return void
+     */
+    public function assertSequencesAreEmpty()
+    {
+        foreach ($this->responseSequences as $responseSequence) {
+            PHPUnit::assertTrue(
+                $responseSequence->isEmpty(),
+                'Not all response sequences are empty.'
+            );
+        }
+    }
+
+    /**
      * Get a collection of the request / response pairs matching the given truth test.
      *
      * @param  callable  $callback
@@ -197,7 +279,7 @@ class Factory
         }
 
         return tap(new PendingRequest($this), function ($request) {
-            $request->stub($this->expectations);
+            $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
     }
 }

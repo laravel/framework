@@ -22,6 +22,7 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithExceptionHandling,
         Concerns\InteractsWithSession,
+        Concerns\InteractsWithViews,
         Concerns\MocksApplicationServices;
 
     /**
@@ -75,6 +76,8 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp(): void
     {
+        Facade::clearResolvedInstances();
+
         if (! $this->app) {
             $this->refreshApplication();
         }
@@ -84,8 +87,6 @@ abstract class TestCase extends BaseTestCase
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
             $callback();
         }
-
-        Facade::clearResolvedInstances();
 
         Model::setEventDispatcher($this->app['events']);
 

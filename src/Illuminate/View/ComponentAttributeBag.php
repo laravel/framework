@@ -3,11 +3,14 @@
 namespace Illuminate\View;
 
 use ArrayAccess;
+use ArrayIterator;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
+use IteratorAggregate;
 
-class ComponentAttributeBag implements ArrayAccess, Htmlable
+class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 {
     /**
      * The raw array of attributes.
@@ -78,6 +81,26 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
     }
 
     /**
+     * Exclude the given attribute from the attribute array.
+     *
+     * @param  mixed|array  $keys
+     * @return static
+     */
+    public function exceptProps($keys)
+    {
+        $props = [];
+
+        foreach ($keys as $key => $defaultValue) {
+            $key = is_numeric($key) ? $defaultValue : $key;
+
+            $props[] = $key;
+            $props[] = Str::kebab($key);
+        }
+
+        return $this->except($props);
+    }
+
+    /**
      * Merge additional attributes / values into the attribute bag.
      *
      * @param  array  $attributes
@@ -85,22 +108,29 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
      */
     public function merge(array $attributeDefaults = [])
     {
-        return new static(
-            array_merge($attributeDefaults, collect($this->attributes)->map(function ($value, $key) use ($attributeDefaults) {
-                if ($value === true) {
-                    return $key;
-                }
+        $attributes = [];
 
-                if ($key !== 'class') {
-                    return $attributeDefaults[$key] ?? $value;
-                }
+        $attributeDefaults = array_map(function ($value) {
+            if (is_null($value) || is_bool($value)) {
+                return $value;
+            }
 
-                return collect([$attributeDefaults[$key] ?? '', $value])
-                                ->filter()
-                                ->unique()
-                                ->join(' ');
-            })->filter()->all())
-        );
+            return e($value);
+        }, $attributeDefaults);
+
+        foreach ($this->attributes as $key => $value) {
+            if ($key !== 'class') {
+                $attributes[$key] = $value;
+
+                continue;
+            }
+
+            $attributes[$key] = implode(' ', array_unique(
+                array_filter([$attributeDefaults[$key] ?? '', $value])
+            ));
+        }
+
+        return new static(array_merge($attributeDefaults, $attributes));
     }
 
     /**
@@ -111,6 +141,15 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
      */
     public function setAttributes(array $attributes)
     {
+        if (isset($attributes['attributes']) &&
+            $attributes['attributes'] instanceof self) {
+            $parentBag = $attributes['attributes'];
+
+            unset($attributes['attributes']);
+
+            $attributes = $parentBag->merge($attributes);
+        }
+
         $this->attributes = $attributes;
     }
 
@@ -181,16 +220,36 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
     }
 
     /**
+     * Get an iterator for the items.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->attributes);
+    }
+
+    /**
      * Implode the attributes into a single HTML ready string.
      *
      * @return string
      */
     public function __toString()
     {
-        return collect($this->attributes)->map(function ($value, $key) {
-            return $value === true
-                    ? $key
-                    : $key.'="'.str_replace('"', '\\"', trim($value)).'"';
-        })->implode(' ');
+        $string = '';
+
+        foreach ($this->attributes as $key => $value) {
+            if ($value === false || is_null($value)) {
+                continue;
+            }
+
+            if ($value === true) {
+                $value = $key;
+            }
+
+            $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+        }
+
+        return trim($string);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -170,7 +170,7 @@ class Command extends SymfonyCommand
     /**
      * {@inheritdoc}
      */
-    public function setHidden($hidden)
+    public function setHidden(bool $hidden)
     {
         parent::setHidden($this->hidden = $hidden);
 

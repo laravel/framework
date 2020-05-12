@@ -125,7 +125,7 @@ class QueueWorkerTest extends TestCase
         });
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
-        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 10]));
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
 
         $this->assertEquals(10, $job->releaseAfter);
         $this->assertFalse($job->deleted);
@@ -168,7 +168,7 @@ class QueueWorkerTest extends TestCase
             throw $e;
         });
 
-        $job->timeoutAt = now()->addSeconds(1)->getTimestamp();
+        $job->retryUntil = now()->addSeconds(1)->getTimestamp();
 
         $job->attempts = 0;
 
@@ -212,7 +212,7 @@ class QueueWorkerTest extends TestCase
             $job->attempts++;
         });
 
-        $job->timeoutAt = Carbon::now()->addSeconds(2)->getTimestamp();
+        $job->retryUntil = Carbon::now()->addSeconds(2)->getTimestamp();
 
         $job->attempts = 1;
 
@@ -254,10 +254,10 @@ class QueueWorkerTest extends TestCase
         });
 
         $job->attempts = 1;
-        $job->delaySeconds = 10;
+        $job->backoff = 10;
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
-        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 3, 'maxTries' => 0]));
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 3, 'maxTries' => 0]));
 
         $this->assertEquals(10, $job->releaseAfter);
     }
@@ -422,8 +422,10 @@ class WorkerFakeJob implements QueueJobContract
     public $releaseAfter;
     public $released = false;
     public $maxTries;
-    public $delaySeconds;
-    public $timeoutAt;
+    public $maxExceptions;
+    public $uuid;
+    public $backoff;
+    public $retryUntil;
     public $attempts = 0;
     public $failedWith;
     public $failed = false;
@@ -459,14 +461,24 @@ class WorkerFakeJob implements QueueJobContract
         return $this->maxTries;
     }
 
-    public function delaySeconds()
+    public function maxExceptions()
     {
-        return $this->delaySeconds;
+        return $this->maxExceptions;
     }
 
-    public function timeoutAt()
+    public function uuid()
     {
-        return $this->timeoutAt;
+        return $this->uuid;
+    }
+
+    public function backoff()
+    {
+        return $this->backoff;
+    }
+
+    public function retryUntil()
+    {
+        return $this->retryUntil;
     }
 
     public function delete()

@@ -2,7 +2,12 @@
 
 namespace Illuminate\Http\Client;
 
-use Illuminate\Support\Traits\Macroable;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\HandlerStack;
+use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Str;
 
 class PendingRequest
 {
@@ -14,6 +19,13 @@ class PendingRequest
      * @var \Illuminate\Http\Client\Factory|null
      */
     protected $factory;
+
+    /**
+     * The base URL for the request.
+     *
+     * @var string
+     */
+    protected $baseUrl = '';
 
     /**
      * The request body format.
@@ -51,6 +63,20 @@ class PendingRequest
     protected $options = [];
 
     /**
+     * The number of times to try the request.
+     *
+     * @var int
+     */
+    protected $tries = 1;
+
+    /**
+     * The number of milliseconds to wait between retries.
+     *
+     * @var int
+     */
+    protected $retryDelay = 100;
+
+    /**
      * The callbacks that should execute before the request is sent.
      *
      * @var array
@@ -62,7 +88,7 @@ class PendingRequest
      *
      * @var \Illuminate\Support\Collection|null
      */
-    protected $expectations;
+    protected $stubCallbacks;
 
     /**
      * Create a new HTTP Client instance.
@@ -83,6 +109,19 @@ class PendingRequest
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options) {
             $this->cookies = $options['cookies'];
         }]);
+    }
+
+    /**
+     * Set the base URL for the pending request.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function baseUrl(string $url)
+    {
+        $this->baseUrl = $url;
+
+        return $this;
     }
 
     /**
@@ -208,9 +247,7 @@ class PendingRequest
     public function withBasicAuth(string $username, string $password)
     {
         return tap($this, function ($request) use ($username, $password) {
-            return $this->options = array_merge_recursive($this->options, [
-                'auth' => [$username, $password],
-            ]);
+            return $this->options['auth'] = [$username, $password];
         });
     }
 
@@ -224,9 +261,7 @@ class PendingRequest
     public function withDigestAuth($username, $password)
     {
         return tap($this, function ($request) use ($username, $password) {
-            return $this->options = array_merge_recursive($this->options, [
-                'auth' => [$username, $password, 'digest'],
-            ]);
+            return $this->options['auth'] = [$username, $password, 'digest'];
         });
     }
 
@@ -239,22 +274,23 @@ class PendingRequest
      */
     public function withToken($token, $type = 'Bearer')
     {
-        return $this->withHeaders([
-            'Authorization' => trim($type.' '.$token),
-        ]);
+        return tap($this, function ($request) use ($token, $type) {
+            return $this->options['headers']['Authorization'] = trim($type.' '.$token);
+        });
     }
 
     /**
      * Specify the cookies that should be included with the request.
      *
      * @param  array  $cookies
+     * @param  string  $domain
      * @return $this
      */
-    public function withCookies(array $cookies)
+    public function withCookies(array $cookies, string $domain)
     {
-        return tap($this, function ($request) use ($cookies) {
+        return tap($this, function ($request) use ($cookies, $domain) {
             return $this->options = array_merge_recursive($this->options, [
-                'cookies' => $cookies,
+                'cookies' => CookieJar::fromArray($cookies, $domain),
             ]);
         });
     }
@@ -267,9 +303,7 @@ class PendingRequest
     public function withoutRedirecting()
     {
         return tap($this, function ($request) {
-            return $this->options = array_merge_recursive($this->options, [
-                'allow_redirects' => false,
-            ]);
+            return $this->options['allow_redirects'] = false;
         });
     }
 
@@ -281,9 +315,7 @@ class PendingRequest
     public function withoutVerifying()
     {
         return tap($this, function ($request) {
-            return $this->options = array_merge_recursive($this->options, [
-                'verify' => false,
-            ]);
+            return $this->options['verify'] = false;
         });
     }
 
@@ -298,6 +330,21 @@ class PendingRequest
         return tap($this, function () use ($seconds) {
             $this->options['timeout'] = $seconds;
         });
+    }
+
+    /**
+     * Specify the number of times the request should be attempted.
+     *
+     * @param  int  $times
+     * @param  int  $sleep
+     * @return $this
+     */
+    public function retry(int $times, int $sleep = 0)
+    {
+        $this->tries = $times;
+        $this->retryDelay = $sleep;
+
+        return $this;
     }
 
     /**
@@ -330,12 +377,26 @@ class PendingRequest
      * Issue a GET request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $query
+     * @param  array|string|null  $query
      * @return \Illuminate\Http\Client\Response
      */
-    public function get(string $url, array $query = [])
+    public function get(string $url, $query = null)
     {
         return $this->send('GET', $url, [
+            'query' => $query,
+        ]);
+    }
+
+    /**
+     * Issue a HEAD request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array|string|null  $query
+     * @return \Illuminate\Http\Client\Response
+     */
+    public function head(string $url, $query = null)
+    {
+        return $this->send('HEAD', $url, [
             'query' => $query,
         ]);
     }
@@ -403,10 +464,18 @@ class PendingRequest
      * @param  string  $url
      * @param  array  $options
      * @return \Illuminate\Http\Client\Response
+     *
+     * @throws \Exception
      */
     public function send(string $method, string $url, array $options = [])
     {
+        $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
+
         if (isset($options[$this->bodyFormat])) {
+            if ($this->bodyFormat === 'multipart') {
+                $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
+            }
+
             $options[$this->bodyFormat] = array_merge(
                 $options[$this->bodyFormat], $this->pendingFiles
             );
@@ -414,20 +483,67 @@ class PendingRequest
 
         $this->pendingFiles = [];
 
-        try {
-            return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
-                'laravel_data' => $options[$this->bodyFormat] ?? [],
-                'query' => $this->parseQueryParams($url),
-                'on_stats' => function ($transferStats) {
-                    $this->transferStats = $transferStats;
-                },
-            ], $options))), function ($response) {
-                $response->cookies = $this->cookies;
-                $response->transferStats = $this->transferStats;
-            });
-        } catch (\GuzzleHttp\Exception\ConnectException $e) {
-            throw new ConnectionException($e->getMessage(), 0, $e);
+        return retry($this->tries ?? 1, function () use ($method, $url, $options) {
+            try {
+                $laravelData = $this->parseRequestData($method, $url, $options);
+
+                return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
+                    'laravel_data' => $laravelData,
+                    'on_stats' => function ($transferStats) {
+                        $this->transferStats = $transferStats;
+                    },
+                ], $options))), function ($response) {
+                    $response->cookies = $this->cookies;
+                    $response->transferStats = $this->transferStats;
+
+                    if ($this->tries > 1 && ! $response->successful()) {
+                        $response->throw();
+                    }
+                });
+            } catch (ConnectException $e) {
+                throw new ConnectionException($e->getMessage(), 0, $e);
+            }
+        }, $this->retryDelay ?? 100);
+    }
+
+    /**
+     * Parse multi-part form data.
+     *
+     * @param  array  $data
+     * @return array|array[]
+     */
+    protected function parseMultipartBodyFormat(array $data)
+    {
+        return collect($data)->map(function ($value, $key) {
+            return is_array($value) ? $value : ['name' => $key, 'contents' => $value];
+        })->values()->all();
+    }
+
+    /**
+     * Get the request data as an array so that we can attach it to the request for convenient assertions.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return array
+     */
+    protected function parseRequestData($method, $url, array $options)
+    {
+        $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
+
+        $urlString = Str::of($url);
+
+        if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
+            $laravelData = (string) $urlString->after('?');
         }
+
+        if (is_string($laravelData)) {
+            parse_str($laravelData, $parsedData);
+
+            $laravelData = is_array($parsedData) ? $parsedData : [];
+        }
+
+        return $laravelData;
     }
 
     /**
@@ -437,7 +553,7 @@ class PendingRequest
      */
     public function buildClient()
     {
-        return new \GuzzleHttp\Client([
+        return new Client([
             'handler' => $this->buildHandlerStack(),
             'cookies' => true,
         ]);
@@ -450,7 +566,7 @@ class PendingRequest
      */
     public function buildHandlerStack()
     {
-        return tap(\GuzzleHttp\HandlerStack::create(), function ($stack) {
+        return tap(HandlerStack::create(), function ($stack) {
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());
             $stack->push($this->buildStubHandler());
@@ -503,13 +619,19 @@ class PendingRequest
     {
         return function ($handler) {
             return function ($request, $options) use ($handler) {
-                $response = ($this->expectations ?? collect())
+                $response = ($this->stubCallbacks ?? collect())
                      ->map
                      ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
                      ->filter()
-                     ->first(null, $handler($request, $options));
+                     ->first();
 
-                return is_array($response) ? Factory::response($response) : $response;
+                if (is_null($response)) {
+                    return $handler($request, $options);
+                } elseif (is_array($response)) {
+                    return Factory::response($response);
+                }
+
+                return $response;
             };
         };
     }
@@ -517,7 +639,7 @@ class PendingRequest
     /**
      * Execute the "before sending" callbacks.
      *
-     * @param  \GuzzleHttp\Psr7\RequestInterface
+     * @param  \GuzzleHttp\Psr7\RequestInterface  $request
      * @param  array  $options
      * @return \Closure
      */
@@ -543,19 +665,6 @@ class PendingRequest
     }
 
     /**
-     * Parse the query parameters in the given URL.
-     *
-     * @param  string  $url
-     * @return array
-     */
-    public function parseQueryParams(string $url)
-    {
-        return tap([], function (&$query) use ($url) {
-            parse_str(parse_url($url, PHP_URL_QUERY), $query);
-        });
-    }
-
-    /**
      * Register a stub callable that will intercept requests and be able to return stub responses.
      *
      * @param  callable  $callback
@@ -563,7 +672,7 @@ class PendingRequest
      */
     public function stub($callback)
     {
-        $this->expectations = collect($callback);
+        $this->stubCallbacks = collect($callback);
 
         return $this;
     }

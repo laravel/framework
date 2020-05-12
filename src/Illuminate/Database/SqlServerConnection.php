@@ -8,6 +8,8 @@ use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
+use Illuminate\Filesystem\Filesystem;
+use RuntimeException;
 use Throwable;
 
 class SqlServerConnection extends Connection
@@ -84,6 +86,19 @@ class SqlServerConnection extends Connection
     protected function getDefaultSchemaGrammar()
     {
         return $this->withTablePrefix(new SchemaGrammar);
+    }
+
+    /**
+     * Get the schema state for the connection.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem|null  $files
+     * @param  callable|null  $processFactory
+     *
+     * @throws \RuntimeException
+     */
+    public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
+    {
+        throw new RuntimeException('Schema dumping is not supported when using SQL Server.');
     }
 
     /**

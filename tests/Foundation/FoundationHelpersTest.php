@@ -43,29 +43,6 @@ class FoundationHelpersTest extends TestCase
         $this->assertSame('default', cache('baz', 'default'));
     }
 
-    public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided()
-    {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('You must specify an expiration time when setting a value in the cache.');
-
-        cache(['foo' => 'bar']);
-    }
-
-    public function testUnversionedElixir()
-    {
-        $file = 'unversioned.css';
-
-        app()->singleton('path.public', function () {
-            return __DIR__;
-        });
-
-        touch(public_path($file));
-
-        $this->assertSame('/'.$file, elixir($file));
-
-        unlink(public_path($file));
-    }
-
     public function testMixDoesNotIncludeHost()
     {
         $app = new Application;

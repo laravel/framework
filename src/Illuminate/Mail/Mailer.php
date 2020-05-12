@@ -10,10 +10,10 @@ use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\HtmlString;
-use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Swift_Mailer;
 
@@ -358,7 +358,7 @@ class Mailer implements MailerContract, MailQueueContract
         if (isset($plain)) {
             $method = isset($view) ? 'addPart' : 'setBody';
 
-            $message->$method($this->renderView($plain, $data), 'text/plain');
+            $message->$method($this->renderView($plain, $data) ?: ' ', 'text/plain');
         }
 
         if (isset($raw)) {

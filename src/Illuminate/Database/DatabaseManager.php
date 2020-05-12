@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Database\Connectors\ConnectionFactory;
-use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -149,7 +149,7 @@ class DatabaseManager implements ConnectionResolverInterface
         $connections = $this->app['config']['database.connections'];
 
         if (is_null($config = Arr::get($connections, $name))) {
-            throw new InvalidArgumentException("Database [{$name}] not configured.");
+            throw new InvalidArgumentException("Database connection [{$name}] not configured.");
         }
 
         return (new ConfigurationUrlParser)
@@ -243,6 +243,24 @@ class DatabaseManager implements ConnectionResolverInterface
         }
 
         return $this->refreshPdoConnections($name);
+    }
+
+    /**
+     * Set the default database connection for the callback execution.
+     *
+     * @param  string  $name
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function usingConnection($name, callable $callback)
+    {
+        $previousName = $this->getDefaultConnection();
+
+        $this->setDefaultConnection($name);
+
+        return tap($callback(), function () use ($previousName) {
+            $this->setDefaultConnection($previousName);
+        });
     }
 
     /**

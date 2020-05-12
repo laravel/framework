@@ -382,6 +382,10 @@ class Worker
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $connectionName, $job, (int) $options->maxTries, $e
                 );
+
+                $this->markJobAsFailedIfWillExceedMaxExceptions(
+                    $connectionName, $job, $e
+                );
             }
 
             $this->raiseExceptionOccurredJobEvent(
@@ -393,9 +397,9 @@ class Worker
             // another listener (or this same one). We will re-throw this exception after.
             if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
                 $job->release(
-                    method_exists($job, 'delaySeconds') && ! is_null($job->delaySeconds())
-                                ? $job->delaySeconds()
-                                : $options->delay
+                    method_exists($job, 'backoff') && ! is_null($job->backoff())
+                                ? $job->backoff()
+                                : $options->backoff
                 );
             }
         }
@@ -417,13 +421,13 @@ class Worker
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
-        $timeoutAt = $job->timeoutAt();
+        $retryUntil = $job->retryUntil();
 
-        if ($timeoutAt && Carbon::now()->getTimestamp() <= $timeoutAt) {
+        if ($retryUntil && Carbon::now()->getTimestamp() <= $retryUntil) {
             return;
         }
 
-        if (! $timeoutAt && ($maxTries === 0 || $job->attempts() <= $maxTries)) {
+        if (! $retryUntil && ($maxTries === 0 || $job->attempts() <= $maxTries)) {
             return;
         }
 
@@ -445,11 +449,38 @@ class Worker
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
-        if ($job->timeoutAt() && $job->timeoutAt() <= Carbon::now()->getTimestamp()) {
+        if ($job->retryUntil() && $job->retryUntil() <= Carbon::now()->getTimestamp()) {
             $this->failJob($job, $e);
         }
 
         if ($maxTries > 0 && $job->attempts() >= $maxTries) {
+            $this->failJob($job, $e);
+        }
+    }
+
+    /**
+     * Mark the given job as failed if it has exceeded the maximum allowed attempts.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  int  $maxTries
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function markJobAsFailedIfWillExceedMaxExceptions($connectionName, $job, Throwable $e)
+    {
+        if (! $this->cache || is_null($uuid = $job->uuid()) ||
+            is_null($maxExceptions = $job->maxExceptions())) {
+            return;
+        }
+
+        if (! $this->cache->get('job-exceptions:'.$uuid)) {
+            $this->cache->put('job-exceptions:'.$uuid, 0, Carbon::now()->addDay());
+        }
+
+        if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
+            $this->cache->forget('job-exceptions:'.$uuid);
+
             $this->failJob($job, $e);
         }
     }

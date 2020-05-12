@@ -26,16 +26,25 @@ class FileStore implements Store
     protected $directory;
 
     /**
+     * Octal representation of the cache file permissions.
+     *
+     * @var int|null
+     */
+    protected $filePermission;
+
+    /**
      * Create a new file cache store instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $directory
+     * @param  int|null  $filePermission
      * @return void
      */
-    public function __construct(Filesystem $files, $directory)
+    public function __construct(Filesystem $files, $directory, $filePermission = null)
     {
         $this->files = $files;
         $this->directory = $directory;
+        $this->filePermission = $filePermission;
     }
 
     /**
@@ -65,7 +74,15 @@ class FileStore implements Store
             $path, $this->expiration($seconds).serialize($value), true
         );
 
-        return $result !== false && $result > 0;
+        if ($result !== false && $result > 0) {
+            if (! is_null($this->filePermission)) {
+                $this->files->chmod($path, $this->filePermission);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

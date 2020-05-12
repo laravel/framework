@@ -3,8 +3,8 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Session\Store as SessionStore;
-use Illuminate\Support\Traits\Macroable;
 
 class Redirector
 {
@@ -174,6 +174,36 @@ class Redirector
     public function route($route, $parameters = [], $status = 302, $headers = [])
     {
         return $this->to($this->generator->route($route, $parameters), $status, $headers);
+    }
+
+    /**
+     * Create a new redirect response to a signed named route.
+     *
+     * @param  string  $route
+     * @param  mixed  $parameters
+     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function signedRoute($route, $parameters = [], $expiration = null, $status = 302, $headers = [])
+    {
+        return $this->to($this->generator->signedRoute($route, $parameters, $expiration), $status, $headers);
+    }
+
+    /**
+     * Create a new redirect response to a signed named route.
+     *
+     * @param  string  $route
+     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
+     * @param  mixed  $parameters
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function temporarySignedRoute($route, $expiration, $parameters = [], $status = 302, $headers = [])
+    {
+        return $this->to($this->generator->temporarySignedRoute($route, $expiration, $parameters), $status, $headers);
     }
 
     /**

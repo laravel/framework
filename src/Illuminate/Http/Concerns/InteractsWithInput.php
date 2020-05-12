@@ -2,8 +2,8 @@
 
 namespace Illuminate\Http\Concerns;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use SplFileInfo;
 use stdClass;
@@ -103,13 +103,7 @@ trait InteractsWithInput
 
         $input = $this->all();
 
-        foreach ($keys as $key) {
-            if (Arr::has($input, $key)) {
-                return true;
-            }
-        }
-
-        return false;
+        return Arr::hasAny($input, $keys);
     }
 
     /**

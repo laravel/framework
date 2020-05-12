@@ -3,8 +3,8 @@
 namespace Illuminate\Queue\Connectors;
 
 use Aws\Sqs\SqsClient;
+use Illuminate\Collections\Arr;
 use Illuminate\Queue\SqsQueue;
-use Illuminate\Support\Arr;
 
 class SqsConnector implements ConnectorInterface
 {
@@ -23,7 +23,7 @@ class SqsConnector implements ConnectorInterface
         }
 
         return new SqsQueue(
-            new SqsClient($config), $config['queue'], $config['prefix'] ?? ''
+            new SqsClient($config), $config['queue'], $config['prefix'] ?? '', $config['suffix'] ?? ''
         );
     }
 

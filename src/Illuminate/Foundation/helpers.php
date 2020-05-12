@@ -12,12 +12,10 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\HttpFoundation\Response;
@@ -249,13 +247,7 @@ if (! function_exists('cache')) {
             );
         }
 
-        if (! isset($arguments[1])) {
-            throw new Exception(
-                'You must specify an expiration time when setting a value in the cache.'
-            );
-        }
-
-        return app('cache')->put(key($arguments[0]), reset($arguments[0]), $arguments[1]);
+        return app('cache')->put(key($arguments[0]), reset($arguments[0]), $arguments[1] ?? null);
     }
 }
 
@@ -305,13 +297,13 @@ if (! function_exists('cookie')) {
      * @param  int  $minutes
      * @param  string|null  $path
      * @param  string|null  $domain
-     * @param  bool  $secure
+     * @param  bool|null  $secure
      * @param  bool  $httpOnly
      * @param  bool  $raw
      * @param  string|null  $sameSite
      * @return \Illuminate\Cookie\CookieJar|\Symfony\Component\HttpFoundation\Cookie
      */
-    function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true, $raw = false, $sameSite = null)
+    function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null)
     {
         $cookie = app(CookieFactory::class);
 
@@ -392,7 +384,7 @@ if (! function_exists('dispatch')) {
     function dispatch($job)
     {
         if ($job instanceof Closure) {
-            $job = new CallQueuedClosure(new SerializableClosure($job));
+            $job = CallQueuedClosure::create($job);
         }
 
         return new PendingDispatch($job);
@@ -410,46 +402,6 @@ if (! function_exists('dispatch_now')) {
     function dispatch_now($job, $handler = null)
     {
         return app(Dispatcher::class)->dispatchNow($job, $handler);
-    }
-}
-
-if (! function_exists('elixir')) {
-    /**
-     * Get the path to a versioned Elixir file.
-     *
-     * @param  string  $file
-     * @param  string  $buildDirectory
-     * @return string
-     *
-     * @throws \InvalidArgumentException
-     */
-    function elixir($file, $buildDirectory = 'build')
-    {
-        static $manifest = [];
-        static $manifestPath;
-
-        if (empty($manifest) || $manifestPath !== $buildDirectory) {
-            $path = public_path($buildDirectory.'/rev-manifest.json');
-
-            if (file_exists($path)) {
-                $manifest = json_decode(file_get_contents($path), true);
-                $manifestPath = $buildDirectory;
-            }
-        }
-
-        $file = ltrim($file, '/');
-
-        if (isset($manifest[$file])) {
-            return '/'.trim($buildDirectory.'/'.$manifest[$file], '/');
-        }
-
-        $unversioned = public_path($file);
-
-        if (file_exists($unversioned)) {
-            return '/'.trim($file, '/');
-        }
-
-        throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
     }
 }
 
@@ -479,26 +431,6 @@ if (! function_exists('event')) {
     function event(...$args)
     {
         return app('events')->dispatch(...$args);
-    }
-}
-
-if (! function_exists('factory')) {
-    /**
-     * Create a model factory builder for a given class and amount.
-     *
-     * @param  string  $class
-     * @param  int  $amount
-     * @return \Illuminate\Database\Eloquent\FactoryBuilder
-     */
-    function factory($class, $amount = null)
-    {
-        $factory = app(EloquentFactory::class);
-
-        if (isset($amount) && is_int($amount)) {
-            return $factory->of($class)->times($amount);
-        }
-
-        return $factory->of($class);
     }
 }
 

@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Countable;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
@@ -100,7 +101,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     /**
      * Determine if messages exist for all of the given keys.
      *
-     * @param  array|string  $key
+     * @param  array|string|null  $key
      * @return bool
      */
     public function has($key)
@@ -167,7 +168,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      * Get all of the messages from the message bag for a given key.
      *
      * @param  string  $key
-     * @param  string  $format
+     * @param  string|null  $format
      * @return array
      */
     public function get($key, $format = null)
@@ -211,7 +212,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     /**
      * Get all of the messages for every key in the message bag.
      *
-     * @param  string  $format
+     * @param  string|null  $format
      * @return array
      */
     public function all($format = null)
@@ -230,7 +231,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     /**
      * Get all of the unique messages for every key in the message bag.
      *
-     * @param  string  $format
+     * @param  string|null  $format
      * @return array
      */
     public function unique($format = null)

@@ -1,7 +1,8 @@
 <?php
 
+use Illuminate\Collections\Arr;
+use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
@@ -130,7 +131,7 @@ if (! function_exists('data_get')) {
      * Get an item from an array or object using "dot" notation.
      *
      * @param  mixed  $target
-     * @param  string|array|int  $key
+     * @param  string|array|int|null  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -142,7 +143,13 @@ if (! function_exists('data_get')) {
 
         $key = is_array($key) ? $key : explode('.', $key);
 
-        while (! is_null($segment = array_shift($key))) {
+        foreach ($key as $i => $segment) {
+            unset($key[$i]);
+
+            if (is_null($segment)) {
+                return $target;
+            }
+
             if ($segment === '*') {
                 if ($target instanceof Collection) {
                     $target = $target->all();
@@ -238,12 +245,16 @@ if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param  \Illuminate\Contracts\Support\Htmlable|string  $value
+     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|string  $value
      * @param  bool  $doubleEncode
      * @return string
      */
     function e($value, $doubleEncode = true)
     {
+        if ($value instanceof DeferringDisplayableValue) {
+            $value = $value->resolveDisplayableValue();
+        }
+
         if ($value instanceof Htmlable) {
             return $value->toHtml();
         }
@@ -310,7 +321,7 @@ if (! function_exists('object_get')) {
      * Get an item from an object using "dot" notation.
      *
      * @param  object  $object
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -376,7 +387,7 @@ if (! function_exists('retry')) {
      * @param  int  $times
      * @param  callable  $callback
      * @param  int  $sleep
-     * @param  callable  $when
+     * @param  callable|null  $when
      * @return mixed
      *
      * @throws \Exception

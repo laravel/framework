@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -14,23 +16,27 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
     public function testBasicCustomCasting()
     {
         $model = new TestEloquentModelWithCustomCast;
-        $model->reversed = 'taylor';
+        $model->uppercase = 'taylor';
 
-        $this->assertEquals('taylor', $model->reversed);
-        $this->assertEquals('rolyat', $model->getAttributes()['reversed']);
-        $this->assertEquals('rolyat', $model->toArray()['reversed']);
+        $this->assertSame('TAYLOR', $model->uppercase);
+        $this->assertSame('TAYLOR', $model->getAttributes()['uppercase']);
+        $this->assertSame('TAYLOR', $model->toArray()['uppercase']);
 
         $unserializedModel = unserialize(serialize($model));
 
-        $this->assertEquals('taylor', $unserializedModel->reversed);
-        $this->assertEquals('rolyat', $unserializedModel->getAttributes()['reversed']);
-        $this->assertEquals('rolyat', $unserializedModel->toArray()['reversed']);
+        $this->assertSame('TAYLOR', $unserializedModel->uppercase);
+        $this->assertSame('TAYLOR', $unserializedModel->getAttributes()['uppercase']);
+        $this->assertSame('TAYLOR', $unserializedModel->toArray()['uppercase']);
+
+        $model->syncOriginal();
+        $model->uppercase = 'dries';
+        $this->assertEquals('TAYLOR', $model->getOriginal('uppercase'));
 
         $model = new TestEloquentModelWithCustomCast;
 
         $model->address = $address = new Address('110 Kingsbrook St.', 'My Childhood House');
         $address->lineOne = '117 Spencer St.';
-        $this->assertEquals('117 Spencer St.', $model->getAttributes()['address_line_one']);
+        $this->assertSame('117 Spencer St.', $model->getAttributes()['address_line_one']);
 
         $model = new TestEloquentModelWithCustomCast;
 
@@ -39,20 +45,20 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
             'address_line_two' => 'My Childhood House',
         ]);
 
-        $this->assertEquals('110 Kingsbrook St.', $model->address->lineOne);
-        $this->assertEquals('My Childhood House', $model->address->lineTwo);
+        $this->assertSame('110 Kingsbrook St.', $model->address->lineOne);
+        $this->assertSame('My Childhood House', $model->address->lineTwo);
 
-        $this->assertEquals('110 Kingsbrook St.', $model->toArray()['address_line_one']);
-        $this->assertEquals('My Childhood House', $model->toArray()['address_line_two']);
+        $this->assertSame('110 Kingsbrook St.', $model->toArray()['address_line_one']);
+        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
 
         $model->address->lineOne = '117 Spencer St.';
 
         $this->assertFalse(isset($model->toArray()['address']));
-        $this->assertEquals('117 Spencer St.', $model->toArray()['address_line_one']);
-        $this->assertEquals('My Childhood House', $model->toArray()['address_line_two']);
+        $this->assertSame('117 Spencer St.', $model->toArray()['address_line_one']);
+        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
 
-        $this->assertEquals('117 Spencer St.', json_decode($model->toJson(), true)['address_line_one']);
-        $this->assertEquals('My Childhood House', json_decode($model->toJson(), true)['address_line_two']);
+        $this->assertSame('117 Spencer St.', json_decode($model->toJson(), true)['address_line_one']);
+        $this->assertSame('My Childhood House', json_decode($model->toJson(), true)['address_line_two']);
 
         $model->address = null;
 
@@ -68,6 +74,11 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals(['foo' => 'bar'], $model->options);
 
         $this->assertEquals(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
+
+        $model = new TestEloquentModelWithCustomCast(['options' => []]);
+        $model->syncOriginal();
+        $model->options = ['foo' => 'bar'];
+        $this->assertTrue($model->isDirty('options'));
     }
 
     public function testOneWayCasting()
@@ -99,19 +110,67 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
             'address_line_two' => 'My Childhood House',
         ]);
 
-        $this->assertEquals('110 Kingsbrook St.', $model->address->lineOne);
+        $this->assertSame('110 Kingsbrook St.', $model->address->lineOne);
 
         $model->setRawAttributes([
             'address_line_one' => '117 Spencer St.',
             'address_line_two' => 'My Childhood House',
         ]);
 
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
+    }
+
+    public function testWithCastableInterface()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->setRawAttributes([
+            'value_object_with_caster' => serialize(new ValueObject('hello')),
+        ]);
+
+        $this->assertInstanceOf(ValueObject::class, $model->value_object_with_caster);
+
+        $model->setRawAttributes([
+            'value_object_caster_with_argument' => null,
+        ]);
+
+        $this->assertEquals('argument', $model->value_object_caster_with_argument);
+
+        $model->setRawAttributes([
+            'value_object_caster_with_caster_instance' => serialize(new ValueObject('hello')),
+        ]);
+
+        $this->assertInstanceOf(ValueObject::class, $model->value_object_caster_with_caster_instance);
+    }
+
+    public function testGetFromUndefinedCast()
+    {
+        $this->expectException(InvalidCastException::class);
+
+        $model = new TestEloquentModelWithCustomCast;
+        $model->undefined_cast_column;
+    }
+
+    public function testSetToUndefinedCast()
+    {
+        $this->expectException(InvalidCastException::class);
+
+        $model = new TestEloquentModelWithCustomCast;
+        $this->assertTrue($model->hasCast('undefined_cast_column'));
+
+        $model->undefined_cast_column = 'Glāžšķūņu rūķīši';
     }
 }
 
 class TestEloquentModelWithCustomCast extends Model
 {
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [];
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -121,8 +180,12 @@ class TestEloquentModelWithCustomCast extends Model
         'address' => AddressCaster::class,
         'password' => HashCaster::class,
         'other_password' => HashCaster::class.':md5',
-        'reversed' => ReverseCaster::class,
+        'uppercase' => UppercaseCaster::class,
         'options' => JsonCaster::class,
+        'value_object_with_caster' => ValueObject::class,
+        'value_object_caster_with_argument' => ValueObject::class.':argument',
+        'value_object_caster_with_caster_instance' => ValueObjectWithCasterInstance::class,
+        'undefined_cast_column' => UndefinedCast::class,
     ];
 }
 
@@ -139,16 +202,16 @@ class HashCaster implements CastsInboundAttributes
     }
 }
 
-class ReverseCaster implements CastsAttributes
+class UppercaseCaster implements CastsAttributes
 {
     public function get($model, $key, $value, $attributes)
     {
-        return strrev($value);
+        return strtoupper($value);
     }
 
     public function set($model, $key, $value, $attributes)
     {
-        return [$key => strrev($value)];
+        return [$key => strtoupper($value)];
     }
 }
 
@@ -175,6 +238,74 @@ class JsonCaster implements CastsAttributes
     public function set($model, $key, $value, $attributes)
     {
         return json_encode($value);
+    }
+}
+
+class ValueObjectCaster implements CastsAttributes
+{
+    private $argument;
+
+    public function __construct($argument = null)
+    {
+        $this->argument = $argument;
+    }
+
+    public function get($model, $key, $value, $attributes)
+    {
+        if ($this->argument) {
+            return $this->argument;
+        }
+
+        return unserialize($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return serialize($value);
+    }
+}
+
+class ValueObject implements Castable
+{
+    public $name;
+
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public static function castUsing(array $arguments)
+    {
+        return new class(...$arguments) implements CastsAttributes {
+            private $argument;
+
+            public function __construct($argument = null)
+            {
+                $this->argument = $argument;
+            }
+
+            public function get($model, $key, $value, $attributes)
+            {
+                if ($this->argument) {
+                    return $this->argument;
+                }
+
+                return unserialize($value);
+            }
+
+            public function set($model, $key, $value, $attributes)
+            {
+                return serialize($value);
+            }
+        };
+    }
+}
+
+class ValueObjectWithCasterInstance extends ValueObject
+{
+    public static function castUsing(array $arguments)
+    {
+        return new ValueObjectCaster();
     }
 }
 

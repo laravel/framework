@@ -21,14 +21,23 @@ class StartSession
     protected $manager;
 
     /**
+     * The callback that can resolve an instance of the cache factory.
+     *
+     * @var callable|null
+     */
+    protected $cacheFactoryResolver;
+
+    /**
      * Create a new session middleware.
      *
      * @param  \Illuminate\Session\SessionManager  $manager
+     * @param  callable|null  $cacheFactoryResolver
      * @return void
      */
-    public function __construct(SessionManager $manager)
+    public function __construct(SessionManager $manager, callable $cacheFactoryResolver = null)
     {
         $this->manager = $manager;
+        $this->cacheFactoryResolver = $cacheFactoryResolver;
     }
 
     /**
@@ -44,11 +53,62 @@ class StartSession
             return $next($request);
         }
 
+        $session = $this->getSession($request);
+
+        if ($this->manager->shouldBlock() ||
+            ($request->route() && $request->route()->locksFor())) {
+            return $this->handleRequestWhileBlocking($request, $session, $next);
+        } else {
+            return $this->handleStatefulRequest($request, $session, $next);
+        }
+    }
+
+    /**
+     * Handle the given request within session state.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    protected function handleRequestWhileBlocking(Request $request, $session, Closure $next)
+    {
+        $lockFor = $request->route() && $request->route()->locksFor()
+                        ? $request->route()->locksFor()
+                        : 10;
+
+        $lock = $this->cache($this->manager->blockDriver())
+                    ->lock('session:'.$session->getId(), $lockFor)
+                    ->betweenBlockedAttemptsSleepFor(50);
+
+        try {
+            $lock->block(
+                ! is_null($request->route()->waitsFor())
+                        ? $request->route()->waitsFor()
+                        : 10
+            );
+
+            return $this->handleStatefulRequest($request, $session, $next);
+        } finally {
+            optional($lock)->release();
+        }
+    }
+
+    /**
+     * Handle the given request within session state.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    protected function handleStatefulRequest(Request $request, $session, Closure $next)
+    {
         // If a session driver has been configured, we will need to start the session here
         // so that the data is ready for an application. Note that the Laravel sessions
         // do not make use of PHP "native" sessions in any way since they are crappy.
         $request->setLaravelSession(
-            $session = $this->startSession($request)
+            $this->startSession($request, $session)
         );
 
         $this->collectGarbage($session);
@@ -71,11 +131,12 @@ class StartSession
      * Start the session for the given request.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Session\Session  $session
      * @return \Illuminate\Contracts\Session\Session
      */
-    protected function startSession(Request $request)
+    protected function startSession(Request $request, $session)
     {
-        return tap($this->getSession($request), function ($session) use ($request) {
+        return tap($session, function ($session) use ($request) {
             $session->setRequestOnHandler($request);
 
             $session->start();
@@ -215,5 +276,16 @@ class StartSession
         $config = $config ?: $this->manager->getSessionConfig();
 
         return ! is_null($config['driver'] ?? null);
+    }
+
+    /**
+     * Resolve the given cache driver.
+     *
+     * @param  string  $cache
+     * @return \Illuminate\Cache\Store
+     */
+    protected function cache($driver)
+    {
+        return call_user_func($this->cacheFactoryResolver)->driver($driver);
     }
 }

@@ -52,6 +52,20 @@ class HttpRedirectResponseTest extends TestCase
         $this->assertSame('bar', $cookies[0]->getValue());
     }
 
+    public function testFragmentIdentifierOnRedirect()
+    {
+        $response = new RedirectResponse('foo.bar');
+
+        $response->withFragment('foo');
+        $this->assertSame('foo', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
+
+        $response->withFragment('#bar');
+        $this->assertSame('bar', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
+
+        $response->withoutFragment();
+        $this->assertNull(parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
+    }
+
     public function testInputOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');

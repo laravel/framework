@@ -493,6 +493,9 @@ class TestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
+        // With falsey key
+        $response->assertJsonCount(1, '0');
+
         // With simple key
         $response->assertJsonCount(3, 'bars');
 
@@ -927,6 +930,7 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
                 'foobar_foo' => 'foo',
                 'foobar_bar' => 'bar',
             ],
+            '0' => ['foo'],
             'bars' => [
                 ['bar' => 'foo 0', 'foo' => 'bar 0'],
                 ['bar' => 'foo 1', 'foo' => 'bar 1'],

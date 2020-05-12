@@ -2,6 +2,7 @@
 
 namespace Illuminate\Testing;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
@@ -73,10 +74,10 @@ class PendingCommand
     }
 
     /**
-     * Specify a question that should be asked when the command runs.
+     * Specify an expected question that will be asked when the command runs.
      *
      * @param  string  $question
-     * @param  string  $answer
+     * @param  string|bool  $answer
      * @return $this
      */
     public function expectsQuestion($question, $answer)
@@ -84,6 +85,37 @@ class PendingCommand
         $this->test->expectedQuestions[] = [$question, $answer];
 
         return $this;
+    }
+
+    /**
+     * Specify an expected confirmation question that will be asked when the command runs.
+     *
+     * @param  string  $question
+     * @param  string  $answer
+     * @return $this
+     */
+    public function expectsConfirmation($question, $answer = 'no')
+    {
+        return $this->expectsQuestion($question, strtolower($answer) === 'yes');
+    }
+
+    /**
+     * Specify an expected choice question with expected answers that will be asked/shown when the command runs.
+     *
+     * @param  string  $question
+     * @param  string  $answer
+     * @param  array  $answers
+     * @param  bool  $strict
+     * @return $this
+     */
+    public function expectsChoice($question, $answer, $answers, $strict = false)
+    {
+        $this->test->expectedChoices[$question] = [
+            'expected' => $answers,
+            'strict' => $strict,
+        ];
+
+        return $this->expectsQuestion($question, $answer);
     }
 
     /**
@@ -131,10 +163,10 @@ class PendingCommand
     {
         $this->hasExecuted = true;
 
-        $this->mockConsoleOutput();
+        $mock = $this->mockConsoleOutput();
 
         try {
-            $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters);
+            $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters, $mock);
         } catch (NoMatchingExpectationException $e) {
             if ($e->getMethodName() === 'askQuestion') {
                 $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
@@ -150,13 +182,43 @@ class PendingCommand
             );
         }
 
+        $this->verifyExpectations();
+
         return $exitCode;
+    }
+
+    /**
+     * Determine if expected questions / choices / outputs are fulfilled.
+     *
+     * @return void
+     */
+    protected function verifyExpectations()
+    {
+        if (count($this->test->expectedQuestions)) {
+            $this->test->fail('Question "'.Arr::first($this->test->expectedQuestions)[0].'" was not asked.');
+        }
+
+        if (count($this->test->expectedChoices) > 0) {
+            foreach ($this->test->expectedChoices as $question => $answers) {
+                $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
+
+                $this->test->{$assertion}(
+                    $answers['expected'],
+                    $answers['actual'],
+                    'Question "'.$question.'" has different options.'
+                );
+            }
+        }
+
+        if (count($this->test->expectedOutput)) {
+            $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
+        }
     }
 
     /**
      * Mock the application's console output.
      *
-     * @return void
+     * @return \Mockery\MockInterface
      */
     protected function mockConsoleOutput()
     {
@@ -169,6 +231,10 @@ class PendingCommand
                 ->once()
                 ->ordered()
                 ->with(Mockery::on(function ($argument) use ($question) {
+                    if (isset($this->test->expectedChoices[$question[0]])) {
+                        $this->test->expectedChoices[$question[0]]['actual'] = $argument->getAutocompleterValues();
+                    }
+
                     return $argument->getQuestion() == $question[0];
                 }))
                 ->andReturnUsing(function () use ($question, $i) {
@@ -181,6 +247,8 @@ class PendingCommand
         $this->app->bind(OutputStyle::class, function () use ($mock) {
             return $mock;
         });
+
+        return $mock;
     }
 
     /**

@@ -21,7 +21,7 @@ interface UrlRoutable
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
@@ -30,8 +30,8 @@ interface UrlRoutable
     /**
      * Retrieve the child model for a bound value.
      *
-     * @param  string   $childType
-     * @param  mixed   $value
+     * @param  string  $childType
+     * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */

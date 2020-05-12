@@ -5,6 +5,10 @@ namespace Illuminate\Testing;
 use ArrayAccess;
 use Illuminate\Testing\Constraints\ArraySubset;
 use PHPUnit\Framework\Assert as PHPUnit;
+use PHPUnit\Framework\Constraint\DirectoryExists;
+use PHPUnit\Framework\Constraint\FileExists;
+use PHPUnit\Framework\Constraint\LogicalNot;
+use PHPUnit\Framework\Constraint\RegularExpression;
 use PHPUnit\Framework\InvalidArgumentException;
 use PHPUnit\Util\InvalidArgumentHelper;
 
@@ -43,5 +47,42 @@ abstract class Assert extends PHPUnit
         $constraint = new ArraySubset($subset, $checkForIdentity);
 
         PHPUnit::assertThat($array, $constraint, $msg);
+    }
+
+    /**
+     * Asserts that a file does not exist.
+     *
+     * @param  string  $filename
+     * @param  string  $message
+     * @return void
+     */
+    public static function assertFileDoesNotExist(string $filename, string $message = ''): void
+    {
+        static::assertThat($filename, new LogicalNot(new FileExists), $message);
+    }
+
+    /**
+     * Asserts that a directory does not exist.
+     *
+     * @param  string  $directory
+     * @param  string  $message
+     * @return void
+     */
+    public static function assertDirectoryDoesNotExist(string $directory, string $message = ''): void
+    {
+        static::assertThat($directory, new LogicalNot(new DirectoryExists), $message);
+    }
+
+    /**
+     * Asserts that a string matches a given regular expression.
+     *
+     * @param  string  $pattern
+     * @param  string  $string
+     * @param  string  $message
+     * @return void
+     */
+    public static function assertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
+    {
+        static::assertThat($string, new RegularExpression($pattern), $message);
     }
 }

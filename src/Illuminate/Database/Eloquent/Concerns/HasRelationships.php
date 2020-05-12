@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 trait HasRelationships
@@ -369,8 +369,12 @@ trait HasRelationships
         $secondKey = $secondKey ?: $through->getForeignKey();
 
         return $this->newHasManyThrough(
-            $this->newRelatedInstance($related)->newQuery(), $this, $through,
-            $firstKey, $secondKey, $localKey ?: $this->getKeyName(),
+            $this->newRelatedInstance($related)->newQuery(),
+            $this,
+            $through,
+            $firstKey,
+            $secondKey,
+            $localKey ?: $this->getKeyName(),
             $secondLocalKey ?: $through->getKeyName()
         );
     }
@@ -488,7 +492,7 @@ trait HasRelationships
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
      * @param  string  $relatedKey
-     * @param  string  $relationName
+     * @param  string|null  $relationName
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,

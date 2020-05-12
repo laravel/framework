@@ -3,11 +3,11 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Exception;
+use Illuminate\Collections\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionFunction;
@@ -261,7 +261,7 @@ abstract class Broadcaster implements BroadcasterContract
      * Normalize the given callback into a callable.
      *
      * @param  mixed  $callback
-     * @return \Closure|callable
+     * @return callable
      */
     protected function normalizeChannelHandlerToCallable($callback)
     {

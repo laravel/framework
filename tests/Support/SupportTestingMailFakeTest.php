@@ -14,12 +14,12 @@ use PHPUnit\Framework\TestCase;
 class SupportTestingMailFakeTest extends TestCase
 {
     /**
-     * @var MailFake
+     * @var \Illuminate\Support\Testing\Fakes\MailFake
      */
     private $fake;
 
     /**
-     * @var MailableStub
+     * @var \Illuminate\Tests\Support\MailableStub
      */
     private $mailable;
 
@@ -153,6 +153,24 @@ class SupportTestingMailFakeTest extends TestCase
         } catch (ExpectationFailedException $e) {
             $this->assertThat($e, new ExceptionMessage('The following mailables were queued unexpectedly: Illuminate\Tests\Support\MailableStub'));
         }
+    }
+
+    public function testAssertQueuedWithClosure()
+    {
+        $this->fake->to($user = new LocalizedRecipientStub)->queue($this->mailable);
+
+        $this->fake->assertQueued(function (MailableStub $mail) use ($user) {
+            return $mail->hasTo($user);
+        });
+    }
+
+    public function testAssertSentWithClosure()
+    {
+        $this->fake->to($user = new LocalizedRecipientStub)->send($this->mailable);
+
+        $this->fake->assertSent(function (MailableStub $mail) use ($user) {
+            return $mail->hasTo($user);
+        });
     }
 }
 

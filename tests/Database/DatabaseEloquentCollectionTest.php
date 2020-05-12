@@ -8,6 +8,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
@@ -386,6 +387,15 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals([], $c[0]->getHidden());
     }
 
+    public function testAppendsAddsTestOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->makeVisible('test');
+        $c = $c->append('test');
+
+        $this->assertEquals(['test' => 'test'], $c[0]->toArray());
+    }
+
     public function testNonModelRelatedMethods()
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
@@ -422,6 +432,24 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c->getQueueableClass();
     }
 
+    public function testQueueableRelationshipsReturnsOnlyRelationsCommonToAllModels()
+    {
+        // This is needed to prevent loading non-existing relationships on polymorphic model collections (#26126)
+        $c = new Collection([new class {
+            public function getQueueableRelations()
+            {
+                return ['user'];
+            }
+        }, new class {
+            public function getQueueableRelations()
+            {
+                return ['user', 'comments'];
+            }
+        }]);
+
+        $this->assertEquals(['user'], $c->getQueueableRelations());
+    }
+
     public function testEmptyCollectionStayEmptyOnFresh()
     {
         $c = new Collection;
@@ -433,4 +461,9 @@ class TestEloquentCollectionModel extends Model
 {
     protected $visible = ['visible'];
     protected $hidden = ['hidden'];
+
+    public function getTestAttribute()
+    {
+        return 'test';
+    }
 }

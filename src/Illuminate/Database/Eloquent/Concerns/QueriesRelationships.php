@@ -152,7 +152,7 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  string  $relation
-     * @param  \Closure  $callback
+     * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -178,7 +178,7 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  string  $relation
-     * @param  \Closure  $callback
+     * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhereDoesntHave($relation, Closure $callback = null)
@@ -204,7 +204,7 @@ trait QueriesRelationships
         $types = (array) $types;
 
         if ($types === ['*']) {
-            $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())->all();
+            $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())->filter()->all();
 
             foreach ($types as &$type) {
                 $type = Relation::getMorphedModel($type) ?? $type;
@@ -311,7 +311,7 @@ trait QueriesRelationships
      *
      * @param  string  $relation
      * @param  string|array  $types
-     * @param  \Closure  $callback
+     * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -339,7 +339,7 @@ trait QueriesRelationships
      *
      * @param  string  $relation
      * @param  string|array  $types
-     * @param  \Closure  $callback
+     * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhereDoesntHaveMorph($relation, $types, Closure $callback = null)

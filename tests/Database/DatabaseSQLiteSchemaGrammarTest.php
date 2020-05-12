@@ -252,6 +252,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
+    public function testAddingRawIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->rawIndex('(function(column))', 'raw_index');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "raw_index" on "users" ((function(column)))', $statements[0]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');
@@ -305,6 +315,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $foreignId = $blueprint->foreignId('foo');
         $blueprint->foreignId('company_id')->constrained();
         $blueprint->foreignId('team_id')->references('id')->on('teams');
+        $blueprint->foreignId('team_column_id')->constrained('teams');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
@@ -313,6 +324,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             'alter table "users" add column "foo" integer not null',
             'alter table "users" add column "company_id" integer not null',
             'alter table "users" add column "team_id" integer not null',
+            'alter table "users" add column "team_column_id" integer not null',
         ], $statements);
     }
 

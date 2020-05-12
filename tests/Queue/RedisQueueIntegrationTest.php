@@ -8,6 +8,7 @@ use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +17,7 @@ class RedisQueueIntegrationTest extends TestCase
     use InteractsWithRedis, InteractsWithTime;
 
     /**
-     * @var RedisQueue
+     * @var \Illuminate\Queue\RedisQueue
      */
     private $queue;
 
@@ -38,7 +39,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testExpiredJobsArePopped($driver)
     {
@@ -110,7 +111,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testPopProperlyPopsJobOffOfRedis($driver)
     {
@@ -122,7 +123,7 @@ class RedisQueueIntegrationTest extends TestCase
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
-        /** @var RedisJob $redisJob */
+        /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
         $after = $this->currentTime();
 
@@ -145,7 +146,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testPopProperlyPopsDelayedJobOffOfRedis($driver)
     {
@@ -172,7 +173,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testPopPopsDelayedJobOffOfRedisWhenExpireNull($driver)
     {
@@ -201,7 +202,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testBlockingPopProperlyPopsJobOffOfRedis($driver)
     {
@@ -212,7 +213,7 @@ class RedisQueueIntegrationTest extends TestCase
         $this->queue->push($job);
 
         // Pop and check it is popped correctly
-        /** @var RedisJob $redisJob */
+        /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
 
         $this->assertNotNull($redisJob);
@@ -222,10 +223,14 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testBlockingPopProperlyPopsExpiredJobs($driver)
     {
+        Str::createUuidsUsing(function () {
+            return 'uuid';
+        });
+
         $this->setQueue($driver, 'default', null, 60, 5);
 
         $jobs = [
@@ -242,12 +247,14 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default:notify'));
         $this->assertEquals(0, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
         $this->assertEquals(2, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+
+        Str::createUuidsNormally();
     }
 
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testNotExpireJobsWhenExpireNull($driver)
     {
@@ -292,7 +299,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testExpireJobsWhenExpireSet($driver)
     {
@@ -321,24 +328,24 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testRelease($driver)
     {
         $this->setQueue($driver);
 
-        //push a job into queue
+        // push a job into queue
         $job = new RedisQueueIntegrationTestJob(30);
         $this->queue->push($job);
 
-        //pop and release the job
+        // pop and release the job
         /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
         $before = $this->currentTime();
         $redisJob->release(1000);
         $after = $this->currentTime();
 
-        //check the content of delayed queue
+        // check the content of delayed queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
 
         $results = $this->redis[$driver]->connection()->zrangebyscore('queues:default:delayed', -INF, INF, ['withscores' => true]);
@@ -355,14 +362,14 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals(1, $decoded->attempts);
         $this->assertEquals($job, unserialize($decoded->data->command));
 
-        //check if the queue has no ready item yet
+        // check if the queue has no ready item yet
         $this->assertNull($this->queue->pop());
     }
 
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testReleaseInThePast($driver)
     {
@@ -370,7 +377,7 @@ class RedisQueueIntegrationTest extends TestCase
         $job = new RedisQueueIntegrationTestJob(30);
         $this->queue->push($job);
 
-        /** @var RedisJob $redisJob */
+        /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
         $redisJob->release(-3);
 
@@ -380,7 +387,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testDelete($driver)
     {
@@ -404,7 +411,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testSize($driver)
     {
@@ -423,7 +430,7 @@ class RedisQueueIntegrationTest extends TestCase
     }
 
     /**
-     * @param string $driver
+     * @param  string  $driver
      * @param  string  $default
      * @param  string  $connection
      * @param  int  $retryAfter

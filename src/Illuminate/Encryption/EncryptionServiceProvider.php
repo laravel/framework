@@ -4,6 +4,7 @@ namespace Illuminate\Encryption;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Opis\Closure\SerializableClosure;
 use RuntimeException;
 
 class EncryptionServiceProvider extends ServiceProvider
@@ -15,18 +16,53 @@ class EncryptionServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerEncrypter();
+        $this->registerOpisSecurityKey();
+    }
+
+    /**
+     * Register the encrypter.
+     *
+     * @return void
+     */
+    protected function registerEncrypter()
+    {
         $this->app->singleton('encrypter', function ($app) {
             $config = $app->make('config')->get('app');
 
-            // If the key starts with "base64:", we will need to decode the key before handing
-            // it off to the encrypter. Keys may be base-64 encoded for presentation and we
-            // want to make sure to convert them back to the raw bytes before encrypting.
-            if (Str::startsWith($key = $this->key($config), $prefix = 'base64:')) {
-                $key = base64_decode(Str::after($key, $prefix));
-            }
-
-            return new Encrypter($key, $config['cipher']);
+            return new Encrypter($this->parseKey($config), $config['cipher']);
         });
+    }
+
+    /**
+     * Configure Opis Closure signing for security.
+     *
+     * @return void
+     */
+    protected function registerOpisSecurityKey()
+    {
+        $config = $this->app->make('config')->get('app');
+
+        if (! class_exists(SerializableClosure::class) || empty($config['key'])) {
+            return;
+        }
+
+        SerializableClosure::setSecretKey($this->parseKey($config));
+    }
+
+    /**
+     * Parse the encryption key.
+     *
+     * @param  array  $config
+     * @return string
+     */
+    protected function parseKey(array $config)
+    {
+        if (Str::startsWith($key = $this->key($config), $prefix = 'base64:')) {
+            $key = base64_decode(Str::after($key, $prefix));
+        }
+
+        return $key;
     }
 
     /**

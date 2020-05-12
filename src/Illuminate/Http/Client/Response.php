@@ -3,7 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 use LogicException;
 
 class Response implements ArrayAccess
@@ -29,7 +29,7 @@ class Response implements ArrayAccess
     /**
      * Create a new response instance.
      *
-     * @param  \Psr\Http\Message\MessageInterface
+     * @param  \Psr\Http\Message\MessageInterface  $response
      * @return void
      */
     public function __construct($response)
@@ -48,22 +48,33 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Get the JSON decoded body of the response.
+     * Get the JSON decoded body of the response as an array.
      *
      * @return array
      */
     public function json()
     {
         if (! $this->decoded) {
-            $this->decoded = json_decode((string) $this->response->getBody(), true);
+            $this->decoded = json_decode($this->body(), true);
         }
 
         return $this->decoded;
     }
 
     /**
+     * Get the JSON decoded body of the response as an object.
+     *
+     * @return object
+     */
+    public function object()
+    {
+        return json_decode($this->body(), false);
+    }
+
+    /**
      * Get a header from the response.
      *
+     * @param  string  $header
      * @return string
      */
     public function header(string $header)
@@ -134,7 +145,17 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Detemine if the response indicates a client error occurred.
+     * Determine if the response indicates a client or server error occurred.
+     *
+     * @return bool
+     */
+    public function failed()
+    {
+        return $this->serverError() || $this->clientError();
+    }
+
+    /**
+     * Determine if the response indicates a client error occurred.
      *
      * @return bool
      */
@@ -144,7 +165,7 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Detemine if the response indicates a server error occurred.
+     * Determine if the response indicates a server error occurred.
      *
      * @return bool
      */
@@ -156,7 +177,7 @@ class Response implements ArrayAccess
     /**
      * Get the response cookies.
      *
-     * @return array
+     * @return \GuzzleHttp\Cookie\CookieJar
      */
     public function cookies()
     {
@@ -176,13 +197,17 @@ class Response implements ArrayAccess
     /**
      * Throw an exception if a server or client error occurred.
      *
-     * @return void
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
      */
     public function throw()
     {
         if ($this->serverError() || $this->clientError()) {
             throw new RequestException($this);
         }
+
+        return $this;
     }
 
     /**

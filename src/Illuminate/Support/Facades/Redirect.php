@@ -12,6 +12,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Http\RedirectResponse away(string $path, int $status = 302, array $headers = [])
  * @method static \Illuminate\Http\RedirectResponse secure(string $path, int $status = 302, array $headers = [])
  * @method static \Illuminate\Http\RedirectResponse route(string $route, array $parameters = [], int $status = 302, array $headers = [])
+ * @method static \Illuminate\Http\RedirectResponse signedRoute(string $name, array $parameters = [], \DateTimeInterface|\DateInterval|int $expiration = null, int $status = 302, array $headers = [])
+ * @method static \Illuminate\Http\RedirectResponse temporarySignedRoute(string $name, \DateTimeInterface|\DateInterval|int $expiration, array $parameters = [], int $status = 302, array $headers = [])
  * @method static \Illuminate\Http\RedirectResponse action(string $action, array $parameters = [], int $status = 302, array $headers = [])
  * @method static \Illuminate\Routing\UrlGenerator getUrlGenerator()
  * @method static void setSession(\Illuminate\Session\Store $session)

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Collections\Arr;
 use InvalidArgumentException;
 
 class ConfigurationUrlParser
@@ -31,9 +32,7 @@ class ConfigurationUrlParser
             $config = ['url' => $config];
         }
 
-        $url = $config['url'] ?? null;
-
-        $config = Arr::except($config, 'url');
+        $url = Arr::pull($config, 'url');
 
         if (! $url) {
             return $config;

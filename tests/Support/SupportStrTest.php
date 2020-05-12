@@ -73,6 +73,9 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith('Malmö', 'Malmö'));
         $this->assertFalse(Str::startsWith('Jönköping', 'Jonko'));
         $this->assertFalse(Str::startsWith('Malmö', 'Malmo'));
+        $this->assertTrue(Str::startsWith('你好', '你'));
+        $this->assertFalse(Str::startsWith('你好', '好'));
+        $this->assertFalse(Str::startsWith('你好', 'a'));
     }
 
     public function testEndsWith()
@@ -100,6 +103,9 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith('Malmö', 'mö'));
         $this->assertFalse(Str::endsWith('Jönköping', 'oping'));
         $this->assertFalse(Str::endsWith('Malmö', 'mo'));
+        $this->assertTrue(Str::endsWith('你好', '好'));
+        $this->assertFalse(Str::endsWith('你好', '你'));
+        $this->assertFalse(Str::endsWith('你好', 'a'));
     }
 
     public function testStrBefore()
@@ -125,6 +131,21 @@ class SupportStrTest extends TestCase
         $this->assertSame('yv0et', Str::beforeLast('yv0et0te', '0'));
         $this->assertSame('yv0et', Str::beforeLast('yv0et0te', 0));
         $this->assertSame('yv2et', Str::beforeLast('yv2et2te', 2));
+    }
+
+    public function testStrBetween()
+    {
+        $this->assertSame('abc', Str::between('abc', '', 'c'));
+        $this->assertSame('abc', Str::between('abc', 'a', ''));
+        $this->assertSame('abc', Str::between('abc', '', ''));
+        $this->assertSame('b', Str::between('abc', 'a', 'c'));
+        $this->assertSame('b', Str::between('dddabc', 'a', 'c'));
+        $this->assertSame('b', Str::between('abcddd', 'a', 'c'));
+        $this->assertSame('b', Str::between('dddabcddd', 'a', 'c'));
+        $this->assertSame('nn', Str::between('hannah', 'ha', 'ah'));
+        $this->assertSame('a]ab[b', Str::between('[a]ab[b]', '[', ']'));
+        $this->assertSame('foo', Str::between('foofoobar', 'foo', 'bar'));
+        $this->assertSame('bar', Str::between('foobarbar', 'foo', 'bar'));
     }
 
     public function testStrAfter()
@@ -185,7 +206,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('hello-world', Str::slug('hello_world'));
         $this->assertSame('hello_world', Str::slug('hello_world', '_'));
         $this->assertSame('user-at-host', Str::slug('user@host'));
-        $this->assertSame('slam-dnya', Str::slug('سلام دنیا', '-', null));
+        $this->assertSame('سلام-دنیا', Str::slug('سلام دنیا', '-', null));
+        $this->assertSame('sometext', Str::slug('some text', ''));
+        $this->assertSame('', Str::slug('', ''));
+        $this->assertSame('', Str::slug(''));
     }
 
     public function testStrStart()
@@ -235,7 +259,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::is('foo/bar/baz', $valueObject));
         $this->assertTrue(Str::is($patternObject, $valueObject));
 
-        //empty patterns
+        // empty patterns
         $this->assertFalse(Str::is([], 'test'));
     }
 
@@ -400,6 +424,20 @@ class SupportStrTest extends TestCase
         $this->assertEmpty(Str::substr('Б', 2));
     }
 
+    public function testSubstrCount()
+    {
+        $this->assertSame(3, Str::substrCount('laravelPHPFramework', 'a'));
+        $this->assertSame(0, Str::substrCount('laravelPHPFramework', 'z'));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'l', 2));
+        $this->assertSame(0, Str::substrCount('laravelPHPFramework', 'z', 2));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'k', -1));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'k', -1));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', 1, 2));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', 1, 2));
+        $this->assertSame(3, Str::substrCount('laravelPHPFramework', 'a', 1, -2));
+        $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', -10, -3));
+    }
+
     public function testUcfirst()
     {
         $this->assertSame('Laravel', Str::ucfirst('laravel'));
@@ -412,6 +450,13 @@ class SupportStrTest extends TestCase
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
+    }
+
+    public function testAsciiNull()
+    {
+        $this->assertSame('', Str::ascii(null));
+        $this->assertTrue(Str::isAscii(null));
+        $this->assertSame('', Str::slug(null));
     }
 
     public function validUuidList()

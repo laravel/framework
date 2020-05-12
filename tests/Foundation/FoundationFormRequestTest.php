@@ -134,7 +134,7 @@ class FoundationFormRequestTest extends TestCase
             throw $e;
         }
 
-        throw new Exception("No exception thrown. Expected exception {$class}");
+        throw new Exception("No exception thrown. Expected exception {$class}.");
     }
 
     /**

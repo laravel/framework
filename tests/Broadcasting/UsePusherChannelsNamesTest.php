@@ -4,36 +4,30 @@ namespace Illuminate\Tests\Broadcasting;
 
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-class UsePusherChannelConventionsTest extends TestCase
+class UsePusherChannelsNamesTest extends TestCase
 {
-    /**
-     * @var \Illuminate\Broadcasting\Broadcasters\RedisBroadcaster
-     */
-    public $broadcaster;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->broadcaster = new FakeBroadcasterUsingPusherChannelsNames();
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     /**
      * @dataProvider channelsProvider
      */
     public function testChannelNameNormalization($requestChannelName, $normalizedName)
     {
-        $this->assertEquals(
+        $broadcaster = new FakeBroadcasterUsingPusherChannelsNames();
+
+        $this->assertSame(
             $normalizedName,
-            $this->broadcaster->normalizeChannelName($requestChannelName)
+            $broadcaster->normalizeChannelName($requestChannelName)
+        );
+    }
+
+    public function testChannelNameNormalizationSpecialCase()
+    {
+        $broadcaster = new FakeBroadcasterUsingPusherChannelsNames();
+
+        $this->assertSame(
+            'private-123',
+            $broadcaster->normalizeChannelName('private-encrypted-private-123')
         );
     }
 
@@ -42,9 +36,11 @@ class UsePusherChannelConventionsTest extends TestCase
      */
     public function testIsGuardedChannel($requestChannelName, $_, $guarded)
     {
-        $this->assertEquals(
+        $broadcaster = new FakeBroadcasterUsingPusherChannelsNames();
+
+        $this->assertSame(
             $guarded,
-            $this->broadcaster->isGuardedChannel($requestChannelName)
+            $broadcaster->isGuardedChannel($requestChannelName)
         );
     }
 
@@ -52,6 +48,7 @@ class UsePusherChannelConventionsTest extends TestCase
     {
         $prefixesInfos = [
             ['prefix' => 'private-', 'guarded' => true],
+            ['prefix' => 'private-encrypted-', 'guarded' => true],
             ['prefix' => 'presence-', 'guarded' => true],
             ['prefix' => '', 'guarded' => false],
         ];

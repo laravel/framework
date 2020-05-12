@@ -155,7 +155,7 @@ class MailMailerTest extends TestCase
         $this->setSwiftMailer($mailer);
         $mailer->alwaysReturnPath('taylorotwell@gmail.com');
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
-            $this->assertEquals('taylorotwell@gmail.com', $message->getReturnPath());
+            $this->assertSame('taylorotwell@gmail.com', $message->getReturnPath());
         });
         $mailer->send('foo', ['data'], function ($m) {
             //

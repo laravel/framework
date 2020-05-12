@@ -4,19 +4,19 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use DateTimeInterface;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
-use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -54,12 +54,13 @@ class Builder
      */
     public $bindings = [
         'select' => [],
-        'from'   => [],
-        'join'   => [],
-        'where'  => [],
+        'from' => [],
+        'join' => [],
+        'where' => [],
+        'groupBy' => [],
         'having' => [],
-        'order'  => [],
-        'union'  => [],
+        'order' => [],
+        'union' => [],
         'unionOrder' => [],
     ];
 
@@ -224,7 +225,7 @@ class Builder
     public function select($columns = ['*'])
     {
         $this->columns = [];
-
+        $this->bindings['select'] = [];
         $columns = is_array($columns) ? $columns : func_get_args();
 
         foreach ($columns as $as => $column) {
@@ -658,7 +659,7 @@ class Builder
         // If the column is a Closure instance and there is an operator value, we will
         // assume the developer wants to run a subquery and then compare the result
         // of that subquery with the given value that was provided to the method.
-        if ($column instanceof Closure && ! is_null($operator)) {
+        if ($this->isQueryable($column) && ! is_null($operator)) {
             [$sub, $bindings] = $this->createSub($column);
 
             return $this->addBinding($bindings, 'where')
@@ -983,6 +984,18 @@ class Builder
     }
 
     /**
+     * Add an "or where in raw" clause for integer values to the query.
+     *
+     * @param  string  $column
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @return $this
+     */
+    public function orWhereIntegerInRaw($column, $values)
+    {
+        return $this->whereIntegerInRaw($column, $values, 'or');
+    }
+
+    /**
      * Add a "where not in raw" clause for integer values to the query.
      *
      * @param  string  $column
@@ -993,6 +1006,18 @@ class Builder
     public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
     {
         return $this->whereIntegerInRaw($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not in raw" clause for integer values to the query.
+     *
+     * @param  string  $column
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @return $this
+     */
+    public function orWhereIntegerNotInRaw($column, $values)
+    {
+        return $this->whereIntegerNotInRaw($column, $values, 'or');
     }
 
     /**
@@ -1696,6 +1721,22 @@ class Builder
     }
 
     /**
+     * Add a raw groupBy clause to the query.
+     *
+     * @param  string  $sql
+     * @param  array  $bindings
+     * @return $this
+     */
+    public function groupByRaw($sql, array $bindings = [])
+    {
+        $this->groups[] = new Expression($sql);
+
+        $this->addBinding($bindings, 'groupBy');
+
+        return $this;
+    }
+
+    /**
      * Add a "having" clause to the query.
      *
      * @param  string  $column
@@ -1802,7 +1843,7 @@ class Builder
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
      * @param  string  $direction
      * @return $this
      *
@@ -1998,6 +2039,25 @@ class Builder
 
         return $this->orderBy($column, 'asc')
                     ->limit($perPage);
+    }
+
+    /**
+     * Remove all existing orders and optionally add a new order.
+     *
+     * @return $this
+     */
+    public function reorder($column = null, $direction = 'asc')
+    {
+        $this->orders = null;
+        $this->unionOrders = null;
+        $this->bindings['order'] = [];
+        $this->bindings['unionOrder'] = [];
+
+        if ($column) {
+            return $this->orderBy($column, $direction);
+        }
+
+        return $this;
     }
 
     /**
@@ -2202,9 +2262,7 @@ class Builder
         // Once we have run the pagination count query, we will get the resulting count and
         // take into account what type of query it was. When there is a group by we will
         // just return the count of the entire results set since that will be correct.
-        if (isset($this->groups)) {
-            return count($results);
-        } elseif (! isset($results[0])) {
+        if (! isset($results[0])) {
             return 0;
         } elseif (is_object($results[0])) {
             return (int) $results[0]->aggregate;
@@ -2221,12 +2279,37 @@ class Builder
      */
     protected function runPaginationCountQuery($columns = ['*'])
     {
+        if ($this->groups || $this->havings) {
+            $clone = $this->cloneForPaginationCount();
+
+            if (is_null($clone->columns) && ! empty($this->joins)) {
+                $clone->select($this->from.'.*');
+            }
+
+            return $this->newQuery()
+                ->from(new Expression('('.$clone->toSql().') as '.$this->grammar->wrap('aggregate_table')))
+                ->mergeBindings($clone)
+                ->setAggregate('count', $this->withoutSelectAliases($columns))
+                ->get()->all();
+        }
+
         $without = $this->unions ? ['orders', 'limit', 'offset'] : ['columns', 'orders', 'limit', 'offset'];
 
         return $this->cloneWithout($without)
                     ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
                     ->setAggregate('count', $this->withoutSelectAliases($columns))
                     ->get()->all();
+    }
+
+    /**
+     * Clone the existing query instance for usage in a pagination subquery.
+     *
+     * @return self
+     */
+    protected function cloneForPaginationCount()
+    {
+        return $this->cloneWithout(['orders', 'limit', 'offset'])
+                    ->cloneWithoutBindings(['order']);
     }
 
     /**
@@ -2324,9 +2407,9 @@ class Builder
             return $column;
         }
 
-        $seperator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
+        $separator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
 
-        return last(preg_split('~'.$seperator.'~i', $column));
+        return last(preg_split('~'.$separator.'~i', $column));
     }
 
     /**

@@ -2,12 +2,12 @@
 
 namespace Illuminate\Http;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Testing\FileFactory;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class UploadedFile extends SymfonyUploadedFile
@@ -98,7 +98,7 @@ class UploadedFile extends SymfonyUploadedFile
     public function get()
     {
         if (! $this->isValid()) {
-            throw new FileNotFoundException("File does not exist at path {$this->getPathname()}");
+            throw new FileNotFoundException("File does not exist at path {$this->getPathname()}.");
         }
 
         return file_get_contents($this->getPathname());

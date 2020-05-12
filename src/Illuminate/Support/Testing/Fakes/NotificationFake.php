@@ -2,17 +2,20 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
+use Exception;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class NotificationFake implements NotificationDispatcher, NotificationFactory
 {
-    use Macroable;
+    use Macroable, ReflectsClosures;
 
     /**
      * All of the notifications that have been sent.
@@ -32,18 +35,28 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      * Assert if a notification was sent based on a truth-test callback.
      *
      * @param  mixed  $notifiable
-     * @param  string  $notification
+     * @param  string|\Closure  $notification
      * @param  callable|null  $callback
      * @return void
+     *
+     * @throws \Exception
      */
     public function assertSentTo($notifiable, $notification, $callback = null)
     {
         if (is_array($notifiable) || $notifiable instanceof Collection) {
+            if (count($notifiable) === 0) {
+                throw new Exception('No notifiable given.');
+            }
+
             foreach ($notifiable as $singleNotifiable) {
                 $this->assertSentTo($singleNotifiable, $notification, $callback);
             }
 
             return;
+        }
+
+        if ($notification instanceof Closure) {
+            [$notification, $callback] = [$this->firstClosureParameterType($notification), $notification];
         }
 
         if (is_numeric($callback)) {
@@ -66,8 +79,10 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      */
     public function assertSentToTimes($notifiable, $notification, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->sent($notifiable, $notification)->count()) === $times,
+        $count = $this->sent($notifiable, $notification)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
             "Expected [{$notification}] to be sent {$times} times, but was sent {$count} times."
         );
     }
@@ -76,13 +91,19 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      * Determine if a notification was sent based on a truth-test callback.
      *
      * @param  mixed  $notifiable
-     * @param  string  $notification
+     * @param  string|\Closure  $notification
      * @param  callable|null  $callback
      * @return void
+     *
+     * @throws \Exception
      */
     public function assertNotSentTo($notifiable, $notification, $callback = null)
     {
         if (is_array($notifiable) || $notifiable instanceof Collection) {
+            if (count($notifiable) === 0) {
+                throw new Exception('No notifiable given.');
+            }
+
             foreach ($notifiable as $singleNotifiable) {
                 $this->assertNotSentTo($singleNotifiable, $notification, $callback);
             }
@@ -90,8 +111,12 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             return;
         }
 
-        PHPUnit::assertTrue(
-            $this->sent($notifiable, $notification, $callback)->count() === 0,
+        if ($notification instanceof Closure) {
+            [$notification, $callback] = [$this->firstClosureParameterType($notification), $notification];
+        }
+
+        PHPUnit::assertCount(
+            0, $this->sent($notifiable, $notification, $callback),
             "The unexpected [{$notification}] notification was sent."
         );
     }

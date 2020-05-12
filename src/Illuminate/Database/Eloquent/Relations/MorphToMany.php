@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 
 class MorphToMany extends BelongsToMany
 {
@@ -120,7 +120,7 @@ class MorphToMany extends BelongsToMany
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function newPivotQuery()
+    public function newPivotQuery()
     {
         return parent::newPivotQuery()->where($this->morphType, $this->morphClass);
     }

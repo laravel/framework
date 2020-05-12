@@ -266,10 +266,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $now = Carbon::now();
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::find(2);
         $userModel->delete();
-        $userModel->syncOriginal();
         $this->assertEquals($now->toDateTimeString(), $userModel->getOriginal('deleted_at'));
         $this->assertNull(SoftDeletesTestUser::find(2));
         $this->assertEquals($userModel, SoftDeletesTestUser::withTrashed()->find(2));
@@ -282,10 +281,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::find(2);
         $userModel->delete();
-        $userModel->syncOriginal();
         $userModel->restore();
 
         $this->assertEquals($userModel->id, SoftDeletesTestUser::find(2)->id);
@@ -298,16 +296,29 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::withTrashed()->find(1);
         $userModel->restore();
         $this->assertEquals($userModel->deleted_at, SoftDeletesTestUser::find(1)->deleted_at);
         $this->assertEquals($userModel->getOriginal('deleted_at'), SoftDeletesTestUser::find(1)->deleted_at);
         $userModel->delete();
-        $userModel->syncOriginal();
         $this->assertNull(SoftDeletesTestUser::find(1));
         $this->assertEquals($userModel->deleted_at, SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
         $this->assertEquals($userModel->getOriginal('deleted_at'), SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
+    }
+
+    public function testModifyingBeforeSoftDeletingAndRestoring()
+    {
+        $this->createUsers();
+
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
+        $userModel = SoftDeletesTestUser::find(2);
+        $userModel->email = 'foo@bar.com';
+        $userModel->delete();
+        $userModel->restore();
+
+        $this->assertEquals($userModel->id, SoftDeletesTestUser::find(2)->id);
+        $this->assertSame('foo@bar.com', SoftDeletesTestUser::find(2)->email);
     }
 
     public function testUpdateOrCreate()

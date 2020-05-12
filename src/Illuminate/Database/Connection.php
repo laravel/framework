@@ -6,6 +6,7 @@ use Closure;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 use Exception;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\StatementPrepared;
@@ -17,7 +18,6 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
-use Illuminate\Support\Arr;
 use LogicException;
 use PDO;
 use PDOStatement;
@@ -327,8 +327,9 @@ class Connection implements ConnectionInterface
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
-            $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
-                              ->prepare($query));
+            $statement = $this->prepared(
+                $this->getPdoForSelect($useReadPdo)->prepare($query)
+            );
 
             $this->bindValues($statement, $this->prepareBindings($bindings));
 
@@ -576,7 +577,8 @@ class Connection implements ConnectionInterface
     {
         foreach ($bindings as $key => $value) {
             $statement->bindValue(
-                is_string($key) ? $key : $key + 1, $value,
+                is_string($key) ? $key : $key + 1,
+                $value,
                 is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR
             );
         }

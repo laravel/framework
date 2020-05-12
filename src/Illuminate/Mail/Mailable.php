@@ -188,7 +188,7 @@ class Mailable implements MailableContract, Renderable
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
         return $queue->connection($connection)->pushOn(
-            $queueName ?: null, new SendQueuedMailable($this)
+            $queueName ?: null, $this->newQueuedJob()
         );
     }
 
@@ -206,8 +206,18 @@ class Mailable implements MailableContract, Renderable
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
         return $queue->connection($connection)->laterOn(
-            $queueName ?: null, $delay, new SendQueuedMailable($this)
+            $queueName ?: null, $delay, $this->newQueuedJob()
         );
+    }
+
+    /**
+     * Make the queued mailable job instance.
+     *
+     * @return mixed
+     */
+    protected function newQueuedJob()
+    {
+        return new SendQueuedMailable($this);
     }
 
     /**
@@ -796,7 +806,7 @@ class Mailable implements MailableContract, Renderable
             'name' => $name ?? basename($path),
             'options' => $options,
         ])->unique(function ($file) {
-            return $file['disk'].$file['path'];
+            return $file['name'].$file['disk'].$file['path'];
         })->all();
 
         return $this;
@@ -814,8 +824,9 @@ class Mailable implements MailableContract, Renderable
     {
         $this->rawAttachments = collect($this->rawAttachments)
                 ->push(compact('data', 'name', 'options'))
-                ->unique('data')
-                ->all();
+                ->unique(function ($file) {
+                    return $file['name'].$file['data'];
+                })->all();
 
         return $this;
     }
@@ -855,6 +866,25 @@ class Mailable implements MailableContract, Renderable
     public static function buildViewDataUsing(callable $callback)
     {
         static::$viewDataCallback = $callback;
+    }
+
+    /**
+     * Apply the callback's message changes if the given "value" is true.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed|$this
+     */
+    public function when($value, $callback, $default = null)
+    {
+        if ($value) {
+            return $callback($this, $value) ?: $this;
+        } elseif ($default) {
+            return $default($this, $value) ?: $this;
+        }
+
+        return $this;
     }
 
     /**

@@ -65,7 +65,7 @@ class ResourceTest extends TestCase
             'abstract' => 'Test abstract',
         ]));
 
-        $this->assertEquals('{"id":5,"title":"Test Title","custom":true}', $resource->toJson());
+        $this->assertSame('{"id":5,"title":"Test Title","custom":true}', $resource->toJson());
     }
 
     public function testAnObjectsMayBeConvertedToJson()

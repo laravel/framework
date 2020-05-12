@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
+use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Support\Testing\Fakes\BusFake;
 
 /**
@@ -31,6 +32,20 @@ class Bus extends Facade
         static::swap($fake = new BusFake(static::getFacadeRoot(), $jobsToFake));
 
         return $fake;
+    }
+
+    /**
+     * Dispatch the given chain of jobs.
+     *
+     * @param  array|mixed  $jobs
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     */
+    public static function dispatchChain($jobs)
+    {
+        $jobs = is_array($jobs) ? $jobs : func_get_args();
+
+        return (new PendingChain(array_shift($jobs), $jobs))
+                    ->dispatch();
     }
 
     /**

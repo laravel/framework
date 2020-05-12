@@ -3,7 +3,7 @@
 namespace Illuminate\View\Concerns;
 
 use Countable;
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 
 trait ManagesLoops
 {

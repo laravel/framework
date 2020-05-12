@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation;
 
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Str;
 
 class ValidationData

@@ -17,9 +17,9 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Session\Session;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -199,7 +199,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Get the ID for the currently authenticated user.
      *
-     * @return int|null
+     * @return int|string|null
      */
     public function id()
     {
@@ -632,7 +632,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Fires the validated event if the dispatcher is set.
      *
-     * @param $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return void
      */
     protected function fireValidatedEvent($user)
     {

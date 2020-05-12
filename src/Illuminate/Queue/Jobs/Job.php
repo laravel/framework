@@ -75,6 +75,16 @@ abstract class Job
     abstract public function getRawBody();
 
     /**
+     * Get the UUID of the job.
+     *
+     * @return string|null
+     */
+    public function uuid()
+    {
+        return $this->payload()['uuid'] ?? null;
+    }
+
+    /**
      * Fire the job.
      *
      * @return void
@@ -246,13 +256,23 @@ abstract class Job
     }
 
     /**
-     * Get the number of seconds to delay a failed job before retrying it.
+     * Get the number of times to attempt a job after an exception.
      *
      * @return int|null
      */
-    public function delaySeconds()
+    public function maxExceptions()
     {
-        return $this->payload()['delay'] ?? null;
+        return $this->payload()['maxExceptions'] ?? null;
+    }
+
+    /**
+     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
+     *
+     * @return int|null
+     */
+    public function backoff()
+    {
+        return $this->payload()['backoff'] ?? $this->payload()['delay'] ?? null;
     }
 
     /**
@@ -270,9 +290,9 @@ abstract class Job
      *
      * @return int|null
      */
-    public function timeoutAt()
+    public function retryUntil()
     {
-        return $this->payload()['timeoutAt'] ?? null;
+        return $this->payload()['retryUntil'] ?? $this->payload()['timeoutAt'] ?? null;
     }
 
     /**

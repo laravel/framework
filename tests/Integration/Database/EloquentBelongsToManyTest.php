@@ -52,7 +52,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         Schema::create('posts_tags', function (Blueprint $table) {
             $table->integer('post_id');
             $table->integer('tag_id');
-            $table->string('flag')->default('');
+            $table->string('flag')->default('')->nullable();
             $table->timestamps();
         });
 
@@ -229,8 +229,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
         foreach ($post->tagsWithCustomExtraPivot as $tag) {
             $this->assertSame('exclude', $tag->pivot->flag);
-            $this->assertEquals('1507630210', $tag->pivot->getAttributes()['created_at']);
-            $this->assertEquals('1507630220', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            $this->assertSame('1507630210', $tag->pivot->getAttributes()['created_at']);
+            $this->assertSame('1507630220', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
         }
     }
 
@@ -661,6 +661,22 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
+    public function testFirstWhere()
+    {
+        $tag = Tag::create(['name' => 'foo']);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
+        ]);
+
+        $relationTag = $post->tags()->firstWhere('name', 'foo');
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+
+        $relationTag = $post->tags()->firstWhere('name', '=', 'foo');
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
     public function testWherePivotOnBoolean()
     {
         $tag = Tag::create(['name' => Str::random()]);
@@ -747,6 +763,40 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $relationTags = $post->tags()->wherePivotIn('flag', ['foo'])->orWherePivotNotIn('flag', ['baz'])->get();
         $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag1->id, $tag2->id]);
+    }
+
+    public function testWherePivotNullMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => null],
+        ]);
+
+        $relationTag = $post->tagsWithExtraPivot()->wherePivotNull('flag')->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag2->getAttributes());
+    }
+
+    public function testWherePivotNotNullMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => null],
+        ]);
+
+        $relationTag = $post->tagsWithExtraPivot()->wherePivotNotNull('flag')->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag1->getAttributes());
     }
 
     public function testCanUpdateExistingPivot()

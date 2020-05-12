@@ -4,13 +4,10 @@ namespace Illuminate\Tests\Events;
 
 use Exception;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Queue\Queue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class EventsDispatcherTest extends TestCase
 {
@@ -46,10 +43,10 @@ class EventsDispatcherTest extends TestCase
         });
 
         $response = $d->dispatch('foo', ['bar'], true);
-        $this->assertEquals('here', $response);
+        $this->assertSame('here', $response);
 
         $response = $d->until('foo', ['bar']);
-        $this->assertEquals('here', $response);
+        $this->assertSame('here', $response);
     }
 
     public function testResponseWhenNoListenersAreSet()
@@ -132,14 +129,20 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->push('update', ['name' => 'taylor']);
         $d->listen('update', function ($name) {
             $_SERVER['__event.test'] = $name;
+        });
+        $d->push('update', ['name' => 'taylor']);
+        $d->listen('update', function ($name) {
+            $_SERVER['__event.test'] .= '_'.$name;
         });
 
         $this->assertFalse(isset($_SERVER['__event.test']));
         $d->flush('update');
-        $this->assertSame('taylor', $_SERVER['__event.test']);
+        $d->listen('update', function ($name) {
+            $_SERVER['__event.test'] .= $name;
+        });
+        $this->assertSame('taylor_taylor', $_SERVER['__event.test']);
     }
 
     public function testQueuedEventsCanBeForgotten()
@@ -154,6 +157,20 @@ class EventsDispatcherTest extends TestCase
         $d->forgetPushed();
         $d->flush('update');
         $this->assertSame('unset', $_SERVER['__event.test']);
+    }
+
+    public function testMultiplePushedEventsWillGetFlushed()
+    {
+        $_SERVER['__event.test'] = '';
+        $d = new Dispatcher;
+        $d->push('update', ['name' => 'taylor ']);
+        $d->push('update', ['name' => 'otwell']);
+        $d->listen('update', function ($name) {
+            $_SERVER['__event.test'] .= $name;
+        });
+
+        $d->flush('update');
+        $this->assertSame('taylor otwell', $_SERVER['__event.test']);
     }
 
     public function testWildcardListeners()
@@ -298,23 +315,6 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch('foo.bar', ['first', 'second']);
     }
 
-    public function testQueuedEventHandlersAreQueued()
-    {
-        $d = new Dispatcher;
-        $queue = m::mock(Queue::class);
-
-        $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
-
-        $queue->shouldReceive('pushOn')->once()->with(null, m::type(CallQueuedListener::class));
-
-        $d->setQueueResolver(function () use ($queue) {
-            return $queue;
-        });
-
-        $d->listen('some.event', TestDispatcherQueuedHandler::class.'@someMethod');
-        $d->dispatch('some.event', ['foo', 'bar']);
-    }
-
     public function testClassesWork()
     {
         unset($_SERVER['__event.test']);
@@ -325,6 +325,18 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch(new ExampleEvent);
 
         $this->assertSame('baz', $_SERVER['__event.test']);
+    }
+
+    public function testEventClassesArePayload()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen(ExampleEvent::class, function ($payload) {
+            $_SERVER['__event.test'] = $payload;
+        });
+        $d->dispatch($e = new ExampleEvent, ['foo']);
+
+        $this->assertSame($e, $_SERVER['__event.test']);
     }
 
     public function testInterfacesWork()
@@ -342,60 +354,25 @@ class EventsDispatcherTest extends TestCase
     public function testBothClassesAndInterfacesWork()
     {
         unset($_SERVER['__event.test']);
+        $_SERVER['__event.test'] = [];
         $d = new Dispatcher;
-        $d->listen(AnotherEvent::class, function () {
+        $d->listen(AnotherEvent::class, function ($p) {
+            $_SERVER['__event.test'][] = $p;
             $_SERVER['__event.test1'] = 'fooo';
         });
-        $d->listen(SomeEventInterface::class, function () {
+        $d->listen(SomeEventInterface::class, function ($p) {
+            $_SERVER['__event.test'][] = $p;
             $_SERVER['__event.test2'] = 'baar';
         });
-        $d->dispatch(new AnotherEvent);
+        $d->dispatch($e = new AnotherEvent, ['foo']);
 
+        $this->assertSame($e, $_SERVER['__event.test'][0]);
+        $this->assertSame($e, $_SERVER['__event.test'][1]);
         $this->assertSame('fooo', $_SERVER['__event.test1']);
         $this->assertSame('baar', $_SERVER['__event.test2']);
-    }
 
-    public function testShouldBroadcastSuccess()
-    {
-        $d = m::mock(Dispatcher::class);
-
-        $d->makePartial()->shouldAllowMockingProtectedMethods();
-
-        $event = new BroadcastEvent;
-
-        $this->assertTrue($d->shouldBroadcast([$event]));
-    }
-
-    public function testShouldBroadcastFail()
-    {
-        $d = m::mock(Dispatcher::class);
-
-        $d->makePartial()->shouldAllowMockingProtectedMethods();
-
-        $event = new BroadcastFalseCondition;
-
-        $this->assertFalse($d->shouldBroadcast([$event]));
-    }
-}
-
-class TestDispatcherQueuedHandler implements ShouldQueue
-{
-    public function handle()
-    {
-        //
-    }
-}
-
-class TestDispatcherQueuedHandlerCustomQueue implements ShouldQueue
-{
-    public function handle()
-    {
-        //
-    }
-
-    public function queue($queue, $handler, array $payload)
-    {
-        $queue->push($handler, $payload);
+        unset($_SERVER['__event.test1']);
+        unset($_SERVER['__event.test2']);
     }
 }
 
@@ -412,25 +389,4 @@ interface SomeEventInterface
 class AnotherEvent implements SomeEventInterface
 {
     //
-}
-
-class BroadcastEvent implements ShouldBroadcast
-{
-    public function broadcastOn()
-    {
-        return ['test-channel'];
-    }
-
-    public function broadcastWhen()
-    {
-        return true;
-    }
-}
-
-class BroadcastFalseCondition extends BroadcastEvent
-{
-    public function broadcastWhen()
-    {
-        return false;
-    }
 }

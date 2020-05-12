@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
@@ -23,6 +24,10 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $query->shouldReceive('update')->once()->with([
             'deleted_at' => 'date-time',
             'updated_at' => 'date-time',
+        ]);
+        $model->shouldReceive('syncOriginalAttributes')->once()->with([
+            'deleted_at',
+            'updated_at',
         ]);
         $model->delete();
 

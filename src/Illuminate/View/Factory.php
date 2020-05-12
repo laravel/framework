@@ -2,13 +2,13 @@
 
 namespace Illuminate\View;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\View\Factory as FactoryContract;
-use Illuminate\Support\Arr;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\View\Engines\EngineResolver;
 use InvalidArgumentException;
 
@@ -281,7 +281,7 @@ class Factory implements FactoryContract
     public function getEngineFromPath($path)
     {
         if (! $extension = $this->getExtension($path)) {
-            throw new InvalidArgumentException("Unrecognized extension in file: {$path}");
+            throw new InvalidArgumentException("Unrecognized extension in file: {$path}.");
         }
 
         $engine = $this->extensions[$extension];
@@ -293,7 +293,7 @@ class Factory implements FactoryContract
      * Get the extension used by the view file.
      *
      * @param  string  $path
-     * @return string
+     * @return string|null
      */
     protected function getExtension($path)
     {

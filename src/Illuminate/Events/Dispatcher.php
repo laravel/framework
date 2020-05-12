@@ -3,15 +3,15 @@
 namespace Illuminate\Events;
 
 use Exception;
+use Illuminate\Collections\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Arr;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
 use ReflectionClass;
 
 class Dispatcher implements DispatcherContract
@@ -524,9 +524,10 @@ class Dispatcher implements DispatcherContract
     {
         return tap($job, function ($job) use ($listener) {
             $job->tries = $listener->tries ?? null;
-            $job->retryAfter = $listener->retryAfter ?? null;
+            $job->backoff = method_exists($listener, 'backoff')
+                                ? $listener->backoff() : ($listener->backoff ?? null);
             $job->timeout = $listener->timeout ?? null;
-            $job->timeoutAt = method_exists($listener, 'retryUntil')
+            $job->retryUntil = method_exists($listener, 'retryUntil')
                                 ? $listener->retryUntil() : null;
         });
     }

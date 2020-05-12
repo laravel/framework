@@ -2,10 +2,10 @@
 
 namespace Illuminate\Cookie;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
-use Illuminate\Support\Arr;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class CookieJar implements JarContract
@@ -119,7 +119,7 @@ class CookieJar implements JarContract
      * @param  string  $key
      * @param  mixed  $default
      * @param  string|null  $path
-     * @return \Symfony\Component\HttpFoundation\Cookie
+     * @return \Symfony\Component\HttpFoundation\Cookie|null
      */
     public function queued($key, $default = null, $path = null)
     {

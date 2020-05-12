@@ -16,7 +16,7 @@ class MySqlGrammar extends Grammar
      */
     protected $modifiers = [
         'Unsigned', 'Charset', 'Collate', 'VirtualAs', 'StoredAs', 'Nullable',
-        'Default', 'Increment', 'Comment', 'After', 'First', 'Srid',
+        'Srid', 'Default', 'Increment', 'Comment', 'After', 'First',
     ];
 
     /**
@@ -690,7 +690,9 @@ class MySqlGrammar extends Grammar
     {
         $columnType = $column->precision ? "timestamp($column->precision)" : 'timestamp';
 
-        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
+        $defaultCurrent = $column->precision ? "CURRENT_TIMESTAMP($column->precision)" : 'CURRENT_TIMESTAMP';
+
+        return $column->useCurrent ? "$columnType default $defaultCurrent" : $columnType;
     }
 
     /**
@@ -941,6 +943,10 @@ class MySqlGrammar extends Grammar
     {
         if (is_null($column->virtualAs) && is_null($column->storedAs)) {
             return $column->nullable ? ' null' : ' not null';
+        }
+
+        if ($column->nullable === false) {
+            return ' not null';
         }
     }
 

@@ -9,10 +9,12 @@ use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Database\Console\DumpCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\WipeCommand;
+use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\ComponentMakeCommand;
@@ -102,6 +104,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'RouteCache' => 'command.route.cache',
         'RouteClear' => 'command.route.clear',
         'RouteList' => 'command.route.list',
+        'SchemaDump' => 'command.schema.dump',
         'Seed' => 'command.seed',
         'ScheduleFinish' => ScheduleFinishCommand::class,
         'ScheduleRun' => ScheduleRunCommand::class,
@@ -118,6 +121,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected $devCommands = [
         'CacheTable' => 'command.cache.table',
+        'CastMake' => 'command.cast.make',
         'ChannelMake' => 'command.channel.make',
         'ComponentMake' => 'command.component.make',
         'ConsoleMake' => 'command.console.make',
@@ -209,6 +213,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.cache.table', function ($app) {
             return new CacheTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerCastMakeCommand()
+    {
+        $this->app->singleton('command.cast.make', function ($app) {
+            return new CastMakeCommand($app['files']);
         });
     }
 
@@ -809,6 +825,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.route.list', function ($app) {
             return new RouteListCommand($app['router']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerSchemaDumpCommand()
+    {
+        $this->app->singleton('command.schema.dump', function () {
+            return new DumpCommand;
         });
     }
 

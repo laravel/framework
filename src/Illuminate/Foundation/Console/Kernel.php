@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Closure;
-use Exception;
+use Illuminate\Collections\Arr;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
@@ -11,7 +11,6 @@ use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -37,7 +36,7 @@ class Kernel implements KernelContract
     /**
      * The Artisan application instance.
      *
-     * @var \Illuminate\Console\Application
+     * @var \Illuminate\Console\Application|null
      */
     protected $artisan;
 

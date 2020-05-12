@@ -91,7 +91,7 @@ class DurationLimiterTest extends TestCase
             return 'foo';
         });
 
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
     }
 
     private function redis()
