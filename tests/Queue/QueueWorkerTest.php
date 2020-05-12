@@ -14,7 +14,7 @@ use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Carbon\Carbon as BaseCarbon;
 use Carbon\Factory;
 use InvalidArgumentException;
 
@@ -88,7 +89,7 @@ class DateFactory
      *
      * @var string
      */
-    const DEFAULT_CLASS_NAME = Carbon::class;
+    const DEFAULT_CLASS_NAME = BaseCarbon::class;
 
     /**
      * The type (class) of dates that should be created.

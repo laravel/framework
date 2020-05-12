@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class CacheFileStoreTest extends TestCase

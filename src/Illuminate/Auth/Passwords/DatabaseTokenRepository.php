@@ -2,10 +2,10 @@
 
 namespace Illuminate\Auth\Passwords;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class DatabaseTokenRepository implements TokenRepositoryInterface

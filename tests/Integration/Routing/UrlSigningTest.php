@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ValidateSignature;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Orchestra\Testbench\TestCase;

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -12,7 +13,6 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
-use Illuminate\Support\Carbon;
 use Throwable;
 
 class Worker

@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use ArrayAccess;
 use BadMethodCallException;
+use Carbon\Carbon;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Cache\Events\CacheHit;
@@ -14,7 +15,6 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Macroable\Macroable;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
 /**

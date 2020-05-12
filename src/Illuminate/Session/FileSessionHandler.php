@@ -2,8 +2,8 @@
 
 namespace Illuminate\Session;
 
+use Carbon\Carbon;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Carbon;
 use SessionHandlerInterface;
 use Symfony\Component\Finder\Finder;
 

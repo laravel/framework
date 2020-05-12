@@ -12,7 +12,7 @@ use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 

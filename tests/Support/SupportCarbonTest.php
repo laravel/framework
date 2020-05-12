@@ -6,13 +6,13 @@ use BadMethodCallException;
 use Carbon\Carbon as BaseCarbon;
 use DateTime;
 use DateTimeInterface;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class SupportCarbonTest extends TestCase
 {
     /**
-     * @var \Illuminate\Support\Carbon
+     * @var \Carbon\Carbon
      */
     protected $now;
 

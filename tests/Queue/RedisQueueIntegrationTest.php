@@ -6,7 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Mockery as m;

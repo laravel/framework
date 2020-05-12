@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Console;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 

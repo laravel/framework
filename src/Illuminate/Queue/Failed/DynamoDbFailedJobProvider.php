@@ -3,9 +3,9 @@
 namespace Illuminate\Queue\Failed;
 
 use Aws\DynamoDb\DynamoDbClient;
+use Carbon\Carbon;
 use DateTimeInterface;
 use Exception;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 

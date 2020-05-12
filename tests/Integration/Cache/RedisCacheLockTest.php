@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 

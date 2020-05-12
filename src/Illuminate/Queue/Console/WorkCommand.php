@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
@@ -10,7 +11,6 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
-use Illuminate\Support\Carbon;
 
 class WorkCommand extends Command
 {

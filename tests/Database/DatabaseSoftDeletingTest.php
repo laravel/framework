@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSoftDeletingTest extends TestCase

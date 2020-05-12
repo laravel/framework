@@ -7,7 +7,7 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 

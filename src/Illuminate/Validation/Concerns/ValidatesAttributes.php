@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Concerns;
 
+use Carbon\Carbon;
 use Countable;
 use DateTime;
 use DateTimeInterface;
@@ -14,7 +15,6 @@ use Egulias\EmailValidator\Validation\SpoofCheckValidation;
 use Exception;
 use Illuminate\Collections\Arr;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
