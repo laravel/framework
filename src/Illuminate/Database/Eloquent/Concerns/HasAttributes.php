@@ -1172,7 +1172,7 @@ trait HasAttributes
     {
         if (is_array($key)) {
             return collect($this->original)->filter(function ($item, $key) {
-                return in_array($key, array_keys($this->changes));
+                return isset($this->changes[$key]);
             })->mapWithKeys(function ($value, $key) {
                 return [$key => $this->transformModelValue($key, $value)];
             })->all();
