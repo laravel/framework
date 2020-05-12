@@ -99,7 +99,8 @@ class TestDispatcherGetQueue implements ShouldQueue
         //
     }
 
-    public function getQueue(): string {
+    public function getQueue()
+    {
         return 'some_other_queue';
     }
 }
