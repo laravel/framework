@@ -553,7 +553,7 @@ class Validator implements ValidatorContract
     protected function getPrimaryAttribute($attribute)
     {
         foreach ($this->implicitAttributes as $unparsed => $parsed) {
-            if (in_array($attribute, $parsed)) {
+            if (in_array($attribute, $parsed, true)) {
                 return $unparsed;
             }
         }
