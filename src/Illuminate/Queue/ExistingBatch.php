@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
+
 class ExistingBatch
 {
     /**
@@ -173,12 +175,13 @@ class ExistingBatch
 
         foreach ($jobs as $job) {
             $job->batchId($this->id);
-
-            $job->onConnection($job->connection ?: $this->data->connection);
-            $job->onQueue($job->queue ?: $this->data->queue);
-
-            dispatch($job);
         }
+
+        app(QueueFactoryContract::class)
+                    ->connection($this->data->connection)
+                    ->bulk(
+                        $jobs, '', $this->data->queue
+                    );
     }
 
     /**
