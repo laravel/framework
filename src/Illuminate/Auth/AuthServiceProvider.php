@@ -3,8 +3,11 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Auth\Access\Gate;
+use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
