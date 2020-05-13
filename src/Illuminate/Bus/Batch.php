@@ -120,7 +120,11 @@ class Batch
 
         $jobs->each->withBatchId($this->id);
 
-        $this->queue->bulk($jobs->all());
+        $this->repository->transaction(function () use ($jobs) {
+            $this->repository->increment($this->id, count($jobs));
+
+            $this->queue->bulk($jobs->all());
+        });
     }
 
     /**

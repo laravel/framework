@@ -162,9 +162,9 @@ trait Queueable
     }
 
     /**
-     * Get the batch instance for the job.
+     * Get the batch instance for the job, if applicable.
      *
-     * @return \Illuminate\Bus\Batch
+     * @return \Illuminate\Bus\Batch|null
      */
     public function batch()
     {

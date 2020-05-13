@@ -3,6 +3,7 @@
 namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
+use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -84,8 +85,8 @@ class DatabaseBatchRepository implements BatchRepository
 
         $this->connection->table($this->table)->insert([
             'id' => $id,
-            'total_jobs' => count($batch->jobs),
-            'pending_jobs' => count($batch->jobs),
+            'total_jobs' => 0,
+            'pending_jobs' => 0,
             'failed_jobs' => 0,
             'options' => serialize($batch->options),
             'cancelled_at' => null,
@@ -93,6 +94,21 @@ class DatabaseBatchRepository implements BatchRepository
         ]);
 
         return $this->find($id);
+    }
+
+    /**
+     * Increment the total number of jobs within the batch.
+     *
+     * @param  string  $batchId
+     * @param  int  $amount
+     * @return void
+     */
+    public function increment(string $batchId, int $amount)
+    {
+        $this->connection->table($this->table)->where('id', $batchId)->update([
+            'total_jobs' => DB::raw('total_jobs + '.$amount),
+            'pending_jobs' => DB::raw('pending_jobs + '.$amount),
+        ]);
     }
 
     /**
@@ -117,5 +133,18 @@ class DatabaseBatchRepository implements BatchRepository
     public function delete(string $batchId)
     {
         $this->connection->table($this->table)->where('id', $batchId)->delete();
+    }
+
+    /**
+     * Execute the given Closure within a storage specific transaction.
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public function transaction(Closure $callback)
+    {
+        return $this->connection->transaction(function () use ($callback) {
+            return $callback();
+        });
     }
 }
