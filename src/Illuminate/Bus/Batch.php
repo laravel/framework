@@ -3,16 +3,17 @@
 namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Collections\Collection;
+use Illuminate\Contracts\Queue\Factory as QueueFactory;
 
 class Batch
 {
     /**
-     * The bus implementation.
+     * The queue factory implementation.
      *
-     * @var \Illuminate\Contracts\Bus\Dispatcher
+     * @var \Illuminate\Contracts\Queue\Factory
      */
-    protected $bus;
+    protected $queue;
 
     /**
      * The repository implementation.
@@ -86,7 +87,7 @@ class Batch
      * @param  \Illuminate\Support\CarbonImmutable  $updatedAt
      * @return void
      */
-    public function __construct(Dispatcher $bus,
+    public function __construct(QueueFactory $queue,
                                 BatchRepository $repository,
                                 string $id,
                                 int $totalJobs,
@@ -96,7 +97,7 @@ class Batch
                                 CarbonImmutable $cancelledAt,
                                 CarbonImmutable $createdAt)
     {
-        $this->bus = $bus;
+        $this->queue = $queue;
         $this->repository = $repository;
         $this->id = $id;
         $this->totalJobs = $totalJobs;
@@ -105,5 +106,18 @@ class Batch
         $this->options = $options;
         $this->cancelledAt = $cancelledAt;
         $this->createdAt = $createdAt;
+    }
+
+    /**
+     * Add additional jobs to the batch.
+     *
+     * @param  \Illuminate\Collections\Collection|array  $jobs
+     * @return void
+     */
+    public function add($jobs)
+    {
+        $jobs = Collection::wrap($jobs);
+
+        $this->queue->bulk($jobs->all());
     }
 }

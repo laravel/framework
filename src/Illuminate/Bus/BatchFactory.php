@@ -3,26 +3,26 @@
 namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Queue\Factory as QueueFactory;
 
 class BatchFactory
 {
     /**
-     * The bus implementation.
+     * The queue factory implementation.
      *
-     * @var \Illuminate\Contracts\Bus\Dispatcher
+     * @var \Illuminate\Contracts\Queue\Factory
      */
-    protected $bus;
+    protected $queue;
 
     /**
      * Create a new batch factory instance.
      *
-     * @param  \Illuminate\Contracts\Bus\Dispatcher  $bus
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return void
      */
-    public function __construct(Dispatcher $bus)
+    public function __construct(QueueFactory $queue)
     {
-        $this->bus = $bus;
+        $this->queue = $queue;
     }
 
     /**
@@ -46,7 +46,8 @@ class BatchFactory
                          int $failedJobs,
                          array $options,
                          CarbonImmutable $cancelledAt,
-                         CarbonImmutable $createdAt) {
-        return new Batch($this->bus, $repository, $id, $totalJobs, $pendingJobs, $failedJobs, $options, $cancelledAt, $createdAt);
+                         CarbonImmutable $createdAt)
+    {
+        return new Batch($this->queue, $repository, $id, $totalJobs, $pendingJobs, $failedJobs, $options, $cancelledAt, $createdAt);
     }
 }
