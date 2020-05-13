@@ -250,7 +250,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param array $compiledSharedPrefixes
      */
-    public function setCompiledSharedPrefixes(array $sharedPrefixes): void
+    public function setCompiledSharedPrefixes(array $sharedPrefixes)
     {
         $this->sharedPrefixes = $sharedPrefixes;
 
@@ -262,7 +262,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @return array
      */
-    public function getCompiledSharedPrefixes(): array
+    public function getCompiledSharedPrefixes()
     {
         $this->compileSharedPrefixes();
 
