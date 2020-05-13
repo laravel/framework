@@ -523,7 +523,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Eager load relationships on the polymorphic relation of a model.
      *
-     * @param  string $relation
+     * @param  string  $relation
      * @param  array  $relations
      * @return $this
      */
@@ -569,7 +569,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Eager load relationship counts on the polymorphic relation of a model.
      *
-     * @param  string $relation
+     * @param  string  $relation
      * @param  array  $relations
      * @return $this
      */

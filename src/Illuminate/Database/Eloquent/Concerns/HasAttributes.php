@@ -560,9 +560,17 @@ trait HasAttributes
         } else {
             $caster = $this->resolveCasterClass($key);
 
-            return $this->classCastCache[$key] = $caster instanceof CastsInboundAttributes
-                ? $value
-                : $caster->get($this, $key, $value, $this->attributes);
+            $value = $caster instanceof CastsInboundAttributes
+                        ? $value
+                        : $caster->get($this, $key, $value, $this->attributes);
+
+            if ($caster instanceof CastsInboundAttributes || ! is_object($value)) {
+                unset($this->classCastCache[$key]);
+            } else {
+                $this->classCastCache[$key] = $value;
+            }
+
+            return $value;
         }
     }
 

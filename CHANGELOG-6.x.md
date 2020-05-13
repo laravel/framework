@@ -1,6 +1,13 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.13...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.14...6.x)
+
+### Fixed
+- Revert of ["Remove `strval` from `Illuminate/Validation/ValidationRuleParser::explodeWildcardRules()`"](https://github.com/laravel/framework/commit/1c76a6f3a80fa8f756740566dffd9fa1be65c123) ([52940cf](https://github.com/laravel/framework/commit/52940cf3275cfebd47ec008fd8ae5bc6d6a42dfd))
+- Fixed Queued Mail MessageSent Listener With Attachments ([#32795](https://github.com/laravel/framework/pull/32795))
+
+
+## [v6.18.14 (2020-05-12)](https://github.com/laravel/framework/compare/v6.18.13...v6.18.14)
 
 ### Added
 - Added SSL SYSCALL EOF as a lost connection message ([#32697](https://github.com/laravel/framework/pull/32697))
@@ -10,6 +17,11 @@
 - Added boolean to types that don't need character options ([#32716](https://github.com/laravel/framework/pull/32716))
 - Fixed `Illuminate\Foundation\Testing\PendingCommand` that do not resolve 'OutputStyle::class' from the container ([#32687](https://github.com/laravel/framework/pull/32687))
 - Clear resolved event facade on `Illuminate\Foundation\Testing\Concerns\MocksApplicationServices::withoutEvents()` ([d1e7f85](https://github.com/laravel/framework/commit/d1e7f85dfd79abbe4f5e01818f620f6ecc67de4d))
+- Fixed deprecated "Doctrine/Common/Inflector/Inflector" class ([#32734](https://github.com/laravel/framework/pull/32734))
+
+### Changed
+- Remove the undocumented dot keys support in validators ([#32764](https://github.com/laravel/framework/pull/32764))
+- Remove `strval` from `Illuminate/Validation/ValidationRuleParser::explodeWildcardRules()` [1c76a6f](https://github.com/laravel/framework/commit/1c76a6f3a80fa8f756740566dffd9fa1be65c123)
 
 
 ## [v6.18.13 (2020-05-05)](https://github.com/laravel/framework/compare/v6.18.12...v6.18.13)
