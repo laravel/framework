@@ -254,8 +254,8 @@ abstract class GeneratorCommand extends Command
     protected function userProviderModel()
     {
         $config = $this->laravel['config'];
-        $guard = $config->get('auth.defaults.guard');
-        $provider = $config->get("auth.guards.{$guard}.provider");
+
+        $provider = $config->get('auth.guards.'.$config->get('auth.defaults.guard').'.provider');
 
         return $config->get("auth.providers.{$provider}.model");
     }
