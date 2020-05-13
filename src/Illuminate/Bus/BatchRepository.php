@@ -13,6 +13,14 @@ interface BatchRepository
     public function store(PendingBatch $batch);
 
     /**
+     * Cancel the batch that has the given ID.
+     *
+     * @param  string  $batchId
+     * @return void
+     */
+    public function cancel(string $batchId);
+
+    /**
      * Delete the batch that has the given ID.
      *
      * @param  string  $batchId

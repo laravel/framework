@@ -16,6 +16,13 @@ class PendingBatch
     public $jobs;
 
     /**
+     * The batch options.
+     *
+     * @var array
+     */
+    public $options = [];
+
+    /**
      * Create a new pending batch instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -26,6 +33,11 @@ class PendingBatch
     {
         $this->container = $container;
         $this->jobs = $jobs;
+    }
+
+    public function then(Closure $callback)
+    {
+        //
     }
 
     /**

@@ -87,12 +87,25 @@ class DatabaseBatchRepository implements BatchRepository
             'total_jobs' => count($batch->jobs),
             'pending_jobs' => count($batch->jobs),
             'failed_jobs' => 0,
-            'options' => json_encode([]),
+            'options' => json_encode($batch->options),
             'cancelled_at' => null,
             'created_at' => time(),
         ]);
 
         return $this->find($id);
+    }
+
+    /**
+     * Cancel the batch that has the given ID.
+     *
+     * @param  string  $batchId
+     * @return void
+     */
+    public function cancel(string $batchId)
+    {
+        $this->connection->table($this->table)->where('id', $batchId)->update([
+            'cancelled_at' => time(),
+        ]);
     }
 
     /**

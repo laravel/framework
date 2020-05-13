@@ -120,4 +120,14 @@ class Batch
 
         $this->queue->bulk($jobs->all());
     }
+
+    /**
+     * Cancel the batch.
+     *
+     * @return void
+     */
+    public function cancel()
+    {
+        $this->repository->cancel($this->id);
+    }
 }
