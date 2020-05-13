@@ -7,7 +7,7 @@
 - Fixed Queued Mail MessageSent Listener With Attachments ([#32795](https://github.com/laravel/framework/pull/32795))
 
 
-## [v6.18.14 (2020-05-13)](https://github.com/laravel/framework/compare/v6.18.13...v6.18.14)
+## [v6.18.14 (2020-05-12)](https://github.com/laravel/framework/compare/v6.18.13...v6.18.14)
 
 ### Added
 - Added SSL SYSCALL EOF as a lost connection message ([#32697](https://github.com/laravel/framework/pull/32697))
