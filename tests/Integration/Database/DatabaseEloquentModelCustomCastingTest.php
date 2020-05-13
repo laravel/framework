@@ -33,6 +33,14 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals('TAYLOR', $model->getOriginal('uppercase'));
 
         $model = new TestEloquentModelWithCustomCast;
+        $model->uppercase = 'taylor';
+        $model->syncOriginal();
+        $model->uppercase = 'dries';
+        $model->getOriginal();
+
+        $this->assertEquals('DRIES', $model->uppercase);
+
+        $model = new TestEloquentModelWithCustomCast;
 
         $model->address = $address = new Address('110 Kingsbrook St.', 'My Childhood House');
         $address->lineOne = '117 Spencer St.';
