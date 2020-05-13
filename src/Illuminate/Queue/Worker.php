@@ -502,7 +502,7 @@ class Worker
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return int
      */
-    protected function calculateBackoff($job, WorkerOptions $options): int
+    protected function calculateBackoff($job, WorkerOptions $options)
     {
         $backoff = explode(',',
             method_exists($job, 'backoff') && ! is_null($job->backoff())
