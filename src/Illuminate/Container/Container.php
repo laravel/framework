@@ -1398,7 +1398,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Compiles shared prefixes to sort from longer to shorter.
      */
-    private function compileSharedPrefixes(): void
+    private function compileSharedPrefixes()
     {
         if ($this->isSharedPrefixesCompiled) {
             return;
