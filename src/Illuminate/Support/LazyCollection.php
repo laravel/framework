@@ -242,6 +242,18 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Determine if all items exist in the collection, using strict comparison.
+     *
+     * @param  mixed $needles
+     *
+     * @return bool
+     */
+    public function containsAllStrict($needles)
+    {
+        return $this->collect()->containsAllStrict($needles);
+    }
+
+    /**
      * Cross join the given iterables, returning all possible permutations.
      *
      * @param  array  ...$arrays

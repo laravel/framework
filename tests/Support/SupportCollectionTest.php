@@ -2785,6 +2785,41 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testContainsAllStrict($collection)
+    {
+        $c = new $collection([1, 3, 5]);
+
+        $this->assertTrue($c->containsAllStrict([1, 3]));
+        $this->assertTrue($c->containsAllStrict([3, 5]));
+        $this->assertTrue($c->containsAllStrict([1, 5]));
+        $this->assertTrue($c->containsAllStrict(5));
+
+        $this->assertFalse($c->containsAllStrict([1, 2]));
+        $this->assertFalse($c->containsAllStrict(2));
+        $this->assertFalse($c->containsAllStrict(true));
+        $this->assertFalse($c->containsAllStrict(false));
+
+        $c = new $collection([0, 3, 5]);
+
+        $this->assertFalse($c->containsAllStrict(['', 3]));
+        $this->assertFalse($c->containsAllStrict([0, true]));
+        $this->assertFalse($c->containsAllStrict([false, 5]));
+        $this->assertFalse($c->containsAllStrict(true));
+        $this->assertFalse($c->containsAllStrict(false));
+        $this->assertFalse($c->containsAllStrict(''));
+
+        $c = new $collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+
+        $this->assertTrue($c->containsAllStrict([['v' => 5], ['v' => 1], ['v' => 3]]));
+        $this->assertTrue($c->containsAllStrict([['v' => 5], ['v' => 3]]));
+
+        $this->assertFalse($c->containsAllStrict(['v' => 3]));
+        $this->assertFalse($c->containsAllStrict([['v' => 1], true]));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSome($collection)
     {
         $c = new $collection([1, 3, 5]);
