@@ -122,6 +122,24 @@ class DatabaseEloquentCollectionTest extends TestCase
         }));
     }
 
+    public function testContainsAll()
+    {
+        $mockModel = m::mock(Model::class);
+        $mockModel->shouldReceive('is')->with($mockModel)->andReturn(true);
+        $mockModel->shouldReceive('is')->andReturn(false)->times(3);
+        $mockModel2 = m::mock(Model::class);
+        $mockModel2->shouldReceive('is')->with($mockModel2)->andReturn(true)->twice();
+        $mockModel2->shouldReceive('is')->andReturn(false);
+        $mockModel3 = m::mock(Model::class);
+        $mockModel3->shouldNotReceive('is');
+        $c = new Collection([$mockModel, $mockModel2]);
+
+        $this->assertTrue($c->containsAll([$mockModel, $mockModel2]));
+        $this->assertTrue($c->containsAll([$mockModel2]));
+
+        $this->assertFalse($c->containsAll([$mockModel3]));
+    }
+
     public function testFindMethodFindsModelById()
     {
         $mockModel = m::mock(Model::class);
