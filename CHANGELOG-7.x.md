@@ -1,12 +1,30 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.10.3...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.11.0...7.x)
+
+### Fixed
+- Fixed Queued Mail MessageSent Listener With Attachments ([#32795](https://github.com/laravel/framework/pull/32795))
+- Added error clearing before sending in `Illuminate\Mail\Mailer::sendSwiftMessage()` ([#32799](https://github.com/laravel/framework/pull/32799))
+- Avoid foundation function call in the auth component ([#32805](https://github.com/laravel/framework/pull/32805))
+
+### Changed
+- Dont cache non objects in `Illuminate/Database/Eloquent/Concerns/HasAttributes::getClassCastableAttributeValue()` ([894fe22](https://github.com/laravel/framework/commit/894fe22c6c111b224de5bada24dcbba4c93f0305))
+
+
+## [v7.11.0 (2020-05-12)](https://github.com/laravel/framework/compare/v7.10.3...v7.11.0)
 
 ### Added
 - Added support for FILTER_FLAG_EMAIL_UNICODE via "email:filter_unicode" in email validator ([#32711](https://github.com/laravel/framework/pull/32711), [43a1ed1](https://github.com/laravel/framework/commit/43a1ed1ee272b77547d292af7d337c745cccd48a))
 - Added `Illuminate\Support\Stringable::split()` ([#32713](https://github.com/laravel/framework/pull/32713), [19c5054](https://github.com/laravel/framework/commit/19c5054eff4d00d234cd928db1e085aaa14c4692))
 - Added `orWhereIntegerInRaw()` and `orWhereIntegerNotInRaw()` to `Illuminate\Database\Query\Builder` ([#32710](https://github.com/laravel/framework/pull/32710))
 - Added `Illuminate\Cache\DatabaseStore::add()` ([7fc452b](https://github.com/laravel/framework/commit/7fc452bd8d6cebd7e7a0c6cd057aea7d4e9a7fc0))
+- Implement env and production Blade directives ([#32742](https://github.com/laravel/framework/pull/32742))
+- Added `Illuminate\Database\Eloquent\Relations\MorphTo::morphWithCount()` method ([#32738](https://github.com/laravel/framework/pull/32738))
+- Added `Illuminate\Database\Eloquent\Collection::loadMorphCount()` method ([#32739](https://github.com/laravel/framework/pull/32739))
+- Added support `viaQueues` method for notifications ([e97d17c](https://github.com/laravel/framework/commit/e97d17cb6061600960bca2818f419bccca6f7da2))
+- Added `loadMorph` and `loadMorphCount` methods to `Illuminate\Database\Eloquent\Model` ([#32760](https://github.com/laravel/framework/pull/32760))
+- Added `Illuminate\Database\DatabaseManager::usingConnection()` method ([#32761](https://github.com/laravel/framework/pull/32761), [5f8c7de](https://github.com/laravel/framework/commit/5f8c7de58c5ba2cdb38ba50f1dfcc4c869d0e02d))
+- Added `Illuminate\Http\Client\PendingRequest::head()` method ([#32782](https://github.com/laravel/framework/pull/32782))
 
 ### Fixed
 - Fixed belongsToMany child relationship solving ([c5e88be](https://github.com/laravel/framework/commit/c5e88be082bc690961889812360cd6c5ba983117))
@@ -14,6 +32,15 @@
 - Added boolean to types that don't need character options ([#32716](https://github.com/laravel/framework/pull/32716))
 - Fixed `Illuminate\Foundation\Testing\PendingCommand` that do not resolve 'OutputStyle::class' from the container ([#32687](https://github.com/laravel/framework/pull/32687))
 - Clear resolved event facade on `Illuminate\Foundation\Testing\Concerns\MocksApplicationServices::withoutEvents()` ([d1e7f85](https://github.com/laravel/framework/commit/d1e7f85dfd79abbe4f5e01818f620f6ecc67de4d))
+- Fixed `Illuminate\Database\Eloquent\Collection::getQueueableRelations()` for filtered collections ([#32747](https://github.com/laravel/framework/pull/32747))
+- Fixed `Illuminate\Database\Eloquent\Collection::loadCount` method to ensure count is set on all models ([#32740](https://github.com/laravel/framework/pull/32740))
+- Fixed deprecated "Doctrine/Common/Inflector/Inflector" class ([#32734](https://github.com/laravel/framework/pull/32734))
+- Fixed `Illuminate\Validation\Validator::getPrimaryAttribute()` ([#32775](https://github.com/laravel/framework/pull/32775))
+- Revert of ["Remove `strval` from `Illuminate/Validation/ValidationRuleParser::explodeWildcardRules()`"](https://github.com/laravel/framework/commit/1c76a6f3a80fa8f756740566dffd9fa1be65c123) ([52940cf](https://github.com/laravel/framework/commit/52940cf3275cfebd47ec008fd8ae5bc6d6a42dfd))
+
+### Changed
+- Updated user model var name in `make:policy` command ([#32748](https://github.com/laravel/framework/pull/32748))
+- Remove the undocumented dot keys support in validators ([#32764](https://github.com/laravel/framework/pull/32764))
 
 
 ## [v7.10.3 (2020-05-06)](https://github.com/laravel/framework/compare/v7.10.2...v7.10.3)
