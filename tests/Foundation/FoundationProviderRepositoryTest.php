@@ -30,6 +30,35 @@ class FoundationProviderRepositoryTest extends TestCase
         $app->shouldReceive('register')->once()->with('foo');
         $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->shouldReceive('addDeferredServices')->once()->with(['deferred']);
+        $app->shouldReceive('setCompiledSharedPrefixes')->once()->with([]);
+
+        $repo->load([]);
+    }
+
+    public function testSharedPrefixesAreRegisteredWhenManifestIsNotRecompiled()
+    {
+        $app = m::mock('Illuminate\Foundation\Application');
+
+        $repo = m::mock(
+            'Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]',
+            [
+                $app,
+                m::mock('Illuminate\Filesystem\Filesystem'),
+                [__DIR__.'/services.php'],
+            ]
+        );
+        $repo->shouldReceive('loadManifest')->once()->andReturn([
+            'when' => [],
+            'eager' => [],
+            'deferred' => [],
+            'sharedPrefixes' => ['foo' => true],
+        ]);
+        $repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
+        $provider = m::mock('Illuminate\Support\ServiceProvider');
+
+        $app->shouldReceive('runningInConsole')->andReturn(false);
+        $app->shouldReceive('addDeferredServices')->once()->with([]);
+        $app->shouldReceive('setCompiledSharedPrefixes')->once()->with(['foo' => true]);
 
         $repo->load([]);
     }
@@ -56,9 +85,13 @@ class FoundationProviderRepositoryTest extends TestCase
             return $manifest;
         });
 
+        // provider add one shared prefix.
+        $app->shouldReceive('getCompiledSharedPrefixes')->once()->andReturn(['foo' => true]);
+
         $app->shouldReceive('register')->once()->with('bar');
         $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->shouldReceive('addDeferredServices')->once()->with(['foo.provides1' => 'foo', 'foo.provides2' => 'foo']);
+        $app->shouldReceive('setCompiledSharedPrefixes')->once()->with(['foo' => true]);
 
         $repo->load(['foo', 'bar']);
     }

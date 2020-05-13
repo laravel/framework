@@ -134,6 +134,20 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingCallbacks = [];
 
     /**
+     * A list of service id prefix where all matches classes are shared.
+     *
+     * @var array
+     */
+    private $sharedPrefixes = [];
+
+    /**
+     * Whether the shared prefix list is compiled.
+     *
+     * @var bool
+     */
+    private $isSharedPrefixesCompiled = true;
+
+    /**
      * Define a contextual binding.
      *
      * @param  array|string  $concrete
@@ -195,9 +209,64 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function isShared($abstract)
     {
-        return isset($this->instances[$abstract]) ||
-               (isset($this->bindings[$abstract]['shared']) &&
-               $this->bindings[$abstract]['shared'] === true);
+        // The abstract was explicitly marked as shared.
+        if (isset($this->instances[$abstract])) {
+            return true;
+        }
+
+        // The abstract is explicitly bound to the container.
+        if (isset($this->bindings[$abstract])) {
+            return isset($this->bindings[$abstract]['shared'])
+                && $this->bindings[$abstract]['shared'] === true;
+        }
+
+        // Resolve global shared configuration.
+        $this->compileSharedPrefixes();
+
+        foreach ($this->sharedPrefixes as $prefix => $shared) {
+            if (0 === \strpos($abstract, $prefix)) {
+                return $shared;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Register a prefix for shared binding in the container.
+     *
+     * @param string $prefix
+     * @param bool   $shared Whether to enable service sharing
+     */
+    public function sharedByPrefix(string $prefix, bool $shared = true)
+    {
+        $this->sharedPrefixes[$prefix] = $shared;
+
+        $this->isSharedPrefixesCompiled = false;
+    }
+
+    /**
+     * Sets compiled shared prefixes.
+     *
+     * @param array $compiledSharedPrefixes
+     */
+    public function setCompiledSharedPrefixes(array $sharedPrefixes): void
+    {
+        $this->sharedPrefixes = $sharedPrefixes;
+
+        $this->isSharedPrefixesCompiled = true;
+    }
+
+    /**
+     * Gets compiled shared prefixes.
+     *
+     * @return array
+     */
+    public function getCompiledSharedPrefixes(): array
+    {
+        $this->compileSharedPrefixes();
+
+        return $this->sharedPrefixes;
     }
 
     /**
@@ -1324,5 +1393,21 @@ class Container implements ArrayAccess, ContainerContract
     public function __set($key, $value)
     {
         $this[$key] = $value;
+    }
+
+    /**
+     * Compiles shared prefixes to sort from longer to shorter.
+     */
+    private function compileSharedPrefixes(): void
+    {
+        if ($this->isSharedPrefixesCompiled) {
+            return;
+        }
+
+        $prefixLengths = array_map('strlen', array_keys($this->sharedPrefixes));
+
+        array_multisort($prefixLengths, SORT_DESC, $this->sharedPrefixes);
+
+        $this->isSharedPrefixesCompiled = true;
     }
 }

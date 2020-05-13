@@ -553,6 +553,95 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
+
+    public function testSharedConcreteResolutionWithPrefix()
+    {
+        $abstract = ContainerConcreteStub::class;
+
+        $container = new Container;
+        $container->sharedByPrefix('Illuminate\\Tests\\Container\\');
+
+        $var1 = $container->make($abstract);
+        $var2 = $container->make($abstract);
+
+        $this->assertSame($var1, $var2);
+        $this->assertTrue($container->isShared($abstract));
+    }
+
+    public function testSharedConcreteResolutionWithPrefixExcludeBound()
+    {
+        $abstract = ContainerConcreteStub::class;
+
+        $container = new Container;
+        $container->sharedByPrefix('Illuminate\\Tests\\Container\\');
+        $container->bind($abstract);
+
+        $var1 = $container->make($abstract);
+        $var2 = $container->make($abstract);
+
+        $this->assertNotSame($var1, $var2);
+        $this->assertFalse($container->isShared($abstract));
+    }
+
+    public function testSharedConcreteResolutionWithPrefixAllowToNotShareSubPrefix()
+    {
+        $abstract = ContainerConcreteStub::class;
+
+        $container = new Container;
+        $container->sharedByPrefix('Illuminate\\Tests\\');
+        $container->sharedByPrefix('Illuminate\\Tests\\Container\\', false);
+
+        $var1 = $container->make($abstract);
+        $var2 = $container->make($abstract);
+
+        $this->assertNotSame($var1, $var2);
+        $this->assertFalse($container->isShared($abstract));
+    }
+
+    public function testSharedConcreteResolutionWithPrefixForDefinedSharedService()
+    {
+        $abstract = ContainerConcreteStub::class;
+
+        $container = new Container;
+        $container->sharedByPrefix('Illuminate\\Tests\\Container\\', false);
+
+        $var1 = $container->make($abstract);
+        $container->instance($abstract, $var1);
+        $var2 = $container->make($abstract);
+
+        $this->assertSame($var1, $var2);
+        $this->assertTrue($container->isShared($abstract));
+    }
+
+    public function testSharedPrefixCompilation()
+    {
+        $container = new Container();
+        $container->sharedByPrefix('foo');
+
+        $compiled = [
+            'foo' => true,
+            'foobar' => false,
+        ];
+
+        $container->setCompiledSharedPrefixes($compiled);
+
+        $this->assertTrue($container->isShared('foobar'));
+    }
+
+    public function testGetCompiledSharedPrefixesTriggerCompilation()
+    {
+        $container = new Container();
+
+        $container->sharedByPrefix('foo');
+        $container->sharedByPrefix('foobar', false);
+
+        $expected = [
+            'foobar' => false,
+            'foo' => true,
+        ];
+
+        $this->assertSame($expected, $container->getCompiledSharedPrefixes());
+    }
 }
 
 class ContainerConcreteStub

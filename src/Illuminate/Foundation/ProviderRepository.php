@@ -76,6 +76,8 @@ class ProviderRepository
         }
 
         $this->app->addDeferredServices($manifest['deferred']);
+
+        $this->app->setCompiledSharedPrefixes($manifest['sharedPrefixes'] ?? []);
     }
 
     /**
@@ -161,6 +163,8 @@ class ProviderRepository
                 $manifest['eager'][] = $provider;
             }
         }
+
+        $manifest['sharedPrefixes'] = $this->app->getCompiledSharedPrefixes();
 
         return $this->writeManifest($manifest);
     }
