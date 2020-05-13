@@ -21,7 +21,23 @@ interface BatchRepository
      * @param  int  $amount
      * @return void
      */
-    public function increment(string $batchId, int $amount);
+    public function incrementTotalJobs(string $batchId, int $amount);
+
+    /**
+     * Decrement the total number of pending jobs for the batch.
+     *
+     * @param  string  $batchId
+     * @return int|null
+     */
+    public function decrementPendingJobs(string $batchId);
+
+    /**
+     * Increment the total number of failed jobs for the batch.
+     *
+     * @param  string  $batchId
+     * @return int
+     */
+    public function incrementFailedJobs(string $batchId);
 
     /**
      * Cancel the batch that has the given ID.

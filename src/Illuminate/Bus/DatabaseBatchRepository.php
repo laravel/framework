@@ -103,12 +103,60 @@ class DatabaseBatchRepository implements BatchRepository
      * @param  int  $amount
      * @return void
      */
-    public function increment(string $batchId, int $amount)
+    public function incrementTotalJobs(string $batchId, int $amount)
     {
         $this->connection->table($this->table)->where('id', $batchId)->update([
             'total_jobs' => DB::raw('total_jobs + '.$amount),
             'pending_jobs' => DB::raw('pending_jobs + '.$amount),
         ]);
+    }
+
+    /**
+     * Decrement the total number of pending jobs for the batch.
+     *
+     * @param  string  $batchId
+     * @return int|null
+     */
+    public function decrementPendingJobs(string $batchId)
+    {
+        return $this->updateAtomicValue($batchId, function ($batch) {
+            return ['pending_jobs' => $batch->pending_jobs - 1];
+        });
+    }
+
+    /**
+     * Increment the total number of failed jobs for the batch.
+     *
+     * @param  string  $batchId
+     * @return int|null
+     */
+    public function incrementFailedJobs(string $batchId)
+    {
+        return $this->updateAtomicValue($batchId, function ($batch) {
+            return ['failed_jobs' => $batch->failed_jobs + 1];
+        });
+    }
+
+    /**
+     * Update an atomic value within the batch.
+     *
+     * @param  string  $batchId
+     * @param  \Closure  $callback
+     * @return int|null
+     */
+    protected function updateAtomicValue(string $batchId, Closure $callback)
+    {
+        return $this->connection->transaction(function () use ($batchId, $callback) {
+            $batch = $this->connection->table($this->table)->where('id', $batchId)
+                        ->lockForUpdate()
+                        ->first();
+
+            return is_null($batch) ? null : head(tap($callback($batch), function ($value) use ($batchId) {
+                $this->connection->table($this->table)->where('id', $batchId)->update([
+                    head(array_flip($value)) => head($value),
+                ]);
+            }));
+        });
     }
 
     /**

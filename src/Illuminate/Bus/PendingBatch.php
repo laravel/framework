@@ -51,6 +51,19 @@ class PendingBatch
     }
 
     /**
+     * Add a callback to be executed after the first failing job in the batch.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function catch(Closure $callback)
+    {
+        $this->options['catch'][] = new SerializableClosure($callback);
+
+        return $this;
+    }
+
+    /**
      * Dispatch the batch.
      *
      * @return void
