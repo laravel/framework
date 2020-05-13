@@ -33,7 +33,7 @@ trait InteractsWithViews
         $tempDirectory = sys_get_temp_dir();
 
         if (! in_array($tempDirectory, ViewFacade::getFinder()->getPaths())) {
-            View::addLocation(sys_get_temp_dir());
+            ViewFacade::addLocation(sys_get_temp_dir());
         }
 
         $tempFile = tempnam($tempDirectory, 'laravel-blade').'.blade.php';
