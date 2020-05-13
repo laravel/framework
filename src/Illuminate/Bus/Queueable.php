@@ -4,6 +4,7 @@ namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Collections\Arr;
+use Illuminate\Container\Container;
 use Illuminate\Queue\CallQueuedClosure;
 use RuntimeException;
 
@@ -57,6 +58,13 @@ trait Queueable
      * @var array
      */
     public $chained = [];
+
+    /**
+     * The batch ID (if applicable).
+     *
+     * @var string
+     */
+    public $batchId;
 
     /**
      * Set the desired connection for the job.
@@ -149,6 +157,31 @@ trait Queueable
         $this->chained = collect($chain)->map(function ($job) {
             return $this->serializeJob($job);
         })->all();
+
+        return $this;
+    }
+
+    /**
+     * Get the batch instance for the job.
+     *
+     * @return \Illuminate\Bus\Batch
+     */
+    public function batch()
+    {
+        if ($this->batchId) {
+            return Container::getInstance()->make(BatchRepository::class)->find($this->batchId);
+        }
+    }
+
+    /**
+     * Set the batch ID on the job.
+     *
+     * @param  string  $batchId
+     * @return $this
+     */
+    public function withBatchId(string $batchId)
+    {
+        $this->batchId = $batchId;
 
         return $this;
     }

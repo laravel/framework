@@ -118,6 +118,8 @@ class Batch
     {
         $jobs = Collection::wrap($jobs);
 
+        $jobs->each->withBatchId($this->id);
+
         $this->queue->bulk($jobs->all());
     }
 
