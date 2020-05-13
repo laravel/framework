@@ -71,7 +71,7 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
     /**
      * @dataProvider jsonWhereNullDataProvider
      */
-    public function testJsonWhereNull(bool $expected, string $key, array $value = ['value' => 123]): void
+    public function testJsonWhereNull($expected, $key, array $value = ['value' => 123])
     {
         DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
 
@@ -81,14 +81,14 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
     /**
      * @dataProvider jsonWhereNullDataProvider
      */
-    public function testJsonWhereNotNull(bool $expected, string $key, array $value = ['value' => 123]): void
+    public function testJsonWhereNotNull($expected, $key, array $value = ['value' => 123])
     {
         DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
 
         $this->assertSame(! $expected, DB::table(self::TABLE)->whereNotNull(self::JSON_COL.'->'.$key)->exists());
     }
 
-    public function jsonWhereNullDataProvider(): array
+    public function jsonWhereNullDataProvider()
     {
         return [
             'key not exists' => [true, 'invalid'],
