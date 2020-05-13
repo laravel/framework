@@ -2,8 +2,10 @@
 
 namespace Illuminate\Bus;
 
+use Closure;
 use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Queue\SerializableClosure;
 use Throwable;
 
 class PendingBatch
@@ -35,9 +37,17 @@ class PendingBatch
         $this->jobs = $jobs;
     }
 
+    /**
+     * Add a callback to be executed after the batch has finished executing.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
     public function then(Closure $callback)
     {
-        //
+        $this->options['then'][] = new SerializableClosure($callback);
+
+        return $this;
     }
 
     /**

@@ -66,7 +66,7 @@ class DatabaseBatchRepository implements BatchRepository
             (int) $batch->total_jobs,
             (int) $batch->pending_jobs,
             (int) $batch->failed_jobs,
-            json_decode($batch->options, true),
+            unserialize($batch->options),
             CarbonImmutable::createFromTimestamp($batch->cancelled_at),
             CarbonImmutable::createFromTimestamp($batch->created_at)
         );
@@ -87,7 +87,7 @@ class DatabaseBatchRepository implements BatchRepository
             'total_jobs' => count($batch->jobs),
             'pending_jobs' => count($batch->jobs),
             'failed_jobs' => 0,
-            'options' => json_encode($batch->options),
+            'options' => serialize($batch->options),
             'cancelled_at' => null,
             'created_at' => time(),
         ]);
