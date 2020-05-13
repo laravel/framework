@@ -2,6 +2,7 @@
 
 namespace Illuminate\Bus;
 
+use Illuminate\Bus\BatchFactory;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Bus\QueueingDispatcher as QueueingDispatcherContract;
 use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
@@ -23,6 +24,8 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
             });
         });
 
+        $this->registerBatchServices();
+
         $this->app->alias(
             Dispatcher::class, DispatcherContract::class
         );
@@ -30,6 +33,24 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->alias(
             Dispatcher::class, QueueingDispatcherContract::class
         );
+    }
+
+    /**
+     * Register the batch handling services.
+     *
+     * @return void
+     */
+    protected function registerBatchServices()
+    {
+        $this->app->singleton(BatchRepository::class, DatabaseBatchRepository::class);
+
+        $this->app->singleton(DatabaseBatchRepository::class, function ($app) {
+            return new DatabaseBatchRepository(
+                $app->make(BatchFactory::class),
+                $app->make('db')->connection(),
+                'batches'
+            );
+        });
     }
 
     /**
@@ -43,6 +64,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
             Dispatcher::class,
             DispatcherContract::class,
             QueueingDispatcherContract::class,
+            BatchRepository::class,
         ];
     }
 }
