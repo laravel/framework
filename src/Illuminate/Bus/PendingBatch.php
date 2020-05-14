@@ -3,6 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Collections\Arr;
 use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\SerializableClosure;
@@ -51,6 +52,16 @@ class PendingBatch
     }
 
     /**
+     * Get the "then" callbacks that have been registered with the pending batch.
+     *
+     * @return array
+     */
+    public function thenCallbacks()
+    {
+        return $this->options['then'] ?? [];
+    }
+
+    /**
      * Add a callback to be executed after the first failing job in the batch.
      *
      * @param  \Closure  $callback
@@ -64,6 +75,16 @@ class PendingBatch
     }
 
     /**
+     * Get the "catch" callbacks that have been registered with the pending batch.
+     *
+     * @return array
+     */
+    public function catchCallbacks()
+    {
+        return $this->options['catch'] ?? [];
+    }
+
+    /**
      * Indicate that the batch should not be cancelled when a job within the batch fails.
      *
      * @return $this
@@ -73,6 +94,16 @@ class PendingBatch
         $this->options['allowFailures'] = true;
 
         return $this;
+    }
+
+    /**
+     * Determine if the pending batch allows jobs to fail without cancelling the batch.
+     *
+     * @return bool
+     */
+    public function allowsFailures()
+    {
+        return Arr::get($this->options, 'allowFailures', false) === true;
     }
 
     /**
@@ -89,6 +120,16 @@ class PendingBatch
     }
 
     /**
+     * Get the connection used by the pending batch.
+     *
+     * @return string|null
+     */
+    public function connection()
+    {
+        return $this->options['connection'] ?? null;
+    }
+
+    /**
      * Specify the queue that the batched jobs should run on.
      *
      * @param  string  $connection
@@ -102,9 +143,19 @@ class PendingBatch
     }
 
     /**
+     * Get the queue used by the pending batch.
+     *
+     * @return string|null
+     */
+    public function queue()
+    {
+        return $this->options['queue'] ?? null;
+    }
+
+    /**
      * Dispatch the batch.
      *
-     * @return void
+     * @return \Illuminate\Support\Batch
      */
     public function dispatch()
     {

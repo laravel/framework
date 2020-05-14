@@ -2,9 +2,14 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Carbon\CarbonImmutable;
 use Closure;
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Collections\Arr;
+use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -39,6 +44,13 @@ class BusFake implements QueueingDispatcher
      * @var array
      */
     protected $commandsAfterResponse = [];
+
+    /**
+     * The batches that have been dispatched.
+     *
+     * @var array
+     */
+    protected $batches = [];
 
     /**
      * Create a new bus fake instance.
@@ -176,6 +188,20 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
+     * Assert if a batch was dispatched based on a truth-test callback.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function assertBatched(callable $callback)
+    {
+        PHPUnit::assertTrue(
+            $this->batched($callback)->count() > 0,
+            "The expected batch was not dispatched."
+        );
+    }
+
+    /**
      * Get all of the jobs matching a truth-test callback.
      *
      * @param  string  $command
@@ -216,6 +242,23 @@ class BusFake implements QueueingDispatcher
 
         return collect($this->commandsAfterResponse[$command])->filter(function ($command) use ($callback) {
             return $callback($command);
+        });
+    }
+
+    /**
+     * Get all of the pending batches matching a truth-test callback.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Support\Collection
+     */
+    public function batched(callable $callback)
+    {
+        if (empty($this->batches)) {
+            return collect();
+        }
+
+        return collect($this->batches)->filter(function ($batch) use ($callback) {
+            return $callback($batch);
         });
     }
 
@@ -318,6 +361,41 @@ class BusFake implements QueueingDispatcher
         } else {
             return $this->dispatcher->dispatch($command);
         }
+    }
+
+    /**
+     * Attempt to find the batch with the given ID.
+     *
+     * @param  string  $batchId
+     * @return \Illuminate\Bus\Batch|null
+     */
+    public function findBatch(string $batchId)
+    {
+        return;
+    }
+
+    /**
+     * Create a new batch of queueable jobs.
+     *
+     * @param  \Illuminate\Collections\Collection|array  $jobs
+     * @return \Illuminate\Bus\PendingBatch
+     */
+    public function batch($jobs)
+    {
+        return new PendingBatchFake($this, Collection::wrap($jobs));
+    }
+
+    /**
+     * Record the fake pending batch dispatch.
+     *
+     * @param  \Illuminate\Bus\PendingBatch
+     * @return \Illuminate\Bus\Batch
+     */
+    public function recordPendingBatch(PendingBatch $pendingBatch)
+    {
+        $this->batches[] = $pendingBatch;
+
+        return (new BatchRepositoryFake)->store($pendingBatch);
     }
 
     /**

@@ -47,8 +47,8 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->singleton(DatabaseBatchRepository::class, function ($app) {
             return new DatabaseBatchRepository(
                 $app->make(BatchFactory::class),
-                $app->make('db')->connection(),
-                'batches'
+                $app->make('db')->connection(config('queue.batching.database')),
+                config('queue.batching.table', 'job_batches'),
             );
         });
     }
