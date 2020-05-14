@@ -179,9 +179,9 @@ class Batch implements JsonSerializable
      */
     public function recordSuccessfulJob()
     {
-        if ($pending = $this->decrementPendingJobs()) {
-            return;
-        }
+        $pending = $this->decrementPendingJobs();
+
+        // if pending - failed === 0 ... fire "then" callbacks...
 
         if ($pending === 0) {
             $this->repository->markAsFinished($this->id);
@@ -252,15 +252,15 @@ class Batch implements JsonSerializable
      */
     public function recordFailedJob($e)
     {
-        if ($this->incrementFailedJobs() > 1) {
-            return;
-        }
+        $failed = $this->incrementFailedJobs();
 
-        if (! $this->allowsFailures()) {
+        if ($failed === 1 && ! $this->allowsFailures()) {
             $this->cancel();
         }
 
-        if ($this->hasCatchCallbacks()) {
+        // if pending - failed === 0 ... fire "then" callbacks...
+
+        if ($failed === 1 && $this->hasCatchCallbacks()) {
             $batch = $this->fresh();
 
             collect($this->options['catch'])->each->__invoke($batch, $e);
