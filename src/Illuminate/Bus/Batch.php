@@ -242,6 +242,25 @@ class Batch
     }
 
     /**
+     * Record that a job within the batch failed to finish successfully, executing any callbacks if necessary.
+     *
+     * @param  \Throwable  $e
+     * @return void
+     */
+    public function recordFailedJob($e)
+    {
+        if ($this->incrementFailedJobs() > 1) {
+            return;
+        }
+
+        if ($this->hasCatchCallbacks()) {
+            $batch = $this->fresh();
+
+            collect($this->options['catch'])->each->__invoke($batch, $e);
+        }
+    }
+
+    /**
      * Increment the failed jobs for the batch.
      *
      * @return int
