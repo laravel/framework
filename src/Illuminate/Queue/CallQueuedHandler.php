@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Exception;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Job;
@@ -60,6 +61,7 @@ class CallQueuedHandler
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
+            $this->ensureSuccessfulBatchJobIsRecorded($command);
         }
 
         if (! $job->isDeletedOrReleased()) {
@@ -133,6 +135,22 @@ class CallQueuedHandler
     }
 
     /**
+     * Ensure the batch is notified of the successful job completion.
+     *
+     * @param  mixed  $command
+     * @return void
+     */
+    protected function ensureSuccessfulBatchJobIsRecorded($command)
+    {
+        if (! in_array(Batchable::class, class_uses_recursive($instance)) ||
+            is_null($command->batch())) {
+            return;
+        }
+
+        $pending = $command->batch()->decrementPendingJobs();
+    }
+
+    /**
      * Handle a model not found exception.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -170,8 +188,27 @@ class CallQueuedHandler
     {
         $command = unserialize($data['command']);
 
+        $this->ensureFailedBatchJobIsRecorded($command, $e);
+
         if (method_exists($command, 'failed')) {
             $command->failed($e);
         }
+    }
+
+    /**
+     * Ensure the batch is notified of the failed job.
+     *
+     * @param  mixed  $command
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function ensureFailedBatchJobIsRecorded($command, $e)
+    {
+        if (! in_array(Batchable::class, class_uses_recursive($instance)) ||
+            is_null($command->batch())) {
+            return;
+        }
+
+        $failed = $command->batch()->incrementFailedJobs();
     }
 }

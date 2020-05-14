@@ -34,9 +34,9 @@ class BatchFactory
      * @param  int  $pendingJobs
      * @param  int  $failedJobs
      * @param  array  $options
-     * @param  \Illuminate\Support\CarbonImmutable  $cancelledAt
      * @param  \Illuminate\Support\CarbonImmutable  $createdAt
-     * @param  \Illuminate\Support\CarbonImmutable  $updatedAt
+     * @param  \Illuminate\Support\CarbonImmutable|null  $cancelledAt
+     * @param  \Illuminate\Support\CarbonImmutable|null  $finishedAt
      * @return void
      */
     public function make(BatchRepository $repository,
@@ -45,9 +45,10 @@ class BatchFactory
                          int $pendingJobs,
                          int $failedJobs,
                          array $options,
-                         CarbonImmutable $cancelledAt,
-                         CarbonImmutable $createdAt)
+                         CarbonImmutable $createdAt,
+                         ?CarbonImmutable $cancelledAt,
+                         ?CarbonImmutable $finishedAt)
     {
-        return new Batch($this->queue, $repository, $id, $totalJobs, $pendingJobs, $failedJobs, $options, $cancelledAt, $createdAt);
+        return new Batch($this->queue, $repository, $id, $totalJobs, $pendingJobs, $failedJobs, $options, $createdAt, $cancelledAt, $finishedAt);
     }
 }

@@ -68,8 +68,9 @@ class DatabaseBatchRepository implements BatchRepository
             (int) $batch->pending_jobs,
             (int) $batch->failed_jobs,
             unserialize($batch->options),
-            CarbonImmutable::createFromTimestamp($batch->cancelled_at),
-            CarbonImmutable::createFromTimestamp($batch->created_at)
+            CarbonImmutable::createFromTimestamp($batch->created_at),
+            $batch->cancelled_at ? CarbonImmutable::createFromTimestamp($batch->cancelled_at) : $batch->cancelled_at,
+            $batch->finished_at ? CarbonImmutable::createFromTimestamp($batch->finished_at) : $batch->finished_at
         );
     }
 
@@ -89,8 +90,9 @@ class DatabaseBatchRepository implements BatchRepository
             'pending_jobs' => 0,
             'failed_jobs' => 0,
             'options' => serialize($batch->options),
-            'cancelled_at' => null,
             'created_at' => time(),
+            'cancelled_at' => null,
+            'finished_at' => null,
         ]);
 
         return $this->find($id);
@@ -108,6 +110,7 @@ class DatabaseBatchRepository implements BatchRepository
         $this->connection->table($this->table)->where('id', $batchId)->update([
             'total_jobs' => DB::raw('total_jobs + '.$amount),
             'pending_jobs' => DB::raw('pending_jobs + '.$amount),
+            'finished_at' => null,
         ]);
     }
 
@@ -169,6 +172,7 @@ class DatabaseBatchRepository implements BatchRepository
     {
         $this->connection->table($this->table)->where('id', $batchId)->update([
             'cancelled_at' => time(),
+            'finished_at' => time(),
         ]);
     }
 

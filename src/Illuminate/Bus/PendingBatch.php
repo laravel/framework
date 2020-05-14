@@ -64,6 +64,44 @@ class PendingBatch
     }
 
     /**
+     * Indicate that the batch should not be cancelled when a job within the batch fails.
+     *
+     * @return $this
+     */
+    public function allowFailures()
+    {
+        $this->options['allowFailures'] = true;
+
+        return $this;
+    }
+
+    /**
+     * Specify the queue connection that the batched jobs should run on.
+     *
+     * @param  string  $connection
+     * @return $this
+     */
+    public function onConnection(string $connection)
+    {
+        $this->options['connection'] = $connection;
+
+        return $this;
+    }
+
+    /**
+     * Specify the queue that the batched jobs should run on.
+     *
+     * @param  string  $connection
+     * @return $this
+     */
+    public function onQueue(string $queue)
+    {
+        $this->options['queue'] = $queue;
+
+        return $this;
+    }
+
+    /**
      * Dispatch the batch.
      *
      * @return void
@@ -75,7 +113,11 @@ class PendingBatch
         try {
             $batch = $repository->store($this);
 
-            $batch->add($this->jobs);
+            $batch->add(
+                $this->jobs,
+                $this->options['connection'] ?? null,
+                $this->options['queue'] ?? null
+            );
         } catch (Throwable $e) {
             if (isset($batch)) {
                 $repository->delete($batch->id);
