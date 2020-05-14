@@ -142,12 +142,12 @@ class CallQueuedHandler
      */
     protected function ensureSuccessfulBatchJobIsRecorded($command)
     {
-        if (! in_array(Batchable::class, class_uses_recursive($instance)) ||
+        if (! in_array(Batchable::class, class_uses_recursive($command)) ||
             is_null($command->batch())) {
             return;
         }
 
-        $pending = $command->batch()->decrementPendingJobs();
+        $command->batch()->recordSuccessfulJob();
     }
 
     /**
@@ -204,11 +204,11 @@ class CallQueuedHandler
      */
     protected function ensureFailedBatchJobIsRecorded($command, $e)
     {
-        if (! in_array(Batchable::class, class_uses_recursive($instance)) ||
+        if (! in_array(Batchable::class, class_uses_recursive($command)) ||
             is_null($command->batch())) {
             return;
         }
 
-        $failed = $command->batch()->incrementFailedJobs();
+        $command->batch()->recordFailedJob($e);
     }
 }

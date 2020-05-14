@@ -163,6 +163,19 @@ class DatabaseBatchRepository implements BatchRepository
     }
 
     /**
+     * Mark the batch that has the given ID as finished.
+     *
+     * @param  string  $batchId
+     * @return void
+     */
+    public function markAsFinished(string $batchId)
+    {
+        $this->connection->table($this->table)->where('id', $batchId)->update([
+            'finished_at' => time(),
+        ]);
+    }
+
+    /**
      * Cancel the batch that has the given ID.
      *
      * @param  string  $batchId

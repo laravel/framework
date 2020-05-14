@@ -40,6 +40,14 @@ interface BatchRepository
     public function incrementFailedJobs(string $batchId);
 
     /**
+     * Mark the batch that has the given ID as finished.
+     *
+     * @param  string  $batchId
+     * @return void
+     */
+    public function markAsFinished(string $batchId);
+
+    /**
      * Cancel the batch that has the given ID.
      *
      * @param  string  $batchId

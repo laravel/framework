@@ -119,6 +119,16 @@ class Batch
     }
 
     /**
+     * Get a fresh instance of the batch represented by this ID.
+     *
+     * @return self
+     */
+    public function fresh()
+    {
+        return $this->repository->find($this->id);
+    }
+
+    /**
      * Add additional jobs to the batch.
      *
      * @param  \Illuminate\Collections\Collection|array  $jobs
@@ -162,6 +172,26 @@ class Batch
     }
 
     /**
+     * Record that a job within the batch finished successfully, executing any callbacks if necessary.
+     *
+     * @return void
+     */
+    public function recordSuccessfulJob()
+    {
+        if ($this->decrementPendingJobs() > 0) {
+            return;
+        }
+
+        $this->repository->markAsFinished($this->id);
+
+        if ($this->hasThenCallbacks()) {
+            $batch = $this->fresh();
+
+            collect($this->options['then'])->each->__invoke($batch);
+        }
+    }
+
+    /**
      * Decrement the pending jobs for the batch.
      *
      * @return int
@@ -179,6 +209,16 @@ class Batch
     public function finished()
     {
         return ! is_null($this->finishedAt);
+    }
+
+    /**
+     * Determine if the batch has "then" callbacks.
+     *
+     * @return bool
+     */
+    public function hasThenCallbacks()
+    {
+        return isset($this->options['then']) && ! empty($this->options['then']);
     }
 
     /**
@@ -209,6 +249,16 @@ class Batch
     public function incrementFailedJobs()
     {
         return $this->repository->incrementFailedJobs($this->id);
+    }
+
+    /**
+     * Determine if the batch has "catch" callbacks.
+     *
+     * @return bool
+     */
+    public function hasCatchCallbacks()
+    {
+        return isset($this->options['catch']) && ! empty($this->options['catch']);
     }
 
     /**
