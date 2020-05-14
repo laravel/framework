@@ -113,11 +113,7 @@ class PendingBatch
         try {
             $batch = $repository->store($this);
 
-            $batch->add(
-                $this->jobs,
-                $this->options['connection'] ?? null,
-                $this->options['queue'] ?? null
-            );
+            $batch->add($this->jobs);
         } catch (Throwable $e) {
             if (isset($batch)) {
                 $repository->delete($batch->id);

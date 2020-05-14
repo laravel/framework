@@ -132,23 +132,21 @@ class Batch
      * Add additional jobs to the batch.
      *
      * @param  \Illuminate\Collections\Collection|array  $jobs
-     * @param  string  $connection
-     * @param  string  $queue
      * @return void
      */
-    public function add($jobs, string $connection = null, string $queue = null)
+    public function add($jobs)
     {
         $jobs = Collection::wrap($jobs);
 
         $jobs->each->withBatchId($this->id);
 
-        $this->repository->transaction(function () use ($jobs, $connection, $queue) {
+        $this->repository->transaction(function () use ($jobs) {
             $this->repository->incrementTotalJobs($this->id, count($jobs));
 
-            $this->queue->connection($connection)->bulk(
+            $this->queue->connection($this->options['connection'] ?? null)->bulk(
                 $jobs->all(),
                 $data = '',
-                $queue
+                $this->options['queue'] ?? null
             );
         });
     }
