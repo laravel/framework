@@ -181,7 +181,7 @@ class Batch implements JsonSerializable
     {
         $pending = $this->decrementPendingJobs();
 
-        // if pending - failed === 0 ... fire "then" callbacks...
+        // TODO: if pending - failed === 0 ... fire "then" callbacks... method above needs to return both values...
 
         if ($pending === 0) {
             $this->repository->markAsFinished($this->id);
@@ -258,7 +258,7 @@ class Batch implements JsonSerializable
             $this->cancel();
         }
 
-        // if pending - failed === 0 ... fire "then" callbacks...
+        // TODO: if pending - failed === 0 ... fire "then" callbacks... method above needs to return both values...
 
         if ($failed === 1 && $this->hasCatchCallbacks()) {
             $batch = $this->fresh();
