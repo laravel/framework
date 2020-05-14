@@ -253,6 +253,10 @@ class Batch
             return;
         }
 
+        if (! $this->allowsFailures()) {
+            $this->cancel();
+        }
+
         if ($this->hasCatchCallbacks()) {
             $batch = $this->fresh();
 

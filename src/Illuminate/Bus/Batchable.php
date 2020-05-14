@@ -22,6 +22,7 @@ trait Batchable
      */
     public function batch()
     {
+        return $this->findBatch();
         static $batch = null;
 
         return $batch = $batch ?: $this->findBatch();
