@@ -75,6 +75,23 @@ if (! function_exists('class_basename')) {
     }
 }
 
+if (! function_exists('class_parent_initial')) {
+    /**
+     * Gets the initial parent class of another class.
+     *
+     * @param  string|object  $class
+     * @return string
+     */
+    function class_parent_initial($class)
+    {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        return Arr::last(class_parents($class), null, $class);
+    }
+}
+
 if (! function_exists('class_uses_recursive')) {
     /**
      * Returns all traits used by a class, its parent classes and trait of their traits.

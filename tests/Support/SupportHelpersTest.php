@@ -33,6 +33,25 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('Baz', class_basename('Baz'));
     }
 
+    public function testClassParentInitial()
+    {
+        $expected = 'Illuminate\Database\Eloquent\Relations\Relation';
+
+        $this->assertSame($expected, class_parent_initial($expected));
+
+        $this->assertSame($expected, class_parent_initial(
+            'Illuminate\Database\Eloquent\Relations\HasMany'
+        ));
+
+        $this->assertSame($expected, class_parent_initial(
+            'Illuminate\Database\Eloquent\Relations\BelongsTo'
+        ));
+
+        $this->assertSame($expected, class_parent_initial(
+            'Illuminate\Database\Eloquent\Relations\HasOneOrMany'
+        ));
+    }
+
     public function testValue()
     {
         $this->assertSame('foo', value('foo'));
