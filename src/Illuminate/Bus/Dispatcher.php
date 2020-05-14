@@ -128,6 +128,17 @@ class Dispatcher implements QueueingDispatcher
     }
 
     /**
+     * Attempt to find the batch with the given ID.
+     *
+     * @param  string  $batchId
+     * @return \Illuminate\Bus\Batch|null
+     */
+    public function findBatch(string $batchId)
+    {
+        return $this->container->make(BatchRepository::class)->find($batchId);
+    }
+
+    /**
      * Create a new batch of queueable jobs.
      *
      * @param  \Illuminate\Collections\Collection|array  $jobs

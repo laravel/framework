@@ -6,8 +6,9 @@ use Carbon\CarbonImmutable;
 use Illuminate\Collections\Arr;
 use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
+use JsonSerializable;
 
-class Batch
+class Batch implements JsonSerializable
 {
     /**
      * The queue factory implementation.
@@ -132,7 +133,7 @@ class Batch
      * Add additional jobs to the batch.
      *
      * @param  \Illuminate\Collections\Collection|array  $jobs
-     * @return void
+     * @return self
      */
     public function add($jobs)
     {
@@ -149,6 +150,8 @@ class Batch
                 $this->options['queue'] ?? null
             );
         });
+
+        return $this->fresh();
     }
 
     /**
@@ -300,5 +303,25 @@ class Batch
     public function cancelled()
     {
         return ! is_null($this->cancelledAt);
+    }
+
+    /**
+     * Get the JSON serializable representation of the object.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'totalJobs' => $this->totalJobs,
+            'pendingJobs' => $this->pendingJobs,
+            'processedJobs' => $this->processedJobs(),
+            'progress' => $this->progress(),
+            'failedJobs' => $this->failedJobs,
+            'createdAt' => $this->createdAt,
+            'cancelledAt' => $this->cancelledAt,
+            'finishedAt' => $this->finishedAt,
+        ];
     }
 }

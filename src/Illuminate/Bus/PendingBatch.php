@@ -113,7 +113,7 @@ class PendingBatch
         try {
             $batch = $repository->store($this);
 
-            $batch->add($this->jobs);
+            $batch = $batch->add($this->jobs);
         } catch (Throwable $e) {
             if (isset($batch)) {
                 $repository->delete($batch->id);
