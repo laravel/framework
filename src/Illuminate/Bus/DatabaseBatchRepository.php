@@ -123,9 +123,12 @@ class DatabaseBatchRepository implements BatchRepository
      */
     public function decrementPendingJobs(string $batchId)
     {
-        return $this->updateAtomicValue($batchId, function ($batch) {
-            return ['pending_jobs' => $batch->pending_jobs - 1];
-        });
+        return $this->updateAtomicValues($batchId, function ($batch) {
+            return [
+                'pending_jobs' => $batch->pending_jobs - 1,
+                'failed_jobs' => $batch->failed_jobs,
+            ];
+        })['pending_jobs'] ?? null;
     }
 
     /**
@@ -136,9 +139,12 @@ class DatabaseBatchRepository implements BatchRepository
      */
     public function incrementFailedJobs(string $batchId)
     {
-        return $this->updateAtomicValue($batchId, function ($batch) {
-            return ['failed_jobs' => $batch->failed_jobs + 1];
-        });
+        return $this->updateAtomicValues($batchId, function ($batch) {
+            return [
+                'pending_jobs' => $batch->pending_jobs,
+                'failed_jobs' => $batch->failed_jobs + 1,
+            ];
+        })['failed_jobs'] ?? null;
     }
 
     /**
@@ -148,18 +154,16 @@ class DatabaseBatchRepository implements BatchRepository
      * @param  \Closure  $callback
      * @return int|null
      */
-    protected function updateAtomicValue(string $batchId, Closure $callback)
+    protected function updateAtomicValues(string $batchId, Closure $callback)
     {
         return $this->connection->transaction(function () use ($batchId, $callback) {
             $batch = $this->connection->table($this->table)->where('id', $batchId)
                         ->lockForUpdate()
                         ->first();
 
-            return is_null($batch) ? null : head(tap($callback($batch), function ($value) use ($batchId) {
-                $this->connection->table($this->table)->where('id', $batchId)->update([
-                    head(array_flip($value)) => head($value),
-                ]);
-            }));
+            return is_null($batch) ? [] : tap($callback($batch), function ($values) use ($batchId) {
+                $this->connection->table($this->table)->where('id', $batchId)->update($values);
+            });
         });
     }
 
