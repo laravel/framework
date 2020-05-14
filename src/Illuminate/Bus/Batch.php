@@ -104,8 +104,8 @@ class Batch implements JsonSerializable
                                 int $failedJobs,
                                 array $options,
                                 CarbonImmutable $createdAt,
-                                ?CarbonImmutable $cancelledAt,
-                                ?CarbonImmutable $finishedAt)
+                                ?CarbonImmutable $cancelledAt = null,
+                                ?CarbonImmutable $finishedAt = null)
     {
         $this->queue = $queue;
         $this->repository = $repository;
@@ -169,7 +169,7 @@ class Batch implements JsonSerializable
      */
     public function progress()
     {
-        return round($this->processedJobs() / $this->totalJobs, 2);
+        return $this->totalJobs > 0 ? round($this->processedJobs() / $this->totalJobs, 2) : 0;
     }
 
     /**
@@ -179,16 +179,18 @@ class Batch implements JsonSerializable
      */
     public function recordSuccessfulJob()
     {
-        if ($this->decrementPendingJobs() > 0) {
+        if ($pending = $this->decrementPendingJobs()) {
             return;
         }
 
-        $this->repository->markAsFinished($this->id);
+        if ($pending === 0) {
+            $this->repository->markAsFinished($this->id);
+        }
 
-        if ($this->hasThenCallbacks()) {
+        if ($pending === 0 && $this->hasSuccessCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['then'])->each->__invoke($batch);
+            collect($this->options['success'])->each->__invoke($batch);
         }
     }
 
@@ -213,13 +215,13 @@ class Batch implements JsonSerializable
     }
 
     /**
-     * Determine if the batch has "then" callbacks.
+     * Determine if the batch has "success" callbacks.
      *
      * @return bool
      */
-    public function hasThenCallbacks()
+    public function hasSuccessCallbacks()
     {
-        return isset($this->options['then']) && ! empty($this->options['then']);
+        return isset($this->options['success']) && ! empty($this->options['success']);
     }
 
     /**
@@ -303,6 +305,16 @@ class Batch implements JsonSerializable
     public function cancelled()
     {
         return ! is_null($this->cancelledAt);
+    }
+
+    /**
+     * Delete the batch from storage.
+     *
+     * @return void
+     */
+    public function delete()
+    {
+        $this->repository->delete($this->id);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Illuminate\Bus;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -108,8 +109,8 @@ class DatabaseBatchRepository implements BatchRepository
     public function incrementTotalJobs(string $batchId, int $amount)
     {
         $this->connection->table($this->table)->where('id', $batchId)->update([
-            'total_jobs' => DB::raw('total_jobs + '.$amount),
-            'pending_jobs' => DB::raw('pending_jobs + '.$amount),
+            'total_jobs' => new Expression('total_jobs + '.$amount),
+            'pending_jobs' => new Expression('pending_jobs + '.$amount),
             'finished_at' => null,
         ]);
     }

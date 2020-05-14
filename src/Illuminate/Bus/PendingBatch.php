@@ -44,21 +44,21 @@ class PendingBatch
      * @param  \Closure  $callback
      * @return $this
      */
-    public function then(Closure $callback)
+    public function success(Closure $callback)
     {
-        $this->options['then'][] = new SerializableClosure($callback);
+        $this->options['success'][] = new SerializableClosure($callback);
 
         return $this;
     }
 
     /**
-     * Get the "then" callbacks that have been registered with the pending batch.
+     * Get the "success" callbacks that have been registered with the pending batch.
      *
      * @return array
      */
-    public function thenCallbacks()
+    public function successCallbacks()
     {
-        return $this->options['then'] ?? [];
+        return $this->options['success'] ?? [];
     }
 
     /**
@@ -87,11 +87,12 @@ class PendingBatch
     /**
      * Indicate that the batch should not be cancelled when a job within the batch fails.
      *
+     * @param  bool  $allowFailures
      * @return $this
      */
-    public function allowFailures()
+    public function allowFailures($allowFailures = true)
     {
-        $this->options['allowFailures'] = true;
+        $this->options['allowFailures'] = $allowFailures;
 
         return $this;
     }

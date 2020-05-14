@@ -26,6 +26,18 @@ trait Batchable
     }
 
     /**
+     * Determine if the batch is still active and processing.
+     *
+     * @return bool
+     */
+    public function batching()
+    {
+        $batch = $this->batch();
+
+        return $batch && ! $batch->cancelled();
+    }
+
+    /**
      * Set the batch ID on the job.
      *
      * @param  string  $batchId
