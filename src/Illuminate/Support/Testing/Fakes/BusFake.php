@@ -2,14 +2,11 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Collections\Arr;
 use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -197,7 +194,7 @@ class BusFake implements QueueingDispatcher
     {
         PHPUnit::assertTrue(
             $this->batched($callback)->count() > 0,
-            "The expected batch was not dispatched."
+            'The expected batch was not dispatched.'
         );
     }
 
@@ -371,7 +368,6 @@ class BusFake implements QueueingDispatcher
      */
     public function findBatch(string $batchId)
     {
-        return;
     }
 
     /**
