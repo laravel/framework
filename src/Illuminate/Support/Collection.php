@@ -919,9 +919,9 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @return static
      */
-    public function reverse()
+    public function reverse($preserve = true)
     {
-        return new static(array_reverse($this->items, true));
+        return new static(array_reverse($this->items, $preserve));
     }
 
     /**
