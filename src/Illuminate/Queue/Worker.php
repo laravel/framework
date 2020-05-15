@@ -396,11 +396,7 @@ class Worker
             // so it is not lost entirely. This'll let the job be retried at a later time by
             // another listener (or this same one). We will re-throw this exception after.
             if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
-                $job->release(
-                    method_exists($job, 'backoff') && ! is_null($job->backoff())
-                                ? $job->backoff()
-                                : $options->backoff
-                );
+                $job->release($this->calculateBackoff($job, $options));
             }
         }
 
@@ -495,6 +491,25 @@ class Worker
     protected function failJob($job, Throwable $e)
     {
         return $job->fail($e);
+    }
+
+    /**
+     * Calculate the backoff for the given job.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return int
+     */
+    protected function calculateBackoff($job, WorkerOptions $options)
+    {
+        $backoff = explode(
+            ',',
+            method_exists($job, 'backoff') && ! is_null($job->backoff())
+                        ? $job->backoff()
+                        : $options->backoff
+        );
+
+        return (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
     }
 
     /**
