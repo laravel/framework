@@ -270,8 +270,11 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     public function provides()
     {
         return [
-            'queue', 'queue.worker', 'queue.listener',
-            'queue.failer', 'queue.connection',
+            'queue',
+            'queue.connection',
+            'queue.failer',
+            'queue.listener',
+            'queue.worker',
         ];
     }
 }
