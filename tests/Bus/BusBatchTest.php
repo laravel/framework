@@ -32,6 +32,7 @@ class BusBatchTest extends TestCase
 
         $this->createSchema();
 
+        $_SERVER['__then.count'] = 0;
         $_SERVER['__success.count'] = 0;
         $_SERVER['__catch.count'] = 0;
     }
@@ -62,6 +63,7 @@ class BusBatchTest extends TestCase
      */
     protected function tearDown(): void
     {
+        unset($_SERVER['__then.batch']);
         unset($_SERVER['__success.batch']);
         unset($_SERVER['__catch.batch']);
         unset($_SERVER['__catch.exception']);
@@ -138,11 +140,13 @@ class BusBatchTest extends TestCase
         $batch->recordSuccessfulJob();
         $batch->recordSuccessfulJob();
 
+        $this->assertInstanceOf(Batch::class, $_SERVER['__then.batch']);
         $this->assertInstanceOf(Batch::class, $_SERVER['__success.batch']);
 
         $batch = $batch->fresh();
         $this->assertEquals(0, $batch->pendingJobs);
         $this->assertTrue($batch->finished());
+        $this->assertEquals(1, $_SERVER['__then.count']);
         $this->assertEquals(1, $_SERVER['__success.count']);
     }
 
@@ -172,6 +176,7 @@ class BusBatchTest extends TestCase
         $batch->recordFailedJob(new RuntimeException('Something went wrong.'));
         $batch->recordFailedJob(new RuntimeException('Something else went wrong.'));
 
+        $this->assertInstanceOf(Batch::class, $_SERVER['__then.batch']);
         $this->assertFalse(isset($_SERVER['__success.batch']));
 
         $batch = $batch->fresh();
@@ -179,6 +184,7 @@ class BusBatchTest extends TestCase
         $this->assertEquals(2, $batch->failedJobs);
         $this->assertTrue($batch->finished());
         $this->assertTrue($batch->cancelled());
+        $this->assertEquals(1, $_SERVER['__then.count']);
         $this->assertEquals(1, $_SERVER['__catch.count']);
         $this->assertEquals('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
@@ -287,6 +293,10 @@ class BusBatchTest extends TestCase
         $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
 
         $pendingBatch = (new PendingBatch(new Container, collect()))
+                            ->then(function (Batch $batch) {
+                                $_SERVER['__then.batch'] = $batch;
+                                $_SERVER['__then.count']++;
+                            })
                             ->success(function (Batch $batch) {
                                 $_SERVER['__success.batch'] = $batch;
                                 $_SERVER['__success.count']++;

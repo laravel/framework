@@ -181,8 +181,6 @@ class Batch implements JsonSerializable
     {
         $counts = $this->decrementPendingJobs();
 
-        // TODO: if pending - failed === 0 ... fire "then" callbacks... method above needs to return both values...
-
         if ($counts->pendingJobs === 0) {
             $this->repository->markAsFinished($this->id);
         }
@@ -191,6 +189,12 @@ class Batch implements JsonSerializable
             $batch = $this->fresh();
 
             collect($this->options['success'])->each->__invoke($batch);
+        }
+
+        if (($counts->pendingJobs - $counts->failedJobs) === 0 && $this->hasThenCallbacks()) {
+            $batch = $this->fresh();
+
+            collect($this->options['then'])->each->__invoke($batch);
         }
     }
 
@@ -258,12 +262,16 @@ class Batch implements JsonSerializable
             $this->cancel();
         }
 
-        // TODO: if pending - failed === 0 ... fire "then" callbacks... method above needs to return both values...
-
         if ($counts->failedJobs === 1 && $this->hasCatchCallbacks()) {
             $batch = $this->fresh();
 
             collect($this->options['catch'])->each->__invoke($batch, $e);
+        }
+
+        if (($counts->pendingJobs - $counts->failedJobs) === 0 && $this->hasThenCallbacks()) {
+            $batch = $this->fresh();
+
+            collect($this->options['then'])->each->__invoke($batch, $e);
         }
     }
 
@@ -285,6 +293,16 @@ class Batch implements JsonSerializable
     public function hasCatchCallbacks()
     {
         return isset($this->options['catch']) && ! empty($this->options['catch']);
+    }
+
+    /**
+     * Determine if the batch has "then" callbacks.
+     *
+     * @return bool
+     */
+    public function hasThenCallbacks()
+    {
+        return isset($this->options['then']) && ! empty($this->options['then']);
     }
 
     /**

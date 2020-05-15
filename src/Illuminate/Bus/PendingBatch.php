@@ -44,6 +44,29 @@ class PendingBatch
      * @param  \Closure  $callback
      * @return $this
      */
+    public function then(Closure $callback)
+    {
+        $this->options['then'][] = new SerializableClosure($callback);
+
+        return $this;
+    }
+
+    /**
+     * Get the "then" callbacks that have been registered with the pending batch.
+     *
+     * @return array
+     */
+    public function thenCallbacks()
+    {
+        return $this->options['then'] ?? [];
+    }
+
+    /**
+     * Add a callback to be executed after all jobs in the batch have executed successfully.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
     public function success(Closure $callback)
     {
         $this->options['success'][] = new SerializableClosure($callback);
