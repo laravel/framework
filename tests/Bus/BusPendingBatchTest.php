@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Bus;
 
-use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Collections\Collection;
 use Illuminate\Container\Container;

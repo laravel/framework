@@ -2,7 +2,6 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Bus\BatchFactory;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Bus\QueueingDispatcher as QueueingDispatcherContract;
 use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
