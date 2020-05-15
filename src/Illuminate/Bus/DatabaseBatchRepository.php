@@ -58,7 +58,7 @@ class DatabaseBatchRepository implements BatchRepository
                             ->first();
 
         if (! $batch) {
-            return null;
+            return;
         }
 
         return $this->factory->make(
