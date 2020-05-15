@@ -333,6 +333,16 @@ class Batch implements JsonSerializable
      *
      * @return bool
      */
+    public function canceled()
+    {
+        return $this->cancelled();
+    }
+
+    /**
+     * Determine if the batch has been cancelled.
+     *
+     * @return bool
+     */
     public function cancelled()
     {
         return ! is_null($this->cancelledAt);
