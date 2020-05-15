@@ -37,7 +37,7 @@ class RetryBatchCommand extends Command
         }
 
         if (empty($batch->failedJobIds)) {
-            $this->error("The given batch does not contain any failed jobs.");
+            $this->error('The given batch does not contain any failed jobs.');
 
             return 1;
         }
