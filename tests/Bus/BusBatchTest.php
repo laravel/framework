@@ -137,8 +137,8 @@ class BusBatchTest extends TestCase
         $batch = $batch->add([$job, $secondJob]);
         $this->assertEquals(2, $batch->pendingJobs);
 
-        $batch->recordSuccessfulJob();
-        $batch->recordSuccessfulJob();
+        $batch->recordSuccessfulJob('test-id');
+        $batch->recordSuccessfulJob('test-id');
 
         $this->assertInstanceOf(Batch::class, $_SERVER['__then.batch']);
         $this->assertInstanceOf(Batch::class, $_SERVER['__success.batch']);
@@ -173,8 +173,8 @@ class BusBatchTest extends TestCase
         $batch = $batch->add([$job, $secondJob]);
         $this->assertEquals(2, $batch->pendingJobs);
 
-        $batch->recordFailedJob(new RuntimeException('Something went wrong.'));
-        $batch->recordFailedJob(new RuntimeException('Something else went wrong.'));
+        $batch->recordFailedJob('test-id', new RuntimeException('Something went wrong.'));
+        $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
 
         $this->assertInstanceOf(Batch::class, $_SERVER['__then.batch']);
         $this->assertFalse(isset($_SERVER['__success.batch']));
@@ -212,8 +212,8 @@ class BusBatchTest extends TestCase
         $batch = $batch->add([$job, $secondJob]);
         $this->assertEquals(2, $batch->pendingJobs);
 
-        $batch->recordFailedJob(new RuntimeException('Something went wrong.'));
-        $batch->recordFailedJob(new RuntimeException('Something else went wrong.'));
+        $batch->recordFailedJob('test-id', new RuntimeException('Something went wrong.'));
+        $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
 
         // While allowing failures this batch never actually completes...
         $this->assertFalse(isset($_SERVER['__success.batch']));

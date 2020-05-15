@@ -27,17 +27,19 @@ interface BatchRepository
      * Decrement the total number of pending jobs for the batch.
      *
      * @param  string  $batchId
+     * @param  string  $jobId
      * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
-    public function decrementPendingJobs(string $batchId);
+    public function decrementPendingJobs(string $batchId, string $jobId);
 
     /**
      * Increment the total number of failed jobs for the batch.
      *
      * @param  string  $batchId
+     * @param  string  $jobId
      * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
-    public function incrementFailedJobs(string $batchId);
+    public function incrementFailedJobs(string $batchId, string $jobId);
 
     /**
      * Mark the batch that has the given ID as finished.

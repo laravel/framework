@@ -118,9 +118,10 @@ class DatabaseBatchRepository implements BatchRepository
      * Decrement the total number of pending jobs for the batch.
      *
      * @param  string  $batchId
+     * @param  string  $jobId
      * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
-    public function decrementPendingJobs(string $batchId)
+    public function decrementPendingJobs(string $batchId, string $jobId)
     {
         $values = $this->updateAtomicValues($batchId, function ($batch) {
             return [
@@ -139,9 +140,10 @@ class DatabaseBatchRepository implements BatchRepository
      * Increment the total number of failed jobs for the batch.
      *
      * @param  string  $batchId
+     * @param  string  $jobId
      * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
-    public function incrementFailedJobs(string $batchId)
+    public function incrementFailedJobs(string $batchId, string $jobId)
     {
         $values = $this->updateAtomicValues($batchId, function ($batch) {
             return [
