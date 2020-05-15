@@ -156,7 +156,7 @@ class PendingBatch
     /**
      * Specify the queue that the batched jobs should run on.
      *
-     * @param  string  $connection
+     * @param  string  $queue
      * @return $this
      */
     public function onQueue(string $queue)
