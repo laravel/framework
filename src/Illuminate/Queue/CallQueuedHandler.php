@@ -181,10 +181,11 @@ class CallQueuedHandler
      * The exception that caused the failure will be passed.
      *
      * @param  array  $data
-     * @param  \Throwable  $e
+     * @param  \Throwable|null  $e
+     * @param  string  $uuid
      * @return void
      */
-    public function failed(array $data, $e)
+    public function failed(array $data, $e, string $uuid)
     {
         $command = unserialize($data['command']);
 
