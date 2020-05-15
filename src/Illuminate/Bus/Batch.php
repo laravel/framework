@@ -90,7 +90,7 @@ class Batch implements JsonSerializable
     /**
      * Create a new batch instance.
      *
-     * @param  \Illuminate\Contracts\Bus\Dispatcher  $bus
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @param  \Illuminate\Bus\BatchRepository  $repository
      * @param  string  $id
      * @param  string  $id
