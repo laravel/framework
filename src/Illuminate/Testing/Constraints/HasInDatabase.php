@@ -78,8 +78,8 @@ class HasInDatabase extends Constraint
         $query = $this->database->table($table);
 
         $similarResults = $query->where(
-            array_key_first($this->data),
-            $this->data[array_key_first($this->data)]
+            $firstKey = $this->firstKey($this->data),
+            $this->data[$firstKey]
         )->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {
@@ -101,6 +101,19 @@ class HasInDatabase extends Constraint
         }
 
         return $description;
+    }
+
+    /**
+     * Get the first key from the data array.
+     *
+     * @param  array  $data
+     * @return string|null
+     */
+    protected function firstKey(array $data)
+    {
+        foreach ($data as $key => $value) {
+            return $key;
+        }
     }
 
     /**
