@@ -36,6 +36,7 @@
         "symfony/finder": "^4.3.4",
         "symfony/http-foundation": "^4.3.4",
         "symfony/http-kernel": "^4.3.4",
+        "symfony/polyfill-php73": "^1.17",
         "symfony/process": "^4.3.4",
         "symfony/routing": "^4.3.4",
         "symfony/var-dumper": "^4.3.4",
