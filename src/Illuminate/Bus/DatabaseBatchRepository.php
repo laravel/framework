@@ -89,6 +89,7 @@ class DatabaseBatchRepository implements BatchRepository
             'total_jobs' => 0,
             'pending_jobs' => 0,
             'failed_jobs' => 0,
+            'failed_job_ids' => '[]',
             'options' => serialize($batch->options),
             'created_at' => time(),
             'cancelled_at' => null,
@@ -123,10 +124,11 @@ class DatabaseBatchRepository implements BatchRepository
      */
     public function decrementPendingJobs(string $batchId, string $jobId)
     {
-        $values = $this->updateAtomicValues($batchId, function ($batch) {
+        $values = $this->updateAtomicValues($batchId, function ($batch) use ($jobId) {
             return [
                 'pending_jobs' => $batch->pending_jobs - 1,
                 'failed_jobs' => $batch->failed_jobs,
+                'failed_job_ids' => json_encode(array_values(array_diff(json_decode($batch->failed_job_ids, true), [$jobId]))),
             ];
         });
 
@@ -145,10 +147,11 @@ class DatabaseBatchRepository implements BatchRepository
      */
     public function incrementFailedJobs(string $batchId, string $jobId)
     {
-        $values = $this->updateAtomicValues($batchId, function ($batch) {
+        $values = $this->updateAtomicValues($batchId, function ($batch) use ($jobId) {
             return [
                 'pending_jobs' => $batch->pending_jobs,
                 'failed_jobs' => $batch->failed_jobs + 1,
+                'failed_job_ids' => json_encode(array_values(array_unique(array_merge(json_decode($batch->failed_job_ids, true), [$jobId])))),
             ];
         });
 
