@@ -24,7 +24,7 @@ class RetryBatchCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int|null
      */
     public function handle()
     {
@@ -34,9 +34,7 @@ class RetryBatchCommand extends Command
             $this->error("Unable to find a batch with ID [{$id}].");
 
             return 1;
-        }
-
-        if (empty($batch->failedJobIds)) {
+        } elseif (empty($batch->failedJobIds)) {
             $this->error('The given batch does not contain any failed jobs.');
 
             return 1;
