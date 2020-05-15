@@ -191,7 +191,7 @@ class Batch implements JsonSerializable
             collect($this->options['success'])->each->__invoke($batch);
         }
 
-        if (($counts->pendingJobs - $counts->failedJobs) === 0 && $this->hasThenCallbacks()) {
+        if ($counts->allJobsHaveRanExactlyOnce() && $this->hasThenCallbacks()) {
             $batch = $this->fresh();
 
             collect($this->options['then'])->each->__invoke($batch);
@@ -268,7 +268,7 @@ class Batch implements JsonSerializable
             collect($this->options['catch'])->each->__invoke($batch, $e);
         }
 
-        if (($counts->pendingJobs - $counts->failedJobs) === 0 && $this->hasThenCallbacks()) {
+        if ($counts->allJobsHaveRanExactlyOnce() && $this->hasThenCallbacks()) {
             $batch = $this->fresh();
 
             collect($this->options['then'])->each->__invoke($batch, $e);
