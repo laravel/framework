@@ -175,9 +175,10 @@ class Batch implements JsonSerializable
     /**
      * Record that a job within the batch finished successfully, executing any callbacks if necessary.
      *
+     * @param  string  $jobId
      * @return void
      */
-    public function recordSuccessfulJob()
+    public function recordSuccessfulJob(string $jobId)
     {
         $counts = $this->decrementPendingJobs();
 
@@ -251,10 +252,11 @@ class Batch implements JsonSerializable
     /**
      * Record that a job within the batch failed to finish successfully, executing any callbacks if necessary.
      *
+     * @param  string  $jobId
      * @param  \Throwable  $e
      * @return void
      */
-    public function recordFailedJob($e)
+    public function recordFailedJob(string $jobId, $e)
     {
         $counts = $this->incrementFailedJobs();
 

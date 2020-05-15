@@ -142,12 +142,15 @@ class CallQueuedHandler
      */
     protected function ensureSuccessfulBatchJobIsRecorded($command)
     {
-        if (! in_array(Batchable::class, class_uses_recursive($command)) ||
+        $uses = class_uses_recursive($command);
+
+        if (! in_array(Batchable::class, $uses) ||
+            ! in_array(InteractsWithQueue::class, $uses) ||
             is_null($command->batch())) {
             return;
         }
 
-        $command->batch()->recordSuccessfulJob();
+        $command->batch()->recordSuccessfulJob($command->job->uuid());
     }
 
     /**
@@ -189,7 +192,7 @@ class CallQueuedHandler
     {
         $command = unserialize($data['command']);
 
-        $this->ensureFailedBatchJobIsRecorded($command, $e);
+        $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);
 
         if (method_exists($command, 'failed')) {
             $command->failed($e);
@@ -199,17 +202,18 @@ class CallQueuedHandler
     /**
      * Ensure the batch is notified of the failed job.
      *
+     * @param  string  $uuid
      * @param  mixed  $command
      * @param  \Throwable  $e
      * @return void
      */
-    protected function ensureFailedBatchJobIsRecorded($command, $e)
+    protected function ensureFailedBatchJobIsRecorded(string $uuid, $command, $e)
     {
         if (! in_array(Batchable::class, class_uses_recursive($command)) ||
             is_null($command->batch())) {
             return;
         }
 
-        $command->batch()->recordFailedJob($e);
+        $command->batch()->recordFailedJob($uuid, $e);
     }
 }
