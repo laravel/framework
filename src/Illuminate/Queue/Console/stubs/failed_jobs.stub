@@ -14,7 +14,8 @@ class Create{{tableClassName}}Table extends Migration
     public function up()
     {
         Schema::create('{{table}}', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
+            $table->string('uuid')->unique();
             $table->text('connection');
             $table->text('queue');
             $table->longText('payload');
