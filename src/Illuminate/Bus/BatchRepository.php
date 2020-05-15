@@ -27,7 +27,7 @@ interface BatchRepository
      * Decrement the total number of pending jobs for the batch.
      *
      * @param  string  $batchId
-     * @return int|null
+     * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function decrementPendingJobs(string $batchId);
 
@@ -35,7 +35,7 @@ interface BatchRepository
      * Increment the total number of failed jobs for the batch.
      *
      * @param  string  $batchId
-     * @return int
+     * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function incrementFailedJobs(string $batchId);
 

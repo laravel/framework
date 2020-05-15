@@ -6,7 +6,6 @@ use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class DatabaseBatchRepository implements BatchRepository
@@ -119,32 +118,42 @@ class DatabaseBatchRepository implements BatchRepository
      * Decrement the total number of pending jobs for the batch.
      *
      * @param  string  $batchId
-     * @return int|null
+     * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function decrementPendingJobs(string $batchId)
     {
-        return $this->updateAtomicValues($batchId, function ($batch) {
+        $values = $this->updateAtomicValues($batchId, function ($batch) {
             return [
                 'pending_jobs' => $batch->pending_jobs - 1,
                 'failed_jobs' => $batch->failed_jobs,
             ];
-        })['pending_jobs'] ?? null;
+        });
+
+        return new UpdatedBatchJobCounts(
+            $values['pending_jobs'],
+            $values['failed_jobs']
+        );
     }
 
     /**
      * Increment the total number of failed jobs for the batch.
      *
      * @param  string  $batchId
-     * @return int|null
+     * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function incrementFailedJobs(string $batchId)
     {
-        return $this->updateAtomicValues($batchId, function ($batch) {
+        $values = $this->updateAtomicValues($batchId, function ($batch) {
             return [
                 'pending_jobs' => $batch->pending_jobs,
                 'failed_jobs' => $batch->failed_jobs + 1,
             ];
-        })['failed_jobs'] ?? null;
+        });
+
+        return new UpdatedBatchJobCounts(
+            $values['pending_jobs'],
+            $values['failed_jobs']
+        );
     }
 
     /**
