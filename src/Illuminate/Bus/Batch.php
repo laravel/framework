@@ -53,6 +53,13 @@ class Batch implements JsonSerializable
     public $failedJobs;
 
     /**
+     * The IDs of the jobs that have failed.
+     *
+     * @var array
+     */
+    public $failedJobIds;
+
+    /**
      * The batch options.
      *
      * @var array
@@ -90,6 +97,7 @@ class Batch implements JsonSerializable
      * @param  int  $totalJobs
      * @param  int  $pendingJobs
      * @param  int  $failedJobs
+     * @param  array  $failedJobIds
      * @param  array  $options
      * @param  \Illuminate\Support\CarbonImmutable  $createdAt
      * @param  \Illuminate\Support\CarbonImmutable|null  $cancelledAt
@@ -102,6 +110,7 @@ class Batch implements JsonSerializable
                                 int $totalJobs,
                                 int $pendingJobs,
                                 int $failedJobs,
+                                array $failedJobIds,
                                 array $options,
                                 CarbonImmutable $createdAt,
                                 ?CarbonImmutable $cancelledAt = null,
@@ -113,6 +122,7 @@ class Batch implements JsonSerializable
         $this->totalJobs = $totalJobs;
         $this->pendingJobs = $pendingJobs;
         $this->failedJobs = $failedJobs;
+        $this->failedJobIds = $failedJobIds;
         $this->options = $options;
         $this->createdAt = $createdAt;
         $this->cancelledAt = $cancelledAt;

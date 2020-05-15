@@ -33,6 +33,7 @@ class BatchFactory
      * @param  int  $totalJobs
      * @param  int  $pendingJobs
      * @param  int  $failedJobs
+     * @param  array  $failedJobIds
      * @param  array  $options
      * @param  \Illuminate\Support\CarbonImmutable  $createdAt
      * @param  \Illuminate\Support\CarbonImmutable|null  $cancelledAt
@@ -44,11 +45,12 @@ class BatchFactory
                          int $totalJobs,
                          int $pendingJobs,
                          int $failedJobs,
+                         array $failedJobIds,
                          array $options,
                          CarbonImmutable $createdAt,
                          ?CarbonImmutable $cancelledAt,
                          ?CarbonImmutable $finishedAt)
     {
-        return new Batch($this->queue, $repository, $id, $totalJobs, $pendingJobs, $failedJobs, $options, $createdAt, $cancelledAt, $finishedAt);
+        return new Batch($this->queue, $repository, $id, $totalJobs, $pendingJobs, $failedJobs, $failedJobIds, $options, $createdAt, $cancelledAt, $finishedAt);
     }
 }
