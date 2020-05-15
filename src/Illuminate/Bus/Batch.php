@@ -93,7 +93,6 @@ class Batch implements JsonSerializable
      * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @param  \Illuminate\Bus\BatchRepository  $repository
      * @param  string  $id
-     * @param  string  $id
      * @param  int  $totalJobs
      * @param  int  $pendingJobs
      * @param  int  $failedJobs
