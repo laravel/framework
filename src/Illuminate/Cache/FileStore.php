@@ -75,7 +75,7 @@ class FileStore implements Store
         );
 
         if ($result !== false && $result > 0) {
-            $this->ensureCorrectPermissions($path);
+            $this->ensureFileHasCorrectPermissions($path);
 
             return true;
         }
@@ -97,18 +97,15 @@ class FileStore implements Store
     }
 
     /**
-     * Set file permission if required.
+     * Ensure the cache file has the correct permissions.
      *
      * @param  string  $path
      * @return void
      */
-    protected function ensureCorrectPermissions($path)
+    protected function ensureFileHasCorrectPermissions($path)
     {
-        if (is_null($this->filePermission)) {
-            return;
-        }
-
-        if (intval($this->files->chmod($path), 8) == $this->filePermission) {
+        if (is_null($this->filePermission) ||
+            intval($this->files->chmod($path), 8) == $this->filePermission) {
             return;
         }
 
