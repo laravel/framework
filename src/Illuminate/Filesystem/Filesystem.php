@@ -194,10 +194,8 @@ class Filesystem
      */
     public function chmod($path, $mode = null, $ensureOwnership = false)
     {
-        if ($mode)
-        {
-            if ($ensureOwnership && extension_loaded("posix") && fileowner($path) !== posix_getuid())
-            {
+        if ($mode) {
+            if ($ensureOwnership && extension_loaded('posix') && fileowner($path) !== posix_getuid()) {
                 return false;
             }
 

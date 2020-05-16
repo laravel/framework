@@ -94,16 +94,14 @@ class FilesystemTest extends TestCase
 
     public function testSetChmodWithOwnershipCheck()
     {
-        if (!extension_loaded('posix'))
-        {
-            $this->markTestSkipped("This test only applies when the posix extension is present");
+        if (! extension_loaded('posix')) {
+            $this->markTestSkipped('This test only applies when the posix extension is present');
         }
 
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
-        exec("sudo chown root " . $this->tempDir.'/file.txt', $output, $exitCode);
-        if ($exitCode !== 0)
-        {
-            $this->markTestSkipped("This test must run as a user with sudo access");
+        exec('sudo chown root '.$this->tempDir.'/file.txt', $output, $exitCode);
+        if ($exitCode !== 0) {
+            $this->markTestSkipped('This test must run as a user with sudo access');
         }
 
         $files = new Filesystem;
