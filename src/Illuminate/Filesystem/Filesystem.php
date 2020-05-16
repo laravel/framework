@@ -192,9 +192,15 @@ class Filesystem
      * @param  int|null  $mode
      * @return mixed
      */
-    public function chmod($path, $mode = null)
+    public function chmod($path, $mode = null, $ensureOwnership = false)
     {
-        if ($mode) {
+        if ($mode)
+        {
+            if ($ensureOwnership && extension_loaded("posix") && fileowner($path) !== posix_getuid())
+            {
+                return false;
+            }
+
             return chmod($path, $mode);
         }
 
