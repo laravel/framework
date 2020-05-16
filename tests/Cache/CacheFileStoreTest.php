@@ -90,7 +90,7 @@ class CacheFileStoreTest extends TestCase
         $files->shouldReceive('put')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, m::any(), m::any()])->andReturnUsing(function ($name, $value) {
             return strlen($value);
         });
-        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash])->andReturnValues(["0600", "0644"])->times(3);
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash])->andReturnValues(['0600', '0644'])->times(3);
         $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, 0644])->andReturn([true])->once();
         $result = $store->put('foo', 'foo', 10);
         $this->assertTrue($result);

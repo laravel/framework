@@ -102,7 +102,8 @@ class FileStore implements Store
      * @param  string  $path
      * @return void
      */
-    protected function ensureCorrectPermissions($path){
+    protected function ensureCorrectPermissions($path)
+    {
         if (is_null($this->filePermission)) {
             return;
         }
