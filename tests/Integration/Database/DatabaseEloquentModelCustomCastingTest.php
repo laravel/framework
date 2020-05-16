@@ -43,7 +43,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->address = $address = new Address('110 Kingsbrook St.', 'My Childhood House');
         $address->lineOne = '117 Spencer St.';
-        $this->assertSame('117 Spencer St.', $model->getAttributes()['address_line_one']);
+        $this->assertSame('117 Spencer St.', $model->syncAttributes()->getAttributes()['address_line_one']);
 
         $model = new TestEloquentModelWithCustomCast;
 
@@ -149,6 +149,33 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertInstanceOf(ValueObject::class, $model->value_object_caster_with_caster_instance);
     }
+
+    public function testGetAttribute()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+        $model->mergeCasts([
+            'mockery' => MockeryAttribute::class,
+        ]);
+        $mockery = \Mockery::mock(CastsAttributes::class);
+        $mockery->shouldReceive('get')->withAnyArgs()->andReturn(function ($_, $key, $value, $attributes) {
+            $obj = new \stdClass();
+            $obj->value = $attributes[$key.'_origin'] - 1;
+
+            return $obj;
+        });
+        $mockery->shouldReceive('set')->withAnyArgs()->once()->andReturnUsing(function ($_, $key, $value, $attributes) {
+            return [
+                $key.'_origin' => $value->value + 1,
+            ];
+        });
+        MockeryAttribute::$attribute = $mockery;
+
+        $std = new \stdClass();
+        $std->value = 1;
+        $model->mockery = $std;
+
+        $this->assertSame(1, $model->mockery->value);
+    }
 }
 
 class TestEloquentModelWithCustomCast extends Model
@@ -250,6 +277,24 @@ class ValueObjectCaster implements CastsAttributes
     public function set($model, $key, $value, $attributes)
     {
         return serialize($value);
+    }
+}
+
+class MockeryAttribute implements CastsAttributes
+{
+    /**
+     * @var CastsAttributes
+     */
+    public static $attribute;
+
+    public function get($model, string $key, $value, array $attributes)
+    {
+        return self::$attribute->get($model, $key, $value, $attributes);
+    }
+
+    public function set($model, string $key, $value, array $attributes)
+    {
+        return self::$attribute->set($model, $key, $value, $attributes);
     }
 }
 

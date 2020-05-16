@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -246,6 +247,8 @@ trait HasAttributes
      */
     protected function getArrayableAttributes()
     {
+        $this->mergeAttributesFromClassCasts();
+
         return $this->getArrayableItems($this->getAttributes());
     }
 
@@ -1067,7 +1070,7 @@ trait HasAttributes
      * Resolve the custom caster class for a given key.
      *
      * @param  string  $key
-     * @return mixed
+     * @return CastsInboundAttributes|CastsAttributes
      */
     protected function resolveCasterClass($key)
     {
@@ -1144,9 +1147,17 @@ trait HasAttributes
      */
     public function getAttributes()
     {
+        return $this->attributes;
+    }
+
+    /**
+     * @return $this
+     */
+    public function syncAttributes()
+    {
         $this->mergeAttributesFromClassCasts();
 
-        return $this->attributes;
+        return $this;
     }
 
     /**
