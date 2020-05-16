@@ -79,6 +79,21 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testStoreUpdatesFilePermissions()
+    {
+        $filePermissions = 0755;
+        $files = $this->mockFilesystem();
+        $store = $this->getMockBuilder(FileStore::class)->setMethods(['expiration'])->setConstructorArgs([$files, __DIR__, $filePermissions])->getMock();
+        $store->expects($this->once())->method('expiration')->with($this->equalTo(10))->willReturn(1111111111);
+        $contents = '1111111111'.serialize('Hello World');
+        $hash = sha1('foo');
+        $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
+        $files->expects($this->once())->method('chmod')->with(__DIR__.'/'.$cache_dir.'/'.$hash, $filePermissions);
+        $result = $store->put('foo', 'Hello World', 10);
+        $this->assertTrue($result);
+    }
+
     public function testForeversAreStoredWithHighTimestamp()
     {
         $files = $this->mockFilesystem();
