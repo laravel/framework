@@ -75,9 +75,7 @@ class FileStore implements Store
         );
 
         if ($result !== false && $result > 0) {
-            if (! is_null($this->filePermission)) {
-                $this->files->chmod($path, $this->filePermission);
-            }
+            $this->ensureCorrectPermissions($path);
 
             return true;
         }
@@ -96,6 +94,24 @@ class FileStore implements Store
         if (! $this->files->exists(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
+    }
+
+    /**
+     * Set file permission if required.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function ensureCorrectPermissions($path){
+        if (is_null($this->filePermission)) {
+            return;
+        }
+
+        if (intval($this->files->chmod($path), 8) == $this->filePermission) {
+            return;
+        }
+
+        $this->files->chmod($path, $this->filePermission);
     }
 
     /**
