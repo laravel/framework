@@ -314,6 +314,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $foreignId = $blueprint->foreignId('foo');
         $blueprint->foreignId('company_id')->constrained();
+        $blueprint->foreignId('laravel_idea_id')->constrained();
         $blueprint->foreignId('team_id')->references('id')->on('teams');
         $blueprint->foreignId('team_column_id')->constrained('teams');
 
@@ -323,6 +324,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame([
             'alter table "users" add column "foo" integer not null',
             'alter table "users" add column "company_id" integer not null',
+            'alter table "users" add column "laravel_idea_id" integer not null',
             'alter table "users" add column "team_id" integer not null',
             'alter table "users" add column "team_column_id" integer not null',
         ], $statements);
