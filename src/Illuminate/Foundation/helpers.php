@@ -961,3 +961,27 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('ddc')) {
+    /**
+     * Dumps variables n times before it dies.
+     *
+     * @param  int  $count
+     * @param  mixed  ...$vars
+     * @return void
+     */
+    function ddc($count, ...$vars)
+    {
+        static $c = 0;
+        $c++;
+        $offset = 0;
+
+        if (is_array($count)) {
+            [$offset, $count] = $count;
+        }
+
+        if ($c > $offset) {
+            ($count == $c) ? dd(...$vars) : dump(...$vars);
+        }
+    }
+}
