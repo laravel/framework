@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Support\Facades\View as ViewFacade;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\TestView;
 use Illuminate\View\View;
 
@@ -59,5 +61,19 @@ trait InteractsWithViews
         return $view instanceof View
                 ? new TestView($view->with($component->data()))
                 : new TestView(view($view, $component->data()));
+    }
+
+    /**
+     * Populate the shared view error bag with the given errors.
+     *
+     * @param  array  $errors
+     * @param  string  $key
+     * @return void
+     */
+    protected function withViewErrors(array $errors, $key = 'default')
+    {
+        tap(new ViewErrorBag, function ($bag) use ($errors, $key) {
+            ViewFacade::share('errors', $bag->put($key, new MessageBag($errors)));
+        });
     }
 }
