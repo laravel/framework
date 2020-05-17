@@ -1328,6 +1328,17 @@ class Builder
     }
 
     /**
+     * Execute the query and get the result only if one record is found.
+     *
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     */
+    public function only($columns = ['*'])
+    {
+        return $this->count() === 1 ? $this->take(1)->get($columns)->first() : null;
+    }
+
+    /**
      * Get the given global macro by name.
      *
      * @param  string  $name

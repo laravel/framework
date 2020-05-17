@@ -180,6 +180,35 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testOnlyMethodWithLessThanOneRecord()
+    {
+        $builder = m::mock(Builder::class.'[get,take]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('count')->times(1)->andReturn(0);
+
+        $result = $builder->only();
+        $this->assertSame(null, $result);
+    }
+
+    public function testOnlyMethodWithMoreThanOneRecord()
+    {
+        $builder = m::mock(Builder::class.'[get,take]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('count')->times(1)->andReturn(2);
+
+        $result = $builder->only();
+        $this->assertSame(null, $result);
+    }
+
+    public function testOnlyMethodWithOneRecord()
+    {
+        $builder = m::mock(Builder::class.'[get,take]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('count')->times(1)->andReturn(1);
+        $builder->shouldReceive('take')->with(1)->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar']));
+
+        $result = $builder->only();
+        $this->assertSame('bar', $result);
+    }
+
     public function testQualifyColumn()
     {
         $builder = new Builder(m::mock(BaseBuilder::class));
