@@ -1738,7 +1738,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 class EloquentTestUser extends Eloquent
 {
     protected $table = 'users';
-    protected $dates = ['birthday'];
+    protected $casts = ['birthday' => 'datetime'];
     protected $guarded = [];
 
     public function friends()
