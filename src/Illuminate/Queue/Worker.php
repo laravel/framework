@@ -20,7 +20,7 @@ class Worker
     use DetectsLostConnections;
 
     /**
-     * The name of the worker;
+     * The name of the worker.
      *
      * @var string
      */
