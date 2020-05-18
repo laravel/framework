@@ -20,6 +20,13 @@ class Worker
     use DetectsLostConnections;
 
     /**
+     * The name of the worker;
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      * The queue manager instance.
      *
      * @var \Illuminate\Contracts\Queue\Factory
@@ -67,6 +74,13 @@ class Worker
      * @var bool
      */
     public $paused = false;
+
+    /**
+     * The callbacks used to pick jobs.
+     *
+     * @var callable[]
+     */
+    protected static $jobPickerCallbacks = [];
 
     /**
      * Create a new queue worker.
@@ -277,9 +291,17 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
+        $popJobCallback = function ($queue) use ($connection) {
+            return $connection->pop($queue);
+        };
+
         try {
+            if (isset(static::$jobPickerCallbacks[$this->name])) {
+                return (static::$jobPickerCallbacks[$this->name])($popJobCallback);
+            }
+
             foreach (explode(',', $queue) as $queue) {
-                if (! is_null($job = $connection->pop($queue))) {
+                if (! is_null($job = $popJobCallback($queue))) {
                     return $job;
                 }
             }
@@ -688,6 +710,33 @@ class Worker
     public function setCache(CacheContract $cache)
     {
         $this->cache = $cache;
+    }
+
+    /**
+     * Set the name of the worker.
+     *
+     * @param  string $name
+     * @return void
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * Register a callback to be executed to pick jobs.
+     *
+     * @param  string  $workerName
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function pickJobsUsing($workerName, $callback)
+    {
+        if (is_null($callback)) {
+            static::$jobPickerCallbacks = [];
+        } else {
+            static::$jobPickerCallbacks[$workerName] = $callback;
+        }
     }
 
     /**
