@@ -116,8 +116,7 @@ abstract class ServiceProvider
     {
         $this->callAfterResolving(BladeCompiler::class, function ($blade) use ($prefix, $components) {
             foreach ($components as $alias => $component) {
-                $alias = is_string($alias) ? $alias : null;
-                $blade->component($component, $alias, $prefix);
+                $blade->component($component, is_string($alias) ? $alias : null, $prefix);
             }
         });
     }
