@@ -733,7 +733,7 @@ class Worker
     public static function pickJobsUsing($workerName, $callback)
     {
         if (is_null($callback)) {
-            static::$jobPickerCallbacks = [];
+            unset(static::$jobPickerCallbacks[$workerName]);
         } else {
             static::$jobPickerCallbacks[$workerName] = $callback;
         }
