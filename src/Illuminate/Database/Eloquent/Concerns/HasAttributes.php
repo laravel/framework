@@ -80,6 +80,13 @@ trait HasAttributes
     ];
 
     /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = [];
+
+    /**
      * The storage format of the model's date columns.
      *
      * @var string
@@ -965,8 +972,8 @@ trait HasAttributes
         ];
 
         return $this->usesTimestamps()
-                    ? $defaults
-                    : [];
+                    ? array_unique(array_merge($this->dates, $defaults))
+                    : $this->dates;
     }
 
     /**
