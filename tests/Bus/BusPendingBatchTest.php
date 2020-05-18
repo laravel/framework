@@ -27,7 +27,7 @@ class BusPendingBatchTest extends TestCase
             use Batchable;
         }]));
 
-        $pendingBatch = $pendingBatch->success(function () {
+        $pendingBatch = $pendingBatch->then(function () {
             //
         })->catch(function () {
             //
@@ -35,7 +35,7 @@ class BusPendingBatchTest extends TestCase
 
         $this->assertEquals('test-connection', $pendingBatch->connection());
         $this->assertEquals('test-queue', $pendingBatch->queue());
-        $this->assertCount(1, $pendingBatch->successCallbacks());
+        $this->assertCount(1, $pendingBatch->thenCallbacks());
         $this->assertCount(1, $pendingBatch->catchCallbacks());
 
         $repository = m::mock(BatchRepository::class);

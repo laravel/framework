@@ -195,16 +195,16 @@ class Batch implements JsonSerializable
             $this->repository->markAsFinished($this->id);
         }
 
-        if ($counts->pendingJobs === 0 && $this->hasSuccessCallbacks()) {
-            $batch = $this->fresh();
-
-            collect($this->options['success'])->each->__invoke($batch);
-        }
-
-        if ($counts->allJobsHaveRanExactlyOnce() && $this->hasThenCallbacks()) {
+        if ($counts->pendingJobs === 0 && $this->hasThenCallbacks()) {
             $batch = $this->fresh();
 
             collect($this->options['then'])->each->__invoke($batch);
+        }
+
+        if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
+            $batch = $this->fresh();
+
+            collect($this->options['finally'])->each->__invoke($batch);
         }
     }
 
@@ -234,9 +234,9 @@ class Batch implements JsonSerializable
      *
      * @return bool
      */
-    public function hasSuccessCallbacks()
+    public function hasThenCallbacks()
     {
-        return isset($this->options['success']) && ! empty($this->options['success']);
+        return isset($this->options['then']) && ! empty($this->options['then']);
     }
 
     /**
@@ -280,10 +280,10 @@ class Batch implements JsonSerializable
             collect($this->options['catch'])->each->__invoke($batch, $e);
         }
 
-        if ($counts->allJobsHaveRanExactlyOnce() && $this->hasThenCallbacks()) {
+        if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['then'])->each->__invoke($batch, $e);
+            collect($this->options['finally'])->each->__invoke($batch, $e);
         }
     }
 
@@ -313,9 +313,9 @@ class Batch implements JsonSerializable
      *
      * @return bool
      */
-    public function hasThenCallbacks()
+    public function hasFinallyCallbacks()
     {
-        return isset($this->options['then']) && ! empty($this->options['then']);
+        return isset($this->options['finally']) && ! empty($this->options['finally']);
     }
 
     /**

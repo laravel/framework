@@ -32,8 +32,8 @@ class BusBatchTest extends TestCase
 
         $this->createSchema();
 
+        $_SERVER['__finally.count'] = 0;
         $_SERVER['__then.count'] = 0;
-        $_SERVER['__success.count'] = 0;
         $_SERVER['__catch.count'] = 0;
     }
 
@@ -64,8 +64,8 @@ class BusBatchTest extends TestCase
      */
     protected function tearDown(): void
     {
+        unset($_SERVER['__finally.batch']);
         unset($_SERVER['__then.batch']);
-        unset($_SERVER['__success.batch']);
         unset($_SERVER['__catch.batch']);
         unset($_SERVER['__catch.exception']);
 
@@ -141,14 +141,14 @@ class BusBatchTest extends TestCase
         $batch->recordSuccessfulJob('test-id');
         $batch->recordSuccessfulJob('test-id');
 
+        $this->assertInstanceOf(Batch::class, $_SERVER['__finally.batch']);
         $this->assertInstanceOf(Batch::class, $_SERVER['__then.batch']);
-        $this->assertInstanceOf(Batch::class, $_SERVER['__success.batch']);
 
         $batch = $batch->fresh();
         $this->assertEquals(0, $batch->pendingJobs);
         $this->assertTrue($batch->finished());
+        $this->assertEquals(1, $_SERVER['__finally.count']);
         $this->assertEquals(1, $_SERVER['__then.count']);
-        $this->assertEquals(1, $_SERVER['__success.count']);
     }
 
     public function test_failed_jobs_can_be_recorded_while_not_allowing_failures()
@@ -177,15 +177,15 @@ class BusBatchTest extends TestCase
         $batch->recordFailedJob('test-id', new RuntimeException('Something went wrong.'));
         $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
 
-        $this->assertInstanceOf(Batch::class, $_SERVER['__then.batch']);
-        $this->assertFalse(isset($_SERVER['__success.batch']));
+        $this->assertInstanceOf(Batch::class, $_SERVER['__finally.batch']);
+        $this->assertFalse(isset($_SERVER['__then.batch']));
 
         $batch = $batch->fresh();
         $this->assertEquals(2, $batch->pendingJobs);
         $this->assertEquals(2, $batch->failedJobs);
         $this->assertTrue($batch->finished());
         $this->assertTrue($batch->cancelled());
-        $this->assertEquals(1, $_SERVER['__then.count']);
+        $this->assertEquals(1, $_SERVER['__finally.count']);
         $this->assertEquals(1, $_SERVER['__catch.count']);
         $this->assertEquals('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
@@ -217,7 +217,7 @@ class BusBatchTest extends TestCase
         $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
 
         // While allowing failures this batch never actually completes...
-        $this->assertFalse(isset($_SERVER['__success.batch']));
+        $this->assertFalse(isset($_SERVER['__then.batch']));
 
         $batch = $batch->fresh();
         $this->assertEquals(2, $batch->pendingJobs);
@@ -264,10 +264,10 @@ class BusBatchTest extends TestCase
         $batch->finishedAt = now();
         $this->assertTrue($batch->finished());
 
-        $batch->options['success'] = [];
-        $this->assertFalse($batch->hasSuccessCallbacks());
-        $batch->options['success'] = [1];
-        $this->assertTrue($batch->hasSuccessCallbacks());
+        $batch->options['then'] = [];
+        $this->assertFalse($batch->hasThenCallbacks());
+        $batch->options['then'] = [1];
+        $this->assertTrue($batch->hasThenCallbacks());
 
         $this->assertFalse($batch->allowsFailures());
         $batch->options['allowFailures'] = true;
@@ -298,14 +298,14 @@ class BusBatchTest extends TestCase
                                 $_SERVER['__then.batch'] = $batch;
                                 $_SERVER['__then.count']++;
                             })
-                            ->success(function (Batch $batch) {
-                                $_SERVER['__success.batch'] = $batch;
-                                $_SERVER['__success.count']++;
-                            })
                             ->catch(function (Batch $batch, $e) {
                                 $_SERVER['__catch.batch'] = $batch;
                                 $_SERVER['__catch.exception'] = $e;
                                 $_SERVER['__catch.count']++;
+                            })
+                            ->finally(function (Batch $batch) {
+                                $_SERVER['__finally.batch'] = $batch;
+                                $_SERVER['__finally.count']++;
                             })
                             ->allowFailures($allowFailures)
                             ->onConnection('test-connection')
