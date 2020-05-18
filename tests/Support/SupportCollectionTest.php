@@ -4169,7 +4169,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testDoesnHaveReturnsValidResults($collection)
+    public function testDoesntHaveReturnsValidResults($collection)
     {
         $data = new $collection(['foo' => 'one', 'bar' => 'two', 1 => 'three']);
         $this->assertFalse($data->doesntHave('foo'));
