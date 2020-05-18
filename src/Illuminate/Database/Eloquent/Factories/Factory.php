@@ -491,7 +491,7 @@ abstract class Factory
      * @param  int  $count
      * @return static
      */
-    public function count(int $count)
+    public function count(?int $count)
     {
         return $this->newInstance(['count' => $count]);
     }
