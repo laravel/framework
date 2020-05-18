@@ -156,5 +156,5 @@ class TestUpdateModel3 extends Model
 
     public $table = 'test_model3';
     protected $fillable = ['counter'];
-    protected $dates = ['deleted_at'];
+    protected $casts = ['deleted_at' => 'datetime'];
 }
