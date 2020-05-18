@@ -1196,14 +1196,47 @@ class Blueprint
     }
 
     /**
-     * Create a new linestring column on the table.
+     * Create a new line column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function lineString($column)
+    public function line($column)
     {
-        return $this->addColumn('linestring', $column);
+        return $this->addColumn('line', $column);
+    }
+
+     /**
+     * Create a new line column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function box($column)
+    {
+        return $this->addColumn('box', $column);
+    }
+
+    /**
+     * Create a new line segment column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function lseg($column)
+    {
+        return $this->addColumn('lseg', $column);
+    }
+
+    /**
+     * Create a new line segment column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function path($column)
+    {
+        return $this->addColumn('path', $column);
     }
 
     /**
@@ -1215,6 +1248,28 @@ class Blueprint
     public function polygon($column)
     {
         return $this->addColumn('polygon', $column);
+    }
+
+    /**
+     * Create a new circle column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function circle($column)
+    {
+        return $this->addColumn('circle', $column);
+    }
+
+    /**
+     * Create a new linestring column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function lineString($column)
+    {
+        return $this->addColumn('linestring', $column);
     }
 
     /**
@@ -1262,14 +1317,103 @@ class Blueprint
     }
 
     /**
-     * Create a new multipolygon column on the table.
+     * Create a new PostGIS geometry column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function multiPolygonZ($column)
+    public function postGisGeometry($column)
     {
-        return $this->addColumn('multipolygonz', $column);
+        return $this->addColumn('postgisgeometry', $column);
+    }
+
+    /**
+     * Create a new PostGIS point column on the table.
+     *
+     * @param  string  $column
+     * @param  int|null  $srid
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function postGisPoint($column, $srid = null)
+    {
+        return $this->addColumn('postgispoint', $column, compact('srid'));
+    }
+
+    /**
+     * Create a new PostGIS linestring column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function postGisLineString($column)
+    {
+        return $this->addColumn('postgislinestring', $column);
+    }
+
+    /**
+     * Create a new PostGIS polygon column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function postGisPolygon($column)
+    {
+        return $this->addColumn('postgispolygon', $column);
+    }
+
+    /**
+     * Create a new PostGIS geometry collection column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function postGisGeometryCollection($column)
+    {
+        return $this->addColumn('postgisgeometrycollection', $column);
+    }
+
+    /**
+     * Create a new PostGIS multipoint column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function postGisMultiPoint($column)
+    {
+        return $this->addColumn('postgismultipoint', $column);
+    }
+
+    /**
+     * Create a new PostGIS multilinestring column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function postGisMultiLineString($column)
+    {
+        return $this->addColumn('postgismultilinestring', $column);
+    }
+
+    /**
+     * Create a new PostGIS multipolygon column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function postGisMultiPolygon($column)
+    {
+        return $this->addColumn('postgismultipolygon', $column);
+    }
+
+    /**
+     * Create a new PostGIS multipolygon column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function postGisMultiPolygonZ($column)
+    {
+        return $this->addColumn('postgismultipolygonz', $column);
     }
 
     /**
