@@ -488,7 +488,7 @@ abstract class Factory
     /**
      * Specify how many models should be generated.
      *
-     * @param  int  $count
+     * @param  int|null  $count
      * @return static
      */
     public function count(?int $count)
