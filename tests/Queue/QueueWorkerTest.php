@@ -337,7 +337,7 @@ class QueueWorkerTest extends TestCase
         $this->assertFalse($defaultJob->fired);
         $this->assertTrue($customJob->fired);
 
-        Worker::pickJobsUsing(null);
+        Worker::pickJobsUsing('myworker', null);
     }
 
     /**
