@@ -31,7 +31,7 @@ class BelongsToManyRelationship
      * Create a new attached relationship definition.
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
-     * @param  callable\array  $pivot
+     * @param  callable|array  $pivot
      * @param  string  $relationship
      * @return void
      */

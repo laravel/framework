@@ -130,7 +130,7 @@ abstract class Factory
     /**
      * Define the model's default state.
      *
-     * @return static
+     * @return array
      */
     abstract public function definition();
 
