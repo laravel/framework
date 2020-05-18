@@ -99,7 +99,9 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function getView()
     {
-        return collect(explode('/', $this->argument('name')))
+        $name = str_replace('\\', '/', $this->argument('name'));
+
+        return collect(explode('/', $name))
             ->map(function ($part) {
                 return Str::kebab($part);
             })
