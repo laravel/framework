@@ -130,7 +130,7 @@ abstract class Factory
     /**
      * Define the model's default state.
      *
-     * @return static
+     * @return array
      */
     abstract public function definition();
 
@@ -488,10 +488,10 @@ abstract class Factory
     /**
      * Specify how many models should be generated.
      *
-     * @param  int  $count
+     * @param  int|null  $count
      * @return static
      */
-    public function count(int $count)
+    public function count(?int $count)
     {
         return $this->newInstance(['count' => $count]);
     }

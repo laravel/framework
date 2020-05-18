@@ -86,6 +86,9 @@ class DatabaseEloquentFactoryTest extends TestCase
         $user = FactoryTestUserFactory::new()->create();
         $this->assertInstanceOf(Eloquent::class, $user);
 
+        $user = FactoryTestUserFactory::new()->createOne();
+        $this->assertInstanceOf(Eloquent::class, $user);
+
         $user = FactoryTestUserFactory::new()->create(['name' => 'Taylor Otwell']);
         $this->assertInstanceOf(Eloquent::class, $user);
         $this->assertEquals('Taylor Otwell', $user->name);
@@ -96,6 +99,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_make_creates_unpersisted_model_instance()
     {
+        $user = FactoryTestUserFactory::new()->makeOne();
+        $this->assertInstanceOf(Eloquent::class, $user);
+
         $user = FactoryTestUserFactory::new()->make(['name' => 'Taylor Otwell']);
 
         $this->assertInstanceOf(Eloquent::class, $user);
