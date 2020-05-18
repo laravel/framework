@@ -516,6 +516,7 @@ class LazyCollection implements Enumerable
     public function doesntHave($key)
     {
         $keys = array_flip(is_array($key) ? $key : func_get_args());
+
         $count = count($keys);
 
         foreach ($this as $key => $value) {
