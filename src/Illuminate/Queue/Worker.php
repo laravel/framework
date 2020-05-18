@@ -297,7 +297,7 @@ class Worker
 
         try {
             if (isset(static::$jobPickerCallbacks[$this->name])) {
-                return (static::$jobPickerCallbacks[$this->name])($popJobCallback);
+                return (static::$jobPickerCallbacks[$this->name])($popJobCallback, $queue);
             }
 
             foreach (explode(',', $queue) as $queue) {
