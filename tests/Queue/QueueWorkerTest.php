@@ -309,6 +309,37 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($job->isDeleted());
     }
 
+    public function testWorkerPicksJobUsingCustomCallbacks()
+    {
+        $worker = $this->getWorker('default', [
+            'default' => [$defaultJob = new WorkerFakeJob], 'custom' => [$customJob = new WorkerFakeJob],
+        ]);
+
+        $worker->runNextJob('default', 'default', new WorkerOptions);
+        $worker->runNextJob('default', 'default', new WorkerOptions);
+
+        $this->assertTrue($defaultJob->fired);
+        $this->assertFalse($customJob->fired);
+
+        $worker2 = $this->getWorker('default', [
+            'default' => [$defaultJob = new WorkerFakeJob], 'custom' => [$customJob = new WorkerFakeJob],
+        ]);
+
+        $worker2->setName('myworker');
+
+        Worker::popUsing('myworker', function ($pop) {
+            return $pop('custom');
+        });
+
+        $worker2->runNextJob('default', 'default', new WorkerOptions);
+        $worker2->runNextJob('default', 'default', new WorkerOptions);
+
+        $this->assertFalse($defaultJob->fired);
+        $this->assertTrue($customJob->fired);
+
+        Worker::popUsing('myworker', null);
+    }
+
     /**
      * Helpers...
      */

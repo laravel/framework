@@ -21,6 +21,7 @@ class WorkCommand extends Command
      */
     protected $signature = 'queue:work
                             {connection? : The name of the queue connection to work}
+                            {--name=default : The name of the worker}
                             {--queue= : The names of the queues to work}
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
@@ -107,9 +108,9 @@ class WorkCommand extends Command
      */
     protected function runWorker($connection, $queue)
     {
-        $this->worker->setCache($this->cache);
-
-        return $this->worker->{$this->option('once') ? 'runNextJob' : 'daemon'}(
+        return $this->worker->setName($this->option('name'))
+                     ->setCache($this->cache)
+                     ->{$this->option('once') ? 'runNextJob' : 'daemon'}(
             $connection, $queue, $this->gatherWorkerOptions()
         );
     }

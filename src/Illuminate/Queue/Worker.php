@@ -20,6 +20,13 @@ class Worker
     use DetectsLostConnections;
 
     /**
+     * The name of the worker.
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      * The queue manager instance.
      *
      * @var \Illuminate\Contracts\Queue\Factory
@@ -67,6 +74,13 @@ class Worker
      * @var bool
      */
     public $paused = false;
+
+    /**
+     * The callbacks used to pop jobs from queues.
+     *
+     * @var callable[]
+     */
+    protected static $popCallbacks = [];
 
     /**
      * Create a new queue worker.
@@ -277,9 +291,17 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
+        $popJobCallback = function ($queue) use ($connection) {
+            return $connection->pop($queue);
+        };
+
         try {
+            if (isset(static::$popCallbacks[$this->name])) {
+                return (static::$popCallbacks[$this->name])($popJobCallback, $queue);
+            }
+
             foreach (explode(',', $queue) as $queue) {
-                if (! is_null($job = $connection->pop($queue))) {
+                if (! is_null($job = $popJobCallback($queue))) {
                     return $job;
                 }
             }
@@ -683,11 +705,42 @@ class Worker
      * Set the cache repository implementation.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @return void
+     * @return $this
      */
     public function setCache(CacheContract $cache)
     {
         $this->cache = $cache;
+
+        return $this;
+    }
+
+    /**
+     * Set the name of the worker.
+     *
+     * @param  string $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to be executed to pick jobs.
+     *
+     * @param  string  $workerName
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function popUsing($workerName, $callback)
+    {
+        if (is_null($callback)) {
+            unset(static::$popCallbacks[$workerName]);
+        } else {
+            static::$popCallbacks[$workerName] = $callback;
+        }
     }
 
     /**
