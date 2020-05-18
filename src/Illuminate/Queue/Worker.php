@@ -76,11 +76,11 @@ class Worker
     public $paused = false;
 
     /**
-     * The callbacks used to pick jobs.
+     * The callbacks used to pop jobs from queues.
      *
      * @var callable[]
      */
-    protected static $jobPickerCallbacks = [];
+    protected static $popCallbacks = [];
 
     /**
      * Create a new queue worker.
@@ -296,8 +296,8 @@ class Worker
         };
 
         try {
-            if (isset(static::$jobPickerCallbacks[$this->name])) {
-                return (static::$jobPickerCallbacks[$this->name])($popJobCallback, $queue);
+            if (isset(static::$popCallbacks[$this->name])) {
+                return (static::$popCallbacks[$this->name])($popJobCallback, $queue);
             }
 
             foreach (explode(',', $queue) as $queue) {
@@ -705,22 +705,26 @@ class Worker
      * Set the cache repository implementation.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @return void
+     * @return $this
      */
     public function setCache(CacheContract $cache)
     {
         $this->cache = $cache;
+
+        return $this;
     }
 
     /**
      * Set the name of the worker.
      *
      * @param  string $name
-     * @return void
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -730,12 +734,12 @@ class Worker
      * @param  callable  $callback
      * @return void
      */
-    public static function pickJobsUsing($workerName, $callback)
+    public static function popUsing($workerName, $callback)
     {
         if (is_null($callback)) {
-            unset(static::$jobPickerCallbacks[$workerName]);
+            unset(static::$popCallbacks[$workerName]);
         } else {
-            static::$jobPickerCallbacks[$workerName] = $callback;
+            static::$popCallbacks[$workerName] = $callback;
         }
     }
 

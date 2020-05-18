@@ -327,7 +327,7 @@ class QueueWorkerTest extends TestCase
 
         $worker2->setName('myworker');
 
-        Worker::pickJobsUsing('myworker', function ($pop) {
+        Worker::popUsing('myworker', function ($pop) {
             return $pop('custom');
         });
 
@@ -337,7 +337,7 @@ class QueueWorkerTest extends TestCase
         $this->assertFalse($defaultJob->fired);
         $this->assertTrue($customJob->fired);
 
-        Worker::pickJobsUsing('myworker', null);
+        Worker::popUsing('myworker', null);
     }
 
     /**
