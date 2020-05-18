@@ -1681,6 +1681,18 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testDoesntHave($collection)
+    {
+        $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+        $this->assertFalse($data->doesntHave('first'));
+        $this->assertTrue($data->doesntHave('third'));
+        $this->assertFalse($data->doesntHave(['first', 'second']));
+        $this->assertTrue($data->doesntHave(['third', 'first']));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testImplode($collection)
     {
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
@@ -4152,6 +4164,18 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($data->has('foo', 'bar', 1));
         $this->assertFalse($data->has('foo', 'bar', 1, 'baz'));
         $this->assertFalse($data->has('baz'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testDoesntHaveReturnsValidResults($collection)
+    {
+        $data = new $collection(['foo' => 'one', 'bar' => 'two', 1 => 'three']);
+        $this->assertFalse($data->doesntHave('foo'));
+        $this->assertFalse($data->doesntHave('foo', 'bar', 1));
+        $this->assertTrue($data->doesntHave('foo', 'bar', 1, 'baz'));
+        $this->assertTrue($data->doesntHave('baz'));
     }
 
     public function testPutAddsItemToCollection()
