@@ -3,6 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -124,6 +125,28 @@ class Dispatcher implements QueueingDispatcher
         }
 
         return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+    }
+
+    /**
+     * Attempt to find the batch with the given ID.
+     *
+     * @param  string  $batchId
+     * @return \Illuminate\Bus\Batch|null
+     */
+    public function findBatch(string $batchId)
+    {
+        return $this->container->make(BatchRepository::class)->find($batchId);
+    }
+
+    /**
+     * Create a new batch of queueable jobs.
+     *
+     * @param  \Illuminate\Collections\Collection|array  $jobs
+     * @return \Illuminate\Bus\PendingBatch
+     */
+    public function batch($jobs)
+    {
+        return new PendingBatch($this->container, Collection::wrap($jobs));
     }
 
     /**

@@ -40,7 +40,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'uuid' => ['S' => (string) $uuid],
                 'connection' => ['S' => 'connection'],
                 'queue' => ['S' => 'queue'],
-                'payload' => ['S' => 'payload'],
+                'payload' => ['S' => json_encode(['uuid' => (string) $uuid])],
                 'exception' => ['S' => (string) $exception],
                 'failed_at' => ['N' => (string) $now->getTimestamp()],
                 'expires_at' => ['N' => (string) $now->addDays(3)->getTimestamp()],
@@ -49,7 +49,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
-        $provider->log('connection', 'queue', 'payload', $exception);
+        $provider->log('connection', 'queue', json_encode(['uuid' => (string) $uuid]), $exception);
 
         Str::createUuidsNormally();
     }

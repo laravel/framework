@@ -204,8 +204,10 @@ class WorkCommand extends Command
     protected function logFailedJob(JobFailed $event)
     {
         $this->laravel['queue.failer']->log(
-            $event->connectionName, $event->job->getQueue(),
-            $event->job->getRawBody(), $event->exception
+            $event->connectionName,
+            $event->job->getQueue(),
+            $event->job->getRawBody(),
+            $event->exception
         );
     }
 
