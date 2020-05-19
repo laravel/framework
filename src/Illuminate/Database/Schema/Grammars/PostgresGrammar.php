@@ -836,7 +836,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a spatial Line segment type.
+     * Create the column definition for a spatial Path type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -857,8 +857,8 @@ class PostgresGrammar extends Grammar
         return 'polygon';
     }
 
-     /**
-     * Create the column definition for a spatial Polygon type.
+    /**
+     * Create the column definition for a spatial Circle type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string

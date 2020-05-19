@@ -1207,7 +1207,7 @@ class Blueprint
     }
 
      /**
-     * Create a new line column on the table.
+     * Create a new box column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
@@ -1229,7 +1229,7 @@ class Blueprint
     }
 
     /**
-     * Create a new line segment column on the table.
+     * Create a new path column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
@@ -1316,6 +1316,13 @@ class Blueprint
         return $this->addColumn('multipolygon', $column);
     }
 
+    /**
+     * Create a new generated, computed column on the table.
+     *
+     * @param  string  $column
+     * @param  string  $expression
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
     public function computed($column, $expression)
     {
         return $this->addColumn('computed', $column, compact('expression'));
