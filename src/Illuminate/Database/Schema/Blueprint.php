@@ -1206,7 +1206,7 @@ class Blueprint
         return $this->addColumn('line', $column);
     }
 
-     /**
+    /**
      * Create a new box column on the table.
      *
      * @param  string  $column
