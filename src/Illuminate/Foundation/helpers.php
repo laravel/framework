@@ -881,6 +881,37 @@ if (! function_exists('trans_choice')) {
     }
 }
 
+if (! function_exists('lang')) {
+    /**
+     * Translate the given message.
+     *
+     * @param  string|null  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return \Illuminate\Contracts\Translation\Translator|string|array|null
+     */
+    function lang($key = null, $replace = [], $locale = null)
+    {
+        return trans($key, $replace, $locale);
+    }
+}
+
+if (! function_exists('lang_choice')) {
+    /**
+     * Translates the given message based on a count.
+     *
+     * @param  string  $key
+     * @param  \Countable|int|array  $number
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return string
+     */
+    function lang_choice($key, $number, array $replace = [], $locale = null)
+    {
+        return trans_choice($key, $number, $replace, $locale);
+    }
+}
+
 if (! function_exists('__')) {
     /**
      * Translate the given message.
