@@ -58,10 +58,11 @@ class QueueWorkerTest extends TestCase
             $firstJob = new WorkerFakeJob,
             $secondJob = new WorkerFakeJob,
         ]]);
+        $worker->stopWithLoopBreaker = true;
 
         $this->expectException(LoopBreakerException::class);
 
-        $worker->daemon('default', 'queue', $workerOptions);
+        $status = $worker->daemon('default', 'queue', $workerOptions);
 
         $this->assertTrue($firstJob->fired);
 
@@ -72,6 +73,30 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->twice();
 
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->twice();
+    }
+
+    public function testWorkerStopsWhenReachedMemoryLimit()
+    {
+        $workerOptions = new WorkerOptions;
+        $workerOptions->memory = 1;
+
+        $worker = $this->getWorker('default', ['queue' => [
+            $firstJob = new WorkerFakeJob,
+            $secondJob = new WorkerFakeJob,
+        ]]);
+        $worker->stopWithLoopBreaker = false;
+
+        $status = $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertTrue($firstJob->fired);
+
+        $this->assertFalse($secondJob->fired);
+
+        $this->assertSame(Worker::EXIT_MEMORY_LIMIT, $status);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->once();
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->once();
     }
 
     public function testJobCanBeFiredBasedOnPriority()
@@ -390,7 +415,11 @@ class InsomniacWorker extends Worker
     {
         $this->stoppedWithStatus = $status;
 
-        throw new LoopBreakerException;
+        if ($this->stopWithLoopBreaker) {
+            throw new LoopBreakerException;
+        }
+
+        return $status;
     }
 
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
