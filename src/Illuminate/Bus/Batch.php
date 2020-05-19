@@ -361,11 +361,11 @@ class Batch implements JsonSerializable
     }
 
     /**
-     * Get the JSON serializable representation of the object.
+     * Convert the batch to an array.
      *
      * @return array
      */
-    public function jsonSerialize()
+    public function toArray()
     {
         return [
             'id' => $this->id,
@@ -378,5 +378,15 @@ class Batch implements JsonSerializable
             'cancelledAt' => $this->cancelledAt,
             'finishedAt' => $this->finishedAt,
         ];
+    }
+
+    /**
+     * Get the JSON serializable representation of the object.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }
