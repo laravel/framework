@@ -6,9 +6,10 @@ use Carbon\CarbonImmutable;
 use Illuminate\Collections\Arr;
 use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
+use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 
-class Batch implements JsonSerializable
+class Batch implements Arrayable, JsonSerializable
 {
     /**
      * The queue factory implementation.
