@@ -6,9 +6,10 @@ use Carbon\CarbonImmutable;
 use Illuminate\Collections\Arr;
 use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
+use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 
-class Batch implements JsonSerializable
+class Batch implements Arrayable, JsonSerializable
 {
     /**
      * The queue factory implementation.
@@ -361,11 +362,11 @@ class Batch implements JsonSerializable
     }
 
     /**
-     * Get the JSON serializable representation of the object.
+     * Convert the batch to an array.
      *
      * @return array
      */
-    public function jsonSerialize()
+    public function toArray()
     {
         return [
             'id' => $this->id,
@@ -378,5 +379,15 @@ class Batch implements JsonSerializable
             'cancelledAt' => $this->cancelledAt,
             'finishedAt' => $this->finishedAt,
         ];
+    }
+
+    /**
+     * Get the JSON serializable representation of the object.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }
