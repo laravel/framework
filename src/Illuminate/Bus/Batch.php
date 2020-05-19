@@ -165,6 +165,8 @@ class Batch implements JsonSerializable
 
     /**
      * Get the total number of jobs that have been processed by the batch thus far.
+     *
+     * @return int
      */
     public function processedJobs()
     {
