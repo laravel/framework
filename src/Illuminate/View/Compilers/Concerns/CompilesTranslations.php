@@ -32,6 +32,27 @@ trait CompilesTranslations
     }
 
     /**
+     * Compile the trans statements into valid PHP.
+     *
+     * @param  string|null  $expression
+     * @return string
+     */
+    protected function compileTrans($expression)
+    {
+        return $this->compileLang($expression);
+    }
+
+    /**
+     * Compile the end-trans statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndtrans()
+    {
+        return $this->compileEndlang();
+    }
+
+    /**
      * Compile the choice statements into valid PHP.
      *
      * @param  string  $expression
