@@ -172,13 +172,13 @@ class Batch implements JsonSerializable
     }
 
     /**
-     * Get the percentage of jobs that have been processed.
+     * Get the percentage of jobs that have been processed (between 0-100).
      *
      * @return int
      */
     public function progress()
     {
-        return $this->totalJobs > 0 ? round($this->processedJobs() / $this->totalJobs) * 100 : 0;
+        return $this->totalJobs > 0 ? round(($this->processedJobs() / $this->totalJobs) * 100) : 0;
     }
 
     /**
