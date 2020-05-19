@@ -112,7 +112,7 @@ class BusBatchTest extends TestCase
         $batch->pendingJobs = 4;
 
         $this->assertEquals(6, $batch->processedJobs());
-        $this->assertEquals(0.6, $batch->progress());
+        $this->assertEquals(60, $batch->progress());
     }
 
     public function test_successful_jobs_can_be_recorded()
