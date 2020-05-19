@@ -59,21 +59,36 @@ class QueueWorkerTest extends TestCase
             $secondJob = new WorkerFakeJob,
         ]]);
 
-        try {
-            $worker->daemon('default', 'queue', $workerOptions);
+        $status = $worker->daemon('default', 'queue', $workerOptions);
 
-            $this->fail('Expected LoopBreakerException to be thrown.');
-        } catch (LoopBreakerException $e) {
-            $this->assertTrue($firstJob->fired);
+        $this->assertTrue($secondJob->fired);
 
-            $this->assertTrue($secondJob->fired);
+        $this->assertSame(0, $status);
 
-            $this->assertSame(0, $worker->stoppedWithStatus);
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->twice();
 
-            $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->twice();
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->twice();
+    }
 
-            $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->twice();
-        }
+    public function testWorkerStopsWhenMemoryExceeded()
+    {
+        $workerOptions = new WorkerOptions;
+
+        $worker = $this->getWorker('default', ['queue' => [
+            $firstJob = new WorkerFakeJob,
+            $secondJob = new WorkerFakeJob,
+        ]]);
+        $worker->stopOnMemoryExceeded = true;
+
+        $status = $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertTrue($firstJob->fired);
+        $this->assertFalse($secondJob->fired);
+        $this->assertSame(12, $status);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->once();
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->once();
     }
 
     public function testJobCanBeFiredBasedOnPriority()
@@ -393,9 +408,7 @@ class InsomniacWorker extends Worker
 
     public function stop($status = 0)
     {
-        $this->stoppedWithStatus = $status;
-
-        throw new LoopBreakerException;
+        return $status;
     }
 
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)

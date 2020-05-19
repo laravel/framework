@@ -73,7 +73,7 @@ class WorkCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int|null
      */
     public function handle()
     {
@@ -94,7 +94,7 @@ class WorkCommand extends Command
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
-        $this->runWorker(
+        return $this->runWorker(
             $connection, $queue
         );
     }
@@ -104,7 +104,7 @@ class WorkCommand extends Command
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @return array
+     * @return int|null
      */
     protected function runWorker($connection, $queue)
     {
