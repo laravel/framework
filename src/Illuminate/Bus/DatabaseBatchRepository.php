@@ -49,7 +49,7 @@ class DatabaseBatchRepository implements BatchRepository
      * Retrieve information about an existing batch.
      *
      * @param  string  $batchId
-     * @return \Illuminate\Bus\Batch
+     * @return \Illuminate\Bus\Batch|null
      */
     public function find(string $batchId)
     {
