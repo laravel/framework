@@ -513,6 +513,18 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware(RouteRegistrarMiddlewareStub::class);
     }
 
+    public function testResourceWithoutMiddlewareRegistration()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->only('index')
+                     ->middleware(['one', 'two'])
+                     ->withoutMiddleware('one');
+
+        $this->seeResponse('controller', Request::create('users', 'GET'));
+
+        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
