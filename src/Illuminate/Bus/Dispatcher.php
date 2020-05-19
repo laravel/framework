@@ -9,6 +9,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use RuntimeException;
@@ -73,8 +74,10 @@ class Dispatcher implements QueueingDispatcher
     public function dispatch($command)
     {
         return $this->queueResolver && $this->commandShouldBeQueued($command)
-                        ? $this->dispatchToQueue($command)
-                        : $this->dispatchNow($command);
+            ? tap($this->dispatchToQueue($command), function ($jobId) use ($command) {
+                $this->raiseJobQueuedEvent($command, $jobId);
+            })
+            : $this->dispatchNow($command);
     }
 
     /**
@@ -271,5 +274,17 @@ class Dispatcher implements QueueingDispatcher
         $this->handlers = array_merge($this->handlers, $map);
 
         return $this;
+    }
+
+    /**
+     * Raise the job queued event.
+     *
+     * @param mixed $command
+     * @param mixed $jobId
+     * @return void
+     */
+    protected function raiseJobQueuedEvent($command, $jobId)
+    {
+        $this->container->make('events')->dispatch(new JobQueued($command, $jobId));
     }
 }
