@@ -2,17 +2,23 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v7.11.0...7.x)
 
+### Added
+- Added `Illuminate\Http\Middleware\TrustHosts` ([9229264](https://github.com/laravel/framework/commit/92292649621f2aadc84ab94376244650a9f55696))
+
 ### Fixed
 - Fixed Queued Mail MessageSent Listener With Attachments ([#32795](https://github.com/laravel/framework/pull/32795))
 - Added error clearing before sending in `Illuminate\Mail\Mailer::sendSwiftMessage()` ([#32799](https://github.com/laravel/framework/pull/32799))
 - Avoid foundation function call in the auth component ([#32805](https://github.com/laravel/framework/pull/32805))
 - Fixed inferred table reference for `Illuminate\Database\Schema\ForeignIdColumnDefinition::constrained()` ([#32847](https://github.com/laravel/framework/pull/32847))
 - Fixed wrong component generation ([73060db](https://github.com/laravel/framework/commit/73060db7c5541fadf5e4f2874a89d18621d705a3))
+- Fixed bug with request rebind and url defaults in `Illuminate\Routing\UrlGenerator` ([6ad92bf](https://github.com/laravel/framework/commit/6ad92bf9a8552a7759a7757cf821b01969baf0b6))
+- Fixed `Illuminate\Cache\ArrayStore::increment()` bug that changes expiration to forever ([#32875](https://github.com/laravel/framework/pull/32875))
 
 ### Changed
 - Dont cache non objects in `Illuminate/Database/Eloquent/Concerns/HasAttributes::getClassCastableAttributeValue()` ([894fe22](https://github.com/laravel/framework/commit/894fe22c6c111b224de5bada24dcbba4c93f0305))
 - Added explicit `symfony/polyfill-php73` dependency ([5796b1e](https://github.com/laravel/framework/commit/5796b1e43dfe14914050a7e5dd24ddf803ec99b8))
 - Set `Cache\FileStore` file permissions only once ([#32845](https://github.com/laravel/framework/pull/32845), [11c533b](https://github.com/laravel/framework/commit/11c533b9aa062f4cba1dd0fe3673bf33d275480f))
+- Added alias as key of package's view components ([#32863](https://github.com/laravel/framework/pull/32863))
 
 
 ## [v7.11.0 (2020-05-12)](https://github.com/laravel/framework/compare/v7.10.3...v7.11.0)
