@@ -127,6 +127,7 @@ class WorkCommand extends Command
                     : $this->option('delay');
 
         return new WorkerOptions(
+            $this->option('name'),
             $backoff,
             $this->option('memory'),
             $this->option('timeout'),

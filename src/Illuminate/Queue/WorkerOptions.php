@@ -5,6 +5,13 @@ namespace Illuminate\Queue;
 class WorkerOptions
 {
     /**
+     * The name of the worker.
+     *
+     * @var int
+     */
+    public $name;
+
+    /**
      * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
      * @var int
@@ -56,6 +63,7 @@ class WorkerOptions
     /**
      * Create a new worker options instance.
      *
+     * @param  string  $name
      * @param  int  $backoff
      * @param  int  $memory
      * @param  int  $timeout
@@ -65,8 +73,9 @@ class WorkerOptions
      * @param  bool  $stopWhenEmpty
      * @return void
      */
-    public function __construct($backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1, $force = false, $stopWhenEmpty = false)
+    public function __construct($name= 'default', $backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1, $force = false, $stopWhenEmpty = false)
     {
+        $this->name = $name;
         $this->backoff = $backoff;
         $this->sleep = $sleep;
         $this->force = $force;
