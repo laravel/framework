@@ -157,7 +157,7 @@ class PendingResourceRegistration
     /**
      * Specify middleware that should be removed from the resource routes.
      *
-     * @param  array|string $middleware
+     * @param  array|string  $middleware
      * @return $this|array
      */
     public function withoutMiddleware($middleware)

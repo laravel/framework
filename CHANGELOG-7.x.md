@@ -1,9 +1,13 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.11.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.12.0...7.x)
+
+
+## [v7.12.0 (2020-05-19)](https://github.com/laravel/framework/compare/v7.11.0...v7.12.0)
 
 ### Added
 - Added `Illuminate\Http\Middleware\TrustHosts` ([9229264](https://github.com/laravel/framework/commit/92292649621f2aadc84ab94376244650a9f55696))
+- Added ability to skip middleware from resource routes ([#32891](https://github.com/laravel/framework/pull/32891))
 
 ### Fixed
 - Fixed Queued Mail MessageSent Listener With Attachments ([#32795](https://github.com/laravel/framework/pull/32795))
