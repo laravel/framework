@@ -7,7 +7,7 @@ class JobQueued
     /**
      * @var mixed
      */
-    public $command;
+    public $job;
 
     /**
      * @var mixed
@@ -17,13 +17,13 @@ class JobQueued
     /**
      * JobQueued constructor.
      *
-     * @param mixed $command
+     * @param mixed $job
      * @param mixed $jobId
      * @return void
      */
-    public function __construct($command, $jobId)
+    public function __construct($job, $jobId)
     {
-        $this->command = $command;
+        $this->job = $job;
         $this->jobId = $jobId;
     }
 }

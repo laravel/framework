@@ -8,7 +8,6 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\InteractsWithQueue;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -24,22 +23,9 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;
-        $container->singleton('events', function () {
-            $mock = m::mock(\Illuminate\Events\Dispatcher::class);
-            $mock->shouldReceive('dispatch')->withArgs(function ($jobQueued) {
-                $this->assertInstanceOf(JobQueued::class, $jobQueued);
-                $this->assertInstanceOf(ShouldQueue::class, $jobQueued->command);
-                $this->assertSame($jobQueued->jobId, 'job_id');
-
-                return true;
-            })->once();
-
-            return $mock;
-        });
-
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
-            $mock->shouldReceive('push')->once()->andReturn('job_id');
+            $mock->shouldReceive('push')->once();
 
             return $mock;
         });
@@ -50,19 +36,6 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;
-        $container->singleton('events', function () {
-            $mock = m::mock(\Illuminate\Events\Dispatcher::class);
-            $mock->shouldReceive('dispatch')->withArgs(function ($jobQueued) {
-                $this->assertInstanceOf(JobQueued::class, $jobQueued);
-                $this->assertInstanceOf(ShouldQueue::class, $jobQueued->command);
-                $this->assertNull($jobQueued->jobId);
-
-                return true;
-            })->once();
-
-            return $mock;
-        });
-
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
@@ -76,19 +49,6 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
     {
         $container = new Container;
-        $container->singleton('events', function () {
-            $mock = m::mock(\Illuminate\Events\Dispatcher::class);
-            $mock->shouldReceive('dispatch')->withArgs(function ($jobQueued) {
-                $this->assertInstanceOf(JobQueued::class, $jobQueued);
-                $this->assertInstanceOf(ShouldQueue::class, $jobQueued->command);
-                $this->assertNull($jobQueued->jobId);
-
-                return true;
-            })->once();
-
-            return $mock;
-        });
-
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type(BusDispatcherTestSpecificQueueAndDelayCommand::class));
@@ -138,18 +98,6 @@ class BusDispatcherTest extends TestCase
                     ],
                 ],
             ]);
-        });
-        $container->singleton('events', function () {
-            $mock = m::mock(\Illuminate\Events\Dispatcher::class);
-            $mock->shouldReceive('dispatch')->withArgs(function ($jobQueued) {
-                $this->assertInstanceOf(JobQueued::class, $jobQueued);
-                $this->assertInstanceOf(ShouldQueue::class, $jobQueued->command);
-                $this->assertNull($jobQueued->jobId);
-
-                return true;
-            })->once();
-
-            return $mock;
         });
 
         $dispatcher = new Dispatcher($container, function () {

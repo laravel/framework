@@ -33,7 +33,7 @@ class SyncQueue extends Queue implements QueueContract
      *
      * @throws \Throwable
      */
-    public function push($job, $data = '', $queue = null)
+    protected function pushCustom($job, $data = '', $queue = null)
     {
         $queueJob = $this->resolveJob($this->createPayload($job, $queue, $data), $queue);
 
@@ -142,7 +142,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function later($delay, $job, $data = '', $queue = null)
+    protected function laterCustom($delay, $job, $data = '', $queue = null)
     {
         return $this->push($job, $data, $queue);
     }

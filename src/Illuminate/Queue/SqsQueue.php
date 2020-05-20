@@ -80,7 +80,7 @@ class SqsQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function push($job, $data = '', $queue = null)
+    protected function pushCustom($job, $data = '', $queue = null)
     {
         return $this->pushRaw($this->createPayload($job, $queue ?: $this->default, $data), $queue);
     }
@@ -109,7 +109,7 @@ class SqsQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function later($delay, $job, $data = '', $queue = null)
+    protected function laterCustom($delay, $job, $data = '', $queue = null)
     {
         return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue),

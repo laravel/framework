@@ -75,7 +75,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function push($job, $data = '', $queue = null)
+    protected function pushCustom($job, $data = '', $queue = null)
     {
         return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
     }
@@ -104,7 +104,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function later($delay, $job, $data = '', $queue = null)
+    protected function laterCustom($delay, $job, $data = '', $queue = null)
     {
         $pheanstalk = $this->pheanstalk->useTube($this->getQueue($queue));
 

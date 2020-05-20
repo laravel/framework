@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Container\Container;
+use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
@@ -36,6 +37,21 @@ abstract class Queue
     /**
      * Push a new job onto the queue.
      *
+     * @param  string|object  $job
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return mixed
+     */
+    public function push($job, $data = '', $queue = null)
+    {
+        return tap($this->pushCustom($job, $data, $queue), function ($jobId) use ($job) {
+            $this->raiseJobQueuedEvent($job, $jobId);
+        });
+    }
+
+    /**
+     * Push a new job onto the queue.
+     *
      * @param  string  $queue
      * @param  string  $job
      * @param  mixed  $data
@@ -44,6 +60,22 @@ abstract class Queue
     public function pushOn($queue, $job, $data = '')
     {
         return $this->push($job, $data, $queue);
+    }
+
+    /**
+     * Push a new job onto the queue after a delay.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param  string|object  $job
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return mixed
+     */
+    public function later($delay, $job, $data = '', $queue = null)
+    {
+        return tap($this->laterCustom($delay, $job, $data, $queue), function ($jobId) use ($job) {
+            $this->raiseJobQueuedEvent($job, $jobId);
+        });
     }
 
     /**
@@ -287,5 +319,19 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Raise the job queued event.
+     *
+     * @param string|object $job
+     * @param mixed $jobId
+     * @return void
+     */
+    protected function raiseJobQueuedEvent($job, $jobId)
+    {
+        if ($this->container->bound('events')) {
+            $this->container['events']->dispatch(new JobQueued($job, $jobId));
+        }
     }
 }

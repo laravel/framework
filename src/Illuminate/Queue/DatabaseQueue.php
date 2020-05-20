@@ -77,7 +77,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function push($job, $data = '', $queue = null)
+    protected function pushCustom($job, $data = '', $queue = null)
     {
         return $this->pushToDatabase($queue, $this->createPayload(
             $job, $this->getQueue($queue), $data
@@ -106,7 +106,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return void
      */
-    public function later($delay, $job, $data = '', $queue = null)
+    protected function laterCustom($delay, $job, $data = '', $queue = null)
     {
         return $this->pushToDatabase($queue, $this->createPayload(
             $job, $this->getQueue($queue), $data
