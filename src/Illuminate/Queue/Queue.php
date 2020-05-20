@@ -163,11 +163,11 @@ abstract class Queue
 
     /**
      * Get the retry delay for an object-based queue handler.
-     * 
+     *
      * Method 'retryAfter()' will have precedence over attribute 'retryAfter'.
      *
      * @param  mixed  $job
-     * @return integer
+     * @return int
      */
     public function getJobRetryDelay($job): int
     {
@@ -185,7 +185,7 @@ abstract class Queue
         }
 
         // Returns delay.
-        return ($delay instanceof DateTimeInterface ? $this->secondsUntil($delay) : $delay);
+        return $delay instanceof DateTimeInterface ? $this->secondsUntil($delay) : $delay;
     }
 
     /**
