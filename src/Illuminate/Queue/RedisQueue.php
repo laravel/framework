@@ -105,7 +105,7 @@ class RedisQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    protected function pushCustom($job, $data = '', $queue = null)
+    protected function pushJob($job, $data = '', $queue = null)
     {
         return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
     }
@@ -137,7 +137,7 @@ class RedisQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    protected function laterCustom($delay, $job, $data = '', $queue = null)
+    protected function laterJob($delay, $job, $data = '', $queue = null)
     {
         return $this->laterRaw($delay, $this->createPayload($job, $this->getQueue($queue), $data), $queue);
     }

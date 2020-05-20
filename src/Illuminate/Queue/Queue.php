@@ -44,10 +44,20 @@ abstract class Queue
      */
     public function push($job, $data = '', $queue = null)
     {
-        return tap($this->pushCustom($job, $data, $queue), function ($jobId) use ($job) {
+        return tap($this->pushJob($job, $data, $queue), function ($jobId) use ($job) {
             $this->raiseJobQueuedEvent($job, $jobId);
         });
     }
+
+    /**
+     * Push a new job onto the queue.
+     *
+     * @param  string  $job
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return mixed
+     */
+    abstract protected function pushJob($job, $data = '', $queue = null);
 
     /**
      * Push a new job onto the queue.
@@ -73,10 +83,21 @@ abstract class Queue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return tap($this->laterCustom($delay, $job, $data, $queue), function ($jobId) use ($job) {
+        return tap($this->laterJob($delay, $job, $data, $queue), function ($jobId) use ($job) {
             $this->raiseJobQueuedEvent($job, $jobId);
         });
     }
+
+    /**
+     * Push a new job onto the queue after a delay.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param  string  $job
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return mixed
+     */
+    abstract protected function laterJob($delay, $job, $data = '', $queue = null);
 
     /**
      * Push a new job onto the queue after a delay.

@@ -25,7 +25,7 @@ class NullQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    protected function pushCustom($job, $data = '', $queue = null)
+    protected function pushJob($job, $data = '', $queue = null)
     {
         //
     }
@@ -52,7 +52,7 @@ class NullQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    protected function laterCustom($delay, $job, $data = '', $queue = null)
+    protected function laterJob($delay, $job, $data = '', $queue = null)
     {
         //
     }
