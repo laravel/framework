@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.18.15...6.x)
 
 
-## [v6.18.15 (2020-05-18)](https://github.com/laravel/framework/compare/v6.18.14...v6.18.15)
+## [v6.18.15 (2020-05-19)](https://github.com/laravel/framework/compare/v6.18.14...v6.18.15)
 
 ### Added
 - Added `Illuminate\Http\Middleware\TrustHosts` ([9229264](https://github.com/laravel/framework/commit/92292649621f2aadc84ab94376244650a9f55696))
