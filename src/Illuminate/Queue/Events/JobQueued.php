@@ -5,21 +5,21 @@ namespace Illuminate\Queue\Events;
 class JobQueued
 {
     /**
-     * @var mixed
+     * @var  string|object
      */
     public $job;
 
     /**
-     * @var mixed
+     * @var  string|int|null
      */
     public $jobId;
 
     /**
      * JobQueued constructor.
      *
-     * @param mixed $job
-     * @param mixed $jobId
-     * @return void
+     * @param  string|object  $job
+     * @param  string|int|null  $jobId
+     * @return  void
      */
     public function __construct($job, $jobId)
     {

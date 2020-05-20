@@ -345,9 +345,9 @@ abstract class Queue
     /**
      * Raise the job queued event.
      *
-     * @param string|object $job
-     * @param mixed $jobId
-     * @return void
+     * @param  string|object  $job
+     * @param  string|int|null  $jobId
+     * @return  void
      */
     protected function raiseJobQueuedEvent($job, $jobId)
     {
