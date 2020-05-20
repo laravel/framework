@@ -169,7 +169,7 @@ abstract class Queue
      * @param  mixed  $job
      * @return int
      */
-    public function getJobRetryDelay($job): int
+    public function getJobRetryDelay($job)
     {
         // If no retry information is provided, will return no delay.
         if (! method_exists($job, 'retryAfter') && ! isset($job->retryAfter)) {
