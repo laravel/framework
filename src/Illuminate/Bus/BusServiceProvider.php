@@ -50,6 +50,15 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
                 config('queue.batching.table', 'job_batches'),
             );
         });
+
+        $this->app->singleton(RedisBatchRepository::class, function ($app) {
+            return new RedisBatchRepository(
+                $app->make(BatchFactory::class),
+                $app->make('redis')->connection(config('database.redis.batching') ? 'batching' : 'default'),
+                config('database.redis.batching.table', 'job_batches')
+            );
+        });
+
     }
 
     /**
