@@ -5,12 +5,12 @@ namespace Illuminate\Queue\Events;
 class JobQueued
 {
     /**
-     * @var  string|object
+     * @var string|object
      */
     public $job;
 
     /**
-     * @var  string|int|null
+     * @var string|int|null
      */
     public $jobId;
 
@@ -19,7 +19,7 @@ class JobQueued
      *
      * @param  string|object  $job
      * @param  string|int|null  $jobId
-     * @return  void
+     * @return void
      */
     public function __construct($job, $jobId)
     {
