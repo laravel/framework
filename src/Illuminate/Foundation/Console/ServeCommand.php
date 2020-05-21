@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -66,7 +65,7 @@ class ServeCommand extends Command
             (new PhpExecutableFinder)->find(false),
             '-S',
             sprintf('%s:%s', $this->host(), $this->port()),
-            base_path('server.php')
+            base_path('server.php'),
         ];
     }
 
