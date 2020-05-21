@@ -3,10 +3,10 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Env;
 use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class ServeCommand extends Command
 {
@@ -40,34 +40,34 @@ class ServeCommand extends Command
      */
     public function handle()
     {
-        chdir(public_path());
-
         $this->line("<info>Laravel development server started:</info> http://{$this->host()}:{$this->port()}");
 
-        passthru($this->serverCommand(), $status);
+        $server = new Process($this->serverCommand(), public_path());
+        $server->setTty(Process::isTtySupported())
+            ->run();
 
-        if ($status && $this->canTryAnotherPort()) {
+        if ($server->getExitCode() && $this->canTryAnotherPort()) {
             $this->portOffset += 1;
 
             return $this->handle();
         }
 
-        return $status;
+        return $server->getExitCode();
     }
 
     /**
      * Get the full server command.
      *
-     * @return string
+     * @return array
      */
     protected function serverCommand()
     {
-        return sprintf('%s -S %s:%s %s',
-            ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false)),
-            $this->host(),
-            $this->port(),
-            ProcessUtils::escapeArgument(base_path('server.php'))
-        );
+        return [
+            (new PhpExecutableFinder)->find(false),
+            '-S',
+            sprintf('%s:%s', $this->host(), $this->port()),
+            base_path('server.php')
+        ];
     }
 
     /**
