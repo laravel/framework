@@ -11,6 +11,7 @@ use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Illuminate\Support\Str;
 
 class PendingCommand
 {
@@ -55,6 +56,13 @@ class PendingCommand
      * @var bool
      */
     protected $hasExecuted = false;
+
+    /**
+     * Keep track of expected output containing strings
+     *
+     * @var array
+     */
+    protected $expectedOutputContains = [];
 
     /**
      * Create a new pending console command run.
@@ -127,6 +135,19 @@ class PendingCommand
     public function expectsOutput($output)
     {
         $this->test->expectedOutput[] = $output;
+
+        return $this;
+    }
+
+    /**
+     * Specify string that should be contained in the output when the command runs.
+     *
+     * @param  string  $output
+     * @return $this
+     */
+    public function expectsOutputContains($output)
+    {
+        $this->expectedOutputContains[] = $output;
 
         return $this;
     }
@@ -213,6 +234,10 @@ class PendingCommand
         if (count($this->test->expectedOutput)) {
             $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
         }
+
+        if (count($this->expectedOutputContains)) {
+            $this->test->fail('Output did not contain "'.Arr::first($this->expectedOutputContains).'"');
+        }
     }
 
     /**
@@ -270,6 +295,18 @@ class PendingCommand
                 ->andReturnUsing(function () use ($i) {
                     unset($this->test->expectedOutput[$i]);
                 });
+        }
+
+        foreach ($this->expectedOutputContains as $i => $output) {
+            $mock->shouldReceive('doWrite')
+                ->once()
+                ->ordered()
+                ->withArgs(function ($args) use ($i, $output) {
+                    if (Str::contains($args, $output)) {
+                        unset($this->expectedOutputContains[$i]);
+                    }
+                })
+                ->andReturn();
         }
 
         return $mock;
