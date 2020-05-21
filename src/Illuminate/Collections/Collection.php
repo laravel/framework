@@ -509,25 +509,6 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Determine if an item does not exist in the collection by key.
-     *
-     * @param  mixed  $key
-     * @return bool
-     */
-    public function doesntHave($key)
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        foreach ($keys as $value) {
-            if (! $this->offsetExists($value)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value

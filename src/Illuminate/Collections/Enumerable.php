@@ -443,14 +443,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function has($key);
 
     /**
-     * Determine if an item does not exist in the collection by key.
-     *
-     * @param  mixed  $key
-     * @return bool
-     */
-    public function doesntHave($key);
-
-    /**
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value

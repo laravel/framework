@@ -508,27 +508,6 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Determine if an item does not exist in the collection by key.
-     *
-     * @param  mixed  $key
-     * @return bool
-     */
-    public function doesntHave($key)
-    {
-        $keys = array_flip(is_array($key) ? $key : func_get_args());
-
-        $count = count($keys);
-
-        foreach ($this as $key => $value) {
-            if (array_key_exists($key, $keys) && --$count == 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
