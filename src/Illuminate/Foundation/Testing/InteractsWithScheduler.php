@@ -24,7 +24,7 @@ trait InteractsWithScheduler
     {
         $event = $this->getScheduledCommand($commandSignature);
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
             Assert::fail("Command $commandSignature is scheduled");
         }
 
