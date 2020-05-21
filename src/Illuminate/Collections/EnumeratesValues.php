@@ -649,6 +649,17 @@ trait EnumeratesValues
     }
 
     /**
+     * Determine if an item does not exist in the collection by key.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function doesntHave($key)
+    {
+        return ! $this->has($key);
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @param  callable  $callback

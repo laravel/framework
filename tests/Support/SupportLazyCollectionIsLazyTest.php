@@ -202,6 +202,21 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testDoesntHaveIsLazy()
+    {
+        $this->assertEnumerates(1, function ($collection) {
+            $collection->doesntHave(0);
+        });
+
+        $this->assertEnumerates(11, function ($collection) {
+            $collection->doesntHave(10);
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->doesntHave('missing-key');
+        });
+    }
+
     public function testDuplicatesIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

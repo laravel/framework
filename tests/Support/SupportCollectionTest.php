@@ -1681,6 +1681,18 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testDoesntHave($collection)
+    {
+        $data = new $collection(['first' => 'Hello', 'second' => 'World']);
+        $this->assertFalse($data->doesntHave('first'));
+        $this->assertFalse($data->doesntHave('second'));
+        $this->assertTrue($data->doesntHave('third'));
+        $this->assertTrue($data->doesntHave(1));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testImplode($collection)
     {
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
