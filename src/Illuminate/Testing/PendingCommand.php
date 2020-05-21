@@ -6,12 +6,12 @@ use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Illuminate\Support\Str;
 
 class PendingCommand
 {
@@ -58,7 +58,7 @@ class PendingCommand
     protected $hasExecuted = false;
 
     /**
-     * Keep track of expected output containing strings
+     * Keep track of expected output containing strings.
      *
      * @var array
      */
