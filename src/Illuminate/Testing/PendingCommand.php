@@ -57,6 +57,13 @@ class PendingCommand
     protected $hasExecuted = false;
 
     /**
+     * The output recorder instance.
+     *
+     * @var \Illuminate\Testing\OutputRecorder
+     */
+    protected $recorder;
+
+    /**
      * Create a new pending console command run.
      *
      * @param  \PHPUnit\Framework\TestCase  $test
@@ -145,6 +152,30 @@ class PendingCommand
     }
 
     /**
+     * Dump the output after execution.
+     *
+     * @return void
+     */
+    public function dumpOutput()
+    {
+        dump($this->getOutput());
+    }
+
+    /**
+     * Get the output from the command.
+     *
+     * @return string
+     */
+    public function getOutput()
+    {
+        if (!$this->hasExecuted) {
+            $this->run();
+        }
+
+        return $this->recorder->getRecording();
+    }
+
+    /**
      * Execute the command.
      *
      * @return int
@@ -163,10 +194,10 @@ class PendingCommand
     {
         $this->hasExecuted = true;
 
-        $mock = $this->mockConsoleOutput();
+        $this->mockConsoleOutput();
 
         try {
-            $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters, $mock);
+            $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters, $this->recorder);
         } catch (NoMatchingExpectationException $e) {
             if ($e->getMethodName() === 'askQuestion') {
                 $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
@@ -211,14 +242,16 @@ class PendingCommand
         }
 
         if (count($this->test->expectedOutput)) {
-            $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
+            $failureMessage = 'Output "'.Arr::first($this->test->expectedOutput).'" was not printed.';
+            $failureMessage .= ' The output of the command was:' . "\r\n\r\n" . $this->recorder->getRecording();
+            $this->test->fail($failureMessage);
         }
     }
 
     /**
      * Mock the application's console output.
      *
-     * @return \Mockery\MockInterface
+     * @return void
      */
     protected function mockConsoleOutput()
     {
@@ -254,7 +287,7 @@ class PendingCommand
     /**
      * Create a mock for the buffered output.
      *
-     * @return \Mockery\MockInterface
+     * @return \Illuminate\Testing\OutputRecorder
      */
     private function createABufferedOutputMock()
     {
@@ -272,7 +305,7 @@ class PendingCommand
                 });
         }
 
-        return $mock;
+        return $this->recorder = new OutputRecorder($mock);
     }
 
     /**
