@@ -553,6 +553,17 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Indicate that Tailwind styling should be used for generated links.
+     *
+     * @return void
+     */
+    public static function useTailwind()
+    {
+        static::defaultView('pagination::tailwind');
+        static::defaultSimpleView('pagination::simple-tailwind');
+    }
+
+    /**
      * Indicate that Bootstrap 3 styling should be used for generated links.
      *
      * @return void
