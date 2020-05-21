@@ -17,7 +17,7 @@ class OutputRecorder extends Output
 
     /**
      * The recorded output.
-     * 
+     *
      * @var string
      */
     protected $recording = '';
@@ -51,7 +51,7 @@ class OutputRecorder extends Output
 
     /**
      * Get the recorded output.
-     * 
+     *
      * @return string
      */
     public function getRecording()

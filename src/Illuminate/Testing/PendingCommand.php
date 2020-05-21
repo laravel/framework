@@ -168,7 +168,7 @@ class PendingCommand
      */
     public function getOutput()
     {
-        if (!$this->hasExecuted) {
+        if (! $this->hasExecuted) {
             $this->run();
         }
 
@@ -243,7 +243,7 @@ class PendingCommand
 
         if (count($this->test->expectedOutput)) {
             $failureMessage = 'Output "'.Arr::first($this->test->expectedOutput).'" was not printed.';
-            $failureMessage .= ' The output of the command was:' . "\r\n\r\n" . $this->recorder->getRecording();
+            $failureMessage .= ' The output of the command was:'."\r\n\r\n".$this->recorder->getRecording();
             $this->test->fail($failureMessage);
         }
     }
