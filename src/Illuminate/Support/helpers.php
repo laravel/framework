@@ -558,3 +558,21 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('if_null')) {
+    /**
+     * Return the given if not null, otherwise return the value from the given callback.
+     *
+     * @param  mixed  $value
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    function if_null($value, callable $callback = null)
+    {
+        if (!is_null($value)) {
+            return $value;
+        }
+        
+        return is_null($callback) ? $value : $callback();
+    }
+}
