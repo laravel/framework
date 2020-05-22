@@ -561,7 +561,7 @@ if (! function_exists('with')) {
 
 if (! function_exists('if_null')) {
     /**
-     * Return the given if not null, otherwise return the value from the given callback.
+     * Return the given value if not null, otherwise return the value from the given callback.
      *
      * @param  mixed  $value
      * @param  callable|null  $callback
