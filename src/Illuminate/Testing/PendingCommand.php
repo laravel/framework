@@ -154,11 +154,13 @@ class PendingCommand
     /**
      * Dump the output after execution.
      *
-     * @return void
+     * @return $this
      */
     public function dumpOutput()
     {
         dump($this->getOutput());
+
+        return $this;
     }
 
     /**
