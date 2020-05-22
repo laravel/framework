@@ -102,7 +102,7 @@ class ThrottleRequests
             return sha1($route->getDomain().'|'.$request->ip());
         }
 
-        throw new RuntimeException('Unable to generate the request signature. Route unavailable.');
+        throw new RuntimeException(__('Unable to generate the request signature. Route unavailable.'));
     }
 
     /**
@@ -123,7 +123,7 @@ class ThrottleRequests
         );
 
         return new ThrottleRequestsException(
-            'Too Many Attempts.', null, $headers
+            __('Too Many Attempts.'), null, $headers
         );
     }
 
