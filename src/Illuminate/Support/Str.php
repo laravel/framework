@@ -371,7 +371,7 @@ class Str
     }
 
     /**
-     * Obfuscates the beginning of a string with a character.
+     * Redacts the beginning of a string with a character.
      *
      * @param  string  $string
      * @param  int|null  $until
@@ -391,23 +391,7 @@ class Str
     }
 
     /**
-     * Obfuscates the string with a character until the first occurrence of a given value.
-     *
-     * @param  string  $string
-     * @param  string  $before
-     * @param  string  $replace
-     * @param  string|null  $encoding
-     * @return string
-     */
-    public static function redactBefore($string, $before, $replace = '*', $encoding = 'UTF-8')
-    {
-        $until = mb_strpos($string, $before, 0) ?: ceil(static::length($string, $encoding) / 2);
-
-        return static::redact($string, $until, $replace, $encoding);
-    }
-
-    /**
-     * Obfuscates all values of given string.
+     * Redacts all values of given string.
      *
      * @param  string  $string
      * @param  string  $search
@@ -420,6 +404,22 @@ class Str
         $replacing = str_pad('', static::length($search, $encoding), $replace[0]);
 
         return str_replace($search, $replacing, $string);
+    }
+
+    /**
+     * Redacts the string with a character until the first occurrence of a given value.
+     *
+     * @param  string  $string
+     * @param  string  $before
+     * @param  string  $replace
+     * @param  string|null  $encoding
+     * @return string
+     */
+    public static function redactBefore($string, $before, $replace = '*', $encoding = 'UTF-8')
+    {
+        $until = mb_strpos($string, $before, 0) ?: ceil(static::length($string, $encoding) / 2);
+
+        return static::redact($string, $until, $replace, $encoding);
     }
 
     /**

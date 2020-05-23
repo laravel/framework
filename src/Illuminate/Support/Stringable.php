@@ -339,7 +339,7 @@ class Stringable
     }
 
     /**
-     * Obfuscates the beginning of a string with a character.
+     * Redacts the beginning of a string with a character.
      *
      * @param  string|int|null  $until
      * @param  string  $replace
@@ -352,20 +352,7 @@ class Stringable
     }
 
     /**
-     * Obfuscates the string with a character until the first occurrence of a given value.
-     *
-     * @param  string  $before
-     * @param  string  $replace
-     * @param  string|null  $encoding
-     * @return string
-     */
-    public function redactBefore($before, $replace = '*', $encoding = null)
-    {
-        return new static(Str::redactBefore($this->value, $before, $replace, $encoding));
-    }
-
-    /**
-     * Obfuscates all values of given string.
+     * Redacts all values of given string.
      *
      * @param  string  $search
      * @param  string  $replace
@@ -375,6 +362,19 @@ class Stringable
     public function redactAll($search, $replace = '*', $encoding = null)
     {
         return new static(Str::redactAll($this->value, $search, $replace, $encoding));
+    }
+
+    /**
+     * Redacts the string with a character until the first occurrence of a given value.
+     *
+     * @param  string  $before
+     * @param  string  $replace
+     * @param  string|null  $encoding
+     * @return string
+     */
+    public function redactBefore($before, $replace = '*', $encoding = null)
+    {
+        return new static(Str::redactBefore($this->value, $before, $replace, $encoding));
     }
 
     /**

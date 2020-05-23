@@ -231,8 +231,23 @@ class SupportStrTest extends TestCase
         $this->assertSame('这是一段中这', Str::redactAll('这是一段中这', 'ミ', '123'));
     }
 
+    public function testRedactWords()
+    {
+        $this->assertSame('*** bar foo', Str::redactWords('foo bar foo', 1));
+        $this->assertSame('******', Str::redactWords('这是一段中这', 1));
+        $this->assertSame('*** *** foo', Str::redactWords('foo bar foo', 2));
+        $this->assertSame('******', Str::redactWords('这是一段中这', 2));
+
+        $this->assertSame('@@@ bar foo', Str::redactWords('foo bar foo', 1, '@'));
+        $this->assertSame('@@@@@@', Str::redactWords('这是一段中这', 1, '@'));
+        $this->assertSame('111 111 foo', Str::redactWords('foo bar foo', 2, '123'));
+        $this->assertSame('111111', Str::redactWords('这是一段中这', 2, '123'));
+    }
+
     public function testParseCallback()
     {
+        echo Str::redact('Jan Michael Vincent');
+
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));
         $this->assertEquals(['Class', 'foo'], Str::parseCallback('Class', 'foo'));
         $this->assertEquals(['Class', null], Str::parseCallback('Class'));
