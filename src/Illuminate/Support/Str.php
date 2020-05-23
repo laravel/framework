@@ -419,7 +419,7 @@ class Str
     {
         $until = mb_strpos($string, $before, 0) ?: ceil(static::length($string, $encoding) / 2);
 
-        return static::redact($string, $until, $replace, $encoding);
+        return str_pad('', $until, $replace[0]).static::substr($string, $until);
     }
 
     /**
