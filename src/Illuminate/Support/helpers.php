@@ -569,10 +569,10 @@ if (! function_exists('if_null')) {
      */
     function if_null($value, callable $callback = null)
     {
-        if (!is_null($value)) {
+        if (! is_null($value)) {
             return $value;
         }
-        
+
         return is_null($callback) ? $value : $callback();
     }
 }
