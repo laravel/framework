@@ -44,7 +44,6 @@ trait HasDatabaseNotifications
     public static function bootHasDatabaseNotifications()
     {
         static::deleting(function ($notifiable) {
-
             if (in_array(SoftDeletes::class, class_uses_recursive($notifiable))) {
                 if (! $notifiable->forceDeleting) {
                     return;
