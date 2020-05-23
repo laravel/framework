@@ -192,6 +192,23 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::containsAll('taylor otwell', ['taylor', 'xxx']));
     }
 
+    public function testStrObfuscate()
+    {
+        $this->assertSame('******quzqux', Str::obfuscate('foobarquzqux'));
+        $this->assertSame('******quzqux', Str::obfuscate('foobarquzqux', 'q'));
+        $this->assertSame('*******@test.com', Str::obfuscate('1234567@test.com', '@test.com'));
+        $this->assertSame('******st.com', Str::obfuscate('123@test.com', 'foo'));
+        $this->assertSame('*****est.com', Str::obfuscate('123@test.com', 5));
+        $this->assertSame('************', Str::obfuscate('123@test.com', 13));
+        $this->assertSame('@@@@@@quzqux', Str::obfuscate('foobarquzqux', null, '@'));
+        $this->assertSame('@@@@@@quzqux', Str::obfuscate('foobarquzqux', 'q', '@'));
+        $this->assertSame('@@@@@@@@test.com', Str::obfuscate('1234567@test.com', '@test.com', '@'));
+        $this->assertSame('@@@@@@st.com', Str::obfuscate('123@test.com', 'foo', '@'));
+        $this->assertSame('@@@@@est.com', Str::obfuscate('123@test.com', 5, '@'));
+        $this->assertSame('@@@@@@@@@@@@', Str::obfuscate('123@test.com', 13, '@'));
+        $this->assertSame('REDACTquzqux', Str::obfuscate('foobarquzqux', null, 'REDACTED'));
+    }
+
     public function testParseCallback()
     {
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));

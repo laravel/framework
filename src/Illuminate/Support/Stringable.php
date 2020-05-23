@@ -339,6 +339,19 @@ class Stringable
     }
 
     /**
+     * Replaces half or the first part of a string with another string.
+     *
+     * @param  string|int|null  $until
+     * @param  string  $character
+     * @param  string  $encoding
+     * @return static
+     */
+    public function obfuscate($until = null, string $character = '*', string $encoding = 'UTF-8')
+    {
+        return new static(Str::obfuscate($this->value, $until, $character, $encoding));
+    }
+
+    /**
      * Parse a Class@method style callback into class and method.
      *
      * @param  string|null  $default

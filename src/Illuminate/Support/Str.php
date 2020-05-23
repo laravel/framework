@@ -371,6 +371,30 @@ class Str
     }
 
     /**
+     * Replaces half or the first part of a string with another string.
+     *
+     * @param  string  $string
+     * @param  string|int|null  $until
+     * @param  string  $replace
+     * @param  string  $encoding
+     * @return string
+     */
+    public static function obfuscate(string $string, $until = null, string $replace = '*', $encoding = 'UTF-8')
+    {
+        $length = static::length($string, $encoding);
+
+        if (is_numeric($until)) {
+            $hidden = max(0, min($length, $until));
+        } elseif (is_string($until)) {
+            $hidden = mb_strpos($string, $until, 0, $encoding) ?: ceil($length / 2);
+        } else {
+            $hidden = ceil($length / 2);
+        }
+
+        return static::substr(str_pad('', $hidden, $replace), 0, $hidden) . static::substr($string, $hidden);
+    }
+
+    /**
      * Parse a Class[@]method style callback into class and method.
      *
      * @param  string  $callback
