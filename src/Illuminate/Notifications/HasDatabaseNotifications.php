@@ -2,6 +2,8 @@
 
 namespace Illuminate\Notifications;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 trait HasDatabaseNotifications
 {
     /**
@@ -32,5 +34,24 @@ trait HasDatabaseNotifications
     public function unreadNotifications()
     {
         return $this->notifications()->whereNull('read_at');
+    }
+
+    /**
+     * Boot the trait on the notifiable model.
+     *
+     * @return void
+     */
+    public static function bootHasDatabaseNotifications()
+    {
+        static::deleting(function ($notifiable) {
+
+            if (in_array(SoftDeletes::class, class_uses_recursive($notifiable))) {
+                if (! $notifiable->forceDeleting) {
+                    return;
+                }
+            }
+
+            $notifiable->notifications->each->delete();
+        });
     }
 }
