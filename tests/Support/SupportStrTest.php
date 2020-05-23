@@ -192,21 +192,43 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::containsAll('taylor otwell', ['taylor', 'xxx']));
     }
 
-    public function testStrObfuscate()
+    public function testRedact()
     {
-        $this->assertSame('******quzqux', Str::obfuscate('foobarquzqux'));
-        $this->assertSame('******quzqux', Str::obfuscate('foobarquzqux', 'q'));
-        $this->assertSame('*******@test.com', Str::obfuscate('1234567@test.com', '@test.com'));
-        $this->assertSame('******st.com', Str::obfuscate('123@test.com', 'foo'));
-        $this->assertSame('*****est.com', Str::obfuscate('123@test.com', 5));
-        $this->assertSame('************', Str::obfuscate('123@test.com', 13));
-        $this->assertSame('@@@@@@quzqux', Str::obfuscate('foobarquzqux', null, '@'));
-        $this->assertSame('@@@@@@quzqux', Str::obfuscate('foobarquzqux', 'q', '@'));
-        $this->assertSame('@@@@@@@@test.com', Str::obfuscate('1234567@test.com', '@test.com', '@'));
-        $this->assertSame('@@@@@@st.com', Str::obfuscate('123@test.com', 'foo', '@'));
-        $this->assertSame('@@@@@est.com', Str::obfuscate('123@test.com', 5, '@'));
-        $this->assertSame('@@@@@@@@@@@@', Str::obfuscate('123@test.com', 13, '@'));
-        $this->assertSame('REDACTquzqux', Str::obfuscate('foobarquzqux', null, 'REDACTED'));
+        $this->assertSame('*** **r baz', Str::redact('foo bar baz'));
+        $this->assertSame('***段中文', Str::redact('这是一段中文'));
+        $this->assertSame('*** *** *az', Str::redact('foo bar baz', 9));
+        $this->assertSame('****中文', Str::redact('这是一段中文', 4));
+
+        $this->assertSame('@@@ @@r baz', Str::redact('foo bar baz', null, '@'));
+        $this->assertSame('@@@段中文', Str::redact('这是一段中文', null, '@'));
+        $this->assertSame('111 11r baz', Str::redact('foo bar baz', null, '123'));
+        $this->assertSame('111段中文', Str::redact('这是一段中文', null, '123'));
+    }
+
+    public function testRedactBefore()
+    {
+        $this->assertSame('*** *** baz', Str::redactBefore('foo bar baz', 'baz'));
+        $this->assertSame('*****文', Str::redactBefore('这是一段中文', '文'));
+        $this->assertSame('*** **r baz', Str::redactBefore('foo bar baz', 'quz'));
+        $this->assertSame('***段中文', Str::redactBefore('这是一段中文', 'ミ'));
+
+        $this->assertSame('@@@ @@@ baz', Str::redactBefore('foo bar baz', 'baz', '@'));
+        $this->assertSame('@@@@@文', Str::redactBefore('这是一段中文', '文', '@'));
+        $this->assertSame('111 11r baz', Str::redactBefore('foo bar baz', 'quz', '123'));
+        $this->assertSame('111段中文', Str::redactBefore('这是一段中文', 'ミ', '123'));
+    }
+
+    public function testRedactAll()
+    {
+        $this->assertSame('*** bar ***', Str::redactAll('foo bar foo', 'foo'));
+        $this->assertSame('*是一段中*', Str::redactAll('这是一段中这', '这'));
+        $this->assertSame('foo bar foo', Str::redactAll('foo bar foo', 'quz'));
+        $this->assertSame('这是一段中这', Str::redactAll('这是一段中这', 'ミ'));
+
+        $this->assertSame('@@@ bar @@@', Str::redactAll('foo bar foo', 'foo', '@'));
+        $this->assertSame('@是一段中@', Str::redactAll('这是一段中这', '这', '@'));
+        $this->assertSame('foo bar foo', Str::redactAll('foo bar foo', 'quz', '123'));
+        $this->assertSame('这是一段中这', Str::redactAll('这是一段中这', 'ミ', '123'));
     }
 
     public function testParseCallback()
