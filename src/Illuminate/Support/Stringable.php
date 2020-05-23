@@ -339,16 +339,42 @@ class Stringable
     }
 
     /**
-     * Replaces half or the first part of a string with another string.
+     * Obfuscates the beginning of a string with a character.
      *
      * @param  string|int|null  $until
-     * @param  string  $character
+     * @param  string  $replace
      * @param  string  $encoding
      * @return static
      */
-    public function obfuscate($until = null, string $character = '*', string $encoding = 'UTF-8')
+    public function redact($until = null, $replace = '*', $encoding = null)
     {
-        return new static(Str::obfuscate($this->value, $until, $character, $encoding));
+        return new static(Str::redact($this->value, $until, $replace, $encoding));
+    }
+
+    /**
+     * Obfuscates the string with a character until the first occurrence of a given value.
+     *
+     * @param  string  $before
+     * @param  string  $replace
+     * @param  string|null  $encoding
+     * @return string
+     */
+    public function redactBefore($before, $replace = '*', $encoding = null)
+    {
+        return new static(Str::redactBefore($this->value, $before, $replace, $encoding));
+    }
+
+    /**
+     * Obfuscates all values of given string.
+     *
+     * @param  string  $search
+     * @param  string  $replace
+     * @param  string|null  $encoding
+     * @return string
+     */
+    public function redactAll($search, $replace = '*', $encoding = null)
+    {
+        return new static(Str::redactAll($this->value, $search, $replace, $encoding));
     }
 
     /**

@@ -371,27 +371,55 @@ class Str
     }
 
     /**
-     * Replaces half or the first part of a string with another string.
+     * Obfuscates the beginning of a string with a character.
      *
      * @param  string  $string
-     * @param  string|int|null  $until
+     * @param  int|null  $until
      * @param  string  $replace
-     * @param  string  $encoding
+     * @param  string|null  $encoding
      * @return string
      */
-    public static function obfuscate(string $string, $until = null, string $replace = '*', $encoding = 'UTF-8')
+    public static function redact($string, $until = null, $replace = '*', $encoding = 'UTF-8')
     {
         $length = static::length($string, $encoding);
 
-        if (is_numeric($until)) {
-            $hidden = max(0, min($length, $until));
-        } elseif (is_string($until)) {
-            $hidden = mb_strpos($string, $until, 0, $encoding) ?: ceil($length / 2);
-        } else {
-            $hidden = ceil($length / 2);
-        }
+        $hidden = $until ? max(0, min($length, $until)) : ceil($length / 2);
 
-        return static::substr(str_pad('', $hidden, $replace), 0, $hidden).static::substr($string, $hidden);
+        $replaced = preg_replace('/\w/mu', $replace[0], static::substr($string, 0, $hidden));
+
+        return $replaced.static::substr($string, $hidden);
+    }
+
+    /**
+     * Obfuscates the string with a character until the first occurrence of a given value.
+     *
+     * @param  string  $string
+     * @param  string  $before
+     * @param  string  $replace
+     * @param  string|null  $encoding
+     * @return string
+     */
+    public static function redactBefore($string, $before, $replace = '*', $encoding = 'UTF-8')
+    {
+        $until = mb_strpos($string, $before, 0) ?: ceil(static::length($string, $encoding) / 2);
+
+        return static::redact($string, $until, $replace, $encoding);
+    }
+
+    /**
+     * Obfuscates all values of given string.
+     *
+     * @param  string  $string
+     * @param  string  $search
+     * @param  string  $replace
+     * @param  string|null  $encoding
+     * @return string
+     */
+    public static function redactAll($string, $search, $replace = '*', $encoding = null)
+    {
+        $replacing = str_pad('', static::length($search, $encoding), $replace[0]);
+
+        return str_replace($search, $replacing, $string);
     }
 
     /**

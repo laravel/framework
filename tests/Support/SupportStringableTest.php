@@ -374,21 +374,43 @@ class SupportStringableTest extends TestCase
         $this->assertSame(11, $this->stringable('foo bar baz')->length('UTF-8'));
     }
 
-    public function testObfuscate()
+    public function testRedact()
     {
-        $this->assertSame('******quzqux', (string) $this->stringable('foobarquzqux')->obfuscate());
-        $this->assertSame('******quzqux', (string) $this->stringable('foobarquzqux')->obfuscate('q'));
-        $this->assertSame('*******@test.com', (string) $this->stringable('1234567@test.com')->obfuscate('@test.com'));
-        $this->assertSame('******st.com', (string) $this->stringable('123@test.com')->obfuscate('foo'));
-        $this->assertSame('*****est.com', (string) $this->stringable('123@test.com')->obfuscate(5));
-        $this->assertSame('************', (string) $this->stringable('123@test.com')->obfuscate(13));
-        $this->assertSame('@@@@@@quzqux', (string) $this->stringable('foobarquzqux')->obfuscate(null, '@'));
-        $this->assertSame('@@@@@@quzqux', (string) $this->stringable('foobarquzqux')->obfuscate('q', '@'));
-        $this->assertSame('@@@@@@@@test.com', (string) $this->stringable('1234567@test.com')->obfuscate('@test.com', '@'));
-        $this->assertSame('@@@@@@st.com', (string) $this->stringable('123@test.com')->obfuscate('foo', '@'));
-        $this->assertSame('@@@@@est.com', (string) $this->stringable('123@test.com')->obfuscate(5, '@'));
-        $this->assertSame('@@@@@@@@@@@@', (string) $this->stringable('123@test.com')->obfuscate(13, '@'));
-        $this->assertSame('REDACTquzqux', (string) $this->stringable('foobarquzqux')->obfuscate(null, 'REDACTED'));
+        $this->assertSame('*** **r baz', (string) $this->stringable('foo bar baz')->redact());
+        $this->assertSame('***段中文', (string) $this->stringable('这是一段中文')->redact());
+        $this->assertSame('*** *** *az', (string) $this->stringable('foo bar baz')->redact(9));
+        $this->assertSame('****中文', (string) $this->stringable('这是一段中文')->redact(4));
+
+        $this->assertSame('@@@ @@r baz', (string) $this->stringable('foo bar baz')->redact(null, '@'));
+        $this->assertSame('@@@段中文', (string) $this->stringable('这是一段中文')->redact(null, '@'));
+        $this->assertSame('111 11r baz', (string) $this->stringable('foo bar baz')->redact(null, '123'));
+        $this->assertSame('111段中文', (string) $this->stringable('这是一段中文')->redact(null, '123'));
+    }
+
+    public function testRedactBefore()
+    {
+        $this->assertSame('*** *** baz', (string) $this->stringable('foo bar baz')->redactBefore('baz'));
+        $this->assertSame('*****文', (string) $this->stringable('这是一段中文')->redactBefore('文'));
+        $this->assertSame('*** **r baz', (string) $this->stringable('foo bar baz')->redactBefore('quz'));
+        $this->assertSame('***段中文', (string) $this->stringable('这是一段中文')->redactBefore('ミ'));
+
+        $this->assertSame('@@@ @@@ baz', (string) $this->stringable('foo bar baz')->redactBefore('baz', '@'));
+        $this->assertSame('@@@@@文', (string) $this->stringable('这是一段中文')->redactBefore('文', '@'));
+        $this->assertSame('111 11r baz', (string) $this->stringable('foo bar baz')->redactBefore('quz', '123'));
+        $this->assertSame('111段中文', (string) $this->stringable('这是一段中文')->redactBefore('ミ', '123'));
+    }
+
+    public function testRedactAll()
+    {
+        $this->assertSame('*** bar ***', (string) $this->stringable('foo bar foo')->redactAll('foo'));
+        $this->assertSame('*是一段中*', (string) $this->stringable('这是一段中这')->redactAll('这'));
+        $this->assertSame('foo bar foo', (string) $this->stringable('foo bar foo')->redactAll('quz'));
+        $this->assertSame('这是一段中这', (string) $this->stringable('这是一段中这')->redactAll('ミ'));
+
+        $this->assertSame('@@@ bar @@@', (string) $this->stringable('foo bar foo')->redactAll('foo', '@'));
+        $this->assertSame('@是一段中@', (string) $this->stringable('这是一段中这')->redactAll('这', '@'));
+        $this->assertSame('foo bar foo', (string) $this->stringable('foo bar foo')->redactAll('quz', '123'));
+        $this->assertSame('这是一段中这', (string) $this->stringable('这是一段中这')->redactAll('ミ', '123'));
     }
 
     public function testReplaceArray()
