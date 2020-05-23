@@ -376,19 +376,19 @@ class SupportStringableTest extends TestCase
 
     public function testObfuscate()
     {
-        $this->assertSame('******quzqux', (string)$this->stringable('foobarquzqux')->obfuscate());
-        $this->assertSame('******quzqux', (string)$this->stringable('foobarquzqux')->obfuscate('q'));
-        $this->assertSame('*******@test.com', (string)$this->stringable('1234567@test.com')->obfuscate('@test.com'));
-        $this->assertSame('******st.com', (string)$this->stringable('123@test.com')->obfuscate('foo'));
-        $this->assertSame('*****est.com', (string)$this->stringable('123@test.com')->obfuscate(5));
-        $this->assertSame('************', (string)$this->stringable('123@test.com')->obfuscate(13));
-        $this->assertSame('@@@@@@quzqux', (string)$this->stringable('foobarquzqux')->obfuscate(null, '@'));
-        $this->assertSame('@@@@@@quzqux', (string)$this->stringable('foobarquzqux')->obfuscate('q', '@'));
-        $this->assertSame('@@@@@@@@test.com', (string)$this->stringable('1234567@test.com')->obfuscate('@test.com', '@'));
-        $this->assertSame('@@@@@@st.com', (string)$this->stringable('123@test.com')->obfuscate('foo', '@'));
-        $this->assertSame('@@@@@est.com', (string)$this->stringable('123@test.com')->obfuscate(5, '@'));
-        $this->assertSame('@@@@@@@@@@@@', (string)$this->stringable('123@test.com')->obfuscate(13, '@'));
-        $this->assertSame('REDACTquzqux', (string)$this->stringable('foobarquzqux')->obfuscate(null, 'REDACTED'));
+        $this->assertSame('******quzqux', (string) $this->stringable('foobarquzqux')->obfuscate());
+        $this->assertSame('******quzqux', (string) $this->stringable('foobarquzqux')->obfuscate('q'));
+        $this->assertSame('*******@test.com', (string) $this->stringable('1234567@test.com')->obfuscate('@test.com'));
+        $this->assertSame('******st.com', (string) $this->stringable('123@test.com')->obfuscate('foo'));
+        $this->assertSame('*****est.com', (string) $this->stringable('123@test.com')->obfuscate(5));
+        $this->assertSame('************', (string) $this->stringable('123@test.com')->obfuscate(13));
+        $this->assertSame('@@@@@@quzqux', (string) $this->stringable('foobarquzqux')->obfuscate(null, '@'));
+        $this->assertSame('@@@@@@quzqux', (string) $this->stringable('foobarquzqux')->obfuscate('q', '@'));
+        $this->assertSame('@@@@@@@@test.com', (string) $this->stringable('1234567@test.com')->obfuscate('@test.com', '@'));
+        $this->assertSame('@@@@@@st.com', (string) $this->stringable('123@test.com')->obfuscate('foo', '@'));
+        $this->assertSame('@@@@@est.com', (string) $this->stringable('123@test.com')->obfuscate(5, '@'));
+        $this->assertSame('@@@@@@@@@@@@', (string) $this->stringable('123@test.com')->obfuscate(13, '@'));
+        $this->assertSame('REDACTquzqux', (string) $this->stringable('foobarquzqux')->obfuscate(null, 'REDACTED'));
     }
 
     public function testReplaceArray()

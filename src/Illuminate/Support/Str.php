@@ -391,7 +391,7 @@ class Str
             $hidden = ceil($length / 2);
         }
 
-        return static::substr(str_pad('', $hidden, $replace), 0, $hidden) . static::substr($string, $hidden);
+        return static::substr(str_pad('', $hidden, $replace), 0, $hidden).static::substr($string, $hidden);
     }
 
     /**
