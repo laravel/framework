@@ -78,6 +78,13 @@ class BelongsToMany extends Relation
     protected $pivotWhereIns = [];
 
     /**
+     * Any pivot table restrictions for whereNull clauses.
+     *
+     * @var array
+     */
+    protected $pivotWhereNulls = [];
+
+    /**
      * The default values for the pivot columns.
      *
      * @var array
@@ -505,6 +512,57 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Set a "where null" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function wherePivotNull($column, $boolean = 'and', $not = false)
+    {
+        $this->pivotWhereNulls[] = func_get_args();
+
+        return $this->whereNull($this->table.'.'.$column, $boolean, $not);
+    }
+
+    /**
+     * Set a "where not null" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function wherePivotNotNull($column, $boolean = 'and')
+    {
+        return $this->wherePivotNull($column, $boolean, true);
+    }
+
+    /**
+     * Set a "or where null" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWherePivotNull($column, $not = false)
+    {
+        return $this->wherePivotNull($column, 'or', $not);
+    }
+
+    /**
+     * Set a "or where not null" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWherePivotNotNull($column)
+    {
+        return $this->orWherePivotNull($column, true);
+    }
+
+    /**
      * Find a related model by its primary key or return new instance of the related model.
      *
      * @param  mixed  $id
@@ -583,7 +641,7 @@ class BelongsToMany extends Relation
      */
     public function find($id, $columns = ['*'])
     {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (! $id instanceof Model && (is_array($id) || $id instanceof Arrayable)) {
             return $this->findMany($id, $columns);
         }
 

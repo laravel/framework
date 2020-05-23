@@ -147,7 +147,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
             $this->setCustomModes($connection, $config);
         } elseif (isset($config['strict'])) {
             if ($config['strict']) {
-                $connection->prepare($this->strictMode($connection))->execute();
+                $connection->prepare($this->strictMode($connection, $config))->execute();
             } else {
                 $connection->prepare("set session sql_mode='NO_ENGINE_SUBSTITUTION'")->execute();
             }
@@ -172,11 +172,14 @@ class MySqlConnector extends Connector implements ConnectorInterface
      * Get the query to enable strict mode.
      *
      * @param  \PDO  $connection
+     * @param  array  $config
      * @return string
      */
-    protected function strictMode(PDO $connection)
+    protected function strictMode(PDO $connection, $config)
     {
-        if (version_compare($connection->getAttribute(PDO::ATTR_SERVER_VERSION), '8.0.11') >= 0) {
+        $version = $config['version'] ?? $connection->getAttribute(PDO::ATTR_SERVER_VERSION);
+
+        if (version_compare($version, '8.0.11') >= 0) {
             return "set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'";
         }
 

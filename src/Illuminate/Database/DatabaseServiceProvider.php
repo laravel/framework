@@ -88,6 +88,8 @@ class DatabaseServiceProvider extends ServiceProvider
                 static::$fakers[$locale] = FakerFactory::create($locale);
             }
 
+            static::$fakers[$locale]->unique(true);
+
             return static::$fakers[$locale];
         });
 

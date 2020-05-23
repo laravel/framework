@@ -6,6 +6,7 @@ use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class CacheFileStoreTest extends TestCase
@@ -77,6 +78,27 @@ class CacheFileStoreTest extends TestCase
         $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
         $result = $store->put('foo', 'Hello World', 10);
         $this->assertTrue($result);
+    }
+
+    public function testStoreItemProperlySetsPermissions()
+    {
+        $files = m::mock(Filesystem::class);
+        $files->shouldIgnoreMissing();
+        $store = $this->getMockBuilder(FileStore::class)->setMethods(['expiration'])->setConstructorArgs([$files, __DIR__, 0644])->getMock();
+        $hash = sha1('foo');
+        $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
+        $files->shouldReceive('put')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, m::any(), m::any()])->andReturnUsing(function ($name, $value) {
+            return strlen($value);
+        });
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash])->andReturnValues(['0600', '0644'])->times(3);
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, 0644])->andReturn([true])->once();
+        $result = $store->put('foo', 'foo', 10);
+        $this->assertTrue($result);
+        $result = $store->put('foo', 'bar', 10);
+        $this->assertTrue($result);
+        $result = $store->put('foo', 'baz', 10);
+        $this->assertTrue($result);
+        m::close();
     }
 
     public function testForeversAreStoredWithHighTimestamp()

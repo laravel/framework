@@ -12,11 +12,6 @@ class RouteRedirectTest extends TestCase
 {
     /**
      * @dataProvider  routeRedirectDataSets
-     *
-     * @param  string  $redirectFrom
-     * @param  string  $redirectTo
-     * @param  string  $requestUri
-     * @param  string  $redirectUri
      */
     public function testRouteRedirect($redirectFrom, $redirectTo, $requestUri, $redirectUri)
     {
@@ -28,7 +23,7 @@ class RouteRedirectTest extends TestCase
         $response->assertStatus(301);
     }
 
-    public function routeRedirectDataSets(): array
+    public function routeRedirectDataSets()
     {
         return [
             'route redirect with no parameters' => ['from', 'to', '/from', '/to'],
