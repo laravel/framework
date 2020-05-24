@@ -5,6 +5,7 @@ namespace Illuminate\Container;
 use Closure;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use InvalidArgumentException;
+use Opis\Closure\SerializableClosure;
 use ReflectionFunction;
 use ReflectionMethod;
 
@@ -24,6 +25,10 @@ class BoundMethod
      */
     public static function call($container, $callback, array $parameters = [], $defaultMethod = null)
     {
+        if (static::isSerializedClosure($callback)) {
+            return static::callSerializedClosure($container, $callback, $parameters);
+        }
+
         if (static::isCallableWithAtSign($callback) || $defaultMethod) {
             return static::callClass($container, $callback, $parameters, $defaultMethod);
         }
@@ -186,5 +191,49 @@ class BoundMethod
     protected static function isCallableWithAtSign($callback)
     {
         return is_string($callback) && strpos($callback, '@') !== false;
+    }
+
+    /**
+     * Determine if the given string is in a serialized Closure syntax.
+     *
+     * @param  mixed  $callback
+     * @return bool
+     */
+    public static function isSerializedClosure($callback)
+    {
+        return static::isCallableWithAtSign($callback)
+            && explode('@', $callback)[0] === SerializedClosure::class;
+    }
+
+    /**
+     * Call a string reference to a serialized Closure syntax.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @param  string  $callback
+     * @param  array  $parameters
+     * @return mixed
+     */
+    protected static function callSerializedClosure($container, $callback, array $parameters = [])
+    {
+        $serialized = explode('@', $callback, 2)[1] ?? '';
+
+        if (empty($serialized)) {
+            throw new InvalidArgumentException(vsprintf(
+                'Serialized Closure expected in [%s@SERIALIZED] format, with SERIALIZED coming from %s. Given: [%s]',
+                [
+                    SerializedClosure::class,
+                    SerializableClosure::class,
+                    $callback,
+                ]
+            ));
+        }
+
+        $closure = SerializedClosure::fromString($serialized);
+
+        return static::callBoundMethod($container, $closure, function () use ($container, $closure, $parameters) {
+            return call_user_func_array(
+                $closure, static::getMethodDependencies($container, $closure, $parameters)
+            );
+        });
     }
 }
