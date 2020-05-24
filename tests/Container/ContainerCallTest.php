@@ -4,7 +4,11 @@ namespace Illuminate\Tests\Container;
 
 use Closure;
 use Illuminate\Container\Container;
+use Illuminate\Container\SerializedClosure;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Foundation\Application;
+use InvalidArgumentException;
+use Opis\Closure\SerializableClosure;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 use stdClass;
@@ -187,6 +191,28 @@ class ContainerCallTest extends TestCase
         $foo = $container->call(function ($foo, $bar = 'default') {
             return $foo;
         });
+    }
+
+    public function testCallWithSerializedClosure()
+    {
+        $closure = function (ContainerCallConcreteStub $param) {
+            return $param;
+        };
+        $container = new Container;
+        $callable = SerializedClosure::class . '@' . serialize(new SerializableClosure($closure));
+        $result = $container->call($callable);
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result);
+    }
+
+    public function testCallWithInvalidSerializedClosureThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Serialized Closure expected in [Illuminate\Container\SerializedClosure@SERIALIZED] format, '.
+                                      'with SERIALIZED coming from Opis\Closure\SerializableClosure. Given: [Illuminate\Container\SerializedClosure@]');
+
+        $container = new Container;
+        $callable = SerializedClosure::class . '@';
+        $container->call($callable);
     }
 }
 
