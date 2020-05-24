@@ -33,6 +33,6 @@ class SerializedClosure
      */
     public static function toString($closure)
     {
-        return self::class . '@' . serialize(new SerializableClosure($closure));
+        return self::class.'@'.serialize(new SerializableClosure($closure));
     }
 }

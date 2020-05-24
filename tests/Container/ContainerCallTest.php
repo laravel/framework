@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Container\SerializedClosure;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Foundation\Application;
 use InvalidArgumentException;
 use Opis\Closure\SerializableClosure;
 use PHPUnit\Framework\TestCase;
@@ -199,7 +198,7 @@ class ContainerCallTest extends TestCase
             return $param;
         };
         $container = new Container;
-        $callable = SerializedClosure::class . '@' . serialize(new SerializableClosure($closure));
+        $callable = SerializedClosure::class.'@'.serialize(new SerializableClosure($closure));
         $result = $container->call($callable);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result);
     }
@@ -211,7 +210,7 @@ class ContainerCallTest extends TestCase
                                       'with SERIALIZED coming from Opis\Closure\SerializableClosure. Given: [Illuminate\Container\SerializedClosure@]');
 
         $container = new Container;
-        $callable = SerializedClosure::class . '@';
+        $callable = SerializedClosure::class.'@';
         $container->call($callable);
     }
 }

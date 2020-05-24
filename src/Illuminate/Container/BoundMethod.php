@@ -224,7 +224,8 @@ class BoundMethod
                     SerializedClosure::class,
                     SerializableClosure::class,
                     $callback,
-            ]));
+                ]
+            ));
         }
 
         $closure = SerializedClosure::fromString($serialized);
