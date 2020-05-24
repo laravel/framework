@@ -211,7 +211,7 @@ class Route
      */
     protected function isControllerAction()
     {
-        return is_string($this->action['uses']) && !BoundMethod::isSerializedClosure($this->action['uses']);
+        return is_string($this->action['uses']) && ! BoundMethod::isSerializedClosure($this->action['uses']);
     }
 
     /**
