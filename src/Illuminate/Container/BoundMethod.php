@@ -227,7 +227,7 @@ class BoundMethod
             ]));
         }
 
-        $closure = SerializedClosure::toClosure($serialized);
+        $closure = SerializedClosure::fromString($serialized);
 
         return static::callBoundMethod($container, $closure, function () use ($container, $closure, $parameters) {
             return call_user_func_array(
