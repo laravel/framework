@@ -4,7 +4,9 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Collections\Arr;
+use Illuminate\Container\BoundMethod;
 use Illuminate\Container\Container;
+use Illuminate\Container\SerializedClosure;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Macroable\Macroable;
@@ -209,7 +211,7 @@ class Route
      */
     protected function isControllerAction()
     {
-        return is_string($this->action['uses']);
+        return is_string($this->action['uses']) && !BoundMethod::isSerializedClosure($this->action['uses']);
     }
 
     /**
@@ -221,8 +223,12 @@ class Route
     {
         $callable = $this->action['uses'];
 
+        if (BoundMethod::isSerializedClosure($callable)) {
+            $callable = SerializedClosure::fromString($callable);
+        }
+
         return $callable(...array_values($this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+            $this->parametersWithoutNulls(), new ReflectionFunction($callable)
         )));
     }
 
@@ -1137,7 +1143,7 @@ class Route
     public function prepareForSerialization()
     {
         if ($this->action['uses'] instanceof Closure) {
-            throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
+            $this->action['uses'] = SerializedClosure::toString($this->action['uses']);
         }
 
         $this->compileRoute();
