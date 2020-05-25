@@ -40,7 +40,7 @@ class SqlServerGrammar extends Grammar
                     on obj.schema_id = schem.schema_id
                 where obj.type = 'U'
                 and obj.name = ?
-                and schem.name = ?";
+                and schem.name = "; // schema concatenated by builder.
     }
 
     /**

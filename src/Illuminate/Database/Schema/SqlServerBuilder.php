@@ -42,7 +42,7 @@ class SqlServerBuilder extends Builder
         [$schema, $tableName] = $grammar->parseSchemaAndTable($table);
 
         $result = $this->connection->selectFromWriteConnection(
-                $grammar->compileTableExists() , [$tableName, ($schema  ?? 'SCHEMA_NAME()')]
+                $grammar->compileTableExists(). ($schema  ? "'$schema'" : 'SCHEMA_NAME()') , [$tableName]
             );
         return count($result) > 0;
     }

@@ -1,0 +1,46 @@
+# run for CI: docker-compose -f sqlsrv.docker-compose.yml up --exit-code-from laravel --abort-on-container-exit
+# for manual/debug testing:
+# 1. docker-compose -f sqlsrv.docker-compose.yml up (spins up db and runs unit tests once, but leaves db running).
+# 2. add environment variables below to phpunit.xml:
+# <env name="DB_CONNECTION" value="sqlsrv"/>
+# <env name="DB_USERNAME" value="SA"/>
+# <env name="DB_PASSWORD" value="p83bpNZTCf3sPsWt"/>
+# <env name="APP_DEBUG" value="true"/>
+version: '3'
+services:
+  sqlsrv:
+    container_name: sqlsrv
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "p83bpNZTCf3sPsWt"
+      ACCEPT_EULA: "Y"
+    networks:
+        - db
+    logging:
+      driver: none # hide logging, only distracting.
+  laravel:
+    depends_on:
+      - sqlsrv
+    container_name: laravel
+    build:
+      context: .
+      dockerfile: php-sqlsrv.dockerfile
+    command: ["vendor/bin/phpunit", "tests/Integration/Database/SqlServer/"]
+    volumes:
+      - ./src/:/var/www/html/src/
+      - ./tests/:/var/www/html/tests/
+      - ./vendor/:/var/www/html/vendor/
+    networks:
+      - db
+    environment:
+      DB_CONNECTION: 'sqlsrv'
+      DB_HOST: sqlsrv
+      DB_PORT: 1433
+      DB_DATABASE: forge
+      DB_USERNAME: SA
+      DB_PASSWORD: 'p83bpNZTCf3sPsWt'
+      APP_DEBUG: 'true'
+networks:
+  db:
