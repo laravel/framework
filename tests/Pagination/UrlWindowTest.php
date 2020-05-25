@@ -41,13 +41,13 @@ class UrlWindowTest extends TestCase
          * Test Being Near The End Of The List
          */
         $array = [];
-        for ($i = 1; $i <= 13; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $array[$i] = 'item'.$i;
         }
-        $p = new LengthAwarePaginator($array, count($array), 1, 10);
+        $p = new LengthAwarePaginator($array, count($array), 1, 17);
         $window = new UrlWindow($p);
         $last = [];
-        for ($i = 4; $i <= 13; $i++) {
+        for ($i = 11; $i <= 20; $i++) {
             $last[$i] = '/?page='.$i;
         }
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
@@ -56,7 +56,7 @@ class UrlWindowTest extends TestCase
     public function testCustomUrlRangeForAWindowOfLinks()
     {
         $array = [];
-        for ($i = 1; $i <= 13; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $array[$i] = 'item'.$i;
         }
 
@@ -69,6 +69,6 @@ class UrlWindowTest extends TestCase
             $slider[$i] = '/?page='.$i;
         }
 
-        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
+        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [19 => '/?page=19', 20 => '/?page=20']], $window->get());
     }
 }
