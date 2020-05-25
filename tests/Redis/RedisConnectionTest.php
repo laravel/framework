@@ -329,6 +329,10 @@ class RedisConnectionTest extends TestCase
                     'count' => 2,
                 ],
             ]));
+            $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->zrangebyscore('set', 0, 11, [
+                'withscores' => true,
+                'limit' => [1, 2],
+            ]));
 
             $redis->flushall();
         }
@@ -345,6 +349,10 @@ class RedisConnectionTest extends TestCase
                     'offset' => 1,
                     'count' => 2,
                 ],
+            ]));
+            $this->assertEquals(['matt' => 5, 'jeffrey' => 1], $redis->ZREVRANGEBYSCORE('set', 10, 0, [
+                'withscores' => true,
+                'limit' => [1, 2],
             ]));
 
             $redis->flushall();
