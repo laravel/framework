@@ -2,6 +2,12 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v7.12.0...7.x)
 
+### Added
+- Added `Illuminate\Pagination\AbstractPaginator::useTailwind()` ([2279b73](https://github.com/laravel/framework/commit/2279b73d5553c34c970128264a248f3bb57afad6), [bf1eef4](https://github.com/laravel/framework/commit/bf1eef400951dcee04839a9ab7c15da1a807f89c), [13a9ec3](https://github.com/laravel/framework/commit/13a9ec349b8bcaa31d1757752ae0304f0328e5ce))
+
+### Fixed
+- Fixed route list command for excluded middleware ([7ebd211](https://github.com/laravel/framework/commit/7ebd21193df520d78269d7abd740537a2fae889e))
+
 
 ## [v7.12.0 (2020-05-19)](https://github.com/laravel/framework/compare/v7.11.0...v7.12.0)
 
