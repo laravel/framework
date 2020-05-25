@@ -35,7 +35,12 @@ class SqlServerGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select * from sysobjects where type = 'U' and name = ?";
+        return "select obj.* from sys.objects  as obj
+                join sys.schemas as schem
+                    on obj.schema_id = schem.schema_id
+                where obj.type = 'U'
+                and obj.name = ?
+                and schem.name = ?";
     }
 
     /**
@@ -46,9 +51,12 @@ class SqlServerGrammar extends Grammar
      */
     public function compileColumnListing($table)
     {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+        $schemaName = $schema ? "'$schema'" : 'SCHEMA_NAME()';
         return "select col.name from sys.columns as col
                 join sys.objects as obj on col.object_id = obj.object_id
-                where obj.type = 'U' and obj.name = '$table'";
+                join sys.schemas as schem on obj.schema_id = schem.schema_id
+                where obj.type = 'U' and obj.name = '$table' and schem.name = $schemaName";
     }
 
     /**
@@ -191,29 +199,29 @@ class SqlServerGrammar extends Grammar
     public function compileDropColumn(Blueprint $blueprint, Fluent $command)
     {
         $columns = $this->wrapArray($command->columns);
+        $tableName = $this->wrapTable($blueprint);
+        $dropExistingConstraintsSql = $this->compileDropDefaultConstraint($tableName, $command);
 
-        $dropExistingConstraintsSql = $this->compileDropDefaultConstraint($blueprint, $command).';';
-
-        return $dropExistingConstraintsSql.'alter table '.$this->wrapTable($blueprint).' drop column '.implode(', ', $columns);
+        $columnInString = implode(', ', $columns);
+        return "{$dropExistingConstraintsSql};alter table {$tableName} drop column {$columnInString}";
     }
 
     /**
      * Compile a drop default constraint command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  string $table
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
-    public function compileDropDefaultConstraint(Blueprint $blueprint, Fluent $command)
+    public function compileDropDefaultConstraint($table, Fluent $command)
     {
         $columns = "'".implode("','", $command->columns)."'";
-
-        $tableName = $this->getTablePrefix().$blueprint->getTable();
-
+        [$schema, $tableName] =$this->parseSchemaAndTable($table);
+        $schemaName = $schema ? "'$schema'" : 'SCHEMA_NAME()';
         $sql = "DECLARE @sql NVARCHAR(MAX) = '';";
-        $sql .= "SELECT @sql += 'ALTER TABLE [dbo].[{$tableName}] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
+        $sql .= "SELECT @sql += 'ALTER TABLE $table DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
         $sql .= 'FROM SYS.COLUMNS ';
-        $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$tableName}]') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
+        $sql .= "WHERE [object_id] = OBJECT_ID($schemaName + '.{$tableName}') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
         $sql .= 'EXEC(@sql)';
 
         return $sql;
@@ -875,6 +883,10 @@ class SqlServerGrammar extends Grammar
         if ($table instanceof Blueprint && $table->temporary) {
             $this->setTablePrefix('#');
         }
+        if(!$table  instanceof Blueprint){
+            // fix infinite loop when $tablePrefix = 'schema.';
+            return $this->wrapValue($table);
+        }
 
         return parent::wrapTable($table);
     }
@@ -892,5 +904,18 @@ class SqlServerGrammar extends Grammar
         }
 
         return "N'$value'";
+    }
+
+    /**
+     * parse given table name to get schema and table name.
+     * @param string $table
+     * @return array|string[]
+     */
+    public function parseSchemaAndTable($table){
+        $parts = explode(".", $table);
+        if(count($parts) == 1){
+            return [null, $parts[0]]; // expect dbo as default schema as it is in sql server
+        }
+        return $parts;
     }
 }
