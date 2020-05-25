@@ -21,13 +21,8 @@ class SqlServerProcessor extends Processor
     {
         $connection = $query->getConnection();
 
-        $connection->insert($sql, $values);
-
-        if ($connection->getConfig('odbc') === true) {
-            $id = $this->processInsertGetIdForOdbc($connection);
-        } else {
-            $id = $connection->getPdo()->lastInsertId();
-        }
+        $result = $connection->selectOne('SET NOCOUNT ON;'.$sql.';SELECT SCOPE_IDENTITY() AS lastInsertedId;', $values, false);
+        $id = is_array($result) ? $result['lastInsertedId'] : $result->lastInsertedId;
 
         return is_numeric($id) ? (int) $id : $id;
     }
