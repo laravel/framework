@@ -81,14 +81,16 @@ trait ManagesComponents
     {
         $view = array_pop($this->componentStack);
 
+        $data = $this->componentData();
+
         if ($view instanceof Closure) {
-            $view = $view();
+            $view = $view($data);
         }
 
         if ($view instanceof View) {
-            return $view->with($this->componentData())->render();
+            return $view->with($data)->render();
         } else {
-            return $this->make($view, $this->componentData())->render();
+            return $this->make($view, $data)->render();
         }
     }
 
