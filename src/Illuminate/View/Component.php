@@ -76,7 +76,8 @@ abstract class Component
 
         return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
             return $resolver($view($data));
-        } : $resolver($view);
+        }
+        : $resolver($view);
     }
 
     /**
