@@ -48,11 +48,11 @@ class DatabaseBatchRepository implements BatchRepository
     /**
      * Get available batches.
      *
-     * @param  mixed  $before
      * @param  int  $limit
+     * @param  mixed  $before
      * @return [\Illuminate\Bus\Batch]
      */
-    public function get($before = null, $limit = 50)
+    public function get($limit = 50, $before = null)
     {
         return $this->connection->table($this->table)
                             ->orderByDesc('id')

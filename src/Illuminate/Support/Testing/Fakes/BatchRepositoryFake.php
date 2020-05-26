@@ -15,11 +15,11 @@ class BatchRepositoryFake implements BatchRepository
     /**
      * Get available batches.
      *
-     * @param  mixed  $before
      * @param  int  $limit
+     * @param  mixed  $before
      * @return [\Illuminate\Bus\Batch]
      */
-    public function get($before, $limit)
+    public function get($limit, $before)
     {
     }
 
