@@ -101,10 +101,17 @@ trait ManagesComponents
      */
     protected function componentData()
     {
+        $defaultSlot = new HtmlString(trim(ob_get_clean()));
+
+        $slots = array_merge([
+            '__default' => $defaultSlot,
+        ], $this->slots[count($this->componentStack)]);
+
         return array_merge(
             $this->componentData[count($this->componentStack)],
-            ['slot' => new HtmlString(trim(ob_get_clean()))],
-            $this->slots[count($this->componentStack)]
+            ['slot' => $defaultSlot],
+            $this->slots[count($this->componentStack)],
+            ['__laravel_slots' => $slots],
         );
     }
 

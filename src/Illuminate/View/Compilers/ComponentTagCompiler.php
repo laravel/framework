@@ -231,7 +231,7 @@ class ComponentTagCompiler
      *
      * @throws \InvalidArgumentException
      */
-    protected function componentClass(string $component)
+    public function componentClass(string $component)
     {
         $viewFactory = Container::getInstance()->make(Factory::class);
 
@@ -288,7 +288,7 @@ class ComponentTagCompiler
      * @param  array  $attributes
      * @return array
      */
-    protected function partitionDataAndAttributes($class, array $attributes)
+    public function partitionDataAndAttributes($class, array $attributes)
     {
         // If the class doesn't exists, we'll assume it's a class-less component and
         // return all of the attributes as both data and attributes since we have
