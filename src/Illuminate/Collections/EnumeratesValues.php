@@ -47,6 +47,7 @@ trait EnumeratesValues
         'contains',
         'each',
         'every',
+        'excludes',
         'filter',
         'first',
         'flatMap',
@@ -126,6 +127,19 @@ trait EnumeratesValues
     public function some($key, $operator = null, $value = null)
     {
         return $this->contains(...func_get_args());
+    }
+
+    /**
+     * Determine if an item does not exist in the collection.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function excludes($key, $operator = null, $value = null)
+    {
+        return ! $this->contains(...func_get_args());
     }
 
     /**

@@ -2771,6 +2771,38 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testExcludes($collection)
+    {
+        $c = new $collection([1, 3, 5]);
+
+        $this->assertFalse($c->excludes(1));
+        $this->assertFalse($c->excludes('1'));
+        $this->assertTrue($c->excludes(2));
+        $this->assertTrue($c->excludes('2'));
+
+        $c = new $collection([0]);
+
+        $this->assertFalse($c->excludes(function ($value) {
+            return $value < 5;
+        }));
+        $this->assertTrue($c->excludes(function ($value) {
+            return $value > 5;
+        }));
+
+        $c = new $collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+
+        $this->assertFalse($c->excludes('v', 1));
+        $this->assertTrue($c->excludes('v', 2));
+
+        $c = new $collection([['a' => false, 'b' => false], ['a' => true, 'b' => false]]);
+
+        $this->assertFalse($c->excludes->a);
+        $this->assertTrue($c->excludes->b);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSome($collection)
     {
         $c = new $collection([1, 3, 5]);
