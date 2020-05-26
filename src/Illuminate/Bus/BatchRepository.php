@@ -7,6 +7,15 @@ use Closure;
 interface BatchRepository
 {
     /**
+     * Get available batches.
+     *
+     * @param  mixed  $before
+     * @param  int  $limit
+     * @return [\Illuminate\Bus\Batch]
+     */
+    public function get($before, $limit);
+
+    /**
      * Store a new pending batch.
      *
      * @param  \Illuminate\Bus\PendingBatch  $batch
