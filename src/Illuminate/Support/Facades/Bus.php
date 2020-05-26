@@ -16,6 +16,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static void assertDispatched(string $command, callable|int $callback = null)
  * @method static void assertDispatchedTimes(string $command, int $times = 1)
  * @method static void assertNotDispatched(string $command, callable|int $callback = null)
+ * @method static \Illuminate\Bus\PendingBatch batch(array $jobs)
  *
  * @see \Illuminate\Contracts\Bus\Dispatcher
  */
