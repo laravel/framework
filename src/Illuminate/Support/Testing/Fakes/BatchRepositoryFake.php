@@ -13,14 +13,15 @@ use Illuminate\Support\Str;
 class BatchRepositoryFake implements BatchRepository
 {
     /**
-     * Get available batches.
+     * Retrieve a list of batches.
      *
      * @param  int  $limit
      * @param  mixed  $before
-     * @return [\Illuminate\Bus\Batch]
+     * @return \Illuminate\Bus\Batch[]
      */
     public function get($limit, $before)
     {
+        return [];
     }
 
     /**

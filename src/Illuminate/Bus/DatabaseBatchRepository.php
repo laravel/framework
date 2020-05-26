@@ -46,11 +46,11 @@ class DatabaseBatchRepository implements BatchRepository
     }
 
     /**
-     * Get available batches.
+     * Retrieve a list of batches.
      *
      * @param  int  $limit
      * @param  mixed  $before
-     * @return [\Illuminate\Bus\Batch]
+     * @return \Illuminate\Bus\Batch[]
      */
     public function get($limit = 50, $before = null)
     {
@@ -243,10 +243,10 @@ class DatabaseBatchRepository implements BatchRepository
     }
 
     /**
-     * Convert the given raw batch to an object.
+     * Convert the given raw batch to a Batch object.
      *
-     * @param object $batch
-     * @@return \Illuminate\Bus\Batch
+     * @param  object  $batch
+     * @return \Illuminate\Bus\Batch
      */
     protected function toBatch($batch)
     {
