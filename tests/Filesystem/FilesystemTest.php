@@ -43,8 +43,22 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
     }
 
-    public function testReplaceStoresFiles()
+    public function testReplaceCreatesFile()
     {
+        $tempFile = "{$this->tempDir}/file.txt";
+
+        $filesystem = new Filesystem;
+
+        $filesystem->replace($tempFile, 'Hello World');
+        $this->assertStringEqualsFile($tempFile, 'Hello World');
+    }
+
+    public function testReplaceWhenUnixSymlinkExists()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Skipping since operating system is Windows');
+        }
+
         $tempFile = "{$this->tempDir}/file.txt";
         $symlinkDir = "{$this->tempDir}/symlink_dir";
         $symlink = "{$symlinkDir}/symlink.txt";
