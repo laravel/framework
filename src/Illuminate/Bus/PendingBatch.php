@@ -26,6 +26,13 @@ class PendingBatch
     public $options = [];
 
     /**
+     * The batch name.
+     *
+     * @var string
+     */
+    public $name = '';
+
+    /**
      * Create a new pending batch instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -128,6 +135,19 @@ class PendingBatch
     public function allowsFailures()
     {
         return Arr::get($this->options, 'allowFailures', false) === true;
+    }
+
+    /**
+     * Add a name for the batch.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function name($name)
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**
