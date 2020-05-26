@@ -16,6 +16,14 @@ interface BatchRepository
     public function get($limit, $before);
 
     /**
+     * Retrieve information about an existing batch.
+     *
+     * @param  string  $batchId
+     * @return \Illuminate\Bus\Batch|null
+     */
+    public function find(string $batchId);
+
+    /**
      * Store a new pending batch.
      *
      * @param  \Illuminate\Bus\PendingBatch  $batch
