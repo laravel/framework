@@ -157,6 +157,17 @@ trait SoftDeletes
     }
 
     /**
+     * Register a forceDeleted model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function forceDeleted($callback)
+    {
+        static::registerModelEvent('forceDeleted', $callback);
+    }
+
+    /**
      * Determine if the model is currently force deleting.
      *
      * @return bool
