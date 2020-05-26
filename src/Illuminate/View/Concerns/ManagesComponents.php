@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Concerns;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\View;
@@ -40,7 +41,7 @@ trait ManagesComponents
     /**
      * Start a component rendering process.
      *
-     * @param  \Illuminate\View\View|string  $view
+     * @param  \Illuminate\View\View|\Closure|string  $view
      * @param  array  $data
      * @return void
      */
@@ -79,6 +80,10 @@ trait ManagesComponents
     public function renderComponent()
     {
         $view = array_pop($this->componentStack);
+
+        if ($view instanceof Closure) {
+            $view = $view();
+        }
 
         if ($view instanceof View) {
             return $view->with($this->componentData())->render();
