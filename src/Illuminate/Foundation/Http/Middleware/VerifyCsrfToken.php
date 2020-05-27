@@ -37,6 +37,13 @@ class VerifyCsrfToken
     protected $except = [];
 
     /**
+     * The error message used for exception.
+     *
+     * @var string
+     */
+    protected $message = 'CSRF token mismatch.';
+    
+    /**
      * Indicates whether the XSRF-TOKEN cookie should be set on the response.
      *
      * @var bool
@@ -80,7 +87,7 @@ class VerifyCsrfToken
             });
         }
 
-        throw new TokenMismatchException('CSRF token mismatch.');
+        throw new TokenMismatchException($this->message);
     }
 
     /**
