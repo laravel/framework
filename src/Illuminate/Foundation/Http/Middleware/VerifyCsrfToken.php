@@ -42,7 +42,7 @@ class VerifyCsrfToken
      * @var string
      */
     protected $message = 'CSRF token mismatch.';
-    
+
     /**
      * Indicates whether the XSRF-TOKEN cookie should be set on the response.
      *
