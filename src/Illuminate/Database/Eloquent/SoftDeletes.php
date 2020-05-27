@@ -135,7 +135,7 @@ trait SoftDeletes
     }
 
     /**
-     * Register a restoring model event with the dispatcher.
+     * Register a "restoring" model event callback with the dispatcher.
      *
      * @param  \Closure|string  $callback
      * @return void
@@ -146,7 +146,7 @@ trait SoftDeletes
     }
 
     /**
-     * Register a restored model event with the dispatcher.
+     * Register a "restored" model event callback with the dispatcher.
      *
      * @param  \Closure|string  $callback
      * @return void
@@ -157,7 +157,7 @@ trait SoftDeletes
     }
 
     /**
-     * Register a forceDeleted model event with the dispatcher.
+     * Register a "forceDeleted" model event callback with the dispatcher.
      *
      * @param  \Closure|string  $callback
      * @return void
