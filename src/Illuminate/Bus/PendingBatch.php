@@ -12,6 +12,13 @@ use Throwable;
 class PendingBatch
 {
     /**
+     * The batch name.
+     *
+     * @var string
+     */
+    public $name = '';
+
+    /**
      * The jobs that belong to the batch.
      *
      * @var \Illuminate\Collections\Collection
@@ -24,13 +31,6 @@ class PendingBatch
      * @var array
      */
     public $options = [];
-
-    /**
-     * The batch name.
-     *
-     * @var string
-     */
-    public $name = '';
 
     /**
      * Create a new pending batch instance.
@@ -138,12 +138,12 @@ class PendingBatch
     }
 
     /**
-     * Add a name for the batch.
+     * Set the name for the batch.
      *
      * @param  string  $name
      * @return $this
      */
-    public function name($name)
+    public function name(string $name)
     {
         $this->name = $name;
 

@@ -380,9 +380,9 @@ class Batch implements Arrayable, JsonSerializable
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'totalJobs' => $this->totalJobs,
             'pendingJobs' => $this->pendingJobs,
-            'name' => $this->name,
             'processedJobs' => $this->processedJobs(),
             'progress' => $this->progress(),
             'failedJobs' => $this->failedJobs,
