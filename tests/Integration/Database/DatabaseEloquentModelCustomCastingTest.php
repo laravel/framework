@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @group integration
@@ -86,6 +87,10 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model->syncOriginal();
         $model->options = ['foo' => 'bar'];
         $this->assertTrue($model->isDirty('options'));
+
+        $model = new TestEloquentModelWithCustomCast;
+        $model->birthday_at = now();
+        $this->assertTrue(is_string($model->toArray()['birthday_at']));
     }
 
     public function testOneWayCasting()
@@ -174,6 +179,7 @@ class TestEloquentModelWithCustomCast extends Model
         'value_object_with_caster' => ValueObject::class,
         'value_object_caster_with_argument' => ValueObject::class.':argument',
         'value_object_caster_with_caster_instance' => ValueObjectWithCasterInstance::class,
+        'birthday_at' => DateObjectCaster::class,
     ];
 }
 
@@ -285,5 +291,25 @@ class Address
     {
         $this->lineOne = $lineOne;
         $this->lineTwo = $lineTwo;
+    }
+}
+
+class DateObjectCaster implements CastsAttributes
+{
+    private $argument;
+
+    public function __construct($argument = null)
+    {
+        $this->argument = $argument;
+    }
+
+    public function get($model, $key, $value, $attributes)
+    {
+        return Carbon::parse($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return $value->format('Y-m-d');
     }
 }
