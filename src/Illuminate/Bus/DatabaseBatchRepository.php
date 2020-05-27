@@ -96,6 +96,7 @@ class DatabaseBatchRepository implements BatchRepository
 
         $this->connection->table($this->table)->insert([
             'id' => $id,
+            'name' => $batch->name,
             'total_jobs' => 0,
             'pending_jobs' => 0,
             'failed_jobs' => 0,
@@ -253,6 +254,7 @@ class DatabaseBatchRepository implements BatchRepository
         return $this->factory->make(
             $this,
             $batch->id,
+            $batch->name,
             (int) $batch->total_jobs,
             (int) $batch->pending_jobs,
             (int) $batch->failed_jobs,

@@ -33,6 +33,13 @@ class Batch implements Arrayable, JsonSerializable
     public $id;
 
     /**
+     * The batch name.
+     *
+     * @var string
+     */
+    public $name;
+
+    /**
      * The total number of jobs that belong to the batch.
      *
      * @var int
@@ -94,6 +101,7 @@ class Batch implements Arrayable, JsonSerializable
      * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @param  \Illuminate\Bus\BatchRepository  $repository
      * @param  string  $id
+     * @param  string  $name
      * @param  int  $totalJobs
      * @param  int  $pendingJobs
      * @param  int  $failedJobs
@@ -107,6 +115,7 @@ class Batch implements Arrayable, JsonSerializable
     public function __construct(QueueFactory $queue,
                                 BatchRepository $repository,
                                 string $id,
+                                string $name,
                                 int $totalJobs,
                                 int $pendingJobs,
                                 int $failedJobs,
@@ -119,6 +128,7 @@ class Batch implements Arrayable, JsonSerializable
         $this->queue = $queue;
         $this->repository = $repository;
         $this->id = $id;
+        $this->name = $name;
         $this->totalJobs = $totalJobs;
         $this->pendingJobs = $pendingJobs;
         $this->failedJobs = $failedJobs;
@@ -370,6 +380,7 @@ class Batch implements Arrayable, JsonSerializable
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'totalJobs' => $this->totalJobs,
             'pendingJobs' => $this->pendingJobs,
             'processedJobs' => $this->processedJobs(),

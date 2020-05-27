@@ -15,6 +15,7 @@ class Create{{tableClassName}}Table extends Migration
     {
         Schema::create('{{table}}', function (Blueprint $table) {
             $table->string('id')->primary();
+            $table->string('name');
             $table->integer('total_jobs');
             $table->integer('pending_jobs');
             $table->integer('failed_jobs');
