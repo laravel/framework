@@ -19,11 +19,8 @@ class ViewServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerFactory();
-
         $this->registerViewFinder();
-
         $this->registerBladeCompiler();
-
         $this->registerEngineResolver();
     }
 
