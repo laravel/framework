@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 
 class StubPublishCommand extends Command
 {
@@ -12,7 +13,7 @@ class StubPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'stub:publish {--force : Overwrite any existing files}';
+    protected $signature = 'stub:publish {--force : Overwrite any existing files} { --s|select : Selects the stub you want to publish}';
 
     /**
      * The console command description.
@@ -59,6 +60,31 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.stub') => $stubsPath.'/controller.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => $stubsPath.'/middleware.stub',
         ];
+
+        if ($this->option('select')) {
+            $stubNames = collect(array_values($files))
+                ->map(function ($stubName) {
+                    return Str::of($stubName)
+                        ->after('stubs/')
+                        ->replace('.stub', '')
+                        ->replace('.', ' ')
+                        ->ucfirst();
+                })->toArray();
+
+            $choices = $this->choice('Select the stubs you want to publish', $stubNames, null, null, true);
+
+            $formattedChoices = collect($choices)
+                ->map(function ($stubName) {
+                    return (string) Str::of($stubName)
+                        ->replace(' ', '.')
+                        ->append('.stub')
+                        ->lower();
+                })->toArray();
+
+            $files = collect($files)->filter(function ($file) use ($formattedChoices) {
+                return Str::of($file)->endsWith($formattedChoices);
+            })->toArray();
+        }
 
         foreach ($files as $from => $to) {
             if (! file_exists($to) || $this->option('force')) {
