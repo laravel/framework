@@ -566,7 +566,7 @@ class Collection extends BaseCollection implements QueueableCollection
         if (count($relations) === 0 || $relations === [[]]) {
             return [];
         } elseif (count($relations) === 1) {
-            return $relations[0];
+            return array_values($relations)[0];
         } else {
             return array_intersect(...$relations);
         }
