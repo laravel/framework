@@ -319,7 +319,7 @@ class Filesystem
      * @param  string  $path
      * @return string|null
      */
-    public function guessedExtension($path)
+    public function guessExtension($path)
     {
         return (new MimeTypes)->getExtensions($this->mimeType($path))[0] ?? null;
     }
