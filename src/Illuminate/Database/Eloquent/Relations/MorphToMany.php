@@ -123,7 +123,7 @@ class MorphToMany extends BelongsToMany
     protected function getCurrentlyAttachedPivots()
     {
         return parent::getCurrentlyAttachedPivots()->map(function ($record) {
-              return $record->setMorphType($this->morphType)
+            return $record->setMorphType($this->morphType)
                             ->setMorphClass($this->morphClass);
         });
     }
