@@ -245,6 +245,16 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Get the underlying PSR compliant request instance.
+     *
+     * @return \Psr\Http\Message\RequestInterface
+     */
+    public function toPsrRequest()
+    {
+        return $this->request;
+    }
+
+    /**
      * Determine if the given offset exists.
      *
      * @param  string  $offset
