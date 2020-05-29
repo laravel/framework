@@ -292,4 +292,14 @@ class Request implements ArrayAccess
     {
         throw new LogicException('Request data may not be mutated using array access.');
     }
+
+    /**
+     * Get the underlying PSR request for the request.
+     *
+     * @return \Psr\Http\Message\RequestInterface
+     */
+    public function toPsrRequest()
+    {
+        return $this->request;
+    }
 }
