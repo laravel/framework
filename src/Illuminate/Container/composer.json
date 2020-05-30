@@ -18,6 +18,9 @@
         "illuminate/contracts": "^7.0",
         "psr/container": "^1.0"
     },
+    "provide": {
+        "psr/container-implementation": "1.0"
+    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Container\\": ""
