@@ -61,7 +61,10 @@ trait HasRelationships
      */
     public static function resolveRelationUsing($name, Closure $callback)
     {
-        static::$relationResolvers[static::class][$name] = $callback;
+        static::$relationResolvers = array_replace_recursive(
+            static::$relationResolvers,
+            [static::class => [$name => $callback]]
+        );
     }
 
     /**
