@@ -1725,8 +1725,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return $this->$method(...$parameters);
         }
 
-        if (isset(static::$relationResolvers[$method])) {
-            return static::$relationResolvers[$method]($this);
+        if ($resolver = static::$relationResolvers[static::class][$method] ?? null) {
+            return $resolver($this);
         }
 
         return $this->forwardCallTo($this->newQuery(), $method, $parameters);

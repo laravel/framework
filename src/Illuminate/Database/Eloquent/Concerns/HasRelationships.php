@@ -61,7 +61,7 @@ trait HasRelationships
      */
     public static function resolveRelationUsing($name, Closure $callback)
     {
-        static::$relationResolvers[$name] = $callback;
+        static::$relationResolvers[static::class][$name] = $callback;
     }
 
     /**
