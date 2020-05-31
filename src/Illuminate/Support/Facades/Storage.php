@@ -10,6 +10,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static string get(string $path)
  * @method static resource|null readStream(string $path)
  * @method static bool put(string $path, string|resource $contents, mixed $options = [])
+ * @method static string|false putFile(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, mixed $options = [])
  * @method static bool writeStream(string $path, resource $resource, array $options = [])
  * @method static string getVisibility(string $path)
  * @method static bool setVisibility(string $path, string $visibility)
