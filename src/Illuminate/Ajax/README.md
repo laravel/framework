@@ -33,7 +33,10 @@ Ajax::make('btn_login' , function($res){
     $password = $res->data('password');
     // do login process...
     if($login_success){
-        return $res->alert('hello ' . $username);
+        // after click the Login btn, this function will be run and if login_success
+        // an alert will be show to the user and next user will be
+        // redirect t the /dashboard url
+        return $res->alert('hello ' . $username)->redirect('/dahsboard');
     }
     return $res->alert('login faild');
 });
@@ -41,3 +44,13 @@ Ajax::make('btn_login' , function($res){
 Ajax::set_handler_route('/ajax-handler');
 
 ```
+
+
+### another `$res` methods:
+
+| Method          |  Description                  |
+|-----------------|:-----------------------------:|
+| alert($message) |  shows javascript alert       |
+| redirect($url)  |    redirect user to the url   |
+
+
