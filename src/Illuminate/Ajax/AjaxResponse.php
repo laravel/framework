@@ -57,5 +57,18 @@ alert('{$message}')";
 
         return $this;
     }
+
+
+    /*
+     * redirect user
+     * 
+     * @param  string  $url
+     */
+    public function redirect($url){
+        $this->response .= "
+location.href = '{$url}'";
+
+        return $this;
+    }
 }
 
