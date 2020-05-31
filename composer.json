@@ -90,6 +90,9 @@
         "predis/predis": "^1.1.1",
         "symfony/cache": "^5.1"
     },
+    "provide": {
+        "psr/container-implementation": "1.0"
+    },
     "conflict": {
         "tightenco/collect": "<5.5.33"
     },
