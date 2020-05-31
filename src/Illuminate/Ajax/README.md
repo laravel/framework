@@ -35,7 +35,7 @@ Ajax::make('btn_login' , function($res){
     if($login_success){
         // after click the Login btn, this function will be run and if login_success
         // an alert will be show to the user and next user will be
-        // redirect t the /dashboard url
+        // redirect to the /dashboard url
         return $res->alert('hello ' . $username)->redirect('/dahsboard');
     }
     return $res->alert('login faild');
