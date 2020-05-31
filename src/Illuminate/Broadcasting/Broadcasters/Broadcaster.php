@@ -207,7 +207,7 @@ abstract class Broadcaster implements BroadcasterContract
 
             $className = new Reflector::getParameterClassName($parameter);
 
-            if (! class_exists($className) || ! $model = (new $className)->resolveRouteBinding($value)) {
+            if (is_null($model = (new $className)->resolveRouteBinding($value))) {
                 throw new AccessDeniedHttpException;
             }
 
