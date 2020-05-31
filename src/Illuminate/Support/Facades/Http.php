@@ -32,6 +32,8 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response post(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response put(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
+ * @method static \GuzzleHttp\Promise\PromiseInterface response($body = null, $status = 200, $headers = [])
+ * @method static \Illuminate\Http\Client\Factory fake($callback = null)
  * @method static \Illuminate\Http\Client\ResponseSequence fakeSequence(string $urlPattern = '*')
  *
  * @see \Illuminate\Http\Client\Factory
