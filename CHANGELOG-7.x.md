@@ -2,8 +2,24 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v7.13.0...7.x)
 
+### Added
+- Views: make attributes available within render method ([#32978](https://github.com/laravel/framework/pull/32978))
+- Added `forceDeleted` method to `SoftDeletes` ([#32982](https://github.com/laravel/framework/pull/32982))
+- Added `Illuminate\Filesystem\Filesystem::guessExtension()` method ([#33001](https://github.com/laravel/framework/pull/33001), [d26be90](https://github.com/laravel/framework/commit/d26be90df373dfd911029679b1765a46ae091d34))
+- Added `Illuminate\Http\Client\Request::toPsrRequest()` ([#33016](https://github.com/laravel/framework/pull/33016))
+- Added `Illuminate\Support\MessageBag::addIf()` method ([50efe09](https://github.com/laravel/framework/commit/50efe099b59e75563298deb992017b4cabfb021d))
+- Provide `psr/container-implementation` ([#33020](https://github.com/laravel/framework/pull/33020))
+
 ### Fixed
 - Restore `app()->getCached*Path()` absolute '/' behavior in Windows ([#32969](https://github.com/laravel/framework/pull/32969))
+- Fixed [Issue with using "sticky" option with Postgresql driver and read/write connections.](https://github.com/laravel/framework/issues/32966) ([#32973](https://github.com/laravel/framework/pull/32973))
+- Fixed custom class cast with dates ([2d52abc](https://github.com/laravel/framework/commit/2d52abc33865cc29b8e92a41ed7ad9a2b5383a11))
+- Fixed `Illuminate\Database\Eloquent\Collection::getQueueableRelations()` ([00e9ed7](https://github.com/laravel/framework/commit/00e9ed76483ea6ad1264676e7b1095b23e16a433))
+- Fixed bug with update existing pivot and polymorphic many to many ([684208b](https://github.com/laravel/framework/commit/684208b10460b49fa34354cc42f33b9b7135814f))
+- Fixed localization in tailwind view ([f2eb9ab](https://github.com/laravel/framework/commit/f2eb9ab82f7f5b126faf05241afe75e341fa22b1))
+
+### Changed
+- Use new line for `route:list` middleware ([#32993](https://github.com/laravel/framework/pull/32993))
 
 
 ## [v7.13.0 (2020-05-26)](https://github.com/laravel/framework/compare/v7.12.0...v7.13.0)
