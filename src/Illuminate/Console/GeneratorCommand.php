@@ -23,6 +23,24 @@ abstract class GeneratorCommand extends Command
     protected $type;
 
     /**
+     * Reserved names that cannot be used for generation.
+     *
+     * @var array
+     */
+    protected $reservedNames = [
+        '__halt_compiler', 'break', 'clone', 'die', 'empty', 'endswitch', 'final',
+        'function', 'include', 'isset', 'print', 'require_once', 'trait', 'while',
+        'abstract', 'callable', 'const', 'do', 'enddeclare', 'endwhile', 'finally',
+        'global', 'include_once', 'list', 'private', 'return', 'try', 'xor', 'and',
+        'case', 'continue', 'echo', 'endfor', 'eval', 'fn', 'goto', 'instanceof',
+        'namespace', 'protected', 'static', 'unset', 'yield', 'array', 'catch',
+        'declare', 'else', 'endforeach', 'exit', 'for', 'if', 'insteadof', 'new',
+        'public', 'switch', 'use', 'as', 'class', 'default', 'elseif', 'endif',
+        'extends', 'foreach', 'implements', 'interface', 'or', 'require', 'throw',
+        'var'
+    ];
+
+    /**
      * Create a new controller creator command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -51,11 +69,20 @@ abstract class GeneratorCommand extends Command
      */
     public function handle()
     {
+        // First we will check whether the name can be found in the reserved names.
+        // We have so called "reserved names" to ensure that no files are generated
+        // using PHP keywords for example, because that would cause errors.
+        if($this->isReservedName($this->getNameInput())) {
+            $this->error('The name "'.$this->getNameInput().'" is reserved. Please pick something else.');
+
+            return false;
+        }
+
         $name = $this->qualifyClass($this->getNameInput());
 
         $path = $this->getPath($name);
 
-        // First we will check to see if the class already exists. If it does, we don't want
+        // We will check to see if the class already exists. If it does, we don't want
         // to create the class and overwrite the user's code. So, we will bail out so the
         // code is untouched. Otherwise, we will continue generating this class' files.
         if ((! $this->hasOption('force') ||
@@ -278,5 +305,18 @@ abstract class GeneratorCommand extends Command
         return [
             ['name', InputArgument::REQUIRED, 'The name of the class'],
         ];
+    }
+
+    /**
+     * Checks whether the given name is reserved.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function isReservedName($name)
+    {
+        $name = strtolower($name);
+
+        return in_array($name, $this->reservedNames);
     }
 }
