@@ -48,9 +48,11 @@ Ajax::set_handler_route('/ajax-handler');
 
 ### another `$res` methods:
 
-| Method          |  Description                  |
-|-----------------|:-----------------------------:|
-| alert($message) |  shows javascript alert       |
-| redirect($url)  |    redirect user to the url   |
+| Method            |  Description                  |
+|-------------------|:-----------------------------:|
+| `alert($message)` |  shows javascript alert       |
+| `redirect($url)`  |    redirect user to the url   |
 
+
+new methods will be add...
 
