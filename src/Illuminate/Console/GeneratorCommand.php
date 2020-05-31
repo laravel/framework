@@ -37,7 +37,7 @@ abstract class GeneratorCommand extends Command
         'declare', 'else', 'endforeach', 'exit', 'for', 'if', 'insteadof', 'new',
         'public', 'switch', 'use', 'as', 'class', 'default', 'elseif', 'endif',
         'extends', 'foreach', 'implements', 'interface', 'or', 'require', 'throw',
-        'var'
+        'var',
     ];
 
     /**
@@ -72,7 +72,7 @@ abstract class GeneratorCommand extends Command
         // First we will check whether the name can be found in the reserved names.
         // We have so called "reserved names" to ensure that no files are generated
         // using PHP keywords for example, because that would cause errors.
-        if($this->isReservedName($this->getNameInput())) {
+        if ($this->isReservedName($this->getNameInput())) {
             $this->error('The name "'.$this->getNameInput().'" is reserved. Please pick something else.');
 
             return false;
