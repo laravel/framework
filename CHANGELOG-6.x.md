@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.18.16...6.x)
 
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Collection::getQueueableRelations()` ([00e9ed7](https://github.com/laravel/framework/commit/00e9ed76483ea6ad1264676e7b1095b23e16a433))
+- Fixed bug with update existing pivot and polymorphic many to many ([684208b](https://github.com/laravel/framework/commit/684208b10460b49fa34354cc42f33b9b7135814f))
+
 
 ## [v6.18.15 (2020-05-19)](https://github.com/laravel/framework/compare/v6.18.14...v6.18.15)
 
