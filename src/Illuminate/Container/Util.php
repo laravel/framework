@@ -48,6 +48,6 @@ class Util
     {
         $type = $parameter->getType();
 
-        return ($type && !$type->isBuiltin()) ? $type->getName() : null;
+        return ($type && ! $type->isBuiltin()) ? $type->getName() : null;
     }
 }
