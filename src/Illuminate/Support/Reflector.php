@@ -12,11 +12,11 @@ class Reflector
      * @param  \ReflectionParameter  $parameter
      * @return string|null
      */
-    public function getParameterClassName($parameter)
+    public static function getParameterClassName($parameter)
     {
         $type = $parameter->getType();
 
-        return ($type && !$type->isBuiltin()) ? $type->getName() : null;
+        return ($type && ! $type->isBuiltin()) ? $type->getName() : null;
     }
 
     /**
@@ -26,12 +26,12 @@ class Reflector
      * @param  string  $className
      * @return bool
      */
-    public function isParameterSubclassOf($parameter, $className)
+    public static function isParameterSubclassOf($parameter, $className)
     {
         $paramClassName = static::getParameterClassName($parameter);
 
         return ($paramClassName && class_exists($paramClassName))
-            ? new ReflectionClass($paramClassName)->isSubclassOf($className) 
+            ? (new ReflectionClass($paramClassName))->isSubclassOf($className)
             : false;
     }
 }

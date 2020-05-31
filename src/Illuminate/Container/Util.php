@@ -44,10 +44,10 @@ class Util
      * @param  \ReflectionParameter  $parameter
      * @return string|null
      */
-    public function getParameterClassName($parameter)
+    public static function getParameterClassName($parameter)
     {
         $type = $parameter->getType();
 
-        return ($type && !$type->isBuiltin()) ? $type->getName() : null;
+        return ($type && ! $type->isBuiltin()) ? $type->getName() : null;
     }
 }
