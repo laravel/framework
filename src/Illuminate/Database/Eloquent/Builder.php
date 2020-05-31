@@ -5,12 +5,12 @@ namespace Illuminate\Database\Eloquent;
 use BadMethodCallException;
 use Closure;
 use Exception;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
@@ -1075,12 +1075,17 @@ class Builder
     /**
      * Set the relationships that should be eager loaded.
      *
-     * @param  mixed  $relations
+     * @param  string|array  $relations
+     * @param  string|\Closure|null  $callback
      * @return $this
      */
-    public function with($relations)
+    public function with($relations, $callback = null)
     {
-        $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+        if ($callback instanceof Closure) {
+            $eagerLoad = $this->parseWithRelations([$relations => $callback]);
+        } else {
+            $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+        }
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
 

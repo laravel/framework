@@ -3,13 +3,13 @@
 namespace Illuminate\Translation;
 
 use Countable;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
-use Illuminate\Support\Arr;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract

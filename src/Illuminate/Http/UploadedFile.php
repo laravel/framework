@@ -2,12 +2,12 @@
 
 namespace Illuminate\Http;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Testing\FileFactory;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class UploadedFile extends SymfonyUploadedFile

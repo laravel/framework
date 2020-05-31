@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class PostgresGrammar extends Grammar
@@ -17,7 +17,7 @@ class PostgresGrammar extends Grammar
         '=', '<', '>', '<=', '>=', '<>', '!=',
         'like', 'not like', 'between', 'ilike', 'not ilike',
         '~', '&', '|', '#', '<<', '>>', '<<=', '>>=',
-        '&&', '@>', '<@', '?', '?|', '?&', '||', '-', '-', '#-',
+        '&&', '@>', '<@', '?', '?|', '?&', '||', '-', '@?', '@@', '#-',
         'is distinct from', 'is not distinct from',
     ];
 

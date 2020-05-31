@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Countable;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;

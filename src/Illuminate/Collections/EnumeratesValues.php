@@ -1,17 +1,12 @@
 <?php
 
-namespace Illuminate\Support\Traits;
+namespace Illuminate\Collections;
 
 use CachingIterator;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Enumerable;
-use Illuminate\Support\HigherOrderCollectionProxy;
-use Illuminate\Support\HigherOrderWhenProxy;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
@@ -745,7 +740,7 @@ trait EnumeratesValues
     /**
      * Collect the values into a collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function collect()
     {

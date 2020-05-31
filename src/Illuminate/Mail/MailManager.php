@@ -5,13 +5,13 @@ namespace Illuminate\Mail;
 use Aws\Ses\SesClient;
 use Closure;
 use GuzzleHttp\Client as HttpClient;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\SesTransport;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Postmark\ThrowExceptionOnFailurePlugin;
@@ -438,6 +438,19 @@ class MailManager implements FactoryContract
         }
 
         $this->app['config']['mail.default'] = $name;
+    }
+
+    /**
+     * Disconnect the given mailer and remove from local cache.
+     *
+     * @param  string|null  $name
+     * @return void
+     */
+    public function purge($name = null)
+    {
+        $name = $name ?: $this->getDefaultDriver();
+
+        unset($this->mailers[$name]);
     }
 
     /**

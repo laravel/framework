@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Collections\Arr;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class SQLiteGrammar extends Grammar

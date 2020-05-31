@@ -59,21 +59,36 @@ class QueueWorkerTest extends TestCase
             $secondJob = new WorkerFakeJob,
         ]]);
 
-        try {
-            $worker->daemon('default', 'queue', $workerOptions);
+        $status = $worker->daemon('default', 'queue', $workerOptions);
 
-            $this->fail('Expected LoopBreakerException to be thrown.');
-        } catch (LoopBreakerException $e) {
-            $this->assertTrue($firstJob->fired);
+        $this->assertTrue($secondJob->fired);
 
-            $this->assertTrue($secondJob->fired);
+        $this->assertSame(0, $status);
 
-            $this->assertSame(0, $worker->stoppedWithStatus);
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->twice();
 
-            $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->twice();
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->twice();
+    }
 
-            $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->twice();
-        }
+    public function testWorkerStopsWhenMemoryExceeded()
+    {
+        $workerOptions = new WorkerOptions;
+
+        $worker = $this->getWorker('default', ['queue' => [
+            $firstJob = new WorkerFakeJob,
+            $secondJob = new WorkerFakeJob,
+        ]]);
+        $worker->stopOnMemoryExceeded = true;
+
+        $status = $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertTrue($firstJob->fired);
+        $this->assertFalse($secondJob->fired);
+        $this->assertSame(12, $status);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->once();
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->once();
     }
 
     public function testJobCanBeFiredBasedOnPriority()
@@ -127,7 +142,7 @@ class QueueWorkerTest extends TestCase
         });
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
-        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 10]));
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
 
         $this->assertEquals(10, $job->releaseAfter);
         $this->assertFalse($job->deleted);
@@ -170,7 +185,7 @@ class QueueWorkerTest extends TestCase
             throw $e;
         });
 
-        $job->timeoutAt = now()->addSeconds(1)->getTimestamp();
+        $job->retryUntil = now()->addSeconds(1)->getTimestamp();
 
         $job->attempts = 0;
 
@@ -214,7 +229,7 @@ class QueueWorkerTest extends TestCase
             $job->attempts++;
         });
 
-        $job->timeoutAt = Carbon::now()->addSeconds(2)->getTimestamp();
+        $job->retryUntil = Carbon::now()->addSeconds(2)->getTimestamp();
 
         $job->attempts = 1;
 
@@ -256,10 +271,10 @@ class QueueWorkerTest extends TestCase
         });
 
         $job->attempts = 1;
-        $job->delaySeconds = 10;
+        $job->backoff = 10;
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
-        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 3, 'maxTries' => 0]));
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 3, 'maxTries' => 0]));
 
         $this->assertEquals(10, $job->releaseAfter);
     }
@@ -313,6 +328,37 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($job->isDeleted());
     }
 
+    public function testWorkerPicksJobUsingCustomCallbacks()
+    {
+        $worker = $this->getWorker('default', [
+            'default' => [$defaultJob = new WorkerFakeJob], 'custom' => [$customJob = new WorkerFakeJob],
+        ]);
+
+        $worker->runNextJob('default', 'default', new WorkerOptions);
+        $worker->runNextJob('default', 'default', new WorkerOptions);
+
+        $this->assertTrue($defaultJob->fired);
+        $this->assertFalse($customJob->fired);
+
+        $worker2 = $this->getWorker('default', [
+            'default' => [$defaultJob = new WorkerFakeJob], 'custom' => [$customJob = new WorkerFakeJob],
+        ]);
+
+        $worker2->setName('myworker');
+
+        Worker::popUsing('myworker', function ($pop) {
+            return $pop('custom');
+        });
+
+        $worker2->runNextJob('default', 'default', new WorkerOptions);
+        $worker2->runNextJob('default', 'default', new WorkerOptions);
+
+        $this->assertFalse($defaultJob->fired);
+        $this->assertTrue($customJob->fired);
+
+        Worker::popUsing('myworker', null);
+    }
+
     /**
      * Helpers...
      */
@@ -362,9 +408,7 @@ class InsomniacWorker extends Worker
 
     public function stop($status = 0)
     {
-        $this->stoppedWithStatus = $status;
-
-        throw new LoopBreakerException;
+        return $status;
     }
 
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
@@ -434,8 +478,8 @@ class WorkerFakeJob implements QueueJobContract
     public $maxTries;
     public $maxExceptions;
     public $uuid;
-    public $delaySeconds;
-    public $timeoutAt;
+    public $backoff;
+    public $retryUntil;
     public $attempts = 0;
     public $failedWith;
     public $failed = false;
@@ -481,14 +525,14 @@ class WorkerFakeJob implements QueueJobContract
         return $this->uuid;
     }
 
-    public function delaySeconds()
+    public function backoff()
     {
-        return $this->delaySeconds;
+        return $this->backoff;
     }
 
-    public function timeoutAt()
+    public function retryUntil()
     {
-        return $this->timeoutAt;
+        return $this->retryUntil;
     }
 
     public function delete()

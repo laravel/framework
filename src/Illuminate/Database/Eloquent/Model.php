@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Exception;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -14,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -625,29 +625,23 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return $query->{$method}($column, $amount, $extra);
         }
 
-        $this->incrementOrDecrementAttributeValue($column, $amount, $extra, $method);
-
-        return $query->where(
-            $this->getKeyName(), $this->getKey()
-        )->{$method}($column, $amount, $extra);
-    }
-
-    /**
-     * Increment the underlying attribute value and sync with original.
-     *
-     * @param  string  $column
-     * @param  float|int  $amount
-     * @param  array  $extra
-     * @param  string  $method
-     * @return void
-     */
-    protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method)
-    {
         $this->{$column} = $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
 
         $this->forceFill($extra);
 
-        $this->syncOriginalAttribute($column);
+        if ($this->fireModelEvent('updating') === false) {
+            return false;
+        }
+
+        return tap($query->where(
+            $this->getKeyName(), $this->getKey()
+        )->{$method}($column, $amount, $extra), function () use ($column) {
+            $this->syncChanges();
+
+            $this->fireModelEvent('updated', false);
+
+            $this->syncOriginalAttribute($column);
+        });
     }
 
     /**

@@ -14,15 +14,17 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": "^7.3",
         "ext-json": "*",
         "egulias/email-validator": "^2.1.10",
-        "illuminate/container": "^7.0",
-        "illuminate/contracts": "^7.0",
-        "illuminate/support": "^7.0",
-        "illuminate/translation": "^7.0",
-        "symfony/http-foundation": "^5.0",
-        "symfony/mime": "^5.0"
+        "illuminate/collections": "^8.0",
+        "illuminate/container": "^8.0",
+        "illuminate/contracts": "^8.0",
+        "illuminate/macroable": "^8.0",
+        "illuminate/support": "^8.0",
+        "illuminate/translation": "^8.0",
+        "symfony/http-foundation": "^5.1",
+        "symfony/mime": "^5.1"
     },
     "autoload": {
         "psr-4": {
@@ -31,11 +33,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "8.x-dev"
         }
     },
     "suggest": {
-        "illuminate/database": "Required to use the database presence verifier (^7.0)."
+        "illuminate/database": "Required to use the database presence verifier (^8.0)."
     },
     "config": {
         "sort-packages": true

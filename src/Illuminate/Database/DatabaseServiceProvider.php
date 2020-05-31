@@ -6,7 +6,6 @@ use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
 use Illuminate\Contracts\Queue\EntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
-use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Support\ServiceProvider;
@@ -91,12 +90,6 @@ class DatabaseServiceProvider extends ServiceProvider
             static::$fakers[$locale]->unique(true);
 
             return static::$fakers[$locale];
-        });
-
-        $this->app->singleton(EloquentFactory::class, function ($app) {
-            return EloquentFactory::construct(
-                $app->make(FakerGenerator::class), $this->app->databasePath('factories')
-            );
         });
     }
 

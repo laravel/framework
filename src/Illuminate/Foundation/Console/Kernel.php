@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Closure;
+use Illuminate\Collections\Arr;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
@@ -10,7 +11,6 @@ use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use ReflectionClass;

@@ -4,10 +4,10 @@ namespace Illuminate\Cache;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Closure;
+use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 /**
@@ -355,6 +355,19 @@ class CacheManager implements FactoryContract
         }
 
         return $this;
+    }
+
+    /**
+     * Disconnect the given driver and remove from local cache.
+     *
+     * @param  string|null  $name
+     * @return void
+     */
+    public function purge($name = null)
+    {
+        $name = $name ?? $this->getDefaultDriver();
+
+        unset($this->stores[$name]);
     }
 
     /**

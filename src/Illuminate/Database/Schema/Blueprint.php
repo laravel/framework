@@ -8,8 +8,8 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Fluent;
-use Illuminate\Support\Traits\Macroable;
 
 class Blueprint
 {

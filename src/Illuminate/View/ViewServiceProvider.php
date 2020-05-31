@@ -19,11 +19,8 @@ class ViewServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerFactory();
-
         $this->registerViewFinder();
-
         $this->registerBladeCompiler();
-
         $this->registerEngineResolver();
     }
 
@@ -88,7 +85,9 @@ class ViewServiceProvider extends ServiceProvider
     public function registerBladeCompiler()
     {
         $this->app->singleton('blade.compiler', function ($app) {
-            return new BladeCompiler($app['files'], $app['config']['view.compiled']);
+            return tap(new BladeCompiler($app['files'], $app['config']['view.compiled']), function ($blade) {
+                $blade->component('dynamic-component', DynamicComponent::class);
+            });
         });
     }
 

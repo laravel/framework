@@ -14,15 +14,16 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "illuminate/broadcasting": "^7.0",
-        "illuminate/bus": "^7.0",
-        "illuminate/container": "^7.0",
-        "illuminate/contracts": "^7.0",
-        "illuminate/filesystem": "^7.0",
-        "illuminate/mail": "^7.0",
-        "illuminate/queue": "^7.0",
-        "illuminate/support": "^7.0"
+        "php": "^7.3",
+        "illuminate/broadcasting": "^8.0",
+        "illuminate/bus": "^8.0",
+        "illuminate/collections": "^8.0",
+        "illuminate/container": "^8.0",
+        "illuminate/contracts": "^8.0",
+        "illuminate/filesystem": "^8.0",
+        "illuminate/mail": "^8.0",
+        "illuminate/queue": "^8.0",
+        "illuminate/support": "^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -31,11 +32,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "8.x-dev"
         }
     },
     "suggest": {
-        "illuminate/database": "Required to use the database transport (^7.0)."
+        "illuminate/database": "Required to use the database transport (^8.0)."
     },
     "config": {
         "sort-packages": true

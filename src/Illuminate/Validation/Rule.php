@@ -3,7 +3,7 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;

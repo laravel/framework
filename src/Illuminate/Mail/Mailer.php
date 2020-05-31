@@ -10,10 +10,10 @@ use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Macroable\Macroable;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\HtmlString;
-use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Swift_Mailer;
 

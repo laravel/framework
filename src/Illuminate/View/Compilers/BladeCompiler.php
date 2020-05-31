@@ -2,7 +2,7 @@
 
 namespace Illuminate\View\Compilers;
 
-use Illuminate\Support\Arr;
+use Illuminate\Collections\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 

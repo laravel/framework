@@ -3,8 +3,8 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Collections\Arr;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Support\Arr;
 use RuntimeException;
 
 trait Queueable
