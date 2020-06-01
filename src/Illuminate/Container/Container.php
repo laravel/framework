@@ -979,10 +979,12 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolveVariadicClass(ReflectionParameter $parameter)
     {
-        $abstract = $this->getAlias($parameter->getClass()->name);
+        $className = Util::getParameterClassName($parameter);
+
+        $abstract = $this->getAlias($className);
 
         if (! is_array($concrete = $this->getContextualConcrete($abstract))) {
-            return $this->make($parameter->getClass()->name);
+            return $this->make($className);
         }
 
         return array_map(function ($abstract) {
