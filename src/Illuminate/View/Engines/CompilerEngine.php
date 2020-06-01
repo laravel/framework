@@ -26,13 +26,14 @@ class CompilerEngine extends PhpEngine
     /**
      * Create a new compiler engine instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $filesystem
      * @param  \Illuminate\View\Compilers\CompilerInterface  $compiler
+     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */
-    public function __construct(Filesystem $filesystem, CompilerInterface $compiler)
+    public function __construct(CompilerInterface $compiler, Filesystem $files)
     {
-        parent::__construct($filesystem);
+        parent::__construct($files);
+
         $this->compiler = $compiler;
     }
 

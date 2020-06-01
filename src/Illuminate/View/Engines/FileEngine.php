@@ -12,17 +12,17 @@ class FileEngine implements Engine
      *
      * @var \Illuminate\Filesystem\Filesystem
      */
-    protected $filesystem;
+    protected $files;
 
     /**
      * Create a new file engine instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $filesystem
+     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */
-    public function __construct(Filesystem $filesystem)
+    public function __construct(Filesystem $files)
     {
-        $this->filesystem = $filesystem;
+        $this->files = $files;
     }
 
     /**
@@ -34,6 +34,6 @@ class FileEngine implements Engine
      */
     public function get($path, array $data = [])
     {
-        return $this->filesystem->get($path);
+        return $this->files->get($path);
     }
 }

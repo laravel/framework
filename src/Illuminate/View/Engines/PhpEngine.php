@@ -13,17 +13,17 @@ class PhpEngine implements Engine
      *
      * @var \Illuminate\Filesystem\Filesystem
      */
-    protected $filesystem;
+    protected $files;
 
     /**
      * Create a new file engine instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $filesystem
+     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */
-    public function __construct(Filesystem $filesystem)
+    public function __construct(Filesystem $files)
     {
-        $this->filesystem = $filesystem;
+        $this->files = $files;
     }
 
     /**
@@ -55,7 +55,7 @@ class PhpEngine implements Engine
         // flush out any stray output that might get out before an error occurs or
         // an exception is thrown. This prevents any partial views from leaking.
         try {
-            $this->filesystem->getRequire($path, $data);
+            $this->files->getRequire($path, $data);
         } catch (Throwable $e) {
             $this->handleViewException($e, $obLevel);
         }

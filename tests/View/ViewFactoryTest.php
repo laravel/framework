@@ -489,7 +489,7 @@ class ViewFactoryTest extends TestCase
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('section exception message');
 
-        $engine = new CompilerEngine(new Filesystem, m::mock(CompilerInterface::class));
+        $engine = new CompilerEngine(m::mock(CompilerInterface::class), new Filesystem);
         $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) {
             return $path;
         });

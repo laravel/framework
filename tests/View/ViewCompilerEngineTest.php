@@ -41,6 +41,6 @@ class ViewCompilerEngineTest extends TestCase
 
     protected function getEngine()
     {
-        return new CompilerEngine(new Filesystem, m::mock(CompilerInterface::class));
+        return new CompilerEngine(m::mock(CompilerInterface::class), new Filesystem);
     }
 }
