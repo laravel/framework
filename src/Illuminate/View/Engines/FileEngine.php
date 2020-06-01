@@ -13,7 +13,7 @@ class FileEngine implements Engine
      */
     protected $filesystem;
 
-    /** 
+    /**
      * Create a new file engine instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $filesystem
