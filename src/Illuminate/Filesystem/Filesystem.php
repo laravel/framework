@@ -95,9 +95,9 @@ class Filesystem
     {
         if ($this->isFile($path)) {
             $__path = $path;
-            $__$data = $data;
+            $__data = $data;
 
-            return (static function() use ($__path, $__$data) {
+            return (static function() use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
 
                 return require $__path;
@@ -118,9 +118,9 @@ class Filesystem
     {
         if ($this->isFile($path)) {
             $__path = $path;
-            $__$data = $data;
+            $__data = $data;
 
-            return (static function() use ($__path, $__$data) {
+            return (static function() use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
 
                 return require_once $__path;
