@@ -97,7 +97,7 @@ class Filesystem
             $__path = $path;
             $__data = $data;
 
-            return (static function() use ($__path, $__data) {
+            return (static function () use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
 
                 return require $__path;
@@ -120,7 +120,7 @@ class Filesystem
             $__path = $path;
             $__data = $data;
 
-            return (static function() use ($__path, $__data) {
+            return (static function () use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
 
                 return require_once $__path;
