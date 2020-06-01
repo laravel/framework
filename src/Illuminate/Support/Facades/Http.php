@@ -5,6 +5,8 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Http\Client\Factory;
 
 /**
+ * @method static \GuzzleHttp\Promise\PromiseInterface response($body = null, $status = 200, $headers = [])
+ * @method static \Illuminate\Http\Client\Factory fake($callback = null)
  * @method static \Illuminate\Http\Client\PendingRequest accept(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest acceptJson()
  * @method static \Illuminate\Http\Client\PendingRequest asForm()
