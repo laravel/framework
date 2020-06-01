@@ -1981,10 +1981,12 @@ class Builder
     public function limit($value)
     {
         $property = $this->unions ? 'unionLimit' : 'limit';
-
-        if ($value >= 0) {
-            $this->$property = $value;
+        
+        if ($value < 0 || !is_numeric($value)) {
+            throw new RuntimeException('You must use positive integer for limit parameter.');
         }
+
+        $this->$property = (int) $value;
 
         return $this;
     }
