@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Events;
 
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionException;
@@ -58,7 +59,7 @@ class DiscoverEvents
                 }
 
                 $listenerEvents[$listener->name.'@'.$method->name] =
-                                optional($method->getParameters()[0]->getClass())->name;
+                                Reflector::getParameterClassName($method->getParameters()[0]);
             }
         }
 
