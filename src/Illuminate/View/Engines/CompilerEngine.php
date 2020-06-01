@@ -23,13 +23,15 @@ class CompilerEngine extends PhpEngine
     protected $lastCompiled = [];
 
     /**
-     * Create a new Blade view engine instance.
+     * Create a new compiler engine instance.
      *
+     * @param  \Illuminate\Filesystem\Filesystem  $filesystem
      * @param  \Illuminate\View\Compilers\CompilerInterface  $compiler
      * @return void
      */
-    public function __construct(CompilerInterface $compiler)
+    public function __construct(Filesystem $filesystem, CompilerInterface $compiler)
     {
+        parent::__construct($filesystem);
         $this->compiler = $compiler;
     }
 
