@@ -28,16 +28,74 @@ abstract class GeneratorCommand extends Command
      * @var array
      */
     protected $reservedNames = [
-        '__halt_compiler', 'break', 'clone', 'die', 'empty', 'endswitch', 'final',
-        'function', 'include', 'isset', 'print', 'require_once', 'trait', 'while',
-        'abstract', 'callable', 'const', 'do', 'enddeclare', 'endwhile', 'finally',
-        'global', 'include_once', 'list', 'private', 'return', 'try', 'xor', 'and',
-        'case', 'continue', 'echo', 'endfor', 'eval', 'fn', 'goto', 'instanceof',
-        'namespace', 'protected', 'static', 'unset', 'yield', 'array', 'catch',
-        'declare', 'else', 'endforeach', 'exit', 'for', 'if', 'insteadof', 'new',
-        'public', 'switch', 'use', 'as', 'class', 'default', 'elseif', 'endif',
-        'extends', 'foreach', 'implements', 'interface', 'or', 'require', 'throw',
+        '__halt_compiler',
+        'abstract',
+        'and',
+        'array',
+        'as',
+        'break',
+        'callable',
+        'case',
+        'catch',
+        'class',
+        'clone',
+        'const',
+        'continue',
+        'declare',
+        'default',
+        'die',
+        'do',
+        'echo',
+        'else',
+        'elseif',
+        'empty',
+        'enddeclare',
+        'endfor',
+        'endforeach',
+        'endif',
+        'endswitch',
+        'endwhile',
+        'eval',
+        'exit',
+        'extends',
+        'final',
+        'finally',
+        'fn',
+        'for',
+        'foreach',
+        'function',
+        'global',
+        'goto',
+        'if',
+        'implements',
+        'include',
+        'include_once',
+        'instanceof',
+        'insteadof',
+        'interface',
+        'isset',
+        'list',
+        'namespace',
+        'new',
+        'or',
+        'print',
+        'private',
+        'protected',
+        'public',
+        'require',
+        'require_once',
+        'return',
+        'static',
+        'switch',
+        'throw',
+        'trait',
+        'try',
+        'unset',
+        'use',
         'var',
+        'while',
+        'xor',
+        'yield',
     ];
 
     /**
@@ -69,11 +127,11 @@ abstract class GeneratorCommand extends Command
      */
     public function handle()
     {
-        // First we will check whether the name can be found in the reserved names.
-        // We have so called "reserved names" to ensure that no files are generated
-        // using PHP keywords for example, because that would cause errors.
+        // First we need to ensure that the given name is not a reserved word within the PHP
+        // language and that the class name will actually be valid. If it is not valid we
+        // can error now and prevent from polluting the filesystem using invalid files.
         if ($this->isReservedName($this->getNameInput())) {
-            $this->error('The name "'.$this->getNameInput().'" is reserved. Please pick something else.');
+            $this->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
 
             return false;
         }
@@ -82,7 +140,7 @@ abstract class GeneratorCommand extends Command
 
         $path = $this->getPath($name);
 
-        // We will check to see if the class already exists. If it does, we don't want
+        // Next, We will check to see if the class already exists. If it does, we don't want
         // to create the class and overwrite the user's code. So, we will bail out so the
         // code is untouched. Otherwise, we will continue generating this class' files.
         if ((! $this->hasOption('force') ||
@@ -296,18 +354,6 @@ abstract class GeneratorCommand extends Command
     }
 
     /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['name', InputArgument::REQUIRED, 'The name of the class'],
-        ];
-    }
-
-    /**
      * Checks whether the given name is reserved.
      *
      * @param  string  $name
@@ -318,5 +364,17 @@ abstract class GeneratorCommand extends Command
         $name = strtolower($name);
 
         return in_array($name, $this->reservedNames);
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['name', InputArgument::REQUIRED, 'The name of the class'],
+        ];
     }
 }
