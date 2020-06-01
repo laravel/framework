@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\Engines\CompilerEngine;
 use Mockery as m;
@@ -40,6 +41,6 @@ class ViewCompilerEngineTest extends TestCase
 
     protected function getEngine()
     {
-        return new CompilerEngine(m::mock(CompilerInterface::class));
+        return new CompilerEngine(m::mock(CompilerInterface::class), new Filesystem);
     }
 }
