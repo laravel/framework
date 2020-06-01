@@ -158,9 +158,7 @@ class BoundMethod
     protected static function addDependencyForCallParameter($container, $parameter,
                                                             array &$parameters, &$dependencies)
     {
-        if (array_key_exists($parameter->getName(), $parameters)) {
-            $paramName = $parameter->getName();
-
+        if (array_key_exists($paramName = $parameter->getName(), $parameters)) {
             $dependencies[] = $parameters[$paramName];
 
             unset($parameters[$paramName]);
