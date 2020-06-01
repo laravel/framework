@@ -35,4 +35,19 @@ class Util
     {
         return $value instanceof Closure ? $value() : $value;
     }
+
+    /**
+     * Get the class name of the given parameter's type, if possible.
+     *
+     * From Reflector::getParameterClassName() in Illuminate\Support.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @return string|null
+     */
+    public static function getParameterClassName($parameter)
+    {
+        $type = $parameter->getType();
+
+        return ($type && ! $type->isBuiltin()) ? $type->getName() : null;
+    }
 }
