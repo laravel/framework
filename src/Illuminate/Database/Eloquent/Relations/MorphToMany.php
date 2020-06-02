@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Support\Arr;
 
 class MorphToMany extends BelongsToMany
@@ -123,8 +124,10 @@ class MorphToMany extends BelongsToMany
     protected function getCurrentlyAttachedPivots()
     {
         return parent::getCurrentlyAttachedPivots()->map(function ($record) {
-            return $record->setMorphType($this->morphType)
-                          ->setMorphClass($this->morphClass);
+            return $record instanceof MorphPivot
+                            ? $record->setMorphType($this->morphType)
+                                     ->setMorphClass($this->morphClass)
+                            : $record;
         });
     }
 
