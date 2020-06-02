@@ -153,7 +153,7 @@ class RoutingServiceProvider extends ServiceProvider
                 return new PsrResponse;
             }
 
-            throw new BindingResolutionException('Unable to resolve PSR response. Please install nyholm/psr7.');
+            throw new BindingResolutionException('Unable to resolve PSR response. Please install the nyholm/psr7 package.');
         });
     }
 
