@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.16...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.17...6.x)
+
+
+## [v6.18.17 (2020-06-02)](https://github.com/laravel/framework/compare/v6.18.16...v6.18.17)
+
+### Added
+- Support PHP 8's reflection API ([#33039](https://github.com/laravel/framework/pull/33039))
 
 ### Fixed
 - Fixed `Illuminate\Database\Eloquent\Collection::getQueueableRelations()` ([00e9ed7](https://github.com/laravel/framework/commit/00e9ed76483ea6ad1264676e7b1095b23e16a433))
