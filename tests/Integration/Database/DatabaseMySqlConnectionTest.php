@@ -17,6 +17,10 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
     {
         parent::setUp();
 
+        if (! isset($_SERVER['CI']) || windows_os()) {
+            $this->markTestSkipped('This test is only executed on CI in Linux.');
+        }
+
         if (! Schema::hasTable(self::TABLE)) {
             Schema::create(self::TABLE, function (Blueprint $table) {
                 $table->json(self::JSON_COL)->nullable();
