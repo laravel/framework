@@ -93,6 +93,19 @@ trait MakesHttpRequests
     }
 
     /**
+     * Add a bearer token to the request headers.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function withBearerToken(string $value)
+    {
+        $this->defaultHeaders['Authorization'] = 'Bearer '.$value;
+
+        return $this;
+    }
+
+    /**
      * Define a set of server variables to be sent with the requests.
      *
      * @param  array  $server
