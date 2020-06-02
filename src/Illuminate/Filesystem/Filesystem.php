@@ -324,7 +324,7 @@ class Filesystem
     {
         if (! class_exists(MimeTypes::class)) {
             throw new RuntimeException(
-                'To enable support for guessing extensions, please install symfony/mime.'
+                'To enable support for guessing extensions, please install the symfony/mime package.'
             );
         }
 
