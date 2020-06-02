@@ -199,7 +199,7 @@ class PendingBatch
     /**
      * Dispatch the batch.
      *
-     * @return \Illuminate\Support\Batch
+     * @return \Illuminate\Bus\Batch
      */
     public function dispatch()
     {
