@@ -96,12 +96,12 @@ trait MakesHttpRequests
      * Add an authorization token for the request.
      *
      * @param  string  $token
-     * @param  string  $type
+     * @param  string|null  $type
      * @return $this
      */
-    public function withToken(string $token, string $type = 'Bearer')
+    public function withToken(string $token, string $type = null)
     {
-        $this->defaultHeaders['Authorization'] = trim($type.' '.$token);
+        $this->defaultHeaders['Authorization'] = sprintf('%s %s', $type ?? 'Bearer', $token);
 
         return $this;
     }
