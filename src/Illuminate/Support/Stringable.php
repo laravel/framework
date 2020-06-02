@@ -195,6 +195,22 @@ class Stringable
     }
 
     /**
+     * Expand the string into an array of Stringables.
+     *
+     * @param  string  $delimiter
+     * @param  int  $limit
+     * @return \Illuminate\Support\Collection
+     */
+    public function expand($delimiter, $limit = PHP_INT_MAX)
+    {
+        return collect(explode($delimiter, $this->value, $limit))
+            ->transform(function ($string) {
+                return Str::of($string);
+            });
+
+    }
+
+    /**
      * Split a string using a regular expression.
      *
      * @param  string  $pattern
