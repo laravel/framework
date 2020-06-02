@@ -399,6 +399,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['foo', 'bar']);
         $c = $c->forget(0)->all();
+        $this->assertFalse(isset($c['foo']));
         $this->assertFalse(isset($c[0]));
         $this->assertTrue(isset($c[1]));
 
