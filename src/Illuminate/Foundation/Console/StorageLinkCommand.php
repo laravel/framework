@@ -67,7 +67,7 @@ class StorageLinkCommand extends Command
     protected function getRelativeTarget($link, $target)
     {
         if (! class_exists(SymfonyFilesystem::class)) {
-            throw new RuntimeException('To enable support for relative links, please install symfony/filesystem.');
+            throw new RuntimeException('To enable support for relative links, please install the symfony/filesystem package.');
         }
 
         return (new SymfonyFilesystem)->makePathRelative($target, dirname($link));
