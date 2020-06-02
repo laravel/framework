@@ -914,7 +914,7 @@ class SqlServerGrammar extends Grammar
     public function parseSchemaAndTable($table){
         $parts = explode(".", $table);
         if(count($parts) == 1){
-            return [null, $parts[0]]; // expect dbo as default schema as it is in sql server
+            return [null, $parts[0]];
         }
         return $parts;
     }

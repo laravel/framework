@@ -28,29 +28,6 @@ class SqlServerProcessor extends Processor
     }
 
     /**
-     * Process an "insert get ID" query for ODBC.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return int
-     *
-     * @throws \Exception
-     */
-    protected function processInsertGetIdForOdbc(Connection $connection)
-    {
-        $result = $connection->selectFromWriteConnection(
-            'SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid'
-        );
-
-        if (! $result) {
-            throw new Exception('Unable to retrieve lastInsertID for ODBC.');
-        }
-
-        $row = $result[0];
-
-        return is_object($row) ? $row->insertid : $row['insertid'];
-    }
-
-    /**
      * Process the results of a column listing query.
      *
      * @param  array  $results
