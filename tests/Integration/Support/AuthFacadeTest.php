@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Support;
 
 use Illuminate\Support\Facades\Auth;
-use RuntimeException;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class AuthFacadeTest extends TestCase
 {
