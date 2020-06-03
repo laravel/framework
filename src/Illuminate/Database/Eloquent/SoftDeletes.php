@@ -186,7 +186,7 @@ trait SoftDeletes
      */
     public function getDeletedAtColumn()
     {
-        return defined('static::DELETED_AT') ? static::DELETED_AT : Config::get('app.timestamps.deleted_at', 'deleted_at');
+        return defined('static::DELETED_AT') ? static::DELETED_AT : Config::get('database.timestamps.deleted_at', 'deleted_at');
     }
 
     /**

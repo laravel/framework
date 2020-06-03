@@ -118,7 +118,7 @@ trait HasTimestamps
         if (static::CREATED_AT !== null) {
             return static::CREATED_AT;
         }
-        return Config::get('app.timestamps.created_at', 'created_at');
+        return Config::get('database.timestamps.created_at', 'created_at');
     }
 
     /**
@@ -131,7 +131,7 @@ trait HasTimestamps
         if (static::UPDATED_AT !== null) {
             return static::UPDATED_AT;
         }
-        return Config::get('app.timestamps.updated_at', 'updated_at');
+        return Config::get('database.timestamps.updated_at', 'updated_at');
     }
 
     /**
