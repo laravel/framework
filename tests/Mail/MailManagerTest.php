@@ -33,30 +33,4 @@ class MailManagerTest extends TestCase
             [null], [''], [' '],
         ];
     }
-
-    public function testForgetMailer()
-    {
-        $this->app['config']->set('mail.mailers.custom_smtp', [
-            'transport' => 'smtp',
-            'host' => 'example.com',
-            'port' => '25',
-            'encryption' => 'tls',
-            'username' => 'username',
-            'password' => 'password',
-            'timeout' => 10,
-        ]);
-
-        /** @var MailManager $mailManager */
-        $mailManager = $this->app['mail.manager'];
-        $mailManager->mailer('custom_smtp');
-
-        $mailersProperty = new \ReflectionProperty($mailManager, 'mailers');
-        $mailersProperty->setAccessible(true);
-
-        $this->assertArrayHasKey('custom_smtp', $mailersProperty->getValue($mailManager), 'Mailer must exist in the $mailers-property');
-
-        $mailManager->forgetMailer('custom_smtp');
-
-        $this->assertArrayNotHasKey('custom_smtp', $mailersProperty->getValue($mailManager), 'Mailer must not exist in the $mailers-property as it must have been removed with MailManager::forgetMailer()');
-    }
 }

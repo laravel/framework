@@ -441,25 +441,6 @@ class MailManager implements FactoryContract
     }
 
     /**
-     * Forget a mailer instance by name.
-     *
-     * @param  array|string|null  $name
-     * @return void
-     */
-    public function forgetMailer($name = null)
-    {
-        $name = $name ?? $this->getDefaultDriver();
-
-        foreach ((array) $name as $mailerName) {
-            if (isset($this->mailers[$mailerName])) {
-                unset($this->mailers[$mailerName]);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * Register a custom transport creator Closure.
      *
      * @param  string  $driver
