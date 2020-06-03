@@ -166,7 +166,7 @@ trait BuildsQueries
      * Pass the query to a given callback.
      *
      * @param  callable  $callback
-     * @return \Illuminate\Database\Query\Builder
+     * @return $this
      */
     public function tap($callback)
     {
