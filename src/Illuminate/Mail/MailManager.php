@@ -73,7 +73,9 @@ class MailManager implements FactoryContract
     }
 
     /**
-     * @param string $name
+     * Forget a mailer instance by name.
+     *
+     * @param  string  $name
      * @return void
      */
     public function forgetMailer($name)
