@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Mail\MailManager;
 use Orchestra\Testbench\TestCase;
 
 class MailManagerTest extends TestCase
