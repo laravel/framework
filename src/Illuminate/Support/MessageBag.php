@@ -76,7 +76,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function addIf($boolean, $key, $message)
     {
-        return $boolean ? $this->add($key, $message) : $this;
+        return value($boolean) ? $this->add($key, $message) : $this;
     }
 
     /**
@@ -90,7 +90,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $messages = (array) $this->messages;
 
-        return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
+        return !isset($messages[$key]) || !in_array($message, $messages[$key]);
     }
 
     /**
@@ -190,7 +190,9 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
         // all the messages that match the given key and output it as an array.
         if (array_key_exists($key, $this->messages)) {
             return $this->transform(
-                $this->messages[$key], $this->checkFormat($format), $key
+                $this->messages[$key],
+                $this->checkFormat($format),
+                $key
             );
         }
 
@@ -211,14 +213,16 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     protected function getMessagesForWildcardKey($key, $format)
     {
         return collect($this->messages)
-                ->filter(function ($messages, $messageKey) use ($key) {
-                    return Str::is($key, $messageKey);
-                })
-                ->map(function ($messages, $messageKey) use ($format) {
-                    return $this->transform(
-                        $messages, $this->checkFormat($format), $messageKey
-                    );
-                })->all();
+            ->filter(function ($messages, $messageKey) use ($key) {
+                return Str::is($key, $messageKey);
+            })
+            ->map(function ($messages, $messageKey) use ($format) {
+                return $this->transform(
+                    $messages,
+                    $this->checkFormat($format),
+                    $messageKey
+                );
+            })->all();
     }
 
     /**
@@ -341,7 +345,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function isEmpty()
     {
-        return ! $this->any();
+        return !$this->any();
     }
 
     /**
