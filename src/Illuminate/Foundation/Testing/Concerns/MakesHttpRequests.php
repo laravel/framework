@@ -81,6 +81,18 @@ trait MakesHttpRequests
     }
 
     /**
+     * Add an authorization token for the request.
+     *
+     * @param  string  $token
+     * @param  string  $type
+     * @return $this
+     */
+    public function withToken(string $token, string $type = 'Bearer')
+    {
+        return $this->withHeader('Authorization', $type.' '.$token);
+    }
+
+    /**
      * Flush all the configured headers.
      *
      * @return $this
@@ -88,20 +100,6 @@ trait MakesHttpRequests
     public function flushHeaders()
     {
         $this->defaultHeaders = [];
-
-        return $this;
-    }
-
-    /**
-     * Add an authorization token for the request.
-     *
-     * @param  string  $token
-     * @param  string|null  $type
-     * @return $this
-     */
-    public function withToken(string $token, string $type = null)
-    {
-        $this->defaultHeaders['Authorization'] = sprintf('%s %s', $type ?? 'Bearer', $token);
 
         return $this;
     }
