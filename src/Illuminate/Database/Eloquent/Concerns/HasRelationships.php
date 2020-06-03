@@ -53,7 +53,7 @@ trait HasRelationships
     protected static $relationResolvers = [];
 
     /**
-     * Define a relation resolver.
+     * Define a dynamic relation resolver.
      *
      * @param  string  $name
      * @param  \Closure  $callback
