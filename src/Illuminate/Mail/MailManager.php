@@ -73,6 +73,17 @@ class MailManager implements FactoryContract
     }
 
     /**
+     * @param string $name
+     * @return void
+     */
+    public function forgetMailer($name)
+    {
+        if(isset($this->mailers[$name])){
+            unset($this->mailers[$name]);
+        }
+    }
+
+    /**
      * Get a mailer driver instance.
      *
      * @param  string|null  $driver
