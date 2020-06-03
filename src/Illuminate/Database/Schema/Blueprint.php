@@ -1112,6 +1112,7 @@ class Blueprint
         if ($column === null) {
             $column = Config::get('database.timestamps.deleted_at', 'deleted_at');
         }
+
         return $this->timestamp($column, $precision)->nullable();
     }
 
@@ -1127,6 +1128,7 @@ class Blueprint
         if ($column === null) {
             $column = Config::get('database.timestamps.deleted_at', 'deleted_at');
         }
+
         return $this->timestampTz($column, $precision)->nullable();
     }
 
