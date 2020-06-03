@@ -8,7 +8,6 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -402,7 +401,7 @@ class Blueprint
      */
     public function dropTimestamps()
     {
-        $this->dropColumn(Config::get('database.timestamps.created_at', 'created_at'), Config::get('database.timestamps.updated_at', 'updated_at'));
+        $this->dropColumn(config('database.timestamps.created_at', 'created_at'), config('database.timestamps.updated_at', 'updated_at'));
     }
 
     /**
@@ -424,7 +423,7 @@ class Blueprint
     public function dropSoftDeletes($column = null)
     {
         if ($column === null) {
-            $column = Config::get('database.timestamps.deleted_at', 'deleted_at');
+            $column = config('database.timestamps.deleted_at', 'deleted_at');
         }
         $this->dropColumn($column);
     }
@@ -438,7 +437,7 @@ class Blueprint
     public function dropSoftDeletesTz($column = null)
     {
         if ($column === null) {
-            $column = Config::get('database.timestamps.deleted_at', 'deleted_at');
+            $column = config('database.timestamps.deleted_at', 'deleted_at');
         }
         $this->dropSoftDeletes($column);
     }
@@ -1069,9 +1068,9 @@ class Blueprint
      */
     public function timestamps($precision = 0)
     {
-        $this->timestamp(Config::get('database.timestamps.created_at', 'created_at'), $precision)->nullable();
+        $this->timestamp(config('database.timestamps.created_at', 'created_at'), $precision)->nullable();
 
-        $this->timestamp(Config::get('database.timestamps.updated_at', 'updated_at'), $precision)->nullable();
+        $this->timestamp(config('database.timestamps.updated_at', 'updated_at'), $precision)->nullable();
     }
 
     /**
@@ -1095,9 +1094,9 @@ class Blueprint
      */
     public function timestampsTz($precision = 0)
     {
-        $this->timestampTz(Config::get('database.timestamps.created_at', 'created_at'), $precision)->nullable();
+        $this->timestampTz(config('database.timestamps.created_at', 'created_at'), $precision)->nullable();
 
-        $this->timestampTz(Config::get('database.timestamps.updated_at', 'updated_at'), $precision)->nullable();
+        $this->timestampTz(config('database.timestamps.updated_at', 'updated_at'), $precision)->nullable();
     }
 
     /**
@@ -1110,7 +1109,7 @@ class Blueprint
     public function softDeletes($column = null, $precision = 0)
     {
         if ($column === null) {
-            $column = Config::get('database.timestamps.deleted_at', 'deleted_at');
+            $column = config('database.timestamps.deleted_at', 'deleted_at');
         }
 
         return $this->timestamp($column, $precision)->nullable();
@@ -1126,7 +1125,7 @@ class Blueprint
     public function softDeletesTz($column = null, $precision = 0)
     {
         if ($column === null) {
-            $column = Config::get('database.timestamps.deleted_at', 'deleted_at');
+            $column = config('database.timestamps.deleted_at', 'deleted_at');
         }
 
         return $this->timestampTz($column, $precision)->nullable();

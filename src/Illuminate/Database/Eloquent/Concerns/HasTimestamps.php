@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Date;
 
 trait HasTimestamps
@@ -119,7 +118,7 @@ trait HasTimestamps
             return static::CREATED_AT;
         }
 
-        return Config::get('database.timestamps.created_at', 'created_at');
+        return config('database.timestamps.created_at', 'created_at');
     }
 
     /**
@@ -133,7 +132,7 @@ trait HasTimestamps
             return static::UPDATED_AT;
         }
 
-        return Config::get('database.timestamps.updated_at', 'updated_at');
+        return config('database.timestamps.updated_at', 'updated_at');
     }
 
     /**

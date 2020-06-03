@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
@@ -276,7 +275,7 @@ class Builder
     public function latest($column = null)
     {
         if (is_null($column)) {
-            $column = $this->model->getCreatedAtColumn() ?? Config::get('database.timestamps.created_at', 'created_at');
+            $column = $this->model->getCreatedAtColumn() ?? config('database.timestamps.created_at', 'created_at');
         }
 
         $this->query->latest($column);
@@ -293,7 +292,7 @@ class Builder
     public function oldest($column = null)
     {
         if (is_null($column)) {
-            $column = $this->model->getCreatedAtColumn() ?? Config::get('database.timestamps.created_at', 'created_at');
+            $column = $this->model->getCreatedAtColumn() ?? config('database.timestamps.created_at', 'created_at');
         }
 
         $this->query->oldest($column);
