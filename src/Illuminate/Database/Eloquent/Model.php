@@ -148,14 +148,14 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      *
      * @var string
      */
-    const CREATED_AT = 'created_at';
+    const CREATED_AT = null;
 
     /**
      * The name of the "updated at" column.
      *
      * @var string
      */
-    const UPDATED_AT = 'updated_at';
+    const UPDATED_AT = null;
 
     /**
      * Create a new Eloquent model instance.

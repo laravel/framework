@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Support\Facades\Config;
+
 /**
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withTrashed()
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder onlyTrashed()
@@ -184,7 +186,7 @@ trait SoftDeletes
      */
     public function getDeletedAtColumn()
     {
-        return defined('static::DELETED_AT') ? static::DELETED_AT : 'deleted_at';
+        return defined('static::DELETED_AT') ? static::DELETED_AT : Config::get('app.timestamps.deleted_at', 'deleted_at');
     }
 
     /**

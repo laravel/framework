@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Date;
 
 trait HasTimestamps
@@ -114,7 +115,10 @@ trait HasTimestamps
      */
     public function getCreatedAtColumn()
     {
-        return static::CREATED_AT;
+        if (static::CREATED_AT !== null) {
+            return static::CREATED_AT;
+        }
+        return Config::get('app.timestamps.created_at', 'created_at');
     }
 
     /**
@@ -124,7 +128,10 @@ trait HasTimestamps
      */
     public function getUpdatedAtColumn()
     {
-        return static::UPDATED_AT;
+        if (static::UPDATED_AT !== null) {
+            return static::UPDATED_AT;
+        }
+        return Config::get('app.timestamps.updated_at', 'updated_at');
     }
 
     /**
