@@ -3,7 +3,7 @@
 namespace Illuminate\Session;
 
 use Closure;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Str;
 use SessionHandlerInterface;

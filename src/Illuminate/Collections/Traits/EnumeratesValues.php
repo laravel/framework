@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Collections;
+namespace Illuminate\Support\Traits;
 
 use CachingIterator;
 use Closure;
@@ -740,7 +740,7 @@ trait EnumeratesValues
     /**
      * Collect the values into a collection.
      *
-     * @return \Illuminate\Collections\Collection
+     * @return \Illuminate\Support\Collection
      */
     public function collect()
     {

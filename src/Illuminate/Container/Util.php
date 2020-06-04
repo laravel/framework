@@ -4,12 +4,15 @@ namespace Illuminate\Container;
 
 use Closure;
 
+/**
+ * @internal
+ */
 class Util
 {
     /**
      * If the given value is not an array and not null, wrap it in one.
      *
-     * From Arr::wrap() in Illuminate\Collections.
+     * From Arr::wrap() in Illuminate\Support.
      *
      * @param  mixed  $value
      * @return array

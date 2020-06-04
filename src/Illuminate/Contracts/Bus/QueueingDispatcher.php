@@ -15,7 +15,7 @@ interface QueueingDispatcher extends Dispatcher
     /**
      * Create a new batch of queueable jobs.
      *
-     * @param  \Illuminate\Collections\Collection|array  $jobs
+     * @param  \Illuminate\Support\Collection|array  $jobs
      * @return \Illuminate\Bus\PendingBatch
      */
     public function batch($jobs);

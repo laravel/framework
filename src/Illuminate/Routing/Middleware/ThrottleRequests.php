@@ -5,7 +5,7 @@ namespace Illuminate\Routing\Middleware;
 use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;

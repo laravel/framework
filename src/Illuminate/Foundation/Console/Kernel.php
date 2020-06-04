@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Closure;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;

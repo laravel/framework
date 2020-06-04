@@ -2,7 +2,7 @@
 
 namespace Illuminate\Http\Concerns;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use SplFileInfo;

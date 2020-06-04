@@ -3,7 +3,7 @@
 namespace Illuminate\Broadcasting;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;

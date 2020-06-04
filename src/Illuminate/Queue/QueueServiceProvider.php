@@ -3,7 +3,7 @@
 namespace Illuminate\Queue;
 
 use Aws\DynamoDb\DynamoDbClient;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;

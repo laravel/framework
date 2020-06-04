@@ -2,7 +2,7 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 

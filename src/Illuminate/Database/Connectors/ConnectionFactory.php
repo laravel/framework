@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Connectors;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;

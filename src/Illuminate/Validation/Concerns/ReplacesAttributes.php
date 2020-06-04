@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation\Concerns;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 
 trait ReplacesAttributes
 {

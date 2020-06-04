@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Bus;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
-use Illuminate\Collections\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;

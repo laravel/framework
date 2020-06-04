@@ -4,7 +4,7 @@ namespace Illuminate\Cache;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Closure;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;

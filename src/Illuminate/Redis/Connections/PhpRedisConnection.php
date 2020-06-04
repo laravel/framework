@@ -3,7 +3,7 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Str;
 use Redis;

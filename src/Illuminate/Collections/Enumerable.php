@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Collections;
+namespace Illuminate\Support;
 
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -897,7 +897,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Collect the values into a collection.
      *
-     * @return \Illuminate\Collections\Collection
+     * @return \Illuminate\Support\Collection
      */
     public function collect();
 

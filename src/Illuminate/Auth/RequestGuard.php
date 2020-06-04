@@ -5,7 +5,7 @@ namespace Illuminate\Auth;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 
 class RequestGuard implements Guard
 {

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 
 class RouteGroup
 {
