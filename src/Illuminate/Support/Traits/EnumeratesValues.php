@@ -574,6 +574,21 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter items searching for a value in an property that is an array.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @param  bool  $strict
+     * @return static
+     */
+    public function whereIncludes($key, $value, $strict = false)
+    {
+        return $this->filter(function ($item) use ($key, $value, $strict) {
+            return in_array($value, data_get($item, $key), $strict);
+        });
+    }
+
+    /**
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key

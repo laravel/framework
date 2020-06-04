@@ -705,6 +705,15 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhereIncludes($collection)
+    {
+        $c = new $collection([['id' => 1, 'tags' => ['a', 'b']], ['id' => 2, 'tags' => ['b', 'c']], ['id' => 3, 'tags' => ['c', 'd']], ['id' => '3', 'tags' => ['d', 'e']], ['id' => 4, 'tags' => ['e', 'f']]]);
+        $this->assertEquals([['id' => 2, 'tags' => ['b', 'c']], ['id' => 3, 'tags' => ['c', 'd']]], $c->whereIncludes('tags', 'c')->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhereInStrict($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
