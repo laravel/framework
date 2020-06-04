@@ -14,6 +14,15 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('previous/url', $this->app['session']->previousUrl());
     }
 
+    public function testWithTokenSetsAuthorizationHeader()
+    {
+        $this->withToken('foobar');
+        $this->assertSame('Bearer foobar', $this->defaultHeaders['Authorization']);
+
+        $this->withToken('foobar', 'Basic');
+        $this->assertSame('Basic foobar', $this->defaultHeaders['Authorization']);
+    }
+
     public function testWithoutAndWithMiddleware()
     {
         $this->assertFalse($this->app->has('middleware.disable'));
