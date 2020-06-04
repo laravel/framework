@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use ArrayIterator;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;

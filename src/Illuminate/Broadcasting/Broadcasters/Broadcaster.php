@@ -3,7 +3,7 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Exception;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 use Illuminate\Contracts\Routing\BindingRegistrar;

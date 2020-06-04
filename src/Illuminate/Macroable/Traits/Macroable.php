@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Macroable;
+namespace Illuminate\Support\Traits;
 
 use BadMethodCallException;
 use Closure;

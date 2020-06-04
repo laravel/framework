@@ -1,10 +1,11 @@
 <?php
 
-namespace Illuminate\Collections;
+namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\EnumeratesValues;
+use Illuminate\Support\Traits\Macroable;
 use stdClass;
 
 class Collection implements ArrayAccess, Enumerable
@@ -62,7 +63,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get a lazy collection for the items in this collection.
      *
-     * @return \Illuminate\Collections\LazyCollection
+     * @return \Illuminate\Support\LazyCollection
      */
     public function lazy()
     {
@@ -325,7 +326,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get all items except for those with the specified keys.
      *
-     * @param  \Illuminate\Collections\Collection|mixed  $keys
+     * @param  \Illuminate\Support\Collection|mixed  $keys
      * @return static
      */
     public function except($keys)
@@ -1321,7 +1322,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get a base Support collection instance from this collection.
      *
-     * @return \Illuminate\Collections\Collection
+     * @return \Illuminate\Support\Collection
      */
     public function toBase()
     {

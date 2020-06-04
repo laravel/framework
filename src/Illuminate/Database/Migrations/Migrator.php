@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;

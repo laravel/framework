@@ -3,8 +3,8 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Collections\Arr;
-use Illuminate\Collections\Collection;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\SerializableClosure;
 use Throwable;
@@ -21,7 +21,7 @@ class PendingBatch
     /**
      * The jobs that belong to the batch.
      *
-     * @var \Illuminate\Collections\Collection
+     * @var \Illuminate\Support\Collection
      */
     public $jobs;
 
@@ -36,7 +36,7 @@ class PendingBatch
      * Create a new pending batch instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  \Illuminate\Collections\Collection  $jobs
+     * @param  \Illuminate\Support\Collection  $jobs
      * @return void
      */
     public function __construct(Container $container, Collection $jobs)

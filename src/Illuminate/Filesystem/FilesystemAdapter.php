@@ -2,7 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\FileExistsException as ContractFileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 

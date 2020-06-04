@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Exceptions;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;

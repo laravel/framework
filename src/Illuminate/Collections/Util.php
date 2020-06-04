@@ -1,9 +1,12 @@
 <?php
 
-namespace Illuminate\Collections;
+namespace Illuminate\Support;
 
 use Closure;
 
+/**
+ * @internal
+ */
 class Util
 {
     /**

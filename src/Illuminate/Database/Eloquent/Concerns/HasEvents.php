@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
 use InvalidArgumentException;
 

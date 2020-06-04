@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

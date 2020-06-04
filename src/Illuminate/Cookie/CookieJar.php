@@ -2,9 +2,9 @@
 
 namespace Illuminate\Cookie;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 

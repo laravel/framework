@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Illuminate\Bus\PendingBatch;
-use Illuminate\Collections\Collection;
+use Illuminate\Support\Collection;
 
 class PendingBatchFake extends PendingBatch
 {
@@ -18,7 +18,7 @@ class PendingBatchFake extends PendingBatch
      * Create a new pending batch instance.
      *
      * @param  \Illuminate\Support\Testing\Fakes\BusFake  $bus
-     * @param  \Illuminate\Collections\Collection  $jobs
+     * @param  \Illuminate\Support\Collection  $jobs
      * @return void
      */
     public function __construct(BusFake $bus, Collection $jobs)

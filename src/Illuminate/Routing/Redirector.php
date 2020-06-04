@@ -3,7 +3,7 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Session\Store as SessionStore;
 
 class Redirector

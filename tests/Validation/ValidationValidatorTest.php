@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Validation;
 
 use DateTime;
 use DateTimeImmutable;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;

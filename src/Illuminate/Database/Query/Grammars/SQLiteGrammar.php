@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
 

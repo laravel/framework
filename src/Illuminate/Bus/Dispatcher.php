@@ -3,7 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Collections\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -141,7 +141,7 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Create a new batch of queueable jobs.
      *
-     * @param  \Illuminate\Collections\Collection|array  $jobs
+     * @param  \Illuminate\Support\Collection|array  $jobs
      * @return \Illuminate\Bus\PendingBatch
      */
     public function batch($jobs)

@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Str;
 
 class PendingRequest

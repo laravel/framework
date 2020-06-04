@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;

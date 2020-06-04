@@ -6,7 +6,7 @@ use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;

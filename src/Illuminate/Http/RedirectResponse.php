@@ -3,7 +3,7 @@
 namespace Illuminate\Http;
 
 use Illuminate\Contracts\Support\MessageProvider;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;

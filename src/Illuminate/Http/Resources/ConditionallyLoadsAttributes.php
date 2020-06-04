@@ -2,7 +2,7 @@
 
 namespace Illuminate\Http\Resources;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 
 trait ConditionallyLoadsAttributes
 {

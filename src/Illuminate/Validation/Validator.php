@@ -3,7 +3,7 @@
 namespace Illuminate\Validation;
 
 use BadMethodCallException;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\ImplicitRule;

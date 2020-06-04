@@ -3,11 +3,11 @@
 namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;

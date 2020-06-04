@@ -1,10 +1,11 @@
 <?php
 
-namespace Illuminate\Collections;
+namespace Illuminate\Support;
 
 use ArrayIterator;
 use Closure;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\EnumeratesValues;
+use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use stdClass;
 

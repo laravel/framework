@@ -6,7 +6,7 @@ use Closure;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 use Exception;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\StatementPrepared;

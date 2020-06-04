@@ -5,7 +5,7 @@ namespace Illuminate\Mail;
 use Aws\Ses\SesClient;
 use Closure;
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;

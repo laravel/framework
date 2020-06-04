@@ -3,7 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Queue\CallQueuedClosure;
 use RuntimeException;
 

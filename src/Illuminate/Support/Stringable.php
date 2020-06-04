@@ -3,7 +3,7 @@
 namespace Illuminate\Support;
 
 use Closure;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable

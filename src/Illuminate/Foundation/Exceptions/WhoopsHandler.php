@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Exceptions;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
 use Whoops\Handler\PrettyPageHandler;
 

@@ -3,7 +3,7 @@
 namespace Illuminate\View\Concerns;
 
 use Closure;
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\View;
 use InvalidArgumentException;
