@@ -1584,9 +1584,9 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         if ($relationship instanceof HasManyThrough ||
             $relationship instanceof BelongsToMany) {
             return $relationship->where($relationship->getRelated()->getTable().'.'.$field, $value)->first();
-        } else {
-            return $relationship->where($field, $value)->first();
         }
+
+        return $relationship->where($field, $value)->first();
     }
 
     /**

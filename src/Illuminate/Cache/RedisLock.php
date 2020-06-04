@@ -36,9 +36,9 @@ class RedisLock extends Lock
     {
         if ($this->seconds > 0) {
             return $this->redis->set($this->name, $this->owner, 'EX', $this->seconds, 'NX') == true;
-        } else {
-            return $this->redis->setnx($this->name, $this->owner) === 1;
         }
+
+        return $this->redis->setnx($this->name, $this->owner) === 1;
     }
 
     /**

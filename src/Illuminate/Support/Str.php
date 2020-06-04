@@ -657,9 +657,9 @@ class Str
     {
         if (! is_null($length)) {
             return substr_count($haystack, $needle, $offset, $length);
-        } else {
-            return substr_count($haystack, $needle, $offset);
         }
+
+        return substr_count($haystack, $needle, $offset);
     }
 
     /**

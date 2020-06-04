@@ -89,9 +89,9 @@ trait ManagesComponents
 
         if ($view instanceof View) {
             return $view->with($data)->render();
-        } else {
-            return $this->make($view, $data)->render();
         }
+
+        return $this->make($view, $data)->render();
     }
 
     /**
