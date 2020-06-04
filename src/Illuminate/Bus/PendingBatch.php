@@ -3,10 +3,10 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\SerializableClosure;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Throwable;
 
 class PendingBatch

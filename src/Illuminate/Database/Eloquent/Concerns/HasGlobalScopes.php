@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
-use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 trait HasGlobalScopes

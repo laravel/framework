@@ -3,7 +3,6 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -11,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
+use Illuminate\Support\Collection;
 use RuntimeException;
 
 class Dispatcher implements QueueingDispatcher

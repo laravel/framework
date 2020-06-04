@@ -3,8 +3,8 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Redis;
 use RedisCluster;

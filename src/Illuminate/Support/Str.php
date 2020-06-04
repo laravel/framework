@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;

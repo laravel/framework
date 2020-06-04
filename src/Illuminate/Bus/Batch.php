@@ -3,10 +3,10 @@
 namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use JsonSerializable;
 
 class Batch implements Arrayable, JsonSerializable
