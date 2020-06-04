@@ -4,9 +4,9 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
 use Illuminate\Bus\PendingBatch;
+use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 

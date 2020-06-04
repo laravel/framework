@@ -2,8 +2,8 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Arr;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class RouteUrlGenerator

@@ -3,14 +3,14 @@
 namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 

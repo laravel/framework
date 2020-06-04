@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use Countable;
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 
 /**
