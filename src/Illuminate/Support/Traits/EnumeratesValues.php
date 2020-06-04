@@ -523,7 +523,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Filter items where the given key is not null.
+     * Filter items where the value for the given key is null.
      *
      * @param  string|null  $key
      * @return static
@@ -534,7 +534,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Filter items where the given key is null.
+     * Filter items where the value for the given key is not null.
      *
      * @param  string|null  $key
      * @return static
