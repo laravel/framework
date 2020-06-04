@@ -56,11 +56,11 @@ class CatchableCollectionProxy
         $originalCollection = $this->collection;
 
         try {
-            foreach($this->calledMethods as $calledMethod) {
-                $this->collection = $this->collection->{$calledMethod['name']}(... $calledMethod['parameters']);
+            foreach ($this->calledMethods as $calledMethod) {
+                $this->collection = $this->collection->{$calledMethod['name']}(...$calledMethod['parameters']);
             }
         } catch (\Throwable $exception) {
-            foreach($handlers as $callable) {
+            foreach ($handlers as $callable) {
                 $type = $this->exceptionType($callable);
                 if ($exception instanceof $type) {
                     return $callable($exception, $originalCollection) ?? $originalCollection;

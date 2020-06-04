@@ -4266,7 +4266,7 @@ class SupportCollectionTest extends TestCase
                 return strtoupper($letter);
             })
             ->catch(function (Exception $exception) {
-                $this->fail('caught unexpected exception: ' . $exception->getMessage());
+                $this->fail('caught unexpected exception: '.$exception->getMessage());
             });
 
         $this->assertEquals(['A', 'B', 'C', 1, 2, 3], $collection->toArray());
@@ -4376,6 +4376,7 @@ class SupportCollectionTest extends TestCase
             })
             ->catch(function (Exception $exception, $collection) {
                 $this->assertEquals('catch me', $exception->getMessage());
+
                 return collect(['d', 'e', 'f']);
             });
 
