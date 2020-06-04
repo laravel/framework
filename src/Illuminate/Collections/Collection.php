@@ -1376,4 +1376,14 @@ class Collection implements ArrayAccess, Enumerable
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Wrap the following collection methods to be catchable.
+     *
+     * @return CatchableCollectionProxy
+     */
+    public function try()
+    {
+        return new CatchableCollectionProxy($this);
+    }
 }
