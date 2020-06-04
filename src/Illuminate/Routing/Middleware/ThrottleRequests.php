@@ -57,9 +57,9 @@ class ThrottleRequests
         $this->limiter->hit($key, $decayMinutes * 60);
 
         $response = $next($request);
-        
+
         $retryAfter = $maxAttempts === 1 ? $this->getTimeUntilNextRetry($key) : null;
-        
+
         return $this->addHeaders(
             $response, $maxAttempts,
             $this->calculateRemainingAttempts($key, $maxAttempts, $retryAfter),
