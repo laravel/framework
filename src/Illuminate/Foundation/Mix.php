@@ -29,7 +29,7 @@ class Mix
             $manifestDirectory = "/{$manifestDirectory}";
         }
 
-        if (file_exists(public_path($manifestDirectory.'/hot'))) {
+        if (is_file(public_path($manifestDirectory.'/hot'))) {
             $url = rtrim(file_get_contents(public_path($manifestDirectory.'/hot')));
 
             if (Str::startsWith($url, ['http://', 'https://'])) {
@@ -42,7 +42,7 @@ class Mix
         $manifestPath = public_path($manifestDirectory.'/mix-manifest.json');
 
         if (! isset($manifests[$manifestPath])) {
-            if (! file_exists($manifestPath)) {
+            if (! is_file($manifestPath)) {
                 throw new Exception('The Mix manifest does not exist.');
             }
 

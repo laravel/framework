@@ -94,7 +94,7 @@ abstract class Component
             $directory = Container::getInstance()['config']->get('view.compiled')
         );
 
-        if (! file_exists($viewFile = $directory.'/'.sha1($contents).'.blade.php')) {
+        if (! is_file($viewFile = $directory.'/'.sha1($contents).'.blade.php')) {
             if (! is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }

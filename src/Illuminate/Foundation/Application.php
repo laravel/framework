@@ -957,7 +957,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function configurationIsCached()
     {
-        return file_exists($this->getCachedConfigPath());
+        return is_file($this->getCachedConfigPath());
     }
 
     /**
@@ -1048,7 +1048,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function isDownForMaintenance()
     {
-        return file_exists($this->storagePath().'/framework/down');
+        return is_file($this->storagePath().'/framework/down');
     }
 
     /**
