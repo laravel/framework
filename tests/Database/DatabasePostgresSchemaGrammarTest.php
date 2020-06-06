@@ -764,6 +764,27 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "foo" uuid not null', $statements[0]);
     }
 
+    public function testAddingForeignUuid()
+    {
+        $blueprint = new Blueprint('users');
+        $foreignUuid = $blueprint->foreignUuid('foo');
+        $blueprint->foreignUuid('company_id')->constrained();
+        $blueprint->foreignUuid('laravel_idea_id')->constrained();
+        $blueprint->foreignUuid('team_id')->references('id')->on('teams');
+        $blueprint->foreignUuid('team_column_id')->constrained('teams');
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignUuid);
+        $this->assertSame([
+            'alter table "users" add column "foo" uuid not null, add column "company_id" uuid not null, add column "laravel_idea_id" uuid not null, add column "team_id" uuid not null, add column "team_column_id" uuid not null',
+            'alter table "users" add constraint "users_company_id_foreign" foreign key ("company_id") references "companies" ("id")',
+            'alter table "users" add constraint "users_laravel_idea_id_foreign" foreign key ("laravel_idea_id") references "laravel_ideas" ("id")',
+            'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
+            'alter table "users" add constraint "users_team_column_id_foreign" foreign key ("team_column_id") references "teams" ("id")',
+        ], $statements);
+    }
+
     public function testAddingGeneratedAs()
     {
         $blueprint = new Blueprint('users');

@@ -710,6 +710,27 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "foo" varchar not null', $statements[0]);
     }
 
+    public function testAddingForeignUuid()
+    {
+        $blueprint = new Blueprint('users');
+        $foreignUuid = $blueprint->foreignUuid('foo');
+        $blueprint->foreignUuid('company_id')->constrained();
+        $blueprint->foreignUuid('laravel_idea_id')->constrained();
+        $blueprint->foreignUuid('team_id')->references('id')->on('teams');
+        $blueprint->foreignUuid('team_column_id')->constrained('teams');
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignUuid);
+        $this->assertSame([
+            'alter table "users" add column "foo" varchar not null',
+            'alter table "users" add column "company_id" varchar not null',
+            'alter table "users" add column "laravel_idea_id" varchar not null',
+            'alter table "users" add column "team_id" varchar not null',
+            'alter table "users" add column "team_column_id" varchar not null',
+        ], $statements);
+    }
+
     public function testAddingIpAddress()
     {
         $blueprint = new Blueprint('users');
