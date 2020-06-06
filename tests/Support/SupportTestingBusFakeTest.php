@@ -44,7 +44,7 @@ class SupportTestingBusFakeTest extends TestCase
     {
         $this->fake->dispatch(new BusJobStub);
 
-        $this->fake->assertDispatched(function (BusJobStub $job) {
+        $this->fake->assertDispatched(static function (BusJobStub $job) {
             return true;
         });
     }
@@ -66,7 +66,7 @@ class SupportTestingBusFakeTest extends TestCase
     public function testAssertDispatchedAfterResponseClosure()
     {
         try {
-            $this->fake->assertDispatchedAfterResponse(function (BusJobStub $job) {
+            $this->fake->assertDispatchedAfterResponse(static function (BusJobStub $job) {
                 return true;
             });
             $this->fail();
@@ -118,7 +118,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->dispatchNow(new OtherBusJobStub(1));
 
         try {
-            $this->fake->assertDispatched(OtherBusJobStub::class, function ($job) {
+            $this->fake->assertDispatched(OtherBusJobStub::class, static function ($job) {
                 return $job->id === 0;
             });
             $this->fail();
@@ -126,11 +126,11 @@ class SupportTestingBusFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was not dispatched.'));
         }
 
-        $this->fake->assertDispatched(OtherBusJobStub::class, function ($job) {
+        $this->fake->assertDispatched(OtherBusJobStub::class, static function ($job) {
             return $job->id === null;
         });
 
-        $this->fake->assertDispatched(OtherBusJobStub::class, function ($job) {
+        $this->fake->assertDispatched(OtherBusJobStub::class, static function ($job) {
             return $job->id === 1;
         });
     }
@@ -141,7 +141,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->dispatchAfterResponse(new OtherBusJobStub(1));
 
         try {
-            $this->fake->assertDispatchedAfterResponse(OtherBusJobStub::class, function ($job) {
+            $this->fake->assertDispatchedAfterResponse(OtherBusJobStub::class, static function ($job) {
                 return $job->id === 0;
             });
             $this->fail();
@@ -149,11 +149,11 @@ class SupportTestingBusFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was not dispatched for after sending the response.'));
         }
 
-        $this->fake->assertDispatchedAfterResponse(OtherBusJobStub::class, function ($job) {
+        $this->fake->assertDispatchedAfterResponse(OtherBusJobStub::class, static function ($job) {
             return $job->id === null;
         });
 
-        $this->fake->assertDispatchedAfterResponse(OtherBusJobStub::class, function ($job) {
+        $this->fake->assertDispatchedAfterResponse(OtherBusJobStub::class, static function ($job) {
             return $job->id === 1;
         });
     }
@@ -209,7 +209,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->dispatchNow(new BusJobStub);
 
         try {
-            $this->fake->assertNotDispatched(function (BusJobStub $job) {
+            $this->fake->assertNotDispatched(static function (BusJobStub $job) {
                 return true;
             });
             $this->fail();
@@ -237,7 +237,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->dispatchAfterResponse(new BusJobStub);
 
         try {
-            $this->fake->assertNotDispatchedAfterResponse(function (BusJobStub $job) {
+            $this->fake->assertNotDispatchedAfterResponse(static function (BusJobStub $job) {
                 return true;
             });
             $this->fail();
@@ -287,7 +287,7 @@ class SupportTestingBusFakeTest extends TestCase
         $dispatcher->shouldReceive('dispatchNow')->never()->with($anotherJob, null);
 
         $fake = new BusFake($dispatcher, [
-            function ($command) {
+            static function ($command) {
                 return $command instanceof OtherBusJobStub && $command->id === 1;
             },
         ]);
@@ -303,10 +303,10 @@ class SupportTestingBusFakeTest extends TestCase
 
         $fake->assertNotDispatched(BusJobStub::class);
         $fake->assertDispatchedTimes(OtherBusJobStub::class, 2);
-        $fake->assertNotDispatched(OtherBusJobStub::class, function ($job) {
+        $fake->assertNotDispatched(OtherBusJobStub::class, static function ($job) {
             return $job->id === null;
         });
-        $fake->assertDispatched(OtherBusJobStub::class, function ($job) {
+        $fake->assertDispatched(OtherBusJobStub::class, static function ($job) {
             return $job->id === 1;
         });
     }

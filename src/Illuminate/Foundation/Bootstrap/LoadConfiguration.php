@@ -42,7 +42,7 @@ class LoadConfiguration
         // Finally, we will set the application's environment based on the configuration
         // values that were loaded. We will pass a callback which will be used to get
         // the environment in a web context where an "--env" switch is not present.
-        $app->detectEnvironment(function () use ($config) {
+        $app->detectEnvironment(static function () use ($config) {
             return $config->get('app.env', 'production');
         });
 

@@ -52,7 +52,7 @@ class FoundationProviderRepositoryTest extends TestCase
         // bar mock is added to eagers since it's not reserved
         $repo->shouldReceive('createProvider')->once()->with('bar')->andReturn($barMock = m::mock(ServiceProvider::class));
         $barMock->shouldReceive('isDeferred')->once()->andReturn(false);
-        $repo->shouldReceive('writeManifest')->once()->andReturnUsing(function ($manifest) {
+        $repo->shouldReceive('writeManifest')->once()->andReturnUsing(static function ($manifest) {
             return $manifest;
         });
 

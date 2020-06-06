@@ -18,7 +18,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('json_casts', function (Blueprint $table) {
+        Schema::create('json_casts', static function (Blueprint $table) {
             $table->increments('id');
             $table->json('basic_string_as_json_field')->nullable();
             $table->json('json_string_as_json_field')->nullable();

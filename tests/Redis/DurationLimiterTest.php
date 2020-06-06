@@ -33,16 +33,16 @@ class DurationLimiterTest extends TestCase
     {
         $store = [];
 
-        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
+        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, static function () use (&$store) {
             $store[] = 1;
         });
 
-        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
+        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, static function () use (&$store) {
             $store[] = 2;
         });
 
         try {
-            (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
+            (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, static function () use (&$store) {
                 $store[] = 3;
             });
         } catch (Throwable $e) {
@@ -53,7 +53,7 @@ class DurationLimiterTest extends TestCase
 
         sleep(2);
 
-        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
+        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, static function () use (&$store) {
             $store[] = 3;
         });
 
@@ -64,19 +64,19 @@ class DurationLimiterTest extends TestCase
     {
         $store = [];
 
-        (new DurationLimiter($this->redis(), 'key', 1, 1))->block(2, function () use (&$store) {
+        (new DurationLimiter($this->redis(), 'key', 1, 1))->block(2, static function () use (&$store) {
             $store[] = 1;
         });
 
         try {
-            (new DurationLimiter($this->redis(), 'key', 1, 1))->block(0, function () use (&$store) {
+            (new DurationLimiter($this->redis(), 'key', 1, 1))->block(0, static function () use (&$store) {
                 $store[] = 2;
             });
         } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
-        (new DurationLimiter($this->redis(), 'key', 1, 1))->block(2, function () use (&$store) {
+        (new DurationLimiter($this->redis(), 'key', 1, 1))->block(2, static function () use (&$store) {
             $store[] = 3;
         });
 
@@ -87,7 +87,7 @@ class DurationLimiterTest extends TestCase
     {
         $limiter = new DurationLimiter($this->redis(), 'key', 1, 1);
 
-        $result = $limiter->block(1, function () {
+        $result = $limiter->block(1, static function () {
             return 'foo';
         });
 

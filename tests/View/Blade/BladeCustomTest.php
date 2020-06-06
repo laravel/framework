@@ -18,7 +18,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomExtensionsAreCompiled()
     {
-        $this->compiler->extend(function ($value) {
+        $this->compiler->extend(static function ($value) {
             return str_replace('foo', 'bar', $value);
         });
         $this->assertSame('bar', $this->compiler->compileString('foo'));
@@ -27,7 +27,7 @@ class BladeCustomTest extends AbstractBladeTestCase
     public function testCustomStatements()
     {
         $this->assertCount(0, $this->compiler->getCustomDirectives());
-        $this->compiler->directive('customControl', function ($expression) {
+        $this->compiler->directive('customControl', static function ($expression) {
             return "<?php echo custom_control({$expression}); ?>";
         });
         $this->assertCount(1, $this->compiler->getCustomDirectives());
@@ -43,7 +43,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomShortStatements()
     {
-        $this->compiler->directive('customControl', function ($expression) {
+        $this->compiler->directive('customControl', static function ($expression) {
             return '<?php echo custom_control(); ?>';
         });
 
@@ -54,16 +54,16 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testValidCustomNames()
     {
-        $this->assertNull($this->compiler->directive('custom', function () {
+        $this->assertNull($this->compiler->directive('custom', static function () {
             //
         }));
-        $this->assertNull($this->compiler->directive('custom_custom', function () {
+        $this->assertNull($this->compiler->directive('custom_custom', static function () {
             //
         }));
-        $this->assertNull($this->compiler->directive('customCustom', function () {
+        $this->assertNull($this->compiler->directive('customCustom', static function () {
             //
         }));
-        $this->assertNull($this->compiler->directive('custom::custom', function () {
+        $this->assertNull($this->compiler->directive('custom::custom', static function () {
             //
         }));
     }
@@ -72,7 +72,7 @@ class BladeCustomTest extends AbstractBladeTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The directive name [custom-custom] is not valid.');
-        $this->compiler->directive('custom-custom', function () {
+        $this->compiler->directive('custom-custom', static function () {
             //
         });
     }
@@ -81,14 +81,14 @@ class BladeCustomTest extends AbstractBladeTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The directive name [custom:custom] is not valid.');
-        $this->compiler->directive('custom:custom', function () {
+        $this->compiler->directive('custom:custom', static function () {
             //
         });
     }
 
     public function testCustomExtensionOverwritesCore()
     {
-        $this->compiler->directive('foreach', function ($expression) {
+        $this->compiler->directive('foreach', static function ($expression) {
             return '<?php custom(); ?>';
         });
 
@@ -99,7 +99,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomConditions()
     {
-        $this->compiler->if('custom', function ($user) {
+        $this->compiler->if('custom', static function ($user) {
             return true;
         });
 
@@ -112,7 +112,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomIfElseConditions()
     {
-        $this->compiler->if('custom', function ($anything) {
+        $this->compiler->if('custom', static function ($anything) {
             return true;
         });
 
@@ -129,7 +129,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomUnlessConditions()
     {
-        $this->compiler->if('custom', function ($anything) {
+        $this->compiler->if('custom', static function ($anything) {
             return true;
         });
 
@@ -142,7 +142,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomConditionsAccepts0AsArgument()
     {
-        $this->compiler->if('custom', function ($number) {
+        $this->compiler->if('custom', static function ($number) {
             return true;
         });
 

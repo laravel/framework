@@ -543,7 +543,7 @@ class Gate implements GateContract
             return $this->abilities[$ability];
         }
 
-        return function () {
+        return static function () {
             //
         };
     }
@@ -726,7 +726,7 @@ class Gate implements GateContract
      */
     public function forUser($user)
     {
-        $callback = function () use ($user) {
+        $callback = static function () use ($user) {
             return $user;
         };
 

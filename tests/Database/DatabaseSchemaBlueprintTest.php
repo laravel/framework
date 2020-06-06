@@ -104,7 +104,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testDefaultCurrentDateTime()
     {
-        $base = new Blueprint('users', function ($table) {
+        $base = new Blueprint('users', static function ($table) {
             $table->dateTime('created')->useCurrent();
         });
 
@@ -125,7 +125,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testDefaultCurrentTimestamp()
     {
-        $base = new Blueprint('users', function ($table) {
+        $base = new Blueprint('users', static function ($table) {
             $table->timestamp('created')->useCurrent();
         });
 
@@ -146,7 +146,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testUnsignedDecimalTable()
     {
-        $base = new Blueprint('users', function ($table) {
+        $base = new Blueprint('users', static function ($table) {
             $table->unsignedDecimal('money', 10, 2)->useCurrent();
         });
 
@@ -158,7 +158,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testRemoveColumn()
     {
-        $base = new Blueprint('users', function ($table) {
+        $base = new Blueprint('users', static function ($table) {
             $table->string('foo');
             $table->string('remove_this');
             $table->removeColumn('remove_this');
@@ -181,7 +181,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             return 'bar';
         });
 
-        $blueprint = new Blueprint('users', function ($table) {
+        $blueprint = new Blueprint('users', static function ($table) {
             $table->foo();
         });
 

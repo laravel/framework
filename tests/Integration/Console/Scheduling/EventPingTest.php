@@ -46,7 +46,7 @@ class EventPingTest extends TestCase
         $thenCalled = false;
 
         $event->pingBefore('https://httpstat.us/500')
-            ->then(function () use (&$thenCalled) {
+            ->then(static function () use (&$thenCalled) {
                 $thenCalled = true;
             });
 

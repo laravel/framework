@@ -185,7 +185,7 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
-        $data = $data->mapWithKeys(function ($value, $key) {
+        $data = $data->mapWithKeys(static function ($value, $key) {
             return [Str::camel($key) => $value];
         });
 
@@ -258,7 +258,7 @@ class ComponentTagCompiler
                     ->make(Application::class)
                     ->getNamespace();
 
-        $componentPieces = array_map(function ($componentPiece) {
+        $componentPieces = array_map(static function ($componentPiece) {
             return ucfirst(Str::camel($componentPiece));
         }, explode('.', $component));
 
@@ -287,7 +287,7 @@ class ComponentTagCompiler
                     ? collect($constructor->getParameters())->map->getName()->all()
                     : [];
 
-        return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
+        return collect($attributes)->partition(static function ($value, $key) use ($parameterNames) {
             return in_array(Str::camel($key), $parameterNames);
         });
     }
@@ -418,7 +418,7 @@ class ComponentTagCompiler
      */
     protected function escapeSingleQuotesOutsideOfPhpBlocks(string $value)
     {
-        return collect(token_get_all($value))->map(function ($token) {
+        return collect(token_get_all($value))->map(static function ($token) {
             if (! is_array($token)) {
                 return $token;
             }

@@ -55,7 +55,7 @@ class SupportTestingNotificationFakeTest extends TestCase
     {
         $this->fake->send($this->user, new NotificationStub);
 
-        $this->fake->assertSentTo($this->user, function (NotificationStub $notification) {
+        $this->fake->assertSentTo($this->user, static function (NotificationStub $notification) {
             return true;
         });
     }
@@ -79,7 +79,7 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->send($this->user, new NotificationStub);
 
         try {
-            $this->fake->assertNotSentTo($this->user, function (NotificationStub $notification) {
+            $this->fake->assertNotSentTo($this->user, static function (NotificationStub $notification) {
                 return true;
             });
             $this->fail();
@@ -139,7 +139,7 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         $this->fake->send($user, new NotificationStub);
 
-        $this->fake->assertSentTo($user, NotificationStub::class, function ($notification, $channels, $notifiable, $locale) use ($user) {
+        $this->fake->assertSentTo($user, NotificationStub::class, static function ($notification, $channels, $notifiable, $locale) use ($user) {
             return $notifiable === $user && $locale === 'au';
         });
     }

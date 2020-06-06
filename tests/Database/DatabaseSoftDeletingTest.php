@@ -21,7 +21,7 @@ class DatabaseSoftDeletingTest extends TestCase
         $model = new class extends SoftDeletingModel {
             protected $dates = ['deleted_at'];
         };
-        $entries = array_filter($model->getDates(), function ($attribute) {
+        $entries = array_filter($model->getDates(), static function ($attribute) {
             return $attribute === 'deleted_at';
         });
 

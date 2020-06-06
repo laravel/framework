@@ -9,7 +9,7 @@ class SupportTappableTest extends TestCase
 {
     public function testTappableClassWithCallback()
     {
-        $name = TappableClass::make()->tap(function ($tappable) {
+        $name = TappableClass::make()->tap(static function ($tappable) {
             $tappable->setName('MyName');
         })->getName();
 

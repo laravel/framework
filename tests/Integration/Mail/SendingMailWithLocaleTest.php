@@ -81,7 +81,7 @@ class SendingMailWithLocaleTest extends TestCase
     {
         Carbon::setTestNow('2018-04-01');
 
-        Event::listen(LocaleUpdated::class, function ($event) {
+        Event::listen(LocaleUpdated::class, static function ($event) {
             Carbon::setLocale($event->locale);
         });
 

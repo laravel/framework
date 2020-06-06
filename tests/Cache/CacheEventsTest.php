@@ -121,13 +121,13 @@ class CacheEventsTest extends TestCase
 
         $dispatcher->shouldReceive('dispatch')->once()->with($this->assertEventMatches(CacheMissed::class, ['key' => 'foo']));
         $dispatcher->shouldReceive('dispatch')->once()->with($this->assertEventMatches(KeyWritten::class, ['key' => 'foo', 'value' => 'bar', 'seconds' => 99]));
-        $this->assertSame('bar', $repository->remember('foo', 99, function () {
+        $this->assertSame('bar', $repository->remember('foo', 99, static function () {
             return 'bar';
         }));
 
         $dispatcher->shouldReceive('dispatch')->once()->with($this->assertEventMatches(CacheMissed::class, ['key' => 'foo', 'tags' => ['taylor']]));
         $dispatcher->shouldReceive('dispatch')->once()->with($this->assertEventMatches(KeyWritten::class, ['key' => 'foo', 'value' => 'bar', 'seconds' => 99, 'tags' => ['taylor']]));
-        $this->assertSame('bar', $repository->tags('taylor')->remember('foo', 99, function () {
+        $this->assertSame('bar', $repository->tags('taylor')->remember('foo', 99, static function () {
             return 'bar';
         }));
     }
@@ -139,13 +139,13 @@ class CacheEventsTest extends TestCase
 
         $dispatcher->shouldReceive('dispatch')->once()->with($this->assertEventMatches(CacheMissed::class, ['key' => 'foo']));
         $dispatcher->shouldReceive('dispatch')->once()->with($this->assertEventMatches(KeyWritten::class, ['key' => 'foo', 'value' => 'bar', 'seconds' => null]));
-        $this->assertSame('bar', $repository->rememberForever('foo', function () {
+        $this->assertSame('bar', $repository->rememberForever('foo', static function () {
             return 'bar';
         }));
 
         $dispatcher->shouldReceive('dispatch')->once()->with($this->assertEventMatches(CacheMissed::class, ['key' => 'foo', 'tags' => ['taylor']]));
         $dispatcher->shouldReceive('dispatch')->once()->with($this->assertEventMatches(KeyWritten::class, ['key' => 'foo', 'value' => 'bar', 'seconds' => null, 'tags' => ['taylor']]));
-        $this->assertSame('bar', $repository->tags('taylor')->rememberForever('foo', function () {
+        $this->assertSame('bar', $repository->tags('taylor')->rememberForever('foo', static function () {
             return 'bar';
         }));
     }
@@ -176,7 +176,7 @@ class CacheEventsTest extends TestCase
 
     protected function assertEventMatches($eventClass, $properties = [])
     {
-        return m::on(function ($event) use ($eventClass, $properties) {
+        return m::on(static function ($event) use ($eventClass, $properties) {
             if (! $event instanceof $eventClass) {
                 return false;
             }

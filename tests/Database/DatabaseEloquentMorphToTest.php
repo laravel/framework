@@ -58,7 +58,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function testMorphToWithDynamicDefault()
     {
-        $relation = $this->getRelation()->withDefault(function ($newModel) {
+        $relation = $this->getRelation()->withDefault(static function ($newModel) {
             $newModel->username = 'taylor';
         });
 

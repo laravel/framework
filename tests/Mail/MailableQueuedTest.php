@@ -66,7 +66,7 @@ class MailableQueuedTest extends TestCase
         $filesystemFactory = $this->getMockBuilder(FilesystemManager::class)
             ->setConstructorArgs([$app])
             ->getMock();
-        $container->singleton('filesystem', function () use ($filesystemFactory) {
+        $container->singleton('filesystem', static function () use ($filesystemFactory) {
             return $filesystemFactory;
         });
         $queueFake = new QueueFake($app);

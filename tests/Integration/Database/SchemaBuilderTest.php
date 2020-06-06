@@ -17,13 +17,13 @@ class SchemaBuilderTest extends DatabaseTestCase
 {
     public function testDropAllTables()
     {
-        Schema::create('table', function (Blueprint $table) {
+        Schema::create('table', static function (Blueprint $table) {
             $table->increments('id');
         });
 
         Schema::dropAllTables();
 
-        Schema::create('table', function (Blueprint $table) {
+        Schema::create('table', static function (Blueprint $table) {
             $table->increments('id');
         });
 
@@ -45,11 +45,11 @@ class SchemaBuilderTest extends DatabaseTestCase
     {
         Schema::registerCustomDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 
-        Schema::create('test', function (Blueprint $table) {
+        Schema::create('test', static function (Blueprint $table) {
             $table->string('test_column');
         });
 
-        $blueprint = new Blueprint('test', function (Blueprint $table) {
+        $blueprint = new Blueprint('test', static function (Blueprint $table) {
             $table->tinyInteger('test_column')->change();
         });
 

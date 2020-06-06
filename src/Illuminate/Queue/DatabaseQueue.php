@@ -266,7 +266,7 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $expiration = Carbon::now()->subSeconds($this->retryAfter)->getTimestamp();
 
-        $query->orWhere(function ($query) use ($expiration) {
+        $query->orWhere(static function ($query) use ($expiration) {
             $query->where('reserved_at', '<=', $expiration);
         });
     }

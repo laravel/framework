@@ -31,7 +31,7 @@ class LogLoggerTest extends TestCase
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
-        $events->listen(MessageLogged::class, function ($event) {
+        $events->listen(MessageLogged::class, static function ($event) {
             $_SERVER['__log.level'] = $event->level;
             $_SERVER['__log.message'] = $event->message;
             $_SERVER['__log.context'] = $event->context;
@@ -55,7 +55,7 @@ class LogLoggerTest extends TestCase
         $this->expectExceptionMessage('Events dispatcher has not been set.');
 
         $writer = new Logger(m::mock(Monolog::class));
-        $writer->listen(function () {
+        $writer->listen(static function () {
             //
         });
     }
@@ -64,7 +64,7 @@ class LogLoggerTest extends TestCase
     {
         $writer = new Logger(m::mock(Monolog::class), $events = m::mock(DispatcherContract::class));
 
-        $callback = function () {
+        $callback = static function () {
             return 'success';
         };
         $events->shouldReceive('listen')->with(MessageLogged::class, $callback)->once();

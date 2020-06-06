@@ -26,13 +26,13 @@ class ValidationFactoryTest extends TestCase
         $this->assertEquals(['baz' => ['boom']], $validator->getRules());
 
         $presence = m::mock(PresenceVerifierInterface::class);
-        $noop1 = function () {
+        $noop1 = static function () {
             //
         };
-        $noop2 = function () {
+        $noop2 = static function () {
             //
         };
-        $noop3 = function () {
+        $noop3 = static function () {
             //
         };
         $factory->extend('foo', $noop1);
@@ -81,7 +81,7 @@ class ValidationFactoryTest extends TestCase
         unset($_SERVER['__validator.factory']);
         $translator = m::mock(TranslatorInterface::class);
         $factory = new Factory($translator);
-        $factory->resolver(function ($translator, $data, $rules) {
+        $factory->resolver(static function ($translator, $data, $rules) {
             $_SERVER['__validator.factory'] = true;
 
             return new Validator($translator, $data, $rules);
@@ -99,7 +99,7 @@ class ValidationFactoryTest extends TestCase
     {
         $translator = m::mock(TranslatorInterface::class);
         $factory = new Factory($translator);
-        $factory->extend('foo', function ($attribute, $value, $parameters, $validator) {
+        $factory->extend('foo', static function ($attribute, $value, $parameters, $validator) {
             return $validator->validateArray($attribute, $value);
         });
 

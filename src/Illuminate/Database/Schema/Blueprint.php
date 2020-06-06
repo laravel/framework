@@ -167,7 +167,7 @@ class Blueprint
      */
     protected function commandsNamed(array $names)
     {
-        return collect($this->commands)->filter(function ($command) use ($names) {
+        return collect($this->commands)->filter(static function ($command) use ($names) {
             return in_array($command->name, $names);
         });
     }
@@ -257,7 +257,7 @@ class Blueprint
      */
     protected function creating()
     {
-        return collect($this->commands)->contains(function ($command) {
+        return collect($this->commands)->contains(static function ($command) {
             return $command->name === 'create';
         });
     }
@@ -1442,7 +1442,7 @@ class Blueprint
      */
     public function removeColumn($name)
     {
-        $this->columns = array_values(array_filter($this->columns, function ($c) use ($name) {
+        $this->columns = array_values(array_filter($this->columns, static function ($c) use ($name) {
             return $c['name'] != $name;
         }));
 
@@ -1512,7 +1512,7 @@ class Blueprint
      */
     public function getAddedColumns()
     {
-        return array_filter($this->columns, function ($column) {
+        return array_filter($this->columns, static function ($column) {
             return ! $column->change;
         });
     }
@@ -1524,7 +1524,7 @@ class Blueprint
      */
     public function getChangedColumns()
     {
-        return array_filter($this->columns, function ($column) {
+        return array_filter($this->columns, static function ($column) {
             return (bool) $column->change;
         });
     }

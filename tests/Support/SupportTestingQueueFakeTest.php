@@ -47,7 +47,7 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $this->fake->push($this->job);
 
-        $this->fake->assertPushed(function (JobStub $job) {
+        $this->fake->assertPushed(static function (JobStub $job) {
             return true;
         });
     }
@@ -80,7 +80,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->push($this->job);
 
         try {
-            $this->fake->assertNotPushed(function (JobStub $job) {
+            $this->fake->assertNotPushed(static function (JobStub $job) {
                 return true;
             });
             $this->fail();
@@ -108,7 +108,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->push($this->job, '', 'foo');
 
         try {
-            $this->fake->assertPushedOn('bar', function (JobStub $job) {
+            $this->fake->assertPushedOn('bar', static function (JobStub $job) {
                 return true;
             });
             $this->fail();
@@ -116,7 +116,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
         }
 
-        $this->fake->assertPushedOn('foo', function (JobStub $job) {
+        $this->fake->assertPushedOn('foo', static function (JobStub $job) {
             return true;
         });
     }
@@ -219,7 +219,7 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $this->fake->assertPushedWithChain(JobWithChainAndParameterStub::class, [
             JobStub::class,
-        ], function ($job) {
+        ], static function ($job) {
             return $job->parameter == 'second';
         });
 
@@ -227,7 +227,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushedWithChain(JobWithChainAndParameterStub::class, [
                 JobStub::class,
                 JobStub::class,
-            ], function ($job) {
+            ], static function ($job) {
                 return $job->parameter == 'second';
             });
             $this->fail();

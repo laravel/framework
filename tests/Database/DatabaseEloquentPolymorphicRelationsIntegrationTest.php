@@ -31,22 +31,22 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
 
     protected function createSchema()
     {
-        $this->schema('default')->create('posts', function ($table) {
+        $this->schema('default')->create('posts', static function ($table) {
             $table->increments('id');
             $table->timestamps();
         });
 
-        $this->schema('default')->create('images', function ($table) {
+        $this->schema('default')->create('images', static function ($table) {
             $table->increments('id');
             $table->timestamps();
         });
 
-        $this->schema('default')->create('tags', function ($table) {
+        $this->schema('default')->create('tags', static function ($table) {
             $table->increments('id');
             $table->timestamps();
         });
 
-        $this->schema('default')->create('taggables', function ($table) {
+        $this->schema('default')->create('taggables', static function ($table) {
             $table->integer('eloquent_many_to_many_polymorphic_test_tag_id');
             $table->integer('taggable_id');
             $table->string('taggable_type');

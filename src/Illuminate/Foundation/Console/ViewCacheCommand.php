@@ -49,7 +49,7 @@ class ViewCacheCommand extends Command
     {
         $compiler = $this->laravel['view']->getEngineResolver()->resolve('blade')->getCompiler();
 
-        $views->map(function (SplFileInfo $file) use ($compiler) {
+        $views->map(static function (SplFileInfo $file) use ($compiler) {
             $compiler->compile($file->getRealPath());
         });
     }

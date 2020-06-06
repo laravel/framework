@@ -329,7 +329,7 @@ class MailManager implements FactoryContract
     {
         return tap(new PostmarkTransport(
             $config['token'] ?? $this->app['config']->get('services.postmark.token')
-        ), function ($transport) {
+        ), static function ($transport) {
             $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
         });
     }

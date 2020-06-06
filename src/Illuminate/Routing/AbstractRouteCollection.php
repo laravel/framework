@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection StaticClosureCanBeUsedInspection */
 
 namespace Illuminate\Routing;
 
@@ -74,11 +74,11 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      */
     protected function matchAgainstRoutes(array $routes, $request, $includingMethod = true)
     {
-        [$fallbacks, $routes] = collect($routes)->partition(function ($route) {
+        [$fallbacks, $routes] = collect($routes)->partition(static function ($route) {
             return $route->isFallback;
         });
 
-        return $routes->merge($fallbacks)->first(function (Route $route) use ($request, $includingMethod) {
+        return $routes->merge($fallbacks)->first(static function (Route $route) use ($request, $includingMethod) {
             return $route->matches($request, $includingMethod);
         });
     }
@@ -95,7 +95,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     protected function getRouteForMethods($request, array $methods)
     {
         if ($request->method() === 'OPTIONS') {
-            return (new Route('OPTIONS', $request->path(), function () use ($methods) {
+            return (new Route('OPTIONS', $request->path(), static function () use ($methods) {
                 return new Response('', 200, ['Allow' => implode(',', $methods)]);
             }))->bind($request);
         }

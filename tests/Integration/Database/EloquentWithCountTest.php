@@ -16,21 +16,21 @@ class EloquentWithCountTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('one', function (Blueprint $table) {
+        Schema::create('one', static function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('two', function (Blueprint $table) {
+        Schema::create('two', static function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
         });
 
-        Schema::create('three', function (Blueprint $table) {
+        Schema::create('three', static function (Blueprint $table) {
             $table->increments('id');
             $table->integer('two_id');
         });
 
-        Schema::create('four', function (Blueprint $table) {
+        Schema::create('four', static function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
         });
@@ -43,7 +43,7 @@ class EloquentWithCountTest extends DatabaseTestCase
         $two->threes()->Create();
 
         $results = Model1::withCount([
-            'twos' => function ($query) {
+            'twos' => static function ($query) {
                 $query->where('id', '>=', 1);
             },
         ]);
@@ -109,7 +109,7 @@ class Model2 extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('app', function ($builder) {
+        static::addGlobalScope('app', static function ($builder) {
             $builder->latest();
         });
     }
@@ -130,7 +130,7 @@ class Model3 extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('app', function ($builder) {
+        static::addGlobalScope('app', static function ($builder) {
             $builder->where('idz', '>', 0);
         });
     }
@@ -146,7 +146,7 @@ class Model4 extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('app', function ($builder) {
+        static::addGlobalScope('app', static function ($builder) {
             $builder->where('id', '>', 1);
         });
     }

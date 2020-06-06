@@ -32,19 +32,19 @@ class DatabaseEloquentTimestampsTest extends TestCase
      */
     public function createSchema()
     {
-        $this->schema()->create('users', function ($table) {
+        $this->schema()->create('users', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->timestamps();
         });
 
-        $this->schema()->create('users_created_at', function ($table) {
+        $this->schema()->create('users_created_at', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->string('created_at');
         });
 
-        $this->schema()->create('users_updated_at', function ($table) {
+        $this->schema()->create('users_updated_at', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->string('updated_at');

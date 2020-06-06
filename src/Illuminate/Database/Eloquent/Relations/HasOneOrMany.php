@@ -183,7 +183,7 @@ abstract class HasOneOrMany extends Relation
     {
         $foreign = $this->getForeignKeyName();
 
-        return $results->mapToDictionary(function ($result) use ($foreign) {
+        return $results->mapToDictionary(static function ($result) use ($foreign) {
             return [$result->{$foreign} => $result];
         })->all();
     }
@@ -249,7 +249,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return tap($this->firstOrNew($attributes), static function ($instance) use ($values) {
             $instance->fill($values);
 
             $instance->save();

@@ -136,7 +136,7 @@ class StartSession
      */
     protected function startSession(Request $request, $session)
     {
-        return tap($session, function ($session) use ($request) {
+        return tap($session, static function ($session) use ($request) {
             $session->setRequestOnHandler($request);
 
             $session->start();
@@ -151,7 +151,7 @@ class StartSession
      */
     public function getSession(Request $request)
     {
-        return tap($this->manager->driver(), function ($session) use ($request) {
+        return tap($this->manager->driver(), static function ($session) use ($request) {
             $session->setId($request->cookies->get($session->getName()));
         });
     }

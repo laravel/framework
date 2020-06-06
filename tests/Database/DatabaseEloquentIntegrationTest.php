@@ -53,24 +53,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     protected function createSchema()
     {
-        $this->schema('default')->create('test_orders', function ($table) {
+        $this->schema('default')->create('test_orders', static function ($table) {
             $table->increments('id');
             $table->string('item_type');
             $table->integer('item_id');
             $table->timestamps();
         });
 
-        $this->schema('default')->create('with_json', function ($table) {
+        $this->schema('default')->create('with_json', static function ($table) {
             $table->increments('id');
             $table->text('json')->default(json_encode([]));
         });
 
-        $this->schema('second_connection')->create('test_items', function ($table) {
+        $this->schema('second_connection')->create('test_items', static function ($table) {
             $table->increments('id');
             $table->timestamps();
         });
 
-        $this->schema('default')->create('users_with_space_in_colum_name', function ($table) {
+        $this->schema('default')->create('users_with_space_in_colum_name', static function ($table) {
             $table->increments('id');
             $table->string('name')->nullable();
             $table->string('email address');
@@ -78,7 +78,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
 
         foreach (['default', 'second_connection'] as $connection) {
-            $this->schema($connection)->create('users', function ($table) {
+            $this->schema($connection)->create('users', static function ($table) {
                 $table->increments('id');
                 $table->string('name')->nullable();
                 $table->string('email');
@@ -86,13 +86,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->timestamps();
             });
 
-            $this->schema($connection)->create('friends', function ($table) {
+            $this->schema($connection)->create('friends', static function ($table) {
                 $table->integer('user_id');
                 $table->integer('friend_id');
                 $table->integer('friend_level_id')->nullable();
             });
 
-            $this->schema($connection)->create('posts', function ($table) {
+            $this->schema($connection)->create('posts', static function ($table) {
                 $table->increments('id');
                 $table->integer('user_id');
                 $table->integer('parent_id')->nullable();
@@ -100,27 +100,27 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->timestamps();
             });
 
-            $this->schema($connection)->create('comments', function ($table) {
+            $this->schema($connection)->create('comments', static function ($table) {
                 $table->increments('id');
                 $table->integer('post_id');
                 $table->string('content');
                 $table->timestamps();
             });
 
-            $this->schema($connection)->create('friend_levels', function ($table) {
+            $this->schema($connection)->create('friend_levels', static function ($table) {
                 $table->increments('id');
                 $table->string('level');
                 $table->timestamps();
             });
 
-            $this->schema($connection)->create('photos', function ($table) {
+            $this->schema($connection)->create('photos', static function ($table) {
                 $table->increments('id');
                 $table->morphs('imageable');
                 $table->string('name');
                 $table->timestamps();
             });
 
-            $this->schema($connection)->create('soft_deleted_users', function ($table) {
+            $this->schema($connection)->create('soft_deleted_users', static function ($table) {
                 $table->increments('id');
                 $table->string('name')->nullable();
                 $table->string('email');
@@ -129,7 +129,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             });
         }
 
-        $this->schema($connection)->create('non_incrementing_users', function ($table) {
+        $this->schema($connection)->create('non_incrementing_users', static function ($table) {
             $table->string('name')->nullable();
         });
     }
@@ -228,7 +228,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
         EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
 
-        Paginator::currentPageResolver(function () {
+        Paginator::currentPageResolver(static function () {
             return 1;
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
@@ -240,7 +240,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('taylorotwell@gmail.com', $models[0]->email);
         $this->assertSame('abigailotwell@gmail.com', $models[1]->email);
 
-        Paginator::currentPageResolver(function () {
+        Paginator::currentPageResolver(static function () {
             return 2;
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
@@ -253,7 +253,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testPaginatedModelCollectionRetrievalWhenNoElements()
     {
-        Paginator::currentPageResolver(function () {
+        Paginator::currentPageResolver(static function () {
             return 1;
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
@@ -261,7 +261,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(0, $models);
         $this->assertInstanceOf(LengthAwarePaginator::class, $models);
 
-        Paginator::currentPageResolver(function () {
+        Paginator::currentPageResolver(static function () {
             return 2;
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
@@ -436,8 +436,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestNonIncrementingSecond::create(['name' => ' Third']);
 
         $users = [];
-        EloquentTestNonIncrementingSecond::query()->eachById(
-            function (EloquentTestNonIncrementingSecond $user, $i) use (&$users) {
+        EloquentTestNonIncrementingSecond::query()->eachById(static function (EloquentTestNonIncrementingSecond $user, $i) use (&$users) {
                 $users[] = [$user->name, $i];
             }, 2, 'name');
         $this->assertSame([[' First', 0], [' Second', 1], [' Third', 0]], $users);
@@ -602,7 +601,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
 
-        $results = EloquentTestUser::whereHas('friends', function ($query) {
+        $results = EloquentTestUser::whereHas('friends', static function ($query) {
             $query->where('email', 'abigailotwell@gmail.com');
         })->get();
 
@@ -628,7 +627,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
         $friend->friends()->create(['email' => 'foo@gmail.com']);
 
-        $results = EloquentTestUser::whereHas('friends.friends', function ($query) {
+        $results = EloquentTestUser::whereHas('friends.friends', static function ($query) {
             $query->where('email', 'foo@gmail.com');
         })->get();
 
@@ -684,7 +683,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
         EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
 
-        $results = EloquentTestPost::whereHas('parentPost', function ($query) {
+        $results = EloquentTestPost::whereHas('parentPost', static function ($query) {
             $query->where('name', 'Parent Post');
         })->get();
 
@@ -710,7 +709,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
         EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
 
-        $results = EloquentTestPost::whereHas('parentPost.parentPost', function ($query) {
+        $results = EloquentTestPost::whereHas('parentPost.parentPost', static function ($query) {
             $query->where('name', 'Grandparent Post');
         })->get();
 
@@ -734,7 +733,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
         EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
 
-        $results = EloquentTestPost::whereHas('childPosts', function ($query) {
+        $results = EloquentTestPost::whereHas('childPosts', static function ($query) {
             $query->where('name', 'Child Post');
         })->get();
 
@@ -760,7 +759,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
         EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
 
-        $results = EloquentTestPost::whereHas('childPosts.childPosts', function ($query) {
+        $results = EloquentTestPost::whereHas('childPosts.childPosts', static function ($query) {
             $query->where('name', 'Child Post');
         })->get();
 
@@ -1045,7 +1044,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user = EloquentTestUser::create(['email' => 'taylor@laravel.com']);
         $this->connection()->transaction(function () use ($user) {
             try {
-                $this->connection()->transaction(function () use ($user) {
+                $this->connection()->transaction(static function () use ($user) {
                     $user->email = 'otwell@laravel.com';
                     $user->save();
                     throw new Exception;
@@ -1504,7 +1503,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Carbon::setTestNow($future = $before->copy()->addDays(3));
 
-        EloquentTouchingUser::withoutTouching(function () use ($post) {
+        EloquentTouchingUser::withoutTouching(static function () use ($post) {
             $post->touch();
         });
 
@@ -1533,7 +1532,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Carbon::setTestNow($future = $before->copy()->addDays(3));
 
-        EloquentTouchingUser::withoutTouching(function () use ($post) {
+        EloquentTouchingUser::withoutTouching(static function () use ($post) {
             $post->update(['name' => 'Updated']);
         });
 
@@ -1555,7 +1554,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Carbon::setTestNow($future = $before->copy()->addDays(3));
 
-        Model::withoutTouching(function () use ($post) {
+        Model::withoutTouching(static function () use ($post) {
             $post->update(['name' => 'Updated']);
         });
 
@@ -1577,7 +1576,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Carbon::setTestNow($future = $before->copy()->addDays(3));
 
-        EloquentTouchingUser::withoutTouching(function () use ($post) {
+        EloquentTouchingUser::withoutTouching(static function () use ($post) {
             $post->delete();
         });
 
@@ -1598,7 +1597,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Carbon::setTestNow($future = $before->copy()->addDays(3));
 
-        EloquentTouchingUser::withoutTouching(function () {
+        EloquentTouchingUser::withoutTouching(static function () {
             EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
         });
 
@@ -1620,7 +1619,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Carbon::setTestNow($future = $before->copy()->addDays(3));
 
-        EloquentTouchingPost::withoutTouching(function () {
+        EloquentTouchingPost::withoutTouching(static function () {
             EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
         });
 
@@ -1642,8 +1641,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Carbon::setTestNow($future = $before->copy()->addDays(3));
 
-        EloquentTouchingUser::withoutTouching(function () {
-            EloquentTouchingPost::withoutTouching(function () {
+        EloquentTouchingUser::withoutTouching(static function () {
+            EloquentTouchingPost::withoutTouching(static function () {
                 EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
             });
         });
@@ -1666,7 +1665,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Carbon::setTestNow($future = $before->copy()->addDays(3));
 
-        Model::withoutTouchingOn([EloquentTouchingUser::class, EloquentTouchingPost::class], function () {
+        Model::withoutTouchingOn([EloquentTouchingUser::class, EloquentTouchingPost::class], static function () {
             EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
         });
 
@@ -1773,7 +1772,7 @@ class EloquentTestUser extends Eloquent
 
     public function postWithPhotos()
     {
-        return $this->post()->join('photo', function ($join) {
+        return $this->post()->join('photo', static function ($join) {
             $join->on('photo.imageable_id', 'post.id');
             $join->where('photo.imageable_type', 'EloquentTestPost');
         });
@@ -1813,7 +1812,7 @@ class EloquentTestUserWithGlobalScope extends EloquentTestUser
     {
         parent::boot();
 
-        static::addGlobalScope(function ($builder) {
+        static::addGlobalScope(static function ($builder) {
             $builder->with('posts');
         });
     }
@@ -1825,7 +1824,7 @@ class EloquentTestUserWithOmittingGlobalScope extends EloquentTestUser
     {
         parent::boot();
 
-        static::addGlobalScope(function ($builder) {
+        static::addGlobalScope(static function ($builder) {
             $builder->where('email', '!=', 'taylorotwell@gmail.com');
         });
     }
@@ -1841,7 +1840,7 @@ class EloquentTestUserWithGlobalScopeRemovingOtherScope extends Eloquent
 
     public static function boot()
     {
-        static::addGlobalScope(function ($builder) {
+        static::addGlobalScope(static function ($builder) {
             $builder->withoutGlobalScope(SoftDeletingScope::class);
         });
 

@@ -17,22 +17,22 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('parent_id')->nullable();
             $table->unsignedInteger('post_id');
         });
 
-        Schema::create('revisions', function (Blueprint $table) {
+        Schema::create('revisions', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('comment_id');
         });
@@ -68,7 +68,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
         DB::enableQueryLog();
 
-        $posts->loadMissing(['comments.parent' => function ($query) {
+        $posts->loadMissing(['comments.parent' => static function ($query) {
             $query->select('id');
         }]);
 

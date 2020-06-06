@@ -20,7 +20,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo', function ($foo) {
+        $d->listen('foo', static function ($foo) {
             $_SERVER['__event.test'] = $foo;
         });
         $response = $d->dispatch('foo', ['bar']);
@@ -38,7 +38,7 @@ class EventsDispatcherTest extends TestCase
 
             return 'here';
         });
-        $d->listen('foo', function ($foo) {
+        $d->listen('foo', static function ($foo) {
             throw new Exception('should not be called');
         });
 
@@ -64,17 +64,17 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo', function ($foo) {
+        $d->listen('foo', static function ($foo) {
             return $foo;
         });
 
-        $d->listen('foo', function ($foo) {
+        $d->listen('foo', static function ($foo) {
             $_SERVER['__event.test'] = $foo;
 
             return false;
         });
 
-        $d->listen('foo', function ($foo) {
+        $d->listen('foo', static function ($foo) {
             throw new Exception('should not be called');
         });
 
@@ -88,16 +88,16 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo', function () {
+        $d->listen('foo', static function () {
             return 0;
         });
-        $d->listen('foo', function () {
+        $d->listen('foo', static function () {
             return [];
         });
-        $d->listen('foo', function () {
+        $d->listen('foo', static function () {
             return '';
         });
-        $d->listen('foo', function () {
+        $d->listen('foo', static function () {
         });
 
         $response = $d->dispatch('foo', ['bar']);
@@ -129,17 +129,17 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('update', function ($name) {
+        $d->listen('update', static function ($name) {
             $_SERVER['__event.test'] = $name;
         });
         $d->push('update', ['name' => 'taylor']);
-        $d->listen('update', function ($name) {
+        $d->listen('update', static function ($name) {
             $_SERVER['__event.test'] .= '_'.$name;
         });
 
         $this->assertFalse(isset($_SERVER['__event.test']));
         $d->flush('update');
-        $d->listen('update', function ($name) {
+        $d->listen('update', static function ($name) {
             $_SERVER['__event.test'] .= $name;
         });
         $this->assertSame('taylor_taylor', $_SERVER['__event.test']);
@@ -150,7 +150,7 @@ class EventsDispatcherTest extends TestCase
         $_SERVER['__event.test'] = 'unset';
         $d = new Dispatcher;
         $d->push('update', ['name' => 'taylor']);
-        $d->listen('update', function ($name) {
+        $d->listen('update', static function ($name) {
             $_SERVER['__event.test'] = $name;
         });
 
@@ -165,7 +165,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $d->push('update', ['name' => 'taylor ']);
         $d->push('update', ['name' => 'otwell']);
-        $d->listen('update', function ($name) {
+        $d->listen('update', static function ($name) {
             $_SERVER['__event.test'] .= $name;
         });
 
@@ -177,13 +177,13 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo.bar', function () {
+        $d->listen('foo.bar', static function () {
             $_SERVER['__event.test'] = 'regular';
         });
-        $d->listen('foo.*', function () {
+        $d->listen('foo.*', static function () {
             $_SERVER['__event.test'] = 'wildcard';
         });
-        $d->listen('bar.*', function () {
+        $d->listen('bar.*', static function () {
             $_SERVER['__event.test'] = 'nope';
         });
 
@@ -197,13 +197,13 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo.bar', function () {
+        $d->listen('foo.bar', static function () {
             return 'regular';
         });
-        $d->listen('foo.*', function () {
+        $d->listen('foo.*', static function () {
             return 'wildcard';
         });
-        $d->listen('bar.*', function () {
+        $d->listen('bar.*', static function () {
             return 'nope';
         });
 
@@ -216,13 +216,13 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo.*', function () {
+        $d->listen('foo.*', static function () {
             $_SERVER['__event.test'] = 'cached_wildcard';
         });
         $d->dispatch('foo.bar');
         $this->assertSame('cached_wildcard', $_SERVER['__event.test']);
 
-        $d->listen('foo.*', function () {
+        $d->listen('foo.*', static function () {
             $_SERVER['__event.test'] = 'new_wildcard';
         });
         $d->dispatch('foo.bar');
@@ -233,7 +233,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo', function () {
+        $d->listen('foo', static function () {
             $_SERVER['__event.test'] = 'foo';
         });
         $d->forget('foo');
@@ -246,7 +246,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo.*', function () {
+        $d->listen('foo.*', static function () {
             $_SERVER['__event.test'] = 'foo';
         });
         $d->forget('foo.*');
@@ -260,7 +260,7 @@ class EventsDispatcherTest extends TestCase
         unset($_SERVER['__event.test']);
 
         $d = new Dispatcher;
-        $d->listen('foo*', function () {
+        $d->listen('foo*', static function () {
             $_SERVER['__event.test'] = 'foo';
         });
         $d->dispatch('foo');
@@ -280,7 +280,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $this->assertFalse($d->hasListeners('foo'));
 
-        $d->listen('foo', function () {
+        $d->listen('foo', static function () {
             //
         });
         $this->assertTrue($d->hasListeners('foo'));
@@ -291,7 +291,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $this->assertFalse($d->hasListeners('foo.*'));
 
-        $d->listen('foo.*', function () {
+        $d->listen('foo.*', static function () {
             //
         });
         $this->assertTrue($d->hasListeners('foo.*'));
@@ -319,7 +319,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen(ExampleEvent::class, function () {
+        $d->listen(ExampleEvent::class, static function () {
             $_SERVER['__event.test'] = 'baz';
         });
         $d->dispatch(new ExampleEvent);
@@ -331,7 +331,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen(ExampleEvent::class, function ($payload) {
+        $d->listen(ExampleEvent::class, static function ($payload) {
             $_SERVER['__event.test'] = $payload;
         });
         $d->dispatch($e = new ExampleEvent, ['foo']);
@@ -343,7 +343,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen(SomeEventInterface::class, function () {
+        $d->listen(SomeEventInterface::class, static function () {
             $_SERVER['__event.test'] = 'bar';
         });
         $d->dispatch(new AnotherEvent);
@@ -356,11 +356,11 @@ class EventsDispatcherTest extends TestCase
         unset($_SERVER['__event.test']);
         $_SERVER['__event.test'] = [];
         $d = new Dispatcher;
-        $d->listen(AnotherEvent::class, function ($p) {
+        $d->listen(AnotherEvent::class, static function ($p) {
             $_SERVER['__event.test'][] = $p;
             $_SERVER['__event.test1'] = 'fooo';
         });
-        $d->listen(SomeEventInterface::class, function ($p) {
+        $d->listen(SomeEventInterface::class, static function ($p) {
             $_SERVER['__event.test'][] = $p;
             $_SERVER['__event.test2'] = 'baar';
         });

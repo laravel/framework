@@ -64,7 +64,7 @@ class HttpClientTest extends TestCase
         $this->assertSame('bar', $barResponse['page']);
         $this->assertSame('fallback', $fallbackResponse['page']);
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/test' &&
                    $request->hasHeader('Content-Type', 'application/json');
         });
@@ -81,7 +81,7 @@ class HttpClientTest extends TestCase
             'name' => 'Taylor',
         ]);
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/json' &&
                    $request->hasHeader('Content-Type', 'application/json') &&
                    $request->hasHeader('X-Test-Header', 'foo') &&
@@ -99,7 +99,7 @@ class HttpClientTest extends TestCase
             'title' => 'Laravel Developer',
         ]);
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/form' &&
                    $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
                    $request['name'] === 'Taylor';
@@ -114,7 +114,7 @@ class HttpClientTest extends TestCase
             'name' => 'Taylor',
         ]);
 
-        $this->factory->assertNotSent(function (Request $request) {
+        $this->factory->assertNotSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/form' &&
                 $request['name'] === 'Peter';
         });
@@ -157,7 +157,7 @@ class HttpClientTest extends TestCase
             ],
         ]);
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/multipart' &&
                    Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
                    $request[0]['name'] === 'foo';
@@ -171,7 +171,7 @@ class HttpClientTest extends TestCase
         $this->factory->attach('foo', 'data', 'file.txt', ['X-Test-Header' => 'foo'])
                 ->post('http://foo.com/file');
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/file' &&
                    Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
                    $request[0]['name'] === 'foo' &&
@@ -187,7 +187,7 @@ class HttpClientTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/multipart' &&
                 Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
                 $request[0]['name'] === 'foo' &&
@@ -208,7 +208,7 @@ class HttpClientTest extends TestCase
             ],
         ]);
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/multipart' &&
                 Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
                 $request[0]['name'] === 'foo' &&
@@ -225,7 +225,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->withToken('token')->post('http://foo.com/json');
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/json' &&
                 $request->hasHeader('Authorization', 'Bearer token');
         });
@@ -326,7 +326,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get', ['foo' => 'bar']);
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo=bar'
                 && $request['foo'] === 'bar';
         });
@@ -338,7 +338,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get', 'foo=bar');
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo=bar'
                 && $request['foo'] === 'bar';
         });
@@ -350,7 +350,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get?foo=bar&page=1');
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo=bar&page=1'
                 && $request['foo'] === 'bar'
                 && $request['page'] === '1';
@@ -363,7 +363,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get?foo;bar;1;5;10&page=1');
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo;bar;1;5;10&page=1'
                 && ! isset($request['foo'])
                 && ! isset($request['bar'])
@@ -377,7 +377,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get?foo=bar&page=1', ['hello' => 'world']);
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/get?hello=world'
                 && $request['hello'] === 'world';
         });
@@ -389,7 +389,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get', ['foo;bar; space test' => 'laravel']);
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo%3Bbar%3B%20space%20test=laravel'
                 && $request['foo;bar; space test'] === 'laravel';
         });
@@ -404,7 +404,7 @@ class HttpClientTest extends TestCase
             'X-Test-ArrayHeader' => ['bar', 'baz'],
         ])->post('http://foo.com/json');
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/json' &&
                    $request->hasHeaders([
                        'X-Test-Header' => 'foo',
@@ -422,7 +422,7 @@ class HttpClientTest extends TestCase
             'X-Test-ArrayHeader' => ['bar', 'baz'],
         ])->post('http://foo.com/json');
 
-        $this->factory->assertSent(function (Request $request) {
+        $this->factory->assertSent(static function (Request $request) {
             return $request->url() === 'http://foo.com/json' &&
                    $request->hasHeaders('X-Test-Header');
         });

@@ -36,23 +36,23 @@ class EloquentModelConnectionsTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('parent', function (Blueprint $table) {
+        Schema::create('parent', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
         });
 
-        Schema::create('child', function (Blueprint $table) {
+        Schema::create('child', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->integer('parent_id');
         });
 
-        Schema::connection('conn2')->create('parent', function (Blueprint $table) {
+        Schema::connection('conn2')->create('parent', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
         });
 
-        Schema::connection('conn2')->create('child', function (Blueprint $table) {
+        Schema::connection('conn2')->create('child', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->integer('parent_id');

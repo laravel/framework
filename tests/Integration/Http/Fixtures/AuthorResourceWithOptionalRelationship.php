@@ -10,7 +10,7 @@ class AuthorResourceWithOptionalRelationship extends PostResource
             'name' => $this->name,
             'posts_count' => $this->whenLoaded('posts', function () {
                 return $this->posts->count().' posts';
-            }, function () {
+            }, static function () {
                 return 'not loaded';
             }),
             'latest_post_title' => $this->whenLoaded('posts', function () {

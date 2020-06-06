@@ -48,7 +48,7 @@ class FoundationExceptionsHandlerTest extends TestCase
             return $this->config;
         });
 
-        $this->container->singleton(ResponseFactoryContract::class, function () {
+        $this->container->singleton(ResponseFactoryContract::class, static function () {
             return new ResponseFactory(
                 m::mock(Factory::class),
                 m::mock(Redirector::class)
@@ -154,14 +154,13 @@ class FoundationExceptionsHandlerTest extends TestCase
         $argumentExpected = ['input' => 'My input value'];
         $argumentActual = null;
 
-        $this->container->singleton('redirect', function () use (&$argumentActual) {
+        $this->container->singleton('redirect', static function () use (&$argumentActual) {
             $redirector = m::mock(Redirector::class);
 
             $redirector->shouldReceive('to')->once()
                 ->andReturn($responser = m::mock(RedirectResponse::class));
 
-            $responser->shouldReceive('withInput')->once()->with(m::on(
-                function ($argument) use (&$argumentActual) {
+            $responser->shouldReceive('withInput')->once()->with(m::on(static function ($argument) use (&$argumentActual) {
                     $argumentActual = $argument;
 
                     return true;

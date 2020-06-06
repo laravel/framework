@@ -37,7 +37,7 @@ class ViewFactoryTest extends TestCase
         $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock(Engine::class));
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
         $factory->setDispatcher(new Dispatcher);
-        $factory->creator('view', function ($view) {
+        $factory->creator('view', static function ($view) {
             $_SERVER['__test.view'] = $view;
         });
         $factory->addExtension('php', 'php');
@@ -69,7 +69,7 @@ class ViewFactoryTest extends TestCase
         $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock(Engine::class));
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
         $factory->setDispatcher(new Dispatcher);
-        $factory->creator('view', function ($view) {
+        $factory->creator('view', static function ($view) {
             $_SERVER['__test.view'] = $view;
         });
         $factory->addExtension('php', 'php');
@@ -125,7 +125,7 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
 
-        $resolver = function () {
+        $resolver = static function () {
             //
         };
 
@@ -171,7 +171,7 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type(Closure::class));
-        $callback = $factory->composer('foo', function () {
+        $callback = $factory->composer('foo', static function () {
             return 'bar';
         });
         $callback = $callback[0];
@@ -489,7 +489,7 @@ class ViewFactoryTest extends TestCase
         $this->expectExceptionMessage('section exception message');
 
         $engine = new CompilerEngine(m::mock(CompilerInterface::class));
-        $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) {
+        $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(static function ($path) {
             return $path;
         });
         $engine->getCompiler()->shouldReceive('isExpired')->twice()->andReturn(false);

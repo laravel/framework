@@ -89,7 +89,7 @@ class RouteParameterBinder
 
         $parameters = array_intersect_key($matches, array_flip($parameterNames));
 
-        return array_filter($parameters, function ($value) {
+        return array_filter($parameters, static function ($value) {
             return is_string($value) && strlen($value) > 0;
         });
     }

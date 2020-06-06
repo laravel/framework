@@ -222,7 +222,7 @@ abstract class Relation
      */
     protected function getKeys(array $models, $key = null)
     {
-        return collect($models)->map(function ($value) use ($key) {
+        return collect($models)->map(static function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
         })->values()->unique(null, true)->sort()->all();
     }
@@ -353,7 +353,7 @@ abstract class Relation
             return $models;
         }
 
-        return array_combine(array_map(function ($model) {
+        return array_combine(array_map(static function ($model) {
             return (new $model)->getTable();
         }, $models), $models);
     }

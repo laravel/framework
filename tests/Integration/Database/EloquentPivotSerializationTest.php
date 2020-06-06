@@ -19,30 +19,30 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->timestamps();
         });
 
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('projects', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('project_users', function (Blueprint $table) {
+        Schema::create('project_users', static function (Blueprint $table) {
             $table->integer('user_id');
             $table->integer('project_id');
         });
 
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('tags', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('taggables', function (Blueprint $table) {
+        Schema::create('taggables', static function (Blueprint $table) {
             $table->integer('tag_id');
             $table->integer('taggable_id');
             $table->string('taggable_type');

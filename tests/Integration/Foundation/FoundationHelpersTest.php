@@ -15,17 +15,17 @@ class FoundationHelpersTest extends TestCase
 {
     public function testRescue()
     {
-        $this->assertEquals(rescue(function () {
+        $this->assertEquals(rescue(static function () {
             throw new Exception;
         }, 'rescued!'), 'rescued!');
 
-        $this->assertEquals(rescue(function () {
+        $this->assertEquals(rescue(static function () {
             throw new Exception;
-        }, function () {
+        }, static function () {
             return 'rescued!';
         }), 'rescued!');
 
-        $this->assertEquals(rescue(function () {
+        $this->assertEquals(rescue(static function () {
             return 'no need to rescue';
         }, 'rescued!'), 'no need to rescue');
 
@@ -36,7 +36,7 @@ class FoundationHelpersTest extends TestCase
             }
         };
 
-        $this->assertEquals(rescue(function () use ($testClass) {
+        $this->assertEquals(rescue(static function () use ($testClass) {
             $testClass->test([]);
         }, 'rescued!'), 'rescued!');
     }
@@ -90,7 +90,7 @@ class FoundationHelpersTest extends TestCase
         $this->app->instance(ExceptionHandler::class, $handler);
         $this->app['config']->set('app.debug', true);
         $manifest = $this->makeManifest();
-        Route::get('test-route', function () {
+        Route::get('test-route', static function () {
             mix('missing.js');
         });
 
@@ -103,7 +103,7 @@ class FoundationHelpersTest extends TestCase
 
     protected function makeManifest($directory = '')
     {
-        $this->app->singleton('path.public', function () {
+        $this->app->singleton('path.public', static function () {
             return __DIR__;
         });
 

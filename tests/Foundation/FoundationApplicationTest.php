@@ -111,7 +111,7 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
         $app->setDeferredServices(['foo' => ApplicationDeferredServiceProviderStub::class]);
-        $app->extend('foo', function ($instance, $container) {
+        $app->extend('foo', static function ($instance, $container) {
             return $instance.'bar';
         });
         $this->assertSame('foobar', $app->make('foo'));
@@ -143,7 +143,7 @@ class FoundationApplicationTest extends TestCase
         $app->setDeferredServices(['foo' => ApplicationDeferredServiceProviderStub::class]);
         $this->assertTrue($app->bound('foo'));
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
-        $app->extend('foo', function ($instance, $container) {
+        $app->extend('foo', static function ($instance, $container) {
             return $instance.'bar';
         });
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
@@ -228,7 +228,7 @@ class FoundationApplicationTest extends TestCase
     public function testMethodAfterLoadingEnvironmentAddsClosure()
     {
         $app = new Application;
-        $closure = function () {
+        $closure = static function () {
             //
         };
         $app->afterLoadingEnvironment($closure);
@@ -238,7 +238,7 @@ class FoundationApplicationTest extends TestCase
     public function testBeforeBootstrappingAddsClosure()
     {
         $app = new Application;
-        $closure = function () {
+        $closure = static function () {
             //
         };
         $app->beforeBootstrapping(RegisterFacades::class, $closure);
@@ -250,15 +250,15 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
 
         $result = [];
-        $callback1 = function () use (&$result) {
+        $callback1 = static function () use (&$result) {
             $result[] = 1;
         };
 
-        $callback2 = function () use (&$result) {
+        $callback2 = static function () use (&$result) {
             $result[] = 2;
         };
 
-        $callback3 = function () use (&$result) {
+        $callback3 = static function () use (&$result) {
             $result[] = 3;
         };
 
@@ -274,7 +274,7 @@ class FoundationApplicationTest extends TestCase
     public function testAfterBootstrappingAddsClosure()
     {
         $app = new Application;
-        $closure = function () {
+        $closure = static function () {
             //
         };
         $app->afterBootstrapping(RegisterFacades::class, $closure);
@@ -485,7 +485,7 @@ class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider imple
 {
     public function register()
     {
-        $this->app->singleton('foo', function () {
+        $this->app->singleton('foo', static function () {
             return new stdClass;
         });
     }
@@ -545,7 +545,7 @@ class SampleImplementationDeferredServiceProvider extends ServiceProvider implem
 {
     public function register()
     {
-        $this->app->when(SampleImplementation::class)->needs('$primitive')->give(function () {
+        $this->app->when(SampleImplementation::class)->needs('$primitive')->give(static function () {
             return 'foo';
         });
     }
@@ -555,7 +555,7 @@ class ApplicationFactoryProviderStub extends ServiceProvider implements Deferrab
 {
     public function register()
     {
-        $this->app->bind('foo', function () {
+        $this->app->bind('foo', static function () {
             static $count = 0;
 
             return ++$count;
@@ -567,10 +567,10 @@ class ApplicationMultiProviderStub extends ServiceProvider implements Deferrable
 {
     public function register()
     {
-        $this->app->singleton('foo', function () {
+        $this->app->singleton('foo', static function () {
             return 'foo';
         });
-        $this->app->singleton('bar', function ($app) {
+        $this->app->singleton('bar', static function ($app) {
             return $app['foo'].'bar';
         });
     }

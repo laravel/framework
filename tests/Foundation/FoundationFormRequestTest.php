@@ -281,7 +281,7 @@ class FoundationTestFormRequestTwiceStub extends FormRequest
 
     public function withValidator(Validator $validator)
     {
-        $validator->after(function ($validator) {
+        $validator->after(static function ($validator) {
             self::$count++;
         });
     }

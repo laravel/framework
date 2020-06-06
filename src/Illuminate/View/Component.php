@@ -74,7 +74,7 @@ abstract class Component
                         : $this->createBladeViewFromString($factory, $view);
         };
 
-        return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
+        return $view instanceof Closure ? static function (array $data = []) use ($view, $resolver) {
             return $resolver($view($data));
         }
         : $resolver($view);
@@ -136,7 +136,7 @@ abstract class Component
                 ->reject(function (ReflectionProperty $property) {
                     return $this->shouldIgnore($property->getName());
                 })
-                ->map(function (ReflectionProperty $property) {
+                ->map(static function (ReflectionProperty $property) {
                     return $property->getName();
                 })->all();
         }
@@ -166,7 +166,7 @@ abstract class Component
                 ->reject(function (ReflectionMethod $method) {
                     return $this->shouldIgnore($method->getName());
                 })
-                ->map(function (ReflectionMethod $method) {
+                ->map(static function (ReflectionMethod $method) {
                     return $method->getName();
                 });
         }

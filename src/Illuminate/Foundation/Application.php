@@ -594,7 +594,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function registerConfiguredProviders()
     {
         $providers = Collection::make($this->config['app.providers'])
-                        ->partition(function ($provider) {
+                        ->partition(static function ($provider) {
                             return strpos($provider, 'Illuminate\\') === 0;
                         });
 
@@ -674,7 +674,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return Arr::where($this->serviceProviders, function ($value) use ($name) {
+        return Arr::where($this->serviceProviders, static function ($value) use ($name) {
             return $value instanceof $name;
         });
     }

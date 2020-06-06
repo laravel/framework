@@ -58,7 +58,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
      */
     public function createSchema()
     {
-        $this->schema()->create($this->table, function (Blueprint $table) {
+        $this->schema()->create($this->table, static function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('queue');
             $table->longText('payload');

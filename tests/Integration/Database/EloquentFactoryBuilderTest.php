@@ -33,27 +33,27 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory = new Factory($app->make(Generator::class));
 
-        $factory->define(FactoryBuildableUser::class, function (Generator $faker) {
+        $factory->define(FactoryBuildableUser::class, static function (Generator $faker) {
             return [
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
             ];
         });
 
-        $factory->define(FactoryBuildableProfile::class, function (Generator $faker) {
+        $factory->define(FactoryBuildableProfile::class, static function (Generator $faker) {
             return [
-                'user_id' => function () {
+                'user_id' => static function () {
                     return factory(FactoryBuildableUser::class)->create()->id;
                 },
             ];
         });
 
-        $factory->afterMaking(FactoryBuildableUser::class, function (FactoryBuildableUser $user, Generator $faker) {
+        $factory->afterMaking(FactoryBuildableUser::class, static function (FactoryBuildableUser $user, Generator $faker) {
             $profile = factory(FactoryBuildableProfile::class)->make(['user_id' => $user->id]);
             $user->setRelation('profile', $profile);
         });
 
-        $factory->afterMakingState(FactoryBuildableUser::class, 'with_callable_server', function (FactoryBuildableUser $user, Generator $faker) {
+        $factory->afterMakingState(FactoryBuildableUser::class, 'with_callable_server', static function (FactoryBuildableUser $user, Generator $faker) {
             $server = factory(FactoryBuildableServer::class)
                 ->state('callable')
                 ->make(['user_id' => $user->id]);
@@ -61,37 +61,37 @@ class EloquentFactoryBuilderTest extends TestCase
             $user->servers->push($server);
         });
 
-        $factory->define(FactoryBuildableTeam::class, function (Generator $faker) {
+        $factory->define(FactoryBuildableTeam::class, static function (Generator $faker) {
             return [
                 'name' => $faker->name,
-                'owner_id' => function () {
+                'owner_id' => static function () {
                     return factory(FactoryBuildableUser::class)->create()->id;
                 },
             ];
         });
 
-        $factory->afterCreating(FactoryBuildableTeam::class, function (FactoryBuildableTeam $team, Generator $faker) {
+        $factory->afterCreating(FactoryBuildableTeam::class, static function (FactoryBuildableTeam $team, Generator $faker) {
             $team->users()->attach($team->owner);
         });
 
-        $factory->define(FactoryBuildableServer::class, function (Generator $faker) {
+        $factory->define(FactoryBuildableServer::class, static function (Generator $faker) {
             return [
                 'name' => $faker->name,
                 'status' => 'active',
                 'tags' => ['Storage', 'Data'],
-                'user_id' => function () {
+                'user_id' => static function () {
                     return factory(FactoryBuildableUser::class)->create()->id;
                 },
             ];
         });
 
-        $factory->state(FactoryBuildableServer::class, 'callable', function (Generator $faker) {
+        $factory->state(FactoryBuildableServer::class, 'callable', static function (Generator $faker) {
             return [
                 'status' => 'callable',
             ];
         });
 
-        $factory->afterCreatingState(FactoryBuildableUser::class, 'with_callable_server', function (FactoryBuildableUser $user, Generator $faker) {
+        $factory->afterCreatingState(FactoryBuildableUser::class, 'with_callable_server', static function (FactoryBuildableUser $user, Generator $faker) {
             factory(FactoryBuildableServer::class)
                 ->state('callable')
                 ->create(['user_id' => $user->id]);
@@ -99,7 +99,7 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->state(FactoryBuildableServer::class, 'inline', ['status' => 'inline']);
 
-        $app->singleton(Factory::class, function ($app) use ($factory) {
+        $app->singleton(Factory::class, static function ($app) use ($factory) {
             return $factory;
         });
     }
@@ -108,36 +108,36 @@ class EloquentFactoryBuilderTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('email');
         });
 
-        Schema::create('profiles', function (Blueprint $table) {
+        Schema::create('profiles', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
         });
 
-        Schema::create('teams', function (Blueprint $table) {
+        Schema::create('teams', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('owner_id');
         });
 
-        Schema::create('team_users', function (Blueprint $table) {
+        Schema::create('team_users', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('team_id');
             $table->unsignedInteger('user_id');
         });
 
-        Schema::connection('alternative-connection')->create('users', function (Blueprint $table) {
+        Schema::connection('alternative-connection')->create('users', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('email');
         });
 
-        Schema::create('servers', function (Blueprint $table) {
+        Schema::create('servers', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('tags');
@@ -220,7 +220,7 @@ class EloquentFactoryBuilderTest extends TestCase
     {
         factory(FactoryBuildableUser::class, 2)
             ->create()
-            ->each(function ($user) {
+            ->each(static function ($user) {
                 $user->servers()->saveMany(factory(FactoryBuildableServer::class, 2)->make());
             })
             ->each(function ($user) {

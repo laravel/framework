@@ -208,7 +208,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getByAction($action)
     {
-        $attributes = collect($this->attributes)->first(function (array $attributes) use ($action) {
+        $attributes = collect($this->attributes)->first(static function (array $attributes) use ($action) {
             if (isset($attributes['action']['controller'])) {
                 return trim($attributes['action']['controller'], '\\') === $action;
             }
@@ -247,11 +247,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
     public function getRoutesByMethod()
     {
         return collect($this->getRoutes())
-            ->groupBy(function (Route $route) {
+            ->groupBy(static function (Route $route) {
                 return $route->methods();
             })
-            ->map(function (Collection $routes) {
-                return $routes->mapWithKeys(function (Route $route) {
+            ->map(static function (Collection $routes) {
+                return $routes->mapWithKeys(static function (Route $route) {
                     return [$route->uri => $route];
                 })->all();
             })
@@ -266,7 +266,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
     public function getRoutesByName()
     {
         return collect($this->getRoutes())
-            ->keyBy(function (Route $route) {
+            ->keyBy(static function (Route $route) {
                 return $route->getName();
             })
             ->all();

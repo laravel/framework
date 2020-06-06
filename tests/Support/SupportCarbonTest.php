@@ -50,7 +50,7 @@ class SupportCarbonTest extends TestCase
 
     public function testCarbonIsMacroableWhenCalledStatically()
     {
-        Carbon::macro('twoDaysAgoAtNoon', function () {
+        Carbon::macro('twoDaysAgoAtNoon', static function () {
             return Carbon::now()->subDays(2)->setTime(12, 0, 0);
         });
 
@@ -75,7 +75,7 @@ class SupportCarbonTest extends TestCase
 
     public function testCarbonAllowsCustomSerializer()
     {
-        Carbon::serializeUsing(function (Carbon $carbon) {
+        Carbon::serializeUsing(static function (Carbon $carbon) {
             return $carbon->getTimestamp();
         });
 

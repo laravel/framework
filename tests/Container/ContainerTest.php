@@ -33,7 +33,7 @@ class ContainerTest extends TestCase
     public function testClosureResolution()
     {
         $container = new Container;
-        $container->bind('name', function () {
+        $container->bind('name', static function () {
             return 'Taylor';
         });
         $this->assertSame('Taylor', $container->make('name'));
@@ -42,10 +42,10 @@ class ContainerTest extends TestCase
     public function testBindIfDoesntRegisterIfServiceAlreadyRegistered()
     {
         $container = new Container;
-        $container->bind('name', function () {
+        $container->bind('name', static function () {
             return 'Taylor';
         });
-        $container->bindIf('name', function () {
+        $container->bindIf('name', static function () {
             return 'Dayle';
         });
 
@@ -55,10 +55,10 @@ class ContainerTest extends TestCase
     public function testBindIfDoesRegisterIfServiceNotRegisteredYet()
     {
         $container = new Container;
-        $container->bind('surname', function () {
+        $container->bind('surname', static function () {
             return 'Taylor';
         });
-        $container->bindIf('name', function () {
+        $container->bindIf('name', static function () {
             return 'Dayle';
         });
 
@@ -68,11 +68,11 @@ class ContainerTest extends TestCase
     public function testSingletonIfDoesntRegisterIfBindingAlreadyRegistered()
     {
         $container = new Container;
-        $container->singleton('class', function () {
+        $container->singleton('class', static function () {
             return new stdClass;
         });
         $firstInstantiation = $container->make('class');
-        $container->singletonIf('class', function () {
+        $container->singletonIf('class', static function () {
             return new ContainerConcreteStub;
         });
         $secondInstantiation = $container->make('class');
@@ -82,10 +82,10 @@ class ContainerTest extends TestCase
     public function testSingletonIfDoesRegisterIfBindingNotRegisteredYet()
     {
         $container = new Container;
-        $container->singleton('class', function () {
+        $container->singleton('class', static function () {
             return new stdClass;
         });
-        $container->singletonIf('otherClass', function () {
+        $container->singletonIf('otherClass', static function () {
             return new ContainerConcreteStub;
         });
         $firstInstantiation = $container->make('otherClass');
@@ -96,7 +96,7 @@ class ContainerTest extends TestCase
     public function testSharedClosureResolution()
     {
         $container = new Container;
-        $container->singleton('class', function () {
+        $container->singleton('class', static function () {
             return new stdClass;
         });
         $firstInstantiation = $container->make('class');
@@ -140,7 +140,7 @@ class ContainerTest extends TestCase
     public function testContainerIsPassedToResolvers()
     {
         $container = new Container;
-        $container->bind('something', function ($c) {
+        $container->bind('something', static function ($c) {
             return $c;
         });
         $c = $container->make('something');
@@ -150,7 +150,7 @@ class ContainerTest extends TestCase
     public function testArrayAccess()
     {
         $container = new Container;
-        $container['something'] = function () {
+        $container['something'] = static function () {
             return 'foo';
         };
         $this->assertTrue(isset($container['something']));
@@ -173,7 +173,7 @@ class ContainerTest extends TestCase
     public function testAliasesWithArrayOfParameters()
     {
         $container = new Container;
-        $container->bind('foo', function ($app, $config) {
+        $container->bind('foo', static function ($app, $config) {
             return $config;
         });
         $container->alias('foo', 'baz');
@@ -239,13 +239,13 @@ class ContainerTest extends TestCase
         unset($_SERVER['__test.rebind']);
 
         $container = new Container;
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             //
         });
-        $container->rebinding('foo', function () {
+        $container->rebinding('foo', static function () {
             $_SERVER['__test.rebind'] = true;
         });
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             //
         });
 
@@ -257,13 +257,13 @@ class ContainerTest extends TestCase
         unset($_SERVER['__test.rebind']);
 
         $container = new Container;
-        $container->instance('foo', function () {
+        $container->instance('foo', static function () {
             //
         });
-        $container->rebinding('foo', function () {
+        $container->rebinding('foo', static function () {
             $_SERVER['__test.rebind'] = true;
         });
-        $container->instance('foo', function () {
+        $container->instance('foo', static function () {
             //
         });
 
@@ -275,10 +275,10 @@ class ContainerTest extends TestCase
         $_SERVER['__test.rebind'] = false;
 
         $container = new Container;
-        $container->rebinding('foo', function () {
+        $container->rebinding('foo', static function () {
             $_SERVER['__test.rebind'] = true;
         });
-        $container->instance('foo', function () {
+        $container->instance('foo', static function () {
             //
         });
 
@@ -352,7 +352,7 @@ class ContainerTest extends TestCase
     public function testContainerFlushFlushesAllBindingsAliasesAndResolvedInstances()
     {
         $container = new Container;
-        $container->bind('ConcreteStub', function () {
+        $container->bind('ConcreteStub', static function () {
             return new ContainerConcreteStub;
         }, true);
         $container->alias('ConcreteStub', 'ContainerConcreteStub');
@@ -371,7 +371,7 @@ class ContainerTest extends TestCase
     public function testResolvedResolvesAliasToBindingNameBeforeChecking()
     {
         $container = new Container;
-        $container->bind('ConcreteStub', function () {
+        $container->bind('ConcreteStub', static function () {
             return new ContainerConcreteStub;
         }, true);
         $container->alias('ConcreteStub', 'foo');
@@ -404,7 +404,7 @@ class ContainerTest extends TestCase
     public function testContainerGetFactory()
     {
         $container = new Container;
-        $container->bind('name', function () {
+        $container->bind('name', static function () {
             return 'Taylor';
         });
 
@@ -437,7 +437,7 @@ class ContainerTest extends TestCase
         $instance = $container->make(ContainerDefaultValueStub::class);
         $this->assertSame('taylor', $instance->default);
 
-        $container->bind('foo', function ($app, $config) {
+        $container->bind('foo', static function ($app, $config) {
             return $config;
         });
 
@@ -455,10 +455,10 @@ class ContainerTest extends TestCase
     public function testNestedParameterOverride()
     {
         $container = new Container;
-        $container->bind('foo', function ($app, $config) {
+        $container->bind('foo', static function ($app, $config) {
             return $app->make('bar', ['name' => 'Taylor']);
         });
-        $container->bind('bar', function ($app, $config) {
+        $container->bind('bar', static function ($app, $config) {
             return $config;
         });
 
@@ -469,11 +469,11 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
 
-        $container->bind('foo', function ($app, $config) {
+        $container->bind('foo', static function ($app, $config) {
             return $app->make('bar');
         });
 
-        $container->bind('bar', function ($app, $config) {
+        $container->bind('bar', static function ($app, $config) {
             return $config;
         });
 
@@ -484,7 +484,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
 
-        $container->singleton('foo', function ($app, $config) {
+        $container->singleton('foo', static function ($app, $config) {
             return $config;
         });
 

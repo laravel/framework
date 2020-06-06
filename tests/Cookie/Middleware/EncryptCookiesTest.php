@@ -31,7 +31,7 @@ class EncryptCookiesTest extends TestCase
         parent::setUp();
 
         $container = new Container;
-        $container->singleton(EncrypterContract::class, function () {
+        $container->singleton(EncrypterContract::class, static function () {
             return new Encrypter(str_repeat('a', 16));
         });
 

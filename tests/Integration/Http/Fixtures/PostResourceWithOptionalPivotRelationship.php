@@ -8,12 +8,12 @@ class PostResourceWithOptionalPivotRelationship extends PostResource
     {
         return [
             'id' => $this->id,
-            'subscription' => $this->whenPivotLoaded(Subscription::class, function () {
+            'subscription' => $this->whenPivotLoaded(Subscription::class, static function () {
                 return [
                     'foo' => 'bar',
                 ];
             }),
-            'custom_subscription' => $this->whenPivotLoadedAs('accessor', Subscription::class, function () {
+            'custom_subscription' => $this->whenPivotLoadedAs('accessor', Subscription::class, static function () {
                 return [
                     'foo' => 'bar',
                 ];

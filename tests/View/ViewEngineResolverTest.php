@@ -12,7 +12,7 @@ class ViewEngineResolverTest extends TestCase
     public function testResolversMayBeResolved()
     {
         $resolver = new EngineResolver;
-        $resolver->register('foo', function () {
+        $resolver->register('foo', static function () {
             return new stdClass;
         });
         $result = $resolver->resolve('foo');

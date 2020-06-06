@@ -89,7 +89,7 @@ class Response implements ArrayAccess
      */
     public function headers()
     {
-        return collect($this->response->getHeaders())->mapWithKeys(function ($v, $k) {
+        return collect($this->response->getHeaders())->mapWithKeys(static function ($v, $k) {
             return [$k => $v];
         })->all();
     }

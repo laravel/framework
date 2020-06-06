@@ -68,14 +68,14 @@ class ContainerCallTest extends TestCase
     public function testCallWithBoundMethod()
     {
         $container = new Container;
-        $container->bindMethod(ContainerTestCallStub::class.'@unresolvable', function ($stub) {
+        $container->bindMethod(ContainerTestCallStub::class.'@unresolvable', static function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call(ContainerTestCallStub::class.'@unresolvable');
         $this->assertEquals(['foo', 'bar'], $result);
 
         $container = new Container;
-        $container->bindMethod(ContainerTestCallStub::class.'@unresolvable', function ($stub) {
+        $container->bindMethod(ContainerTestCallStub::class.'@unresolvable', static function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
@@ -95,14 +95,14 @@ class ContainerCallTest extends TestCase
     public function testBindMethodAcceptsAnArray()
     {
         $container = new Container;
-        $container->bindMethod([ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
+        $container->bindMethod([ContainerTestCallStub::class, 'unresolvable'], static function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call(ContainerTestCallStub::class.'@unresolvable');
         $this->assertEquals(['foo', 'bar'], $result);
 
         $container = new Container;
-        $container->bindMethod([ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
+        $container->bindMethod([ContainerTestCallStub::class, 'unresolvable'], static function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
@@ -112,11 +112,11 @@ class ContainerCallTest extends TestCase
     public function testClosureCallWithInjectedDependency()
     {
         $container = new Container;
-        $container->call(function (ContainerCallConcreteStub $stub) {
+        $container->call(static function (ContainerCallConcreteStub $stub) {
             //
         }, ['foo' => 'bar']);
 
-        $container->call(function (ContainerCallConcreteStub $stub) {
+        $container->call(static function (ContainerCallConcreteStub $stub) {
             //
         }, ['foo' => 'bar', 'stub' => new ContainerCallConcreteStub]);
     }
@@ -124,14 +124,14 @@ class ContainerCallTest extends TestCase
     public function testCallWithDependencies()
     {
         $container = new Container;
-        $result = $container->call(function (stdClass $foo, $bar = []) {
+        $result = $container->call(static function (stdClass $foo, $bar = []) {
             return func_get_args();
         });
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertEquals([], $result[1]);
 
-        $result = $container->call(function (stdClass $foo, $bar = []) {
+        $result = $container->call(static function (stdClass $foo, $bar = []) {
             return func_get_args();
         }, ['bar' => 'taylor']);
 
@@ -139,7 +139,7 @@ class ContainerCallTest extends TestCase
         $this->assertSame('taylor', $result[1]);
 
         $stub = new ContainerCallConcreteStub;
-        $result = $container->call(function (stdClass $foo, ContainerCallConcreteStub $bar) {
+        $result = $container->call(static function (stdClass $foo, ContainerCallConcreteStub $bar) {
             return func_get_args();
         }, [ContainerCallConcreteStub::class => $stub]);
 
@@ -149,7 +149,7 @@ class ContainerCallTest extends TestCase
         /*
          * Wrap a function...
          */
-        $result = $container->wrap(function (stdClass $foo, $bar = []) {
+        $result = $container->wrap(static function (stdClass $foo, $bar = []) {
             return func_get_args();
         }, ['bar' => 'taylor']);
 
@@ -184,7 +184,7 @@ class ContainerCallTest extends TestCase
         $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerCallTest');
 
         $container = new Container;
-        $foo = $container->call(function ($foo, $bar = 'default') {
+        $foo = $container->call(static function ($foo, $bar = 'default') {
             return $foo;
         });
     }

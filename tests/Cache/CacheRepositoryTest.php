@@ -50,7 +50,7 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);
         $this->assertSame('bar', $repo->get('foo', 'bar'));
-        $this->assertSame('baz', $repo->get('boom', function () {
+        $this->assertSame('baz', $repo->get('boom', static function () {
             return 'baz';
         }));
     }
@@ -89,7 +89,7 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
-        $result = $repo->remember('foo', 10, function () {
+        $result = $repo->remember('foo', 10, static function () {
             return 'bar';
         });
         $this->assertSame('bar', $result);
@@ -103,11 +103,11 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 602);
         $repo->getStore()->shouldReceive('put')->once()->with('baz', 'qux', 598);
-        $result = $repo->remember('foo', Carbon::now()->addMinutes(10)->addSeconds(2), function () {
+        $result = $repo->remember('foo', Carbon::now()->addMinutes(10)->addSeconds(2), static function () {
             return 'bar';
         });
         $this->assertSame('bar', $result);
-        $result = $repo->remember('baz', Carbon::now()->addMinutes(10)->subSeconds(2), function () {
+        $result = $repo->remember('baz', Carbon::now()->addMinutes(10)->subSeconds(2), static function () {
             return 'qux';
         });
         $this->assertSame('qux', $result);
@@ -118,7 +118,7 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
         $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
-        $result = $repo->rememberForever('foo', function () {
+        $result = $repo->rememberForever('foo', static function () {
             return 'bar';
         });
         $this->assertSame('bar', $result);

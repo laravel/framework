@@ -246,7 +246,7 @@ class PendingCommand
                 });
         }
 
-        $this->app->bind(OutputStyle::class, function () use ($mock) {
+        $this->app->bind(OutputStyle::class, static function () use ($mock) {
             return $mock;
         });
 

@@ -19,18 +19,18 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('some_default_value');
             $table->softDeletes();
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('post_id');
         });
 
-        Schema::create('likes', function (Blueprint $table) {
+        Schema::create('likes', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('post_id');
         });

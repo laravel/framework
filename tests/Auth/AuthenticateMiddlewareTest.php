@@ -152,7 +152,7 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         $driver = $this->createAuthDriver($authenticated);
 
-        $this->auth->extend($name, function () use ($driver) {
+        $this->auth->extend($name, static function () use ($driver) {
             return $driver;
         });
 
@@ -167,7 +167,7 @@ class AuthenticateMiddlewareTest extends TestCase
      */
     protected function createAuthDriver($authenticated)
     {
-        return new RequestGuard(function () use ($authenticated) {
+        return new RequestGuard(static function () use ($authenticated) {
             return $authenticated ? new stdClass : null;
         }, m::mock(Request::class), m::mock(EloquentUserProvider::class));
     }
@@ -186,7 +186,7 @@ class AuthenticateMiddlewareTest extends TestCase
 
         $nextParam = null;
 
-        $next = function ($param) use (&$nextParam) {
+        $next = static function ($param) use (&$nextParam) {
             $nextParam = $param;
         };
 

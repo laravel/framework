@@ -1236,7 +1236,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             static::newQueryWithoutScopes()->findOrFail($this->getKey())->attributes
         );
 
-        $this->load(collect($this->relations)->reject(function ($relation) {
+        $this->load(collect($this->relations)->reject(static function ($relation) {
             return $relation instanceof Pivot
                 || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
         })->keys()->all());

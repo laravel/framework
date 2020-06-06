@@ -274,7 +274,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('getModel')->andReturn($model);
 
-        EloquentRelationResetModelStub::resolveRelationUsing('customer', function ($model) use ($builder) {
+        EloquentRelationResetModelStub::resolveRelationUsing('customer', static function ($model) use ($builder) {
             return new EloquentResolverRelationStub($builder, $model);
         });
 

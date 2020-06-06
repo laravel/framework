@@ -724,7 +724,7 @@ class Builder
      */
     protected function addArrayOfWheres($column, $boolean, $method = 'where')
     {
-        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
+        return $this->whereNested(static function ($query) use ($column, $method, $boolean) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
                     $query->{$method}(...array_values($value));
@@ -2069,7 +2069,7 @@ class Builder
     protected function removeExistingOrdersFor($column)
     {
         return Collection::make($this->orders)
-                    ->reject(function ($order) use ($column) {
+                    ->reject(static function ($order) use ($column) {
                         return isset($order['column'])
                                ? $order['column'] === $column : false;
                     })->values()->all();
@@ -2320,7 +2320,7 @@ class Builder
      */
     protected function withoutSelectAliases(array $columns)
     {
-        return array_map(function ($column) {
+        return array_map(static function ($column) {
             return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
                     ? substr($column, 0, $aliasPosition) : $column;
         }, $columns);
@@ -3019,7 +3019,7 @@ class Builder
      */
     protected function cleanBindings(array $bindings)
     {
-        return array_values(array_filter($bindings, function ($binding) {
+        return array_values(array_filter($bindings, static function ($binding) {
             return ! $binding instanceof Expression;
         }));
     }
@@ -3097,7 +3097,7 @@ class Builder
      */
     public function cloneWithout(array $properties)
     {
-        return tap(clone $this, function ($clone) use ($properties) {
+        return tap(clone $this, static function ($clone) use ($properties) {
             foreach ($properties as $property) {
                 $clone->{$property} = null;
             }
@@ -3112,7 +3112,7 @@ class Builder
      */
     public function cloneWithoutBindings(array $except)
     {
-        return tap(clone $this, function ($clone) use ($except) {
+        return tap(clone $this, static function ($clone) use ($except) {
             foreach ($except as $type) {
                 $clone->bindings[$type] = [];
             }

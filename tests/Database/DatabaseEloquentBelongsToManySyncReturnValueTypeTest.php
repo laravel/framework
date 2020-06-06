@@ -30,19 +30,19 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
      */
     public function createSchema()
     {
-        $this->schema()->create('users', function ($table) {
+        $this->schema()->create('users', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
         });
 
-        $this->schema()->create('articles', function ($table) {
+        $this->schema()->create('articles', static function ($table) {
             $table->string('id');
             $table->string('title');
 
             $table->primary('id');
         });
 
-        $this->schema()->create('article_user', function ($table) {
+        $this->schema()->create('article_user', static function ($table) {
             $table->string('article_id');
             $table->foreign('article_id')->references('id')->on('articles');
             $table->integer('user_id')->unsigned();

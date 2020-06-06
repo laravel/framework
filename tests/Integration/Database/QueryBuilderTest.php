@@ -17,7 +17,7 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
             $table->text('content');
@@ -50,7 +50,7 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $this->assertSame(
             ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
-            (array) DB::table('posts')->select(['id', 'title', 'foo' => function ($query) {
+            (array) DB::table('posts')->select(['id', 'title', 'foo' => static function ($query) {
                 $query->select('bar');
             }])->first()
         );
@@ -69,7 +69,7 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $this->assertSame(
             ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
-            (array) DB::table('posts')->addSelect(['id', 'title', 'foo' => function ($query) {
+            (array) DB::table('posts')->addSelect(['id', 'title', 'foo' => static function ($query) {
                 $query->select('bar');
             }])->first()
         );
@@ -84,7 +84,7 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $this->assertSame(
             'Fake Post',
-            DB::table(function ($query) {
+            DB::table(static function ($query) {
                 $query->selectRaw("'Fake Post' as title");
             }, 'posts')->first()->title
         );
@@ -92,7 +92,7 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testWhereValueSubQuery()
     {
-        $subQuery = function ($query) {
+        $subQuery = static function ($query) {
             $query->selectRaw("'Sub query value'");
         };
 

@@ -220,16 +220,16 @@ class Schedule
      */
     public function compileArrayInput($key, $value)
     {
-        $value = collect($value)->map(function ($value) {
+        $value = collect($value)->map(static function ($value) {
             return ProcessUtils::escapeArgument($value);
         });
 
         if (Str::startsWith($key, '--')) {
-            $value = $value->map(function ($value) use ($key) {
+            $value = $value->map(static function ($value) use ($key) {
                 return "{$key}={$value}";
             });
         } elseif (Str::startsWith($key, '-')) {
-            $value = $value->map(function ($value) use ($key) {
+            $value = $value->map(static function ($value) use ($key) {
                 return "{$key} {$value}";
             });
         }

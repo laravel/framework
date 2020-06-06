@@ -11,7 +11,7 @@ class PreviousUrlTest extends TestCase
 {
     public function testPreviousUrlWithoutSession()
     {
-        Route::post('/previous-url', function (DummyFormRequest $request) {
+        Route::post('/previous-url', static function (DummyFormRequest $request) {
             return 'OK';
         });
 
@@ -24,7 +24,7 @@ class PreviousUrlTest extends TestCase
     {
         $providers = parent::getApplicationProviders($app);
 
-        return array_filter($providers, function ($provider) {
+        return array_filter($providers, static function ($provider) {
             return $provider !== SessionServiceProvider::class;
         });
     }

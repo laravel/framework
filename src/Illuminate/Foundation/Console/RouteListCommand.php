@@ -127,7 +127,7 @@ class RouteListCommand extends Command
      */
     protected function sortRoutes($sort, array $routes)
     {
-        return Arr::sort($routes, function ($route) use ($sort) {
+        return Arr::sort($routes, static function ($route) use ($sort) {
             return $route[$sort];
         });
     }
@@ -170,7 +170,7 @@ class RouteListCommand extends Command
      */
     protected function getMiddleware($route)
     {
-        return collect($this->router->gatherRouteMiddleware($route))->map(function ($middleware) {
+        return collect($this->router->gatherRouteMiddleware($route))->map(static function ($middleware) {
             return $middleware instanceof Closure ? 'Closure' : $middleware;
         })->implode("\n");
     }

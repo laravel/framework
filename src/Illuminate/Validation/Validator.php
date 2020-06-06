@@ -581,7 +581,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceAsterisksInParameters(array $parameters, array $keys)
     {
-        return array_map(function ($field) use ($keys) {
+        return array_map(static function ($field) use ($keys) {
             return vsprintf(str_replace('*', '%s', $field), $keys);
         }, $parameters);
     }
@@ -823,7 +823,7 @@ class Validator implements ValidatorContract
      */
     protected function attributesThatHaveMessages()
     {
-        return collect($this->messages()->toArray())->map(function ($message, $key) {
+        return collect($this->messages()->toArray())->map(static function ($message, $key) {
             return explode('.', $key)[0];
         })->unique()->flip()->all();
     }

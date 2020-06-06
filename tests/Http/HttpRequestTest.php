@@ -182,7 +182,7 @@ class HttpRequestTest extends TestCase
 
         $this->assertFalse($request->routeIs('foo.bar'));
 
-        $request->setRouteResolver(function () use ($request) {
+        $request->setRouteResolver(static function () use ($request) {
             $route = new Route('GET', '/foo/bar', ['as' => 'foo.bar']);
             $route->bind($request);
 
@@ -198,7 +198,7 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/foo/bar', 'GET');
 
-        $request->setRouteResolver(function () use ($request) {
+        $request->setRouteResolver(static function () use ($request) {
             $route = new Route('GET', '/foo/{required}/{optional?}', []);
             $route->bind($request);
 
@@ -419,7 +419,7 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
 
-        $request->setRouteResolver(function () use ($request) {
+        $request->setRouteResolver(static function () use ($request) {
             $route = new Route('GET', '/foo/bar/{id}/{name}', []);
             $route->bind($request);
             $route->setParameter('id', 'foo');
@@ -892,7 +892,7 @@ class HttpRequestTest extends TestCase
     public function testUserResolverMakesUserAvailableAsMagicProperty()
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
-        $request->setUserResolver(function () {
+        $request->setUserResolver(static function () {
             return 'user';
         });
         $this->assertSame('user', $request->user());
@@ -901,7 +901,7 @@ class HttpRequestTest extends TestCase
     public function testFingerprintMethod()
     {
         $request = Request::create('/', 'GET', [], [], [], []);
-        $request->setRouteResolver(function () use ($request) {
+        $request->setRouteResolver(static function () use ($request) {
             $route = new Route('GET', '/foo/bar/{id}', []);
             $route->bind($request);
 
@@ -965,7 +965,7 @@ class HttpRequestTest extends TestCase
 
         // Simulates Route parameters.
         $request = Request::create('/example/bar', 'GET', ['xyz' => 'overwritten']);
-        $request->setRouteResolver(function () use ($request) {
+        $request->setRouteResolver(static function () use ($request) {
             $route = new Route('GET', '/example/{foo}/{xyz?}/{undefined?}', []);
             $route->bind($request);
 
@@ -991,7 +991,7 @@ class HttpRequestTest extends TestCase
 
         // Simulates empty QueryString and Routes.
         $request = Request::create('/', 'GET');
-        $request->setRouteResolver(function () use ($request) {
+        $request->setRouteResolver(static function () use ($request) {
             $route = new Route('GET', '/', []);
             $route->bind($request);
 

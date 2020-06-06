@@ -12,7 +12,7 @@ class ContainerExtendTest extends TestCase
     {
         $container = new Container;
         $container['foo'] = 'foo';
-        $container->extend('foo', function ($old, $container) {
+        $container->extend('foo', static function ($old, $container) {
             return $old.'bar';
         });
 
@@ -20,10 +20,10 @@ class ContainerExtendTest extends TestCase
 
         $container = new Container;
 
-        $container->singleton('foo', function () {
+        $container->singleton('foo', static function () {
             return (object) ['name' => 'taylor'];
         });
-        $container->extend('foo', function ($old, $container) {
+        $container->extend('foo', static function ($old, $container) {
             $old->age = 26;
 
             return $old;
@@ -39,7 +39,7 @@ class ContainerExtendTest extends TestCase
     public function testExtendInstancesArePreserved()
     {
         $container = new Container;
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             $obj = new stdClass;
             $obj->foo = 'bar';
 
@@ -49,12 +49,12 @@ class ContainerExtendTest extends TestCase
         $obj = new stdClass;
         $obj->foo = 'foo';
         $container->instance('foo', $obj);
-        $container->extend('foo', function ($obj, $container) {
+        $container->extend('foo', static function ($obj, $container) {
             $obj->bar = 'baz';
 
             return $obj;
         });
-        $container->extend('foo', function ($obj, $container) {
+        $container->extend('foo', static function ($obj, $container) {
             $obj->baz = 'foo';
 
             return $obj;
@@ -71,7 +71,7 @@ class ContainerExtendTest extends TestCase
 
         $container = new Container;
         $container->bind(ContainerLazyExtendStub::class);
-        $container->extend(ContainerLazyExtendStub::class, function ($obj, $container) {
+        $container->extend(ContainerLazyExtendStub::class, static function ($obj, $container) {
             $obj->init();
 
             return $obj;
@@ -84,7 +84,7 @@ class ContainerExtendTest extends TestCase
     public function testExtendCanBeCalledBeforeBind()
     {
         $container = new Container;
-        $container->extend('foo', function ($old, $container) {
+        $container->extend('foo', static function ($old, $container) {
             return $old.'bar';
         });
         $container['foo'] = 'foo';
@@ -97,14 +97,14 @@ class ContainerExtendTest extends TestCase
         $_SERVER['_test_rebind'] = false;
 
         $container = new Container;
-        $container->rebinding('foo', function () {
+        $container->rebinding('foo', static function () {
             $_SERVER['_test_rebind'] = true;
         });
 
         $obj = new stdClass;
         $container->instance('foo', $obj);
 
-        $container->extend('foo', function ($obj, $container) {
+        $container->extend('foo', static function ($obj, $container) {
             return $obj;
         });
 
@@ -116,10 +116,10 @@ class ContainerExtendTest extends TestCase
         $_SERVER['_test_rebind'] = false;
 
         $container = new Container;
-        $container->rebinding('foo', function () {
+        $container->rebinding('foo', static function () {
             $_SERVER['_test_rebind'] = true;
         });
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             return new stdClass;
         });
 
@@ -127,7 +127,7 @@ class ContainerExtendTest extends TestCase
 
         $container->make('foo');
 
-        $container->extend('foo', function ($obj, $container) {
+        $container->extend('foo', static function ($obj, $container) {
             return $obj;
         });
 
@@ -137,11 +137,11 @@ class ContainerExtendTest extends TestCase
     public function testExtensionWorksOnAliasedBindings()
     {
         $container = new Container;
-        $container->singleton('something', function () {
+        $container->singleton('something', static function () {
             return 'some value';
         });
         $container->alias('something', 'something-alias');
-        $container->extend('something-alias', function ($value) {
+        $container->extend('something-alias', static function ($value) {
             return $value.' extended';
         });
 
@@ -152,10 +152,10 @@ class ContainerExtendTest extends TestCase
     {
         $container = new Container;
         $container['foo'] = 'foo';
-        $container->extend('foo', function ($old, $container) {
+        $container->extend('foo', static function ($old, $container) {
             return $old.'bar';
         });
-        $container->extend('foo', function ($old, $container) {
+        $container->extend('foo', static function ($old, $container) {
             return $old.'baz';
         });
 
@@ -165,14 +165,14 @@ class ContainerExtendTest extends TestCase
     public function testUnsetExtend()
     {
         $container = new Container;
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             $obj = new stdClass;
             $obj->foo = 'bar';
 
             return $obj;
         });
 
-        $container->extend('foo', function ($obj, $container) {
+        $container->extend('foo', static function ($obj, $container) {
             $obj->bar = 'baz';
 
             return $obj;
@@ -181,7 +181,7 @@ class ContainerExtendTest extends TestCase
         unset($container['foo']);
         $container->forgetExtenders('foo');
 
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             return 'foo';
         });
 

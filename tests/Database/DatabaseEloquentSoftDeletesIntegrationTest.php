@@ -38,7 +38,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     public function createSchema()
     {
-        $this->schema()->create('users', function ($table) {
+        $this->schema()->create('users', static function ($table) {
             $table->increments('id');
             $table->integer('group_id')->nullable();
             $table->string('email')->unique();
@@ -46,7 +46,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             $table->softDeletes();
         });
 
-        $this->schema()->create('posts', function ($table) {
+        $this->schema()->create('posts', static function ($table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('title');
@@ -54,7 +54,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             $table->softDeletes();
         });
 
-        $this->schema()->create('comments', function ($table) {
+        $this->schema()->create('comments', static function ($table) {
             $table->increments('id');
             $table->integer('owner_id')->nullable();
             $table->string('owner_type')->nullable();
@@ -64,7 +64,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             $table->softDeletes();
         });
 
-        $this->schema()->create('addresses', function ($table) {
+        $this->schema()->create('addresses', static function ($table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('address');
@@ -72,7 +72,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             $table->softDeletes();
         });
 
-        $this->schema()->create('groups', function ($table) {
+        $this->schema()->create('groups', static function ($table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
@@ -124,7 +124,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $count = 0;
         $query = SoftDeletesTestUser::query();
-        $query->chunk(2, function ($user) use (&$count) {
+        $query->chunk(2, static function ($user) use (&$count) {
             $count += count($user);
         });
         $this->assertEquals(1, $count);
@@ -132,7 +132,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->pluck('email')->all());
 
-        Paginator::currentPageResolver(function () {
+        Paginator::currentPageResolver(static function () {
             return 1;
         });
 
@@ -478,17 +478,17 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $users = SoftDeletesTestUser::where('email', 'doesnt@exist.com')->orHas('posts')->get();
         $this->assertCount(1, $users);
 
-        $users = SoftDeletesTestUser::whereHas('posts', function ($query) {
+        $users = SoftDeletesTestUser::whereHas('posts', static function ($query) {
             $query->where('title', 'First Title');
         })->get();
         $this->assertCount(1, $users);
 
-        $users = SoftDeletesTestUser::whereHas('posts', function ($query) {
+        $users = SoftDeletesTestUser::whereHas('posts', static function ($query) {
             $query->where('title', 'Another Title');
         })->get();
         $this->assertCount(0, $users);
 
-        $users = SoftDeletesTestUser::where('email', 'doesnt@exist.com')->orWhereHas('posts', function ($query) {
+        $users = SoftDeletesTestUser::where('email', 'doesnt@exist.com')->orWhereHas('posts', static function ($query) {
             $query->where('title', 'First Title');
         })->get();
         $this->assertCount(1, $users);
@@ -511,12 +511,12 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $users = SoftDeletesTestUser::has('posts')->get();
         $this->assertCount(0, $users);
 
-        $users = SoftDeletesTestUser::whereHas('posts', function ($q) {
+        $users = SoftDeletesTestUser::whereHas('posts', static function ($q) {
             $q->onlyTrashed();
         })->get();
         $this->assertCount(1, $users);
 
-        $users = SoftDeletesTestUser::whereHas('posts', function ($q) {
+        $users = SoftDeletesTestUser::whereHas('posts', static function ($q) {
             $q->withTrashed();
         })->get();
         $this->assertCount(1, $users);
@@ -571,22 +571,22 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $user = SoftDeletesTestUser::withCount('posts')->orderBy('postsCount', 'desc')->first();
         $this->assertEquals(2, $user->posts_count);
 
-        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+        $user = SoftDeletesTestUser::withCount(['posts' => static function ($q) {
             $q->onlyTrashed();
         }])->orderBy('postsCount', 'desc')->first();
         $this->assertEquals(1, $user->posts_count);
 
-        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+        $user = SoftDeletesTestUser::withCount(['posts' => static function ($q) {
             $q->withTrashed();
         }])->orderBy('postsCount', 'desc')->first();
         $this->assertEquals(3, $user->posts_count);
 
-        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+        $user = SoftDeletesTestUser::withCount(['posts' => static function ($q) {
             $q->withTrashed()->where('title', 'First Title');
         }])->orderBy('postsCount', 'desc')->first();
         $this->assertEquals(1, $user->posts_count);
 
-        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+        $user = SoftDeletesTestUser::withCount(['posts' => static function ($q) {
             $q->where('title', 'First Title');
         }])->orderBy('postsCount', 'desc')->first();
         $this->assertEquals(0, $user->posts_count);
@@ -614,19 +614,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $abigail->delete();
 
-        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
+        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => static function ($q) {
             $q->withoutGlobalScope(SoftDeletingScope::class);
         }])->first();
 
         $this->assertEquals($abigail->email, $comment->owner->email);
 
-        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
+        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => static function ($q) {
             $q->withTrashed();
         }])->first();
 
         $this->assertEquals($abigail->email, $comment->owner->email);
 
-        $comment = TestCommentWithoutSoftDelete::with(['owner' => function ($q) {
+        $comment = TestCommentWithoutSoftDelete::with(['owner' => static function ($q) {
             $q->withTrashed();
         }])->first();
 
@@ -648,7 +648,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             'owner_id' => $abigail->id,
         ]);
 
-        TestCommentWithoutSoftDelete::with(['owner' => function ($q) {
+        TestCommentWithoutSoftDelete::with(['owner' => static function ($q) {
             $q->thisMethodDoesNotExist();
         }])->first();
     }
@@ -665,7 +665,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             'owner_id' => $abigail->id,
         ]);
 
-        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
+        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => static function ($q) {
             $q->where('email', 'taylorotwell@gmail.com');
         }])->first();
 

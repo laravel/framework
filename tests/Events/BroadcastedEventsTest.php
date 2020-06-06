@@ -39,7 +39,7 @@ class BroadcastedEventsTest extends TestCase
         $broadcast->shouldReceive('queue')->once();
         $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
 
-        $d->listen(AlwaysBroadcastEvent::class, function ($payload) {
+        $d->listen(AlwaysBroadcastEvent::class, static function ($payload) {
             $_SERVER['__event.test'] = $payload;
         });
 

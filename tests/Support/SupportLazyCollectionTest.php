@@ -46,7 +46,7 @@ class SupportLazyCollectionTest extends TestCase
 
     public function testCanCreateCollectionFromClosure()
     {
-        $data = LazyCollection::make(function () {
+        $data = LazyCollection::make(static function () {
             yield 1;
             yield 2;
             yield 3;
@@ -54,7 +54,7 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2, 3], $data->all());
 
-        $data = LazyCollection::make(function () {
+        $data = LazyCollection::make(static function () {
             yield 'a' => 1;
             yield 'b' => 2;
             yield 'c' => 3;
@@ -71,7 +71,7 @@ class SupportLazyCollectionTest extends TestCase
     {
         $source = [1, 2, 3, 4, 5];
 
-        $data = LazyCollection::make(function () use (&$source) {
+        $data = LazyCollection::make(static function () use (&$source) {
             yield from $source;
         })->eager();
 
@@ -84,7 +84,7 @@ class SupportLazyCollectionTest extends TestCase
     {
         $source = [1, 2, 3, 4];
 
-        $collection = LazyCollection::make(function () use (&$source) {
+        $collection = LazyCollection::make(static function () use (&$source) {
             yield from $source;
         })->remember();
 
@@ -99,7 +99,7 @@ class SupportLazyCollectionTest extends TestCase
     {
         $source = [1, 2, 3, 4];
 
-        $collection = LazyCollection::make(function () use (&$source) {
+        $collection = LazyCollection::make(static function () use (&$source) {
             yield from $source;
         })->remember();
 
@@ -142,12 +142,12 @@ class SupportLazyCollectionTest extends TestCase
 
     public function testRememberWithDuplicateKeys()
     {
-        $collection = LazyCollection::make(function () {
+        $collection = LazyCollection::make(static function () {
             yield 'key' => 1;
             yield 'key' => 2;
         })->remember();
 
-        $results = $collection->map(function ($value, $key) {
+        $results = $collection->map(static function ($value, $key) {
             return [$key, $value];
         })->values()->all();
 
@@ -160,7 +160,7 @@ class SupportLazyCollectionTest extends TestCase
 
         $tapped = [];
 
-        $data = $data->tapEach(function ($value, $key) use (&$tapped) {
+        $data = $data->tapEach(static function ($value, $key) use (&$tapped) {
             $tapped[$key] = $value;
         });
 

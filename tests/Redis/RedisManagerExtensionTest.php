@@ -81,7 +81,7 @@ class RedisManagerExtensionTest extends TestCase
             return m::mock(Connector::class)
                 ->shouldReceive('connectToCluster')
                 ->once()
-                ->withArgs(function ($configArg) use ($config) {
+                ->withArgs(static function ($configArg) use ($config) {
                     return $config === $configArg;
                 })
                 ->getMock();

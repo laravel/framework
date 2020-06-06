@@ -9,7 +9,7 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
 {
     public function testRenameColumnOnTableWithEnum()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('users', static function (Blueprint $table) {
             $table->renameColumn('name', 'username');
         });
 
@@ -18,7 +18,7 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
 
     public function testChangeColumnOnTableWithEnum()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('users', static function (Blueprint $table) {
             $table->unsignedInteger('age')->charset('')->change();
         });
 
@@ -29,7 +29,7 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->integer('id');
             $table->string('name');
             $table->string('age');

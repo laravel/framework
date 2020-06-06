@@ -22,7 +22,7 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
         }
 
         if (! Schema::hasTable(self::TABLE)) {
-            Schema::create(self::TABLE, function (Blueprint $table) {
+            Schema::create(self::TABLE, static function (Blueprint $table) {
                 $table->json(self::JSON_COL)->nullable();
                 $table->float(self::FLOAT_COL)->nullable();
             });

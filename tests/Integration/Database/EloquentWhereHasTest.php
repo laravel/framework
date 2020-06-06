@@ -16,17 +16,17 @@ class EloquentWhereHasTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->boolean('public');
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('commentable_type');
             $table->integer('commentable_id');
@@ -43,7 +43,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
 
     public function testWithCount()
     {
-        $users = User::whereHas('posts', function ($query) {
+        $users = User::whereHas('posts', static function ($query) {
             $query->where('public', true);
         })->get();
 

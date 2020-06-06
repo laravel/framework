@@ -1,5 +1,5 @@
 <?php
 
-$router->get('users', function () {
+$router->get('users', static function () {
     return 'all-users';
 });

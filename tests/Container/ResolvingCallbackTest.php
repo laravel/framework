@@ -11,10 +11,10 @@ class ResolvingCallbackTest extends TestCase
     public function testResolvingCallbacksAreCalledForSpecificAbstracts()
     {
         $container = new Container;
-        $container->resolving('foo', function ($object) {
+        $container->resolving('foo', static function ($object) {
             return $object->name = 'taylor';
         });
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             return new stdClass;
         });
         $instance = $container->make('foo');
@@ -25,10 +25,10 @@ class ResolvingCallbackTest extends TestCase
     public function testResolvingCallbacksAreCalled()
     {
         $container = new Container;
-        $container->resolving(function ($object) {
+        $container->resolving(static function ($object) {
             return $object->name = 'taylor';
         });
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             return new stdClass;
         });
         $instance = $container->make('foo');
@@ -39,10 +39,10 @@ class ResolvingCallbackTest extends TestCase
     public function testResolvingCallbacksAreCalledForType()
     {
         $container = new Container;
-        $container->resolving(stdClass::class, function ($object) {
+        $container->resolving(stdClass::class, static function ($object) {
             return $object->name = 'taylor';
         });
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             return new stdClass;
         });
         $instance = $container->make('foo');
@@ -54,10 +54,10 @@ class ResolvingCallbackTest extends TestCase
     {
         $container = new Container;
         $container->alias(stdClass::class, 'std');
-        $container->resolving('std', function ($object) {
+        $container->resolving('std', static function ($object) {
             return $object->name = 'taylor';
         });
-        $container->bind('foo', function () {
+        $container->bind('foo', static function () {
             return new stdClass;
         });
         $instance = $container->make('foo');
@@ -70,7 +70,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -88,7 +88,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(function () use (&$callCounter) {
+        $container->resolving(static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -106,7 +106,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -132,7 +132,7 @@ class ResolvingCallbackTest extends TestCase
         $container->make(ResolvingImplementationStub::class);
 
         $callCounter = 0;
-        $container->resolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -147,7 +147,7 @@ class ResolvingCallbackTest extends TestCase
         $container->bind(ResolvingContractStub::class, ResolvingImplementationStub::class);
 
         $callCounter = 0;
-        $container->resolving(ResolvingImplementationStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingImplementationStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -164,7 +164,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving('foo', function () use (&$callCounter) {
+        $container->resolving('foo', static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -182,7 +182,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingImplementationStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingImplementationStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -208,11 +208,11 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
-        $container->bind(ResolvingContractStub::class, function () {
+        $container->bind(ResolvingContractStub::class, static function () {
             return new ResolvingImplementationStub;
         });
 
@@ -234,12 +234,12 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
         $container->bind(ResolvingContractStub::class, ResolvingImplementationStub::class);
-        $container->bind(ResolvingContractStub::class, function () {
+        $container->bind(ResolvingContractStub::class, static function () {
             return new ResolvingImplementationStub;
         });
 
@@ -287,7 +287,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -302,7 +302,7 @@ class ResolvingCallbackTest extends TestCase
         $container->make(ResolvingImplementationStubTwo::class);
         $this->assertEquals(3, $callCounter);
 
-        $container->bind(ResolvingContractStub::class, function () {
+        $container->bind(ResolvingContractStub::class, static function () {
             return new ResolvingImplementationStubTwo();
         });
         $this->assertEquals(4, $callCounter);
@@ -317,11 +317,11 @@ class ResolvingCallbackTest extends TestCase
 
         $callCounter = 0;
 
-        $container->resolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
-        $container->resolving(ResolvingImplementationStubTwo::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingImplementationStubTwo::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -346,7 +346,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -362,7 +362,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingImplementationStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingImplementationStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -380,7 +380,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingImplementationStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingImplementationStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -398,7 +398,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingImplementationStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingImplementationStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -413,7 +413,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->resolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->resolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 
@@ -429,7 +429,7 @@ class ResolvingCallbackTest extends TestCase
         $container = new Container;
 
         $callCounter = 0;
-        $container->afterResolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->afterResolving(ResolvingContractStub::class, static function () use (&$callCounter) {
             $callCounter++;
         });
 

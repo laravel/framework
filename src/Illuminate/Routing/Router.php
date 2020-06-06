@@ -652,7 +652,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function runRoute(Request $request, Route $route)
     {
-        $request->setRouteResolver(function () use ($route) {
+        $request->setRouteResolver(static function () use ($route) {
             return $route;
         });
 
@@ -701,7 +701,7 @@ class Router implements BindingRegistrar, RegistrarContract
 
         $middleware = collect($route->gatherMiddleware())->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
-        })->flatten()->reject(function ($name) use ($route, $excluded) {
+        })->flatten()->reject(static function ($name) use ($route, $excluded) {
             return in_array($name, $excluded, true);
         })->values();
 

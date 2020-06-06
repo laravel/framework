@@ -575,7 +575,7 @@ class Event
      */
     protected function pingCallback($url)
     {
-        return function (Container $container, HttpClient $http) use ($url) {
+        return static function (Container $container, HttpClient $http) use ($url) {
             try {
                 $http->request('GET', $url);
             } catch (ClientExceptionInterface | TransferException $e) {
@@ -673,7 +673,7 @@ class Event
      */
     public function when($callback)
     {
-        $this->filters[] = is_callable($callback) ? $callback : function () use ($callback) {
+        $this->filters[] = is_callable($callback) ? $callback : static function () use ($callback) {
             return $callback;
         };
 
@@ -688,7 +688,7 @@ class Event
      */
     public function skip($callback)
     {
-        $this->rejects[] = is_callable($callback) ? $callback : function () use ($callback) {
+        $this->rejects[] = is_callable($callback) ? $callback : static function () use ($callback) {
             return $callback;
         };
 

@@ -47,7 +47,7 @@ class FoundationHelpersTest extends TestCase
     {
         $file = 'unversioned.css';
 
-        app()->singleton('path.public', function () {
+        app()->singleton('path.public', static function () {
             return __DIR__;
         });
 
@@ -215,7 +215,7 @@ class FoundationHelpersTest extends TestCase
 
     protected function makeHotModuleReloadFile($url, $directory = '')
     {
-        app()->singleton('path.public', function () {
+        app()->singleton('path.public', static function () {
             return __DIR__;
         });
 
@@ -230,7 +230,7 @@ class FoundationHelpersTest extends TestCase
 
     protected function makeManifest($directory = '')
     {
-        app()->singleton('path.public', function () {
+        app()->singleton('path.public', static function () {
             return __DIR__;
         });
 
@@ -249,7 +249,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixIsSwappableForTests()
     {
-        (new Application)->instance(Mix::class, function () {
+        (new Application)->instance(Mix::class, static function () {
             return 'expected';
         });
 

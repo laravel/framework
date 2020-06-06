@@ -16,17 +16,17 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
         });
 
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('projects', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
         });
 
-        Schema::create('project_users', function (Blueprint $table) {
+        Schema::create('project_users', static function (Blueprint $table) {
             $table->integer('user_id');
             $table->integer('project_id');
             $table->text('permissions');

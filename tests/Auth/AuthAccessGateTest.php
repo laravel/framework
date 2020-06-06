@@ -17,10 +17,10 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
+        $gate->define('foo', static function ($user) {
             return true;
         });
-        $gate->define('bar', function ($user) {
+        $gate->define('bar', static function ($user) {
             return false;
         });
 
@@ -30,7 +30,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testBeforeCanTakeAnArrayCallbackAsObject()
     {
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 
@@ -41,7 +41,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testBeforeCanTakeAnArrayCallbackAsObjectStatic()
     {
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 
@@ -52,7 +52,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testBeforeCanTakeAnArrayCallbackWithStaticMethod()
     {
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 
@@ -63,11 +63,11 @@ class AuthAccessGateTest extends TestCase
 
     public function testBeforeCanAllowGuests()
     {
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 
-        $gate->before(function (?stdClass $user) {
+        $gate->before(static function (?stdClass $user) {
             return true;
         });
 
@@ -76,11 +76,11 @@ class AuthAccessGateTest extends TestCase
 
     public function testAfterCanAllowGuests()
     {
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 
-        $gate->after(function (?stdClass $user) {
+        $gate->after(static function (?stdClass $user) {
             return true;
         });
 
@@ -89,15 +89,15 @@ class AuthAccessGateTest extends TestCase
 
     public function testClosuresCanAllowGuestUsers()
     {
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 
-        $gate->define('foo', function (?stdClass $user) {
+        $gate->define('foo', static function (?stdClass $user) {
             return true;
         });
 
-        $gate->define('bar', function (stdClass $user) {
+        $gate->define('bar', static function (stdClass $user) {
             return false;
         });
 
@@ -109,7 +109,7 @@ class AuthAccessGateTest extends TestCase
     {
         unset($_SERVER['__laravel.testBefore']);
 
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 
@@ -133,7 +133,7 @@ class AuthAccessGateTest extends TestCase
     {
         $_SERVER['__laravel.testBefore'] = false;
 
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 
@@ -153,27 +153,27 @@ class AuthAccessGateTest extends TestCase
         $_SERVER['__laravel.gateAfter'] = false;
         $_SERVER['__laravel.gateAfter2'] = false;
 
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 
-        $gate->before(function (?stdClass $user) {
+        $gate->before(static function (?stdClass $user) {
             $_SERVER['__laravel.gateBefore'] = true;
         });
 
-        $gate->after(function (?stdClass $user) {
+        $gate->after(static function (?stdClass $user) {
             $_SERVER['__laravel.gateAfter'] = true;
         });
 
-        $gate->before(function (stdClass $user) {
+        $gate->before(static function (stdClass $user) {
             $_SERVER['__laravel.gateBefore2'] = true;
         });
 
-        $gate->after(function (stdClass $user) {
+        $gate->after(static function (stdClass $user) {
             $_SERVER['__laravel.gateAfter2'] = true;
         });
 
-        $gate->define('foo', function ($user = null) {
+        $gate->define('foo', static function ($user = null) {
             return true;
         });
 
@@ -223,7 +223,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
+        $gate->define('foo', static function ($user) {
             return true;
         });
         $gate->before(function ($user, $ability) {
@@ -239,10 +239,10 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
+        $gate->define('foo', static function ($user) {
             return true;
         });
-        $gate->before(function () {
+        $gate->before(static function () {
             //
         });
 
@@ -253,11 +253,11 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
+        $gate->define('foo', static function ($user) {
             return true;
         });
 
-        $gate->define('bar', function ($user) {
+        $gate->define('bar', static function ($user) {
             return false;
         });
 
@@ -280,7 +280,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->after(function ($user, $ability, $result) {
+        $gate->after(static function ($user, $ability, $result) {
             return true;
         });
 
@@ -291,15 +291,15 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('deny', function ($user) {
+        $gate->define('deny', static function ($user) {
             return false;
         });
 
-        $gate->define('allow', function ($user) {
+        $gate->define('allow', static function ($user) {
             return true;
         });
 
-        $gate->after(function ($user, $ability, $result) {
+        $gate->after(static function ($user, $ability, $result) {
             return ! $result;
         });
 
@@ -311,11 +311,11 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->after(function ($user, $ability, $result) {
+        $gate->after(static function ($user, $ability, $result) {
             return $ability == 'allow';
         });
 
-        $gate->after(function ($user, $ability, $result) {
+        $gate->after(static function ($user, $ability, $result) {
             return ! $result;
         });
 
@@ -504,7 +504,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('nonexistent_method', function ($user) {
+        $gate->define('nonexistent_method', static function ($user) {
             return true;
         });
 
@@ -531,12 +531,12 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function () {
+        $gate->define('foo', static function () {
             return true;
         });
 
         $counter = 0;
-        $guesserCallback = function () use (&$counter) {
+        $guesserCallback = static function () use (&$counter) {
             $counter++;
         };
         $gate->guessPolicyNamesUsing($guesserCallback);
@@ -689,7 +689,7 @@ class AuthAccessGateTest extends TestCase
 
     protected function getBasicGate($isAdmin = false)
     {
-        return new Gate(new Container, function () use ($isAdmin) {
+        return new Gate(new Container, static function () use ($isAdmin) {
             return (object) ['id' => 1, 'isAdmin' => $isAdmin];
         });
     }
@@ -796,7 +796,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testClassesCanBeDefinedAsCallbacksUsingAtNotationForGuests()
     {
-        $gate = new Gate(new Container, function () {
+        $gate = new Gate(new Container, static function () {
             //
         });
 

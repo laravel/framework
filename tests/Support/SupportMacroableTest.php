@@ -22,7 +22,7 @@ class SupportMacroableTest extends TestCase
     public function testRegisterMacro()
     {
         $macroable = $this->macroable;
-        $macroable::macro(__CLASS__, function () {
+        $macroable::macro(__CLASS__, static function () {
             return 'Taylor';
         });
         $this->assertSame('Taylor', $macroable::{__CLASS__}());
@@ -42,7 +42,7 @@ class SupportMacroableTest extends TestCase
         TestMacroable::macro('tryInstance', function () {
             return $this->protectedVariable;
         });
-        TestMacroable::macro('tryStatic', function () {
+        TestMacroable::macro('tryStatic', static function () {
             return static::getProtectedStatic();
         });
         $instance = new TestMacroable;

@@ -733,8 +733,7 @@ trait HasAttributes
         $caster = $this->resolveCasterClass($key);
 
         if (is_null($value)) {
-            $this->attributes = array_merge($this->attributes, array_map(
-                function () {
+            $this->attributes = array_merge($this->attributes, array_map(static function () {
                 },
                 $this->normalizeCastClassResponse($key, $caster->set(
                     $this, $key, $this->{$key}, $this->attributes
@@ -766,7 +765,7 @@ trait HasAttributes
      */
     protected function getArrayAttributeWithValue($path, $key, $value)
     {
-        return tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
+        return tap($this->getArrayAttributeByKey($key), static function (&$array) use ($path, $value) {
             Arr::set($array, str_replace('->', '.', $path), $value);
         });
     }
@@ -1492,7 +1491,7 @@ trait HasAttributes
      */
     public static function cacheMutatedAttributes($class)
     {
-        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))->map(function ($match) {
+        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))->map(static function ($match) {
             return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
         })->all();
     }

@@ -160,7 +160,7 @@ trait ManagesEvents
     protected function addEventListener($name, $callback)
     {
         if (Str::contains($name, '*')) {
-            $callback = function ($name, array $data) use ($callback) {
+            $callback = static function ($name, array $data) use ($callback) {
                 return $callback($data[0]);
             };
         }

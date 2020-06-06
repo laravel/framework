@@ -628,7 +628,7 @@ trait HasRelationships
      */
     protected function guessBelongsToManyRelation()
     {
-        $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
+        $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), static function ($trace) {
             return ! in_array(
                 $trace['function'],
                 array_merge(static::$manyMethods, ['guessBelongsToManyRelation'])

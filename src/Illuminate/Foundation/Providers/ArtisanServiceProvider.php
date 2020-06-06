@@ -185,7 +185,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerCacheClearCommand()
     {
-        $this->app->singleton('command.cache.clear', function ($app) {
+        $this->app->singleton('command.cache.clear', static function ($app) {
             return new CacheClearCommand($app['cache'], $app['files']);
         });
     }
@@ -197,7 +197,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerCacheForgetCommand()
     {
-        $this->app->singleton('command.cache.forget', function ($app) {
+        $this->app->singleton('command.cache.forget', static function ($app) {
             return new CacheForgetCommand($app['cache']);
         });
     }
@@ -209,7 +209,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerCacheTableCommand()
     {
-        $this->app->singleton('command.cache.table', function ($app) {
+        $this->app->singleton('command.cache.table', static function ($app) {
             return new CacheTableCommand($app['files'], $app['composer']);
         });
     }
@@ -221,7 +221,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerCastMakeCommand()
     {
-        $this->app->singleton('command.cast.make', function ($app) {
+        $this->app->singleton('command.cast.make', static function ($app) {
             return new CastMakeCommand($app['files']);
         });
     }
@@ -233,7 +233,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerChannelMakeCommand()
     {
-        $this->app->singleton('command.channel.make', function ($app) {
+        $this->app->singleton('command.channel.make', static function ($app) {
             return new ChannelMakeCommand($app['files']);
         });
     }
@@ -245,7 +245,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerClearCompiledCommand()
     {
-        $this->app->singleton('command.clear-compiled', function () {
+        $this->app->singleton('command.clear-compiled', static function () {
             return new ClearCompiledCommand;
         });
     }
@@ -257,7 +257,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerClearResetsCommand()
     {
-        $this->app->singleton('command.auth.resets.clear', function () {
+        $this->app->singleton('command.auth.resets.clear', static function () {
             return new ClearResetsCommand;
         });
     }
@@ -269,7 +269,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerComponentMakeCommand()
     {
-        $this->app->singleton('command.component.make', function ($app) {
+        $this->app->singleton('command.component.make', static function ($app) {
             return new ComponentMakeCommand($app['files']);
         });
     }
@@ -281,7 +281,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerConfigCacheCommand()
     {
-        $this->app->singleton('command.config.cache', function ($app) {
+        $this->app->singleton('command.config.cache', static function ($app) {
             return new ConfigCacheCommand($app['files']);
         });
     }
@@ -293,7 +293,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerConfigClearCommand()
     {
-        $this->app->singleton('command.config.clear', function ($app) {
+        $this->app->singleton('command.config.clear', static function ($app) {
             return new ConfigClearCommand($app['files']);
         });
     }
@@ -305,7 +305,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerConsoleMakeCommand()
     {
-        $this->app->singleton('command.console.make', function ($app) {
+        $this->app->singleton('command.console.make', static function ($app) {
             return new ConsoleMakeCommand($app['files']);
         });
     }
@@ -317,7 +317,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerControllerMakeCommand()
     {
-        $this->app->singleton('command.controller.make', function ($app) {
+        $this->app->singleton('command.controller.make', static function ($app) {
             return new ControllerMakeCommand($app['files']);
         });
     }
@@ -329,7 +329,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerDbWipeCommand()
     {
-        $this->app->singleton('command.db.wipe', function () {
+        $this->app->singleton('command.db.wipe', static function () {
             return new WipeCommand;
         });
     }
@@ -341,7 +341,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerEventGenerateCommand()
     {
-        $this->app->singleton('command.event.generate', function () {
+        $this->app->singleton('command.event.generate', static function () {
             return new EventGenerateCommand;
         });
     }
@@ -353,7 +353,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerEventMakeCommand()
     {
-        $this->app->singleton('command.event.make', function ($app) {
+        $this->app->singleton('command.event.make', static function ($app) {
             return new EventMakeCommand($app['files']);
         });
     }
@@ -365,7 +365,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerExceptionMakeCommand()
     {
-        $this->app->singleton('command.exception.make', function ($app) {
+        $this->app->singleton('command.exception.make', static function ($app) {
             return new ExceptionMakeCommand($app['files']);
         });
     }
@@ -377,7 +377,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerFactoryMakeCommand()
     {
-        $this->app->singleton('command.factory.make', function ($app) {
+        $this->app->singleton('command.factory.make', static function ($app) {
             return new FactoryMakeCommand($app['files']);
         });
     }
@@ -389,7 +389,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerDownCommand()
     {
-        $this->app->singleton('command.down', function () {
+        $this->app->singleton('command.down', static function () {
             return new DownCommand;
         });
     }
@@ -401,7 +401,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerEnvironmentCommand()
     {
-        $this->app->singleton('command.environment', function () {
+        $this->app->singleton('command.environment', static function () {
             return new EnvironmentCommand;
         });
     }
@@ -413,7 +413,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerEventCacheCommand()
     {
-        $this->app->singleton('command.event.cache', function () {
+        $this->app->singleton('command.event.cache', static function () {
             return new EventCacheCommand;
         });
     }
@@ -425,7 +425,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerEventClearCommand()
     {
-        $this->app->singleton('command.event.clear', function ($app) {
+        $this->app->singleton('command.event.clear', static function ($app) {
             return new EventClearCommand($app['files']);
         });
     }
@@ -437,7 +437,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerEventListCommand()
     {
-        $this->app->singleton('command.event.list', function () {
+        $this->app->singleton('command.event.list', static function () {
             return new EventListCommand();
         });
     }
@@ -449,7 +449,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerJobMakeCommand()
     {
-        $this->app->singleton('command.job.make', function ($app) {
+        $this->app->singleton('command.job.make', static function ($app) {
             return new JobMakeCommand($app['files']);
         });
     }
@@ -461,7 +461,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerKeyGenerateCommand()
     {
-        $this->app->singleton('command.key.generate', function () {
+        $this->app->singleton('command.key.generate', static function () {
             return new KeyGenerateCommand;
         });
     }
@@ -473,7 +473,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerListenerMakeCommand()
     {
-        $this->app->singleton('command.listener.make', function ($app) {
+        $this->app->singleton('command.listener.make', static function ($app) {
             return new ListenerMakeCommand($app['files']);
         });
     }
@@ -485,7 +485,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerMailMakeCommand()
     {
-        $this->app->singleton('command.mail.make', function ($app) {
+        $this->app->singleton('command.mail.make', static function ($app) {
             return new MailMakeCommand($app['files']);
         });
     }
@@ -497,7 +497,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerMiddlewareMakeCommand()
     {
-        $this->app->singleton('command.middleware.make', function ($app) {
+        $this->app->singleton('command.middleware.make', static function ($app) {
             return new MiddlewareMakeCommand($app['files']);
         });
     }
@@ -509,7 +509,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerModelMakeCommand()
     {
-        $this->app->singleton('command.model.make', function ($app) {
+        $this->app->singleton('command.model.make', static function ($app) {
             return new ModelMakeCommand($app['files']);
         });
     }
@@ -521,7 +521,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerNotificationMakeCommand()
     {
-        $this->app->singleton('command.notification.make', function ($app) {
+        $this->app->singleton('command.notification.make', static function ($app) {
             return new NotificationMakeCommand($app['files']);
         });
     }
@@ -533,7 +533,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerNotificationTableCommand()
     {
-        $this->app->singleton('command.notification.table', function ($app) {
+        $this->app->singleton('command.notification.table', static function ($app) {
             return new NotificationTableCommand($app['files'], $app['composer']);
         });
     }
@@ -545,7 +545,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerOptimizeCommand()
     {
-        $this->app->singleton('command.optimize', function () {
+        $this->app->singleton('command.optimize', static function () {
             return new OptimizeCommand;
         });
     }
@@ -557,7 +557,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerObserverMakeCommand()
     {
-        $this->app->singleton('command.observer.make', function ($app) {
+        $this->app->singleton('command.observer.make', static function ($app) {
             return new ObserverMakeCommand($app['files']);
         });
     }
@@ -569,7 +569,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerOptimizeClearCommand()
     {
-        $this->app->singleton('command.optimize.clear', function () {
+        $this->app->singleton('command.optimize.clear', static function () {
             return new OptimizeClearCommand;
         });
     }
@@ -581,7 +581,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerPackageDiscoverCommand()
     {
-        $this->app->singleton('command.package.discover', function () {
+        $this->app->singleton('command.package.discover', static function () {
             return new PackageDiscoverCommand;
         });
     }
@@ -593,7 +593,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerPolicyMakeCommand()
     {
-        $this->app->singleton('command.policy.make', function ($app) {
+        $this->app->singleton('command.policy.make', static function ($app) {
             return new PolicyMakeCommand($app['files']);
         });
     }
@@ -605,7 +605,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerProviderMakeCommand()
     {
-        $this->app->singleton('command.provider.make', function ($app) {
+        $this->app->singleton('command.provider.make', static function ($app) {
             return new ProviderMakeCommand($app['files']);
         });
     }
@@ -617,7 +617,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueFailedCommand()
     {
-        $this->app->singleton('command.queue.failed', function () {
+        $this->app->singleton('command.queue.failed', static function () {
             return new ListFailedQueueCommand;
         });
     }
@@ -629,7 +629,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueForgetCommand()
     {
-        $this->app->singleton('command.queue.forget', function () {
+        $this->app->singleton('command.queue.forget', static function () {
             return new ForgetFailedQueueCommand;
         });
     }
@@ -641,7 +641,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueFlushCommand()
     {
-        $this->app->singleton('command.queue.flush', function () {
+        $this->app->singleton('command.queue.flush', static function () {
             return new FlushFailedQueueCommand;
         });
     }
@@ -653,7 +653,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueListenCommand()
     {
-        $this->app->singleton('command.queue.listen', function ($app) {
+        $this->app->singleton('command.queue.listen', static function ($app) {
             return new QueueListenCommand($app['queue.listener']);
         });
     }
@@ -665,7 +665,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueRestartCommand()
     {
-        $this->app->singleton('command.queue.restart', function ($app) {
+        $this->app->singleton('command.queue.restart', static function ($app) {
             return new QueueRestartCommand($app['cache.store']);
         });
     }
@@ -677,7 +677,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueRetryCommand()
     {
-        $this->app->singleton('command.queue.retry', function () {
+        $this->app->singleton('command.queue.retry', static function () {
             return new QueueRetryCommand;
         });
     }
@@ -689,7 +689,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueWorkCommand()
     {
-        $this->app->singleton('command.queue.work', function ($app) {
+        $this->app->singleton('command.queue.work', static function ($app) {
             return new QueueWorkCommand($app['queue.worker'], $app['cache.store']);
         });
     }
@@ -701,7 +701,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueFailedTableCommand()
     {
-        $this->app->singleton('command.queue.failed-table', function ($app) {
+        $this->app->singleton('command.queue.failed-table', static function ($app) {
             return new FailedTableCommand($app['files'], $app['composer']);
         });
     }
@@ -713,7 +713,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueTableCommand()
     {
-        $this->app->singleton('command.queue.table', function ($app) {
+        $this->app->singleton('command.queue.table', static function ($app) {
             return new TableCommand($app['files'], $app['composer']);
         });
     }
@@ -725,7 +725,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerRequestMakeCommand()
     {
-        $this->app->singleton('command.request.make', function ($app) {
+        $this->app->singleton('command.request.make', static function ($app) {
             return new RequestMakeCommand($app['files']);
         });
     }
@@ -737,7 +737,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerResourceMakeCommand()
     {
-        $this->app->singleton('command.resource.make', function ($app) {
+        $this->app->singleton('command.resource.make', static function ($app) {
             return new ResourceMakeCommand($app['files']);
         });
     }
@@ -749,7 +749,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerRuleMakeCommand()
     {
-        $this->app->singleton('command.rule.make', function ($app) {
+        $this->app->singleton('command.rule.make', static function ($app) {
             return new RuleMakeCommand($app['files']);
         });
     }
@@ -761,7 +761,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerSeederMakeCommand()
     {
-        $this->app->singleton('command.seeder.make', function ($app) {
+        $this->app->singleton('command.seeder.make', static function ($app) {
             return new SeederMakeCommand($app['files'], $app['composer']);
         });
     }
@@ -773,7 +773,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerSessionTableCommand()
     {
-        $this->app->singleton('command.session.table', function ($app) {
+        $this->app->singleton('command.session.table', static function ($app) {
             return new SessionTableCommand($app['files'], $app['composer']);
         });
     }
@@ -785,7 +785,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerStorageLinkCommand()
     {
-        $this->app->singleton('command.storage.link', function () {
+        $this->app->singleton('command.storage.link', static function () {
             return new StorageLinkCommand;
         });
     }
@@ -797,7 +797,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerRouteCacheCommand()
     {
-        $this->app->singleton('command.route.cache', function ($app) {
+        $this->app->singleton('command.route.cache', static function ($app) {
             return new RouteCacheCommand($app['files']);
         });
     }
@@ -809,7 +809,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerRouteClearCommand()
     {
-        $this->app->singleton('command.route.clear', function ($app) {
+        $this->app->singleton('command.route.clear', static function ($app) {
             return new RouteClearCommand($app['files']);
         });
     }
@@ -821,7 +821,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerRouteListCommand()
     {
-        $this->app->singleton('command.route.list', function ($app) {
+        $this->app->singleton('command.route.list', static function ($app) {
             return new RouteListCommand($app['router']);
         });
     }
@@ -833,7 +833,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerSeedCommand()
     {
-        $this->app->singleton('command.seed', function ($app) {
+        $this->app->singleton('command.seed', static function ($app) {
             return new SeedCommand($app['db']);
         });
     }
@@ -865,7 +865,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerServeCommand()
     {
-        $this->app->singleton('command.serve', function () {
+        $this->app->singleton('command.serve', static function () {
             return new ServeCommand;
         });
     }
@@ -877,7 +877,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerStubPublishCommand()
     {
-        $this->app->singleton('command.stub.publish', function () {
+        $this->app->singleton('command.stub.publish', static function () {
             return new StubPublishCommand;
         });
     }
@@ -889,7 +889,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerTestMakeCommand()
     {
-        $this->app->singleton('command.test.make', function ($app) {
+        $this->app->singleton('command.test.make', static function ($app) {
             return new TestMakeCommand($app['files']);
         });
     }
@@ -901,7 +901,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerUpCommand()
     {
-        $this->app->singleton('command.up', function () {
+        $this->app->singleton('command.up', static function () {
             return new UpCommand;
         });
     }
@@ -913,7 +913,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerVendorPublishCommand()
     {
-        $this->app->singleton('command.vendor.publish', function ($app) {
+        $this->app->singleton('command.vendor.publish', static function ($app) {
             return new VendorPublishCommand($app['files']);
         });
     }
@@ -925,7 +925,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerViewCacheCommand()
     {
-        $this->app->singleton('command.view.cache', function () {
+        $this->app->singleton('command.view.cache', static function () {
             return new ViewCacheCommand;
         });
     }
@@ -937,7 +937,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerViewClearCommand()
     {
-        $this->app->singleton('command.view.clear', function ($app) {
+        $this->app->singleton('command.view.clear', static function ($app) {
             return new ViewClearCommand($app['files']);
         });
     }

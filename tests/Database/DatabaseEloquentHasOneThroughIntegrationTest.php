@@ -32,7 +32,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
      */
     public function createSchema()
     {
-        $this->schema()->create('users', function ($table) {
+        $this->schema()->create('users', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->unsignedInteger('position_id')->unique()->nullable();
@@ -41,7 +41,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
             $table->softDeletes();
         });
 
-        $this->schema()->create('contracts', function ($table) {
+        $this->schema()->create('contracts', static function ($table) {
             $table->increments('id');
             $table->integer('user_id')->unique();
             $table->string('title');
@@ -50,7 +50,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema()->create('positions', function ($table) {
+        $this->schema()->create('positions', static function ($table) {
             $table->increments('id');
             $table->string('name');
             $table->string('shortname');
@@ -109,7 +109,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
     public function testWhereHasOnARelationWithCustomIntermediateAndLocalKey()
     {
         $this->seedData();
-        $position = HasOneThroughIntermediateTestPosition::whereHas('contract', function ($query) {
+        $position = HasOneThroughIntermediateTestPosition::whereHas('contract', static function ($query) {
             $query->where('title', 'A title');
         })->get();
 
@@ -297,14 +297,14 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
      */
     protected function migrateDefault()
     {
-        $this->schema()->create('users_default', function ($table) {
+        $this->schema()->create('users_default', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->unsignedInteger('has_one_through_default_test_position_id')->unique()->nullable();
             $table->timestamps();
         });
 
-        $this->schema()->create('contracts_default', function ($table) {
+        $this->schema()->create('contracts_default', static function ($table) {
             $table->increments('id');
             $table->integer('has_one_through_default_test_user_id')->unique();
             $table->string('title');
@@ -312,7 +312,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema()->create('positions_default', function ($table) {
+        $this->schema()->create('positions_default', static function ($table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();

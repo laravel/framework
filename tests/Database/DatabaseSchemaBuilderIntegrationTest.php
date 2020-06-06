@@ -41,12 +41,12 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     public function testDropAllTablesWorksWithForeignKeys()
     {
-        $this->db->connection()->getSchemaBuilder()->create('table1', function (Blueprint $table) {
+        $this->db->connection()->getSchemaBuilder()->create('table1', static function (Blueprint $table) {
             $table->integer('id');
             $table->string('name');
         });
 
-        $this->db->connection()->getSchemaBuilder()->create('table2', function (Blueprint $table) {
+        $this->db->connection()->getSchemaBuilder()->create('table2', static function (Blueprint $table) {
             $table->integer('id');
             $table->string('user_id');
             $table->foreign('user_id')->references('id')->on('table1');
@@ -65,7 +65,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
     {
         $this->db->connection()->setTablePrefix('test_');
 
-        $this->db->connection()->getSchemaBuilder()->create('table1', function (Blueprint $table) {
+        $this->db->connection()->getSchemaBuilder()->create('table1', static function (Blueprint $table) {
             $table->integer('id');
             $table->string('name');
         });
@@ -82,7 +82,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             'prefix_indexes' => false,
         ]);
 
-        $this->db->connection()->getSchemaBuilder()->create('table1', function (Blueprint $table) {
+        $this->db->connection()->getSchemaBuilder()->create('table1', static function (Blueprint $table) {
             $table->integer('id');
             $table->string('name')->index();
         });
@@ -99,7 +99,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             'prefix_indexes' => true,
         ]);
 
-        $this->db->connection()->getSchemaBuilder()->create('table1', function (Blueprint $table) {
+        $this->db->connection()->getSchemaBuilder()->create('table1', static function (Blueprint $table) {
             $table->integer('id');
             $table->string('name')->index();
         });

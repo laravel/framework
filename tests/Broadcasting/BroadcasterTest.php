@@ -35,25 +35,25 @@ class BroadcasterTest extends TestCase
 
     public function testExtractingParametersWhileCheckingForUserAccess()
     {
-        $callback = function ($user, BroadcasterTestEloquentModelStub $model, $nonModel) {
+        $callback = static function ($user, BroadcasterTestEloquentModelStub $model, $nonModel) {
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', $callback);
         $this->assertEquals(['model.1.instance', 'something'], $parameters);
 
-        $callback = function ($user, BroadcasterTestEloquentModelStub $model, BroadcasterTestEloquentModelStub $model2, $something) {
+        $callback = static function ($user, BroadcasterTestEloquentModelStub $model, BroadcasterTestEloquentModelStub $model2, $something) {
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{model2}.{nonModel}', 'asd.1.uid.something', $callback);
         $this->assertEquals(['model.1.instance', 'model.uid.instance', 'something'], $parameters);
 
-        $callback = function ($user) {
+        $callback = static function ($user) {
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
         $this->assertEquals([], $parameters);
 
-        $callback = function ($user, $something) {
+        $callback = static function ($user, $something) {
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
@@ -65,11 +65,11 @@ class BroadcasterTest extends TestCase
         $container = new Container;
         Container::setInstance($container);
         $binder = m::mock(BindingRegistrar::class);
-        $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn(function () {
+        $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn(static function () {
             return 'bound';
         });
         $container->instance(BindingRegistrar::class, $binder);
-        $callback = function ($user, $model) {
+        $callback = static function ($user, $model) {
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
@@ -92,7 +92,7 @@ class BroadcasterTest extends TestCase
 
     public function testCanRegisterChannelsAsClasses()
     {
-        $this->broadcaster->channel('something', function () {
+        $this->broadcaster->channel('something', static function () {
             //
         });
 
@@ -103,7 +103,7 @@ class BroadcasterTest extends TestCase
     {
         $this->expectException(HttpException::class);
 
-        $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
+        $callback = static function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
             //
         };
         $this->broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
@@ -111,7 +111,7 @@ class BroadcasterTest extends TestCase
 
     public function testCanRegisterChannelsWithoutOptions()
     {
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         });
     }
@@ -119,7 +119,7 @@ class BroadcasterTest extends TestCase
     public function testCanRegisterChannelsWithOptions()
     {
         $options = ['a' => ['b', 'c']];
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         }, $options);
     }
@@ -127,7 +127,7 @@ class BroadcasterTest extends TestCase
     public function testCanRetrieveChannelsOptions()
     {
         $options = ['a' => ['b', 'c']];
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         }, $options);
 
@@ -140,7 +140,7 @@ class BroadcasterTest extends TestCase
     public function testCanRetrieveChannelsOptionsUsingAChannelNameContainingArgs()
     {
         $options = ['a' => ['b', 'c']];
-        $this->broadcaster->channel('somechannel.{id}.test.{text}', function () {
+        $this->broadcaster->channel('somechannel.{id}.test.{text}', static function () {
             //
         }, $options);
 
@@ -153,10 +153,10 @@ class BroadcasterTest extends TestCase
     public function testCanRetrieveChannelsOptionsWhenMultipleChannelsAreRegistered()
     {
         $options = ['a' => ['b', 'c']];
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         });
-        $this->broadcaster->channel('someotherchannel', function () {
+        $this->broadcaster->channel('someotherchannel', static function () {
             //
         }, $options);
 
@@ -169,7 +169,7 @@ class BroadcasterTest extends TestCase
     public function testDontRetrieveChannelsOptionsWhenChannelDoesntExists()
     {
         $options = ['a' => ['b', 'c']];
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         }, $options);
 
@@ -181,7 +181,7 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserWithoutGuard()
     {
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         });
 
@@ -199,7 +199,7 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserWithOneGuardUsingAStringForSpecifyingGuard()
     {
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         }, ['guards' => 'myguard']);
 
@@ -217,10 +217,10 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserWithMultipleGuardsAndRespectGuardsOrder()
     {
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         }, ['guards' => ['myguard1', 'myguard2']]);
-        $this->broadcaster->channel('someotherchannel', function () {
+        $this->broadcaster->channel('someotherchannel', static function () {
             //
         }, ['guards' => ['myguard2', 'myguard1']]);
 
@@ -248,7 +248,7 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserDontUseDefaultGuardWhenOneGuardSpecified()
     {
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         }, ['guards' => 'myguard']);
 
@@ -265,7 +265,7 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserDontUseDefaultGuardWhenMultipleGuardsSpecified()
     {
-        $this->broadcaster->channel('somechannel', function () {
+        $this->broadcaster->channel('somechannel', static function () {
             //
         }, ['guards' => ['myguard1', 'myguard2']]);
 
