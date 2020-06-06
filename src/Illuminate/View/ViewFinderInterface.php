@@ -12,6 +12,13 @@ interface ViewFinderInterface
     const HINT_PATH_DELIMITER = '::';
 
     /**
+     * Hint path force vendor.
+     *
+     * @var string
+     */
+    const HINT_PATH_FORCE_VENDOR = ':';
+
+    /**
      * Get the fully qualified location of the view.
      *
      * @param  string  $view

@@ -126,9 +126,12 @@ class FileViewFinder implements ViewFinderInterface
      */
     protected function findInPaths($name, $paths)
     {
+        $name = ltrim($name, static::HINT_PATH_FORCE_VENDOR);
+
         foreach ((array) $paths as $path) {
             foreach ($this->getPossibleViewFiles($name) as $file) {
-                if ($this->files->exists($viewPath = $path.'/'.$file)) {
+                // Check if last resolved view is the same to avoid loop
+                if ($this->files->exists($viewPath = $path.'/'.$file) && end($this->views) != $viewPath) {
                     return $viewPath;
                 }
             }
