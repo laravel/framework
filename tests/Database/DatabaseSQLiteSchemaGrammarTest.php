@@ -112,7 +112,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $schema = $db->getConnection()->getSchemaBuilder();
 
-        $schema->create('users', function (Blueprint $table) {
+        $schema->create('users', static function (Blueprint $table) {
             $table->string('email');
             $table->string('name');
         });
@@ -120,7 +120,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertTrue($schema->hasTable('users'));
         $this->assertTrue($schema->hasColumn('users', 'name'));
 
-        $schema->table('users', function (Blueprint $table) {
+        $schema->table('users', static function (Blueprint $table) {
             $table->dropColumn('name');
         });
 
@@ -163,12 +163,12 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $schema = $db->getConnection()->getSchemaBuilder();
 
-        $schema->create('users', function (Blueprint $table) {
+        $schema->create('users', static function (Blueprint $table) {
             $table->string('name');
             $table->string('email');
         });
 
-        $schema->table('users', function (Blueprint $table) {
+        $schema->table('users', static function (Blueprint $table) {
             $table->index(['name', 'email'], 'index1');
         });
 
@@ -177,7 +177,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertTrue($details->hasIndex('index1'));
         $this->assertFalse($details->hasIndex('index2'));
 
-        $schema->table('users', function (Blueprint $table) {
+        $schema->table('users', static function (Blueprint $table) {
             $table->renameIndex('index1', 'index2');
         });
 
@@ -813,7 +813,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.
-        $this->getGrammar()::macro('compileReplace', function () {
+        $this->getGrammar()::macro('compileReplace', static function () {
             return true;
         });
 

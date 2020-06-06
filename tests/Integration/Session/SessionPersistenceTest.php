@@ -22,11 +22,11 @@ class SessionPersistenceTest extends TestCase
         $handler = new FakeNullSessionHandler;
         $this->assertFalse($handler->written);
 
-        Session::extend('fake-null', function () use ($handler) {
+        Session::extend('fake-null', static function () use ($handler) {
             return $handler;
         });
 
-        Route::get('/', function () {
+        Route::get('/', static function () {
             throw new TokenMismatchException;
         })->middleware('web');
 

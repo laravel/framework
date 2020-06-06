@@ -36,7 +36,7 @@ class DateFacadeTest extends TestCase
         $start = Carbon::now()->getTimestamp();
         $this->assertSame(Carbon::class, get_class(Date::now()));
         $this->assertBetweenStartAndNow($start, Date::now()->getTimestamp());
-        DateFactory::use(function (Carbon $date) {
+        DateFactory::use(static function (Carbon $date) {
             return new DateTime($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
         });
         $start = Carbon::now()->getTimestamp();
@@ -61,11 +61,11 @@ class DateFacadeTest extends TestCase
         $this->assertSame(CarbonImmutable::class, get_class(Date::now()));
         DateFactory::use(Carbon::class);
         $this->assertSame(Carbon::class, get_class(Date::now()));
-        DateFactory::use(function (Carbon $date) {
+        DateFactory::use(static function (Carbon $date) {
             return $date->toImmutable();
         });
         $this->assertSame(CarbonImmutable::class, get_class(Date::now()));
-        DateFactory::use(function ($date) {
+        DateFactory::use(static function ($date) {
             return $date;
         });
         $this->assertSame(Carbon::class, get_class(Date::now()));
@@ -91,7 +91,7 @@ class DateFacadeTest extends TestCase
 
     public function testMacro()
     {
-        Date::macro('returnNonDate', function () {
+        Date::macro('returnNonDate', static function () {
             return 'string';
         });
 

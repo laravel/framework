@@ -77,7 +77,7 @@ class NotificationMailMessageTest extends TestCase
 
     public function testCallbackIsSetCorrectly()
     {
-        $callback = function () {
+        $callback = static function () {
             //
         };
 

@@ -16,16 +16,16 @@ class EloquentMorphCountLazyEagerLoadingTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('likes', function (Blueprint $table) {
+        Schema::create('likes', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('post_id');
         });
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('commentable_type');
             $table->integer('commentable_id');

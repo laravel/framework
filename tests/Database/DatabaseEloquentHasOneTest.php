@@ -41,7 +41,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     public function testHasOneWithDynamicDefault()
     {
-        $relation = $this->getRelation()->withDefault(function ($newModel) {
+        $relation = $this->getRelation()->withDefault(static function ($newModel) {
             $newModel->username = 'taylor';
         });
 
@@ -60,7 +60,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     public function testHasOneWithDynamicDefaultUseParentModel()
     {
-        $relation = $this->getRelation()->withDefault(function ($newModel, $parentModel) {
+        $relation = $this->getRelation()->withDefault(static function ($newModel, $parentModel) {
             $newModel->username = $parentModel->username;
         });
 

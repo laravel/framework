@@ -13,20 +13,20 @@ class FluentRoutingTest extends TestCase
     public function testMiddlewareRunWhenRegisteredAsArrayOrParams()
     {
         Route::middleware(Middleware::class, Middleware2::class)
-            ->get('one', function () {
+            ->get('one', static function () {
                 return 'Hello World';
             });
 
-        Route::get('two', function () {
+        Route::get('two', static function () {
             return 'Hello World';
         })->middleware(Middleware::class, Middleware2::class);
 
         Route::middleware([Middleware::class, Middleware2::class])
-            ->get('three', function () {
+            ->get('three', static function () {
                 return 'Hello World';
             });
 
-        Route::get('four', function () {
+        Route::get('four', static function () {
             return 'Hello World';
         })->middleware([Middleware::class, Middleware2::class]);
 

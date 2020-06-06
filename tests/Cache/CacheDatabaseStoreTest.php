@@ -81,7 +81,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
-        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnUsing(function () {
+        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnUsing(static function () {
             throw new Exception;
         });
         $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
@@ -139,7 +139,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $cache = m::mock(stdClass::class);
 
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(static function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -149,7 +149,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertFalse($store->increment('foo'));
 
         $cache->value = serialize('bar');
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(static function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -159,7 +159,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertFalse($store->increment('foo'));
 
         $cache->value = serialize(2);
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(static function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -178,7 +178,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $cache = m::mock(stdClass::class);
 
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(static function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -188,7 +188,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertFalse($store->decrement('foo'));
 
         $cache->value = serialize('bar');
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(static function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -198,7 +198,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertFalse($store->decrement('foo'));
 
         $cache->value = serialize(3);
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(static function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);

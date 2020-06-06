@@ -284,7 +284,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     protected function parseAddresses($value)
     {
-        return collect($value)->map(function ($address, $name) {
+        return collect($value)->map(static function ($address, $name) {
             return [$address, is_numeric($name) ? null : $name];
         })->values()->all();
     }

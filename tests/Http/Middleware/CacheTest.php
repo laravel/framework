@@ -16,7 +16,7 @@ class CacheTest extends TestCase
         $request = new Request;
         $request->setMethod('PUT');
 
-        $response = (new Cache)->handle($request, function () {
+        $response = (new Cache)->handle($request, static function () {
             return new Response('Hello Laravel');
         }, 'max_age=120;s_maxage=60');
 
@@ -25,7 +25,7 @@ class CacheTest extends TestCase
 
     public function testDoNotSetHeaderWhenNoContent()
     {
-        $response = (new Cache)->handle(new Request, function () {
+        $response = (new Cache)->handle(new Request, static function () {
             return new Response;
         }, 'max_age=120;s_maxage=60');
 
@@ -35,7 +35,7 @@ class CacheTest extends TestCase
 
     public function testAddHeaders()
     {
-        $response = (new Cache)->handle(new Request, function () {
+        $response = (new Cache)->handle(new Request, static function () {
             return new Response('some content');
         }, 'max_age=100;s_maxage=200;etag=ABC');
 
@@ -45,7 +45,7 @@ class CacheTest extends TestCase
 
     public function testAddHeadersUsingArray()
     {
-        $response = (new Cache)->handle(new Request, function () {
+        $response = (new Cache)->handle(new Request, static function () {
             return new Response('some content');
         }, ['max_age' => 100, 's_maxage' => 200, 'etag' => 'ABC']);
 
@@ -55,7 +55,7 @@ class CacheTest extends TestCase
 
     public function testGenerateEtag()
     {
-        $response = (new Cache)->handle(new Request, function () {
+        $response = (new Cache)->handle(new Request, static function () {
             return new Response('some content');
         }, 'etag;max_age=100;s_maxage=200');
 
@@ -68,7 +68,7 @@ class CacheTest extends TestCase
         $request = new Request;
         $request->headers->set('If-None-Match', '"9893532233caff98cd083a116b013c0b"');
 
-        $response = (new Cache)->handle($request, function () {
+        $response = (new Cache)->handle($request, static function () {
             return new Response('some content');
         }, 'etag;max_age=100;s_maxage=200');
 
@@ -79,7 +79,7 @@ class CacheTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Cache)->handle(new Request, function () {
+        (new Cache)->handle(new Request, static function () {
             return new Response('some content');
         }, 'invalid');
     }
@@ -88,7 +88,7 @@ class CacheTest extends TestCase
     {
         $time = time();
 
-        $response = (new Cache)->handle(new Request, function () {
+        $response = (new Cache)->handle(new Request, static function () {
             return new Response('some content');
         }, "last_modified=$time");
 
@@ -98,7 +98,7 @@ class CacheTest extends TestCase
     public function testLastModifiedStringDate()
     {
         $birthdate = '1973-04-09 10:10:10';
-        $response = (new Cache)->handle(new Request, function () {
+        $response = (new Cache)->handle(new Request, static function () {
             return new Response('some content');
         }, "last_modified=$birthdate");
 

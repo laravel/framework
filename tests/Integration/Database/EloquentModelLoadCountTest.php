@@ -17,21 +17,21 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('base_models', function (Blueprint $table) {
+        Schema::create('base_models', static function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('related1s', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('base_model_id');
-        });
-
-        Schema::create('related2s', function (Blueprint $table) {
+        Schema::create('related1s', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('base_model_id');
         });
 
-        Schema::create('deleted_related', function (Blueprint $table) {
+        Schema::create('related2s', static function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('base_model_id');
+        });
+
+        Schema::create('deleted_related', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('base_model_id');
             $table->softDeletes();

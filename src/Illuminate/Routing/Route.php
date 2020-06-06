@@ -447,7 +447,7 @@ class Route
      */
     public function parametersWithoutNulls()
     {
-        return array_filter($this->parameters(), function ($p) {
+        return array_filter($this->parameters(), static function ($p) {
             return ! is_null($p);
         });
     }
@@ -475,7 +475,7 @@ class Route
     {
         preg_match_all('/\{(.*?)\}/', $this->getDomain().$this->uri, $matches);
 
-        return array_map(function ($m) {
+        return array_map(static function ($m) {
             return trim($m, '?');
         }, $matches[1]);
     }

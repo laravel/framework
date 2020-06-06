@@ -48,11 +48,11 @@ class RoutingSortedMiddlewareTest extends TestCase
 
     public function testItDoesNotMoveNonStringValues()
     {
-        $closure = function () {
+        $closure = static function () {
             return 'foo';
         };
 
-        $closure2 = function () {
+        $closure2 = static function () {
             return 'bar';
         };
 

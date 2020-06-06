@@ -114,10 +114,10 @@ class DatabaseEloquentCollectionTest extends TestCase
         $mockModel2->shouldReceive('getKey')->andReturn(2);
         $c = new Collection([$mockModel1, $mockModel2]);
 
-        $this->assertTrue($c->contains(function ($model) {
+        $this->assertTrue($c->contains(static function ($model) {
             return $model->getKey() < 2;
         }));
-        $this->assertFalse($c->contains(function ($model) {
+        $this->assertFalse($c->contains(static function ($model) {
             return $model->getKey() > 2;
         }));
     }
@@ -209,7 +209,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c = new Collection([$one, $two]);
 
-        $cAfterMap = $c->map(function ($item) {
+        $cAfterMap = $c->map(static function ($item) {
             return $item;
         });
 
@@ -222,7 +222,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $one = m::mock(Model::class);
         $two = m::mock(Model::class);
 
-        $c = (new Collection([$one, $two]))->map(function ($item) {
+        $c = (new Collection([$one, $two]))->map(static function ($item) {
             return 'not-a-model';
         });
 

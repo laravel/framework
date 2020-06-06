@@ -18,13 +18,13 @@ class EloquentTouchParentWithGlobalScopeTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
             $table->timestamps();
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->integer('post_id');
             $table->string('title');
@@ -61,7 +61,7 @@ class Post extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('age', function ($builder) {
+        static::addGlobalScope('age', static function ($builder) {
             $builder->join('comments', 'comments.post_id', '=', 'posts.id');
         });
     }

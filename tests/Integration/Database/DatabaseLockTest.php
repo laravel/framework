@@ -16,7 +16,7 @@ class DatabaseLockTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('cache_locks', function (Blueprint $table) {
+        Schema::create('cache_locks', static function (Blueprint $table) {
             $table->string('key')->primary();
             $table->string('owner');
             $table->integer('expiration');

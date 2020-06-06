@@ -142,7 +142,7 @@ trait DatabaseRule
      */
     public function whereIn($column, array $values)
     {
-        return $this->where(function ($query) use ($column, $values) {
+        return $this->where(static function ($query) use ($column, $values) {
             $query->whereIn($column, $values);
         });
     }
@@ -156,7 +156,7 @@ trait DatabaseRule
      */
     public function whereNotIn($column, array $values)
     {
-        return $this->where(function ($query) use ($column, $values) {
+        return $this->where(static function ($query) use ($column, $values) {
             $query->whereNotIn($column, $values);
         });
     }
@@ -191,7 +191,7 @@ trait DatabaseRule
      */
     protected function formatWheres()
     {
-        return collect($this->wheres)->map(function ($where) {
+        return collect($this->wheres)->map(static function ($where) {
             return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
         })->implode(',');
     }

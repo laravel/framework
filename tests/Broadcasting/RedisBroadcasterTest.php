@@ -36,7 +36,7 @@ class RedisBroadcasterTest extends TestCase
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
     {
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             return true;
         });
 
@@ -52,7 +52,7 @@ class RedisBroadcasterTest extends TestCase
     {
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             return false;
         });
 
@@ -65,7 +65,7 @@ class RedisBroadcasterTest extends TestCase
     {
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             return true;
         });
 
@@ -77,7 +77,7 @@ class RedisBroadcasterTest extends TestCase
     public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray()
     {
         $returnData = [1, 2, 3, 4];
-        $this->broadcaster->channel('test', function () use ($returnData) {
+        $this->broadcaster->channel('test', static function () use ($returnData) {
             return $returnData;
         });
 
@@ -93,7 +93,7 @@ class RedisBroadcasterTest extends TestCase
     {
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             //
         });
 
@@ -106,7 +106,7 @@ class RedisBroadcasterTest extends TestCase
     {
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             return [1, 2, 3, 4];
         });
 

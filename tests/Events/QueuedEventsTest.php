@@ -27,7 +27,7 @@ class QueuedEventsTest extends TestCase
 
         $queue->shouldReceive('pushOn')->once()->with(null, m::type(CallQueuedListener::class));
 
-        $d->setQueueResolver(function () use ($queue) {
+        $d->setQueueResolver(static function () use ($queue) {
             return $queue;
         });
 
@@ -41,7 +41,7 @@ class QueuedEventsTest extends TestCase
 
         $fakeQueue = new QueueFake(new Container());
 
-        $d->setQueueResolver(function () use ($fakeQueue) {
+        $d->setQueueResolver(static function () use ($fakeQueue) {
             return $fakeQueue;
         });
 

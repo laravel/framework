@@ -30,7 +30,7 @@ class ContextualBindingTest extends TestCase
         $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
 
         $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContextContractStub::class)->give(ContainerContextImplementationStub::class);
-        $container->when(ContainerTestContextInjectTwo::class)->needs(IContainerContextContractStub::class)->give(function ($container) {
+        $container->when(ContainerTestContextInjectTwo::class)->needs(IContainerContextContractStub::class)->give(static function ($container) {
             return $container->make(ContainerContextImplementationStubTwo::class);
         });
 
@@ -184,7 +184,7 @@ class ContextualBindingTest extends TestCase
         $this->assertEquals(100, $instance->something);
 
         $container = new Container;
-        $container->when(ContainerInjectVariableStub::class)->needs('$something')->give(function ($container) {
+        $container->when(ContainerInjectVariableStub::class)->needs('$something')->give(static function ($container) {
             return $container->make(ContainerConcreteStub::class);
         });
         $instance = $container->make(ContainerInjectVariableStub::class);
@@ -214,7 +214,7 @@ class ContextualBindingTest extends TestCase
     {
         $container = new Container;
 
-        $container->when(ContainerTestContextInjectTwoInstances::class)->needs(ContainerTestContextInjectTwo::class)->give(function () {
+        $container->when(ContainerTestContextInjectTwoInstances::class)->needs(ContainerTestContextInjectTwo::class)->give(static function () {
             return new ContainerTestContextInjectTwo(new ContainerContextImplementationStubTwo);
         });
 
@@ -236,7 +236,7 @@ class ContextualBindingTest extends TestCase
     {
         $container = new Container;
 
-        $container->when(ContainerTestContextInjectVariadic::class)->needs(IContainerContextContractStub::class)->give(function ($c) {
+        $container->when(ContainerTestContextInjectVariadic::class)->needs(IContainerContextContractStub::class)->give(static function ($c) {
             return [
                 $c->make(ContainerContextImplementationStub::class),
                 $c->make(ContainerContextImplementationStubTwo::class),
@@ -263,7 +263,7 @@ class ContextualBindingTest extends TestCase
     {
         $container = new Container;
 
-        $container->when(ContainerTestContextInjectVariadicAfterNonVariadic::class)->needs(IContainerContextContractStub::class)->give(function ($c) {
+        $container->when(ContainerTestContextInjectVariadicAfterNonVariadic::class)->needs(IContainerContextContractStub::class)->give(static function ($c) {
             return [
                 $c->make(ContainerContextImplementationStub::class),
                 $c->make(ContainerContextImplementationStubTwo::class),

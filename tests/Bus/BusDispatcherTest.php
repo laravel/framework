@@ -23,7 +23,7 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;
-        $dispatcher = new Dispatcher($container, function () {
+        $dispatcher = new Dispatcher($container, static function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
 
@@ -36,7 +36,7 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;
-        $dispatcher = new Dispatcher($container, function () {
+        $dispatcher = new Dispatcher($container, static function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
 
@@ -49,7 +49,7 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
     {
         $container = new Container;
-        $dispatcher = new Dispatcher($container, function () {
+        $dispatcher = new Dispatcher($container, static function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type(BusDispatcherTestSpecificQueueAndDelayCommand::class));
 
@@ -64,7 +64,7 @@ class BusDispatcherTest extends TestCase
         $container = new Container;
         $mock = m::mock(Queue::class);
         $mock->shouldReceive('push')->never();
-        $dispatcher = new Dispatcher($container, function () use ($mock) {
+        $dispatcher = new Dispatcher($container, static function () use ($mock) {
             return $mock;
         });
 
@@ -75,7 +75,7 @@ class BusDispatcherTest extends TestCase
     {
         $container = new Container;
         $mock = m::mock(Queue::class);
-        $dispatcher = new Dispatcher($container, function () use ($mock) {
+        $dispatcher = new Dispatcher($container, static function () use ($mock) {
             return $mock;
         });
 
@@ -89,7 +89,7 @@ class BusDispatcherTest extends TestCase
     public function testOnConnectionOnJobWhenDispatching()
     {
         $container = new Container;
-        $container->singleton('config', function () {
+        $container->singleton('config', static function () {
             return new Config([
                 'queue' => [
                     'default' => 'null',
@@ -100,7 +100,7 @@ class BusDispatcherTest extends TestCase
             ]);
         });
 
-        $dispatcher = new Dispatcher($container, function () {
+        $dispatcher = new Dispatcher($container, static function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
 

@@ -741,7 +741,7 @@ class DatabaseEloquentModelTest extends TestCase
         $grammar = m::mock(Grammar::class);
         $processor = m::mock(Processor::class);
         EloquentModelStub::setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
-        $conn->shouldReceive('query')->andReturnUsing(function () use ($conn, $grammar, $processor) {
+        $conn->shouldReceive('query')->andReturnUsing(static function () use ($conn, $grammar, $processor) {
             return new BaseBuilder($conn, $grammar, $processor);
         });
         $resolver->shouldReceive('connection')->andReturn($conn);
@@ -1038,7 +1038,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testUnguardedRunsCallbackWhileBeingUnguarded()
     {
-        $model = Model::unguarded(function () {
+        $model = Model::unguarded(static function () {
             return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
         });
         $this->assertSame('Taylor', $model->name);
@@ -1048,7 +1048,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUnguardedCallDoesNotChangeUnguardedState()
     {
         Model::unguard();
-        $model = Model::unguarded(function () {
+        $model = Model::unguarded(static function () {
             return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
         });
         $this->assertSame('Taylor', $model->name);
@@ -1059,7 +1059,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUnguardedCallDoesNotChangeUnguardedStateOnException()
     {
         try {
-            Model::unguarded(function () {
+            Model::unguarded(static function () {
                 throw new Exception;
             });
         } catch (Exception $e) {
@@ -1410,14 +1410,14 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('forget');
         EloquentModelSaveStub::observe(EloquentTestObserverStub::class);
 
-        $model = EloquentModelSaveStub::withoutEvents(function () {
+        $model = EloquentModelSaveStub::withoutEvents(static function () {
             $model = new EloquentModelSaveStub;
             $model->save();
 
             return $model;
         });
 
-        $model->withoutEvents(function () use ($model) {
+        $model->withoutEvents(static function () use ($model) {
             $model->first_name = 'Taylor';
             $model->save();
         });
@@ -1554,7 +1554,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
 
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
-        $events->shouldReceive('dispatch')->once()->with('eloquent.replicating: '.get_class($model), m::on(function ($m) use ($model) {
+        $events->shouldReceive('dispatch')->once()->with('eloquent.replicating: '.get_class($model), m::on(static function ($m) use ($model) {
             return $model->is($m);
         }));
 
@@ -1935,7 +1935,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $called = false;
 
-        EloquentModelStub::withoutTouching(function () use (&$called) {
+        EloquentModelStub::withoutTouching(static function () use (&$called) {
             $called = true;
         });
 
@@ -1948,7 +1948,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $called = false;
 
-        Model::withoutTouchingOn([EloquentModelStub::class], function () use (&$called) {
+        Model::withoutTouchingOn([EloquentModelStub::class], static function () use (&$called) {
             $called = true;
         });
 
@@ -1961,7 +1961,7 @@ class DatabaseEloquentModelTest extends TestCase
         $resolver->shouldReceive('connection')->andReturn($connection = m::mock(Connection::class));
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
         $connection->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
-        $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
+        $connection->shouldReceive('query')->andReturnUsing(static function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });
     }
@@ -2244,7 +2244,7 @@ class EloquentModelSaveStub extends Model
         $mock->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
         $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
         $mock->shouldReceive('getName')->andReturn('name');
-        $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
+        $mock->shouldReceive('query')->andReturnUsing(static function () use ($mock, $grammar, $processor) {
             return new BaseBuilder($mock, $grammar, $processor);
         });
 

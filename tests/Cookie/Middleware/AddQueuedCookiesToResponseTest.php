@@ -19,7 +19,7 @@ class AddQueuedCookiesToResponseTest extends TestCase
         $cookieJar->queue($cookieOne);
         $cookieJar->queue($cookieTwo);
         $addQueueCookiesToResponseMiddleware = new AddQueuedCookiesToResponse($cookieJar);
-        $next = function (Request $request) {
+        $next = static function (Request $request) {
             return new Response();
         };
         $this->assertEquals(

@@ -17,12 +17,12 @@ class EloquentModelTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('test_model1', function (Blueprint $table) {
+        Schema::create('test_model1', static function (Blueprint $table) {
             $table->increments('id');
             $table->timestamp('nullable_date')->nullable();
         });
 
-        Schema::create('test_model2', function (Blueprint $table) {
+        Schema::create('test_model2', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('title');

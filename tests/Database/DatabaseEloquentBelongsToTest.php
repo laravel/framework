@@ -36,7 +36,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testBelongsToWithDynamicDefault()
     {
-        $relation = $this->getRelation()->withDefault(function ($newModel) {
+        $relation = $this->getRelation()->withDefault(static function ($newModel) {
             $newModel->username = 'taylor';
         });
 

@@ -25,28 +25,28 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
 
     public function createSchema()
     {
-        $this->schema()->create('irregular_plural_humans', function ($table) {
+        $this->schema()->create('irregular_plural_humans', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->timestamps();
         });
 
-        $this->schema()->create('irregular_plural_tokens', function ($table) {
+        $this->schema()->create('irregular_plural_tokens', static function ($table) {
             $table->increments('id');
             $table->string('title');
         });
 
-        $this->schema()->create('irregular_plural_human_irregular_plural_token', function ($table) {
+        $this->schema()->create('irregular_plural_human_irregular_plural_token', static function ($table) {
             $table->integer('irregular_plural_human_id')->unsigned();
             $table->integer('irregular_plural_token_id')->unsigned();
         });
 
-        $this->schema()->create('irregular_plural_mottoes', function ($table) {
+        $this->schema()->create('irregular_plural_mottoes', static function ($table) {
             $table->increments('id');
             $table->string('name');
         });
 
-        $this->schema()->create('cool_mottoes', function ($table) {
+        $this->schema()->create('cool_mottoes', static function ($table) {
             $table->integer('irregular_plural_motto_id');
             $table->integer('cool_motto_id');
             $table->string('cool_motto_type');

@@ -23,7 +23,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
     {
         $uuid = Str::orderedUuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Str::createUuidsUsing(static function () use ($uuid) {
             return $uuid;
         });
 

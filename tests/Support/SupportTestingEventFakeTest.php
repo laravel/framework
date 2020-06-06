@@ -35,7 +35,7 @@ class SupportTestingEventFakeTest extends TestCase
     {
         $this->fake->dispatch(new EventStub);
 
-        $this->fake->assertDispatched(function (EventStub $event) {
+        $this->fake->assertDispatched(static function (EventStub $event) {
             return true;
         });
     }
@@ -89,7 +89,7 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->dispatch(new EventStub);
 
         try {
-            $this->fake->assertNotDispatched(function (EventStub $event) {
+            $this->fake->assertNotDispatched(static function (EventStub $event) {
                 return true;
             });
             $this->fail();
@@ -105,7 +105,7 @@ class SupportTestingEventFakeTest extends TestCase
 
         $fake = new EventFake($dispatcher, [
             'Foo',
-            function ($event, $payload) {
+            static function ($event, $payload) {
                 return $event === 'Bar' && $payload['id'] === 1;
             },
         ]);

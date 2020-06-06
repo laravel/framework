@@ -23,7 +23,7 @@ class DiscoverEvents
     {
         return collect(static::getListenerEvents(
             (new Finder)->files()->in($listenerPath), $basePath
-        ))->mapToDictionary(function ($event, $listener) {
+        ))->mapToDictionary(static function ($event, $listener) {
             return [$event => $listener];
         })->all();
     }

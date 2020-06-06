@@ -18,7 +18,7 @@ class MailSesTransportTest extends TestCase
     {
         $container = new Container();
 
-        $container->singleton('config', function () {
+        $container->singleton('config', static function () {
             return new Repository([
                 'services.ses' => [
                     'key' => 'foo',

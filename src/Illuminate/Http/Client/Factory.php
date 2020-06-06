@@ -94,7 +94,7 @@ class Factory
         $this->record();
 
         if (is_null($callback)) {
-            $callback = function () {
+            $callback = static function () {
                 return static::response();
             };
         }
@@ -110,7 +110,7 @@ class Factory
         $this->stubCallbacks = $this->stubCallbacks->merge(collect([
             $callback instanceof Closure
                     ? $callback
-                    : function () use ($callback) {
+                    : static function () use ($callback) {
                         return $callback;
                     },
         ]));
@@ -140,7 +140,7 @@ class Factory
      */
     public function stubUrl($url, $callback)
     {
-        return $this->fake(function ($request, $options) use ($url, $callback) {
+        return $this->fake(static function ($request, $options) use ($url, $callback) {
             if (! Str::is(Str::start($url, '*'), $request->url())) {
                 return;
             }
@@ -256,11 +256,11 @@ class Factory
             return collect();
         }
 
-        $callback = $callback ?: function () {
+        $callback = $callback ?: static function () {
             return true;
         };
 
-        return collect($this->recorded)->filter(function ($pair) use ($callback) {
+        return collect($this->recorded)->filter(static function ($pair) use ($callback) {
             return $callback($pair[0], $pair[1]);
         });
     }

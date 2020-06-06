@@ -134,7 +134,7 @@ class ValidationExistsRuleTest extends TestCase
 
     protected function createSchema()
     {
-        $this->schema('default')->create('users', function ($table) {
+        $this->schema('default')->create('users', static function ($table) {
             $table->unsignedInteger('id');
             $table->string('type');
         });

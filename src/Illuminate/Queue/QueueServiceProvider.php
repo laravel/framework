@@ -58,7 +58,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerConnection()
     {
-        $this->app->singleton('queue.connection', function ($app) {
+        $this->app->singleton('queue.connection', static function ($app) {
             return $app['queue']->connection();
         });
     }
@@ -84,7 +84,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerNullConnector($manager)
     {
-        $manager->addConnector('null', function () {
+        $manager->addConnector('null', static function () {
             return new NullConnector;
         });
     }
@@ -97,7 +97,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerSyncConnector($manager)
     {
-        $manager->addConnector('sync', function () {
+        $manager->addConnector('sync', static function () {
             return new SyncConnector;
         });
     }
@@ -136,7 +136,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerBeanstalkdConnector($manager)
     {
-        $manager->addConnector('beanstalkd', function () {
+        $manager->addConnector('beanstalkd', static function () {
             return new BeanstalkdConnector;
         });
     }
@@ -149,7 +149,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerSqsConnector($manager)
     {
-        $manager->addConnector('sqs', function () {
+        $manager->addConnector('sqs', static function () {
             return new SqsConnector;
         });
     }
@@ -182,7 +182,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerListener()
     {
-        $this->app->singleton('queue.listener', function ($app) {
+        $this->app->singleton('queue.listener', static function ($app) {
             return new Listener($app->basePath());
         });
     }

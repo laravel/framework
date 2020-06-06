@@ -104,7 +104,7 @@ class MailFake implements Factory, Mailer, MailQueue
      */
     public function assertNothingSent()
     {
-        $mailableNames = collect($this->mailables)->map(function ($mailable) {
+        $mailableNames = collect($this->mailables)->map(static function ($mailable) {
             return get_class($mailable);
         })->join(', ');
 
@@ -173,7 +173,7 @@ class MailFake implements Factory, Mailer, MailQueue
      */
     public function assertNothingQueued()
     {
-        $mailableNames = collect($this->queuedMailables)->map(function ($mailable) {
+        $mailableNames = collect($this->queuedMailables)->map(static function ($mailable) {
             return get_class($mailable);
         })->join(', ');
 
@@ -193,11 +193,11 @@ class MailFake implements Factory, Mailer, MailQueue
             return collect();
         }
 
-        $callback = $callback ?: function () {
+        $callback = $callback ?: static function () {
             return true;
         };
 
-        return $this->mailablesOf($mailable)->filter(function ($mailable) use ($callback) {
+        return $this->mailablesOf($mailable)->filter(static function ($mailable) use ($callback) {
             return $callback($mailable);
         });
     }
@@ -226,11 +226,11 @@ class MailFake implements Factory, Mailer, MailQueue
             return collect();
         }
 
-        $callback = $callback ?: function () {
+        $callback = $callback ?: static function () {
             return true;
         };
 
-        return $this->queuedMailablesOf($mailable)->filter(function ($mailable) use ($callback) {
+        return $this->queuedMailablesOf($mailable)->filter(static function ($mailable) use ($callback) {
             return $callback($mailable);
         });
     }
@@ -254,7 +254,7 @@ class MailFake implements Factory, Mailer, MailQueue
      */
     protected function mailablesOf($type)
     {
-        return collect($this->mailables)->filter(function ($mailable) use ($type) {
+        return collect($this->mailables)->filter(static function ($mailable) use ($type) {
             return $mailable instanceof $type;
         });
     }
@@ -267,7 +267,7 @@ class MailFake implements Factory, Mailer, MailQueue
      */
     protected function queuedMailablesOf($type)
     {
-        return collect($this->queuedMailables)->filter(function ($mailable) use ($type) {
+        return collect($this->queuedMailables)->filter(static function ($mailable) use ($type) {
             return $mailable instanceof $type;
         });
     }

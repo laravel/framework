@@ -40,10 +40,10 @@ class ConsoleScheduledEventTest extends TestCase
         $event = new Event(m::mock(EventMutex::class), 'php foo');
         $this->assertSame('* * * * *', $event->getExpression());
         $this->assertTrue($event->isDue($app));
-        $this->assertTrue($event->skip(function () {
+        $this->assertTrue($event->skip(static function () {
             return true;
         })->isDue($app));
-        $this->assertFalse($event->skip(function () {
+        $this->assertFalse($event->skip(static function () {
             return true;
         })->filtersPass($app));
 
@@ -53,7 +53,7 @@ class ConsoleScheduledEventTest extends TestCase
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
         $this->assertSame('* * * * *', $event->getExpression());
-        $this->assertFalse($event->when(function () {
+        $this->assertFalse($event->when(static function () {
             return false;
         })->filtersPass($app));
 

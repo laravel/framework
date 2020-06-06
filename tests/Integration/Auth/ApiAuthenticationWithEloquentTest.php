@@ -33,7 +33,7 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 
     public function testAuthenticationViaApiWithEloquentUsingWrongDatabaseCredentialsShouldNotCauseInfiniteLoop()
     {
-        Route::get('/auth', function () {
+        Route::get('/auth', static function () {
             return 'success';
         })->middleware('auth:api');
 

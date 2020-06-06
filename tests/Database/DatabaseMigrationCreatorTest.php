@@ -36,7 +36,7 @@ class DatabaseMigrationCreatorTest extends TestCase
 
         $creator = $this->getCreator();
         unset($_SERVER['__migration.creator']);
-        $creator->afterCreate(function ($table) {
+        $creator->afterCreate(static function ($table) {
             $_SERVER['__migration.creator'] = $table;
         });
 

@@ -21,7 +21,7 @@ trait ReflectsClosures
     {
         $reflection = new ReflectionFunction($closure);
 
-        return collect($reflection->getParameters())->mapWithKeys(function ($parameter) {
+        return collect($reflection->getParameters())->mapWithKeys(static function ($parameter) {
             if ($parameter->isVariadic()) {
                 return [$parameter->getName() => null];
             }

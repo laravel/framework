@@ -31,28 +31,28 @@ class RouteRegistrarTest extends TestCase
 
     public function testMiddlewareFluentRegistration()
     {
-        $this->router->middleware(['one', 'two'])->get('users', function () {
+        $this->router->middleware(['one', 'two'])->get('users', static function () {
             return 'all-users';
         });
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertEquals(['one', 'two'], $this->getRoute()->middleware());
 
-        $this->router->middleware('three', 'four')->get('users', function () {
+        $this->router->middleware('three', 'four')->get('users', static function () {
             return 'all-users';
         });
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertEquals(['three', 'four'], $this->getRoute()->middleware());
 
-        $this->router->get('users', function () {
+        $this->router->get('users', static function () {
             return 'all-users';
         })->middleware('five', 'six');
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertEquals(['five', 'six'], $this->getRoute()->middleware());
 
-        $this->router->middleware('seven')->get('users', function () {
+        $this->router->middleware('seven')->get('users', static function () {
             return 'all-users';
         });
 
@@ -62,7 +62,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testWithoutMiddlewareRegistration()
     {
-        $this->router->middleware(['one', 'two'])->get('users', function () {
+        $this->router->middleware(['one', 'two'])->get('users', static function () {
             return 'all-users';
         })->withoutMiddleware('one');
 
@@ -73,7 +73,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterGetRouteWithClosureAction()
     {
-        $this->router->middleware('get-middleware')->get('users', function () {
+        $this->router->middleware('get-middleware')->get('users', static function () {
             return 'all-users';
         });
 
@@ -83,7 +83,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterPostRouteWithClosureAction()
     {
-        $this->router->middleware('post-middleware')->post('users', function () {
+        $this->router->middleware('post-middleware')->post('users', static function () {
             return 'saved';
         });
 
@@ -93,7 +93,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterAnyRouteWithClosureAction()
     {
-        $this->router->middleware('test-middleware')->any('users', function () {
+        $this->router->middleware('test-middleware')->any('users', static function () {
             return 'anything';
         });
 
@@ -103,7 +103,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterMatchRouteWithClosureAction()
     {
-        $this->router->middleware('match-middleware')->match(['DELETE'], 'users', function () {
+        $this->router->middleware('match-middleware')->match(['DELETE'], 'users', static function () {
             return 'deleted';
         });
 
@@ -113,7 +113,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterRouteWithArrayAndClosureAction()
     {
-        $this->router->middleware('patch-middleware')->patch('users', [function () {
+        $this->router->middleware('patch-middleware')->patch('users', [static function () {
             return 'updated';
         }]);
 
@@ -123,7 +123,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterRouteWithArrayAndClosureUsesAction()
     {
-        $this->router->middleware('put-middleware')->put('users', ['uses' => function () {
+        $this->router->middleware('put-middleware')->put('users', ['uses' => static function () {
             return 'replaced';
         }]);
 
@@ -152,8 +152,8 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterGroupWithMiddleware()
     {
-        $this->router->middleware('group-middleware')->group(function ($router) {
-            $router->get('users', function () {
+        $this->router->middleware('group-middleware')->group(static function ($router) {
+            $router->get('users', static function () {
                 return 'all-users';
             });
         });
@@ -164,7 +164,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterGroupWithNamespace()
     {
-        $this->router->namespace('App\Http\Controllers')->group(function ($router) {
+        $this->router->namespace('App\Http\Controllers')->group(static function ($router) {
             $router->get('users', 'UsersController@index');
         });
 
@@ -176,7 +176,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterGroupWithPrefix()
     {
-        $this->router->prefix('api')->group(function ($router) {
+        $this->router->prefix('api')->group(static function ($router) {
             $router->get('users', 'UsersController@index');
         });
 
@@ -185,8 +185,8 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterGroupWithPrefixAndWhere()
     {
-        $this->router->prefix('foo/{bar}')->where(['bar' => '[0-9]+'])->group(function ($router) {
-            $router->get('here', function () {
+        $this->router->prefix('foo/{bar}')->where(['bar' => '[0-9]+'])->group(static function ($router) {
+            $router->get('here', static function () {
                 return 'good';
             });
         });
@@ -196,7 +196,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterGroupWithNamePrefix()
     {
-        $this->router->name('api.')->group(function ($router) {
+        $this->router->name('api.')->group(static function ($router) {
             $router->get('users', 'UsersController@index')->name('users');
         });
 
@@ -205,7 +205,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterGroupWithDomain()
     {
-        $this->router->domain('{account}.myapp.com')->group(function ($router) {
+        $this->router->domain('{account}.myapp.com')->group(static function ($router) {
             $router->get('users', 'UsersController@index');
         });
 
@@ -214,7 +214,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanRegisterGroupWithDomainAndNamePrefix()
     {
-        $this->router->domain('{account}.myapp.com')->name('api.')->group(function ($router) {
+        $this->router->domain('{account}.myapp.com')->name('api.')->group(static function ($router) {
             $router->get('users', 'UsersController@index')->name('users');
         });
 
@@ -227,7 +227,7 @@ class RouteRegistrarTest extends TestCase
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Method Illuminate\Routing\RouteRegistrar::missing does not exist.');
 
-        $this->router->domain('foo')->missing('bar')->group(function ($router) {
+        $this->router->domain('foo')->missing('bar')->group(static function ($router) {
             //
         });
     }
@@ -527,7 +527,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanSetRouteName()
     {
-        $this->router->as('users.index')->get('users', function () {
+        $this->router->as('users.index')->get('users', static function () {
             return 'all-users';
         });
 
@@ -537,7 +537,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanSetRouteNameUsingNameAlias()
     {
-        $this->router->name('users.index')->get('users', function () {
+        $this->router->name('users.index')->get('users', static function () {
             return 'all-users';
         });
 

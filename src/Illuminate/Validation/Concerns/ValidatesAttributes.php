@@ -622,7 +622,7 @@ trait ValidatesAttributes
 
         $pattern = str_replace('\*', '[^.]+', preg_quote($attribute, '#'));
 
-        return Arr::where(Arr::dot($attributeData), function ($value, $key) use ($pattern) {
+        return Arr::where(Arr::dot($attributeData), static function ($value, $key) use ($pattern) {
             return (bool) preg_match('#^'.$pattern.'\z#u', $key);
         });
     }
@@ -643,7 +643,7 @@ trait ValidatesAttributes
 
         $validations = collect($parameters)
             ->unique()
-            ->map(function ($validation) {
+            ->map(static function ($validation) {
                 if ($validation === 'rfc') {
                     return new RFCValidation();
                 } elseif ($validation === 'strict') {
@@ -1087,7 +1087,7 @@ trait ValidatesAttributes
 
         $attributeData = ValidationData::extractDataFromPath($explicitPath, $this->data);
 
-        $otherValues = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($parameters) {
+        $otherValues = Arr::where(Arr::dot($attributeData), static function ($value, $key) use ($parameters) {
             return Str::is($parameters[0], $key);
         });
 
@@ -1492,7 +1492,7 @@ trait ValidatesAttributes
      */
     protected function convertValuesToBoolean($values)
     {
-        return array_map(function ($value) {
+        return array_map(static function ($value) {
             if ($value === 'true') {
                 return true;
             } elseif ($value === 'false') {
@@ -1850,7 +1850,7 @@ trait ValidatesAttributes
      */
     protected function parseNamedParameters($parameters)
     {
-        return array_reduce($parameters, function ($result, $item) {
+        return array_reduce($parameters, static function ($result, $item) {
             [$key, $value] = array_pad(explode('=', $item, 2), 2, null);
 
             $result[$key] = $value;

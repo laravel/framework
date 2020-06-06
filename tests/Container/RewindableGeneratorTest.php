@@ -9,7 +9,7 @@ class RewindableGeneratorTest extends TestCase
 {
     public function testCountUsesProvidedValue()
     {
-        $generator = new RewindableGenerator(function () {
+        $generator = new RewindableGenerator(static function () {
             yield 'foo';
         }, 999);
 
@@ -20,9 +20,9 @@ class RewindableGeneratorTest extends TestCase
     {
         $called = 0;
 
-        $generator = new RewindableGenerator(function () {
+        $generator = new RewindableGenerator(static function () {
             yield 'foo';
-        }, function () use (&$called) {
+        }, static function () use (&$called) {
             $called++;
 
             return 500;

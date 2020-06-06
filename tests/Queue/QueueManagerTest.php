@@ -30,7 +30,7 @@ class QueueManagerTest extends TestCase
         $queue = m::mock(stdClass::class);
         $queue->shouldReceive('setConnectionName')->once()->with('sync')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'sync'])->andReturn($queue);
-        $manager->addConnector('sync', function () use ($connector) {
+        $manager->addConnector('sync', static function () use ($connector) {
             return $connector;
         });
 
@@ -53,7 +53,7 @@ class QueueManagerTest extends TestCase
         $queue = m::mock(stdClass::class);
         $queue->shouldReceive('setConnectionName')->once()->with('foo')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'bar'])->andReturn($queue);
-        $manager->addConnector('bar', function () use ($connector) {
+        $manager->addConnector('bar', static function () use ($connector) {
             return $connector;
         });
         $queue->shouldReceive('setContainer')->once()->with($app);
@@ -75,7 +75,7 @@ class QueueManagerTest extends TestCase
         $queue = m::mock(stdClass::class);
         $queue->shouldReceive('setConnectionName')->once()->with('null')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'null'])->andReturn($queue);
-        $manager->addConnector('null', function () use ($connector) {
+        $manager->addConnector('null', static function () use ($connector) {
             return $connector;
         });
         $queue->shouldReceive('setContainer')->once()->with($app);

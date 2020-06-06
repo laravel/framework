@@ -17,20 +17,20 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('post_id');
             $table->unsignedInteger('user_id');
         });
 
-        Schema::create('videos', function (Blueprint $table) {
+        Schema::create('videos', static function (Blueprint $table) {
             $table->increments('video_id');
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('commentable_type');
             $table->integer('commentable_id');

@@ -176,7 +176,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $segments = explode('/', $this->decodedPath());
 
-        return array_values(array_filter($segments, function ($value) {
+        return array_values(array_filter($segments, static function ($value) {
             return $value !== '';
         }));
     }
@@ -575,7 +575,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function getUserResolver()
     {
-        return $this->userResolver ?: function () {
+        return $this->userResolver ?: static function () {
             //
         };
     }
@@ -600,7 +600,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function getRouteResolver()
     {
-        return $this->routeResolver ?: function () {
+        return $this->routeResolver ?: static function () {
             //
         };
     }

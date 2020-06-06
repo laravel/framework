@@ -75,7 +75,7 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
      */
     public function giveTagged($tag)
     {
-        $this->give(function ($container) use ($tag) {
+        $this->give(static function ($container) use ($tag) {
             $taggedServices = $container->tagged($tag);
 
             return is_array($taggedServices) ? $taggedServices : iterator_to_array($taggedServices);

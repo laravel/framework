@@ -32,7 +32,7 @@ class CommandTest extends TestCase
         $output = new NullOutput();
         $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn(m::mock(OutputStyle::class));
 
-        $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
+        $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(static function () use ($command, $application) {
             $commandCalled = m::mock(Command::class);
 
             $application->shouldReceive('make')->once()->with(Command::class)->andReturn($commandCalled);
@@ -104,7 +104,7 @@ class CommandTest extends TestCase
     public function testTheOutputSetterOverwrite()
     {
         $output = m::mock(OutputStyle::class);
-        $output->shouldReceive('writeln')->once()->withArgs(function (...$args) {
+        $output->shouldReceive('writeln')->once()->withArgs(static function (...$args) {
             return $args[0] === '<info>foo</info>';
         });
 
@@ -117,7 +117,7 @@ class CommandTest extends TestCase
     public function testChoiceIsSingleSelectByDefault()
     {
         $output = m::mock(OutputStyle::class);
-        $output->shouldReceive('askQuestion')->once()->withArgs(function (ChoiceQuestion $question) {
+        $output->shouldReceive('askQuestion')->once()->withArgs(static function (ChoiceQuestion $question) {
             return $question->isMultiselect() === false;
         });
 
@@ -130,7 +130,7 @@ class CommandTest extends TestCase
     public function testChoiceWithMultiselect()
     {
         $output = m::mock(OutputStyle::class);
-        $output->shouldReceive('askQuestion')->once()->withArgs(function (ChoiceQuestion $question) {
+        $output->shouldReceive('askQuestion')->once()->withArgs(static function (ChoiceQuestion $question) {
             return $question->isMultiselect() === true;
         });
 

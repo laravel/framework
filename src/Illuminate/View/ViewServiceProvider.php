@@ -72,7 +72,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerViewFinder()
     {
-        $this->app->bind('view.finder', function ($app) {
+        $this->app->bind('view.finder', static function ($app) {
             return new FileViewFinder($app['files'], $app['config']['view.paths']);
         });
     }
@@ -84,7 +84,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerBladeCompiler()
     {
-        $this->app->singleton('blade.compiler', function ($app) {
+        $this->app->singleton('blade.compiler', static function ($app) {
             return tap(new BladeCompiler($app['files'], $app['config']['view.compiled']), function ($blade) {
                 $blade->component('dynamic-component', DynamicComponent::class);
             });

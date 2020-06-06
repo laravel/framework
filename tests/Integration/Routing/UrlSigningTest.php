@@ -17,7 +17,7 @@ class UrlSigningTest extends TestCase
 {
     public function testSigningUrl()
     {
-        Route::get('/foo/{id}', function (Request $request, $id) {
+        Route::get('/foo/{id}', static function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
         })->name('foo');
 
@@ -27,7 +27,7 @@ class UrlSigningTest extends TestCase
 
     public function testTemporarySignedUrls()
     {
-        Route::get('/foo/{id}', function (Request $request, $id) {
+        Route::get('/foo/{id}', static function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
         })->name('foo');
 
@@ -41,7 +41,7 @@ class UrlSigningTest extends TestCase
 
     public function testSignedUrlWithUrlWithoutSignatureParameter()
     {
-        Route::get('/foo/{id}', function (Request $request, $id) {
+        Route::get('/foo/{id}', static function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
         })->name('foo');
 
@@ -50,7 +50,7 @@ class UrlSigningTest extends TestCase
 
     public function testSignedMiddleware()
     {
-        Route::get('/foo/{id}', function (Request $request, $id) {
+        Route::get('/foo/{id}', static function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
         })->name('foo')->middleware(ValidateSignature::class);
 
@@ -61,7 +61,7 @@ class UrlSigningTest extends TestCase
 
     public function testSignedMiddlewareWithInvalidUrl()
     {
-        Route::get('/foo/{id}', function (Request $request, $id) {
+        Route::get('/foo/{id}', static function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
         })->name('foo')->middleware(ValidateSignature::class);
 
@@ -78,7 +78,7 @@ class UrlSigningTest extends TestCase
         $model = new RoutableInterfaceStub;
         $model->routable = 'routable';
 
-        Route::get('/foo/{bar}', function (Request $request, $routable) {
+        Route::get('/foo/{bar}', static function (Request $request, $routable) {
             return $request->hasValidSignature() ? $routable : 'invalid';
         })->name('foo');
 

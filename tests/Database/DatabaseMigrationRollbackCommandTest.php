@@ -24,7 +24,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(static function ($name, $callback) {
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
@@ -40,7 +40,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(static function ($name, $callback) {
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
@@ -56,7 +56,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(static function ($name, $callback) {
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
@@ -72,7 +72,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(static function ($name, $callback) {
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);

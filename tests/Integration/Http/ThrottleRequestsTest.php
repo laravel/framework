@@ -33,7 +33,7 @@ class ThrottleRequestsTest extends TestCase
     {
         Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
 
-        Route::get('/', function () {
+        Route::get('/', static function () {
             return 'yes';
         })->middleware(ThrottleRequests::class.':2,1');
 

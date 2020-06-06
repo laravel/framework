@@ -23,7 +23,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
 
         $gate = $this->getBasicGate();
 
-        $gate->define('baz', function () {
+        $gate->define('baz', static function () {
             $_SERVER['_test.authorizes.trait'] = true;
 
             return true;
@@ -42,7 +42,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
 
         $gate = $this->getBasicGate();
 
-        $gate->define('baz', function () {
+        $gate->define('baz', static function () {
             return false;
         });
 
@@ -108,7 +108,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
     {
         $container = Container::setInstance(new Container);
 
-        $gate = new Gate($container, function () {
+        $gate = new Gate($container, static function () {
             return (object) ['id' => 1];
         });
 

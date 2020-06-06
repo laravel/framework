@@ -34,7 +34,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
 
             Carbon::setTestNow($now);
 
-            Route::get('/', function () {
+            Route::get('/', static function () {
                 return 'yes';
             })->middleware(ThrottleRequestsWithRedis::class.':2,1');
 

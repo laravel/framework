@@ -37,7 +37,7 @@ class MailMailerTest extends TestCase
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
-        $mailer->send('foo', ['data'], function ($m) {
+        $mailer->send('foo', ['data'], static function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
         unset($_SERVER['__mailer.test']);
@@ -58,7 +58,7 @@ class MailMailerTest extends TestCase
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
-        $mailer->send(['html' => new HtmlString('rendered.view'), 'text' => new HtmlString('rendered.text')], ['data'], function ($m) {
+        $mailer->send(['html' => new HtmlString('rendered.view'), 'text' => new HtmlString('rendered.text')], ['data'], static function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
         unset($_SERVER['__mailer.test']);
@@ -78,7 +78,7 @@ class MailMailerTest extends TestCase
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
-        $mailer->html('rendered.view', function ($m) {
+        $mailer->html('rendered.view', static function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
         unset($_SERVER['__mailer.test']);
@@ -100,7 +100,7 @@ class MailMailerTest extends TestCase
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
-        $mailer->send(['foo', 'bar'], ['data'], function ($m) {
+        $mailer->send(['foo', 'bar'], ['data'], static function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
         unset($_SERVER['__mailer.test']);
@@ -122,7 +122,7 @@ class MailMailerTest extends TestCase
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
-        $mailer->send(['html' => 'foo', 'text' => 'bar'], ['data'], function ($m) {
+        $mailer->send(['html' => 'foo', 'text' => 'bar'], ['data'], static function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
         unset($_SERVER['__mailer.test']);
@@ -140,7 +140,7 @@ class MailMailerTest extends TestCase
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
             $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getFrom());
         });
-        $mailer->send('foo', ['data'], function ($m) {
+        $mailer->send('foo', ['data'], static function ($m) {
             //
         });
     }
@@ -157,7 +157,7 @@ class MailMailerTest extends TestCase
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
             $this->assertSame('taylorotwell@gmail.com', $message->getReturnPath());
         });
-        $mailer->send('foo', ['data'], function ($m) {
+        $mailer->send('foo', ['data'], static function ($m) {
             //
         });
     }
@@ -174,7 +174,7 @@ class MailMailerTest extends TestCase
         $swift = new FailingSwiftMailerStub;
         $mailer->setSwiftMailer($swift);
 
-        $mailer->send('foo', ['data'], function ($m) {
+        $mailer->send('foo', ['data'], static function ($m) {
             //
         });
 
@@ -193,7 +193,7 @@ class MailMailerTest extends TestCase
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $this->setSwiftMailer($mailer);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), []);
-        $mailer->send('foo', ['data'], function ($m) {
+        $mailer->send('foo', ['data'], static function ($m) {
             //
         });
     }

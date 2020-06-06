@@ -18,7 +18,7 @@ class EloquentModelRefreshTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
             $table->timestamps();
@@ -61,7 +61,7 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
     public function testAsPivot()
     {
-        Schema::create('post_posts', function (Blueprint $table) {
+        Schema::create('post_posts', static function (Blueprint $table) {
             $table->bigInteger('foreign_id');
             $table->bigInteger('related_id');
         });
@@ -89,7 +89,7 @@ class Post extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('age', function ($query) {
+        static::addGlobalScope('age', static function ($query) {
             $query->where('title', '!=', 'mohamed');
         });
     }

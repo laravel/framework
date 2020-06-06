@@ -145,7 +145,7 @@ class Handler implements ExceptionHandlerContract
     {
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
-        return ! is_null(Arr::first($dontReport, function ($type) use ($e) {
+        return ! is_null(Arr::first($dontReport, static function ($type) use ($e) {
             return $e instanceof $type;
         }));
     }
@@ -420,7 +420,7 @@ class Handler implements ExceptionHandlerContract
     {
         $paths = collect(config('view.paths'));
 
-        View::replaceNamespace('errors', $paths->map(function ($path) {
+        View::replaceNamespace('errors', $paths->map(static function ($path) {
             return "{$path}/errors";
         })->push(__DIR__.'/views')->all());
     }
@@ -488,7 +488,7 @@ class Handler implements ExceptionHandlerContract
             'exception' => get_class($e),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
-            'trace' => collect($e->getTrace())->map(function ($trace) {
+            'trace' => collect($e->getTrace())->map(static function ($trace) {
                 return Arr::except($trace, ['args']);
             })->all(),
         ] : [

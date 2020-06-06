@@ -146,7 +146,7 @@ class SupportArrTest extends TestCase
         // Callback is null and array is empty
         $this->assertNull(Arr::first([], null));
         $this->assertSame('foo', Arr::first([], null, 'foo'));
-        $this->assertSame('bar', Arr::first([], null, function () {
+        $this->assertSame('bar', Arr::first([], null, static function () {
             return 'bar';
         }));
 
@@ -154,21 +154,21 @@ class SupportArrTest extends TestCase
         $this->assertEquals(100, Arr::first($array));
 
         // Callback is not null and array is not empty
-        $value = Arr::first($array, function ($value) {
+        $value = Arr::first($array, static function ($value) {
             return $value >= 150;
         });
         $this->assertEquals(200, $value);
 
         // Callback is not null, array is not empty but no satisfied item
-        $value2 = Arr::first($array, function ($value) {
+        $value2 = Arr::first($array, static function ($value) {
             return $value > 300;
         });
-        $value3 = Arr::first($array, function ($value) {
+        $value3 = Arr::first($array, static function ($value) {
             return $value > 300;
         }, 'bar');
-        $value4 = Arr::first($array, function ($value) {
+        $value4 = Arr::first($array, static function ($value) {
             return $value > 300;
-        }, function () {
+        }, static function () {
             return 'baz';
         });
         $this->assertNull($value2);
@@ -180,12 +180,12 @@ class SupportArrTest extends TestCase
     {
         $array = [100, 200, 300];
 
-        $last = Arr::last($array, function ($value) {
+        $last = Arr::last($array, static function ($value) {
             return $value < 250;
         });
         $this->assertEquals(200, $last);
 
-        $last = Arr::last($array, function ($value, $key) {
+        $last = Arr::last($array, static function ($value, $key) {
             return $key < 2;
         });
         $this->assertEquals(200, $last);
@@ -325,7 +325,7 @@ class SupportArrTest extends TestCase
         // Test return default value for non-existing key.
         $array = ['names' => ['developer' => 'taylor']];
         $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', 'dayle'));
-        $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', function () {
+        $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', static function () {
             return 'dayle';
         }));
     }
@@ -731,7 +731,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals($expected, $sorted);
 
         // sort with closure
-        $sortedWithClosure = array_values(Arr::sort($unsorted, function ($value) {
+        $sortedWithClosure = array_values(Arr::sort($unsorted, static function ($value) {
             return $value['name'];
         }));
         $this->assertEquals($expected, $sortedWithClosure);
@@ -803,7 +803,7 @@ class SupportArrTest extends TestCase
     {
         $array = [100, '200', 300, '400', 500];
 
-        $array = Arr::where($array, function ($value, $key) {
+        $array = Arr::where($array, static function ($value, $key) {
             return is_string($value);
         });
 
@@ -814,7 +814,7 @@ class SupportArrTest extends TestCase
     {
         $array = ['10' => 1, 'foo' => 3, 20 => 2];
 
-        $array = Arr::where($array, function ($value, $key) {
+        $array = Arr::where($array, static function ($value, $key) {
             return is_numeric($key);
         });
 

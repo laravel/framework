@@ -9,13 +9,13 @@ class ValidationRequiredIfTest extends TestCase
 {
     public function testItClousureReturnsFormatsAStringVersionOfTheRule()
     {
-        $rule = new RequiredIf(function () {
+        $rule = new RequiredIf(static function () {
             return true;
         });
 
         $this->assertSame('required', (string) $rule);
 
-        $rule = new RequiredIf(function () {
+        $rule = new RequiredIf(static function () {
             return false;
         });
 

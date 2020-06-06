@@ -65,7 +65,7 @@ trait CallsCommands
      */
     protected function createInputFromArguments(array $arguments)
     {
-        return tap(new ArrayInput(array_merge($this->context(), $arguments)), function ($input) {
+        return tap(new ArrayInput(array_merge($this->context(), $arguments)), static function ($input) {
             if ($input->hasParameterOption(['--no-interaction'], true)) {
                 $input->setInteractive(false);
             }
@@ -85,7 +85,7 @@ trait CallsCommands
             'no-interaction',
             'quiet',
             'verbose',
-        ])->filter()->mapWithKeys(function ($value, $key) {
+        ])->filter()->mapWithKeys(static function ($value, $key) {
             return ["--{$key}" => $value];
         })->all();
     }

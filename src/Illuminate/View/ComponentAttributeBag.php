@@ -110,7 +110,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         $attributes = [];
 
-        $attributeDefaults = array_map(function ($value) {
+        $attributeDefaults = array_map(static function ($value) {
             if (is_object($value) || is_null($value) || is_bool($value)) {
                 return $value;
             }

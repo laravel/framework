@@ -167,7 +167,7 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $model = m::mock(Model::class);
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = []) {
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(static function ($array = []) {
             return new Collection($array);
         });
         $model->shouldReceive('setRelation')->once()->with('foo', m::type(Collection::class));
@@ -220,7 +220,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $model3 = new EloquentHasManyModelStub;
         $model3->id = 3;
 
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(static function ($array) {
             return new Collection($array);
         });
         $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');

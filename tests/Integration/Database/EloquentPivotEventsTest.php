@@ -16,19 +16,19 @@ class EloquentPivotEventsTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->timestamps();
         });
 
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('projects', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('project_users', function (Blueprint $table) {
+        Schema::create('project_users', static function (Blueprint $table) {
             $table->integer('user_id');
             $table->integer('project_id');
             $table->text('permissions')->nullable();
@@ -160,37 +160,37 @@ class PivotEventsTestCollaborator extends Pivot
     {
         parent::boot();
 
-        static::creating(function ($model) {
+        static::creating(static function ($model) {
             static::$eventsCalled[] = 'creating';
         });
 
-        static::created(function ($model) {
+        static::created(static function ($model) {
             static::$eventsCalled[] = 'created';
         });
 
-        static::updating(function ($model) {
+        static::updating(static function ($model) {
             static::$eventsCalled[] = 'updating';
         });
 
-        static::updated(function ($model) {
+        static::updated(static function ($model) {
             $_SERVER['pivot_attributes'] = $model->getAttributes();
             $_SERVER['pivot_dirty_attributes'] = $model->getDirty();
             static::$eventsCalled[] = 'updated';
         });
 
-        static::saving(function ($model) {
+        static::saving(static function ($model) {
             static::$eventsCalled[] = 'saving';
         });
 
-        static::saved(function ($model) {
+        static::saved(static function ($model) {
             static::$eventsCalled[] = 'saved';
         });
 
-        static::deleting(function ($model) {
+        static::deleting(static function ($model) {
             static::$eventsCalled[] = 'deleting';
         });
 
-        static::deleted(function ($model) {
+        static::deleted(static function ($model) {
             static::$eventsCalled[] = 'deleted';
         });
     }

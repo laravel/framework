@@ -458,7 +458,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function priority($level = 3)
     {
-        $this->callbacks[] = function ($message) use ($level) {
+        $this->callbacks[] = static function ($message) use ($level) {
             $message->setPriority($level);
         };
 
@@ -661,7 +661,7 @@ class Mailable implements MailableContract, Renderable
             'address' => $expected->email,
         ];
 
-        return collect($this->{$property})->contains(function ($actual) use ($expected) {
+        return collect($this->{$property})->contains(static function ($actual) use ($expected) {
             if (! isset($expected['name'])) {
                 return $actual['address'] == $expected['address'];
             }
@@ -805,7 +805,7 @@ class Mailable implements MailableContract, Renderable
             'path' => $path,
             'name' => $name ?? basename($path),
             'options' => $options,
-        ])->unique(function ($file) {
+        ])->unique(static function ($file) {
             return $file['name'].$file['disk'].$file['path'];
         })->all();
 
@@ -824,7 +824,7 @@ class Mailable implements MailableContract, Renderable
     {
         $this->rawAttachments = collect($this->rawAttachments)
                 ->push(compact('data', 'name', 'options'))
-                ->unique(function ($file) {
+                ->unique(static function ($file) {
                     return $file['name'].$file['data'];
                 })->all();
 

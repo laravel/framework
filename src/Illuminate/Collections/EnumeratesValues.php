@@ -138,7 +138,7 @@ trait EnumeratesValues
     public function containsStrict($key, $value = null)
     {
         if (func_num_args() === 2) {
-            return $this->contains(function ($item) use ($key, $value) {
+            return $this->contains(static function ($item) use ($key, $value) {
                 return data_get($item, $key) === $value;
             });
         }
@@ -178,7 +178,7 @@ trait EnumeratesValues
     {
         (new static(func_get_args()))
             ->push($this)
-            ->each(function ($item) {
+            ->each(static function ($item) {
                 VarDumper::dump($item);
             });
 
@@ -210,7 +210,7 @@ trait EnumeratesValues
      */
     public function eachSpread(callable $callback)
     {
-        return $this->each(function ($chunk, $key) use ($callback) {
+        return $this->each(static function ($chunk, $key) use ($callback) {
             $chunk[] = $key;
 
             return $callback(...$chunk);
@@ -273,7 +273,7 @@ trait EnumeratesValues
      */
     public function mapSpread(callable $callback)
     {
-        return $this->map(function ($chunk, $key) use ($callback) {
+        return $this->map(static function ($chunk, $key) use ($callback) {
             $chunk[] = $key;
 
             return $callback(...$chunk);
@@ -314,7 +314,7 @@ trait EnumeratesValues
      */
     public function mapInto($class)
     {
-        return $this->map(function ($value, $key) use ($class) {
+        return $this->map(static function ($value, $key) use ($class) {
             return new $class($value, $key);
         });
     }
@@ -329,11 +329,11 @@ trait EnumeratesValues
     {
         $callback = $this->valueRetriever($callback);
 
-        return $this->map(function ($value) use ($callback) {
+        return $this->map(static function ($value) use ($callback) {
             return $callback($value);
-        })->filter(function ($value) {
+        })->filter(static function ($value) {
             return ! is_null($value);
-        })->reduce(function ($result, $value) {
+        })->reduce(static function ($result, $value) {
             return is_null($result) || $value < $result ? $value : $result;
         });
     }
@@ -348,9 +348,9 @@ trait EnumeratesValues
     {
         $callback = $this->valueRetriever($callback);
 
-        return $this->filter(function ($value) {
+        return $this->filter(static function ($value) {
             return ! is_null($value);
-        })->reduce(function ($result, $item) use ($callback) {
+        })->reduce(static function ($result, $item) use ($callback) {
             $value = $callback($item);
 
             return is_null($result) || $value > $result ? $value : $result;
@@ -408,14 +408,14 @@ trait EnumeratesValues
     public function sum($callback = null)
     {
         if (is_null($callback)) {
-            $callback = function ($value) {
+            $callback = static function ($value) {
                 return $value;
             };
         } else {
             $callback = $this->valueRetriever($callback);
         }
 
-        return $this->reduce(function ($result, $item) use ($callback) {
+        return $this->reduce(static function ($result, $item) use ($callback) {
             return $result + $callback($item);
         }, 0);
     }
@@ -563,7 +563,7 @@ trait EnumeratesValues
     {
         $values = $this->getArrayableItems($values);
 
-        return $this->filter(function ($item) use ($key, $values, $strict) {
+        return $this->filter(static function ($item) use ($key, $values, $strict) {
             return in_array(data_get($item, $key), $values, $strict);
         });
     }
@@ -601,7 +601,7 @@ trait EnumeratesValues
      */
     public function whereNotBetween($key, $values)
     {
-        return $this->filter(function ($item) use ($key, $values) {
+        return $this->filter(static function ($item) use ($key, $values) {
             return data_get($item, $key) < reset($values) || data_get($item, $key) > end($values);
         });
     }
@@ -618,7 +618,7 @@ trait EnumeratesValues
     {
         $values = $this->getArrayableItems($values);
 
-        return $this->reject(function ($item) use ($key, $values, $strict) {
+        return $this->reject(static function ($item) use ($key, $values, $strict) {
             return in_array(data_get($item, $key), $values, $strict);
         });
     }
@@ -643,7 +643,7 @@ trait EnumeratesValues
      */
     public function whereInstanceOf($type)
     {
-        return $this->filter(function ($value) use ($type) {
+        return $this->filter(static function ($value) use ($type) {
             return $value instanceof $type;
         });
     }
@@ -682,7 +682,7 @@ trait EnumeratesValues
     {
         $useAsCallable = $this->useAsCallable($callback);
 
-        return $this->filter(function ($value, $key) use ($callback, $useAsCallable) {
+        return $this->filter(static function ($value, $key) use ($callback, $useAsCallable) {
             return $useAsCallable
                 ? ! $callback($value, $key)
                 : $value != $callback;
@@ -702,7 +702,7 @@ trait EnumeratesValues
 
         $exists = [];
 
-        return $this->reject(function ($item, $key) use ($callback, $strict, &$exists) {
+        return $this->reject(static function ($item, $key) use ($callback, $strict, &$exists) {
             if (in_array($id = $callback($item, $key), $exists, $strict)) {
                 return true;
             }
@@ -754,7 +754,7 @@ trait EnumeratesValues
      */
     public function toArray()
     {
-        return $this->map(function ($value) {
+        return $this->map(static function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
         })->all();
     }
@@ -766,7 +766,7 @@ trait EnumeratesValues
      */
     public function jsonSerialize()
     {
-        return array_map(function ($value) {
+        return array_map(static function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
             } elseif ($value instanceof Jsonable) {
@@ -810,12 +810,12 @@ trait EnumeratesValues
     public function countBy($callback = null)
     {
         if (is_null($callback)) {
-            $callback = function ($value) {
+            $callback = static function ($value) {
                 return $value;
             };
         }
 
-        return new static($this->groupBy($callback)->map(function ($value) {
+        return new static($this->groupBy($callback)->map(static function ($value) {
             return $value->count();
         }));
     }
@@ -905,10 +905,10 @@ trait EnumeratesValues
             $operator = '=';
         }
 
-        return function ($item) use ($key, $operator, $value) {
+        return static function ($item) use ($key, $operator, $value) {
             $retrieved = data_get($item, $key);
 
-            $strings = array_filter([$retrieved, $value], function ($value) {
+            $strings = array_filter([$retrieved, $value], static function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
             });
 
@@ -955,7 +955,7 @@ trait EnumeratesValues
             return $value;
         }
 
-        return function ($item) use ($value) {
+        return static function ($item) use ($value) {
             return data_get($item, $value);
         };
     }
@@ -968,7 +968,7 @@ trait EnumeratesValues
      */
     protected function equality($value)
     {
-        return function ($item) use ($value) {
+        return static function ($item) use ($value) {
             return $item === $value;
         };
     }
@@ -981,7 +981,7 @@ trait EnumeratesValues
      */
     protected function negate(Closure $callback)
     {
-        return function (...$params) use ($callback) {
+        return static function (...$params) use ($callback) {
             return ! $callback(...$params);
         };
     }

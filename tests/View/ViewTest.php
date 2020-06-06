@@ -62,15 +62,15 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('decrementRender');
         $view->getFactory()->shouldReceive('flushStateIfDoneRendering');
 
-        $this->assertSame('new contents', $view->render(function () {
+        $this->assertSame('new contents', $view->render(static function () {
             return 'new contents';
         }));
 
-        $this->assertEmpty($view->render(function () {
+        $this->assertEmpty($view->render(static function () {
             return '';
         }));
 
-        $this->assertSame('contents', $view->render(function () {
+        $this->assertSame('contents', $view->render(static function () {
             //
         }));
     }

@@ -14,8 +14,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('events', function ($app) {
-            return (new Dispatcher($app))->setQueueResolver(function () use ($app) {
+        $this->app->singleton('events', static function ($app) {
+            return (new Dispatcher($app))->setQueueResolver(static function () use ($app) {
                 return $app->make(QueueFactoryContract::class);
             });
         });

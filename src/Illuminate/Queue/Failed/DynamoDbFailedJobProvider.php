@@ -95,7 +95,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
             'ScanIndexForward' => false,
         ]);
 
-        return collect($results['Items'])->sortByDesc(function ($result) {
+        return collect($results['Items'])->sortByDesc(static function ($result) {
             return (int) $result['failed_at']['N'];
         })->map(function ($result) {
             return (object) [

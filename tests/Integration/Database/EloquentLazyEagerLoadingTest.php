@@ -17,16 +17,16 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('one', function (Blueprint $table) {
+        Schema::create('one', static function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('two', function (Blueprint $table) {
+        Schema::create('two', static function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
         });
 
-        Schema::create('three', function (Blueprint $table) {
+        Schema::create('three', static function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
         });

@@ -212,7 +212,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     protected function getMessagesForWildcardKey($key, $format)
     {
         return collect($this->messages)
-                ->filter(function ($messages, $messageKey) use ($key) {
+                ->filter(static function ($messages, $messageKey) use ($key) {
                     return Str::is($key, $messageKey);
                 })
                 ->map(function ($messages, $messageKey) use ($format) {
@@ -263,7 +263,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     protected function transform($messages, $format, $messageKey)
     {
         return collect((array) $messages)
-            ->map(function ($message) use ($format, $messageKey) {
+            ->map(static function ($message) use ($format, $messageKey) {
                 // We will simply spin through the given messages and transform each one
                 // replacing the :message place holder with the real message allowing
                 // the messages to be easily formatted to each developer's desires.

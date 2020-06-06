@@ -67,7 +67,7 @@ class SendingMailNotificationsTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->string('name')->nullable();
@@ -93,7 +93,7 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
-            m::on(function ($closure) {
+            m::on(static function ($closure) {
                 $message = m::mock(Message::class);
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
@@ -139,7 +139,7 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
-            m::on(function ($closure) {
+            m::on(static function ($closure) {
                 $message = m::mock(Message::class);
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com' => 'Taylor Otwell', 'foo_taylor@laravel.com']);
@@ -184,7 +184,7 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
-            m::on(function ($closure) {
+            m::on(static function ($closure) {
                 $message = m::mock(Message::class);
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
@@ -219,7 +219,7 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
-            m::on(function ($closure) {
+            m::on(static function ($closure) {
                 $message = m::mock(Message::class);
 
                 $message->shouldReceive('to')->once()->with(['foo_taylor@laravel.com', 'bar_taylor@laravel.com']);

@@ -54,7 +54,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz']);
         $v->setContainer(new Container);
-        $v->after(function ($validator) {
+        $v->after(static function ($validator) {
             $_SERVER['__validator.after.test'] = true;
 
             // For asserting we can actually work with the instance
@@ -242,7 +242,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required' => 'foo bar'], 'en');
         $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
-        $v->addReplacer('required', function ($message, $attribute, $rule, $parameters) {
+        $v->addReplacer('required', static function ($message, $attribute, $rule, $parameters) {
             return str_replace('bar', 'taylor', $message);
         });
         $this->assertFalse($v->passes());
@@ -417,7 +417,7 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.framework_php' => ':input is not a valid PHP Framework'], 'en');
 
         $v = new Validator($trans, ['framework' => 3], ['framework' => 'framework_php']);
-        $v->addExtension('framework_php', function ($attribute, $value, $parameters, $validator) {
+        $v->addExtension('framework_php', static function ($attribute, $value, $parameters, $validator) {
             return in_array($value, [1, 2]);
         });
         $v->addCustomValues(['framework' => $frameworks]);
@@ -520,12 +520,12 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.attributes.firstname' => 'Firstname'], 'en');
         $trans->addLines(['validation.attributes.lastname' => 'Lastname'], 'en');
         $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
-        $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
+        $v->addExtension('alliteration', static function ($attribute, $value, $parameters, $validator) {
             $other = Arr::get($validator->getData(), $parameters[0]);
 
             return $value[0] == $other[0];
         });
-        $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
+        $v->addReplacer('alliteration', static function ($message, $attribute, $rule, $parameters, $validator) {
             return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
         });
         $this->assertFalse($v->passes());
@@ -537,12 +537,12 @@ class ValidationValidatorTest extends TestCase
         $customAttributes = ['firstname' => 'Firstname', 'lastname' => 'Lastname'];
         $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
         $v->addCustomAttributes($customAttributes);
-        $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
+        $v->addExtension('alliteration', static function ($attribute, $value, $parameters, $validator) {
             $other = Arr::get($validator->getData(), $parameters[0]);
 
             return $value[0] == $other[0];
         });
-        $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
+        $v->addReplacer('alliteration', static function ($message, $attribute, $rule, $parameters, $validator) {
             return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
         });
         $this->assertFalse($v->passes());
@@ -2185,7 +2185,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,NULL,id_col,foo,bar']);
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
         $mock->shouldReceive('setConnection')->once()->with(null);
-        $mock->shouldReceive('getCount')->once()->withArgs(function () {
+        $mock->shouldReceive('getCount')->once()->withArgs(static function () {
             return func_get_args() === ['users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar']];
         })->andReturn(2);
         $v->setPresenceVerifier($mock);
@@ -2206,7 +2206,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
-        $closure = function () {
+        $closure = static function () {
             //
         };
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
@@ -3523,42 +3523,42 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
-        $v->sometimes('x', 'Confirmed', function ($i) {
+        $v->sometimes('x', 'Confirmed', static function ($i) {
             return $i->x == 'foo';
         });
         $this->assertEquals(['x' => ['Required', 'Confirmed']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ''], ['y' => 'Required']);
-        $v->sometimes('x', 'Required', function ($i) {
+        $v->sometimes('x', 'Required', static function ($i) {
             return true;
         });
         $this->assertEquals(['x' => ['Required'], 'y' => ['Required']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
-        $v->sometimes('x', 'Confirmed', function ($i) {
+        $v->sometimes('x', 'Confirmed', static function ($i) {
             return $i->x == 'bar';
         });
         $this->assertEquals(['x' => ['Required']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
-        $v->sometimes('x', 'Foo|Bar', function ($i) {
+        $v->sometimes('x', 'Foo|Bar', static function ($i) {
             return $i->x == 'foo';
         });
         $this->assertEquals(['x' => ['Required', 'Foo', 'Bar']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
-        $v->sometimes('x', ['Foo', 'Bar:Baz'], function ($i) {
+        $v->sometimes('x', ['Foo', 'Bar:Baz'], static function ($i) {
             return $i->x == 'foo';
         });
         $this->assertEquals(['x' => ['Required', 'Foo', 'Bar:Baz']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => [['name' => 'first', 'title' => null]]], []);
-        $v->sometimes('foo.*.name', 'Required|String', function ($i) {
+        $v->sometimes('foo.*.name', 'Required|String', static function ($i) {
             return is_null($i['foo'][0]['title']);
         });
         $this->assertEquals(['foo.0.name' => ['Required', 'String']], $v->getRules());
@@ -3569,7 +3569,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.foo' => 'foo!'], 'en');
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
-        $v->addExtension('foo', function () {
+        $v->addExtension('foo', static function () {
             return false;
         });
         $this->assertFalse($v->passes());
@@ -3579,7 +3579,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.foo_bar' => 'foo!'], 'en');
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo_bar']);
-        $v->addExtension('FooBar', function () {
+        $v->addExtension('FooBar', static function () {
             return false;
         });
         $this->assertFalse($v->passes());
@@ -3588,7 +3588,7 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo_bar']);
-        $v->addExtension('FooBar', function () {
+        $v->addExtension('FooBar', static function () {
             return false;
         });
         $v->setFallbackMessages(['foo_bar' => 'foo!']);
@@ -3599,7 +3599,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo_bar']);
         $v->addExtensions([
-            'FooBar' => function () {
+            'FooBar' => static function () {
                 return false;
             },
         ]);
@@ -3641,7 +3641,7 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [], ['implicit_rule' => 'foo']);
-        $v->addImplicitExtension('implicit_rule', function () {
+        $v->addImplicitExtension('implicit_rule', static function () {
             return true;
         });
         $this->assertTrue($v->passes());
@@ -3656,7 +3656,7 @@ class ValidationValidatorTest extends TestCase
             ],
             ['*.name' => 'dependent_rule:*.age']
         );
-        $v->addDependentExtension('dependent_rule', function ($name) use ($v) {
+        $v->addDependentExtension('dependent_rule', static function ($name) use ($v) {
             return Arr::get($v->getData(), $name) == 'Jamie';
         });
         $this->assertTrue($v->passes());
@@ -4753,7 +4753,7 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
             [
-                'name.*' => function ($attribute, $value, $fail) {
+                'name.*' => static function ($attribute, $value, $fail) {
                     if ($value !== 'taylor') {
                         $fail(':attribute was '.$value.' instead of taylor');
                     }
@@ -4768,7 +4768,7 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'adam'],
             [
-                'name' => function ($attribute, $value, $fail) {
+                'name' => static function ($attribute, $value, $fail) {
                     if ($value !== 'taylor') {
                         $fail(':attribute was '.$value.' instead of taylor');
                     }
@@ -4795,7 +4795,7 @@ class ValidationValidatorTest extends TestCase
                         return ':attribute must be AR or TX';
                     }
                 },
-                'name' => function ($attribute, $value, $fail) {
+                'name' => static function ($attribute, $value, $fail) {
                     if ($value !== 'taylor') {
                         $fail(':attribute must be taylor');
                     }
@@ -4803,7 +4803,7 @@ class ValidationValidatorTest extends TestCase
                 'number' => [
                     'required',
                     'integer',
-                    function ($attribute, $value, $fail) {
+                    static function ($attribute, $value, $fail) {
                         if ($value % 4 !== 0) {
                             $fail(':attribute must be divisible by 4');
                         }
@@ -4901,7 +4901,7 @@ class ValidationValidatorTest extends TestCase
         $post = ['first' => 'john', 'preferred' => 'john', 'last' => 'doe', 'type' => 'admin'];
 
         $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required', 'preferred' => 'required']);
-        $v->sometimes('type', 'required', function () {
+        $v->sometimes('type', 'required', static function () {
             return false;
         });
         $data = $v->validate();
@@ -4916,7 +4916,7 @@ class ValidationValidatorTest extends TestCase
         $rules = ['nested.foo' => 'required', 'array.*' => 'integer'];
 
         $v = new Validator($this->getIlluminateArrayTranslator(), $post, $rules);
-        $v->sometimes('type', 'required', function () {
+        $v->sometimes('type', 'required', static function () {
             return false;
         });
         $data = $v->validate();
@@ -4929,7 +4929,7 @@ class ValidationValidatorTest extends TestCase
         $post = ['nested' => ['foo' => 'bar', 'with' => 'extras', 'type' => 'admin']];
 
         $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['nested.foo' => 'required']);
-        $v->sometimes('nested.type', 'required', function () {
+        $v->sometimes('nested.type', 'required', static function () {
             return false;
         });
         $data = $v->validate();
@@ -4942,7 +4942,7 @@ class ValidationValidatorTest extends TestCase
         $post = ['nested' => [['bar' => 'baz', 'with' => 'extras', 'type' => 'admin'], ['bar' => 'baz2', 'with' => 'extras', 'type' => 'admin']]];
 
         $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['nested.*.bar' => 'required']);
-        $v->sometimes('nested.*.type', 'required', function () {
+        $v->sometimes('nested.*.type', 'required', static function () {
             return false;
         });
         $data = $v->validate();
@@ -4955,7 +4955,7 @@ class ValidationValidatorTest extends TestCase
         $post = ['first' => 'john', 'preferred' => 'john', 'last' => 'doe', 'type' => 'admin'];
 
         $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required', 'preferred' => 'required']);
-        $v->sometimes('type', 'required', function () {
+        $v->sometimes('type', 'required', static function () {
             return false;
         });
         $data = $v->validate();
@@ -4971,7 +4971,7 @@ class ValidationValidatorTest extends TestCase
 
         $validateCount = 0;
         $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required', 'preferred' => 'required']);
-        $v->after(function () use (&$validateCount) {
+        $v->after(static function () use (&$validateCount) {
             $validateCount++;
         });
         $data = $v->validate();

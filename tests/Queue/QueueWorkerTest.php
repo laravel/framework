@@ -116,7 +116,7 @@ class QueueWorkerTest extends TestCase
             new WorkerFakeManager('default', new BrokenQueueConnection($e = new RuntimeException)),
             $this->events,
             $this->exceptionHandler,
-            function () {
+            static function () {
                 return false;
             }
         );
@@ -137,7 +137,7 @@ class QueueWorkerTest extends TestCase
     {
         $e = new RuntimeException;
 
-        $job = new WorkerFakeJob(function () use ($e) {
+        $job = new WorkerFakeJob(static function () use ($e) {
             throw $e;
         });
 
@@ -155,7 +155,7 @@ class QueueWorkerTest extends TestCase
     {
         $e = new RuntimeException;
 
-        $job = new WorkerFakeJob(function ($job) use ($e) {
+        $job = new WorkerFakeJob(static function ($job) use ($e) {
             // In normal use this would be incremented by being popped off the queue
             $job->attempts++;
 
@@ -178,7 +178,7 @@ class QueueWorkerTest extends TestCase
     {
         $e = new RuntimeException;
 
-        $job = new WorkerFakeJob(function ($job) use ($e) {
+        $job = new WorkerFakeJob(static function ($job) use ($e) {
             // In normal use this would be incremented by being popped off the queue
             $job->attempts++;
 
@@ -206,7 +206,7 @@ class QueueWorkerTest extends TestCase
 
     public function testJobIsFailedIfItHasAlreadyExceededMaxAttempts()
     {
-        $job = new WorkerFakeJob(function ($job) {
+        $job = new WorkerFakeJob(static function ($job) {
             $job->attempts++;
         });
 
@@ -225,7 +225,7 @@ class QueueWorkerTest extends TestCase
 
     public function testJobIsFailedIfItHasAlreadyExpired()
     {
-        $job = new WorkerFakeJob(function ($job) {
+        $job = new WorkerFakeJob(static function ($job) {
             $job->attempts++;
         });
 
@@ -250,7 +250,7 @@ class QueueWorkerTest extends TestCase
 
     public function testJobBasedMaxRetries()
     {
-        $job = new WorkerFakeJob(function ($job) {
+        $job = new WorkerFakeJob(static function ($job) {
             $job->attempts++;
         });
         $job->attempts = 2;
@@ -266,7 +266,7 @@ class QueueWorkerTest extends TestCase
 
     public function testJobBasedFailedDelay()
     {
-        $job = new WorkerFakeJob(function ($job) {
+        $job = new WorkerFakeJob(static function ($job) {
             throw new Exception('Something went wrong.');
         });
 
@@ -281,11 +281,11 @@ class QueueWorkerTest extends TestCase
 
     public function testJobRunsIfAppIsNotInMaintenanceMode()
     {
-        $firstJob = new WorkerFakeJob(function ($job) {
+        $firstJob = new WorkerFakeJob(static function ($job) {
             $job->attempts++;
         });
 
-        $secondJob = new WorkerFakeJob(function ($job) {
+        $secondJob = new WorkerFakeJob(static function ($job) {
             $job->attempts++;
         });
 
@@ -314,7 +314,7 @@ class QueueWorkerTest extends TestCase
 
     public function testJobDoesNotFireIfDeleted()
     {
-        $job = new WorkerFakeJob(function () {
+        $job = new WorkerFakeJob(static function () {
             return true;
         });
 
@@ -375,7 +375,7 @@ class QueueWorkerTest extends TestCase
             new WorkerFakeManager($connectionName, new WorkerFakeConnection($jobs)),
             $this->events,
             $this->exceptionHandler,
-            $isInMaintenanceMode ?? function () {
+            $isInMaintenanceMode ?? static function () {
                 return false;
             },
         ];
@@ -489,7 +489,7 @@ class WorkerFakeJob implements QueueJobContract
 
     public function __construct($callback = null)
     {
-        $this->callback = $callback ?: function () {
+        $this->callback = $callback ?: static function () {
             //
         };
     }

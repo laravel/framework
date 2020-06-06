@@ -37,7 +37,7 @@ class MakesHttpRequestsTest extends TestCase
 
     public function testWithoutAndWithMiddlewareWithParameter()
     {
-        $next = function ($request) {
+        $next = static function ($request) {
             return $request;
         };
 

@@ -78,16 +78,16 @@ class SupportStringableTest extends TestCase
     public function testWhenEmpty()
     {
         tap($this->stringable(), function ($stringable) {
-            $this->assertSame($stringable, $stringable->whenEmpty(function () {
+            $this->assertSame($stringable, $stringable->whenEmpty(static function () {
                 //
             }));
         });
 
-        $this->assertSame('empty', (string) $this->stringable()->whenEmpty(function () {
+        $this->assertSame('empty', (string) $this->stringable()->whenEmpty(static function () {
             return 'empty';
         }));
 
-        $this->assertSame('not-empty', (string) $this->stringable('not-empty')->whenEmpty(function () {
+        $this->assertSame('not-empty', (string) $this->stringable('not-empty')->whenEmpty(static function () {
             return 'empty';
         }));
     }

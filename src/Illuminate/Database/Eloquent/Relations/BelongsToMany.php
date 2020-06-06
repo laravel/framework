@@ -903,7 +903,7 @@ class BelongsToMany extends Relation
      */
     public function each(callable $callback, $count = 1000)
     {
-        return $this->chunk($count, function ($results) use ($callback) {
+        return $this->chunk($count, static function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($value, $key) === false) {
                     return false;

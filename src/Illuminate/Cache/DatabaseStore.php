@@ -167,7 +167,7 @@ class DatabaseStore implements Store
      */
     public function increment($key, $value = 1)
     {
-        return $this->incrementOrDecrement($key, $value, function ($current, $value) {
+        return $this->incrementOrDecrement($key, $value, static function ($current, $value) {
             return $current + $value;
         });
     }
@@ -181,7 +181,7 @@ class DatabaseStore implements Store
      */
     public function decrement($key, $value = 1)
     {
-        return $this->incrementOrDecrement($key, $value, function ($current, $value) {
+        return $this->incrementOrDecrement($key, $value, static function ($current, $value) {
             return $current - $value;
         });
     }

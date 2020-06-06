@@ -131,7 +131,7 @@ trait InteractsWithPivotTable
      */
     protected function formatRecordsList(array $records)
     {
-        return collect($records)->mapWithKeys(function ($attributes, $id) {
+        return collect($records)->mapWithKeys(static function ($attributes, $id) {
             if (! is_array($attributes)) {
                 [$id, $attributes] = [$attributes, []];
             }

@@ -27,7 +27,7 @@ class PusherBroadcasterTest extends TestCase
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
     {
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             return true;
         });
 
@@ -43,7 +43,7 @@ class PusherBroadcasterTest extends TestCase
     {
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             return false;
         });
 
@@ -56,7 +56,7 @@ class PusherBroadcasterTest extends TestCase
     {
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             return true;
         });
 
@@ -68,7 +68,7 @@ class PusherBroadcasterTest extends TestCase
     public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray()
     {
         $returnData = [1, 2, 3, 4];
-        $this->broadcaster->channel('test', function () use ($returnData) {
+        $this->broadcaster->channel('test', static function () use ($returnData) {
             return $returnData;
         });
 
@@ -84,7 +84,7 @@ class PusherBroadcasterTest extends TestCase
     {
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             //
         });
 
@@ -97,7 +97,7 @@ class PusherBroadcasterTest extends TestCase
     {
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->broadcaster->channel('test', function () {
+        $this->broadcaster->channel('test', static function () {
             return [1, 2, 3, 4];
         });
 

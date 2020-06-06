@@ -22,7 +22,7 @@ class GatePolicyResolutionTest extends TestCase
 
     public function testPolicyCanBeGuessedUsingCallback()
     {
-        Gate::guessPolicyNamesUsing(function () {
+        Gate::guessPolicyNamesUsing(static function () {
             return AuthenticationTestUserPolicy::class;
         });
 
@@ -34,7 +34,7 @@ class GatePolicyResolutionTest extends TestCase
 
     public function testPolicyCanBeGuessedMultipleTimes()
     {
-        Gate::guessPolicyNamesUsing(function () {
+        Gate::guessPolicyNamesUsing(static function () {
             return [
                 'App\\Policies\\TestUserPolicy',
                 AuthenticationTestUserPolicy::class,

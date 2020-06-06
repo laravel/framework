@@ -49,7 +49,7 @@ class RedisCacheLockTest extends TestCase
         Carbon::setTestNow();
 
         Cache::store('redis')->lock('foo')->forceRelease();
-        $this->assertSame('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
+        $this->assertSame('taylor', Cache::store('redis')->lock('foo', 10)->block(1, static function () {
             return 'taylor';
         }));
 
@@ -80,7 +80,7 @@ class RedisCacheLockTest extends TestCase
         $firstLock = Cache::store('redis')->lock('foo', 10);
 
         try {
-            $firstLock->block(1, function () {
+            $firstLock->block(1, static function () {
                 throw new Exception('failed');
             });
         } catch (Exception $e) {

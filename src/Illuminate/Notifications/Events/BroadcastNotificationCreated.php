@@ -64,7 +64,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
             return [new PrivateChannel($channels)];
         }
 
-        return collect($channels)->map(function ($channel) {
+        return collect($channels)->map(static function ($channel) {
             return new PrivateChannel($channel);
         })->all();
     }

@@ -34,7 +34,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
      */
     public function createSchema()
     {
-        $this->schema()->create('users', function ($table) {
+        $this->schema()->create('users', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->unsignedInteger('country_id');
@@ -43,7 +43,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             $table->softDeletes();
         });
 
-        $this->schema()->create('posts', function ($table) {
+        $this->schema()->create('posts', static function ($table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('title');
@@ -52,7 +52,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema()->create('countries', function ($table) {
+        $this->schema()->create('countries', static function ($table) {
             $table->increments('id');
             $table->string('name');
             $table->string('shortname');
@@ -114,7 +114,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     public function testWhereHasOnARelationWithCustomIntermediateAndLocalKey()
     {
         $this->seedData();
-        $country = HasManyThroughIntermediateTestCountry::whereHas('posts', function ($query) {
+        $country = HasManyThroughIntermediateTestCountry::whereHas('posts', static function ($query) {
             $query->where('title', 'A title');
         })->get();
 
@@ -268,7 +268,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $i = 0;
         $count = 0;
 
-        $country->posts()->chunkById(2, function ($collection) use (&$i, &$count) {
+        $country->posts()->chunkById(2, static function ($collection) use (&$i, &$count) {
             $i++;
             $count += $collection->count();
         });
@@ -403,14 +403,14 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
      */
     protected function migrateDefault()
     {
-        $this->schema()->create('users_default', function ($table) {
+        $this->schema()->create('users_default', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->unsignedInteger('has_many_through_default_test_country_id');
             $table->timestamps();
         });
 
-        $this->schema()->create('posts_default', function ($table) {
+        $this->schema()->create('posts_default', static function ($table) {
             $table->increments('id');
             $table->integer('has_many_through_default_test_user_id');
             $table->string('title');
@@ -418,7 +418,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema()->create('countries_default', function ($table) {
+        $this->schema()->create('countries_default', static function ($table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();

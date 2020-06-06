@@ -50,7 +50,7 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->fake->to($user)->send($this->mailable);
 
-        $this->fake->assertSent(MailableStub::class, function ($mail) use ($user) {
+        $this->fake->assertSent(MailableStub::class, static function ($mail) use ($user) {
             return $mail->hasTo($user) && $mail->locale === 'au';
         });
     }
@@ -159,7 +159,7 @@ class SupportTestingMailFakeTest extends TestCase
     {
         $this->fake->to($user = new LocalizedRecipientStub)->queue($this->mailable);
 
-        $this->fake->assertQueued(function (MailableStub $mail) use ($user) {
+        $this->fake->assertQueued(static function (MailableStub $mail) use ($user) {
             return $mail->hasTo($user);
         });
     }
@@ -168,7 +168,7 @@ class SupportTestingMailFakeTest extends TestCase
     {
         $this->fake->to($user = new LocalizedRecipientStub)->send($this->mailable);
 
-        $this->fake->assertSent(function (MailableStub $mail) use ($user) {
+        $this->fake->assertSent(static function (MailableStub $mail) use ($user) {
             return $mail->hasTo($user);
         });
     }

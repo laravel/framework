@@ -64,7 +64,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard',
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -74,13 +74,13 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testSimpleAbilityAuthorized()
     {
-        $this->gate()->define('view-dashboard', function ($user) {
+        $this->gate()->define('view-dashboard', static function ($user) {
             return true;
         });
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard',
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -92,13 +92,13 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testSimpleAbilityWithStringParameter()
     {
-        $this->gate()->define('view-dashboard', function ($user, $param) {
+        $this->gate()->define('view-dashboard', static function ($user, $param) {
             return $param === 'some string';
         });
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard,"some string"',
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -118,7 +118,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard,null',
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -130,11 +130,11 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         $post = new stdClass;
 
-        $this->router->bind('post', function () use ($post) {
+        $this->router->bind('post', static function () use ($post) {
             return $post;
         });
 
-        $this->gate()->define('view-comments', function ($user, $model = null) {
+        $this->gate()->define('view-comments', static function ($user, $model = null) {
             return true;
         });
 
@@ -142,13 +142,13 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('comments', [
             'middleware' => $middleware,
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
         $this->router->get('posts/{post}/comments', [
             'middleware' => $middleware,
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -162,13 +162,13 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testSimpleAbilityWithStringParameterFromRouteParameter()
     {
-        $this->gate()->define('view-dashboard', function ($user, $param) {
+        $this->gate()->define('view-dashboard', static function ($user, $param) {
             return $param === 'true';
         });
 
         $this->router->get('dashboard/{route_parameter}', [
             'middleware' => Authorize::class.':view-dashboard,route_parameter',
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -191,7 +191,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('users/create', [
             'middleware' => [SubstituteBindings::class, Authorize::class.':create,App\User'],
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -209,7 +209,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('users/create', [
             'middleware' => Authorize::class.':create,App\User',
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -226,7 +226,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $post = new stdClass;
 
-        $this->router->bind('post', function () use ($post) {
+        $this->router->bind('post', static function () use ($post) {
             return $post;
         });
 
@@ -238,7 +238,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('posts/{post}/edit', [
             'middleware' => [SubstituteBindings::class, Authorize::class.':edit,post'],
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -250,7 +250,7 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         $post = new stdClass;
 
-        $this->router->bind('post', function () use ($post) {
+        $this->router->bind('post', static function () use ($post) {
             return $post;
         });
 
@@ -262,7 +262,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('posts/{post}/edit', [
             'middleware' => [SubstituteBindings::class, Authorize::class.':edit,post'],
-            'uses' => function () {
+            'uses' => static function () {
                 return 'success';
             },
         ]);
@@ -286,7 +286,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $nextParam = null;
 
-        $next = function ($param) use (&$nextParam) {
+        $next = static function ($param) use (&$nextParam) {
             $nextParam = $param;
         };
 

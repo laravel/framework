@@ -218,7 +218,7 @@ trait HasEvents
     protected function filterModelEventResults($result)
     {
         if (is_array($result)) {
-            $result = array_filter($result, function ($response) {
+            $result = array_filter($result, static function ($response) {
                 return ! is_null($response);
             });
         }

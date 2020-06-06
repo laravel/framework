@@ -456,7 +456,7 @@ class SessionStoreTest extends TestCase
     {
         $session = $this->getSession();
         $session->getHandler()->shouldReceive('get')->andReturn(null);
-        $result = $session->remember('foo', function () {
+        $result = $session->remember('foo', static function () {
             return 'bar';
         });
         $this->assertSame('bar', $session->get('foo'));

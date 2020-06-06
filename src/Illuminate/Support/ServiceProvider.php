@@ -175,7 +175,7 @@ abstract class ServiceProvider
      */
     protected function loadViewComponentsAs($prefix, array $components)
     {
-        $this->callAfterResolving(BladeCompiler::class, function ($blade) use ($prefix, $components) {
+        $this->callAfterResolving(BladeCompiler::class, static function ($blade) use ($prefix, $components) {
             foreach ($components as $alias => $component) {
                 $blade->component($component, is_string($alias) ? $alias : null, $prefix);
             }
@@ -191,7 +191,7 @@ abstract class ServiceProvider
      */
     protected function loadTranslationsFrom($path, $namespace)
     {
-        $this->callAfterResolving('translator', function ($translator) use ($path, $namespace) {
+        $this->callAfterResolving('translator', static function ($translator) use ($path, $namespace) {
             $translator->addNamespace($namespace, $path);
         });
     }
@@ -204,7 +204,7 @@ abstract class ServiceProvider
      */
     protected function loadJsonTranslationsFrom($path)
     {
-        $this->callAfterResolving('translator', function ($translator) use ($path) {
+        $this->callAfterResolving('translator', static function ($translator) use ($path) {
             $translator->addJsonPath($path);
         });
     }
@@ -217,7 +217,7 @@ abstract class ServiceProvider
      */
     protected function loadMigrationsFrom($paths)
     {
-        $this->callAfterResolving('migrator', function ($migrator) use ($paths) {
+        $this->callAfterResolving('migrator', static function ($migrator) use ($paths) {
             foreach ((array) $paths as $path) {
                 $migrator->path($path);
             }
@@ -234,7 +234,7 @@ abstract class ServiceProvider
      */
     protected function loadFactoriesFrom($paths)
     {
-        $this->callAfterResolving(ModelFactory::class, function ($factory) use ($paths) {
+        $this->callAfterResolving(ModelFactory::class, static function ($factory) use ($paths) {
             foreach ((array) $paths as $path) {
                 $factory->load($path);
             }
@@ -319,7 +319,7 @@ abstract class ServiceProvider
             return $paths;
         }
 
-        return collect(static::$publishes)->reduce(function ($paths, $p) {
+        return collect(static::$publishes)->reduce(static function ($paths, $p) {
             return array_merge($paths, $p);
         }, []);
     }
@@ -390,7 +390,7 @@ abstract class ServiceProvider
     {
         $commands = is_array($commands) ? $commands : func_get_args();
 
-        Artisan::starting(function ($artisan) use ($commands) {
+        Artisan::starting(static function ($artisan) use ($commands) {
             $artisan->resolveCommands($commands);
         });
     }

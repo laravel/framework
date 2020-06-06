@@ -30,13 +30,13 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
      */
     public function createSchema()
     {
-        $this->schema()->create('users', function ($table) {
+        $this->schema()->create('users', static function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->timestamps();
         });
 
-        $this->schema()->create('posts', function ($table) {
+        $this->schema()->create('posts', static function ($table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('title');
@@ -44,7 +44,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema()->create('comments', function ($table) {
+        $this->schema()->create('comments', static function ($table) {
             $table->increments('id');
             $table->integer('commentable_id');
             $table->string('commentable_type');
@@ -53,7 +53,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema()->create('likes', function ($table) {
+        $this->schema()->create('likes', static function ($table) {
             $table->increments('id');
             $table->integer('likeable_id');
             $table->string('likeable_type');

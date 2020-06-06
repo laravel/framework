@@ -18,12 +18,12 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->softDeletes();
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('commentable_type');
             $table->integer('commentable_id');
@@ -46,7 +46,7 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
 
     public function testWithoutGlobalScope()
     {
-        $comments = Comment::with(['commentable' => function ($query) {
+        $comments = Comment::with(['commentable' => static function ($query) {
             $query->withoutGlobalScopes([SoftDeletingScope::class]);
         }])->get();
 
@@ -56,7 +56,7 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
 
     public function testWithoutGlobalScopes()
     {
-        $comments = Comment::with(['commentable' => function ($query) {
+        $comments = Comment::with(['commentable' => static function ($query) {
             $query->withoutGlobalScopes();
         }])->get();
 

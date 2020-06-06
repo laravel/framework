@@ -11,7 +11,7 @@ class PipelineTest extends TestCase
 {
     public function testPipelineBasicUsage()
     {
-        $pipeTwo = function ($piped, $next) {
+        $pipeTwo = static function ($piped, $next) {
             $_SERVER['__test.pipe.two'] = $piped;
 
             return $next($piped);
@@ -20,7 +20,7 @@ class PipelineTest extends TestCase
         $result = (new Pipeline(new Container))
                     ->send('foo')
                     ->through([PipelineTestPipeOne::class, $pipeTwo])
-                    ->then(function ($piped) {
+                    ->then(static function ($piped) {
                         return $piped;
                     });
 
@@ -37,7 +37,7 @@ class PipelineTest extends TestCase
         $result = (new Pipeline(new Container))
             ->send('foo')
             ->through([new PipelineTestPipeOne])
-            ->then(function ($piped) {
+            ->then(static function ($piped) {
                 return $piped;
             });
 
@@ -53,7 +53,7 @@ class PipelineTest extends TestCase
             ->send('foo')
             ->through([new PipelineTestPipeTwo])
             ->then(
-                function ($piped) {
+                static function ($piped) {
                     return $piped;
                 }
             );
@@ -66,7 +66,7 @@ class PipelineTest extends TestCase
 
     public function testPipelineUsageWithCallable()
     {
-        $function = function ($piped, $next) {
+        $function = static function ($piped, $next) {
             $_SERVER['__test.pipe.one'] = 'foo';
 
             return $next($piped);
@@ -76,7 +76,7 @@ class PipelineTest extends TestCase
             ->send('foo')
             ->through([$function])
             ->then(
-                function ($piped) {
+                static function ($piped) {
                     return $piped;
                 }
             );
@@ -103,7 +103,7 @@ class PipelineTest extends TestCase
             ->send('foo')
             ->through([PipelineTestPipeTwo::class])
             ->then(
-                function ($piped) {
+                static function ($piped) {
                     return $piped;
                 }
             );
@@ -121,7 +121,7 @@ class PipelineTest extends TestCase
         $result = (new Pipeline(new Container))
             ->send('foo')
             ->through(PipelineTestParameterPipe::class.':'.implode(',', $parameters))
-            ->then(function ($piped) {
+            ->then(static function ($piped) {
                 return $piped;
             });
 
@@ -137,7 +137,7 @@ class PipelineTest extends TestCase
         $result = $pipelineInstance->send('data')
             ->through(PipelineTestPipeOne::class)
             ->via('differentMethod')
-            ->then(function ($piped) {
+            ->then(static function ($piped) {
                 return $piped;
             });
         $this->assertSame('data', $result);
@@ -150,7 +150,7 @@ class PipelineTest extends TestCase
 
         (new Pipeline)->send('data')
             ->through(PipelineTestPipeOne::class)
-            ->then(function ($piped) {
+            ->then(static function ($piped) {
                 return $piped;
             });
     }

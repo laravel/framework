@@ -34,20 +34,20 @@ class ConcurrentLimiterTest extends TestCase
         $store = [];
 
         foreach (range(1, 2) as $i) {
-            (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 2, 5))->block(2, function () use (&$store, $i) {
+            (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 2, 5))->block(2, static function () use (&$store, $i) {
                 $store[] = $i;
             });
         }
 
         try {
-            (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 2, 5))->block(0, function () use (&$store) {
+            (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 2, 5))->block(0, static function () use (&$store) {
                 $store[] = 3;
             });
         } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
-        (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'other_key', 2, 5))->block(2, function () use (&$store) {
+        (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'other_key', 2, 5))->block(2, static function () use (&$store) {
             $store[] = 4;
         });
 
@@ -59,7 +59,7 @@ class ConcurrentLimiterTest extends TestCase
         $store = [];
 
         foreach (range(1, 4) as $i) {
-            (new ConcurrencyLimiter($this->redis(), 'key', 2, 5))->block(2, function () use (&$store, $i) {
+            (new ConcurrencyLimiter($this->redis(), 'key', 2, 5))->block(2, static function () use (&$store, $i) {
                 $store[] = $i;
             });
         }
@@ -73,12 +73,12 @@ class ConcurrentLimiterTest extends TestCase
 
         $lock = (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 1));
 
-        $lock->block(2, function () use (&$store) {
+        $lock->block(2, static function () use (&$store) {
             $store[] = 1;
         });
 
         try {
-            $lock->block(0, function () use (&$store) {
+            $lock->block(0, static function () use (&$store) {
                 $store[] = 2;
             });
         } catch (Throwable $e) {
@@ -87,7 +87,7 @@ class ConcurrentLimiterTest extends TestCase
 
         usleep(1.2 * 1000000);
 
-        $lock->block(0, function () use (&$store) {
+        $lock->block(0, static function () use (&$store) {
             $store[] = 3;
         });
 
@@ -100,19 +100,19 @@ class ConcurrentLimiterTest extends TestCase
 
         $lock = (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 2));
 
-        $lock->block(2, function () use (&$store) {
+        $lock->block(2, static function () use (&$store) {
             $store[] = 1;
         });
 
         try {
-            $lock->block(0, function () use (&$store) {
+            $lock->block(0, static function () use (&$store) {
                 $store[] = 2;
             });
         } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
-        $lock->block(3, function () use (&$store) {
+        $lock->block(3, static function () use (&$store) {
             $store[] = 3;
         });
 
@@ -125,12 +125,12 @@ class ConcurrentLimiterTest extends TestCase
 
         $lock = (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 10));
 
-        $lock->block(2, function () use (&$store) {
+        $lock->block(2, static function () use (&$store) {
             $store[] = 1;
         });
 
         try {
-            $lock->block(2, function () use (&$store) {
+            $lock->block(2, static function () use (&$store) {
                 $store[] = 2;
             });
         } catch (Throwable $e) {

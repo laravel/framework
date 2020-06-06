@@ -17,11 +17,11 @@ class EloquentModelLoadMissingTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('parent_id')->nullable();
             $table->unsignedInteger('post_id');

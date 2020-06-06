@@ -82,7 +82,7 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
     {
         foreach ($conditions as $key => $value) {
             if ($value instanceof Closure) {
-                $query->where(function ($query) use ($value) {
+                $query->where(static function ($query) use ($value) {
                     $value($query);
                 });
             } else {

@@ -18,26 +18,26 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('slug')->nullable();
             $table->integer('team_id')->nullable();
             $table->string('name');
         });
 
-        Schema::create('teams', function (Blueprint $table) {
+        Schema::create('teams', static function (Blueprint $table) {
             $table->increments('id');
             $table->integer('owner_id')->nullable();
             $table->string('owner_slug')->nullable();
         });
 
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('categories', static function (Blueprint $table) {
             $table->increments('id');
             $table->integer('parent_id')->nullable();
             $table->softDeletes();
         });
 
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('products', static function (Blueprint $table) {
             $table->increments('id');
             $table->integer('category_id');
         });
@@ -158,7 +158,7 @@ class UserWithGlobalScope extends Model
     {
         parent::boot();
 
-        static::addGlobalScope(function ($query) {
+        static::addGlobalScope(static function ($query) {
             $query->select('users.id');
         });
     }

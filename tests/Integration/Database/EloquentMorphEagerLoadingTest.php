@@ -17,20 +17,20 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('post_id');
             $table->unsignedInteger('user_id');
         });
 
-        Schema::create('videos', function (Blueprint $table) {
+        Schema::create('videos', static function (Blueprint $table) {
             $table->increments('video_id');
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('commentable_type');
             $table->integer('commentable_id');
@@ -49,7 +49,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     public function testWithMorphLoading()
     {
         $comments = Comment::query()
-            ->with(['commentable' => function (MorphTo $morphTo) {
+            ->with(['commentable' => static function (MorphTo $morphTo) {
                 $morphTo->morphWith([Post::class => ['user']]);
             }])
             ->get();
@@ -62,7 +62,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     public function testWithMorphLoadingWithSingleRelation()
     {
         $comments = Comment::query()
-            ->with(['commentable' => function (MorphTo $morphTo) {
+            ->with(['commentable' => static function (MorphTo $morphTo) {
                 $morphTo->morphWith([Post::class => 'user']);
             }])
             ->get();

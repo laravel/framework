@@ -34,18 +34,18 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
 
     protected function createSchema()
     {
-        $this->schema('default')->create('users', function ($table) {
+        $this->schema('default')->create('users', static function ($table) {
             $table->increments('id');
             $table->string('email');
             $table->timestamps();
         });
 
-        $this->schema('default')->create('friends', function ($table) {
+        $this->schema('default')->create('friends', static function ($table) {
             $table->integer('user_id');
             $table->integer('friend_id');
         });
 
-        $this->schema('default')->create('posts', function ($table) {
+        $this->schema('default')->create('posts', static function ($table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->integer('parent_id')->nullable();
@@ -53,7 +53,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema('default')->create('photos', function ($table) {
+        $this->schema('default')->create('photos', static function ($table) {
             $table->increments('id');
             $table->morphs('imageable');
             $table->string('name');

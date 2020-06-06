@@ -35,7 +35,7 @@ class EloquentModelStringCastingTest extends TestCase
      */
     public function createSchema()
     {
-        $this->schema()->create('casting_table', function (Blueprint $table) {
+        $this->schema()->create('casting_table', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('array_attributes');
             $table->string('json_attributes');

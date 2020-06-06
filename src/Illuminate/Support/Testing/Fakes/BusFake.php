@@ -211,11 +211,11 @@ class BusFake implements QueueingDispatcher
             return collect();
         }
 
-        $callback = $callback ?: function () {
+        $callback = $callback ?: static function () {
             return true;
         };
 
-        return collect($this->commands[$command])->filter(function ($command) use ($callback) {
+        return collect($this->commands[$command])->filter(static function ($command) use ($callback) {
             return $callback($command);
         });
     }
@@ -233,11 +233,11 @@ class BusFake implements QueueingDispatcher
             return collect();
         }
 
-        $callback = $callback ?: function () {
+        $callback = $callback ?: static function () {
             return true;
         };
 
-        return collect($this->commandsAfterResponse[$command])->filter(function ($command) use ($callback) {
+        return collect($this->commandsAfterResponse[$command])->filter(static function ($command) use ($callback) {
             return $callback($command);
         });
     }
@@ -407,7 +407,7 @@ class BusFake implements QueueingDispatcher
         }
 
         return collect($this->jobsToFake)
-            ->filter(function ($job) use ($command) {
+            ->filter(static function ($job) use ($command) {
                 return $job instanceof Closure
                             ? $job($command)
                             : $job === get_class($command);

@@ -13,7 +13,7 @@ class ResponsableTest extends TestCase
 {
     public function testResponsableObjectsAreRendered()
     {
-        Route::get('/responsable', function () {
+        Route::get('/responsable', static function () {
             return new TestResponsableResponse;
         });
 

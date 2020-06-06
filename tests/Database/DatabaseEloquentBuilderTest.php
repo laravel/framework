@@ -252,7 +252,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
 
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+        $builder->chunk(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         });
     }
@@ -272,7 +272,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+        $builder->chunk(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         });
     }
@@ -292,7 +292,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+        $builder->chunk(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
 
             return false;
@@ -311,7 +311,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->never();
 
-        $builder->chunk(0, function ($results) use ($callbackAssertor) {
+        $builder->chunk(0, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         });
     }
@@ -334,7 +334,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
 
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+        $builder->chunkById(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         }, 'someIdField');
     }
@@ -354,7 +354,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+        $builder->chunkById(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         }, 'someIdField');
     }
@@ -371,7 +371,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->never();
 
-        $builder->chunkById(0, function ($results) use ($callbackAssertor) {
+        $builder->chunkById(0, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         }, 'someIdField');
     }
@@ -435,7 +435,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             m::mock(Grammar::class),
             m::mock(Processor::class)
         ));
-        $builder->macro('fooBar', function ($builder) {
+        $builder->macro('fooBar', static function ($builder) {
             $_SERVER['__test.builder'] = $builder;
 
             return $builder;
@@ -489,10 +489,10 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testEagerLoadRelationsLoadTopLevelRelationships()
     {
         $builder = m::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
-        $nop1 = function () {
+        $nop1 = static function () {
             //
         };
-        $nop2 = function () {
+        $nop2 = static function () {
             //
         };
         $builder->setEagerLoads(['foo' => $nop1, 'foo.bar' => $nop2]);
@@ -505,7 +505,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testRelationshipEagerLoadProcess()
     {
         $builder = m::mock(Builder::class.'[getRelation]', [$this->getMockQueryBuilder()]);
-        $builder->setEagerLoads(['orders' => function ($query) {
+        $builder->setEagerLoads(['orders' => static function ($query) {
             $_SERVER['__eloquent.constrain'] = $query;
         }]);
         $relation = m::mock(stdClass::class);
@@ -591,7 +591,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertInstanceOf(Closure::class, $eagers['orders.lines']);
 
         $builder = $this->getBuilder();
-        $builder->with(['orders' => function () {
+        $builder->with(['orders' => static function () {
             return 'foo';
         }]);
         $eagers = $builder->getEagerLoads();
@@ -599,7 +599,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('foo', $eagers['orders']());
 
         $builder = $this->getBuilder();
-        $builder->with(['orders.lines' => function () {
+        $builder->with(['orders.lines' => static function () {
             return 'foo';
         }]);
         $eagers = $builder->getEagerLoads();
@@ -681,7 +681,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'and');
         $nestedQuery->shouldReceive('foo')->once();
 
-        $result = $builder->where(function ($query) {
+        $result = $builder->where(static function ($query) {
             $query->foo();
         });
         $this->assertEquals($builder, $result);
@@ -691,7 +691,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) {
+        $query = $model->newQuery()->where('foo', '=', 'bar')->where(static function ($query) {
             $query->where('baz', '>', 9000);
         });
         $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
@@ -702,7 +702,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) {
+        $query = $model->newQuery()->where('foo', '=', 'bar')->where(static function ($query) {
             $query->where('baz', '>', 9000)->onlyTrashed();
         })->withTrashed();
         $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ? and "table"."deleted_at" is not null)', $query->toSql());
@@ -713,7 +713,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->empty()->where('foo', '=', 'bar')->empty()->where(function ($query) {
+        $query = $model->newQuery()->empty()->where('foo', '=', 'bar')->empty()->where(static function ($query) {
             $query->empty()->where('baz', '>', 9000);
         });
         $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
@@ -755,7 +755,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testDeleteOverride()
     {
         $builder = $this->getBuilder();
-        $builder->onDelete(function ($builder) {
+        $builder->onDelete(static function ($builder) {
             return ['foo' => $builder];
         });
         $this->assertEquals(['foo' => $builder], $builder->delete());
@@ -783,7 +783,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->select('id')->withCount(['activeFoo' => function ($q) {
+        $builder = $model->select('id')->withCount(['activeFoo' => static function ($q) {
             $q->where('bam', '>', 'qux');
         }]);
 
@@ -794,14 +794,14 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWithCountAndGlobalScope()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', function ($query) {
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', static function ($query) {
             return $query->addSelect('id');
         });
 
         $builder = $model->select('id')->withCount(['foo']);
 
         // Remove the global scope so it doesn't interfere with any other tests
-        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', function ($query) {
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', static function ($query) {
             //
         });
 
@@ -813,7 +813,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestModelParentStub;
 
         $builder = $model->where('bar', 'baz');
-        $builder->withCount(['foo' => function ($q) {
+        $builder->withCount(['foo' => static function ($q) {
             $q->where('bam', '>', 'qux');
         }])->having('foo_count', '>=', 1);
 
@@ -844,7 +844,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestModelParentStub;
 
         $builder = $model->where('bar', 'baz');
-        $builder->whereHas('foo', function ($q) {
+        $builder->whereHas('foo', static function ($q) {
             $q->having('bam', '>', 'qux');
         })->where('quux', 'quuux');
 
@@ -857,7 +857,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestModelParentStub;
 
         $builder = $model->where('name', 'larry');
-        $builder->whereHas('address', function ($q) {
+        $builder->whereHas('address', static function ($q) {
             $q->where('zipcode', '90210');
             $q->orWhere('zipcode', '90220');
             $q->having('street', '=', 'fooside dr');
@@ -871,8 +871,8 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
         $builder = $model->where('bar', 'baz');
-        $builder->whereHas('foo', function ($q) {
-            $q->join('quuuux', function ($j) {
+        $builder->whereHas('foo', static function ($q) {
+            $q->join('quuuux', static function ($j) {
                 $j->where('quuuuux', '=', 'quuuuuux');
             });
             $q->having('bam', '>', 'qux');
@@ -887,7 +887,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestModelParentStub;
 
         $builder = $model->where('bar', 'baz');
-        $builder->whereHas('foo', function ($q) {
+        $builder->whereHas('foo', static function ($q) {
             $q->having('bam', '>', 'qux');
         }, '>=', 2)->where('quux', 'quuux');
 
@@ -900,7 +900,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestModelParentStub;
 
         $builder = $model->newQuery();
-        $builder->withCount(['foo' => function ($q) use ($model) {
+        $builder->withCount(['foo' => static function ($q) use ($model) {
             $q->selectSub($model->newQuery()->where('bam', '=', 3)->selectRaw('count(0)'), 'bam_3_count');
         }]);
 
@@ -912,13 +912,13 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->whereHas('foo', function ($q) {
-            $q->whereHas('bar', function ($q) {
+        $builder = $model->whereHas('foo', static function ($q) {
+            $q->whereHas('bar', static function ($q) {
                 $q->where('baz', 'bam');
             });
         })->toSql();
 
-        $result = $model->whereHas('foo.bar', function ($q) {
+        $result = $model->whereHas('foo.bar', static function ($q) {
             $q->where('baz', 'bam');
         })->toSql();
 
@@ -929,7 +929,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->whereHas('foo', function ($q) {
+        $builder = $model->whereHas('foo', static function ($q) {
             $q->has('bar');
         });
 
@@ -942,9 +942,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->whereHas('foo', function ($q) {
+        $builder = $model->whereHas('foo', static function ($q) {
             $q->has('bar');
-        })->orWhereHas('foo', function ($q) {
+        })->orWhereHas('foo', static function ($q) {
             $q->has('baz');
         });
 
@@ -957,7 +957,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelSelfRelatedStub;
 
-        $nestedSql = $model->whereHas('parentFoo', function ($q) {
+        $nestedSql = $model->whereHas('parentFoo', static function ($q) {
             $q->has('childFoo');
         })->toSql();
 
@@ -1020,7 +1020,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->whereDoesntHave('foo', function ($query) {
+        $builder = $model->whereDoesntHave('foo', static function ($query) {
             $query->where('bar', 'baz');
         });
 
@@ -1032,7 +1032,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->where('bar', 'baz')->orWhereDoesntHave('foo', function ($query) {
+        $builder = $model->where('bar', 'baz')->orWhereDoesntHave('foo', static function ($query) {
             $query->where('qux', 'quux');
         });
 
@@ -1272,7 +1272,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $grammar = new $grammarClass;
         $processor = new $processorClass;
         $connection = m::mock(ConnectionInterface::class, ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
-        $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
+        $connection->shouldReceive('query')->andReturnUsing(static function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });
         $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);

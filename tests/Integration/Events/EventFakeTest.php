@@ -39,7 +39,7 @@ class EventFakeTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
             $table->string('slug')->unique();
@@ -76,13 +76,13 @@ class EventFakeTest extends TestCase
     public function testNonFakedEventGetsProperlyDispatchedAndReturnsResponses()
     {
         Event::fake(NonImportantEvent::class);
-        Event::listen('test', function () {
+        Event::listen('test', static function () {
             // one
         });
-        Event::listen('test', function () {
+        Event::listen('test', static function () {
             return 'two';
         });
-        Event::listen('test', function () {
+        Event::listen('test', static function () {
             //
         });
 
@@ -94,10 +94,10 @@ class EventFakeTest extends TestCase
     public function testNonFakedEventGetsProperlyDispatchedAndCancelsFutureListeners()
     {
         Event::fake(NonImportantEvent::class);
-        Event::listen('test', function () {
+        Event::listen('test', static function () {
             // one
         });
-        Event::listen('test', function () {
+        Event::listen('test', static function () {
             return false;
         });
         Event::listen('test', function () {
@@ -112,10 +112,10 @@ class EventFakeTest extends TestCase
     public function testNonFakedHaltedEventGetsProperlyDispatchedAndReturnsResponse()
     {
         Event::fake(NonImportantEvent::class);
-        Event::listen('test', function () {
+        Event::listen('test', static function () {
             // one
         });
-        Event::listen('test', function () {
+        Event::listen('test', static function () {
             return 'two';
         });
         Event::listen('test', function () {

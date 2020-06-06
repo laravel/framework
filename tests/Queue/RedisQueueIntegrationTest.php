@@ -233,7 +233,7 @@ class RedisQueueIntegrationTest extends TestCase
      */
     public function testBlockingPopProperlyPopsExpiredJobs($driver)
     {
-        Str::createUuidsUsing(function () {
+        Str::createUuidsUsing(static function () {
             return 'uuid';
         });
 

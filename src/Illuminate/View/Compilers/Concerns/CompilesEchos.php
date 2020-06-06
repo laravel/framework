@@ -43,7 +43,7 @@ trait CompilesEchos
     {
         $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->rawTags[0], $this->rawTags[1]);
 
-        $callback = function ($matches) {
+        $callback = static function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
             return $matches[1] ? substr($matches[0], 1) : "<?php echo {$matches[2]}; ?>{$whitespace}";
@@ -83,7 +83,7 @@ trait CompilesEchos
     {
         $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
 
-        $callback = function ($matches) {
+        $callback = static function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
             return $matches[1] ? $matches[0] : "<?php echo e({$matches[2]}); ?>{$whitespace}";

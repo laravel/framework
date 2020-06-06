@@ -39,7 +39,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerRouter()
     {
-        $this->app->singleton('router', function ($app) {
+        $this->app->singleton('router', static function ($app) {
             return new Router($app['events'], $app);
         });
     }
@@ -81,7 +81,7 @@ class RoutingServiceProvider extends ServiceProvider
             // If the route collection is "rebound", for example, when the routes stay
             // cached for the application, we will need to rebind the routes on the
             // URL generator instance so it has the latest version of the routes.
-            $app->rebinding('routes', function ($app, $routes) {
+            $app->rebinding('routes', static function ($app, $routes) {
                 $app['url']->setRoutes($routes);
             });
 
@@ -96,7 +96,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function requestRebinder()
     {
-        return function ($app, $request) {
+        return static function ($app, $request) {
             $app['url']->setRequest($request);
         };
     }
@@ -108,7 +108,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerRedirector()
     {
-        $this->app->singleton('redirect', function ($app) {
+        $this->app->singleton('redirect', static function ($app) {
             $redirector = new Redirector($app['url']);
 
             // If the session is set on the application instance, we'll inject it into
@@ -129,7 +129,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerPsrRequest()
     {
-        $this->app->bind(ServerRequestInterface::class, function ($app) {
+        $this->app->bind(ServerRequestInterface::class, static function ($app) {
             if (class_exists(Psr17Factory::class) && class_exists(PsrHttpFactory::class)) {
                 $psr17Factory = new Psr17Factory;
 
@@ -148,7 +148,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerPsrResponse()
     {
-        $this->app->bind(ResponseInterface::class, function () {
+        $this->app->bind(ResponseInterface::class, static function () {
             if (class_exists(PsrResponse::class)) {
                 return new PsrResponse;
             }
@@ -164,7 +164,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerResponseFactory()
     {
-        $this->app->singleton(ResponseFactoryContract::class, function ($app) {
+        $this->app->singleton(ResponseFactoryContract::class, static function ($app) {
             return new ResponseFactory($app[ViewFactoryContract::class], $app['redirect']);
         });
     }
@@ -176,7 +176,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerControllerDispatcher()
     {
-        $this->app->singleton(ControllerDispatcherContract::class, function ($app) {
+        $this->app->singleton(ControllerDispatcherContract::class, static function ($app) {
             return new ControllerDispatcher($app);
         });
     }

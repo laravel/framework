@@ -16,12 +16,12 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('commentable_type');
             $table->integer('commentable_id');
@@ -40,7 +40,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
 
     public function testSelectRaw()
     {
-        $comments = Comment::with(['commentable' => function ($query) {
+        $comments = Comment::with(['commentable' => static function ($query) {
             $query->selectRaw('id');
         }])->get();
 
@@ -49,8 +49,8 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
 
     public function testSelectSub()
     {
-        $comments = Comment::with(['commentable' => function ($query) {
-            $query->selectSub(function ($query) {
+        $comments = Comment::with(['commentable' => static function ($query) {
+            $query->selectSub(static function ($query) {
                 $query->select('id');
             }, 'id');
         }])->get();
@@ -60,7 +60,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
 
     public function testAddSelect()
     {
-        $comments = Comment::with(['commentable' => function ($query) {
+        $comments = Comment::with(['commentable' => static function ($query) {
             $query->addSelect('id');
         }])->get();
 

@@ -281,7 +281,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testTapCallback()
     {
-        $callback = function ($query) {
+        $callback = static function ($query) {
             return $query->where('id', '=', 1);
         };
 
@@ -938,7 +938,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users');
-        $builder->union($this->getBuilder()->select('*')->from('dogs')->join('breeds', function ($join) {
+        $builder->union($this->getBuilder()->select('*')->from('dogs')->join('breeds', static function ($join) {
             $join->on('dogs.breed_id', '=', 'breeds.id')
                 ->where('breeds.is_native', '=', 1);
         }));
@@ -1001,14 +1001,14 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSubSelectWhereIns()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereIn('id', function ($q) {
+        $builder->select('*')->from('users')->whereIn('id', static function ($q) {
             $q->select('id')->from('users')->where('age', '>', 25)->take(3);
         });
         $this->assertSame('select * from "users" where "id" in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
         $this->assertEquals([25], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereNotIn('id', function ($q) {
+        $builder->select('*')->from('users')->whereNotIn('id', static function ($q) {
             $q->select('id')->from('users')->where('age', '>', 25)->take(3);
         });
         $this->assertSame('select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
@@ -1170,7 +1170,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testOrderBySubQueries()
     {
         $expected = 'select * from "users" order by (select "created_at" from "logins" where "user_id" = "users"."id" limit 1)';
-        $subQuery = function ($query) {
+        $subQuery = static function ($query) {
             return $query->select('created_at')->from('logins')->whereColumn('user_id', 'users.id')->limit(1);
         };
 
@@ -1244,7 +1244,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?';
         $builder->getConnection()->shouldReceive('select')->once()->with($query, ['popular', 3], true)->andReturn([['category' => 'rock', 'total' => 5]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
         $builder->from('item');
@@ -1255,7 +1255,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3';
         $builder->getConnection()->shouldReceive('select')->once()->with($query, ['popular'], true)->andReturn([['category' => 'rock', 'total' => 5]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
         $builder->from('item');
@@ -1327,12 +1327,12 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testGetCountForPaginationWithBindings()
     {
         $builder = $this->getBuilder();
-        $builder->from('users')->selectSub(function ($q) {
+        $builder->from('users')->selectSub(static function ($q) {
             $q->select('body')->from('posts')->where('id', 4);
         }, 'post');
 
         $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
 
@@ -1348,7 +1348,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('posts')->select($columns);
 
         $builder->getConnection()->shouldReceive('select')->once()->with('select count("body", "teaser", "posts"."created") as aggregate from "posts"', [], true)->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
 
@@ -1362,7 +1362,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('posts')->select('id')->union($this->getBuilder()->from('videos')->select('id'));
 
         $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true)->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
 
@@ -1399,7 +1399,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testNestedWheres()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where('email', '=', 'foo')->orWhere(function ($q) {
+        $builder->select('*')->from('users')->where('email', '=', 'foo')->orWhere(static function ($q) {
             $q->where('name', '=', 'bar')->where('age', '=', 25);
         });
         $this->assertSame('select * from "users" where "email" = ? or ("name" = ? and "age" = ?)', $builder->toSql());
@@ -1409,7 +1409,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testNestedWhereBindings()
     {
         $builder = $this->getBuilder();
-        $builder->where('email', '=', 'foo')->where(function ($q) {
+        $builder->where('email', '=', 'foo')->where(static function ($q) {
             $q->selectRaw('?', ['ignore'])->where('name', '=', 'bar');
         });
         $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
@@ -1418,7 +1418,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testFullSubSelects()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where('email', '=', 'foo')->orWhere('id', '=', function ($q) {
+        $builder->select('*')->from('users')->where('email', '=', 'foo')->orWhere('id', '=', static function ($q) {
             $q->select(new Raw('max(id)'))->from('users')->where('email', '=', 'bar');
         });
 
@@ -1429,25 +1429,25 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereExists()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('orders')->whereExists(function ($q) {
+        $builder->select('*')->from('orders')->whereExists(static function ($q) {
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertSame('select * from "orders" where exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('orders')->whereNotExists(function ($q) {
+        $builder->select('*')->from('orders')->whereNotExists(static function ($q) {
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertSame('select * from "orders" where not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereExists(function ($q) {
+        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereExists(static function ($q) {
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertSame('select * from "orders" where "id" = ? or exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereNotExists(function ($q) {
+        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereNotExists(static function ($q) {
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertSame('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
@@ -1487,13 +1487,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testComplexJoin()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->on('users.id', '=', 'contacts.id')->orOn('users.name', '=', 'contacts.name');
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "users"."name" = "contacts"."name"', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->where('users.id', '=', 'foo')->orWhere('users.name', '=', 'bar');
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
@@ -1507,13 +1507,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinWhereNull()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->on('users.id', '=', 'contacts.id')->whereNull('contacts.deleted_at');
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is null', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->on('users.id', '=', 'contacts.id')->orWhereNull('contacts.deleted_at');
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."deleted_at" is null', $builder->toSql());
@@ -1522,13 +1522,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinWhereNotNull()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->on('users.id', '=', 'contacts.id')->whereNotNull('contacts.deleted_at');
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is not null', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->on('users.id', '=', 'contacts.id')->orWhereNotNull('contacts.deleted_at');
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."deleted_at" is not null', $builder->toSql());
@@ -1537,14 +1537,14 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinWhereIn()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->on('users.id', '=', 'contacts.id')->whereIn('contacts.name', [48, 'baz', null]);
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."name" in (?, ?, ?)', $builder->toSql());
         $this->assertEquals([48, 'baz', null], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->on('users.id', '=', 'contacts.id')->orWhereIn('contacts.name', [48, 'baz', null]);
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."name" in (?, ?, ?)', $builder->toSql());
@@ -1575,14 +1575,14 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinWhereNotIn()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->on('users.id', '=', 'contacts.id')->whereNotIn('contacts.name', [48, 'baz', null]);
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."name" not in (?, ?, ?)', $builder->toSql());
         $this->assertEquals([48, 'baz', null], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function ($j) {
+        $builder->select('*')->from('users')->join('contacts', static function ($j) {
             $j->on('users.id', '=', 'contacts.id')->orWhereNotIn('contacts.name', [48, 'baz', null]);
         });
         $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."name" not in (?, ?, ?)', $builder->toSql());
@@ -1592,8 +1592,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinsWithNestedConditions()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
-            $j->on('users.id', '=', 'contacts.id')->where(function ($j) {
+        $builder->select('*')->from('users')->leftJoin('contacts', static function ($j) {
+            $j->on('users.id', '=', 'contacts.id')->where(static function ($j) {
                 $j->where('contacts.country', '=', 'US')->orWhere('contacts.is_partner', '=', 1);
             });
         });
@@ -1601,11 +1601,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['US', 1], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
-            $j->on('users.id', '=', 'contacts.id')->where('contacts.is_active', '=', 1)->orOn(function ($j) {
-                $j->orWhere(function ($j) {
+        $builder->select('*')->from('users')->leftJoin('contacts', static function ($j) {
+            $j->on('users.id', '=', 'contacts.id')->where('contacts.is_active', '=', 1)->orOn(static function ($j) {
+                $j->orWhere(static function ($j) {
                     $j->where('contacts.country', '=', 'UK')->orOn('contacts.type', '=', 'users.type');
-                })->where(function ($j) {
+                })->where(static function ($j) {
                     $j->where('contacts.country', '=', 'US')->orWhereNull('contacts.is_partner');
                 });
             });
@@ -1617,8 +1617,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinsWithAdvancedConditions()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
-            $j->on('users.id', 'contacts.id')->where(function ($j) {
+        $builder->select('*')->from('users')->leftJoin('contacts', static function ($j) {
+            $j->on('users.id', 'contacts.id')->where(static function ($j) {
                 $j->whereRole('admin')
                     ->orWhereNull('contacts.disabled')
                     ->orWhereRaw('year(contacts.created_at) = 2016');
@@ -1631,8 +1631,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinsWithSubqueryCondition()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
-            $j->on('users.id', 'contacts.id')->whereIn('contact_type_id', function ($q) {
+        $builder->select('*')->from('users')->leftJoin('contacts', static function ($j) {
+            $j->on('users.id', 'contacts.id')->whereIn('contact_type_id', static function ($q) {
                 $q->select('id')->from('contact_types')
                     ->where('category_id', '1')
                     ->whereNull('deleted_at');
@@ -1642,8 +1642,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['1'], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
-            $j->on('users.id', 'contacts.id')->whereExists(function ($q) {
+        $builder->select('*')->from('users')->leftJoin('contacts', static function ($j) {
+            $j->on('users.id', 'contacts.id')->whereExists(static function ($q) {
                 $q->selectRaw('1')->from('contact_types')
                     ->whereRaw('contact_types.id = contacts.contact_type_id')
                     ->where('category_id', '1')
@@ -1657,13 +1657,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinsWithAdvancedSubqueryCondition()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
-            $j->on('users.id', 'contacts.id')->whereExists(function ($q) {
+        $builder->select('*')->from('users')->leftJoin('contacts', static function ($j) {
+            $j->on('users.id', 'contacts.id')->whereExists(static function ($q) {
                 $q->selectRaw('1')->from('contact_types')
                     ->whereRaw('contact_types.id = contacts.contact_type_id')
                     ->where('category_id', '1')
                     ->whereNull('deleted_at')
-                    ->whereIn('level_id', function ($q) {
+                    ->whereIn('level_id', static function ($q) {
                         $q->select('id')->from('levels')
                             ->where('is_active', true);
                     });
@@ -1676,7 +1676,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinsWithNestedJoins()
     {
         $builder = $this->getBuilder();
-        $builder->select('users.id', 'contacts.id', 'contact_types.id')->from('users')->leftJoin('contacts', function ($j) {
+        $builder->select('users.id', 'contacts.id', 'contact_types.id')->from('users')->leftJoin('contacts', static function ($j) {
             $j->on('users.id', 'contacts.id')->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id');
         });
         $this->assertSame('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id") on "users"."id" = "contacts"."id"', $builder->toSql());
@@ -1685,12 +1685,12 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinsWithMultipleNestedJoins()
     {
         $builder = $this->getBuilder();
-        $builder->select('users.id', 'contacts.id', 'contact_types.id', 'countrys.id', 'planets.id')->from('users')->leftJoin('contacts', function ($j) {
+        $builder->select('users.id', 'contacts.id', 'contact_types.id', 'countrys.id', 'planets.id')->from('users')->leftJoin('contacts', static function ($j) {
             $j->on('users.id', 'contacts.id')
                 ->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id')
-                ->leftJoin('countrys', function ($q) {
+                ->leftJoin('countrys', static function ($q) {
                     $q->on('contacts.country', '=', 'countrys.country')
-                        ->join('planets', function ($q) {
+                        ->join('planets', static function ($q) {
                             $q->on('countrys.planet_id', '=', 'planet.id')
                                 ->where('planet.is_settled', '=', 1)
                                 ->where('planet.population', '>=', 10000);
@@ -1704,13 +1704,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinsWithNestedJoinWithAdvancedSubqueryCondition()
     {
         $builder = $this->getBuilder();
-        $builder->select('users.id', 'contacts.id', 'contact_types.id')->from('users')->leftJoin('contacts', function ($j) {
+        $builder->select('users.id', 'contacts.id', 'contact_types.id')->from('users')->leftJoin('contacts', static function ($j) {
             $j->on('users.id', 'contacts.id')
                 ->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id')
-                ->whereExists(function ($q) {
+                ->whereExists(static function ($q) {
                     $q->select('*')->from('countrys')
                         ->whereColumn('contacts.country', '=', 'countrys.country')
-                        ->join('planets', function ($q) {
+                        ->join('planets', static function ($q) {
                             $q->on('countrys.planet_id', '=', 'planet.id')
                                 ->where('planet.is_settled', '=', 1);
                         })
@@ -1728,7 +1728,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" inner join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->from('users')->joinSub(function ($q) {
+        $builder->from('users')->joinSub(static function ($q) {
             $q->from('contacts');
         }, 'sub', 'users.id', '=', 'sub.id');
         $this->assertSame('select * from "users" inner join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
@@ -1796,7 +1796,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', [1], true)->andReturn([['foo' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(static function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->find(1);
@@ -1807,7 +1807,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', [1], true)->andReturn([['foo' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(static function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->first();
@@ -1818,7 +1818,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn([['foo' => 'bar'], ['foo' => 'baz']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(function ($query, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(static function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->pluck('foo');
@@ -1826,7 +1826,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn([['id' => 1, 'foo' => 'bar'], ['id' => 10, 'foo' => 'baz']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['id' => 1, 'foo' => 'bar'], ['id' => 10, 'foo' => 'baz']])->andReturnUsing(function ($query, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['id' => 1, 'foo' => 'bar'], ['id' => 10, 'foo' => 'baz']])->andReturnUsing(static function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->pluck('foo', 'id');
@@ -1838,7 +1838,7 @@ class DatabaseQueryBuilderTest extends TestCase
         // Test without glue.
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn([['foo' => 'bar'], ['foo' => 'baz']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(function ($query, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(static function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->implode('foo');
@@ -1847,7 +1847,7 @@ class DatabaseQueryBuilderTest extends TestCase
         // Test with glue.
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn([['foo' => 'bar'], ['foo' => 'baz']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(function ($query, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(static function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->implode('foo', ',');
@@ -1867,7 +1867,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
         $results = $builder->from('users')->count();
@@ -1885,7 +1885,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select max("id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
         $results = $builder->from('users')->max('id');
@@ -1893,7 +1893,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
         $results = $builder->from('users')->min('id');
@@ -1901,7 +1901,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
         $results = $builder->from('users')->sum('id');
@@ -1920,13 +1920,13 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 1]]);
-        $results = $builder->from('users')->doesntExistOr(function () {
+        $results = $builder->from('users')->doesntExistOr(static function () {
             return 123;
         });
         $this->assertSame(123, $results);
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 0]]);
-        $results = $builder->from('users')->doesntExistOr(function () {
+        $results = $builder->from('users')->doesntExistOr(static function () {
             throw new RuntimeException();
         });
         $this->assertTrue($results);
@@ -1936,13 +1936,13 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 0]]);
-        $results = $builder->from('users')->existsOr(function () {
+        $results = $builder->from('users')->existsOr(static function () {
             return 123;
         });
         $this->assertSame(123, $results);
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 1]]);
-        $results = $builder->from('users')->existsOr(function () {
+        $results = $builder->from('users')->existsOr(static function () {
             throw new RuntimeException();
         });
         $this->assertTrue($results);
@@ -1954,7 +1954,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 2]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column1", "column2" from "users"', [], true)->andReturn([['column1' => 'foo', 'column2' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
         $builder->from('users')->select('column1', 'column2');
@@ -1971,7 +1971,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', [], true)->andReturn([['column2' => 'foo', 'column3' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
         $builder->from('users');
@@ -1986,7 +1986,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', [], true)->andReturn([['column2' => 'foo', 'column3' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
         $builder->from('users');
@@ -2000,10 +2000,10 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(static function ($builder, $results) {
             return $results;
         });
-        $builder->from('users')->selectSub(function ($query) {
+        $builder->from('users')->selectSub(static function ($query) {
             $query->from('posts')->select('foo', 'bar')->where('title', 'foo');
         }, 'post');
         $count = $builder->count();
@@ -2020,7 +2020,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->groupBy('a')->having('a', '=', 1)->union($second)->union($third);
         $this->assertEquals([0 => 1, 1 => 2, 2 => 3, 3 => 4], $builder->getBindings());
 
-        $builder = $this->getBuilder()->select('*')->from('users')->where('email', '=', function ($q) {
+        $builder = $this->getBuilder()->select('*')->from('users')->where('email', '=', static function ($q) {
             $q->select(new Raw('max(id)'))
               ->from('users')->where('email', '=', 'bar')
               ->orderByRaw('email like ?', '%.com')
@@ -2044,7 +2044,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $result = $builder->from('table1')->insertUsing(
             ['foo'],
-            function (Builder $query) {
+            static function (Builder $query) {
                 $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
             }
         );
@@ -2172,7 +2172,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ? set "email" = ?, "name" = ?', [1, 'foo', 'bar'])->andReturn(1);
-        $result = $builder->from('users')->join('orders', function ($join) {
+        $result = $builder->from('users')->join('orders', static function ($join) {
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
@@ -2188,7 +2188,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update [users] set [email] = ?, [name] = ? from [users] inner join [orders] on [users].[id] = [orders].[user_id] and [users].[id] = ?', ['foo', 'bar', 1])->andReturn(1);
-        $result = $builder->from('users')->join('orders', function ($join) {
+        $result = $builder->from('users')->join('orders', static function ($join) {
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
@@ -2204,7 +2204,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update `users` inner join `orders` on `users`.`id` = `orders`.`user_id` and `users`.`id` = ? set `email` = ?, `name` = ?', [1, 'foo', 'bar'])->andReturn(1);
-        $result = $builder->from('users')->join('orders', function ($join) {
+        $result = $builder->from('users')->join('orders', static function ($join) {
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
@@ -2225,7 +2225,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
-        $result = $builder->from('users')->join('orders', function ($join) {
+        $result = $builder->from('users')->join('orders', static function ($join) {
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
@@ -2272,7 +2272,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "ctid" in (select "users"."ctid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
-        $result = $builder->from('users')->join('orders', function ($join) {
+        $result = $builder->from('users')->join('orders', static function ($join) {
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
@@ -2281,7 +2281,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "ctid" in (select "users"."ctid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ? where "name" = ?)', ['foo', 'bar', 1, 'baz'])->andReturn(1);
         $result = $builder->from('users')
-            ->join('orders', function ($join) {
+            ->join('orders', static function ($join) {
                 $join->on('users.id', '=', 'orders.user_id')
                     ->where('users.id', '=', 1);
             })->where('name', 'baz')
@@ -2438,7 +2438,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "ctid" in (select "users"."ctid" from "users" inner join "contacts" on "users"."id" = "contacts"."user_id" and "users"."id" = ? where "name" = ?)', [1, 'baz'])->andReturn(1);
         $result = $builder->from('users')
-            ->join('contacts', function ($join) {
+            ->join('contacts', static function ($join) {
                 $join->on('users.id', '=', 'contacts.user_id')
                     ->where('users.id', '=', 1);
             })->where('name', 'baz')
@@ -2967,7 +2967,7 @@ SQL;
         $expectedBindings = ['foo', 1, 3, 'bar'];
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('othertable', function ($join) {
+        $builder->select('*')->from('users')->join('othertable', static function ($join) {
             $join->where('bar', '=', 'foo');
         })->where('registered', 1)->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', ['bar']);
         $this->assertEquals($expectedSql, $builder->toSql());
@@ -2975,7 +2975,7 @@ SQL;
 
         // order of statements reversed
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->orderByRaw('match ("foo") against(?)', ['bar'])->having('population', '>', 3)->groupBy('city')->where('registered', 1)->join('othertable', function ($join) {
+        $builder->select('*')->from('users')->orderByRaw('match ("foo") against(?)', ['bar'])->having('population', '>', 3)->groupBy('city')->where('registered', 1)->join('othertable', static function ($join) {
             $join->where('bar', '=', 'foo');
         });
         $this->assertEquals($expectedSql, $builder->toSql());
@@ -3026,7 +3026,7 @@ SQL;
 
         $builder = $this->getPostgresBuilder();
         $builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
-        $builder->selectSub(function ($query) {
+        $builder->selectSub(static function ($query) {
             $query->from('two')->select('baz')->where('subkey', '=', 'subval');
         }, 'sub');
         $this->assertEquals($expectedSql, $builder->toSql());
@@ -3048,7 +3048,7 @@ SQL;
     public function testSubSelectResetBindings()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->from('one')->selectSub(function ($query) {
+        $builder->from('one')->selectSub(static function ($query) {
             $query->from('two')->select('baz')->where('subkey', '=', 'subval');
         }, 'sub');
 
@@ -3119,7 +3119,7 @@ SQL;
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
 
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+        $builder->chunk(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         });
     }
@@ -3139,7 +3139,7 @@ SQL;
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+        $builder->chunk(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         });
     }
@@ -3159,7 +3159,7 @@ SQL;
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+        $builder->chunk(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
 
             return false;
@@ -3178,7 +3178,7 @@ SQL;
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->never();
 
-        $builder->chunk(0, function ($results) use ($callbackAssertor) {
+        $builder->chunk(0, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         });
     }
@@ -3201,7 +3201,7 @@ SQL;
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
 
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+        $builder->chunkById(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         }, 'someIdField');
     }
@@ -3221,7 +3221,7 @@ SQL;
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+        $builder->chunkById(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         }, 'someIdField');
     }
@@ -3238,7 +3238,7 @@ SQL;
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->never();
 
-        $builder->chunkById(0, function ($results) use ($callbackAssertor) {
+        $builder->chunkById(0, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         }, 'someIdField');
     }
@@ -3258,7 +3258,7 @@ SQL;
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+        $builder->chunkById(2, static function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         }, 'table.id', 'table_id');
     }
@@ -3278,7 +3278,7 @@ SQL;
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
-        Paginator::currentPathResolver(function () use ($path) {
+        Paginator::currentPathResolver(static function () use ($path) {
             return $path;
         });
 
@@ -3304,11 +3304,11 @@ SQL;
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
-        Paginator::currentPageResolver(function () {
+        Paginator::currentPageResolver(static function () {
             return 1;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
+        Paginator::currentPathResolver(static function () use ($path) {
             return $path;
         });
 
@@ -3334,11 +3334,11 @@ SQL;
         $builder->shouldNotReceive('forPage');
         $builder->shouldNotReceive('get');
 
-        Paginator::currentPageResolver(function () {
+        Paginator::currentPageResolver(static function () {
             return 1;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
+        Paginator::currentPathResolver(static function () use ($path) {
             return $path;
         });
 
@@ -3365,7 +3365,7 @@ SQL;
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
-        Paginator::currentPathResolver(function () use ($path) {
+        Paginator::currentPathResolver(static function () use ($path) {
             return $path;
         });
 
@@ -3606,7 +3606,7 @@ SQL;
     public function testFromSub()
     {
         $builder = $this->getBuilder();
-        $builder->fromSub(function ($query) {
+        $builder->fromSub(static function ($query) {
             $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions')->where('foo', '=', '1');
         }, 'sessions')->where('bar', '<', '10');
         $this->assertSame('select * from (select max(last_seen_at) as last_seen_at from "user_sessions" where "foo" = ?) as "sessions" where "bar" < ?', $builder->toSql());
@@ -3621,7 +3621,7 @@ SQL;
     {
         $builder = $this->getBuilder();
         $builder->getGrammar()->setTablePrefix('prefix_');
-        $builder->fromSub(function ($query) {
+        $builder->fromSub(static function ($query) {
             $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions')->where('foo', '=', '1');
         }, 'sessions')->where('bar', '<', '10');
         $this->assertSame('select * from (select max(last_seen_at) as last_seen_at from "prefix_user_sessions" where "foo" = ?) as "prefix_sessions" where "bar" < ?', $builder->toSql());
@@ -3631,7 +3631,7 @@ SQL;
     public function testFromSubWithoutBindings()
     {
         $builder = $this->getBuilder();
-        $builder->fromSub(function ($query) {
+        $builder->fromSub(static function ($query) {
             $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions');
         }, 'sessions');
         $this->assertSame('select * from (select max(last_seen_at) as last_seen_at from "user_sessions") as "sessions"', $builder->toSql());

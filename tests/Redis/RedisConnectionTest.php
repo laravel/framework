@@ -479,7 +479,7 @@ class RedisConnectionTest extends TestCase
     public function testItRunsPipes()
     {
         foreach ($this->connections() as $redis) {
-            $result = $redis->pipeline(function ($pipe) {
+            $result = $redis->pipeline(static function ($pipe) {
                 $pipe->set('test:pipeline:1', 1);
                 $pipe->get('test:pipeline:1');
                 $pipe->set('test:pipeline:2', 2);
@@ -497,7 +497,7 @@ class RedisConnectionTest extends TestCase
     public function testItRunsTransactions()
     {
         foreach ($this->connections() as $redis) {
-            $result = $redis->transaction(function ($pipe) {
+            $result = $redis->transaction(static function ($pipe) {
                 $pipe->set('test:transaction:1', 1);
                 $pipe->get('test:transaction:1');
                 $pipe->set('test:transaction:2', 2);

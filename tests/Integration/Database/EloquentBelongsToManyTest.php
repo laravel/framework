@@ -22,34 +22,34 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('uuid');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('uuid');
             $table->string('title');
             $table->timestamps();
         });
 
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('tags', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('users_posts', function (Blueprint $table) {
+        Schema::create('users_posts', static function (Blueprint $table) {
             $table->string('user_uuid');
             $table->string('post_uuid');
             $table->tinyInteger('is_draft')->default(1);
             $table->timestamps();
         });
 
-        Schema::create('posts_tags', function (Blueprint $table) {
+        Schema::create('posts_tags', static function (Blueprint $table) {
             $table->integer('post_id');
             $table->integer('tag_id');
             $table->string('flag')->default('')->nullable();
@@ -916,7 +916,7 @@ class User extends Model
     protected static function boot()
     {
         parent::boot();
-        static::creating(function ($model) {
+        static::creating(static function ($model) {
             $model->setAttribute('uuid', Str::random());
         });
     }
@@ -940,7 +940,7 @@ class Post extends Model
     protected static function boot()
     {
         parent::boot();
-        static::creating(function ($model) {
+        static::creating(static function ($model) {
             $model->setAttribute('uuid', Str::random());
         });
     }
@@ -1062,7 +1062,7 @@ class TagWithGlobalScope extends Model
     {
         parent::boot();
 
-        static::addGlobalScope(function ($query) {
+        static::addGlobalScope(static function ($query) {
             $query->select('tags.id');
         });
     }

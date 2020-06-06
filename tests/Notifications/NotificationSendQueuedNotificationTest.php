@@ -22,7 +22,7 @@ class NotificationSendQueuedNotificationTest extends TestCase
     {
         $job = new SendQueuedNotifications('notifiables', 'notification');
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('sendNow')->once()->withArgs(function ($notifiables, $notification, $channels) {
+        $manager->shouldReceive('sendNow')->once()->withArgs(static function ($notifiables, $notification, $channels) {
             return $notifiables instanceof Collection && $notifiables->toArray() === ['notifiables']
                 && $notification === 'notification'
                 && $channels === null;

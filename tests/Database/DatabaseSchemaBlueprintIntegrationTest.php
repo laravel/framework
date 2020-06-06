@@ -45,12 +45,12 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testRenamingAndChangingColumnsWork()
     {
-        $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
+        $this->db->connection()->getSchemaBuilder()->create('users', static function ($table) {
             $table->string('name');
             $table->string('age');
         });
 
-        $blueprint = new Blueprint('users', function ($table) {
+        $blueprint = new Blueprint('users', static function ($table) {
             $table->renameColumn('name', 'first_name');
             $table->integer('age')->change();
         });
@@ -75,15 +75,15 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testChangingColumnWithCollationWorks()
     {
-        $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
+        $this->db->connection()->getSchemaBuilder()->create('users', static function ($table) {
             $table->string('age');
         });
 
-        $blueprint = new Blueprint('users', function ($table) {
+        $blueprint = new Blueprint('users', static function ($table) {
             $table->integer('age')->collation('RTRIM')->change();
         });
 
-        $blueprint2 = new Blueprint('users', function ($table) {
+        $blueprint2 = new Blueprint('users', static function ($table) {
             $table->integer('age')->collation('NOCASE')->change();
         });
 
@@ -112,16 +112,16 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testRenameIndexWorks()
     {
-        $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
+        $this->db->connection()->getSchemaBuilder()->create('users', static function ($table) {
             $table->string('name');
             $table->string('age');
         });
 
-        $this->db->connection()->getSchemaBuilder()->table('users', function ($table) {
+        $this->db->connection()->getSchemaBuilder()->table('users', static function ($table) {
             $table->index(['name'], 'index1');
         });
 
-        $blueprint = new Blueprint('users', function ($table) {
+        $blueprint = new Blueprint('users', static function ($table) {
             $table->renameIndex('index1', 'index2');
         });
 
@@ -161,11 +161,11 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testAddUniqueIndexWithoutNameWorks()
     {
-        $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
+        $this->db->connection()->getSchemaBuilder()->create('users', static function ($table) {
             $table->string('name')->nullable();
         });
 
-        $blueprintMySql = new Blueprint('users', function ($table) {
+        $blueprintMySql = new Blueprint('users', static function ($table) {
             $table->string('name')->nullable()->unique()->change();
         });
 
@@ -182,7 +182,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $blueprintPostgres = new Blueprint('users', function ($table) {
+        $blueprintPostgres = new Blueprint('users', static function ($table) {
             $table->string('name')->nullable()->unique()->change();
         });
 
@@ -199,7 +199,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $blueprintSQLite = new Blueprint('users', function ($table) {
+        $blueprintSQLite = new Blueprint('users', static function ($table) {
             $table->string('name')->nullable()->unique()->change();
         });
 
@@ -216,7 +216,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $blueprintSqlServer = new Blueprint('users', function ($table) {
+        $blueprintSqlServer = new Blueprint('users', static function ($table) {
             $table->string('name')->nullable()->unique()->change();
         });
 
@@ -236,11 +236,11 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testAddUniqueIndexWithNameWorks()
     {
-        $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
+        $this->db->connection()->getSchemaBuilder()->create('users', static function ($table) {
             $table->string('name')->nullable();
         });
 
-        $blueprintMySql = new Blueprint('users', function ($table) {
+        $blueprintMySql = new Blueprint('users', static function ($table) {
             $table->string('name')->nullable()->unique('index1')->change();
         });
 
@@ -257,7 +257,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $blueprintPostgres = new Blueprint('users', function ($table) {
+        $blueprintPostgres = new Blueprint('users', static function ($table) {
             $table->unsignedInteger('name')->nullable()->unique('index1')->change();
         });
 
@@ -274,7 +274,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $blueprintSQLite = new Blueprint('users', function ($table) {
+        $blueprintSQLite = new Blueprint('users', static function ($table) {
             $table->unsignedInteger('name')->nullable()->unique('index1')->change();
         });
 
@@ -291,7 +291,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $blueprintSqlServer = new Blueprint('users', function ($table) {
+        $blueprintSqlServer = new Blueprint('users', static function ($table) {
             $table->unsignedInteger('name')->nullable()->unique('index1')->change();
         });
 
@@ -313,7 +313,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
     {
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
 
-        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+        $this->db->connection()->getSchemaBuilder()->table('users', static function (Blueprint $table) {
             $table->dropColumn('name');
             $table->dropColumn('email');
         });
@@ -323,7 +323,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
     {
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
 
-        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+        $this->db->connection()->getSchemaBuilder()->table('users', static function (Blueprint $table) {
             $table->renameColumn('name', 'first_name');
             $table->renameColumn('name2', 'last_name');
         });
@@ -333,7 +333,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
     {
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
 
-        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+        $this->db->connection()->getSchemaBuilder()->table('users', static function (Blueprint $table) {
             $table->dropColumn('name');
             $table->renameColumn('name2', 'last_name');
         });
@@ -343,7 +343,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
     {
         $this->expectExceptionMessage("SQLite doesn't support dropping foreign keys (you would need to re-create the table).");
 
-        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+        $this->db->connection()->getSchemaBuilder()->table('users', static function (Blueprint $table) {
             $table->dropForeign('something');
         });
     }

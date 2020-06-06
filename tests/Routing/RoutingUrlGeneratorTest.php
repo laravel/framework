@@ -59,7 +59,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
         $routes->add($route);
 
-        $url->formatHostUsing(function ($host) {
+        $url->formatHostUsing(static function ($host) {
             return str_replace('foo.com', 'foo.org', $host);
         });
 
@@ -136,7 +136,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
         $routes->add($route);
 
-        $url->formatPathUsing(function ($path) {
+        $url->formatPathUsing(static function ($path) {
             return '/something'.$path;
         });
 
@@ -154,11 +154,11 @@ class RoutingUrlGeneratorTest extends TestCase
         $namedRoute = new Route(['GET'], '/bar', ['as' => 'plain', 'root' => 'bar.com', 'path' => 'foo']);
         $routes->add($namedRoute);
 
-        $url->formatHostUsing(function ($root, $route) {
+        $url->formatHostUsing(static function ($root, $route) {
             return $route ? 'http://'.$route->getAction('root') : $root;
         });
 
-        $url->formatPathUsing(function ($path, $route) {
+        $url->formatPathUsing(static function ($path, $route) {
             return $route ? '/'.$route->getAction('path') : $path;
         });
 
@@ -237,7 +237,7 @@ class RoutingUrlGeneratorTest extends TestCase
          * With Default Parameter
          */
         $url->defaults(['locale' => 'en']);
-        $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', function () {
+        $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', static function () {
             //
         }]);
         $routes->add($route);
@@ -542,7 +542,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('http://www.foo.com:8080/')
         );
 
-        $route = new Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', function () {
+        $route = new Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', static function () {
             //
         }]);
         $routes->add($route);
@@ -617,11 +617,11 @@ class RoutingUrlGeneratorTest extends TestCase
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com/')
         );
-        $url->setKeyResolver(function () {
+        $url->setKeyResolver(static function () {
             return 'secret';
         });
 
-        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', static function () {
             //
         }]);
         $routes->add($route);
@@ -641,11 +641,11 @@ class RoutingUrlGeneratorTest extends TestCase
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com/')
         );
-        $url->setKeyResolver(function () {
+        $url->setKeyResolver(static function () {
             return 'secret';
         });
 
-        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', static function () {
             //
         }]);
         $routes->add($route);
@@ -667,11 +667,11 @@ class RoutingUrlGeneratorTest extends TestCase
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com/')
         );
-        $url->setKeyResolver(function () {
+        $url->setKeyResolver(static function () {
             return 'secret';
         });
 
-        $route = new Route(['GET'], 'foo/{signature}', ['as' => 'foo', function () {
+        $route = new Route(['GET'], 'foo/{signature}', ['as' => 'foo', static function () {
             //
         }]);
         $routes->add($route);
