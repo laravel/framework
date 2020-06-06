@@ -1149,7 +1149,7 @@ class Blueprint
     {
         return $this->addColumn('uuid', $column);
     }
-    
+
     /**
      * Create a new UUID column on the table with a foreign key constraint.
      *
