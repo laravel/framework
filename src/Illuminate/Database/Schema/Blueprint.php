@@ -1154,8 +1154,7 @@ class Blueprint
      * Create a new UUID column on the table with a foreign key constraint.
      *
      * @param  string  $column
-     *
-     * @return ForeignIdColumnDefinition
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
     public function foreignUuid($column)
     {
