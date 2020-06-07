@@ -440,7 +440,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             function (EloquentTestNonIncrementingSecond $user, $i) use (&$users) {
                 $users[] = [$user->name, $i];
             }, 2, 'name');
-        $this->assertSame([[' First', 0], [' Second', 1], [' Third', 0]], $users);
+        $this->assertSame([[' First', 0], [' Second', 1], [' Third', 2]], $users);
     }
 
     public function testPluck()
