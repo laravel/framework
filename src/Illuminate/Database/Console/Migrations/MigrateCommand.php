@@ -129,7 +129,7 @@ class MigrateCommand extends BaseCommand
         // continue with the standard migration operation as normal without errors.
         if ($connection instanceof SQLiteConnection ||
             $connection instanceof SqlServerConnection ||
-            ! file_exists($path = $this->schemaPath($connection))) {
+            ! is_file($path = $this->schemaPath($connection))) {
             return;
         }
 
