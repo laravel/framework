@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Compilers;
 
+use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -317,7 +318,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             return $value;
         }
 
-        return app(ComponentTagCompiler::class, [
+        return Container::getInstance()->make(ComponentTagCompiler::class, [
             $this->classComponentAliases, $this,
         ])->compile($value);
     }
