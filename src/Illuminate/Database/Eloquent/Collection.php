@@ -240,6 +240,8 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Set realtion over each item.
      *
+     * @param  mixed  $name
+     * @param  mixed  $relation
      * @return array
      */
     public function setRelation($name, $relation = null)
