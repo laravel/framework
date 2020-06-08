@@ -637,11 +637,11 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('x"null"x', env('foo'));
     }
 
-    public function testGetFromENVFirst()
+    public function testGetFromSERVERFirst()
     {
         $_ENV['foo'] = 'From $_ENV';
         $_SERVER['foo'] = 'From $_SERVER';
-        $this->assertSame('From $_ENV', env('foo'));
+        $this->assertSame('From $_SERVER', env('foo'));
     }
 
     public function providesPregReplaceArrayData()
