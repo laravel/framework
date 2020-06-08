@@ -11,6 +11,8 @@ class NullDispatcher implements DispatcherContract
 
     /**
      * The underlying event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Bus\Dispatcher
      */
     protected $dispatcher;
 
@@ -68,7 +70,7 @@ class NullDispatcher implements DispatcherContract
      */
     public function listen($events, $listener)
     {
-        return $this->dispatcher->listen($events, $listener);
+        $this->dispatcher->listen($events, $listener);
     }
 
     /**
@@ -90,7 +92,7 @@ class NullDispatcher implements DispatcherContract
      */
     public function subscribe($subscriber)
     {
-        return $this->dispatcher->subscribe($subscriber);
+        $this->dispatcher->subscribe($subscriber);
     }
 
     /**
@@ -101,7 +103,7 @@ class NullDispatcher implements DispatcherContract
      */
     public function flush($event)
     {
-        return $this->dispatcher->flush($event);
+        $this->dispatcher->flush($event);
     }
 
     /**
@@ -112,7 +114,7 @@ class NullDispatcher implements DispatcherContract
      */
     public function forget($event)
     {
-        return $this->dispatcher->forget($event);
+        $this->dispatcher->forget($event);
     }
 
     /**
@@ -122,7 +124,7 @@ class NullDispatcher implements DispatcherContract
      */
     public function forgetPushed()
     {
-        return $this->dispatcher->forgetPushed();
+        $this->dispatcher->forgetPushed();
     }
 
     /**
