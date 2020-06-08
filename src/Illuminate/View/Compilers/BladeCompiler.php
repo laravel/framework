@@ -318,7 +318,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         return app(ComponentTagCompiler::class, [
-            $this->classComponentAliases, $this
+            $this->classComponentAliases, $this,
         ])->compile($value);
     }
 
