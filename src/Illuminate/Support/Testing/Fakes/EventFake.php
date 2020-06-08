@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
-use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 

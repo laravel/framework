@@ -2,10 +2,10 @@
 
 namespace Illuminate\Cookie;
 
-use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class CookieJar implements JarContract

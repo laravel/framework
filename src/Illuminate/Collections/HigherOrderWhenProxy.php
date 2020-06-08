@@ -1,16 +1,16 @@
 <?php
 
-namespace Illuminate\Collections;
+namespace Illuminate\Support;
 
 /**
- * @mixin \Illuminate\Collections\Enumerable
+ * @mixin \Illuminate\Support\Enumerable
  */
 class HigherOrderWhenProxy
 {
     /**
      * The collection being operated on.
      *
-     * @var \Illuminate\Collections\Enumerable
+     * @var \Illuminate\Support\Enumerable
      */
     protected $collection;
 
@@ -24,7 +24,7 @@ class HigherOrderWhenProxy
     /**
      * Create a new proxy instance.
      *
-     * @param  \Illuminate\Collections\Enumerable  $collection
+     * @param  \Illuminate\Support\Enumerable  $collection
      * @param  bool  $condition
      * @return void
      */

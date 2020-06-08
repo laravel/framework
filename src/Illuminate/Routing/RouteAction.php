@@ -2,7 +2,7 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Collections\Arr;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LogicException;
 use UnexpectedValueException;

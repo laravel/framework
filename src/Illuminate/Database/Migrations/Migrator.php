@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
@@ -11,6 +10,7 @@ use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Output\OutputInterface;

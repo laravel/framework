@@ -4,9 +4,9 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
 use Illuminate\Bus\PendingBatch;
-use Illuminate\Collections\Arr;
-use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -373,7 +373,7 @@ class BusFake implements QueueingDispatcher
     /**
      * Create a new batch of queueable jobs.
      *
-     * @param  \Illuminate\Collections\Collection|array  $jobs
+     * @param  \Illuminate\Support\Collection|array  $jobs
      * @return \Illuminate\Bus\PendingBatch
      */
     public function batch($jobs)

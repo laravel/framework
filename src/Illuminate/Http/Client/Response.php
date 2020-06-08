@@ -3,7 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use LogicException;
 
 class Response implements ArrayAccess

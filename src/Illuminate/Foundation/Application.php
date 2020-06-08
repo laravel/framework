@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation;
 
 use Closure;
-use Illuminate\Collections\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
@@ -16,6 +15,7 @@ use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;

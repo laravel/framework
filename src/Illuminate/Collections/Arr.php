@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Collections;
+namespace Illuminate\Support;
 
 use ArrayAccess;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
 class Arr

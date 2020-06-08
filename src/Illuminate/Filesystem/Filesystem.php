@@ -5,7 +5,7 @@ namespace Illuminate\Filesystem;
 use ErrorException;
 use FilesystemIterator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Mime\MimeTypes;

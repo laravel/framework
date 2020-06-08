@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use ArrayIterator;
-use Illuminate\Collections\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Arr;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

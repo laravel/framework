@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Illuminate\\Macroable\\": ""
+            "Illuminate\\Support\\": ""
         }
     },
     "extra": {

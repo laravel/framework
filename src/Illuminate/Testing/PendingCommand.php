@@ -2,10 +2,10 @@
 
 namespace Illuminate\Testing;
 
-use Illuminate\Collections\Arr;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Arr;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;

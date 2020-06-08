@@ -4,10 +4,10 @@ namespace Illuminate\Http;
 
 use ArrayAccess;
 use Closure;
-use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;

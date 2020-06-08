@@ -2,8 +2,8 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Collections\Arr;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Macroable;
 
 class PendingResourceRegistration
 {

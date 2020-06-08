@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Illuminate\\Collections\\": ""
+            "Illuminate\\Support\\": ""
         }
     },
     "extra": {

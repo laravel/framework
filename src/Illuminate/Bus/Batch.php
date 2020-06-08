@@ -3,10 +3,10 @@
 namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Collections\Arr;
-use Illuminate\Collections\Collection;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use JsonSerializable;
 
 class Batch implements Arrayable, JsonSerializable
@@ -152,7 +152,7 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Add additional jobs to the batch.
      *
-     * @param  \Illuminate\Collections\Collection|array  $jobs
+     * @param  \Illuminate\Support\Collection|array  $jobs
      * @return self
      */
     public function add($jobs)

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Collections\Arr;
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;

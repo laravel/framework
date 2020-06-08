@@ -7,9 +7,9 @@ use Exception;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Translation\HasLocalePreference;
-use Illuminate\Macroable\Macroable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 

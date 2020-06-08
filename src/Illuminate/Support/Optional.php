@@ -4,8 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayObject;
-use Illuminate\Collections\Arr;
-use Illuminate\Macroable\Macroable;
+use Illuminate\Support\Traits\Macroable;
 
 class Optional implements ArrayAccess
 {
