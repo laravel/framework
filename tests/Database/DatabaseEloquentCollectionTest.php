@@ -479,8 +479,10 @@ class DatabaseEloquentCollectionTest extends TestCase
 
 
         $c = new Collection([$one, $two]);
-        $c->setRelation('testRelation1', $relation1);
-        $c->setRelation('testRelation2', $relation2);
+        $c->setRelation([
+            'testRelation1' => $relation1,
+            'testRelation2' => $relation2,
+        ]);
 
         $this->assertEquals($relation1, $c[0]->testRelation1);
         $this->assertEquals($relation2, $c[0]->testRelation2);
