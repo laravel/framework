@@ -292,6 +292,7 @@ abstract class Factory
     /**
      * Get a raw attributes array for the model.
      *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return mixed
      */
     protected function getExpandedAttributes(?Model $parent)
@@ -335,7 +336,7 @@ abstract class Factory
     /**
      * Expand all attributes to their underlying values.
      *
-     * @param  array  $attributes
+     * @param  array  $definition
      * @return array
      */
     protected function expandAttributes(array $definition)
@@ -474,6 +475,7 @@ abstract class Factory
      * Call the "after creating" callbacks for the given model instances.
      *
      * @param  \Illuminate\Support\Collection  $instances
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return void
      */
     protected function callAfterCreating(Collection $instances, ?Model $parent = null)
