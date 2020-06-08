@@ -50,7 +50,7 @@ class Response implements ArrayAccess
     /**
      * Get the JSON decoded body of the response as an array.
      *
-     * @return array
+     * @return mixed
      */
     public function json()
     {
