@@ -455,6 +455,38 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection;
         $this->assertEquals($c, $c->fresh());
     }
+
+    public function testSetRelation() {
+        $relation = new TestEloquentCollectionModel();
+
+        $one = new TestEloquentCollectionModel();
+        $two = new TestEloquentCollectionModel();
+
+
+        $c = new Collection([$one, $two]);
+        $c->setRelation('testRelation', $relation);
+
+        $this->assertEquals($relation, $c[0]->testRelation);
+        $this->assertEquals($relation, $c[1]->testRelation);
+    }
+
+    public function testSetManyRelation() {
+        $relation1 = new TestEloquentCollectionModel();
+        $relation2 = new TestEloquentCollectionModel();
+
+        $one = new TestEloquentCollectionModel();
+        $two = new TestEloquentCollectionModel();
+
+
+        $c = new Collection([$one, $two]);
+        $c->setRelation('testRelation1', $relation1);
+        $c->setRelation('testRelation2', $relation2);
+
+        $this->assertEquals($relation1, $c[0]->testRelation1);
+        $this->assertEquals($relation2, $c[0]->testRelation2);
+        $this->assertEquals($relation1, $c[1]->testRelation1);
+        $this->assertEquals($relation2, $c[1]->testRelation2);
+    }
 }
 
 class TestEloquentCollectionModel extends Model

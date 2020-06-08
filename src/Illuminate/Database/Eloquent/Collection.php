@@ -238,6 +238,24 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Set realtion over each item.
+     *
+     * @return array
+     */
+    public function setRelation($name, $relation)
+    {
+        $relations = is_array($relation) ? $relation : [$name => $relation];
+
+        $this->each(function($model) use ($relations) {
+            foreach($relations as $name => $relation) {
+                $model->setRelation($name, $relation);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
      * Get the array of primary keys.
      *
      * @return array
