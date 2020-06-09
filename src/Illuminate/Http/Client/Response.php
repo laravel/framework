@@ -48,9 +48,9 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Get the JSON decoded body of the response as an array.
+     * Get the JSON decoded body of the response as an array or scalar value.
      *
-     * @return array
+     * @return mixed
      */
     public function json()
     {
