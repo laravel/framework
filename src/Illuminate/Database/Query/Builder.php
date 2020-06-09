@@ -242,7 +242,7 @@ class Builder
     /**
      * Add a subselect expression to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
+     * @param  \Closure|$this|string  $query
      * @param  string  $as
      * @return \Illuminate\Database\Query\Builder|static
      *
