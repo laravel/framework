@@ -1,9 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.18...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.19...6.x)
+
+
+## [v6.18.19 (2020-06-09)](https://github.com/laravel/framework/compare/v6.18.18...v6.18.19)
 
 ### Fixed
-- Fixed `Model::withoutEvents()` not registering listeners inside boot() ([#33149](https://github.com/laravel/framework/pull/33149))
+- Fixed `Model::withoutEvents()` not registering listeners inside boot() ([#33149](https://github.com/laravel/framework/pull/33149), [4bb32ae](https://github.com/laravel/framework/commit/4bb32aea50eec4c3cc8b77f463e4a96213a0af09))
 
 
 ## [v6.18.18 (2020-06-03)](https://github.com/laravel/framework/compare/v6.18.17...v6.18.18)
