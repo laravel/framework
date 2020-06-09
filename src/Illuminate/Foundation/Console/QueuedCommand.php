@@ -39,4 +39,14 @@ class QueuedCommand implements ShouldQueue
     {
         call_user_func_array([$kernel, 'call'], $this->data);
     }
+
+    /**
+     * Return data.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
 }
