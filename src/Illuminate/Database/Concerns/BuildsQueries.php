@@ -113,7 +113,7 @@ trait BuildsQueries
     }
 
     /**
-     * Execute a callback over each item while chunking by id.
+     * Execute a callback over each item while chunking by ID.
      *
      * @param  callable  $callback
      * @param  int  $count
