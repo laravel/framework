@@ -21,6 +21,9 @@
         "illuminate/contracts": "^6.0",
         "illuminate/support": "^6.0"
     },
+    "replace": {
+        "laravel/legacy-factories": "1.*"
+    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Database\\": ""
