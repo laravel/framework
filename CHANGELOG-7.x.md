@@ -5,6 +5,12 @@
 ### Added
 - Added extendable relations for models ([#33025](https://github.com/laravel/framework/pull/33025))
 - Added `Illuminate\Foundation\Testing\Concerns\MakesHttpRequests::withToken()` ([#33075](https://github.com/laravel/framework/pull/33075), [79383a1](https://github.com/laravel/framework/commit/79383a129bf213177ff00ec1ba7c396da5d7749b))
+- Added the ability to `Illuminate\Database\Eloquent\Relations\HasOneOrMany::makeMany()` (create many without saving) ([#33021](https://github.com/laravel/framework/pull/33021))
+- Added `Illuminate\Database\Schema\Blueprint::foreignUuid()` ([#33129](https://github.com/laravel/framework/pull/33129))
+- Allow setting the event handler queue via a `viaQueue()` method ([#32770](https://github.com/laravel/framework/pull/32770), [852a927](https://github.com/laravel/framework/commit/852a927d254af9719c9fde6eb31466472fd03dfc)) 
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Relations\MorphToMany::getCurrentlyAttachedPivots()` ([110b129](https://github.com/laravel/framework/commit/110b129531df172f03bf163f561c71123fac6296))
 
 
 ## [v7.14.1 (2020-06-03)](https://github.com/laravel/framework/compare/v7.14.0...v7.14.1)
