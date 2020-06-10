@@ -33,7 +33,6 @@ class DatabaseBatchRepository implements BatchRepository
      */
     protected $events;
 
-
     /**
      * The database table to use to store batch information.
      *
