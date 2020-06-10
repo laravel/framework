@@ -3,6 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Bus\Events\BatchDispatched;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
@@ -216,6 +217,10 @@ class PendingBatch
 
             throw $e;
         }
+
+        $this->container->make('events')->dispatch(
+            new BatchDispatched($batch)
+        );
 
         return $batch;
     }
