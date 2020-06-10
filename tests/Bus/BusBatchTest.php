@@ -12,6 +12,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -292,7 +293,7 @@ class BusBatchTest extends TestCase
 
     protected function createTestBatch($queue, $allowFailures = false)
     {
-        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), new Dispatcher, 'job_batches');
 
         $pendingBatch = (new PendingBatch(new Container, collect()))
                             ->then(function (Batch $batch) {
