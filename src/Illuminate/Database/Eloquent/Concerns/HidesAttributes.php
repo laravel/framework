@@ -114,11 +114,7 @@ trait HidesAttributes
             $truthTest = $truthTest($this);
         }
 
-        if ($truthTest) {
-            $this->makeVisible($attributes);
-        }
-
-        return $this;
+        return $truthTest ? $this->makeVisible($attributes) : $this;
     }
 
     /**
@@ -135,10 +131,6 @@ trait HidesAttributes
             $truthTest = $truthTest($this);
         }
 
-        if ($truthTest) {
-            $this->makeHidden($attributes);
-        }
-
-        return $this;
+        return $truthTest ? $this->makeHidden($attributes) : $this;
     }
 }
