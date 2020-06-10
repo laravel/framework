@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Closure;
+
 trait HidesAttributes
 {
     /**
@@ -94,6 +96,48 @@ trait HidesAttributes
         $this->hidden = array_merge(
             $this->hidden, is_array($attributes) ? $attributes : func_get_args()
         );
+
+        return $this;
+    }
+
+    /**
+     * Make the given, typically hidden, attributes visible,
+     * only if the truth test passes.
+     *
+     * @param  bool|Closure  $truthTest
+     * @param  array|string|null  $attributes
+     * @return $this
+     */
+    public function makeVisibleIf($truthTest, $attributes)
+    {
+        if ($truthTest instanceof Closure) {
+            $truthTest = $truthTest($this);
+        }
+
+        if ($truthTest) {
+            $this->makeVisible($attributes);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Make the given, typically visible, attributes hidden,
+     * only if the truth test passes.
+     *
+     * @param  bool|Closure  $truthTest
+     * @param  array|string|null  $attributes
+     * @return $this
+     */
+    public function makeHiddenIf($truthTest, $attributes)
+    {
+        if ($truthTest instanceof Closure) {
+            $truthTest = $truthTest($this);
+        }
+
+        if ($truthTest) {
+            $this->makeHidden($attributes);
+        }
 
         return $this;
     }
