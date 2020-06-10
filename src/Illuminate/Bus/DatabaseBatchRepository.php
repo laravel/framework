@@ -4,6 +4,8 @@ namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
 use Closure;
+use Illuminate\Bus\Events\BatchDispatched;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
@@ -25,6 +27,14 @@ class DatabaseBatchRepository implements BatchRepository
     protected $connection;
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
+
+
+    /**
      * The database table to use to store batch information.
      *
      * @var string
@@ -36,12 +46,17 @@ class DatabaseBatchRepository implements BatchRepository
      *
      * @param  \Illuminate\Bus\BatchFactory  $factory
      * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  string  $table
      */
-    public function __construct(BatchFactory $factory, Connection $connection, string $table)
+    public function __construct(BatchFactory $factory,
+                                Connection $connection,
+                                Dispatcher $events,
+                                string $table)
     {
         $this->factory = $factory;
         $this->connection = $connection;
+        $this->events = $events;
         $this->table = $table;
     }
 
@@ -107,7 +122,11 @@ class DatabaseBatchRepository implements BatchRepository
             'finished_at' => null,
         ]);
 
-        return $this->find($id);
+        return tap($this->find($id), function ($batch) {
+            $this->events->dispatch(new BatchDispatched(
+                $batch
+            ));
+        });
     }
 
     /**

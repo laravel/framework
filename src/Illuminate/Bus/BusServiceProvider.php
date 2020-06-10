@@ -47,6 +47,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
             return new DatabaseBatchRepository(
                 $app->make(BatchFactory::class),
                 $app->make('db')->connection(config('queue.batching.database')),
+                $app['events'],
                 config('queue.batching.table', 'job_batches'),
             );
         });
