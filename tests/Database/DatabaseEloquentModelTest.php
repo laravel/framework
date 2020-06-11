@@ -950,6 +950,65 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
+    public function testMakeVisibleIf()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(true, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(false, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(function ($model) {
+            return ! is_null($model->name);
+        }, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+    }
+
+    public function testMakeHiddenIf()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'address' => 'foobar', 'id' => 'baz']);
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHiddenIf(true, 'address')->toArray();
+        $this->assertArrayNotHasKey('address', $array);
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $model->makeVisible('address');
+
+        $array = $model->makeHiddenIf(false, ['name', 'age'])->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHiddenIf(function ($model) {
+            return ! is_null($model->id);
+        }, ['name', 'age'])->toArray();
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayNotHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
+    }
+
     public function testFillable()
     {
         $model = new EloquentModelStub;

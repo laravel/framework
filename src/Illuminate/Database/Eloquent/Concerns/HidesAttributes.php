@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Closure;
+
 trait HidesAttributes
 {
     /**
@@ -96,5 +98,39 @@ trait HidesAttributes
         );
 
         return $this;
+    }
+
+    /**
+     * Make the given, typically hidden, attributes visible,
+     * only if the truth test passes.
+     *
+     * @param  bool|Closure  $truthTest
+     * @param  array|string|null  $attributes
+     * @return $this
+     */
+    public function makeVisibleIf($truthTest, $attributes)
+    {
+        if ($truthTest instanceof Closure) {
+            $truthTest = $truthTest($this);
+        }
+
+        return $truthTest ? $this->makeVisible($attributes) : $this;
+    }
+
+    /**
+     * Make the given, typically visible, attributes hidden,
+     * only if the truth test passes.
+     *
+     * @param  bool|Closure  $truthTest
+     * @param  array|string|null  $attributes
+     * @return $this
+     */
+    public function makeHiddenIf($truthTest, $attributes)
+    {
+        if ($truthTest instanceof Closure) {
+            $truthTest = $truthTest($this);
+        }
+
+        return $truthTest ? $this->makeHidden($attributes) : $this;
     }
 }
