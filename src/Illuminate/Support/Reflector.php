@@ -15,7 +15,7 @@ class Reflector
      */
     public static function getParameterClassName($parameter)
     {
-        $type = $parameter->getType()
+        $type = $parameter->getType();
 
         if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
             return;
