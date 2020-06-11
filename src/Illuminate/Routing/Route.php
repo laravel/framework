@@ -720,27 +720,32 @@ class Route
     /**
      * Add a prefix to the route URI.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     * @param string $delimiter
      * @return $this
      */
-    public function prefix($prefix)
+    public function prefix($prefix, $delimiter = '/')
     {
-        $this->updatePrefixOnAction($prefix);
+        $trimmer = $delimiter === '/' ? $delimiter : '/'.$delimiter;
 
-        $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
+        $this->updatePrefixOnAction($prefix, $delimiter, $trimmer);
 
-        return $this->setUri($uri !== '/' ? trim($uri, '/') : $uri);
+        $uri = rtrim($prefix, $trimmer).$delimiter.ltrim($this->uri, $trimmer);
+
+        return $this->setUri($uri !== $trimmer ? trim($uri, $trimmer) : $uri);
     }
 
     /**
      * Update the "prefix" attribute on the action array.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     * @param string $delimiter
+     * @param string $trimmer
      * @return void
      */
-    protected function updatePrefixOnAction($prefix)
+    protected function updatePrefixOnAction($prefix, $delimiter = '/', $trimmer = '/')
     {
-        if (! empty($newPrefix = trim(rtrim($prefix, '/').'/'.ltrim($this->action['prefix'] ?? '', '/'), '/'))) {
+        if (! empty($newPrefix = trim(rtrim($prefix, $trimmer).$delimiter.ltrim($this->action['prefix'] ?? '', $trimmer), $trimmer))) {
             $this->action['prefix'] = $newPrefix;
         }
     }
