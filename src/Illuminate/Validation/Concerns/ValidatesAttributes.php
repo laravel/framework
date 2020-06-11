@@ -1646,7 +1646,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute matches the hash
+     * Validate that an attribute matches the hash.
      *
      * @param  string  $attribute
      * @param  mixed  $value
