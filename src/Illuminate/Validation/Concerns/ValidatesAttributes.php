@@ -1646,6 +1646,23 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute matches the hash
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    public function validateHashEquals($attribute, $value, $parameters)
+    {
+        $hasher = $this->container->make('hash');
+
+        $this->requireParameterCount(1, $parameters, 'hash_equals');
+
+        return $hasher->check($value, $parameters[0]);
+    }
+
+    /**
      * Validate the size of an attribute.
      *
      * @param  string  $attribute

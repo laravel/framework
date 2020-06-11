@@ -1205,6 +1205,35 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateHashEquals()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // Fails when hash is incorrect
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->with('baz', 'hashed_bar')->andReturn(false);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $v = new Validator($trans, ['foo' => 'baz'], ['foo' => 'hash_equals:hashed_bar']);
+        $v->setContainer($container);
+
+        $this->assertFalse($v->passes());
+
+        // Succeeds when hash is correct.
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->with('bar', 'hashed_bar')->andReturn(true);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'hash_equals:hashed_bar']);
+        $v->setContainer($container);
+
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateDifferent()
     {
         $trans = $this->getIlluminateArrayTranslator();
