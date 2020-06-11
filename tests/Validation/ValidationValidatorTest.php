@@ -3662,6 +3662,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testRuleBasedCustomValidators()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => true], ['bar' => 'foo']);
+        $v->setContainer($container = m::mock(Container::class));
+        $v->addExtension('foo', FooRule::class);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => false], ['bar' => 'foo']);
+        $v->addExtension('foo', FooRule::class);
+        $this->assertFalse($v->passes());
+        $this->assertSame('foo bar', $v->messages()->first('bar'));
+    }
+
     public function testExceptionThrownOnIncorrectParameterCount()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -5500,4 +5515,17 @@ class ExplicitTableAndConnectionModel extends Model
 
 class NonEloquentModel
 {
+}
+
+class FooRule implements Rule
+{
+    public function passes($attribute, $value)
+    {
+        return $value;
+    }
+
+    public function message()
+    {
+        return 'foo :attribute';
+    }
 }
