@@ -75,12 +75,70 @@ class DiscoverEvents
      */
     protected static function classFromFile(SplFileInfo $file, $basePath)
     {
+        $psr4Mapping = self::readComposerJson('autoload.psr-4');
+        $psr4Mapping[DIRECTORY_SEPARATOR] = '/';
+
+        // sort the array by keys length to have proper replacement.
+        $psr4Mapping = self::sortByKeyLength($psr4Mapping);
+
         $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        $class = Str::replaceLast('.php', '', $class);
 
         return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
-            ['\\', app()->getNamespace()],
-            ucfirst(Str::replaceLast('.php', '', $class))
+            array_values($psr4Mapping),
+            array_keys($psr4Mapping),
+            str_replace(DIRECTORY_SEPARATOR, '/', $class)
         );
+    }
+
+    /**
+     * Adds a forward slash to the end of the path, if missing.
+     *
+     * @param  array  $psr4Mapping
+     *
+     * @return array
+     */
+    private static function normalizePaths($psr4Mapping)
+    {
+        foreach ($psr4Mapping as $namespace => $path) {
+            if (! Str::endsWith($path, ['/'])) {
+                $psr4Mapping[$namespace] .= '/';
+            }
+        }
+
+        return $psr4Mapping;
+    }
+
+    /**
+     * Reads a key value from composer.json file.
+     *
+     * @param  string  $key
+     *
+     * @return array
+     */
+    protected static function readComposerJson($key)
+    {
+        $composerData = json_decode(file_get_contents(app()->basePath('composer.json')), true);
+
+        $psr4Mapping = (array) data_get($composerData, $key, []);
+        $psr4Mapping = self::normalizePaths($psr4Mapping);
+
+        return $psr4Mapping;
+    }
+
+    /**
+     * Sorts an associative array by keys length.
+     *
+     * @param  array  $keyValueArray
+     *
+     * @return array
+     */
+    protected static function sortByKeyLength($keyValueArray)
+    {
+        uksort($keyValueArray, function ($key1, $key2) {
+            return strlen($key2) <=> strlen($key1);
+        });
+
+        return $keyValueArray;
     }
 }
