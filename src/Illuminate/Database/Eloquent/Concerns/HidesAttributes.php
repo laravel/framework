@@ -86,6 +86,20 @@ trait HidesAttributes
     }
 
     /**
+     * Make the given, typically hidden, attributes visible if the given truth test passes.
+     *
+     * @param  bool|Closure  $condition
+     * @param  array|string|null  $attributes
+     * @return $this
+     */
+    public function makeVisibleIf($condition, $attributes)
+    {
+        $condition = $condition instanceof Closure ? $condition($this) : $condition;
+
+        return $condition ? $this->makeVisible($attributes) : $this;
+    }
+
+    /**
      * Make the given, typically visible, attributes hidden.
      *
      * @param  array|string|null  $attributes
@@ -101,36 +115,16 @@ trait HidesAttributes
     }
 
     /**
-     * Make the given, typically hidden, attributes visible,
-     * only if the truth test passes.
+     * Make the given, typically visible, attributes hidden if the given truth test passes.
      *
      * @param  bool|Closure  $truthTest
      * @param  array|string|null  $attributes
      * @return $this
      */
-    public function makeVisibleIf($truthTest, $attributes)
+    public function makeHiddenIf($condition, $attributes)
     {
-        if ($truthTest instanceof Closure) {
-            $truthTest = $truthTest($this);
-        }
+        $condition = $condition instanceof Closure ? $condition($this) : $condition;
 
-        return $truthTest ? $this->makeVisible($attributes) : $this;
-    }
-
-    /**
-     * Make the given, typically visible, attributes hidden,
-     * only if the truth test passes.
-     *
-     * @param  bool|Closure  $truthTest
-     * @param  array|string|null  $attributes
-     * @return $this
-     */
-    public function makeHiddenIf($truthTest, $attributes)
-    {
-        if ($truthTest instanceof Closure) {
-            $truthTest = $truthTest($this);
-        }
-
-        return $truthTest ? $this->makeHidden($attributes) : $this;
+        return value($condition) ? $this->makeHidden($attributes) : $this;
     }
 }
