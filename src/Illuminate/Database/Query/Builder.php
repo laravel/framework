@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
@@ -337,7 +338,7 @@ class Builder
      */
     protected function parseSub($query)
     {
-        if ($query instanceof self || $query instanceof EloquentBuilder) {
+        if ($query instanceof self || $query instanceof EloquentBuilder || $query instanceof Relation) {
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
             return [$query, []];
@@ -3086,6 +3087,7 @@ class Builder
     {
         return $value instanceof self ||
                $value instanceof EloquentBuilder ||
+               $value instanceof Relation ||
                $value instanceof Closure;
     }
 
