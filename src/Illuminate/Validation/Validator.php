@@ -478,6 +478,10 @@ class Validator implements ValidatorContract
     {
         $this->currentRule = $rule;
 
+        if ($this->isRuleExtension($rule)) {
+            $rule = new $this->extensions[$rule];
+        }
+
         [$rule, $parameters] = ValidationRuleParser::parse($rule);
 
         if ($rule == '') {
@@ -604,6 +608,21 @@ class Validator implements ValidatorContract
                $this->passesOptionalCheck($attribute) &&
                $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
+    }
+
+    /**
+     * Determine if the rule is an extension and implements the Rule contract.
+     *
+     * @param string $rule
+     * @return bool
+     */
+    protected function isRuleExtension(string $rule): bool
+    {
+        if (! array_key_exists($rule, $this->extensions)) {
+            return false;
+        }
+
+        return in_array(RuleContract::class, class_implements($this->extensions[$rule]));
     }
 
     /**
