@@ -67,7 +67,7 @@ class DiscoverEvents
     }
 
     /**
-     * Extract the class name from the given file path.
+     * Extract the namespaced class name from the given file path.
      *
      * @param  \SplFileInfo  $file
      * @param  string  $basePath
@@ -75,12 +75,17 @@ class DiscoverEvents
      */
     protected static function classFromFile(SplFileInfo $file, $basePath)
     {
-        $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        $composerData = json_decode(file_get_contents(app()->basePath('composer.json')), true);
+        $psr4 = data_get($composerData, 'autoload.psr-4', []);
 
-        return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
-            ['\\', app()->getNamespace()],
-            ucfirst(Str::replaceLast('.php', '', $class))
-        );
+        // Sorts the array by keys length to have proper replacement.
+        uksort($psr4, function ($key1, $key2) {
+            return strlen($key2) <=> strlen($key1);
+        });
+        // Derives relative path from absolute path
+        $path = Str::replaceFirst($basePath, '', $file->getRealPath());
+        $class = str_replace(array_values($psr4), array_keys($psr4), Str::replaceLast('.php', '', $path));
+
+        return str_replace(['/', '\\\\'], '\\', $class);
     }
 }
