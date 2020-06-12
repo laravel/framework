@@ -161,7 +161,15 @@ class Dispatcher implements DispatcherContract
     {
         $subscriber = $this->resolveSubscriber($subscriber);
 
-        $subscriber->subscribe($this);
+        $events = $subscriber->subscribe($this);
+
+        if (is_array($events)) {
+            foreach ($events as $event => $listeners) {
+                foreach (array_unique($listeners) as $listener) {
+                    $this->listen($event, $listener);
+                }
+            }
+        }
     }
 
     /**
