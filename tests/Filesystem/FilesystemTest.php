@@ -551,6 +551,10 @@ class FilesystemTest extends TestCase
 
     public function testCreateFtpDriver()
     {
+        if (! defined('FTP_BINARY')) {
+            $this->markTestSkipped('Skipping since FTP extension is not available.');
+        }
+
         $filesystem = new FilesystemManager(new Application);
 
         $driver = $filesystem->createFtpDriver([
