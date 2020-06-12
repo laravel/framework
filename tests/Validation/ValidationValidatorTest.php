@@ -3662,7 +3662,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testRuleBasedCustomValidators()
+    public function testRuleObjectBasedCustomValidators()
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['bar' => true], ['bar' => 'foo']);

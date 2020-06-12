@@ -478,7 +478,7 @@ class Validator implements ValidatorContract
     {
         $this->currentRule = $rule;
 
-        if ($this->isRuleExtension($rule)) {
+        if ($this->isRuleObjectExtension($rule)) {
             $rule = new $this->extensions[$rule];
         }
 
@@ -611,12 +611,12 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Determine if the rule is an extension and implements the Rule contract.
+     * Determine if the rule is a Rule object.
      *
      * @param  array|string  $rule
      * @return bool
      */
-    protected function isRuleExtension($rule): bool
+    protected function isRuleObjectExtension($rule): bool
     {
         if (! is_string($rule) || ! isset($this->extensions[$rule])) {
             return false;
