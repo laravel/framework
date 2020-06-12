@@ -165,7 +165,7 @@ class Dispatcher implements DispatcherContract
 
         if (is_array($events)) {
             foreach ($events as $event => $listeners) {
-                foreach (array_unique($listeners) as $listener) {
+                foreach ($listeners as $listener) {
                     $this->listen($event, $listener);
                 }
             }
