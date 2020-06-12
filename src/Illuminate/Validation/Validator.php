@@ -613,16 +613,19 @@ class Validator implements ValidatorContract
     /**
      * Determine if the rule is an extension and implements the Rule contract.
      *
-     * @param string $rule
+     * @param  array|string  $rule
      * @return bool
      */
-    protected function isRuleExtension(string $rule): bool
+    protected function isRuleExtension($rule): bool
     {
-        if (! array_key_exists($rule, $this->extensions)) {
+        if (! is_string($rule) || ! isset($this->extensions[$rule])) {
             return false;
         }
 
-        return in_array(RuleContract::class, class_implements($this->extensions[$rule]));
+        $rule = $this->extensions[$rule];
+
+        return is_string($rule) && class_exists($rule)
+            && in_array(RuleContract::class, class_implements($rule));
     }
 
     /**
