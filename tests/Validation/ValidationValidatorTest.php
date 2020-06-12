@@ -3666,7 +3666,6 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['bar' => true], ['bar' => 'foo']);
-        $v->setContainer($container = m::mock(Container::class));
         $v->addExtension('foo', FooRule::class);
         $this->assertTrue($v->passes());
 
