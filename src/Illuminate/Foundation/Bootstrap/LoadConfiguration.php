@@ -83,12 +83,16 @@ class LoadConfiguration
     {
         $files = [];
 
-        $configPath = realpath($app->configPath());
+        $isPhar = class_exists('Phar') && (bool) \Phar::running();
+
+        $configPath = $isPhar ? $app->configPath() : realpath($app->configPath());
 
         foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
             $directory = $this->getNestedDirectory($file, $configPath);
 
-            $files[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+            $filePath = $isPhar ? $file->getPathname() : $file->getRealPath();
+
+            $files[$directory.basename($filePath, '.php')] = $filePath;
         }
 
         ksort($files, SORT_NATURAL);
