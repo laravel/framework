@@ -69,7 +69,7 @@ class FilesystemTest extends TestCase
     public function testReplaceWhenUnixSymlinkExists()
     {
         if (windows_os()) {
-            $this->markTestSkipped('Skipping since operating system is Windows');
+            $this->markTestSkipped('The operating system is Windows');
         }
 
         $tempFile = self::$tempDir.'/file.txt';
@@ -462,15 +462,12 @@ class FilesystemTest extends TestCase
 
     /**
      * @requires extension pcntl
+     * @requires function pcntl_fork
      */
     public function testSharedGet()
     {
         if (PHP_OS == 'Darwin') {
-            $this->markTestSkipped('Skipping on MacOS');
-        }
-
-        if (! function_exists('pcntl_fork')) {
-            $this->markTestSkipped('Skipping since the pcntl extension is not available');
+            $this->markTestSkipped('The operating system is MacOS.');
         }
 
         $content = str_repeat('123456', 1000000);
@@ -549,12 +546,11 @@ class FilesystemTest extends TestCase
         $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->allFiles(self::$tempDir));
     }
 
+    /**
+     * @requires extension ftp
+     */
     public function testCreateFtpDriver()
     {
-        if (! defined('FTP_BINARY')) {
-            $this->markTestSkipped('Skipping since FTP extension is not available.');
-        }
-
         $filesystem = new FilesystemManager(new Application);
 
         $driver = $filesystem->createFtpDriver([
