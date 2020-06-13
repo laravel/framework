@@ -161,7 +161,15 @@ class Dispatcher implements DispatcherContract
     {
         $subscriber = $this->resolveSubscriber($subscriber);
 
-        $subscriber->subscribe($this);
+        $events = $subscriber->subscribe($this);
+
+        if (is_array($events)) {
+            foreach ($events as $event => $listeners) {
+                foreach ($listeners as $listener) {
+                    $this->listen($event, $listener);
+                }
+            }
+        }
     }
 
     /**
@@ -351,13 +359,13 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  \Closure|string  $listener
+     * @param  \Closure|string|array  $listener
      * @param  bool  $wildcard
      * @return \Closure
      */
     public function makeListener($listener, $wildcard = false)
     {
-        if (is_string($listener)) {
+        if (is_string($listener) || is_array($listener)) {
             return $this->createClassListener($listener, $wildcard);
         }
 
@@ -373,7 +381,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a class based listener using the IoC container.
      *
-     * @param  string  $listener
+     * @param  string|array  $listener
      * @param  bool  $wildcard
      * @return \Closure
      */
@@ -393,12 +401,12 @@ class Dispatcher implements DispatcherContract
     /**
      * Create the class based event callable.
      *
-     * @param  string  $listener
+     * @param  string|array  $listener
      * @return callable
      */
     protected function createClassCallable($listener)
     {
-        [$class, $method] = $this->parseClassCallable($listener);
+        [$class, $method] = is_array($listener) ? $listener : $this->parseClassCallable($listener);
 
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);

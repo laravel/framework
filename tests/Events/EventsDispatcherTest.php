@@ -327,6 +327,16 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('baz', $_SERVER['__event.test']);
     }
 
+    public function testArrayCallbackListenersAreHandled()
+    {
+        unset($_SERVER['__event.ExampleListener']);
+        $d = new Dispatcher;
+        $d->listen(ExampleEvent::class, [ExampleListener::class, 'hear']);
+        $d->dispatch(new ExampleEvent);
+
+        $this->assertTrue($_SERVER['__event.ExampleListener']);
+    }
+
     public function testEventClassesArePayload()
     {
         unset($_SERVER['__event.test']);
@@ -389,4 +399,12 @@ interface SomeEventInterface
 class AnotherEvent implements SomeEventInterface
 {
     //
+}
+
+class ExampleListener
+{
+    public function hear()
+    {
+        $_SERVER['__event.ExampleListener'] = true;
+    }
 }
