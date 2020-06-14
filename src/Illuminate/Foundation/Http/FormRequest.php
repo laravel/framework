@@ -17,6 +17,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     use ValidatesWhenResolvedTrait;
 
     /**
+     * Additional validation rules, added at runtime.
+     *
+     * @var array<string, array>
+     */
+    protected static $extensionRules = [];
+
+    /**
      * The container instance.
      *
      * @var \Illuminate\Contracts\Container\Container
@@ -101,8 +108,14 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function createDefaultValidator(ValidationFactory $factory)
     {
+        $rules = $this->container->call([$this, 'rules']);
+
+        foreach (static::getExtensionRules() as $rule) {
+            $rules += $rule;
+        }
+
         return $factory->make(
-            $this->validationData(), $this->container->call([$this, 'rules']),
+            $this->validationData(), $rules,
             $this->messages(), $this->attributes()
         );
     }
@@ -245,5 +258,26 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $this->container = $container;
 
         return $this;
+    }
+
+    /**
+     * Add a set of validation rules.
+     *
+     * @param  array<string, mixed>  $rules
+     * @return void
+     */
+    public static function extendRules($rules)
+    {
+        static::$extensionRules[static::class][] = $rules;
+    }
+
+    /**
+     * Get all the rule extensions.
+     *
+     * @return  array
+     */
+    public static function getExtensionRules()
+    {
+        return static::$extensionRules[static::class] ?? [];
     }
 }
