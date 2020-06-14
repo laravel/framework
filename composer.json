@@ -119,6 +119,7 @@
         }
     },
     "suggest": {
+        "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-memcached": "Required to use the memcache cache driver.",
         "ext-pcntl": "Required to use all features of the queue worker.",
