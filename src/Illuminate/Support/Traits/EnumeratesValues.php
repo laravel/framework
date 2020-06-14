@@ -438,7 +438,7 @@ trait EnumeratesValues
         if (! $callback) {
             return new HigherOrderWhenProxy($this, $value);
         }
-        
+
         if (is_callable($value)) {
             $value = $value($this);
         }
