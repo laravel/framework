@@ -428,7 +428,7 @@ trait EnumeratesValues
     /**
      * Apply the callback if the value is truthy.
      *
-     * @param  bool|mixed  $value
+     * @param  bool|callable|mixed  $value
      * @param  callable|null  $callback
      * @param  callable|null  $default
      * @return static|mixed
@@ -437,6 +437,10 @@ trait EnumeratesValues
     {
         if (! $callback) {
             return new HigherOrderWhenProxy($this, $value);
+        }
+        
+        if (is_callable($value)) {
+            $value = $value($this);
         }
 
         if ($value) {
