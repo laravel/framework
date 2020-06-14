@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -65,6 +66,28 @@ class PolicyMakeCommand extends GeneratorCommand
             $model,
             $stub
         );
+    }
+
+    /**
+     * Get the model for the guard's user provider.
+     *
+     * @return string|null
+     */
+    protected function userProviderModel()
+    {
+        $config = $this->laravel['config'];
+
+        if ($this->option('any-guard')) {
+            return Authorizable::class;
+        }
+
+        $guard = $this->option('guard')
+                    ? $this->option('guard')
+                    : $config->get('auth.defaults.guard');
+
+        $provider = $config->get('auth.guards.'.$guard.'.provider');
+
+        return $config->get("auth.providers.{$provider}.model");
     }
 
     /**
@@ -160,6 +183,8 @@ class PolicyMakeCommand extends GeneratorCommand
     {
         return [
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to'],
+            ['guard', 'g', InputOption::VALUE_OPTIONAL, 'The guard that the policy relies on'],
+            ['any-guard', null, InputOption::VALUE_NONE, 'Allow use with any authorizable model (overrides --guard)'],
         ];
     }
 }
