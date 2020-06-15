@@ -34,12 +34,58 @@ class EventsSubscriberTest extends TestCase
         $d->subscribe($subs);
         $this->assertTrue(true);
     }
+
+    public function testEventSubscribeCanReturnMappings()
+    {
+        $d = new Dispatcher();
+        $d->subscribe(DeclarativeSubscriber::class);
+
+        $d->dispatch('myEvent1');
+        $this->assertEquals(DeclarativeSubscriber::$string, 'L1_L2_');
+
+        $d->dispatch('myEvent2');
+        $this->assertEquals(DeclarativeSubscriber::$string, 'L1_L2_L3');
+    }
 }
 
 class ExampleSubscriber
 {
     public function subscribe($e)
     {
-        //
+        // There would be no error if a non-array is returned.
+        return '(O_o)';
+    }
+}
+
+class DeclarativeSubscriber
+{
+    public static $string = '';
+
+    public function subscribe()
+    {
+        return [
+            'myEvent1' => [
+                self::class.'@Listener1',
+                self::class.'@Listener2',
+            ],
+            'myEvent2' => [
+                self::class.'@Listener3',
+            ],
+        ];
+    }
+
+    public function Listener1()
+    {
+        self::$string .= 'L1_';
+    }
+
+    public function Listener2()
+    {
+        self::$string .= 'L2_';
+    }
+
+    public function Listener3()
+    {
+        self::$string .= 'L3';
     }
 }
