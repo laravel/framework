@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -80,7 +79,7 @@ class PolicyMakeCommand extends GeneratorCommand
         $guard = $this->option('guard') ?: $config->get('auth.defaults.guard');
 
         return $config->get(
-            "auth.providers.".$config->get('auth.guards.'.$guard.'.provider').".model"
+            'auth.providers.'.$config->get('auth.guards.'.$guard.'.provider').'.model'
         );
     }
 
