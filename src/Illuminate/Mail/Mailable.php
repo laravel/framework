@@ -140,6 +140,13 @@ class Mailable implements MailableContract, Renderable
     public $mailer;
 
     /**
+     * The name of the theme that should be used in the message (null to use the default theme defined in your config).
+     *
+     * @var string|null
+     */
+    public $theme = null;
+
+    /**
      * The callback that should be invoked while building the view data.
      *
      * @var callable
