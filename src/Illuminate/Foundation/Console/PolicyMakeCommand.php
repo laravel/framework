@@ -77,17 +77,11 @@ class PolicyMakeCommand extends GeneratorCommand
     {
         $config = $this->laravel['config'];
 
-        if ($this->option('any-guard')) {
-            return Authorizable::class;
-        }
+        $guard = $this->option('guard') ?: $config->get('auth.defaults.guard');
 
-        $guard = $this->option('guard')
-                    ? $this->option('guard')
-                    : $config->get('auth.defaults.guard');
-
-        $provider = $config->get('auth.guards.'.$guard.'.provider');
-
-        return $config->get("auth.providers.{$provider}.model");
+        return $config->get(
+            "auth.providers.".$config->get('auth.guards.'.$guard.'.provider').".model"
+        );
     }
 
     /**
@@ -184,7 +178,6 @@ class PolicyMakeCommand extends GeneratorCommand
         return [
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to'],
             ['guard', 'g', InputOption::VALUE_OPTIONAL, 'The guard that the policy relies on'],
-            ['any-guard', null, InputOption::VALUE_NONE, 'Allow use with any authorizable model (overrides --guard)'],
         ];
     }
 }
