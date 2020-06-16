@@ -365,7 +365,7 @@ class Dispatcher implements DispatcherContract
      */
     public function makeListener($listener, $wildcard = false)
     {
-        if (is_string($listener) || is_array($listener)) {
+        if (is_string($listener)) {
             return $this->createClassListener($listener, $wildcard);
         }
 
@@ -381,7 +381,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a class based listener using the IoC container.
      *
-     * @param  string|array  $listener
+     * @param  string  $listener
      * @param  bool  $wildcard
      * @return \Closure
      */
@@ -401,12 +401,12 @@ class Dispatcher implements DispatcherContract
     /**
      * Create the class based event callable.
      *
-     * @param  string|array  $listener
+     * @param  string  $listener
      * @return callable
      */
     protected function createClassCallable($listener)
     {
-        [$class, $method] = is_array($listener) ? $listener : $this->parseClassCallable($listener);
+        [$class, $method] = $this->parseClassCallable($listener);
 
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
