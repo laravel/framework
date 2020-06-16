@@ -32,7 +32,6 @@ class Inspiring
             'Act only according to that maxim whereby you can, at the same time, will that it should become a universal law. - Immanuel Kant',
             'Knowing is not enough; we must apply. Being willing is not enough; we must do. - Leonardo da Vinci',
             'An unexamined life is not worth living. - Socrates',
-            'Happiness is not something readymade. It comes from your own actions. - Dalai Lama',
             'The only way to do great work is to love what you do. - Steve Jobs',
             'The whole future lies in uncertainty: live immediately. - Seneca',
             'Waste no more time arguing what a good man should be, be one. - Marcus Aurelius',
