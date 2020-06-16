@@ -13,6 +13,9 @@ trait SeedDatabase
      */
     public function seed(string $seederClass = 'DatabaseSeeder', string $connection = '')
     {
+        if ($seederClass == '') {
+            $seederClass = 'DatabaseSeeder';
+        }
         if ($connection == '') {
             $connection = config('database.default');
         }
