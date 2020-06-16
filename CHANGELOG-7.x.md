@@ -1,9 +1,20 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.15.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.16.1...7.x)
+
+
+## [v7.16.1 (2020-06-16)](https://github.com/laravel/framework/compare/v7.16.0...v7.16.1)
+
+### Revert
+- Revert "handle array callbacks" in event dispatcher ([4e3fedb](https://github.com/laravel/framework/commit/4e3fedb2a401986676f9d6aa5f244e95e9c92444))
+
+
+## [v7.16.0 (2020-06-16)](https://github.com/laravel/framework/compare/v7.15.0...v7.16.0)
 
 ### Added
 - Added `makeVisibleIf` and `makeHiddenIf` methods to `Illuminate\Database\Eloquent\Concerns\HidesAttributes` ([#33176](https://github.com/laravel/framework/pull/33176), [42383e4](https://github.com/laravel/framework/commit/42383e4ba8806ac0ab69f80d0325fa01fd9c30f4))
+- Added option to specify a custom guard for the `make:policy` command ([#33210](https://github.com/laravel/framework/pull/33210), [13e3b65](https://github.com/laravel/framework/commit/13e3b65bad5062eeba34aa2f39effd0fc4081ccd))
+- Added `theme` property to `Illuminate\Mail\Mailable` class ([#33218](https://github.com/laravel/framework/pull/33218))
 
 ### Changed
 - Improved the reflector ([#33184](https://github.com/laravel/framework/pull/33184))
