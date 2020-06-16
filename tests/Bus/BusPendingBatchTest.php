@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Bus;
 
+use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +24,11 @@ class BusPendingBatchTest extends TestCase
     public function test_pending_batch_may_be_configured_and_dispatched()
     {
         $container = new Container;
+
+        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher->shouldReceive('dispatch')->once();
+
+        $container->instance(Dispatcher::class, $eventDispatcher);
 
         $pendingBatch = new PendingBatch($container, new Collection([$job = new class {
             use Batchable;
@@ -40,7 +47,7 @@ class BusPendingBatchTest extends TestCase
 
         $repository = m::mock(BatchRepository::class);
         $repository->shouldReceive('store')->once()->with($pendingBatch)->andReturn($batch = m::mock(stdClass::class));
-        $batch->shouldReceive('add')->once()->with(m::type(Collection::class));
+        $batch->shouldReceive('add')->once()->with(m::type(Collection::class))->andReturn($batch = m::mock(Batch::class));
 
         $container->instance(BatchRepository::class, $repository);
 
