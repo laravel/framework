@@ -26,6 +26,13 @@ class Limit
     public $decayMinutes;
 
     /**
+     * The response generator callback.
+     *
+     * @var callable
+     */
+    public $responseCallback;
+
+    /**
      * Create a new limit instance.
      *
      * @param  mixed|string  $key
@@ -70,6 +77,19 @@ class Limit
     public function by($key)
     {
         $this->key = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set the callback that should generate the response when the limit is exceeded.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function response(callable $callback)
+    {
+        $this->responseCallback = $callback;
 
         return $this;
     }

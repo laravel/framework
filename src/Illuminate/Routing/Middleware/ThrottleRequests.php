@@ -5,6 +5,7 @@ namespace Illuminate\Routing\Middleware;
 use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
@@ -62,6 +63,7 @@ class ThrottleRequests
                     'key' => $prefix.$this->resolveRequestSignature($request),
                     'maxAttempts' => $this->resolveMaxAttempts($request, $maxAttempts),
                     'decayMinutes' => $decayMinutes,
+                    'responseCallback' => null,
                 ],
             ]
         );
@@ -96,6 +98,7 @@ class ThrottleRequests
                     'key' => md5($limiterName.$limit->key),
                     'maxAttempts' => $limit->maxAttempts,
                     'decayMinutes' => $limit->decayMinutes,
+                    'responseCallback' => $limit->responseCallback,
                 ];
             })->all()
         );
@@ -115,7 +118,7 @@ class ThrottleRequests
     {
         foreach ($limits as $limit) {
             if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
-                throw $this->buildException($limit->key, $limit->maxAttempts);
+                throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
 
             $this->limiter->hit($limit->key, $limit->decayMinutes * 60);
@@ -176,19 +179,25 @@ class ThrottleRequests
     /**
      * Create a 'too many attempts' exception.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  string  $key
      * @param  int  $maxAttempts
+     * @param  callable|null  $responseCallback
      * @return \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
-    protected function buildException($key, $maxAttempts)
+    protected function buildException($request, $key, $maxAttempts, $responseCallback = null)
     {
         $retryAfter = $this->getTimeUntilNextRetry($key);
 
-        return new ThrottleRequestsException('Too Many Attempts.', null, $this->getHeaders(
+        $headers = $this->getHeaders(
             $maxAttempts,
             $this->calculateRemainingAttempts($key, $maxAttempts, $retryAfter),
             $retryAfter
-        ));
+        );
+
+        return is_callable($responseCallback)
+                    ? new HttpResponseException($responseCallback($request, $headers))
+                    : new ThrottleRequestsException('Too Many Attempts.', null, $headers);
     }
 
     /**
