@@ -65,26 +65,26 @@ class DeclarativeSubscriber
     {
         return [
             'myEvent1' => [
-                self::class.'@Listener1',
-                self::class.'@Listener2',
+                self::class.'@listener1',
+                self::class.'@listener2',
             ],
             'myEvent2' => [
-                self::class.'@Listener3',
+                self::class.'@listener3',
             ],
         ];
     }
 
-    public function Listener1()
+    public function listener1()
     {
         self::$string .= 'L1_';
     }
 
-    public function Listener2()
+    public function listener2()
     {
         self::$string .= 'L2_';
     }
 
-    public function Listener3()
+    public function listener3()
     {
         self::$string .= 'L3';
     }
