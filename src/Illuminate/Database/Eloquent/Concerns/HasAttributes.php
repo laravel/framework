@@ -1371,7 +1371,7 @@ trait HasAttributes
         $attribute = Arr::get($this->attributes, $key);
         $original = Arr::get($this->original, $key);
 
-        if ($this->getCastType($key) === 'float'){
+        if ($this->hasCast($key, static::$primitiveCastTypes) && $this->getCastType($key) === 'float'){
             return bccomp($this->castAttribute($key, $attribute), $this->castAttribute($key, $original)) === 0;
         } elseif ($attribute === $original) {
             return true;
