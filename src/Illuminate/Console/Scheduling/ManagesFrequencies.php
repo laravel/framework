@@ -338,6 +338,21 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run on the last day of the month
+     *
+     * @param string $time
+     * @return $this
+     */
+    public function monthlyOnLastDay($time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        $lastDayOfMonth = now()->endOfMonth()->day;
+
+        return $this->spliceIntoPosition(3, $lastDayOfMonth);
+    }
+
+    /**
      * Schedule the event to run twice monthly.
      *
      * @param  int  $first
