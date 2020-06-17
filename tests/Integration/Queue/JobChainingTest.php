@@ -224,29 +224,6 @@ class JobChainingTest extends TestCase
         $this->assertEquals(['var1' => 1, 'var2' => 2], JobChainingTestFirstJob::$usedSharedData);
         $this->assertEquals(['var1' => 1, 'var2' => 2], JobChainingTestSecondJob::$usedSharedData);
     }
-
-    public function testClosuresCanBeChainedOnSuccessUsingPendingChainAndSharedData()
-    {
-        $job1SharedData = 'test';
-        $job2SharedData = 'test';
-        $job3Shareddata = 'test';
-
-        JobChainingTestFirstJob::withChain([
-            function ($sharedData) use (&$job1SharedData) {
-                $job1SharedData = $sharedData;
-            },
-            function ($sharedData) use (&$job2SharedData) {
-                $job2SharedData = $sharedData;
-            },
-            function ($sharedData) use (&$job3SharedData) {
-                $job3SharedData = $sharedData;
-            },
-        ], ['var1' => 1])->dispatch();
-
-        $this->assertEquals(['var1' => 1], $job1SharedData);
-        $this->assertEquals(['var1' => 1], $job2SharedData);
-        $this->assertEquals(['var1' => 1], $job3SharedData);
-    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue

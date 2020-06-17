@@ -9,13 +9,6 @@ class SerializableClosure extends OpisSerializableClosure
     use SerializesAndRestoresModelIdentifiers;
 
     /**
-     * The data that will be shared across the jobs.
-     *
-     * @var mixed
-     */
-    public $sharedData;
-
-    /**
      * Transform the use variables before serialization.
      *
      * @param  array  $data The Closure's use variables
@@ -43,18 +36,5 @@ class SerializableClosure extends OpisSerializableClosure
         }
 
         return $data;
-    }
-
-    /**
-     * Pass the shared data.
-     *
-     * @param  mixed  $sharedData
-     * @return $this
-     */
-    public function sharedData($sharedData)
-    {
-        $this->sharedData = $sharedData;
-
-        return $this;
     }
 }
