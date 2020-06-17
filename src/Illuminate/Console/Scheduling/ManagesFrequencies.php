@@ -340,7 +340,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run on the last day of the month.
      *
-     * @param string $time
+     * @param  string  $time
      * @return $this
      */
     public function monthlyOnLastDay($time = '0:0')
