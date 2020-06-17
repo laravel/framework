@@ -208,7 +208,6 @@ class JobChainingTest extends TestCase
             new JobChainingTestThirdJob,
         ], ['var1' => 1])->dispatch();
 
-
         $this->assertEquals(['var1' => 1], JobChainingTestFirstJob::$usedSharedData);
         $this->assertEquals(['var1' => 1], JobChainingTestSecondJob::$usedSharedData);
         $this->assertEquals(['var1' => 1], JobChainingTestThirdJob::$usedSharedData);
@@ -221,7 +220,6 @@ class JobChainingTest extends TestCase
             new JobChainingTestSecondJob,
         ], ['var1' => 1])->dispatch();
 
-
         $this->assertEquals(['var1' => 1], JobChainingTestThatModifiesSharedData::$usedSharedData);
         $this->assertEquals(['var1' => 1, 'var2' => 2], JobChainingTestFirstJob::$usedSharedData);
         $this->assertEquals(['var1' => 1, 'var2' => 2], JobChainingTestSecondJob::$usedSharedData);
@@ -229,9 +227,9 @@ class JobChainingTest extends TestCase
 
     public function testClosuresCanBeChainedOnSuccessUsingPendingChainAndSharedData()
     {
-        $this->markTestIncomplete(
+        /* $this->markTestIncomplete(
             'Serialized Closures do work properly.'
-        );
+        ); */
 
         $job1SharedData = 'test';
         $job2SharedData = 'test';

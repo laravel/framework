@@ -7,7 +7,6 @@ use Illuminate\Support\Fluent;
 
 trait Dispatchable
 {
-
     /**
      * The data that was shared between previous jobs (if any).
      *
