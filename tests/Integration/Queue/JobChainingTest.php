@@ -227,10 +227,6 @@ class JobChainingTest extends TestCase
 
     public function testClosuresCanBeChainedOnSuccessUsingPendingChainAndSharedData()
     {
-        /* $this->markTestIncomplete(
-            'Serialized Closures do work properly.'
-        ); */
-
         $job1SharedData = 'test';
         $job2SharedData = 'test';
         $job3Shareddata = 'test';
