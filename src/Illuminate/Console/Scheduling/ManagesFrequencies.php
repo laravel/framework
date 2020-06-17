@@ -347,7 +347,7 @@ trait ManagesFrequencies
     {
         $this->dailyAt($time);
 
-        $lastDayOfMonth = now()->endOfMonth()->day;
+        $lastDayOfMonth = Carbon::now()->endOfMonth()->day;
 
         return $this->spliceIntoPosition(3, $lastDayOfMonth);
     }
