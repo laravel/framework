@@ -187,6 +187,7 @@ trait Queueable
 
                 $next->onConnection($next->connection ?: $this->chainConnection);
                 $next->onQueue($next->queue ?: $this->chainQueue);
+                $next->sharedData($this->sharedData);
 
                 $next->chainConnection = $this->chainConnection;
                 $next->chainQueue = $this->chainQueue;

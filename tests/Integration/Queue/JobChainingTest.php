@@ -200,7 +200,32 @@ class JobChainingTest extends TestCase
         $this->assertNull(JobChainingTestThirdJob::$usedQueue);
         $this->assertNull(JobChainingTestThirdJob::$usedConnection);
     }
-}
+
+    public function testJobsCanBeChainedOnSuccessUsingPendingChainAndSharedData()
+    {
+        JobChainingTestFirstJob::withChain([
+            new JobChainingTestSecondJob,
+            new JobChainingTestThirdJob,
+        ], ['var1' => 1])->dispatch();
+
+
+        $this->assertEquals(['var1' => 1], JobChainingTestFirstJob::$usedSharedData);
+        $this->assertEquals(['var1' => 1], JobChainingTestSecondJob::$usedSharedData);
+        $this->assertEquals(['var1' => 1], JobChainingTestThirdJob::$usedSharedData);
+    }
+
+    public function testJobsCanBeChainedAndModifySharedDataMidProcess()
+    {
+        JobChainingTestThatModifiesSharedData::withChain([
+            new JobChainingTestFirstJob,
+            new JobChainingTestSecondJob,
+        ], ['var1' => 1])->dispatch();
+
+
+        $this->assertEquals(['var1' => 1], JobChainingTestThatModifiesSharedData::$usedSharedData);
+        $this->assertEquals(['var1' => 1, 'var2' => 2], JobChainingTestFirstJob::$usedSharedData);
+        $this->assertEquals(['var1' => 1, 'var2' => 2], JobChainingTestSecondJob::$usedSharedData);
+    }
 
 class JobChainingTestFirstJob implements ShouldQueue
 {
@@ -209,12 +234,14 @@ class JobChainingTestFirstJob implements ShouldQueue
     public static $ran = false;
     public static $usedQueue = null;
     public static $usedConnection = null;
+    public static $usedSharedData = null;
 
     public function handle()
     {
         static::$ran = true;
         static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
+        static::$usedSharedData = $this->sharedData;
     }
 }
 
@@ -225,12 +252,14 @@ class JobChainingTestSecondJob implements ShouldQueue
     public static $ran = false;
     public static $usedQueue = null;
     public static $usedConnection = null;
+    public static $usedSharedData = null;
 
     public function handle()
     {
         static::$ran = true;
         static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
+        static::$usedSharedData = $this->sharedData;
     }
 }
 
@@ -241,12 +270,34 @@ class JobChainingTestThirdJob implements ShouldQueue
     public static $ran = false;
     public static $usedQueue = null;
     public static $usedConnection = null;
+    public static $usedSharedData = null;
 
     public function handle()
     {
         static::$ran = true;
         static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
+        static::$usedSharedData = $this->sharedData;
+    }
+}
+
+class JobChainingTestThatModifiesSharedData implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public static $ran = false;
+    public static $usedQueue = null;
+    public static $usedConnection = null;
+    public static $usedSharedData = null;
+
+    public function handle()
+    {
+        static::$ran = true;
+        static::$usedQueue = $this->queue;
+        static::$usedConnection = $this->connection;
+        static::$usedSharedData = $this->sharedData;
+
+        $this->sharedData['var2'] = 2;
     }
 }
 
