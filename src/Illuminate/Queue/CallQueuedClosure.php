@@ -42,11 +42,15 @@ class CallQueuedClosure implements ShouldQueue
      * Create a new job instance.
      *
      * @param  \Closure  $closure
+     * @param  mixed  $sharedData
      * @return self
      */
-    public static function create(Closure $job)
+    public static function create(Closure $job, $sharedData = null)
     {
-        return new self(new SerializableClosure($job));
+        return new self(
+            (new SerializableClosure($job))
+                ->sharedData($sharedData)
+        );
     }
 
     /**
@@ -57,7 +61,7 @@ class CallQueuedClosure implements ShouldQueue
      */
     public function handle(Container $container)
     {
-        $container->call($this->closure->getClosure());
+        $container->call($this->closure->getClosure(), [$this->closure->sharedData]);
     }
 
     /**

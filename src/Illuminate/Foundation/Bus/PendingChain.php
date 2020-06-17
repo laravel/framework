@@ -53,7 +53,7 @@ class PendingChain
         if (is_string($this->job)) {
             $firstJob = (new $this->job(...func_get_args()))->sharedData($this->sharedData);
         } elseif ($this->job instanceof Closure) {
-            $firstJob = CallQueuedClosure::create($this->job);
+            $firstJob = CallQueuedClosure::create($this->job, $this->sharedData);
         } else {
             $firstJob = $this->job;
         }
