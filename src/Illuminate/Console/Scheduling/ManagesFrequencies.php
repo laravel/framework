@@ -338,7 +338,7 @@ trait ManagesFrequencies
     }
 
     /**
-     * Schedule the event to run on the last day of the month
+     * Schedule the event to run on the last day of the month.
      *
      * @param string $time
      * @return $this
