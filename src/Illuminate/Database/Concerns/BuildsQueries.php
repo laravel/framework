@@ -77,7 +77,7 @@ trait BuildsQueries
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
     {
-        $column = $column ?? $this->getQualifiedKeyName();
+        $column = $column ?? $this->getModel()->getQualifiedKeyName();
 
         $alias = $alias ?? $column;
 
