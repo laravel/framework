@@ -1372,10 +1372,7 @@ trait HasAttributes
         $original = Arr::get($this->original, $key);
 
         if ($this->getCastType($key) === 'float'){
-            return abs(
-                    $this->castAttribute($key, $attribute) -
-                    $this->castAttribute($key, $original)
-                ) < PHP_FLOAT_EPSILON;
+            return bccomp($this->castAttribute($key, $attribute), $this->castAttribute($key, $original)) === 0;
         } elseif ($attribute === $original) {
             return true;
         } elseif (is_null($attribute)) {
