@@ -539,7 +539,11 @@ class MySqlGrammar extends Grammar
      */
     protected function typeFloat(Fluent $column)
     {
-        return $this->typeDouble($column);
+        if ($column->total && $column->places) {
+            return "float({$column->total}, {$column->places})";
+        }
+
+        return 'float';
     }
 
     /**
