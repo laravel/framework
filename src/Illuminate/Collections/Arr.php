@@ -622,11 +622,13 @@ class Arr
         }
 
         if (static::isAssoc($array)) {
-            $descending ? krsort($array, $options)
-                : ksort($array, $options);
+            $descending
+                    ? krsort($array, $options)
+                    : ksort($array, $options);
         } else {
-            $descending ? rsort($array, $options)
-                : sort($array, $options);
+            $descending
+                    ? rsort($array, $options)
+                    : sort($array, $options);
         }
 
         return $array;
