@@ -1,6 +1,9 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.19...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.20...6.x)
+
+
+## [v6.18.20 (2020-06-16)](https://github.com/laravel/framework/compare/v6.18.19...v6.18.20)
 
 ### Changed
 - Improved the reflector ([#33184](https://github.com/laravel/framework/pull/33184))
