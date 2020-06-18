@@ -19,6 +19,7 @@ abstract class TestCase extends BaseTestCase
         Concerns\MakesHttpRequests,
         Concerns\InteractsWithAuthentication,
         Concerns\InteractsWithConsole,
+        Concerns\InteractsWithFormRequest,
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithExceptionHandling,
         Concerns\InteractsWithSession,
