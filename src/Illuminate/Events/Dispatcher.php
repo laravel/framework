@@ -414,6 +414,10 @@ class Dispatcher implements DispatcherContract
                             ? $listener
                             : $this->parseClassCallable($listener);
 
+        if (! method_exists($class, $method)) {
+            $method = '__invoke';
+        }
+
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
         }

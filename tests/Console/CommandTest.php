@@ -23,7 +23,12 @@ class CommandTest extends TestCase
 
     public function testCallingClassCommandResolveCommandViaApplicationResolution()
     {
-        $command = new Command();
+        $command = new class extends Command {
+            public function handle()
+            {
+
+            }
+        };
 
         $application = m::mock(Application::class);
         $command->setLaravel($application);

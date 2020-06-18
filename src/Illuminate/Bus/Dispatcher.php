@@ -116,11 +116,15 @@ class Dispatcher implements QueueingDispatcher
 
         if ($handler || $handler = $this->getCommandHandler($command)) {
             $callback = function ($command) use ($handler) {
-                return $handler->handle($command);
+                $method = method_exists($handler, 'handle') ? 'handle' : '__invoke';
+
+                return $handler->{$method}($command);
             };
         } else {
             $callback = function ($command) {
-                return $this->container->call([$command, 'handle']);
+                $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
+
+                return $this->container->call([$command, $method]);
             };
         }
 
