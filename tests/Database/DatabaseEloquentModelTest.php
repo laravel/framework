@@ -148,6 +148,23 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isClean(['foo', 'bar']));
     }
 
+    public function testCleanWhenFloatUpdateAttribute()
+    {
+        $original = -16.666347;
+        $new = 20.1 - 36.766347;
+
+        // PHP isn't able to compare two floats using === reliably.
+        // See warning here:
+        // https://www.php.net/manual/en/language.types.float.php
+
+        $this->assertTrue($original !== $new);
+        $this->assertTrue(bccomp($original, $new) === 0);
+
+        $model = new EloquentModelStub(['castedFloat' => $original]);
+        $model->syncOriginal();
+        $this->assertTrue($model->originalIsEquivalent('castedFloat', $new));
+    }
+
     public function testCalculatedAttributes()
     {
         $model = new EloquentModelStub;
@@ -1992,6 +2009,7 @@ class EloquentModelStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = EloquentModelSaveStub::class;
+    protected $casts = ['castedFloat' => 'float'];
 
     public function getListItemsAttribute($value)
     {
