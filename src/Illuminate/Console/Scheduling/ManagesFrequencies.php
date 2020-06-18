@@ -338,21 +338,6 @@ trait ManagesFrequencies
     }
 
     /**
-     * Schedule the event to run on the last day of the month.
-     *
-     * @param  string  $time
-     * @return $this
-     */
-    public function monthlyOnLastDay($time = '0:0')
-    {
-        $this->dailyAt($time);
-
-        $lastDayOfMonth = Carbon::now()->endOfMonth()->day;
-
-        return $this->spliceIntoPosition(3, $lastDayOfMonth);
-    }
-
-    /**
      * Schedule the event to run twice monthly.
      *
      * @param  int  $first
@@ -366,6 +351,19 @@ trait ManagesFrequencies
         return $this->spliceIntoPosition(1, 0)
             ->spliceIntoPosition(2, 0)
             ->spliceIntoPosition(3, $days);
+    }
+
+    /**
+     * Schedule the event to run on the last day of the month.
+     *
+     * @param  string  $time
+     * @return $this
+     */
+    public function lastDayOfMonth($time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, Carbon::now()->endOfMonth()->day);
     }
 
     /**
