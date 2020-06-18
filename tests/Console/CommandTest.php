@@ -26,7 +26,6 @@ class CommandTest extends TestCase
         $command = new class extends Command {
             public function handle()
             {
-
             }
         };
 
