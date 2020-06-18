@@ -151,7 +151,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testCleanWhenFloatUpdateAttribute()
     {
         $original = -16.666347;
-        $new = 20.1-36.766347;
+        $new = 20.1 - 36.766347;
 
         // PHP isn't able to compare two floats using === reliably.
         // See warning here:
