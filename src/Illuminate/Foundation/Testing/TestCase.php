@@ -22,6 +22,7 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithExceptionHandling,
         Concerns\InteractsWithSession,
+        Concerns\InteractsWithTime,
         Concerns\InteractsWithViews,
         Concerns\MocksApplicationServices;
 
