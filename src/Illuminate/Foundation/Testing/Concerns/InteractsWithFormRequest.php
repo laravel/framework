@@ -3,9 +3,6 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Testing\PendingFormRequest;
-use Illuminate\Console\OutputStyle;
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Testing\PendingCommand;
 
 trait InteractsWithFormRequest
 {
