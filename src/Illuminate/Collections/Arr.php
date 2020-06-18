@@ -609,20 +609,24 @@ class Arr
      * Recursively sort an array by keys and values.
      *
      * @param  array  $array
+     * @param  int  $options
+     * @param  bool  $descending
      * @return array
      */
-    public static function sortRecursive($array)
+    public static function sortRecursive($array, $options = SORT_REGULAR, $descending = false)
     {
         foreach ($array as &$value) {
             if (is_array($value)) {
-                $value = static::sortRecursive($value);
+                $value = static::sortRecursive($value, $options, $descending);
             }
         }
 
         if (static::isAssoc($array)) {
-            ksort($array);
+            $descending ? krsort($array, $options)
+                : ksort($array, $options);
         } else {
-            sort($array);
+            $descending ? rsort($array, $options)
+                : sort($array, $options);
         }
 
         return $array;
