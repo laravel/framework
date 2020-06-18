@@ -369,6 +369,10 @@ class Dispatcher implements DispatcherContract
             return $this->createClassListener($listener, $wildcard);
         }
 
+        if (is_array($listener) && isset($listener[0]) && is_string($listener[0])) {
+            return $this->createClassListener($listener, $wildcard);
+        }
+
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return $listener($event, $payload);
@@ -401,12 +405,14 @@ class Dispatcher implements DispatcherContract
     /**
      * Create the class based event callable.
      *
-     * @param  string  $listener
+     * @param  array|string  $listener
      * @return callable
      */
     protected function createClassCallable($listener)
     {
-        [$class, $method] = $this->parseClassCallable($listener);
+        [$class, $method] = is_array($listener)
+                            ? $listener
+                            : $this->parseClassCallable($listener);
 
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
