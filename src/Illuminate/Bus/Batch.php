@@ -385,6 +385,7 @@ class Batch implements Arrayable, JsonSerializable
             'pendingJobs' => $this->pendingJobs,
             'processedJobs' => $this->processedJobs(),
             'progress' => $this->progress(),
+            'options' => $this->options,
             'failedJobs' => $this->failedJobs,
             'createdAt' => $this->createdAt,
             'cancelledAt' => $this->cancelledAt,
