@@ -1343,4 +1343,15 @@ class LazyCollection implements Enumerable
             yield from $this->collect()->$method(...$params);
         });
     }
+
+    /**
+     * Returns the collection shifted by one based on a given value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function roundRobin($value)
+    {
+        return $this->collect()->roundRobin($value);
+    }
 }

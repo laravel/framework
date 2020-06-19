@@ -1377,4 +1377,22 @@ class Collection implements ArrayAccess, Enumerable
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Returns the collection shifted by one based on a given value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function roundRobin($value)
+    {
+        $found = false;
+        $partitions = $this->partition(function ($currentItem, $key) use ($value, &$found) {
+            $found = $found || $value === $key;
+
+            return $found;
+        });
+
+        return $partitions->first()->merge($partitions->last())->values();
+    }
 }

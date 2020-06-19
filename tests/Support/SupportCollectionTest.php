@@ -4241,6 +4241,24 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testRoundRobin($collection)
+    {
+        $data = new $collection([1, 2, 3, 4]);
+
+        $this->assertEquals([2, 3, 4, 1], $data->roundRobin(1)->all());
+        $this->assertEquals([3, 4, 1, 2], $data->roundRobin(2)->all());
+        $this->assertEquals([4, 1, 2, 3], $data->roundRobin(3)->all());
+        $this->assertEquals([1, 2, 3, 4], $data->roundRobin(4)->all());
+
+        // return the original collection on edge cases
+        foreach ([5, 0, -1, null, false] as $i) {
+            $this->assertEquals([1, 2, 3, 4], $data->roundRobin($i)->all());
+        }
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testCollect($collection)
     {
         $data = $collection::make([
