@@ -73,7 +73,7 @@ class PendingFormRequest {
     protected $hasExecuted = false;
 
     /**
-     * Create a new pending console command run
+     * Create a new pending form request
      *
      * @param \PHPUnit\Framework\TestCase $test
      * @param \Illuminate\Contracts\Container\Container $app
@@ -168,7 +168,7 @@ class PendingFormRequest {
     }
 
     /**
-     * Execute the command
+     * Execute the form request
      *
      * @return $this
      */
@@ -177,7 +177,7 @@ class PendingFormRequest {
     }
 
     /**
-     * Execute the command
+     * Execute the form request
      *
      * @return $this
      */
