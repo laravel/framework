@@ -1312,6 +1312,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function isProviderNotLoaded(string $provider): bool
     {
-        return !$this->isProviderLoaded($provider);
+        return ! $this->isProviderLoaded($provider);
     }
 }
