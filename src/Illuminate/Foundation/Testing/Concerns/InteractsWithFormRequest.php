@@ -7,7 +7,7 @@ use Illuminate\Testing\PendingFormRequest;
 trait InteractsWithFormRequest
 {
     /**
-     * Call artisan command and return code.
+     * Build form request to run authorization and validation on
      *
      * @param \Illuminate\Foundation\Http\FormRequest|string $formRequest
      * @param string $route
