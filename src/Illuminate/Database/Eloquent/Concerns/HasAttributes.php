@@ -1412,6 +1412,11 @@ trait HasAttributes
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
             return $this->castAttribute($key, $attribute) ==
                 $this->castAttribute($key, $original);
+        } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
+            return bccomp(
+                $this->castAttribute($key, $current),
+                $this->castAttribute($key, $original)
+            ) === 0;
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                    $this->castAttribute($key, $original);
