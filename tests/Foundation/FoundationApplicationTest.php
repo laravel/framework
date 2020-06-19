@@ -87,6 +87,30 @@ class FoundationApplicationTest extends TestCase
         $this->assertArrayHasKey($class, $app->getLoadedProviders());
     }
 
+    public function testServiceProvidersCouldBeLoaded()
+    {
+        $provider = m::mock(ServiceProvider::class);
+        $class = get_class($provider);
+        $provider->shouldReceive('register')->once();
+        $app = new Application;
+        $app->register($provider);
+
+        $this->assertTrue($app->isProviderLoaded($class));
+        $this->assertFalse($app->isProviderLoaded(ApplicationBasicServiceProviderStub::class));
+    }
+
+    public function testServiceProvidersCouldBeNotLoaded()
+    {
+        $provider = m::mock(ServiceProvider::class);
+        $class = get_class($provider);
+        $provider->shouldReceive('register')->once();
+        $app = new Application;
+        $app->register($provider);
+
+        $this->assertTrue($app->isProviderNotLoaded(ApplicationBasicServiceProviderStub::class));
+        $this->assertFalse($app->isProviderNotLoaded($class));
+    }
+
     public function testDeferredServicesMarkedAsBound()
     {
         $app = new Application;

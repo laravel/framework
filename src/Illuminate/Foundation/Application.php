@@ -1292,4 +1292,26 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         throw new RuntimeException('Unable to detect application namespace.');
     }
+
+    /**
+     * Determine if service provider is loaded.
+     *
+     * @param string $provider
+     * @return bool
+     */
+    public function isProviderLoaded(string $provider): bool
+    {
+        return isset($this->loadedProviders[$provider]);
+    }
+
+    /**
+     * Determine if service provider is not loaded.
+     *
+     * @param string $provider
+     * @return bool
+     */
+    public function isProviderNotLoaded(string $provider): bool
+    {
+        return !$this->isProviderLoaded($provider);
+    }
 }
