@@ -342,7 +342,7 @@ trait ManagesFrequencies
      *
      * @param  int  $first
      * @param  int  $second
-     * @param string $time
+     * @param  string  $time
      * @return $this
      */
     public function twiceMonthly($first = 1, $second = 16, $time = '0:0')
