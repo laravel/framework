@@ -51,9 +51,7 @@ class DatabaseJob extends Job implements JobContract
     {
         parent::release($delay);
 
-        $this->delete();
-
-        return $this->database->release($this->queue, $this->job, $delay);
+        return $this->database->deleteAndRelease($this->queue, $this, $delay);
     }
 
     /**
@@ -96,5 +94,15 @@ class DatabaseJob extends Job implements JobContract
     public function getRawBody()
     {
         return $this->job->payload;
+    }
+
+    /**
+     * Get the database job record.
+     *
+     * @return \Illuminate\Queue\Jobs\DatabaseJobRecord
+     */
+    public function getJobRecord()
+    {
+        return $this->job;
     }
 }
