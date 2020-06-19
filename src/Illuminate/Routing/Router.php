@@ -747,7 +747,7 @@ class Router implements BindingRegistrar, RegistrarContract
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
         } elseif ($response instanceof Model && $response->wasRecentlyCreated) {
-            $response = new JsonResponse($response, 201);
+            $response = new JsonResponse($response, Response::HTTP_CREATED);
         } elseif (! $response instanceof SymfonyResponse &&
                    ($response instanceof Arrayable ||
                     $response instanceof Jsonable ||
@@ -756,7 +756,7 @@ class Router implements BindingRegistrar, RegistrarContract
                     is_array($response))) {
             $response = new JsonResponse($response);
         } elseif (! $response instanceof SymfonyResponse) {
-            $response = new Response($response, 200, ['Content-Type' => 'text/html']);
+            $response = new Response($response, Response::HTTP_OK, ['Content-Type' => 'text/html']);
         }
 
         if ($response->getStatusCode() === Response::HTTP_NOT_MODIFIED) {
