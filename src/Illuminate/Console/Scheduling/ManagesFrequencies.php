@@ -338,7 +338,7 @@ trait ManagesFrequencies
     }
 
     /**
-     * Schedule the event to run twice monthly on a given time.
+     * Schedule the event to run twice monthly at a given time.
      *
      * @param  int  $first
      * @param  int  $second
@@ -348,6 +348,7 @@ trait ManagesFrequencies
     public function twiceMonthly($first = 1, $second = 16, $time = '0:0')
     {
         $days = $first.','.$second;
+
         $this->dailyAt($time);
         
         return $this->spliceIntoPosition(1, 0)
