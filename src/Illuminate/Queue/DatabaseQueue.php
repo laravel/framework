@@ -340,7 +340,6 @@ class DatabaseQueue extends Queue implements QueueContract
         });
     }
 
-
     /**
      * Get the queue or return the default.
      *
