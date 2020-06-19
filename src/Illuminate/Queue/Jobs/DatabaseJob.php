@@ -45,13 +45,13 @@ class DatabaseJob extends Job implements JobContract
      * Release the job back into the queue.
      *
      * @param  int  $delay
-     * @return mixed
+     * @return void
      */
     public function release($delay = 0)
     {
         parent::release($delay);
 
-        return $this->database->deleteAndRelease($this->queue, $this, $delay);
+        $this->database->deleteAndRelease($this->queue, $this, $delay);
     }
 
     /**
