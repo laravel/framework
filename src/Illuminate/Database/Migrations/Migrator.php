@@ -516,6 +516,14 @@ class Migrator
     }
 
     /**
+     * Clear all registered migration paths.
+     */
+    public function clearPaths()
+    {
+        $this->paths = [];
+    }
+
+    /**
      * Get the default connection name.
      *
      * @return string
