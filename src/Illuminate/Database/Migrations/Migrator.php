@@ -517,6 +517,8 @@ class Migrator
 
     /**
      * Clear all registered migration paths.
+     *
+     * @return void
      */
     public function clearPaths()
     {
