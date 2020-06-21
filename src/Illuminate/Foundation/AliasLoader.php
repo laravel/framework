@@ -138,9 +138,9 @@ class AliasLoader
      * @param  string  $alias
      * @return void
      */
-    public function alias($class, $alias)
+    public function alias($alias, $class)
     {
-        $this->aliases[$class] = $alias;
+        $this->aliases[$alias] = $class;
     }
 
     /**
