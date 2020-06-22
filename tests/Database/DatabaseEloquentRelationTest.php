@@ -281,6 +281,53 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertInstanceOf(EloquentResolverRelationStub::class, $model->customer());
         $this->assertSame(['key' => 'value'], $model->customer);
     }
+
+    public function testGetRelationOrQueryWhenLoaded()
+    {
+        $parent = new EloquentWithRelationStub;
+        $relation = new Collection();
+        $parent->setRelation('relationStub', $relation);
+
+        $loaded = $parent->getRelationOrQuery('relationStub');
+
+        $this->assertInstanceOf(Collection::class, $loaded);
+        $this->assertTrue($parent->relationLoaded('relationStub'));
+    }
+
+    public function testGetRelationOrQueryWhenNotLoaded()
+    {
+        $parent = new EloquentWithRelationStub;
+
+        $loaded = $parent->getRelationOrQuery('relationStub');
+
+        $this->assertInstanceOf(Relation::class, $loaded);
+        $this->assertFalse($parent->relationLoaded('relationStub'));
+    }
+
+    public function testGetCountWhenLoaded()
+    {
+        $parent = new EloquentWithRelationStub;
+        $relation = new Collection([
+            new EloquentRelationResetModelStub,
+            new EloquentRelationResetModelStub
+        ]);
+        $parent->setRelation('relationStub', $relation);
+
+        $count = $parent->getCount('relationStub');
+
+        $this->assertEquals(2, $count);
+    }
+
+    public function testGetCountWhenCountIsSet()
+    {
+        $parent = new EloquentWithRelationStub;
+        $parent->relation_stub_count = 3;
+
+        $count = $parent->getCount('relationStub');
+
+        $this->assertEquals(3, $count);
+        $this->assertFalse($parent->relationLoaded('relationStub'));
+    }
 }
 
 class EloquentRelationResetModelStub extends Model
@@ -349,5 +396,13 @@ class EloquentResolverRelationStub extends EloquentRelationStub
     public function getResults()
     {
         return ['key' => 'value'];
+    }
+}
+
+class EloquentWithRelationStub extends EloquentRelationResetModelStub
+{
+    public function relationStub()
+    {
+        return $this->hasMany(EloquentRelationResetModelStub::class);
     }
 }

@@ -867,4 +867,34 @@ trait HasRelationships
 
         return $this;
     }
+        
+    /**
+     * Get the relation if it is loaded and its builder otherwise.
+     *
+     * @param  string  $relation
+     * @return mixed
+     */
+    public function getRelationOrQuery(string $relation)
+    {
+        if ($this->relationLoaded($relation))
+            return $this->$relation;
+        
+        return $this->$relation();
+    }
+     
+    /**
+     * Get the count of related models.
+     *
+     * @param  string  $relation
+     * @return integer
+     */
+    public function getCount(string $relation)
+    {
+        $countKey = Str::snake($relation.'_count');
+        
+        if (array_key_exists($countKey, $this->attributes))
+            return $this->$countKey;
+        
+        return $this->getRelationOrQuery($relation)->count();
+    }
 }
