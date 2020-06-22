@@ -311,6 +311,29 @@ class SupportStrTest extends TestCase
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, ''));
     }
 
+    public function testLimitOnSpace()
+    {
+        $this->assertSame('Laravel is...', Str::limitOnSpace('Laravel is a free, open source PHP web application framework.', 10));
+        $this->assertSame('Laravel is...', Str::limitOnSpace('Laravel is a free, open source PHP web application framework.', 11));
+        $this->assertSame('这是一...', Str::limitOnSpace('这是一段中文', 6));
+
+        $string = 'The PHP framework for web artisans.';
+        $this->assertSame('The PHP...', Str::limitOnSpace($string, 7));
+        $this->assertSame('The PHP...', Str::limitOnSpace($string, 9));
+        $this->assertSame('The PHP ->', Str::limitOnSpace($string, 12, ' ->'));
+        $this->assertSame('The PHP framework for web*', Str::limitOnSpace($string, 34, '*'));
+        $this->assertSame('The PHP framework for web artisans.', Str::limitOnSpace($string, 35));
+        $this->assertSame('The PHP framework for web artisans.', Str::limitOnSpace($string, 100));
+
+        $string = 'ThePHPFrameworkForWebArtisans';
+        $this->assertSame('ThePHP', Str::limitOnSpace($string, 6, ''));
+        $this->assertSame('ThePHP', Str::limitOnSpace($string, 12, '', 'F'));
+
+        $nonAsciiString = '这是一段中文';
+        $this->assertSame('这是一...', Str::limitOnSpace($nonAsciiString, 6));
+        $this->assertSame('这是一', Str::limitOnSpace($nonAsciiString, 6, ''));
+    }
+
     public function testLength()
     {
         $this->assertEquals(11, Str::length('foo bar baz'));

@@ -341,6 +341,36 @@ class Str
     }
 
     /**
+     * Limit the number of characters in a string on the last space before the limit..
+     *
+     * @param  string  $value
+     * @param  int  $limit
+     * @param  string  $end
+     * @param  string  $spaceChar
+     * @return string
+     */
+    public static function limitOnSpace($value, $limit = 100, $end = '...', $spaceChar = ' ')
+    {
+        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+            return $value;
+        }
+
+        if ($value[$limit] === $spaceChar) {
+            return self::limit($value, $limit, $end);
+        }
+
+        $limitedString = mb_strimwidth($value, 0, $limit, '', 'UTF-8');
+
+        $spaceLimit = mb_strrpos($limitedString, $spaceChar);
+
+        if($spaceLimit === false) {
+            $spaceLimit = $limit;
+        }
+
+        return self::limit($value, $spaceLimit, $end);
+    }
+
+    /**
      * Convert the given string to lower-case.
      *
      * @param  string  $value
