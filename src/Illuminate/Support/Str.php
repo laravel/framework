@@ -363,7 +363,7 @@ class Str
 
         $spaceLimit = mb_strrpos($limitedString, $spaceChar);
 
-        if($spaceLimit === false) {
+        if ($spaceLimit === false) {
             $spaceLimit = $limit;
         }
 
