@@ -341,27 +341,27 @@ class Str
     }
 
     /**
-     * Limit the number of characters in a string on the last space before the limit..
+     * Limit the number of characters in a string on the last given char before the limit.
      *
      * @param  string  $value
      * @param  int  $limit
      * @param  string  $end
-     * @param  string  $spaceChar
+     * @param  string  $char
      * @return string
      */
-    public static function limitOnSpace($value, $limit = 100, $end = '...', $spaceChar = ' ')
+    public static function limitOnChar($value, $limit = 100, $end = '...', $char = ' ')
     {
         if (mb_strwidth($value, 'UTF-8') <= $limit) {
             return $value;
         }
 
-        if ($value[$limit] === $spaceChar) {
+        if ($value[$limit] === $char) {
             return self::limit($value, $limit, $end);
         }
 
         $limitedString = mb_strimwidth($value, 0, $limit, '', 'UTF-8');
 
-        $spaceLimit = mb_strrpos($limitedString, $spaceChar);
+        $spaceLimit = mb_strrpos($limitedString, $char);
 
         if ($spaceLimit === false) {
             $spaceLimit = $limit;
