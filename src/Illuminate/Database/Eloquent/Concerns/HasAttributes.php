@@ -1193,13 +1193,11 @@ trait HasAttributes
     /**
      * Get the model's original attribute values.
      *
-     * This should not be called by the end user / developer.
-     *
      * @param  string|null  $key
      * @param  mixed  $default
      * @return mixed|array
      */
-    public function getOriginalWithoutRewindingModel($key = null, $default = null)
+    protected function getOriginalWithoutRewindingModel($key = null, $default = null)
     {
         if ($key) {
             return $this->transformModelValue(
