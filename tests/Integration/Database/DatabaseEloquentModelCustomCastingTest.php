@@ -96,7 +96,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
     public function testGetOriginalWithCastValueObjects()
     {
         $model = new TestEloquentModelWithCustomCast([
-            'address' => new Address('110 Kingsbrook St.', 'My Childhood House')
+            'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
         ]);
 
         $model->syncOriginal();
@@ -106,7 +106,6 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals('117 Spencer St.', $model->address->lineOne);
         $this->assertEquals('110 Kingsbrook St.', $model->getOriginal('address')->lineOne);
         $this->assertEquals('117 Spencer St.', $model->address->lineOne);
-
 
 
         $model = new TestEloquentModelWithCustomCast([
@@ -122,9 +121,8 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals('117 Spencer St.', $model->address->lineOne);
 
 
-
         $model = new TestEloquentModelWithCustomCast([
-            'address' => new Address('110 Kingsbrook St.', 'My Childhood House')
+            'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
         ]);
 
         $model->syncOriginal();
@@ -257,7 +255,7 @@ class AddressCaster implements CastsAttributes
     public function get($model, $key, $value, $attributes)
     {
         if (is_null($attributes['address_line_one'])) {
-            return null;
+            return;
         }
 
         return new Address($attributes['address_line_one'], $attributes['address_line_two']);
