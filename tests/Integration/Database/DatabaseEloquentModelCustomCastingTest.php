@@ -118,6 +118,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals('117 Spencer St.', $model->address->lineOne);
         $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
         $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
 
         $model = new TestEloquentModelWithCustomCast([
             'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
