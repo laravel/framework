@@ -42,6 +42,13 @@ class PendingRequest
     protected $pendingFiles = [];
 
     /**
+     * The binary for the request.
+     *
+     * @var array
+     */
+    protected $pendingBinary;
+
+    /**
      * The request cookies.
      *
      * @var array
@@ -175,6 +182,34 @@ class PendingRequest
     public function asMultipart()
     {
         return $this->bodyFormat('multipart');
+    }
+
+    /**
+     * Attach a binary to the request.
+     *
+     * @param  string $content
+     * @param  string $contentType
+     * @return $this
+     */
+    public function binary($content, $contentType)
+    {
+        $this->asBinary();
+
+        $this->pendingBinary = $content;
+
+        $this->contentType($contentType);
+
+        return $this;
+    }
+
+    /**
+     * Indicate the request contains form parameters.
+     *
+     * @return $this
+     */
+    public function asBinary()
+    {
+        return $this->bodyFormat('body');
     }
 
     /**
@@ -476,9 +511,15 @@ class PendingRequest
                 $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
             }
 
-            $options[$this->bodyFormat] = array_merge(
-                $options[$this->bodyFormat], $this->pendingFiles
-            );
+            if ($this->bodyFormat === 'body') {
+                $options[$this->bodyFormat] = $this->pendingBinary;
+            }
+
+            if (is_array($options[$this->bodyFormat])) {
+                $options[$this->bodyFormat] = array_merge(
+                    $options[$this->bodyFormat], $this->pendingFiles
+                );
+            }
         }
 
         $this->pendingFiles = [];
