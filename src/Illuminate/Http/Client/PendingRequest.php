@@ -98,6 +98,13 @@ class PendingRequest
     protected $stubCallbacks;
 
     /**
+     * The middleware callables added by users that will handle requests.
+     *
+     * @var \Illuminate\Support\Collection|null
+     */
+    protected $middleware;
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -386,6 +393,19 @@ class PendingRequest
     }
 
     /**
+     * Add new middleware the client handlerstack.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function withMiddleware(callable $middleware)
+    {
+        return tap($this, function ($request) use ($middleware) {
+            return $this->middleware = collect($this->middleware)->push($middleware);
+        });
+    }
+
+    /**
      * Add a new "before sending" callback to the request.
      *
      * @param  callable  $callback
@@ -599,6 +619,10 @@ class PendingRequest
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());
             $stack->push($this->buildStubHandler());
+
+            collect($this->middleware)->each(function (callable $middleware) use ($stack) {
+                $stack->push($middleware);
+            });
         });
     }
 
