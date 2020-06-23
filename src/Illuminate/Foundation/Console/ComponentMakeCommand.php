@@ -37,6 +37,12 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
+        if(Str::of($this->getNameInput())->match('/^[a-z_]\w+$/i')->length()){
+            $this->error($this->type.' Invalid class name!');
+
+            return false;
+        }
+
         if (parent::handle() === false && ! $this->option('force')) {
             return false;
         }
