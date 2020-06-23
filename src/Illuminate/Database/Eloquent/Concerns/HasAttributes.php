@@ -1185,6 +1185,12 @@ trait HasAttributes
      */
     public function getOriginal($key = null, $default = null)
     {
+        if ($key && $this->isClassCastable($key) && $this->isDirty()) {
+            return (new static)->setRawAttributes(
+                $this->original, $sync = true
+            )->getOriginal($key, $default);
+        }
+
         if ($key) {
             return $this->transformModelValue(
                 $key, Arr::get($this->original, $key, $default)
