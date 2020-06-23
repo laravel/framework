@@ -35,18 +35,18 @@ class PendingRequest
     protected $bodyFormat;
 
     /**
+     * The raw body for the request.
+     *
+     * @var string
+     */
+    protected $pendingBody;
+
+    /**
      * The pending files for the request.
      *
      * @var array
      */
     protected $pendingFiles = [];
-
-    /**
-     * The binary for the request.
-     *
-     * @var array
-     */
-    protected $pendingBinary;
 
     /**
      * The request cookies.
@@ -132,6 +132,24 @@ class PendingRequest
     }
 
     /**
+     * Attach a raw body to the request.
+     *
+     * @param  resource|string  $content
+     * @param  string  $contentType
+     * @return $this
+     */
+    public function withBody($content, $contentType)
+    {
+        $this->bodyFormat('body');
+
+        $this->pendingBody = $content;
+
+        $this->contentType($contentType);
+
+        return $this;
+    }
+
+    /**
      * Indicate the request contains JSON.
      *
      * @return $this
@@ -182,34 +200,6 @@ class PendingRequest
     public function asMultipart()
     {
         return $this->bodyFormat('multipart');
-    }
-
-    /**
-     * Attach a binary to the request.
-     *
-     * @param  string $content
-     * @param  string $contentType
-     * @return $this
-     */
-    public function binary($content, $contentType)
-    {
-        $this->asBinary();
-
-        $this->pendingBinary = $content;
-
-        $this->contentType($contentType);
-
-        return $this;
-    }
-
-    /**
-     * Indicate the request contains form parameters.
-     *
-     * @return $this
-     */
-    public function asBinary()
-    {
-        return $this->bodyFormat('body');
     }
 
     /**
@@ -509,10 +499,8 @@ class PendingRequest
         if (isset($options[$this->bodyFormat])) {
             if ($this->bodyFormat === 'multipart') {
                 $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
-            }
-
-            if ($this->bodyFormat === 'body') {
-                $options[$this->bodyFormat] = $this->pendingBinary;
+            } elseif ($this->bodyFormat === 'body') {
+                $options[$this->bodyFormat] = $this->pendingBody;
             }
 
             if (is_array($options[$this->bodyFormat])) {
@@ -522,7 +510,7 @@ class PendingRequest
             }
         }
 
-        $this->pendingFiles = [];
+        [$this->pendingBody, $this->pendingFiles] = [null, []];
 
         return retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {
