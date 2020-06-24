@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
@@ -100,7 +101,7 @@ class PendingRequest
     /**
      * The middleware callables added by users that will handle requests.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var \Illuminate\Support\Collection
      */
     protected $middleware;
 
@@ -113,6 +114,7 @@ class PendingRequest
     public function __construct(Factory $factory = null)
     {
         $this->factory = $factory;
+        $this->middleware = new Collection;
 
         $this->asJson();
 
@@ -393,16 +395,16 @@ class PendingRequest
     }
 
     /**
-     * Add new middleware the client handlerstack.
+     * Add new middleware the client handler stack.
      *
      * @param  callable  $middleware
      * @return $this
      */
     public function withMiddleware(callable $middleware)
     {
-        return tap($this, function ($request) use ($middleware) {
-            return $this->middleware = collect($this->middleware)->push($middleware);
-        });
+        $this->middleware->push($middleware);
+
+        return $this;
     }
 
     /**
@@ -620,7 +622,7 @@ class PendingRequest
             $stack->push($this->buildRecorderHandler());
             $stack->push($this->buildStubHandler());
 
-            collect($this->middleware)->each(function (callable $middleware) use ($stack) {
+            $this->middleware->each(function ($middleware) use ($stack) {
                 $stack->push($middleware);
             });
         });
