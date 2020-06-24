@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Http\Client\Event\PendingRequestSent;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
@@ -483,7 +484,7 @@ class PendingRequest
 
         $this->pendingFiles = [];
 
-        return retry($this->tries ?? 1, function () use ($method, $url, $options) {
+        return tap(retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {
                 $laravelData = $this->parseRequestData($method, $url, $options);
 
@@ -503,7 +504,9 @@ class PendingRequest
             } catch (ConnectException $e) {
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
-        }, $this->retryDelay ?? 100);
+        }, $this->retryDelay ?? 100),function($response) use ($method, $url, $options){
+            event(new PendingRequestSent($method, $url, $options, $response));
+        });
     }
 
     /**
