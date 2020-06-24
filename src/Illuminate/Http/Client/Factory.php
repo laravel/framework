@@ -277,7 +277,11 @@ class Factory
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
         }
-
+        $r = tap(new PendingRequest($this), function ($request) {
+            $request->stub($this->stubCallbacks);
+        })->{$method}(...$parameters);
+//        dd($r->toPsrRequest());
+//        dd($method);
         return tap(new PendingRequest($this), function ($request) {
             $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
