@@ -148,6 +148,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isClean(['foo', 'bar']));
     }
 
+    public function testCleanWhenFloatUpdateAttribute()
+    {
+        // test is equivalent
+        $model = new EloquentModelStub(['castedFloat' => 8 - 6.4]);
+        $model->syncOriginal();
+        $this->assertTrue($model->originalIsEquivalent('castedFloat', 1.6));
+
+        // test is not equivalent
+        $model = new EloquentModelStub(['castedFloat' => 5.6]);
+        $model->syncOriginal();
+        $this->assertFalse($model->originalIsEquivalent('castedFloat', 5.5));
+    }
+
     public function testCalculatedAttributes()
     {
         $model = new EloquentModelStub;
@@ -1992,6 +2005,7 @@ class EloquentModelStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = EloquentModelSaveStub::class;
+    protected $casts = ['castedFloat' => 'float'];
 
     public function getListItemsAttribute($value)
     {
