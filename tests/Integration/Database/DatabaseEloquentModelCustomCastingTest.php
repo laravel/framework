@@ -94,6 +94,46 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertTrue(is_string($model->toArray()['birthday_at']));
     }
 
+    public function testGetOriginalWithCastValueObjects()
+    {
+        $model = new TestEloquentModelWithCustomCast([
+            'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
+        ]);
+
+        $model->syncOriginal();
+
+        $model->address = new Address('117 Spencer St.', 'Another house.');
+
+        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal('address')->lineOne);
+        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+
+        $model = new TestEloquentModelWithCustomCast([
+            'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
+        ]);
+
+        $model->syncOriginal();
+
+        $model->address = new Address('117 Spencer St.', 'Another house.');
+
+        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
+        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
+
+        $model = new TestEloquentModelWithCustomCast([
+            'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
+        ]);
+
+        $model->syncOriginal();
+
+        $model->address = null;
+
+        $this->assertNull($model->address);
+        $this->assertInstanceOf(Address::class, $model->getOriginal('address'));
+        $this->assertNull($model->address);
+    }
+
     public function testOneWayCasting()
     {
         // CastsInboundAttributes is used for casting that is unidirectional... only use case I can think of is one-way hashing...
@@ -233,11 +273,22 @@ class AddressCaster implements CastsAttributes
 {
     public function get($model, $key, $value, $attributes)
     {
+        if (is_null($attributes['address_line_one'])) {
+            return;
+        }
+
         return new Address($attributes['address_line_one'], $attributes['address_line_two']);
     }
 
     public function set($model, $key, $value, $attributes)
     {
+        if (is_null($value)) {
+            return [
+                'address_line_one' => null,
+                'address_line_two' => null,
+            ];
+        }
+
         return ['address_line_one' => $value->lineOne, 'address_line_two' => $value->lineTwo];
     }
 }
