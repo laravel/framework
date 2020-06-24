@@ -416,8 +416,6 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
      * @return void
-     *
-     * @throws \Throwable
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
     {
@@ -434,8 +432,6 @@ class Worker
         }
 
         $this->failJob($job, $e = $this->maxAttemptsExceededException($job));
-
-        throw $e;
     }
 
     /**
@@ -493,10 +489,14 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Throwable  $e
      * @return void
+     *
+     * @throws \Throwable
      */
     protected function failJob($job, Throwable $e)
     {
-        return $job->fail($e);
+        $job->fail($e);
+
+        throw $e;
     }
 
     /**
