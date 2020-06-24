@@ -75,6 +75,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new RuntimeException('Exception message'));
     }
 
+    public function testHandlerReportsExceptionWhenUnReportable()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
+
+        $this->handler->report(new UnReportableException('Exception message'));
+    }
+
     public function testHandlerCallsReportMethodWithDependencies()
     {
         $reporter = m::mock(ReportingService::class);
@@ -228,6 +237,14 @@ class ReportableException extends Exception
     public function report(ReportingService $reportingService)
     {
         $reportingService->send($this->getMessage());
+    }
+}
+
+class UnReportableException extends Exception
+{
+    public function report()
+    {
+        return false;
     }
 }
 
