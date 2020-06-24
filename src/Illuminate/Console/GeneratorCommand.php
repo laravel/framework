@@ -127,13 +127,15 @@ abstract class GeneratorCommand extends Command
      */
     public function handle()
     {
+        // First we check if the proposed class name is a valid class name. If it is not valid
+        // we can error now and prevent from polluting the filesystem using invalid files.
         if (Str::of($this->getNameInput())->match('/^[a-z_]\w+$/i')->length() === 0) {
-            $this->error($this->type.' Invalid class name!');
+            $this->error('The name "'.$this->getNameInput().'" is not a valid class name.');
 
             return false;
         }
 
-        // First we need to ensure that the given name is not a reserved word within the PHP
+        // Next, we need to ensure that the given name is not a reserved word within the PHP
         // language and that the class name will actually be valid. If it is not valid we
         // can error now and prevent from polluting the filesystem using invalid files.
         if ($this->isReservedName($this->getNameInput())) {
