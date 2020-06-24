@@ -164,7 +164,7 @@ trait Queueable
         if ($job instanceof Closure) {
             if (! class_exists(CallQueuedClosure::class)) {
                 throw new RuntimeException(
-                    'To enable support for closure jobs, please install illuminate/queue.'
+                    'To enable support for closure jobs, please install the illuminate/queue package.'
                 );
             }
 

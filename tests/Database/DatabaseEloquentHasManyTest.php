@@ -26,6 +26,27 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
     }
 
+    public function testMakeManyCreatesARelatedModelForEachRecord()
+    {
+        $records = [
+            'taylor' => ['name' => 'taylor'],
+            'colin' => ['name' => 'colin'],
+        ];
+
+        $relation = $this->getRelation();
+        $relation->getRelated()->shouldReceive('newCollection')->once()->andReturn(new Collection);
+
+        $taylor = $this->expectNewModel($relation, ['name' => 'taylor']);
+        $taylor->expects($this->never())->method('save');
+        $colin = $this->expectNewModel($relation, ['name' => 'colin']);
+        $colin->expects($this->never())->method('save');
+
+        $instances = $relation->makeMany($records);
+        $this->assertInstanceOf(Collection::class, $instances);
+        $this->assertEquals($taylor, $instances[0]);
+        $this->assertEquals($colin, $instances[1]);
+    }
+
     public function testCreateMethodProperlyCreatesNewModel()
     {
         $relation = $this->getRelation();

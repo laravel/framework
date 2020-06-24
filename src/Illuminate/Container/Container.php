@@ -848,7 +848,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve all of the dependencies from the ReflectionParameters.
      *
-     * @param  array  $dependencies
+     * @param  \ReflectionParameter[]  $dependencies
      * @return array
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -870,7 +870,7 @@ class Container implements ArrayAccess, ContainerContract
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
-            $result = is_null($dependency->getClass())
+            $result = is_null(Util::getParameterClassName($dependency))
                             ? $this->resolvePrimitive($dependency)
                             : $this->resolveClass($dependency);
 
@@ -928,7 +928,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolvePrimitive(ReflectionParameter $parameter)
     {
-        if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->name))) {
+        if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->getName()))) {
             return $concrete instanceof Closure ? $concrete($this) : $concrete;
         }
 
@@ -952,7 +952,7 @@ class Container implements ArrayAccess, ContainerContract
         try {
             return $parameter->isVariadic()
                         ? $this->resolveVariadicClass($parameter)
-                        : $this->make($parameter->getClass()->name);
+                        : $this->make(Util::getParameterClassName($parameter));
         }
 
         // If we can not resolve the class instance, we will check to see if the value
@@ -979,10 +979,12 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolveVariadicClass(ReflectionParameter $parameter)
     {
-        $abstract = $this->getAlias($parameter->getClass()->name);
+        $className = Util::getParameterClassName($parameter);
+
+        $abstract = $this->getAlias($className);
 
         if (! is_array($concrete = $this->getContextualConcrete($abstract))) {
-            return $this->make($parameter->getClass()->name);
+            return $this->make($className);
         }
 
         return array_map(function ($abstract) {

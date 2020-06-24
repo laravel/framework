@@ -1,10 +1,50 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.14...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.20...6.x)
+
+
+## [v6.18.20 (2020-06-16)](https://github.com/laravel/framework/compare/v6.18.19...v6.18.20)
+
+### Changed
+- Improved the reflector ([#33184](https://github.com/laravel/framework/pull/33184))
+
+
+## [v6.18.19 (2020-06-09)](https://github.com/laravel/framework/compare/v6.18.18...v6.18.19)
+
+### Fixed
+- Fixed `Model::withoutEvents()` not registering listeners inside boot() ([#33149](https://github.com/laravel/framework/pull/33149), [4bb32ae](https://github.com/laravel/framework/commit/4bb32aea50eec4c3cc8b77f463e4a96213a0af09))
+
+
+## [v6.18.18 (2020-06-03)](https://github.com/laravel/framework/compare/v6.18.17...v6.18.18)
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Relations\MorphToMany::getCurrentlyAttachedPivots()` ([110b129](https://github.com/laravel/framework/commit/110b129531df172f03bf163f561c71123fac6296))
+
+
+## [v6.18.17 (2020-06-02)](https://github.com/laravel/framework/compare/v6.18.16...v6.18.17)
+
+### Added
+- Support PHP 8's reflection API ([#33039](https://github.com/laravel/framework/pull/33039))
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Collection::getQueueableRelations()` ([00e9ed7](https://github.com/laravel/framework/commit/00e9ed76483ea6ad1264676e7b1095b23e16a433))
+- Fixed bug with update existing pivot and polymorphic many to many ([684208b](https://github.com/laravel/framework/commit/684208b10460b49fa34354cc42f33b9b7135814f))
+
+
+## [v6.18.15 (2020-05-19)](https://github.com/laravel/framework/compare/v6.18.14...v6.18.15)
+
+### Added
+- Added `Illuminate\Http\Middleware\TrustHosts` ([9229264](https://github.com/laravel/framework/commit/92292649621f2aadc84ab94376244650a9f55696))
 
 ### Fixed
 - Revert of ["Remove `strval` from `Illuminate/Validation/ValidationRuleParser::explodeWildcardRules()`"](https://github.com/laravel/framework/commit/1c76a6f3a80fa8f756740566dffd9fa1be65c123) ([52940cf](https://github.com/laravel/framework/commit/52940cf3275cfebd47ec008fd8ae5bc6d6a42dfd))
 - Fixed Queued Mail MessageSent Listener With Attachments ([#32795](https://github.com/laravel/framework/pull/32795))
+- Added error clearing before sending in `Illuminate\Mail\Mailer::sendSwiftMessage()` ([#32799](https://github.com/laravel/framework/pull/32799))
+- Avoid foundation function call in the auth component ([#32805](https://github.com/laravel/framework/pull/32805))
+
+### Changed
+- Added explicit `symfony/polyfill-php73` dependency ([5796b1e](https://github.com/laravel/framework/commit/5796b1e43dfe14914050a7e5dd24ddf803ec99b8))
+- Set `Cache\FileStore` file permissions only once ([#32845](https://github.com/laravel/framework/pull/32845), [11c533b](https://github.com/laravel/framework/commit/11c533b9aa062f4cba1dd0fe3673bf33d275480f))
 
 
 ## [v6.18.14 (2020-05-12)](https://github.com/laravel/framework/compare/v6.18.13...v6.18.14)

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Exception;
 use Illuminate\Console\Command;
+use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class StorageLinkCommand extends Command
@@ -67,7 +67,7 @@ class StorageLinkCommand extends Command
     protected function getRelativeTarget($link, $target)
     {
         if (! class_exists(SymfonyFilesystem::class)) {
-            throw new Exception('Please install the symfony/filesystem Composer package to create relative links.');
+            throw new RuntimeException('To enable support for relative links, please install the symfony/filesystem package.');
         }
 
         return (new SymfonyFilesystem)->makePathRelative($target, dirname($link));

@@ -400,10 +400,13 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['foo', 'bar']);
         $c = $c->forget(0)->all();
         $this->assertFalse(isset($c['foo']));
+        $this->assertFalse(isset($c[0]));
+        $this->assertTrue(isset($c[1]));
 
         $c = new Collection(['foo' => 'bar', 'baz' => 'qux']);
         $c = $c->forget('foo')->all();
         $this->assertFalse(isset($c['foo']));
+        $this->assertTrue(isset($c['baz']));
     }
 
     public function testForgetArrayOfKeys()

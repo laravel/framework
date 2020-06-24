@@ -16,7 +16,8 @@
     "require": {
         "php": "^7.2.5",
         "illuminate/contracts": "^7.0",
-        "illuminate/support": "^7.0"
+        "illuminate/support": "^7.0",
+        "symfony/polyfill-php73": "^1.17"
     },
     "autoload": {
         "psr-4": {

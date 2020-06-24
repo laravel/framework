@@ -60,6 +60,23 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Create and return an un-saved instances of the related models.
+     *
+     * @param  iterable  $records
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function makeMany($records)
+    {
+        $instances = $this->related->newCollection();
+
+        foreach ($records as $record) {
+            $instances->push($this->make($record));
+        }
+
+        return $instances;
+    }
+
+    /**
      * Set the base constraints on the relation query.
      *
      * @return void

@@ -67,6 +67,19 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     }
 
     /**
+     * Add a message to the message bag if the given conditional is "true".
+     *
+     * @param  bool  $boolean
+     * @param  string  $key
+     * @param  string  $message
+     * @return $this
+     */
+    public function addIf($boolean, $key, $message)
+    {
+        return $boolean ? $this->add($key, $message) : $this;
+    }
+
+    /**
      * Determine if a key and message combination already exists.
      *
      * @param  string  $key

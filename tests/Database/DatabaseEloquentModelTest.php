@@ -159,6 +159,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isClean(['foo', 'bar']));
     }
 
+    public function testCleanWhenFloatUpdateAttribute()
+    {
+        $original = -16.666347;
+        $new = 20.1 - 36.766347;
+
+        $this->assertFalse($original === $new);
+        $this->assertSame(0, bccomp($original, $new));
+
+        $model = new EloquentModelStub(['castedFloat' => $original]);
+        $model->syncOriginal();
+        $this->assertTrue($model->originalIsEquivalent('castedFloat', $new));
+    }
+
     public function testCalculatedAttributes()
     {
         $model = new EloquentModelStub;
@@ -948,6 +961,65 @@ class DatabaseEloquentModelTest extends TestCase
         $array = $model->toArray();
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayNotHasKey('age', $array);
+    }
+
+    public function testMakeVisibleIf()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(true, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(false, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(function ($model) {
+            return ! is_null($model->name);
+        }, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+    }
+
+    public function testMakeHiddenIf()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'address' => 'foobar', 'id' => 'baz']);
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHiddenIf(true, 'address')->toArray();
+        $this->assertArrayNotHasKey('address', $array);
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $model->makeVisible('address');
+
+        $array = $model->makeHiddenIf(false, ['name', 'age'])->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHiddenIf(function ($model) {
+            return ! is_null($model->id);
+        }, ['name', 'age'])->toArray();
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayNotHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
     }
 
     public function testFillable()
@@ -2106,6 +2178,7 @@ class EloquentModelStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = EloquentModelSaveStub::class;
+    protected $casts = ['castedFloat' => 'float'];
 
     public function getListItemsAttribute($value)
     {

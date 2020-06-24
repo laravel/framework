@@ -30,7 +30,7 @@
         }
     },
     "suggest": {
-        "illuminate/queue": "Required to use closures when chaining jobs (^7.0)"
+        "illuminate/queue": "Required to use closures when chaining jobs (^7.0)."
     },
     "config": {
         "sort-packages": true

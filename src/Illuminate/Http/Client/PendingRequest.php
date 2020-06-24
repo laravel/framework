@@ -35,6 +35,13 @@ class PendingRequest
     protected $bodyFormat;
 
     /**
+     * The raw body for the request.
+     *
+     * @var string
+     */
+    protected $pendingBody;
+
+    /**
      * The pending files for the request.
      *
      * @var array
@@ -120,6 +127,24 @@ class PendingRequest
     public function baseUrl(string $url)
     {
         $this->baseUrl = $url;
+
+        return $this;
+    }
+
+    /**
+     * Attach a raw body to the request.
+     *
+     * @param  resource|string  $content
+     * @param  string  $contentType
+     * @return $this
+     */
+    public function withBody($content, $contentType)
+    {
+        $this->bodyFormat('body');
+
+        $this->pendingBody = $content;
+
+        $this->contentType($contentType);
 
         return $this;
     }
@@ -474,14 +499,18 @@ class PendingRequest
         if (isset($options[$this->bodyFormat])) {
             if ($this->bodyFormat === 'multipart') {
                 $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
+            } elseif ($this->bodyFormat === 'body') {
+                $options[$this->bodyFormat] = $this->pendingBody;
             }
 
-            $options[$this->bodyFormat] = array_merge(
-                $options[$this->bodyFormat], $this->pendingFiles
-            );
+            if (is_array($options[$this->bodyFormat])) {
+                $options[$this->bodyFormat] = array_merge(
+                    $options[$this->bodyFormat], $this->pendingFiles
+                );
+            }
         }
 
-        $this->pendingFiles = [];
+        [$this->pendingBody, $this->pendingFiles] = [null, []];
 
         return retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {

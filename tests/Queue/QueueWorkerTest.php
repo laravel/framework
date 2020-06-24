@@ -59,19 +59,21 @@ class QueueWorkerTest extends TestCase
             $secondJob = new WorkerFakeJob,
         ]]);
 
-        $this->expectException(LoopBreakerException::class);
+        try {
+            $worker->daemon('default', 'queue', $workerOptions);
 
-        $worker->daemon('default', 'queue', $workerOptions);
+            $this->fail('Expected LoopBreakerException to be thrown.');
+        } catch (LoopBreakerException $e) {
+            $this->assertTrue($firstJob->fired);
 
-        $this->assertTrue($firstJob->fired);
+            $this->assertTrue($secondJob->fired);
 
-        $this->assertTrue($secondJob->fired);
+            $this->assertSame(0, $worker->stoppedWithStatus);
 
-        $this->assertSame(0, $worker->stoppedWithStatus);
+            $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->twice();
 
-        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->twice();
-
-        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->twice();
+            $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->twice();
+        }
     }
 
     public function testJobCanBeFiredBasedOnPriority()
@@ -276,21 +278,23 @@ class QueueWorkerTest extends TestCase
 
         $maintenanceModeChecker = function () {
             if ($this->maintenanceFlags) {
-                return array_pop($this->maintenanceFlags);
+                return array_shift($this->maintenanceFlags);
             }
 
             throw new LoopBreakerException;
         };
 
-        $this->expectException(LoopBreakerException::class);
-
         $worker = $this->getWorker('default', ['queue' => [$firstJob, $secondJob]], $maintenanceModeChecker);
 
-        $worker->daemon('default', 'queue', $this->workerOptions());
+        try {
+            $worker->daemon('default', 'queue', $this->workerOptions());
 
-        $this->assertEquals($firstJob->attempts, 1);
+            $this->fail('Expected LoopBreakerException to be thrown');
+        } catch (LoopBreakerException $e) {
+            $this->assertSame(1, $firstJob->attempts);
 
-        $this->assertEquals($firstJob->attempts, 0);
+            $this->assertSame(0, $secondJob->attempts);
+        }
     }
 
     public function testJobDoesNotFireIfDeleted()
@@ -349,6 +353,7 @@ class QueueWorkerTest extends TestCase
 class InsomniacWorker extends Worker
 {
     public $sleptFor;
+    public $stopOnMemoryExceeded = false;
 
     public function sleep($seconds)
     {
@@ -365,6 +370,11 @@ class InsomniacWorker extends Worker
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
     {
         return ! ($this->isDownForMaintenance)();
+    }
+
+    public function memoryExceeded($memoryLimit)
+    {
+        return $this->stopOnMemoryExceeded;
     }
 }
 
