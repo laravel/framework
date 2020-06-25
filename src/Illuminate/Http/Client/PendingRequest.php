@@ -505,7 +505,7 @@ class PendingRequest
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
         }, $this->retryDelay ?? 100),function($response) use ($method, $url, $options){
-            event(new PendingRequestSent($method, $url, $options, $response));
+//            event(new PendingRequestSent($method, $url, $options, $response));
         });
     }
 
