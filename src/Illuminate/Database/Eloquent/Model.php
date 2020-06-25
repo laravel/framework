@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
@@ -1119,11 +1118,11 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * Create a new Eloquent Collection instance.
      *
      * @param  array  $models
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function newCollection(array $models = [])
     {
-        return new LazyCollection($models);
+        return new Collection($models);
     }
 
     /**
