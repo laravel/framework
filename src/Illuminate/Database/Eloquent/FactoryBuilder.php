@@ -82,10 +82,11 @@ class FactoryBuilder
      * @param  array  $afterMaking
      * @param  array  $afterCreating
      * @param  \Faker\Generator  $faker
+     *
      * @return void
      */
     public function __construct($class, array $definitions, array $states,
-                                array $afterMaking, array $afterCreating, Faker $faker)
+        array $afterMaking, array $afterCreating, Faker $faker)
     {
         $this->class = $class;
         $this->faker = $faker;
@@ -99,6 +100,7 @@ class FactoryBuilder
      * Set the amount of models you wish to create / make.
      *
      * @param  int  $amount
+     *
      * @return $this
      */
     public function times($amount)
@@ -112,6 +114,7 @@ class FactoryBuilder
      * Set the state to be applied to the model.
      *
      * @param  string  $state
+     *
      * @return $this
      */
     public function state($state)
@@ -123,6 +126,7 @@ class FactoryBuilder
      * Set the states to be applied to the model.
      *
      * @param  array|mixed  $states
+     *
      * @return $this
      */
     public function states($states)
@@ -136,6 +140,7 @@ class FactoryBuilder
      * Set the database connection on which the model instance should be persisted.
      *
      * @param  string  $name
+     *
      * @return $this
      */
     public function connection($name)
@@ -149,6 +154,7 @@ class FactoryBuilder
      * Create a model and persist it in the database if requested.
      *
      * @param  array  $attributes
+     *
      * @return \Closure
      */
     public function lazy(array $attributes = [])
@@ -162,6 +168,7 @@ class FactoryBuilder
      * Create a collection of models and persist them to the database.
      *
      * @param  array  $attributes
+     *
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|mixed
      */
     public function create(array $attributes = [])
@@ -182,9 +189,52 @@ class FactoryBuilder
     }
 
     /**
+     * Create a collection of models and persist the to the database using chunks.
+     *
+     * @param  int  $chunkSize
+     * @param  array  $attributes
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|mixed
+     */
+    public function quickCreate(int $chunkSize = 100, array $attributes = [])
+    {
+        $results = $this->make($attributes);
+
+        if ($results instanceof Model) {
+            $this->store(collect([$results]));
+
+            $this->callAfterCreating(collect([$results]));
+        } else {
+            $results->map(function ($model) {
+                if (! $model->usesTimestamps()) {
+                    return $model->toArray();
+                }
+
+                $modelAttributes = $model->toArray();
+
+                if (! in_array('created_at', $modelAttributes)) {
+                    $model['created_at'] = now()->toDateTimeString();
+                }
+
+                if (! in_array('updated_at', $modelAttributes)) {
+                    $model['updated_at'] = now()->toDateTimeString();
+                }
+
+                return $modelAttributes;
+            })->chunk($chunkSize)
+                ->each(function ($modelsChunk) {
+                    ($this->class)::insert($modelsChunk->toArray());
+                });
+        }
+
+        return $results;
+    }
+
+    /**
      * Create a collection of models and persist them to the database.
      *
      * @param  iterable  $records
+     *
      * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
     public function createMany(iterable $records)
@@ -198,6 +248,7 @@ class FactoryBuilder
      * Set the connection name on the results and store them.
      *
      * @param  \Illuminate\Support\Collection  $results
+     *
      * @return void
      */
     protected function store($results)
@@ -215,6 +266,7 @@ class FactoryBuilder
      * Create a collection of models.
      *
      * @param  array  $attributes
+     *
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|mixed
      */
     public function make(array $attributes = [])
@@ -242,6 +294,7 @@ class FactoryBuilder
      * Create an array of raw attribute arrays.
      *
      * @param  array  $attributes
+     *
      * @return mixed
      */
     public function raw(array $attributes = [])
@@ -263,6 +316,7 @@ class FactoryBuilder
      * Get a raw attributes array for the model.
      *
      * @param  array  $attributes
+     *
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -287,6 +341,7 @@ class FactoryBuilder
      * Make an instance of the model with the given attributes.
      *
      * @param  array  $attributes
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     protected function makeInstance(array $attributes = [])
@@ -309,6 +364,7 @@ class FactoryBuilder
      *
      * @param  array  $definition
      * @param  array  $attributes
+     *
      * @return array
      *
      * @throws \InvalidArgumentException
@@ -338,6 +394,7 @@ class FactoryBuilder
      *
      * @param  string  $state
      * @param  array  $attributes
+     *
      * @return array
      */
     protected function stateAttributes($state, array $attributes)
@@ -355,6 +412,7 @@ class FactoryBuilder
      * Expand all attributes to their underlying values.
      *
      * @param  array  $attributes
+     *
      * @return array
      */
     protected function expandAttributes(array $attributes)
@@ -380,6 +438,7 @@ class FactoryBuilder
      * Run after making callbacks on a collection of models.
      *
      * @param  \Illuminate\Support\Collection  $models
+     *
      * @return void
      */
     public function callAfterMaking($models)
@@ -391,6 +450,7 @@ class FactoryBuilder
      * Run after creating callbacks on a collection of models.
      *
      * @param  \Illuminate\Support\Collection  $models
+     *
      * @return void
      */
     public function callAfterCreating($models)
@@ -403,6 +463,7 @@ class FactoryBuilder
      *
      * @param  array  $afterCallbacks
      * @param  \Illuminate\Support\Collection  $models
+     *
      * @return void
      */
     protected function callAfter(array $afterCallbacks, $models)
@@ -422,6 +483,7 @@ class FactoryBuilder
      * @param  array  $afterCallbacks
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $state
+     *
      * @return void
      */
     protected function callAfterCallbacks(array $afterCallbacks, $model, $state)
@@ -439,11 +501,12 @@ class FactoryBuilder
      * Determine if the given state has an "after" callback.
      *
      * @param  string  $state
+     *
      * @return bool
      */
     protected function stateHasAfterCallback($state)
     {
         return isset($this->afterMaking[$this->class][$state]) ||
-               isset($this->afterCreating[$this->class][$state]);
+            isset($this->afterCreating[$this->class][$state]);
     }
 }
