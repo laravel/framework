@@ -40,6 +40,7 @@ class ConfigurationUrlParser
         }
 
         $rawComponents = $this->parseUrl($url);
+
         $decodedComponents = $this->parseStringsToNativeTypes(
             array_map('rawurldecode', $rawComponents)
         );
