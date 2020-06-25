@@ -12,6 +12,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -384,7 +385,7 @@ if (! function_exists('dispatch')) {
     function dispatch($job)
     {
         if ($job instanceof Closure) {
-            $job = CallQueuedClosure::create($job);
+            return new PendingClosureDispatch(CallQueuedClosure::create($job));
         }
 
         return new PendingDispatch($job);
