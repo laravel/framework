@@ -174,6 +174,17 @@ class ConfigurationUrlParserTest extends TestCase
                     'driver' => 'mysql',
                 ],
             ],
+            'simple URL with percent encoding in query' => [
+                'mysql://foo:bar%25bar@localhost/baz?timezone=%2B00%3A00',
+                [
+                    'username' => 'foo',
+                    'password' => 'bar%bar',
+                    'host' => 'localhost',
+                    'database' => 'baz',
+                    'driver' => 'mysql',
+                    'timezone' => '+00:00',
+                ],
+            ],
             'URL with mssql alias driver' => [
                 'mssql://null',
                 [
