@@ -629,4 +629,22 @@ class Collection extends BaseCollection implements QueueableCollection
 
         return $connection;
     }
+
+    /**
+     * Get the Eloquent query builder from the collection
+     *
+     * @return Illuminate\Database\Eloquen\Builder
+     *
+     * @throws \LogicException
+     */
+    public function toQuery()
+    {
+        $model = $this->first();
+
+        if (! $model) {
+            throw new LogicException('can not get Eloquent QueryBuilder from an empty Collection.');
+        }
+
+        return $model->newModelQuery()->whereKey($this->modelKeys());
+    }
 }
