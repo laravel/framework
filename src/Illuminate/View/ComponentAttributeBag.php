@@ -8,10 +8,13 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 
 class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 {
+    use Macroable;
+    
     /**
      * The raw array of attributes.
      *
