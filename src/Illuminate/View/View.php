@@ -207,7 +207,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
 
         $keys = explode(',', $matches[1][0]);
         $keys = array_map(function ($key) {
-            if (!Str::contains($key, '$')) {
+            if (! Str::contains($key, '$')) {
                 throw new ParseError('Incorrect format: Must be defined variable.');
             }
 
