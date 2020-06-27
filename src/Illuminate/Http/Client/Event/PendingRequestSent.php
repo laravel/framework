@@ -17,12 +17,13 @@ class PendingRequestSent
     public $method;
 
     /**
-     * The Http client Response.
      *
      * @var Response
      */
     public $data;
     /**
+     * The Http client Response.
+     *
      * @var Response|null
      */
     protected $response;
@@ -43,6 +44,7 @@ class PendingRequestSent
      * @param string $url
      * @param array $options
      * @param \Illuminate\Http\Client\Response $response
+     * @param array $data
      */
     public function __construct($method, $url, $options, $response = null)
     {

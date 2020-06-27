@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use Illuminate\Contracts\Events\Dispatcher;
 use function GuzzleHttp\Promise\promise_for;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Support\Str;
@@ -42,15 +43,20 @@ class Factory
      * @var array
      */
     protected $responseSequences = [];
+    /**
+     * @var Dispatcher|null
+     */
+    private $dispatcher;
 
     /**
      * Create a new factory instance.
      *
-     * @return void
+     * @param Dispatcher|null $dispatcher
      */
-    public function __construct()
+    public function __construct(Dispatcher $dispatcher = null)
     {
         $this->stubCallbacks = collect();
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -278,7 +284,7 @@ class Factory
             return $this->macroCall($method, $parameters);
         }
 
-        return tap(new PendingRequest($this), function ($request) {
+        return tap(new PendingRequest($this,$this->dispatcher), function ($request) {
             $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
     }
