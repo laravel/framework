@@ -190,6 +190,41 @@ class View implements ArrayAccess, Htmlable, ViewContract
     }
 
     /**
+     * Pass variables as key values to the view.
+     *
+     * @param mixed ...$vars
+     * @return $this
+     */
+    public function pass(...$vars)
+    {
+        $bt = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
+
+        $lines = file($bt[0]['file']);
+        $line = $lines[$bt[0]['line'] - 1];
+
+        preg_match_all("#pass\(([^\)]+)\)#", $line, $matches);
+
+        $keys = explode(',', $matches[1][0]);
+        $keys = array_map(function($key) {
+            if (!Str::contains($key, '$')) {
+                throw new ParseError('Incorrect format: Must be defined variable.');
+            }
+
+            return ltrim(trim($key), '$');
+        }, $keys);
+
+        if (count($keys) !== count($vars)) {
+            throw new ParseError('Incorrect format: Must be defined variables.');
+        }
+
+        foreach (array_combine($keys, $vars) as $key => $variable) {
+            $this->with($key, $variable);
+        }
+
+      	return $this;
+    }
+
+    /**
      * Add a view instance to the view data.
      *
      * @param  string  $key

@@ -34,6 +34,18 @@ class ViewTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
     }
 
+    public function testDataCanBeSetOnViewUsingPass()
+    {
+        $view = $this->getView();
+
+        $foo = ['baz' => 'bar'];
+        $bar = 'foo';
+
+        $view->pass($foo, $bar);
+
+        $this->assertEquals(['foo' => $foo, 'bar' => 'foo'], $view->getData());
+    }
+
     public function testRenderProperlyRendersView()
     {
         $view = $this->getView(['foo' => 'bar']);
