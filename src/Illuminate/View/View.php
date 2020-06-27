@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\ViewErrorBag;
 use Throwable;
+use ParseError;
 
 class View implements ArrayAccess, Htmlable, ViewContract
 {
