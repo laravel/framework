@@ -14,8 +14,8 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\ViewErrorBag;
-use Throwable;
 use ParseError;
+use Throwable;
 
 class View implements ArrayAccess, Htmlable, ViewContract
 {
@@ -206,7 +206,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
         preg_match_all("#pass\(([^\)]+)\)#", $line, $matches);
 
         $keys = explode(',', $matches[1][0]);
-        $keys = array_map(function($key) {
+        $keys = array_map(function ($key) {
             if (!Str::contains($key, '$')) {
                 throw new ParseError('Incorrect format: Must be defined variable.');
             }
@@ -222,7 +222,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
             $this->with($key, $variable);
         }
 
-      	return $this;
+        return $this;
     }
 
     /**
