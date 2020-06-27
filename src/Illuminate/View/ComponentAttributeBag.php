@@ -117,6 +117,30 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         return $this->whereStartsWith($string);
     }
+    
+    /**
+     * Get the first attribute that starts with the given value from the attribute array.
+     *
+     * @param  string  $string
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function getFirstWhereStartsWith($string, $default = null)
+    {
+        return $this->whereStartsWith($string)->getIterator()->current() ?? value($default);
+    }
+    
+    /**
+     * Get the first attribute that starts with the given value from the attribute array.
+     *
+     * @param  string  $string
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function getFirstThatStartsWith($string, $default = null)
+    {
+        return $this->getFirstWhereStartsWith($string, $default);
+    }
 
     /**
      * Exclude the given attribute from the attribute array.
