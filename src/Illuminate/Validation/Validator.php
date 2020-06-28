@@ -311,7 +311,7 @@ class Validator implements ValidatorContract
      */
     public function replacePlaceholders($data)
     {
-        $newData = [];
+        $originalData = [];
 
         foreach ($data as $key => $value) {
             if (is_array($value)) {
@@ -324,10 +324,10 @@ class Validator implements ValidatorContract
                 $key
             );
 
-            $newData[$key] = $value;
+            $originalData[$key] = $value;
         }
 
-        return $newData;
+        return $originalData;
     }
 
     /**
