@@ -16,16 +16,20 @@ class PendingRequestSent
     /**
      * The Http client Response.
      *
-     * @var Response|null
+     * @var Illuminate\Http\Client\Response|null
      */
     public $response;
 
     /**
+     * The pending request url
+     *
      * @var string
      */
     public $url;
 
     /**
+     * The pending request options
+     *
      * @var array
      */
     public $options;

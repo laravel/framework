@@ -44,7 +44,7 @@ class Factory
      */
     protected $responseSequences = [];
     /**
-     * @var Dispatcher|null
+     * @var Illuminate\Contracts\Events\Dispatcher|null
      */
     private $dispatcher;
 
