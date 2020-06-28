@@ -44,14 +44,14 @@ class Factory
      */
     protected $responseSequences = [];
     /**
-     * @var Illuminate\Contracts\Events\Dispatcher|null
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     private $dispatcher;
 
     /**
      * Create a new factory instance.
      *
-     * @param Dispatcher|null $dispatcher
+     * @param \Illuminate\Contracts\Events\Dispatcher|null $dispatcher
      */
     public function __construct(Dispatcher $dispatcher = null)
     {

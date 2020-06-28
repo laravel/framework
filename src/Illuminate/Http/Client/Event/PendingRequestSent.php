@@ -16,7 +16,7 @@ class PendingRequestSent
     /**
      * The Http client Response.
      *
-     * @var Illuminate\Http\Client\Response|null
+     * @var \Illuminate\Http\Client\Response|null
      */
     public $response;
 
