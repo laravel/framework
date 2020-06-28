@@ -119,6 +119,7 @@ class PendingRequest
      *
      * @param \Illuminate\Http\Client\Factory|null $factory
      * @param Dispatcher|null $events
+     * @return void
      */
     public function __construct(Factory $factory = null, Dispatcher $events = null)
     {
@@ -747,10 +748,10 @@ class PendingRequest
     /**
      * Dispatch the Pending Request sent event.
      *
-     * @param $method
-     * @param $url
-     * @param $options
-     * @param null $response
+     * @param string $method
+     * @param string $url
+     * @param array $options
+     * @param \Illuminate\Http\Client\Response|null $response
      * @return void
      */
     protected function dispatchSentEvent($method, $url, $options, $response = null)

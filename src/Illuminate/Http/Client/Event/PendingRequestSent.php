@@ -40,8 +40,8 @@ class PendingRequestSent
      * @param string $method
      * @param string $url
      * @param array $options
-     * @param \Illuminate\Http\Client\Response $response
-     * @param array $data
+     * @param \Illuminate\Http\Client\Response|null $response
+     * @return void
      */
     public function __construct($method, $url, $options, $response = null)
     {

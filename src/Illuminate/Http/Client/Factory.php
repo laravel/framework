@@ -52,6 +52,7 @@ class Factory
      * Create a new factory instance.
      *
      * @param \Illuminate\Contracts\Events\Dispatcher|null $dispatcher
+     * @return void
      */
     public function __construct(Dispatcher $dispatcher = null)
     {
