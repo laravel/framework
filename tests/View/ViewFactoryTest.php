@@ -354,7 +354,7 @@ class ViewFactoryTest extends TestCase
     public function testComponentHandlingUsingViewObject()
     {
         $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__ . '/fixtures/component.php');
+        $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
         $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new PhpEngine(new Filesystem));
         $factory->getDispatcher()->shouldReceive('dispatch');
         $factory->startComponent($factory->make('component'), ['name' => 'Taylor']);
