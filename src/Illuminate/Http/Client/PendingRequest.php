@@ -105,7 +105,7 @@ class PendingRequest
      *
      * @var \Illuminate\Support\Collection
      */
-     protected $middleware;
+    protected $middleware;
 
 
     /**
