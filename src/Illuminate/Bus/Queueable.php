@@ -24,6 +24,13 @@ trait Queueable
     public $queue;
 
     /**
+     * The callbacks to be executed on chain failure.
+     *
+     * @var array|null
+     */
+    public $chainCatchCallbacks;
+
+    /**
      * The name of the connection the chain should be sent to.
      *
      * @var string|null
@@ -188,9 +195,21 @@ trait Queueable
                 $next->onConnection($next->connection ?: $this->chainConnection);
                 $next->onQueue($next->queue ?: $this->chainQueue);
 
+                $next->chainCatchCallbacks = $this->chainCatchCallbacks;
                 $next->chainConnection = $this->chainConnection;
                 $next->chainQueue = $this->chainQueue;
             }));
         }
+    }
+
+    /**
+     * Dispatch the next job on the chain.
+     *
+     * @param  \Throwable  $e
+     * @return void
+     */
+    public function invokeChainCatchCallbacks($e)
+    {
+        collect($this->chainCatchCallbacks)->each->__invoke($e);
     }
 }
