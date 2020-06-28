@@ -9,11 +9,11 @@ use Illuminate\Queue\SerializableClosure;
 class PendingChain
 {
     /**
-     * The class name of the job being dispatched.
+     * The name of the connection the chain should be sent to.
      *
-     * @var mixed
+     * @var string|null
      */
-    public $job;
+    public $connection;
 
     /**
      * The jobs to be chained.
@@ -28,6 +28,20 @@ class PendingChain
      * @var array
      */
     public $catchCallbacks = [];
+
+    /**
+     * The name of the queue the chain should be sent to.
+     *
+     * @var string|null
+     */
+    public $queue;
+
+    /**
+     * The class name of the job being dispatched.
+     *
+     * @var mixed
+     */
+    public $job;
 
     /**
      * Create a new PendingChain instance.
@@ -66,6 +80,32 @@ class PendingChain
     }
 
     /**
+     * Set the desired connection for the job.
+     *
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function onConnection($connection)
+    {
+        $this->job->onConnection($connection);
+
+        return $this;
+    }
+
+    /**
+     * Set the desired queue for the job.
+     *
+     * @param  string|null  $queue
+     * @return $this
+     */
+    public function onQueue($queue)
+    {
+        $this->job->onQueue($queue);
+
+        return $this;
+    }
+
+    /**
      * Dispatch the job with the given arguments.
      *
      * @return \Illuminate\Foundation\Bus\PendingDispatch
@@ -81,6 +121,8 @@ class PendingChain
         }
 
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
+        $firstJob->allOnQueue($this->queue);
+        $firstJob->allOnConnection($this->connection);
 
         return (new PendingDispatch($firstJob))->chain($this->chain);
     }

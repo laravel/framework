@@ -160,7 +160,7 @@ class JobChainingTest extends TestCase
             new JobChainingTestFailingJob(),
             new JobChainingTestSecondJob(),
         ])->catch(function () {
-            self::$catchCallbackRan = true;
+            JobChainingTest::$catchCallbackRan = true;
         })->dispatch();
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
