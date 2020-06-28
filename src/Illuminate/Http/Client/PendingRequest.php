@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Client\Event\PendingRequestSent;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
@@ -98,6 +99,14 @@ class PendingRequest
      * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $events;
+
+    /**
+     * The middleware callables added by users that will handle requests.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+     protected $middleware;
+
 
     /**
      * Create a new HTTP Client instance.
