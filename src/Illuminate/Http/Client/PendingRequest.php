@@ -101,7 +101,6 @@ class PendingRequest
     protected $stubCallbacks;
 
     /**
-
      * The event dispatcher instance.
      *
      * @var \Illuminate\Contracts\Events\Dispatcher|null
@@ -109,7 +108,6 @@ class PendingRequest
     protected $events;
 
     /**
-
      * The middleware callables added by users that will handle requests.
      *
      * @var \Illuminate\Support\Collection
@@ -566,8 +564,8 @@ class PendingRequest
             } catch (ConnectException $e) {
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
-        }, $this->retryDelay ?? 100), function($response) use ($method, $url, $options){
-            $this->dispatchSentEvent($method,$url,$options,$response);
+        }, $this->retryDelay ?? 100), function ($response) use ($method, $url, $options){
+            $this->dispatchSentEvent($method, $url, $options, $response);
         });
     }
 
