@@ -21,14 +21,14 @@ class PendingRequestSent
     public $response;
 
     /**
-     * The pending request url
+     * The pending request url.
      *
      * @var string
      */
     public $url;
 
     /**
-     * The pending request options
+     * The pending request options.
      *
      * @var array
      */
