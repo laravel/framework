@@ -435,7 +435,7 @@ class HttpClientTest extends TestCase
     {
 
         $factory = new Factory($events = new Dispatcher);
-        $dataEvent=[];
+        $dataEvent = [];
         $events->listen(PendingRequestSent::class, function ($event) use (&$dataEvent) {
             $dataEvent['url'] = $event->url;
             $dataEvent['method'] = $event->method;
@@ -448,10 +448,9 @@ class HttpClientTest extends TestCase
         $url = 'http://foo.com/';
 
         $response = $factory->post($url);
-        $this->assertEquals('POST',$dataEvent['method']);
-        $this->assertEquals($url,$dataEvent['url']);
-        $this->assertEquals(["json" => []],$dataEvent['options']);
-        $this->assertEquals($response,$dataEvent['response']);
-
+        $this->assertEquals('POST', $dataEvent['method']);
+        $this->assertEquals($url, $dataEvent['url']);
+        $this->assertEquals(["json" => []], $dataEvent['options']);
+        $this->assertEquals($response, $dataEvent['response']);
     }
 }

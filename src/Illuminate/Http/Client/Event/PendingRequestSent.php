@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Illuminate\Http\Client\Event;
-
 
 use Illuminate\Http\Client\Response;
 
@@ -16,22 +14,22 @@ class PendingRequestSent
      */
     public $method;
 
-
     /**
      * The Http client Response.
      *
      * @var Response|null
      */
     public $response;
+
     /**
      * @var string
      */
     public $url;
+
     /**
      * @var array
      */
     public $options;
-
 
     /**
      * Create a new event instance.
@@ -49,6 +47,4 @@ class PendingRequestSent
         $this->url = $url;
         $this->options = $options;
     }
-
 }
-
