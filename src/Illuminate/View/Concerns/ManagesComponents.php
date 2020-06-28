@@ -3,6 +3,7 @@
 namespace Illuminate\View\Concerns;
 
 use Closure;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\View;
@@ -41,7 +42,7 @@ trait ManagesComponents
     /**
      * Start a component rendering process.
      *
-     * @param  \Illuminate\View\View|\Closure|string  $view
+     * @param  \Illuminate\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
      * @param  array  $data
      * @return void
      */
@@ -89,6 +90,8 @@ trait ManagesComponents
 
         if ($view instanceof View) {
             return $view->with($data)->render();
+        } elseif ($view instanceof Htmlable) {
+            return $view->toHtml();
         } else {
             return $this->make($view, $data)->render();
         }

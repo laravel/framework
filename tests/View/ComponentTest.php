@@ -4,9 +4,13 @@ namespace Illuminate\Tests\View;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
 use Illuminate\View\Factory;
+use Illuminate\View\View;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -24,6 +28,7 @@ class ComponentTest extends TestCase
         $this->viewFactory = m::mock(Factory::class);
 
         $container->instance('view', $this->viewFactory);
+        $container->alias('view', FactoryContract::class);
         $container->instance('config', $this->config);
 
         Container::setInstance($container);
@@ -53,12 +58,32 @@ class ComponentTest extends TestCase
 
     public function testRegularViewsGetReturned()
     {
-        $this->viewFactory->shouldReceive('exists')->once()->andReturn(true);
-        $this->viewFactory->shouldReceive('addNamespace')->never();
+        $view = m::mock(View::class);
+        $this->viewFactory->shouldReceive('make')->once()->with('alert', [], [])->andReturn($view);
 
         $component = new TestRegularViewComponent();
 
+        $this->assertSame($view, $component->resolveView());
+    }
+
+    public function testRegularViewNamesGetReturned()
+    {
+        $this->viewFactory->shouldReceive('exists')->once()->andReturn(true);
+        $this->viewFactory->shouldReceive('addNamespace')->never();
+
+        $component = new TestRegularViewNameViewComponent();
+
         $this->assertSame('alert', $component->resolveView());
+    }
+
+    public function testHtmlablesGetReturned()
+    {
+        $component = new TestHtmlableReturningViewComponent();
+
+        $view = $component->resolveView();
+
+        $this->assertInstanceOf(Htmlable::class, $view);
+        $this->assertSame('<p>Hello foo</p>', $view->toHtml());
     }
 }
 
@@ -88,6 +113,36 @@ class TestRegularViewComponent extends Component
 
     public function render()
     {
+        return view('alert');
+    }
+}
+
+class TestRegularViewNameViewComponent extends Component
+{
+    public $title;
+
+    public function __construct($title = 'foo')
+    {
+        $this->title = $title;
+    }
+
+    public function render()
+    {
         return 'alert';
+    }
+}
+
+class TestHtmlableReturningViewComponent extends Component
+{
+    protected $title;
+
+    public function __construct($title = 'foo')
+    {
+        $this->title = $title;
+    }
+
+    public function render()
+    {
+        return new HtmlString("<p>Hello {$this->title}</p>");
     }
 }
