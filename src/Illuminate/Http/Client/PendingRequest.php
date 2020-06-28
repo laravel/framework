@@ -6,6 +6,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Client\Event\PendingRequestSent;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
@@ -91,12 +93,19 @@ class PendingRequest
     protected $stubCallbacks;
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    protected $events;
+
+    /**
      * Create a new HTTP Client instance.
      *
-     * @param  \Illuminate\Http\Client\Factory|null  $factory
-     * @return void
+     * @param \Illuminate\Http\Client\Factory|null $factory
+     * @param Dispatcher|null $events
      */
-    public function __construct(Factory $factory = null)
+    public function __construct(Factory $factory = null, Dispatcher $events = null)
     {
         $this->factory = $factory;
 
@@ -109,6 +118,7 @@ class PendingRequest
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options) {
             $this->cookies = $options['cookies'];
         }]);
+        $this->events = $events;
     }
 
     /**
@@ -483,7 +493,7 @@ class PendingRequest
 
         $this->pendingFiles = [];
 
-        return retry($this->tries ?? 1, function () use ($method, $url, $options) {
+        return tap(retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {
                 $laravelData = $this->parseRequestData($method, $url, $options);
 
@@ -503,7 +513,10 @@ class PendingRequest
             } catch (ConnectException $e) {
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
-        }, $this->retryDelay ?? 100);
+        }, $this->retryDelay ?? 100),function($response) use ($method, $url, $options){
+            $this->dispatchSentEvent($method,$url,$options,$response);
+//            event(new PendingRequestSent($method, $url, $options, $response));
+        });
     }
 
     /**
@@ -675,5 +688,24 @@ class PendingRequest
         $this->stubCallbacks = collect($callback);
 
         return $this;
+    }
+
+    /**
+     * Dispatch the Pending Request sent event.
+     *
+     * @param $method
+     * @param $url
+     * @param $options
+     * @param null $response
+     * @return void
+     */
+    protected function dispatchSentEvent($method, $url, $options, $response = null)
+    {
+
+        if ($this->events) {
+            $this->events->dispatch(
+                new PendingRequestSent($method, $url, $options, $response)
+            );
+        }
     }
 }
