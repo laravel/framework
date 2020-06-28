@@ -6,7 +6,6 @@ use Illuminate\Http\Client\Response;
 
 class PendingRequestSent
 {
-
     /**
      * The pending request method.
      *

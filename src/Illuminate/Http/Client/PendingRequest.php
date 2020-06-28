@@ -564,7 +564,7 @@ class PendingRequest
             } catch (ConnectException $e) {
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
-        }, $this->retryDelay ?? 100), function ($response) use ($method, $url, $options){
+        }, $this->retryDelay ?? 100), function ($response) use ($method, $url, $options) {
             $this->dispatchSentEvent($method, $url, $options, $response);
         });
     }
@@ -755,7 +755,6 @@ class PendingRequest
      */
     protected function dispatchSentEvent($method, $url, $options, $response = null)
     {
-
         if ($this->events) {
             $this->events->dispatch(
                 new PendingRequestSent($method, $url, $options, $response)
