@@ -16,25 +16,21 @@ class PendingRequestSent
      */
     public $method;
 
-    /**
-     *
-     * @var Response
-     */
-    public $data;
+
     /**
      * The Http client Response.
      *
      * @var Response|null
      */
-    protected $response;
+    public $response;
     /**
      * @var string
      */
-    protected $url;
+    public $url;
     /**
      * @var array
      */
-    protected $options;
+    public $options;
 
 
     /**

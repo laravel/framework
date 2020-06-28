@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Http;
 
+use Illuminate\Events\Dispatcher;
+use Illuminate\Http\Client\Event\PendingRequestSent;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Str;
@@ -426,5 +428,30 @@ class HttpClientTest extends TestCase
             return $request->url() === 'http://foo.com/json' &&
                    $request->hasHeaders('X-Test-Header');
         });
+    }
+
+
+    public function testHttpClientHasFiredEvent()
+    {
+
+        $factory = new Factory($events = new Dispatcher);
+        $dataEvent=[];
+        $events->listen(PendingRequestSent::class, function ($event) use (&$dataEvent) {
+            $dataEvent['url'] = $event->url;
+            $dataEvent['method'] = $event->method;
+            $dataEvent['options'] = $event->options;
+            $dataEvent['response'] = $event->response;
+        });
+
+        $factory->fake();
+
+        $url = 'http://foo.com/';
+
+        $response = $factory->post($url);
+        $this->assertEquals('POST',$dataEvent['method']);
+        $this->assertEquals($url,$dataEvent['url']);
+        $this->assertEquals(["json" => []],$dataEvent['options']);
+        $this->assertEquals($response,$dataEvent['response']);
+
     }
 }
