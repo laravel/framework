@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Bus;
 
 use Closure;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\SerializableClosure;
 
@@ -87,7 +88,7 @@ class PendingChain
      */
     public function onConnection($connection)
     {
-        $this->job->onConnection($connection);
+        $this->connection = $connection;
 
         return $this;
     }
@@ -100,7 +101,7 @@ class PendingChain
      */
     public function onQueue($queue)
     {
-        $this->job->onQueue($queue);
+        $this->queue = $queue;
 
         return $this;
     }
@@ -121,9 +122,11 @@ class PendingChain
         }
 
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
+
         $firstJob->allOnQueue($this->queue);
         $firstJob->allOnConnection($this->connection);
+        $firstJob->chain($this->chain);
 
-        return (new PendingDispatch($firstJob))->chain($this->chain);
+        return app(Dispatcher::class)->dispatch($firstJob);
     }
 }
