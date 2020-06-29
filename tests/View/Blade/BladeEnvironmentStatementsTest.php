@@ -26,11 +26,11 @@ breeze
 @else
 boom
 @endproduction';
-        $expected = "<?php if(app()->isProduction()): ?>
+        $expected = '<?php if(app()->isProduction()): ?>
 breeze
 <?php else: ?>
 boom
-<?php endif; ?>";
+<?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }
