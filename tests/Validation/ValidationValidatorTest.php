@@ -3880,6 +3880,32 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testPlaceholdersAreReplaced()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'matrix' => ['\\' => ['invalid'], '1\\' => ['invalid']],
+        ], [
+            'matrix.*.*' => 'integer',
+        ]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [
+            'matrix' => ['\\' => [1], '1\\' => [1]],
+        ], [
+            'matrix.*.*' => 'integer',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'foo' => ['bar' => 'valid'], 'foo.bar' => 'invalid', 'foo->bar' => 'valid',
+        ], [
+            'foo\.bar' => 'required|in:valid',
+        ]);
+        $this->assertTrue($v->fails());
+    }
+
     public function testCoveringEmptyKeys()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3891,35 +3917,8 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'size:4']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'size:4']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo.*' => 'integer', 'foo.0' => 'required']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'size:4']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans,
-            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'min:3']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans,
-            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'between:3,6']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans,
-            ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
-            ['foo.*.votes' => ['Required', 'Size:2']]);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans,
-            ['foo' => [['name' => 'first', 'votes' => [1, 2, 3]], ['name' => 'second', 'votes' => ['something', 2]]]],
-            ['foo.*.votes' => ['Required', 'Size:2']]);
-        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['foo' => ['bar.baz' => '']], ['foo' => 'required']);
+        $this->assertEquals(['foo' => ['bar.baz' => '']], $v->validated());
     }
 
     public function testValidateNestedArrayWithCommonParentChildKey()
