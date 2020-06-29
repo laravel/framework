@@ -17,7 +17,7 @@ class SupportHelpersTest extends TestCase
     {
         m::close();
     }
-    
+
     public function testDebug()
     {
         $config = m::mock('config');
