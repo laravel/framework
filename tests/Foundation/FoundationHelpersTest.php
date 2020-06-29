@@ -17,6 +17,21 @@ class FoundationHelpersTest extends TestCase
     {
         m::close();
     }
+    
+    public function testDebug()
+    {
+        $app = new Application;
+        $app['config'] = $config = m::mock('config');
+
+        $config->shouldReceive('get')->withArgs(['app.debug', null])->andReturn(true)->twice();
+        $this->assertSame('foo', debug('foo'));
+        $this->assertSame('foo', debug(function () {
+            return 'foo';
+        }));
+
+        $config->shouldReceive('get')->withArgs(['app.debug', null])->andReturn(false)->once();
+        $this->assertNull(debug('foo'));
+    }
 
     public function testCache()
     {
