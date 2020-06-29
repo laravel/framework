@@ -96,8 +96,8 @@ class ApplicationDatabaseRollbackStub extends Application
         }
     }
 
-    public function environment(...$environments)
+    public function isProduction()
     {
-        return 'development';
+        return false;
     }
 }
