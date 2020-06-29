@@ -304,12 +304,12 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Replace the placeholder used in data keys.
+     * Replace the placeholders used in data keys.
      *
      * @param  array  $data
      * @return array
      */
-    public function replacePlaceholders($data)
+    protected function replacePlaceholders($data)
     {
         $originalData = [];
 
