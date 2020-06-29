@@ -57,7 +57,7 @@ abstract class Component
     /**
      * Resolve the Blade view or view file that should be used when rendering the component.
      *
-     * @return \Illuminate\View\View|\Illuminate\Contracts\Support\Htmlable|\Clousure|string
+     * @return \Illuminate\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
      */
     public function resolveView()
     {
