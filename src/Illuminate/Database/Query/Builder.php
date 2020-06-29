@@ -2710,7 +2710,6 @@ class Builder
             $values = [$values];
         }
 
-
         // Here, we will sort the insert keys for every record so that each insert is
         // in the same order for the record. We need to make sure this is the case
         // so there are not any errors or problems when inserting these records.
@@ -2738,7 +2737,8 @@ class Builder
      *
      * @return array
      */
-    private function resolveInsertDefalts(array $attributes){
+    private function resolveInsertDefalts(array $attributes)
+    {
         return collect($attributes)
             ->map(function ($value, $key) {
                 if ($value instanceof Closure) {
