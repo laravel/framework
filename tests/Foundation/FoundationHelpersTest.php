@@ -17,7 +17,7 @@ class FoundationHelpersTest extends TestCase
     {
         m::close();
     }
-    
+
     public function testDebug()
     {
         $app = new Application;
