@@ -241,6 +241,23 @@ if (! function_exists('data_set')) {
     }
 }
 
+if (! function_exists('debug')) {
+    /**
+     * Return default value only in debug mode.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    function debug($value)
+    {
+        if (! config('app.debug')) {
+            return;
+        }
+
+        return value($value);
+    }
+}
+
 if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
