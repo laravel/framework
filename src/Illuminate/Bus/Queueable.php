@@ -24,13 +24,6 @@ trait Queueable
     public $queue;
 
     /**
-     * The callbacks to be executed on chain failure.
-     *
-     * @var array|null
-     */
-    public $chainCatchCallbacks;
-
-    /**
      * The name of the connection the chain should be sent to.
      *
      * @var string|null
@@ -43,6 +36,13 @@ trait Queueable
      * @var string|null
      */
     public $chainQueue;
+
+    /**
+     * The callbacks to be executed on chain failure.
+     *
+     * @var array|null
+     */
+    public $chainCatchCallbacks;
 
     /**
      * The number of seconds before the job should be made available.
@@ -195,15 +195,15 @@ trait Queueable
                 $next->onConnection($next->connection ?: $this->chainConnection);
                 $next->onQueue($next->queue ?: $this->chainQueue);
 
-                $next->chainCatchCallbacks = $this->chainCatchCallbacks;
                 $next->chainConnection = $this->chainConnection;
                 $next->chainQueue = $this->chainQueue;
+                $next->chainCatchCallbacks = $this->chainCatchCallbacks;
             }));
         }
     }
 
     /**
-     * Dispatch the next job on the chain.
+     * Invoke all of the chain's failed job callbacks.
      *
      * @param  \Throwable  $e
      * @return void
