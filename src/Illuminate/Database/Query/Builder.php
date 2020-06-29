@@ -2734,7 +2734,6 @@ class Builder
      * Evaluate the values of default attributes passed if closures exist.
      *
      * @param  array  $attributes
-     *
      * @return array
      */
     private function resolveInsertDefalts(array $attributes)
