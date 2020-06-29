@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
@@ -454,6 +455,30 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $c = new Collection;
         $this->assertEquals($c, $c->fresh());
+    }
+
+    public function testCanConvertCollectionOfModelsToEloquentQueryBuilder()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturn(1);
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturn(2);
+
+        $c = new Collection([$one, $two]);
+
+        $mocBuilder = m::mock(Builder::class);
+        $one->shouldReceive('newModelQuery')->once()->andReturn($mocBuilder);
+        $mocBuilder->shouldReceive('whereKey')->once()->with($c->modelKeys())->andReturn($mocBuilder);
+        $this->assertInstanceOf(Builder::class, $c->toQuery());
+    }
+
+    public function testConvertingEmptyCollectionToQueryThrowsException()
+    {
+        $this->expectException(LogicException::class);
+
+        $c = new Collection;
+        $c->toQuery();
     }
 }
 
