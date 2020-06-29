@@ -193,6 +193,7 @@ class CallQueuedHandler
         $command = unserialize($data['command']);
 
         $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);
+        $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);
 
         if (method_exists($command, 'failed')) {
             $command->failed($e);
@@ -215,5 +216,20 @@ class CallQueuedHandler
         }
 
         $command->batch()->recordFailedJob($uuid, $e);
+    }
+
+    /**
+     * Ensure the chained job catch callbacks are invoked.
+     *
+     * @param  string  $uuid
+     * @param  mixed  $command
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function ensureChainCatchCallbacksAreInvoked(string $uuid, $command, $e)
+    {
+        if (method_exists($command, 'invokeChainCatchCallbacks')) {
+            $command->invokeChainCatchCallbacks($e);
+        }
     }
 }
