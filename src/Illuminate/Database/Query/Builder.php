@@ -2694,9 +2694,10 @@ class Builder
      * Insert a new record into the database.
      *
      * @param  array  $values
+     * @param  array  $defaultValues
      * @return bool
      */
-    public function insert(array $values)
+    public function insert(array $values, array $defaultValues = [])
     {
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient when building these
@@ -2709,6 +2710,7 @@ class Builder
             $values = [$values];
         }
 
+
         // Here, we will sort the insert keys for every record so that each insert is
         // in the same order for the record. We need to make sure this is the case
         // so there are not any errors or problems when inserting these records.
@@ -2716,7 +2718,7 @@ class Builder
             foreach ($values as $key => $value) {
                 ksort($value);
 
-                $values[$key] = $value;
+                $values[$key] = array_merge($value, $this->resolveInsertDefalts($defaultValues));
             }
         }
 
@@ -2727,6 +2729,24 @@ class Builder
             $this->grammar->compileInsert($this, $values),
             $this->cleanBindings(Arr::flatten($values, 1))
         );
+    }
+
+    /**
+     * Evaluate the values of default attributes passed if closures exist.
+     *
+     * @param  array  $attributes
+     *
+     * @return array
+     */
+    private function resolveInsertDefalts(array $attributes){
+        return collect($attributes)
+            ->map(function ($value, $key) {
+                if ($value instanceof Closure) {
+                    $value = $value();
+                }
+
+                return $value;
+            })->toArray();
     }
 
     /**
