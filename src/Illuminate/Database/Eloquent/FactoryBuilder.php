@@ -113,9 +113,15 @@ class FactoryBuilder
      *
      * @param  string  $state
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function state($state)
     {
+        if (func_num_args() > 1) {
+            throw new InvalidArgumentException('Can\'t pass multiple parameters to state(), use states() instead.');
+        }
+
         return $this->states([$state]);
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -214,6 +215,13 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $this->assertSame('active', $server->status);
         $this->assertSame('inline', $inlineServer->status);
+    }
+
+    public function testCreatingModelsWithTooManyStates()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        factory(FactoryBuildableServer::class)->state('inline', 'test')->make();
     }
 
     public function testCreatingModelsWithRelationships()
