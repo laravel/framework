@@ -82,6 +82,17 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every minute on the hour that is divisible by the interval.
+     *
+     * @param  int  $minutes
+     * @return $this
+     */
+    public function everyMinuteInterval($minutes = 1)
+    {
+        return $this->spliceIntoPosition(1, '*/'.$minutes);
+    }
+
+    /**
      * Schedule the event to run every five minutes.
      *
      * @return $this
