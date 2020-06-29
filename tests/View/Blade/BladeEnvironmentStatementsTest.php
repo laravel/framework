@@ -26,7 +26,7 @@ breeze
 @else
 boom
 @endproduction';
-        $expected = "<?php if(app()->environment('production')): ?>
+        $expected = "<?php if(app()->isProduction()): ?>
 breeze
 <?php else: ?>
 boom

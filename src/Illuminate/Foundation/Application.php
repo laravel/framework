@@ -546,7 +546,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function isProduction()
     {
-        return $this['env'] === 'production';
+        return ! in_array($this['env'], ['local', 'staging', 'testing']);
     }
 
     /**

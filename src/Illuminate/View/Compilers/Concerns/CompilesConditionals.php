@@ -75,7 +75,7 @@ trait CompilesConditionals
      */
     protected function compileProduction()
     {
-        return "<?php if(app()->environment('production')): ?>";
+        return "<?php if(app()->isProduction()): ?>";
     }
 
     /**

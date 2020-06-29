@@ -235,6 +235,13 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue($testing->runningUnitTests());
         $this->assertFalse($testing->isLocal());
         $this->assertFalse($testing->isProduction());
+
+        $empty = new Application;
+        $empty['env'] = '';
+
+        $this->assertTrue($empty->isProduction());
+        $this->assertFalse($empty->runningUnitTests());
+        $this->assertFalse($empty->isLocal());
     }
 
     public function testMethodAfterLoadingEnvironmentAddsClosure()
