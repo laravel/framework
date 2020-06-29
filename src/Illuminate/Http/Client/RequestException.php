@@ -32,33 +32,14 @@ class RequestException extends Exception
         $this->response = $response;
     }
 
-    private static function getResponseBodySummary(Response $response, $truncateAt = 120)
+    /**
+     * Get a short summary from the body of response.
+     *
+     * @param \Illuminate\Http\Client\Response $response
+     * @return string|null
+     */
+    private static function getResponseBodySummary(Response $response)
     {
-        $body = $response->toPsrResponse()->getBody();
-
-        if (! $body->isSeekable() || ! $body->isReadable()) {
-            return;
-        }
-
-        $size = $body->getSize();
-
-        if ($size === 0) {
-            return;
-        }
-
-        $summary = $body->read($truncateAt);
-        $body->rewind();
-
-        if ($size > $truncateAt) {
-            $summary .= ' (truncated...)';
-        }
-
-        // Matches any printable character, including unicode characters:
-        // letters, marks, numbers, punctuation, spacing, and separators.
-        if (preg_match('/[^\pL\pM\pN\pP\pS\pZ\n\r\t]/', $summary)) {
-            return;
-        }
-
-        return $summary;
+        return \GuzzleHttp\Psr7\get_message_body_summary($response->toPsrResponse());
     }
 }
