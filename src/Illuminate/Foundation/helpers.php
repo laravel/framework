@@ -361,6 +361,23 @@ if (! function_exists('database_path')) {
     }
 }
 
+if (! function_exists('debug')) {
+    /**
+     * Return default value only in debug mode.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    function debug($value)
+    {
+        if (! config('app.debug')) {
+            return;
+        }
+
+        return value($value);
+    }
+}
+
 if (! function_exists('decrypt')) {
     /**
      * Decrypt the given value.
