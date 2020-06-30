@@ -184,6 +184,8 @@ class ControllerMakeCommand extends GeneratorCommand
             throw new InvalidArgumentException('Model name contains invalid characters.');
         }
 
+        return $this->qualifyModel($model);
+
         $model = trim(str_replace('/', '\\', $model), '\\');
 
         if (! Str::startsWith($model, $rootNamespace = $this->laravel->getNamespace())) {
