@@ -82,6 +82,36 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every two minutes.
+     *
+     * @return $this
+     */
+    public function everyTwoMinutes()
+    {
+        return $this->spliceIntoPosition(1, '*/2');
+    }
+
+    /**
+     * Schedule the event to run every three minutes.
+     *
+     * @return $this
+     */
+    public function everyThreeMinutes()
+    {
+        return $this->spliceIntoPosition(1, '*/3');
+    }
+
+    /**
+     * Schedule the event to run every four minutes.
+     *
+     * @return $this
+     */
+    public function everyFourMinutes()
+    {
+        return $this->spliceIntoPosition(1, '*/4');
+    }
+
+    /**
      * Schedule the event to run every five minutes.
      *
      * @return $this

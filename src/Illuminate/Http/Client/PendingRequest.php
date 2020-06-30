@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
@@ -98,6 +99,13 @@ class PendingRequest
     protected $stubCallbacks;
 
     /**
+     * The middleware callables added by users that will handle requests.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $middleware;
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -106,6 +114,7 @@ class PendingRequest
     public function __construct(Factory $factory = null)
     {
         $this->factory = $factory;
+        $this->middleware = new Collection;
 
         $this->asJson();
 
@@ -386,6 +395,19 @@ class PendingRequest
     }
 
     /**
+     * Add new middleware the client handler stack.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function withMiddleware(callable $middleware)
+    {
+        $this->middleware->push($middleware);
+
+        return $this;
+    }
+
+    /**
      * Add a new "before sending" callback to the request.
      *
      * @param  callable  $callback
@@ -599,6 +621,10 @@ class PendingRequest
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());
             $stack->push($this->buildStubHandler());
+
+            $this->middleware->each(function ($middleware) use ($stack) {
+                $stack->push($middleware);
+            });
         });
     }
 
