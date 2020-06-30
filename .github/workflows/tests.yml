@@ -10,6 +10,7 @@ jobs:
   linux_tests:
 
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     services:
       mysql:
         image: mysql:5.7
@@ -29,6 +30,10 @@ jobs:
       matrix:
         php: [7.2, 7.3, 7.4]
         stability: [prefer-lowest, prefer-stable]
+        include:
+          - php: 8.0
+            stability: prefer-stable
+            experimental: true
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
