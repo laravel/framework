@@ -33,7 +33,7 @@ jobs:
         experimental: [false]
         include:
           - php: 8.0
-            stability: prefer-stable
+            stability: dev
             experimental: true
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
