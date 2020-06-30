@@ -58,7 +58,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
-          composer require "doctrine/dbal=${{ matrix.dbal }}" --prefer-dist --no-interaction --no-progress
+          composer require "doctrine/dbal=${{ matrix.dbal }}" --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
