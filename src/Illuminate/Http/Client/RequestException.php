@@ -21,25 +21,23 @@ class RequestException extends Exception
      */
     public function __construct(Response $response)
     {
-        $message = "HTTP request returned status code {$response->status()}";
-        $summary = self::getResponseBodySummary($response);
+        parent::__construct($this->prepareMessage($response), $response->status());
 
-        if ($summary !== null) {
-            $message .= ":\n{$summary}\n";
-        }
-
-        parent::__construct($message, $response->status());
         $this->response = $response;
     }
 
     /**
-     * Get a short summary from the body of response.
+     * Prepare the exception message.
      *
      * @param  \Illuminate\Http\Client\Response  $response
-     * @return string|null
+     * @return string
      */
-    private static function getResponseBodySummary(Response $response)
+    protected function prepareMessage(Response $response)
     {
-        return \GuzzleHttp\Psr7\get_message_body_summary($response->toPsrResponse());
+        $message = "HTTP request returned status code {$response->status()}";
+
+        $summary = \GuzzleHttp\Psr7\get_message_body_summary($response->toPsrResponse());
+
+        return is_null($summary) ? $message : $message .= ":\n{$summary}\n";;
     }
 }
