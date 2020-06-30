@@ -35,7 +35,7 @@ jobs:
         include:
           - php: 8.0
             dbal: ^3.0
-            stability: ignore-platform-reqs=php
+            stability: ignore-platform-req=php
             experimental: true
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
