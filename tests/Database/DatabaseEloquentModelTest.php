@@ -164,12 +164,14 @@ class DatabaseEloquentModelTest extends TestCase
         // test is equivalent
         $model = new EloquentModelStub(['castedFloat' => 8 - 6.4]);
         $model->syncOriginal();
-        $this->assertTrue($model->originalIsEquivalent('castedFloat', 1.6));
+        $model->castedFloat = 1.6;
+        $this->assertTrue($model->originalIsEquivalent('castedFloat'));
 
         // test is not equivalent
         $model = new EloquentModelStub(['castedFloat' => 5.6]);
         $model->syncOriginal();
-        $this->assertFalse($model->originalIsEquivalent('castedFloat', 5.5));
+        $model->castedFloat = 5.5;
+        $this->assertFalse($model->originalIsEquivalent('castedFloat'));
     }
 
     public function testCalculatedAttributes()
