@@ -35,7 +35,7 @@ class RequestException extends Exception
     /**
      * Get a short summary from the body of response.
      *
-     * @param \Illuminate\Http\Client\Response $response
+     * @param  \Illuminate\Http\Client\Response  $response
      * @return string|null
      */
     private static function getResponseBodySummary(Response $response)
