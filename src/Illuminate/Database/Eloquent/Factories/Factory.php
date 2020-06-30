@@ -549,7 +549,11 @@ abstract class Factory
     public function modelName()
     {
         $resolver = static::$modelNameResolver ?: function (self $factory) {
-            return 'App\\'.Str::replaceLast('Factory', '', class_basename($factory));
+            $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
+
+            return class_exists('App\\Models\\'.$factoryBasename)
+                        ? 'App\\Models\\'.$factoryBasename
+                        : 'App\\'.$factoryBasename;
         };
 
         return $this->model ?: $resolver($this);
