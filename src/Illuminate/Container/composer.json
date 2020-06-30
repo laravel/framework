@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2|^8.0",
         "illuminate/contracts": "^6.0",
         "psr/container": "^1.0"
     },
