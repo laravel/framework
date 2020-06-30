@@ -30,6 +30,7 @@ jobs:
       matrix:
         php: [7.2, 7.3, 7.4]
         stability: [prefer-lowest, prefer-stable]
+        experimental: [false]
         include:
           - php: 8.0
             stability: prefer-stable
