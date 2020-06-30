@@ -29,10 +29,12 @@ jobs:
       fail-fast: true
       matrix:
         php: [7.2, 7.3, 7.4]
+        dbal: [^2.6]
         stability: [prefer-lowest, prefer-stable]
         experimental: [false]
         include:
           - php: 8.0
+            dbal: ^3.0
             stability: ignore-platform-reqs=php
             experimental: true
 
@@ -54,7 +56,9 @@ jobs:
         uses: niden/actions-memcached@v7
 
       - name: Install dependencies
-        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+        run: |
+          - composer require "doctrine/dbal=${{ matrix.dbal }}" --prefer-dist --no-interaction --no-progress
+          - composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
