@@ -33,7 +33,7 @@ jobs:
         experimental: [false]
         include:
           - php: 8.0
-            stability: ignore-platform-reqs
+            stability: ignore-platform-reqs=php
             experimental: true
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
