@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Validation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -19,17 +20,54 @@ class ValidatorTest extends DatabaseTestCase
 
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('uuid');
             $table->string('first_name');
         });
 
-        User::create(['first_name' => 'John']);
-        User::create(['first_name' => 'John']);
+        User::create(['uuid' => (string) Str::uuid(), 'first_name' => 'John']);
+        User::create(['uuid' => (string) Str::uuid(), 'first_name' => 'Jim']);
     }
 
     public function testExists()
     {
-        $validator = $this->getValidator(['first_name' => ['John', 'Jim']], ['first_name' => 'exists:users']);
+        $validator = $this->getValidator(['first_name' => ['John', 'Taylor']], ['first_name' => 'exists:users']);
         $this->assertFalse($validator->passes());
+    }
+
+    public function testUnique()
+    {
+        $validator = $this->getValidator(['first_name' => 'John'], ['first_name' => 'unique:'.User::class]);
+        $this->assertFalse($validator->passes());
+
+        $validator = $this->getValidator(['first_name' => 'John'], ['first_name' => 'unique:'.User::class.',first_name,1']);
+        $this->assertTrue($validator->passes());
+
+        $validator = $this->getValidator(['first_name' => 'Taylor'], ['first_name' => 'unique:'.User::class]);
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testUniqueWithCustomModelKey()
+    {
+        $_SERVER['CUSTOM_MODEL_KEY_NAME'] = 'uuid';
+
+        $validator = $this->getValidator(['first_name' => 'John'], ['first_name' => 'unique:'.UserWithUuid::class]);
+        $this->assertFalse($validator->passes());
+
+        $user = UserWithUuid::where('first_name', 'John')->first();
+
+        $validator = $this->getValidator(['first_name' => 'John'], ['first_name' => 'unique:'.UserWithUuid::class.',first_name,'.$user->uuid]);
+        $this->assertTrue($validator->passes());
+
+        $validator = $this->getValidator(['first_name' => 'John'], ['first_name' => 'unique:users,first_name,'.$user->uuid.',uuid']);
+        $this->assertTrue($validator->passes());
+
+        $validator = $this->getValidator(['first_name' => 'John'], ['first_name' => 'unique:users,first_name,'.$user->uuid.',id']);
+        $this->assertFalse($validator->passes());
+
+        $validator = $this->getValidator(['first_name' => 'Taylor'], ['first_name' => 'unique:'.UserWithUuid::class]);
+        $this->assertTrue($validator->passes());
+
+        unset($_SERVER['CUSTOM_MODEL_KEY_NAME']);
     }
 
     public function testImplicitAttributeFormatting()
@@ -63,4 +101,18 @@ class User extends Model
 {
     public $timestamps = false;
     protected $guarded = ['id'];
+}
+
+class UserWithUuid extends Model
+{
+    protected $table = 'users';
+    public $timestamps = false;
+    protected $guarded = ['id'];
+    protected $keyType = 'string';
+    public $incrementing = false;
+
+    public function getKeyName()
+    {
+        return 'uuid';
+    }
 }
