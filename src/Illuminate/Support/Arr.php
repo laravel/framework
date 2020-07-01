@@ -242,14 +242,8 @@ class Arr
 
         $nextOffset = strpos($key, ".", $keyOffset);
 
-        // Top level keys can be removed even with .
-        if($keyOffset == 0 && array_key_exists(substr($key, $keyOffset), $array)) {
-            unset($array[substr($key, $keyOffset)]);
-            return;
-        }
-
-        // Otherwise, the key must have no further .
-        if($nextOffset === false && array_key_exists(substr($key, $keyOffset), $array)) {
+        // First check allows top level keys to be removed even if they contain "."
+        if(($keyOffset == 0 || $nextOffset === false) && array_key_exists(substr($key, $keyOffset), $array)) {
             unset($array[substr($key, $keyOffset)]);
             return;
         }
