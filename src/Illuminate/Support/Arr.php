@@ -228,6 +228,43 @@ class Arr
     }
 
     /**
+     * Removes one item from a given array using "dot" notation"
+     * top level keys containing
+     *
+     * @param array $array
+     * @param string $key
+     * @param int $keyOffset
+     * @return void
+     */
+    private static function forgetKey(&$array, &$key, $keyOffset=0) {
+        if(!is_array($array)) {
+            return;
+        }
+
+        $nextOffset = strpos($key, ".", $keyOffset);
+
+        // Top level keys can be removed even with .
+        if($keyOffset == 0 && array_key_exists(substr($key, $keyOffset), $array)) {
+            unset($array[substr($key, $keyOffset)]);
+            return;
+        }
+
+        // Otherwise, the key must have no further .
+        if($nextOffset === false && array_key_exists(substr($key, $keyOffset), $array)) {
+            unset($array[substr($key, $keyOffset)]);
+            return;
+        }
+
+        $nextIndex  = substr($key, $keyOffset, $nextOffset-$keyOffset);
+
+        if ($nextOffset === false || !array_key_exists($nextIndex, $array)) {
+            return;
+        }
+        
+        static::forgetKey($array[$nextIndex], $key, $nextOffset + 1);
+    }
+
+    /**
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
@@ -236,43 +273,16 @@ class Arr
      */
     public static function forget(&$array, $keys)
     {
-        $original = &$array;
-
         $keys = (array) $keys;
 
-        if (count($keys) === 0) {
-            return;
-        }
-
-        foreach ($keys as $key) {
-            // if the exact key exists in the top-level, remove it
-            if (static::exists($array, $key)) {
-                unset($array[$key]);
-
-                continue;
-            }
-
-            $parts = explode('.', $key);
-
-            // clean up before each pass
-            $array = &$original;
-
-            while (count($parts) > 1) {
-                $part = array_shift($parts);
-
-                if (isset($array[$part]) && is_array($array[$part])) {
-                    $array = &$array[$part];
-                } else {
-                    continue 2;
-                }
-            }
-
-            unset($array[array_shift($parts)]);
+        foreach($keys as $key) {
+            static::forgetKey($array, $key);
         }
     }
 
     /**
-     * Get an item from an array using "dot" notation.
+     * Get an item from an array using "dot" notation. Removing an array key
+     * containing a "." will only work at the top-level of the array.
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
