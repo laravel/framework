@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 
 trait ManagesFrequencies
 {
@@ -76,11 +77,13 @@ trait ManagesFrequencies
      *
      * @param  int  $minutes
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function everyXMinutes($minutes = 1)
     {
         if (60 % $minutes !== 0) {
-            throw new \InvalidArgumentException('$minutes must be a factor of 60.');
+            throw new InvalidArgumentException('$minutes must be a factor of 60.');
         }
 
         return $this->spliceIntoPosition(1, '*/'.$minutes);
@@ -171,11 +174,13 @@ trait ManagesFrequencies
      *
      * @param  int  $hours
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function everyXHours($hours = 1)
     {
         if (24 % $hours !== 0) {
-            throw new \InvalidArgumentException('$hours must be a factor of 24.');
+            throw new InvalidArgumentException('$hours must be a factor of 24.');
         }
 
         return $this->spliceIntoPosition(1, 0)
