@@ -460,6 +460,16 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->check('update-dash', new AccessGateTestDummy));
     }
 
+    
+    public function testPolicyConvertsSpaceToCamel()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update dash', new AccessGateTestDummy));
+    }
+
     public function testPolicyDefaultToFalseIfMethodDoesNotExistAndGateDoesNotExist()
     {
         $gate = $this->getBasicGate();
