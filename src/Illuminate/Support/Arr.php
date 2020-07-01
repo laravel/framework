@@ -235,25 +235,26 @@ class Arr
      * @param int $keyOffset
      * @return void
      */
-    private static function forgetKey(&$array, &$key, $keyOffset=0) {
-        if(!is_array($array)) {
+    private static function forgetKey(&$array, &$key, $keyOffset = 0)
+    {
+        if (!is_array($array)) {
             return;
         }
 
         $nextOffset = strpos($key, ".", $keyOffset);
 
-        // First check allows top level keys to be removed even if they contain "."
-        if(($keyOffset == 0 || $nextOffset === false) && array_key_exists(substr($key, $keyOffset), $array)) {
+        // First check allows top-level keys to be removed even if they contain "."
+        if (($keyOffset == 0 || $nextOffset === false) && array_key_exists(substr($key, $keyOffset), $array)) {
             unset($array[substr($key, $keyOffset)]);
             return;
         }
 
-        $nextIndex  = substr($key, $keyOffset, $nextOffset-$keyOffset);
+        $nextIndex  = substr($key, $keyOffset, $nextOffset - $keyOffset);
 
         if ($nextOffset === false || !array_key_exists($nextIndex, $array)) {
             return;
         }
-        
+
         static::forgetKey($array[$nextIndex], $key, $nextOffset + 1);
     }
 
