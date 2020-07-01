@@ -264,7 +264,8 @@ class Arr
     }
 
     /**
-     * Remove one or many array items from a given array using "dot" notation.
+     * Remove one or many array items from a given array using "dot" notation. Removing an array key
+     * containing a "." will only work at the top-level of the array.
      *
      * @param  array  $array
      * @param  array|string  $keys
@@ -280,8 +281,7 @@ class Arr
     }
 
     /**
-     * Get an item from an array using "dot" notation. Removing an array key
-     * containing a "." will only work at the top-level of the array.
+     * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
