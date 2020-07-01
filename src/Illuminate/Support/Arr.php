@@ -228,7 +228,7 @@ class Arr
     }
 
     /**
-     * Removes one item from a given array using "dot" notation"
+     * Removes one item from a given array using "dot" notation".
      *
      * @param array $array
      * @param string $key
@@ -237,21 +237,22 @@ class Arr
      */
     private static function forgetKey(&$array, &$key, $keyOffset = 0)
     {
-        if (!is_array($array)) {
+        if (! is_array($array)) {
             return;
         }
 
-        $nextOffset = strpos($key, ".", $keyOffset);
+        $nextOffset = strpos($key, '.', $keyOffset);
 
         // First check allows top-level keys to be removed even if they contain "."
         if (($keyOffset == 0 || $nextOffset === false) && array_key_exists(substr($key, $keyOffset), $array)) {
             unset($array[substr($key, $keyOffset)]);
+
             return;
         }
 
-        $nextIndex  = substr($key, $keyOffset, $nextOffset - $keyOffset);
+        $nextIndex = substr($key, $keyOffset, $nextOffset - $keyOffset);
 
-        if ($nextOffset === false || !array_key_exists($nextIndex, $array)) {
+        if ($nextOffset === false || ! array_key_exists($nextIndex, $array)) {
             return;
         }
 
@@ -270,7 +271,7 @@ class Arr
     {
         $keys = (array) $keys;
 
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             static::forgetKey($array, $key);
         }
     }
