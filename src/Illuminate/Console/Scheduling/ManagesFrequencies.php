@@ -72,6 +72,21 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every minute that is divisible by the interval.
+     *
+     * @param  int  $minutes
+     * @return $this
+     */
+    public function everyXMinutes($minutes = 1)
+    {
+        if (60 % $minutes !== 0) {
+            throw new \InvalidArgumentException('$minutes must be a factor of 60.');
+        }
+
+        return $this->spliceIntoPosition(1, '*/'.$minutes);
+    }
+
+    /**
      * Schedule the event to run every minute.
      *
      * @return $this
@@ -149,6 +164,22 @@ trait ManagesFrequencies
     public function everyThirtyMinutes()
     {
         return $this->spliceIntoPosition(1, '0,30');
+    }
+
+    /**
+     * Schedule the event to run every hour that is divisible by the interval.
+     *
+     * @param  int  $hours
+     * @return $this
+     */
+    public function everyXHours($hours = 1)
+    {
+        if (24 % $hours !== 0) {
+            throw new \InvalidArgumentException('$hours must be a factor of 24.');
+        }
+
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, '*/'.$hours);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Console\Scheduling;
 
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -30,10 +31,19 @@ class FrequencyTest extends TestCase
 
     public function testEveryXMinutes()
     {
-        $this->assertSame('*/2 * * * *', $this->event->everyTwoMinutes()->getExpression());
-        $this->assertSame('*/3 * * * *', $this->event->everyThreeMinutes()->getExpression());
-        $this->assertSame('*/4 * * * *', $this->event->everyFourMinutes()->getExpression());
-        $this->assertSame('*/5 * * * *', $this->event->everyFiveMinutes()->getExpression());
+        $this->assertSame('*/2 * * * *', $this->event->everyXMinutes(2)->getExpression());
+        $this->assertSame('*/3 * * * *', $this->event->everyXMinutes(3)->getExpression());
+        $this->assertSame('*/4 * * * *', $this->event->everyXMinutes(4)->getExpression());
+        $this->assertSame('*/5 * * * *', $this->event->everyXMinutes(5)->getExpression());
+        $this->assertSame('*/6 * * * *', $this->event->everyXMinutes(6)->getExpression());
+        $this->assertSame('*/10 * * * *', $this->event->everyXMinutes(10)->getExpression());
+        $this->assertSame('*/12 * * * *', $this->event->everyXMinutes(12)->getExpression());
+        $this->assertSame('*/15 * * * *', $this->event->everyXMinutes(15)->getExpression());
+        $this->assertSame('*/20 * * * *', $this->event->everyXMinutes(20)->getExpression());
+        $this->assertSame('*/30 * * * *', $this->event->everyXMinutes(30)->getExpression());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->event->everyXMinutes(7);
     }
 
     public function testDaily()
@@ -53,12 +63,17 @@ class FrequencyTest extends TestCase
         $this->assertSame('15,30,45 * * * *', $this->event->hourlyAt([15, 30, 45])->getExpression());
     }
 
-    public function testHourly()
+    public function testEveryXHours()
     {
-        $this->assertSame('0 */2 * * *', $this->event->everyTwoHours()->getExpression());
-        $this->assertSame('0 */3 * * *', $this->event->everyThreeHours()->getExpression());
-        $this->assertSame('0 */4 * * *', $this->event->everyFourHours()->getExpression());
-        $this->assertSame('0 */6 * * *', $this->event->everySixHours()->getExpression());
+        $this->assertSame('0 */2 * * *', $this->event->everyXHours(2)->getExpression());
+        $this->assertSame('0 */3 * * *', $this->event->everyXHours(3)->getExpression());
+        $this->assertSame('0 */4 * * *', $this->event->everyXHours(4)->getExpression());
+        $this->assertSame('0 */6 * * *', $this->event->everyXHours(6)->getExpression());
+        $this->assertSame('0 */8 * * *', $this->event->everyXHours(8)->getExpression());
+        $this->assertSame('0 */12 * * *', $this->event->everyXHours(12)->getExpression());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->event->everyXHours(5);
     }
 
     public function testMonthlyOn()
