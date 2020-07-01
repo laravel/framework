@@ -229,7 +229,6 @@ class Arr
 
     /**
      * Removes one item from a given array using "dot" notation"
-     * top level keys containing
      *
      * @param array $array
      * @param string $key
