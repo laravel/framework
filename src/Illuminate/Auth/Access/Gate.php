@@ -719,7 +719,7 @@ class Gate implements GateContract
      */
     protected function formatAbilityToMethod($ability)
     {
-        return strpos($ability, '-') !== false ? Str::camel($ability) : $ability;
+        return (strpos($ability, '-') !== false || strpos($ability, ' ') !== false) ? Str::camel($ability) : $ability;
     }
 
     /**
