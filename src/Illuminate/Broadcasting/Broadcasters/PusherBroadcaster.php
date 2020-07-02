@@ -117,11 +117,11 @@ class PusherBroadcaster extends Broadcaster
             || $response === true) {
             return;
         }
-
+        
         throw new BroadcastException(
             empty($response['body'])
                 ? 'Failed to connect to Pusher.'
-                : sprintf('Pusher error: %s (%s).', $response['body'], $response['status'])
+                : sprintf('Pusher error: %s.', $response['status'])
         );
     }
 
