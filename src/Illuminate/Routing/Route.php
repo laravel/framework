@@ -32,14 +32,14 @@ class Route
     /**
      * The HTTP methods the route responds to.
      *
-     * @var array
+     * @var string[]
      */
     public $methods;
 
     /**
      * The route action array.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     public $action;
 
@@ -60,14 +60,14 @@ class Route
     /**
      * The default values for the route.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     public $defaults = [];
 
     /**
      * The regular expression requirements.
      *
-     * @var array
+     * @var string[]
      */
     public $wheres = [];
 
@@ -88,7 +88,7 @@ class Route
     /**
      * The array of the matched parameters' original values.
      *
-     * @var array
+     * @var array|null
      */
     protected $originalParameters;
 
