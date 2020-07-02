@@ -56,7 +56,7 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testOnDemandNotificationsCannotUseDatabaseChannel()
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException('Cannot use database channel for on-demand notifications.')
+            new InvalidArgumentException('The database channel does not support on-demand notifications.')
         );
 
         Notification::route('database', 'foo');
