@@ -117,7 +117,7 @@ class PusherBroadcaster extends Broadcaster
             || $response === true) {
             return;
         }
-        
+
         throw new BroadcastException(
             empty($response['body'])
                 ? 'Failed to connect to Pusher.'
