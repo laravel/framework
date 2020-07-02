@@ -24,7 +24,7 @@ class AnonymousNotifiable
     public function route($channel, $route)
     {
         if ($channel === 'database') {
-            throw new InvalidArgumentException('Cannot use database channel for on-demand notifications.');
+            throw new InvalidArgumentException('The database channel does not support on-demand notifications.');
         }
 
         $this->routes[$channel] = $route;
