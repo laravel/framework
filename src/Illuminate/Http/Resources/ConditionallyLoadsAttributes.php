@@ -210,6 +210,23 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve an accessor when it has been appended.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    protected function whenAppended($attribute, $value = null, $default = null)
+    {
+        if ($this->resource->hasAppended($attribute)) {
+            return func_num_args() >= 2 ? value($value) : $this->resource->$attribute;
+        }
+
+        return func_num_args() === 3 ? value($default) : new MissingValue;
+    }
+
+    /**
      * Transform the given value if it is present.
      *
      * @param  mixed  $value
