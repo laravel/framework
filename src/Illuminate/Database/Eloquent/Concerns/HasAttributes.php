@@ -1485,7 +1485,7 @@ trait HasAttributes
     }
 
     /**
-     * Return whether the accessor attribute has been appended
+     * Return whether the accessor attribute has been appended.
      *
      * @param  string  $attribute
      * @return bool
