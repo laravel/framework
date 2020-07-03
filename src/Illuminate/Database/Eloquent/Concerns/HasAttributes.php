@@ -1485,6 +1485,17 @@ trait HasAttributes
     }
 
     /**
+     * Return whether the accessor attribute has been appended.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    public function hasAppended($attribute)
+    {
+        return in_array($attribute, $this->appends);
+    }
+
+    /**
      * Get the mutated attributes for a given instance.
      *
      * @return array
