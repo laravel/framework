@@ -14,7 +14,7 @@ class Post extends Model
     protected $guarded = [];
 
     /**
-     * Return whether the post is published
+     * Return whether the post is published.
      *
      * @return bool
      */
