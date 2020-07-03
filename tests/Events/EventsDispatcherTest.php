@@ -324,6 +324,18 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('baz', $_SERVER['__event.test']);
     }
 
+    public function testClassesWorkWithAnonymousListeners()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen(function (ExampleEvent $event) {
+            $_SERVER['__event.test'] = 'qux';
+        });
+        $d->dispatch(new ExampleEvent);
+
+        $this->assertSame('qux', $_SERVER['__event.test']);
+    }
+
     public function testEventClassesArePayload()
     {
         unset($_SERVER['__event.test']);
