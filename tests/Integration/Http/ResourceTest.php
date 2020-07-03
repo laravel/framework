@@ -198,7 +198,7 @@ class ResourceTest extends TestCase
 
         $response->assertStatus(200);
 
-        $response->assertJson([
+        $response->assertExactJson([
             'data' => [
                 'id' => 5,
                 'fourth' => 'default',
