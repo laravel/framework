@@ -333,9 +333,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileInsertGetId(Builder $query, $values, $sequence)
     {
-        $sql = $this->compileInsert($query, $values);
-
-        return 'set nocount on;'.$sql.';select scope_identity() as '.$this->wrap($sequence ?: 'id');
+        return 'set nocount on;'.$this->compileInsert($query, $values).';select scope_identity() as '.$this->wrap($sequence ?: 'id');
     }
 
     /**
