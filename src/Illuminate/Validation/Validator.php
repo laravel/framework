@@ -369,7 +369,8 @@ class Validator implements ValidatorContract
      */
     protected function removeAttribute($attribute)
     {
-        unset($this->data[$attribute], $this->rules[$attribute]);
+        Arr::forget($this->data, $attribute);
+        Arr::forget($this->rules, $attribute);
     }
 
     /**
