@@ -102,6 +102,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('intAttribute'));
     }
 
+    public function testFloatAndNullComparisonWhenDirty()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->floatAttribute = null;
+        $model->syncOriginal();
+        $this->assertFalse($model->isDirty('floatAttribute'));
+        $model->forceFill(['floatAttribute' => 0.0]);
+        $this->assertTrue($model->isDirty('floatAttribute'));
+    }
+
     public function testDirtyOnCastOrDateAttributes()
     {
         $model = new EloquentModelCastingStub;

@@ -1,6 +1,17 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.22...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.23...6.x)
+
+### Fixed
+- Fixed notifications database channel for anonymous notifiables ([#33409](https://github.com/laravel/framework/pull/33409))
+- Added float comparison null checks ([#33421](https://github.com/laravel/framework/pull/33421))
+
+
+## [v6.18.23 (2020-06-30)](https://github.com/laravel/framework/compare/v6.18.22...v6.18.23)
+
+### Fixed
+- Fixed `ConfigurationUrlParser` query decoding ([#33340](https://github.com/laravel/framework/pull/33340))
+- Correct implementation of float casting comparison ([#33322](https://github.com/laravel/framework/pull/33322))
 
 
 ## [v6.18.22 (2020-06-24)](https://github.com/laravel/framework/compare/v6.18.21...v6.18.22)
