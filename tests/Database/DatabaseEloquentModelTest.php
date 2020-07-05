@@ -102,6 +102,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('intAttribute'));
     }
 
+    public function testFloatAndNullComparisonWhenDirty()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->floatAttribute = null;
+        $model->syncOriginal();
+        $this->assertFalse($model->isDirty('floatAttribute'));
+        $model->forceFill(['floatAttribute' => 0.0]);
+        $this->assertTrue($model->isDirty('floatAttribute'));
+    }
+
     public function testDirtyOnCastOrDateAttributes()
     {
         $model = new EloquentModelCastingStub;
@@ -1588,6 +1598,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('admin', $model->is_admin);
         $this->assertSame('camelCased', $model->camelCased);
         $this->assertSame('StudlyCased', $model->StudlyCased);
+
+        $this->assertTrue($model->hasAppended('is_admin'));
+        $this->assertTrue($model->hasAppended('camelCased'));
+        $this->assertTrue($model->hasAppended('StudlyCased'));
+        $this->assertFalse($model->hasAppended('not_appended'));
 
         $model->setHidden(['is_admin', 'camelCased', 'StudlyCased']);
         $this->assertEquals([], $model->toArray());

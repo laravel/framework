@@ -71,7 +71,7 @@ class EventFake implements Dispatcher
     }
 
     /**
-     * Assert if a event was dispatched a number of times.
+     * Assert if an event was dispatched a number of times.
      *
      * @param  string  $event
      * @param  int  $times

@@ -25,6 +25,17 @@ class UrlSigningTest extends TestCase
         $this->assertSame('valid', $this->get($url)->original);
     }
 
+    public function testSigningUrlWithCustomRouteSlug()
+    {
+        Route::get('/foo/{post:slug}', function (Request $request, $slug) {
+            return ['slug' => $slug, 'valid' => $request->hasValidSignature() ? 'valid' : 'invalid'];
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['post' => new RoutableInterfaceStub]));
+        $this->assertSame('valid', $this->get($url)->original['valid']);
+        $this->assertSame('routable-slug', $this->get($url)->original['slug']);
+    }
+
     public function testTemporarySignedUrls()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
@@ -103,6 +114,7 @@ class UrlSigningTest extends TestCase
 class RoutableInterfaceStub implements UrlRoutable
 {
     public $key;
+    public $slug = 'routable-slug';
 
     public function getRouteKey()
     {
