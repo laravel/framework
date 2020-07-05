@@ -1,6 +1,69 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.16.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.18.0...7.x)
+
+### Added
+- Added `everyTwoHours()` | `everyThreeHours()` | `everyFourHours()` | `everySixHours()` methods to `Illuminate\Console\Scheduling\ManagesFrequencies` ([#33393](https://github.com/laravel/framework/pull/33393))
+- Conditionally returning appended attributes in API resources ([#33422](https://github.com/laravel/framework/pull/33422))
+- Added `ScheduledTaskFailed` event ([#33427](https://github.com/laravel/framework/pull/33427))
+
+### Fixed
+- Fixed signed urls with custom parameters ([bcb133e](https://github.com/laravel/framework/commit/bcb133e46906e748067772cf49b2f355441815c5))
+- Determine model key name correctly in Illuminate/Validation/Concerns/ValidatesAttributes.php ([a1fdd53](https://github.com/laravel/framework/commit/a1fdd536c542dabbe9882f50e849cc177dc0ad88))
+- Fixed notifications database channel for anonymous notifiables ([#33409](https://github.com/laravel/framework/pull/33409))
+
+### Chnaged
+- Improve SQL Server last insert id retrieval ([#33430](https://github.com/laravel/framework/pull/33430), [de1d159](https://github.com/laravel/framework/commit/de1d1592f3a69bd9952431ee67e76996d00e001c))
+
+
+## [v7.18.0 (2020-06-30)](https://github.com/laravel/framework/compare/v7.17.2...v7.18.0)
+
+### Added
+- Added `Illuminate\Http\Client\PendingRequest::withMiddleware()` ([#33315](https://github.com/laravel/framework/pull/33315), [b718d3a](https://github.com/laravel/framework/commit/b718d3a06d7009c0fd0237222602c1e42681b6a3))
+- Make ComponentAttributeBag Macroable ([#33354](https://github.com/laravel/framework/pull/33354))
+- Added `filter` and `whereStartsWith` and `thatStartWith` to `Illuminate\View\ComponentAttributeBag` ([0abe2db](https://github.com/laravel/framework/commit/0abe2dbed9d9b1c4a733a4c24e8383d747134286), [07ee3e8](https://github.com/laravel/framework/commit/07ee3e820b34df5e422fb868886fd190880dfc7f))
+- Added `Illuminate\Database\Eloquent\Collection::toQuery()` ([#33356](https://github.com/laravel/framework/pull/33356), [15586fa](https://github.com/laravel/framework/commit/15586fa6691884db18627721f6e143c3e035ddc0))
+- Added `first()` to `Illuminate\View\ComponentAttributeBag` ([#33358](https://github.com/laravel/framework/pull/33358), [731b94f](https://github.com/laravel/framework/commit/731b94f1734dcdb97a9466948111ab639ac11a2a))
+- Added `everyTwoMinutes()` | `everyThreeMinutes()` | `everyFourMinutes()` methods to `Illuminate/Console/Scheduling/ManagesFrequencies` ([#33379](https://github.com/laravel/framework/pull/33379))
+
+### Fixed
+- Fixed `ConfigurationUrlParser` query decoding ([#33340](https://github.com/laravel/framework/pull/33340))
+- Fixed exists in `Illuminate\Database\Eloquent\Relations\Concerns\AsPivot::delete()` ([#33347](https://github.com/laravel/framework/pull/33347))
+
+### Changed
+- Replace placeholder for dots and asterisks in validator ([#33367](https://github.com/laravel/framework/pull/33367))
+
+
+## [v7.17.2 (2020-06-24)](https://github.com/laravel/framework/compare/v7.17.1...v7.17.2)
+
+### Added
+- Added `Illuminate\Http\Client\PendingRequest::withBody()` method ([1e1f531](https://github.com/laravel/framework/commit/1e1f5311f062d62468fe2d3cef1695b8fa338cfb), [7b0b437](https://github.com/laravel/framework/commit/7b0b4375bbe231a3b96c739ff144b1df1465a387))
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Concerns\HasAttributes::getOriginal()` ([b20125d](https://github.com/laravel/framework/commit/b20125d7bf270bcd6cc651114512a2dc7f182a96), [899c765](https://github.com/laravel/framework/commit/899c765e89573d8a64e16b008af519096e12d534), [2937cce](https://github.com/laravel/framework/commit/2937cce360f4feb96e93d6cf86e24f2e8c0832fc))
+
+### Revert
+- Revert "Fixed `Model::originalIsEquivalent()` with floats ([#33259](https://github.com/laravel/framework/pull/33259), [d68d915](https://github.com/laravel/framework/commit/d68d91516db6d1b9cba8a72f99b2c7e8223e988f))" [bf3cb6f](https://github.com/laravel/framework/commit/bf3cb6f6979df2d6965d2e0aa731724d0e2b15e5)
+
+
+## [v7.17.1 (2020-06-23)](https://github.com/laravel/framework/compare/v7.17.0...v7.17.1)
+
+### Fixed
+- Fixed "Undefined variable: current" exception  in `Illuminate\Database\Eloquent\Concerns\HasAttributes::originalIsEquivalent()` [#33308](https://github.com/laravel/framework/pull/33308)
+
+
+## [v7.17.0 (2020-06-23)](https://github.com/laravel/framework/compare/v7.16.1...v7.17.0)
+
+### Added
+- Added `Illuminate\Console\Scheduling\ManagesFrequencies::lastDayOfMonth()` ([#33241](https://github.com/laravel/framework/pull/33241), [be194a8](https://github.com/laravel/framework/commit/be194a8a7b302fa68b1b2ed66d440f9f91dfec9f))
+- Allow array based event listeners ([7594267](https://github.com/laravel/framework/commit/75942673f6f54dc70fec246051171183af8e06e3))
+- Allow array callback format with non-static methods in `Illuminate\Auth\Access\Gate::define()` ([b7977d3](https://github.com/laravel/framework/commit/b7977d322a2c9baf28cc127cee09c70727c5f56e))
+- Added `Illuminate\Console\Scheduling\ManagesFrequencies::time()` parameter on twiceMonthly function ([#33274](https://github.com/laravel/framework/pull/33274))
+- Added `providerIsLoaded` method to `Illuminate\Foundation\Application` ([#33286](https://github.com/laravel/framework/pull/33286), [b87233f](https://github.com/laravel/framework/commit/b87233f48da0b4f219adebd851acd22058dfd551))
+
+### Fixed
+- Fixed domain binding with custom fields in `Illuminate\Routing\Route::domain()` ([#33231](https://github.com/laravel/framework/pull/33231))
+- Fixed `Model::originalIsEquivalent()` with floats ([#33259](https://github.com/laravel/framework/pull/33259), [d68d915](https://github.com/laravel/framework/commit/d68d91516db6d1b9cba8a72f99b2c7e8223e988f))
 
 
 ## [v7.16.1 (2020-06-16)](https://github.com/laravel/framework/compare/v7.16.0...v7.16.1)
