@@ -134,6 +134,7 @@ class DatabaseEloquentFactoryTest extends TestCase
                         ->has(
                             FactoryTestPostFactory::times(3)
                                     ->state(function ($attributes, $user) {
+                                        // Test parent is passed to child state mutations...
                                         $_SERVER['__test.post.state-user'] = $user;
 
                                         return [];
