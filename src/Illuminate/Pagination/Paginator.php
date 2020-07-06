@@ -160,7 +160,17 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      */
     public function jsonSerialize()
     {
-        return $this->toArray();
+        return [
+            'current_page' => $this->currentPage(),
+            'data' => $this->items->jsonSerialize(),
+            'first_page_url' => $this->url(1),
+            'from' => $this->firstItem(),
+            'next_page_url' => $this->nextPageUrl(),
+            'path' => $this->path(),
+            'per_page' => $this->perPage(),
+            'prev_page_url' => $this->previousPageUrl(),
+            'to' => $this->lastItem(),
+        ];
     }
 
     /**

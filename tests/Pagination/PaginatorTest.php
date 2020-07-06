@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Pagination;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Pagination\Paginator;
+use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 
 class PaginatorTest extends TestCase
@@ -61,5 +63,24 @@ class PaginatorTest extends TestCase
                                     ['path' => 'http://website.com/test']);
 
         $this->assertSame($p->path(), 'http://website.com/test');
+    }
+
+    public function testPaginatorCorrectlyJsonSerializesItsItems()
+    {
+        $p = new Paginator($array = [
+            new class implements Arrayable, JsonSerializable {
+                public function toArray()
+                {
+                    return 'array';
+                }
+
+                public function jsonSerialize()
+                {
+                    return 'JSON';
+                }
+            }
+        ], 2, 2);
+
+        $this->assertSame(['JSON'], $p->jsonSerialize()['data']);
     }
 }

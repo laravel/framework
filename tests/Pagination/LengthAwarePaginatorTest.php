@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Pagination;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 
 class LengthAwarePaginatorTest extends TestCase
@@ -110,5 +113,24 @@ class LengthAwarePaginatorTest extends TestCase
     public function testItRetrievesThePaginatorOptions()
     {
         $this->assertSame($this->options, $this->p->getOptions());
+    }
+
+    public function testLengthAwarePaginatorCorrectlyJsonSerializesItsItems()
+    {
+        $this->p->setCollection(Collection::make([
+            new class implements Arrayable, JsonSerializable {
+                public function toArray()
+                {
+                    return 'array';
+                }
+
+                public function jsonSerialize()
+                {
+                    return 'JSON';
+                }
+            }
+        ]));
+
+        $this->assertSame(['JSON'], $this->p->jsonSerialize()['data']);
     }
 }
