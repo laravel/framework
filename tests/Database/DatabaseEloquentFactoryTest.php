@@ -252,19 +252,21 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(FactoryTestUserFactory::class, FactoryTestUser::factory());
     }
 
-    public function test_call()
+    public function test_dynamic_has_and_for_methods()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
             return $model.'Factory';
         });
 
         $user = FactoryTestUserFactory::new()->hasPosts(3)->create();
+
         $this->assertCount(3, $user->posts);
 
         $post = FactoryTestPostFactory::new()
                             ->forAuthor(['name' => 'Taylor Otwell'])
                             ->hasComments(2)
                             ->create();
+
         $this->assertInstanceOf(FactoryTestUser::class, $post->author);
         $this->assertEquals('Taylor Otwell', $post->author->name);
         $this->assertCount(2, $post->comments);
