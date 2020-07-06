@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
@@ -242,6 +243,33 @@ class DatabaseEloquentFactoryTest extends TestCase
         }));
     }
 
+    public function test_model_has_factory()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $this->assertInstanceOf(FactoryTestUserFactory::class, FactoryTestUser::factory());
+    }
+
+    public function test_call()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $user = FactoryTestUserFactory::new()->hasPosts(3)->create();
+        $this->assertCount(3, $user->posts);
+
+        $post = FactoryTestPostFactory::new()
+                            ->forAuthor(['name' => 'Taylor Otwell'])
+                            ->hasComments(2)
+                            ->create();
+        $this->assertInstanceOf(FactoryTestUser::class, $post->author);
+        $this->assertEquals('Taylor Otwell', $post->author->name);
+        $this->assertCount(2, $post->comments);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -277,6 +305,8 @@ class FactoryTestUserFactory extends Factory
 
 class FactoryTestUser extends Eloquent
 {
+    use HasFactory;
+
     protected $table = 'users';
 
     public function posts()
@@ -308,6 +338,11 @@ class FactoryTestPost extends Eloquent
     protected $table = 'posts';
 
     public function user()
+    {
+        return $this->belongsTo(FactoryTestUser::class, 'user_id');
+    }
+
+    public function author()
     {
         return $this->belongsTo(FactoryTestUser::class, 'user_id');
     }
