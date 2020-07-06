@@ -127,7 +127,6 @@ class AuthPasswordBrokerTest extends TestCase
         $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $closure));
 
         $this->assertTrue($executed);
-
     }
 
     protected function getBroker($mocks)
