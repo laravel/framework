@@ -1170,7 +1170,7 @@ trait HasAttributes
 
         if ($current === $original) {
             return true;
-        } elseif (is_null($current)) {
+        } elseif (is_null($current) || is_null($original)) {
             return false;
         } elseif ($this->isDateAttribute($key)) {
             return $this->fromDateTime($current) ===
