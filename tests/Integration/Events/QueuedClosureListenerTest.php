@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Events;
 
 use Illuminate\Events\CallQueuedListener;
-use Illuminate\Events\InvokeQueuedClosureForEvent;
+use Illuminate\Events\InvokeQueuedClosure;
 use function Illuminate\Events\queueable;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -24,7 +24,7 @@ class QueuedClosureListenerTest extends TestCase
         Event::dispatch(new TestEvent);
 
         Bus::assertDispatched(CallQueuedListener::class, function ($job) {
-            return $job->class == InvokeQueuedClosureForEvent::class;
+            return $job->class == InvokeQueuedClosure::class;
         });
     }
 }

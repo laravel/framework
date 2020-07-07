@@ -2,7 +2,7 @@
 
 namespace Illuminate\Events;
 
-class InvokeQueuedClosureForEvent
+class InvokeQueuedClosure
 {
     /**
      * Handle the event.

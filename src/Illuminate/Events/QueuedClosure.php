@@ -113,7 +113,7 @@ class QueuedClosure
     public function resolve()
     {
         return function (...$arguments) {
-            dispatch(new CallQueuedListener(InvokeQueuedClosureForEvent::class, 'handle', [
+            dispatch(new CallQueuedListener(InvokeQueuedClosure::class, 'handle', [
                 'closure' => new SerializableClosure($this->closure),
                 'arguments' => $arguments,
                 'catch' => collect($this->catchCallbacks)->map(function ($callback) {
