@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": "^7.3",
+        "illuminate/bus": "^8.0",
         "illuminate/collections": "^8.0",
         "illuminate/container": "^8.0",
         "illuminate/contracts": "^8.0",
