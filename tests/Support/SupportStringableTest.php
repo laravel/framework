@@ -92,6 +92,32 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenFalse()
+    {
+        $this->assertSame('when', (string) $this->stringable('when')->when(false, function ($stringable, $value) {
+            return $stringable->append($value)->append('false');
+        }));
+
+        $this->assertSame('when false fallbacks to default', (string) $this->stringable('when false ')->when(false, function ($stringable, $value) {
+            return $stringable->append($value);
+        }, function ($stringable) {
+            return $stringable->append('fallbacks to default');
+        }));
+    }
+
+    public function testWhenTrue()
+    {
+        $this->assertSame('when true', (string) $this->stringable('when ')->when(true, function ($stringable) {
+            return $stringable->append('true');
+        }));
+
+        $this->assertSame('gets a value from if', (string) $this->stringable('gets a value ')->when('from if', function ($stringable, $value) {
+            return $stringable->append($value);
+        }, function ($stringable) {
+            return $stringable->append('fallbacks to default');
+        }));
+    }
+
     public function testTrimmedOnlyWhereNecessary()
     {
         $this->assertSame(' Taylor Otwell ', (string) $this->stringable(' Taylor Otwell ')->words(3));

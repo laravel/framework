@@ -119,7 +119,7 @@ class PusherBroadcaster extends Broadcaster
         }
 
         throw new BroadcastException(
-            isset($response['body'])
+            ! empty($response['body'])
                 ? sprintf('Pusher error: %s.', $response['status'])
                 : 'Failed to connect to Pusher.'
         );

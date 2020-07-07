@@ -1,10 +1,17 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.23...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.24...6.x)
+
+### Fixed
+- Fixed `Illuminate\Cache\FileStore::flush()` ([#33458](https://github.com/laravel/framework/pull/33458))
+
+
+## [v6.18.24 (2020-07-07)](https://github.com/laravel/framework/compare/v6.18.23...v6.18.24)
 
 ### Fixed
 - Fixed notifications database channel for anonymous notifiables ([#33409](https://github.com/laravel/framework/pull/33409))
 - Added float comparison null checks ([#33421](https://github.com/laravel/framework/pull/33421))
+- Improve SQL Server last insert id retrieval ([#33453](https://github.com/laravel/framework/pull/33453))
 
 
 ## [v6.18.23 (2020-06-30)](https://github.com/laravel/framework/compare/v6.18.22...v6.18.23)

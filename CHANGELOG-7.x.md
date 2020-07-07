@@ -1,19 +1,27 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.18.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.19.0...7.x)
+
+### Fixed
+- Fixed `Illuminate\Cache\FileStore::flush()` ([#33458](https://github.com/laravel/framework/pull/33458))
+
+
+## [v7.19.0 (2020-07-07)](https://github.com/laravel/framework/compare/v7.18.0...v7.19.0)
 
 ### Added
 - Added `everyTwoHours()` | `everyThreeHours()` | `everyFourHours()` | `everySixHours()` methods to `Illuminate\Console\Scheduling\ManagesFrequencies` ([#33393](https://github.com/laravel/framework/pull/33393))
 - Conditionally returning appended attributes in API resources ([#33422](https://github.com/laravel/framework/pull/33422))
 - Added `ScheduledTaskFailed` event ([#33427](https://github.com/laravel/framework/pull/33427))
+- Added `Illuminate\Support\Stringable::when()` ([#33455](https://github.com/laravel/framework/pull/33455))
 
 ### Fixed
 - Fixed signed urls with custom parameters ([bcb133e](https://github.com/laravel/framework/commit/bcb133e46906e748067772cf49b2f355441815c5))
 - Determine model key name correctly in Illuminate/Validation/Concerns/ValidatesAttributes.php ([a1fdd53](https://github.com/laravel/framework/commit/a1fdd536c542dabbe9882f50e849cc177dc0ad88))
 - Fixed notifications database channel for anonymous notifiables ([#33409](https://github.com/laravel/framework/pull/33409))
 
-### Chnaged
+### Changed
 - Improve SQL Server last insert id retrieval ([#33430](https://github.com/laravel/framework/pull/33430), [de1d159](https://github.com/laravel/framework/commit/de1d1592f3a69bd9952431ee67e76996d00e001c))
+- Make Str::endsWith return false if both haystack and needle are empty strings ([#33434](https://github.com/laravel/framework/pull/33434))
 
 
 ## [v7.18.0 (2020-06-30)](https://github.com/laravel/framework/compare/v7.17.2...v7.18.0)
