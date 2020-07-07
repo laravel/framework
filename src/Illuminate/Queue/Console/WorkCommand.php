@@ -28,6 +28,8 @@ class WorkCommand extends Command
                             {--stop-when-empty : Stop when the queue is empty}
                             {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
+                            {--max-jobs=0 : The number of jobs to process before stopping}
+                            {--max-time=0 : The number of seconds before stopping}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
                             {--sleep=3 : Number of seconds to sleep when no job is available}
@@ -134,7 +136,9 @@ class WorkCommand extends Command
             $this->option('sleep'),
             $this->option('tries'),
             $this->option('force'),
-            $this->option('stop-when-empty')
+            $this->option('stop-when-empty'),
+            $this->option('max-jobs'),
+            $this->option('max-time')
         );
     }
 

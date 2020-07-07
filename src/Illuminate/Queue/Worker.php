@@ -122,6 +122,9 @@ class Worker
 
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
+        $timer = microtime(true);
+        $counter = 0;
+
         while (true) {
             // Before reserving any jobs, we will make sure this queue is not paused and
             // if it is we will just pause this worker for a given amount of time and
@@ -151,6 +154,8 @@ class Worker
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
             if ($job) {
+                $counter++;
+
                 $this->runJob($job, $connectionName, $options);
             } else {
                 $this->sleep($options->sleep);
@@ -163,7 +168,7 @@ class Worker
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
-            $status = $this->stopIfNecessary($options, $lastRestart, $job);
+            $status = $this->stopIfNecessary($options, $lastRestart, $timer, $counter, $job);
 
             if (! is_null($status)) {
                 return $this->stop($status);
@@ -254,10 +259,12 @@ class Worker
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
+     * @param  int  $timer
+     * @param  int  $counter
      * @param  mixed  $job
      * @return int|null
      */
-    protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $job = null)
+    protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $timer, $counter, $job = null)
     {
         if ($this->shouldQuit) {
             return static::EXIT_SUCCESS;
@@ -266,6 +273,10 @@ class Worker
         } elseif ($this->queueShouldRestart($lastRestart)) {
             return static::EXIT_SUCCESS;
         } elseif ($options->stopWhenEmpty && is_null($job)) {
+            return static::EXIT_SUCCESS;
+        } elseif ($options->maxTime && microtime(true) - $timer >= $options->maxTime) {
+            return static::EXIT_SUCCESS;
+        } elseif ($options->maxJobs && $counter >= $options->maxJobs) {
             return static::EXIT_SUCCESS;
         }
     }
