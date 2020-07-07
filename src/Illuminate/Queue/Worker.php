@@ -130,7 +130,7 @@ class Worker
             // if it is we will just pause this worker for a given amount of time and
             // make sure we do not need to kill this worker process off completely.
             if (! $this->daemonShouldRun($options, $connectionName, $queue)) {
-                $status = $this->pauseWorker($options, $lastRestart);
+                $status = $this->pauseWorker($options, $lastRestart, $timer, $counter);
 
                 if (! is_null($status)) {
                     return $this->stop($status);
@@ -264,7 +264,7 @@ class Worker
      * @param  mixed  $job
      * @return int|null
      */
-    protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $timer, $counter, $job = null)
+    protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $timer = 0, $counter = 0, $job = null)
     {
         if ($this->shouldQuit) {
             return static::EXIT_SUCCESS;
