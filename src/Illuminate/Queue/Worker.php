@@ -130,7 +130,7 @@ class Worker
             // if it is we will just pause this worker for a given amount of time and
             // make sure we do not need to kill this worker process off completely.
             if (! $this->daemonShouldRun($options, $connectionName, $queue)) {
-                $status = $this->pauseWorker($options, $lastRestart, $timer, $counter);
+                $status = $this->pauseWorker($options, $lastRestart);
 
                 if (! is_null($status)) {
                     return $this->stop($status);
