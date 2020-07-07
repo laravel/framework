@@ -19,7 +19,7 @@
 - Determine model key name correctly in Illuminate/Validation/Concerns/ValidatesAttributes.php ([a1fdd53](https://github.com/laravel/framework/commit/a1fdd536c542dabbe9882f50e849cc177dc0ad88))
 - Fixed notifications database channel for anonymous notifiables ([#33409](https://github.com/laravel/framework/pull/33409))
 
-### Chnaged
+### Changed
 - Improve SQL Server last insert id retrieval ([#33430](https://github.com/laravel/framework/pull/33430), [de1d159](https://github.com/laravel/framework/commit/de1d1592f3a69bd9952431ee67e76996d00e001c))
 - Make Str::endsWith return false if both haystack and needle are empty strings ([#33434](https://github.com/laravel/framework/pull/33434))
 
