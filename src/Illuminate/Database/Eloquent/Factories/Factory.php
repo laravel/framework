@@ -401,9 +401,9 @@ abstract class Factory
     }
 
     /**
-     * Guess relation name between the model and the related.
+     * Attempt to guess the relationship name for a "has" relationship.
      *
-     * @param string $related
+     * @param  string  $related
      * @return string
      */
     protected function guessRelationship(string $related)
