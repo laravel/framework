@@ -41,6 +41,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('options')->nullable();
             $table->timestamps();
         });
 
@@ -96,6 +97,20 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $users = FactoryTestUserFactory::times(10)->create();
         $this->assertCount(10, $users);
+    }
+
+    public function test_expanded_closure_attributes_are_resolved_and_passed_to_closures()
+    {
+        $user = FactoryTestUserFactory::new()->create([
+            'name' => function () {
+                return 'taylor';
+            },
+            'options' => function ($attributes) {
+                return $attributes['name'].'-options';
+            },
+        ]);
+
+        $this->assertEquals('taylor-options', $user->options);
     }
 
     public function test_make_creates_unpersisted_model_instance()
@@ -302,6 +317,7 @@ class FactoryTestUserFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
+            'options' => null,
         ];
     }
 }
