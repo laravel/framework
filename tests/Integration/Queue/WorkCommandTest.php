@@ -109,8 +109,7 @@ class WorkCommandTest extends TestCase
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--max-jobs' => 1,
-            '--memory' => 1000,
-        ])->assertExitCode(0);
+        ]);
 
         // Memory limit isn't checked until after the first job is attempted.
         $this->assertSame(1, Queue::connection('database')->size());
@@ -129,8 +128,7 @@ class WorkCommandTest extends TestCase
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--max-time' => 1,
-            '--memory' => 1000,
-        ])->assertExitCode(0);
+        ]);
 
         // Memory limit isn't checked until after the first job is attempted.
         $this->assertSame(2, Queue::connection('database')->size());
