@@ -85,6 +85,8 @@ class WorkerOptions
      * @param  int  $maxTries
      * @param  bool  $force
      * @param  bool  $stopWhenEmpty
+     * @param  int  $maxJobs
+     * @param  int  $maxTime
      * @return void
      */
     public function __construct($name = 'default', $backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1,
