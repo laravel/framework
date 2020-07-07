@@ -7,7 +7,7 @@ class InvokeQueuedClosureForEvent
     /**
      * Handle the event.
      *
-     * @param  \Closure  $closure
+     * @param  \Illuminate\Queue\SerializableClosure  $closure
      * @param  array  $arguments
      * @return void
      */
@@ -19,7 +19,7 @@ class InvokeQueuedClosureForEvent
     /**
      * Handle a job failure.
      *
-     * @param  \Closure  $closure
+     * @param  \Illuminate\Queue\SerializableClosure  $closure
      * @param  array  $arguments
      * @param  array  $catchCallbacks
      * @param  \Throwable  $exception
