@@ -122,7 +122,7 @@ class Worker
 
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
-        $timer = microtime(true);
+        $timer = hrtime(true) / 1e9;
         $counter = 0;
 
         while (true) {
@@ -274,7 +274,7 @@ class Worker
             return static::EXIT_SUCCESS;
         } elseif ($options->stopWhenEmpty && is_null($job)) {
             return static::EXIT_SUCCESS;
-        } elseif ($options->maxTime && microtime(true) - $timer >= $options->maxTime) {
+        } elseif ($options->maxTime && hrtime(true) / 1e9 - $timer >= $options->maxTime) {
             return static::EXIT_SUCCESS;
         } elseif ($options->maxJobs && $counter >= $options->maxJobs) {
             return static::EXIT_SUCCESS;
