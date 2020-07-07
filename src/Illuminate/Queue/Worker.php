@@ -122,8 +122,7 @@ class Worker
 
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
-        $timer = hrtime(true) / 1e9;
-        $counter = 0;
+        [$startTime, $jobsProcessed] = [hrtime(true) / 1e9, 0];
 
         while (true) {
             // Before reserving any jobs, we will make sure this queue is not paused and
@@ -154,7 +153,7 @@ class Worker
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
             if ($job) {
-                $counter++;
+                $jobsProcessed++;
 
                 $this->runJob($job, $connectionName, $options);
             } else {
@@ -168,7 +167,9 @@ class Worker
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
-            $status = $this->stopIfNecessary($options, $lastRestart, $timer, $counter, $job);
+            $status = $this->stopIfNecessary(
+                $options, $lastRestart, $startTime, $jobsProcessed, $job
+            );
 
             if (! is_null($status)) {
                 return $this->stop($status);
@@ -259,12 +260,12 @@ class Worker
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
-     * @param  int  $timer
-     * @param  int  $counter
+     * @param  int  $startTime
+     * @param  int  $jobsProcessed
      * @param  mixed  $job
      * @return int|null
      */
-    protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $timer = 0, $counter = 0, $job = null)
+    protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $startTime = 0, $jobsProcessed = 0, $job = null)
     {
         if ($this->shouldQuit) {
             return static::EXIT_SUCCESS;
@@ -274,9 +275,9 @@ class Worker
             return static::EXIT_SUCCESS;
         } elseif ($options->stopWhenEmpty && is_null($job)) {
             return static::EXIT_SUCCESS;
-        } elseif ($options->maxTime && hrtime(true) / 1e9 - $timer >= $options->maxTime) {
+        } elseif ($options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime) {
             return static::EXIT_SUCCESS;
-        } elseif ($options->maxJobs && $counter >= $options->maxJobs) {
+        } elseif ($options->maxJobs && $jobsProcessed >= $options->maxJobs) {
             return static::EXIT_SUCCESS;
         }
     }
