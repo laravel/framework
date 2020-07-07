@@ -61,6 +61,20 @@ class WorkerOptions
     public $stopWhenEmpty;
 
     /**
+     * The maximum number of jobs to run.
+     *
+     * @var int
+     */
+    public $maxJobs;
+
+    /**
+     * The maximum number of seconds a worker may live.
+     *
+     * @var int
+     */
+    public $maxTime;
+
+    /**
      * Create a new worker options instance.
      *
      * @param  string  $name
@@ -71,9 +85,12 @@ class WorkerOptions
      * @param  int  $maxTries
      * @param  bool  $force
      * @param  bool  $stopWhenEmpty
+     * @param  int  $maxJobs
+     * @param  int  $maxTime
      * @return void
      */
-    public function __construct($name = 'default', $backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1, $force = false, $stopWhenEmpty = false)
+    public function __construct($name = 'default', $backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1,
+                                $force = false, $stopWhenEmpty = false, $maxJobs = 0, $maxTime = 0)
     {
         $this->name = $name;
         $this->backoff = $backoff;
@@ -83,5 +100,7 @@ class WorkerOptions
         $this->timeout = $timeout;
         $this->maxTries = $maxTries;
         $this->stopWhenEmpty = $stopWhenEmpty;
+        $this->maxJobs = $maxJobs;
+        $this->maxTime = $maxTime;
     }
 }
