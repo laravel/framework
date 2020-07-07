@@ -341,18 +341,20 @@ abstract class Factory
      */
     protected function expandAttributes(array $definition)
     {
-        return collect($definition)->map(function ($attribute) use ($definition) {
+        return collect($definition)->map(function ($attribute, $key) use (&$definition) {
             if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
                 $attribute = $attribute($definition);
             }
 
             if ($attribute instanceof self) {
-                return $attribute->create()->getKey();
+                $attribute = $attribute->create()->getKey();
             } elseif ($attribute instanceof Model) {
-                return $attribute->getKey();
-            } else {
-                return $attribute;
+                $attribute = $attribute->getKey();
             }
+
+            $definition[$key] = $attribute;
+
+            return $attribute;
         })->all();
     }
 
