@@ -23,11 +23,11 @@ class ResetPassword extends Notification
     public static $createUrlCallback;
 
     /**
-     * The password reset custom route name.
+     * The password reset custom URL.
      *
      * @var string|null
      */
-    public $customRouteName;
+    public $customUrl;
 
     /**
      * The callback that should be used to build the mail message.
@@ -40,13 +40,13 @@ class ResetPassword extends Notification
      * Create a notification instance.
      *
      * @param  string  $token
-     * @param  string  string|null
+     * @param  string|null $customUrl
      * @return void
      */
-    public function __construct($token, $customRouteName = null)
+    public function __construct($token, $customUrl = null)
     {
         $this->token = $token;
-        $this->customRouteName = $customRouteName;
+        $this->customUrl = $customUrl;
     }
 
     /**
@@ -72,10 +72,10 @@ class ResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        if (static::$createUrlCallback) {
-            $url = call_user_func(static::$createUrlCallback, $notifiable, $this->token);
+        if (! empty($this->customUrl)) {
+            $url = $this->customUrl;
         } else {
-            $url = url(route($this->customRouteName ?? 'password.reset', [
+            $url = url(route('password.reset', [
                 'token' => $this->token,
                 'email' => $notifiable->getEmailForPasswordReset(),
             ], false));
@@ -87,17 +87,6 @@ class ResetPassword extends Notification
             ->action(Lang::get('Reset Password'), $url)
             ->line(Lang::get('This password reset link will expire in :count minutes.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
             ->line(Lang::get('If you did not request a password reset, no further action is required.'));
-    }
-
-    /**
-     * Set a callback that should be used when creating the reset password button URL.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public static function createUrlUsing($callback)
-    {
-        static::$createUrlCallback = $callback;
     }
 
     /**
