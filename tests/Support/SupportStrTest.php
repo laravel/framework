@@ -186,6 +186,9 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::contains('taylor', ['xxx']));
         $this->assertFalse(Str::contains('taylor', ''));
         $this->assertFalse(Str::contains('', ''));
+        $this->assertFalse(Str::contains('taylor', [null]));
+        $this->assertFalse(Str::contains('taylor', null));
+        $this->assertFalse(Str::contains('taylor', 'YLO'));
     }
 
     public function testStrContainsAll()
