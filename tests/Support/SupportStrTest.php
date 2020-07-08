@@ -58,7 +58,7 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::startsWith('jason', [null]));
         $this->assertFalse(Str::startsWith('0123', [null]));
         $this->assertTrue(Str::startsWith('0123', 0));
-        $this->assertFalse(Str::startsWith('jason', 'J'));
+        $this->assertFalse(Str::startsWith('jason', 'JAS'));
         $this->assertFalse(Str::startsWith('jason', ''));
         $this->assertFalse(Str::startsWith('', ''));
         $this->assertFalse(Str::startsWith('7', ' 7'));
@@ -91,7 +91,7 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::endsWith('', ''));
         $this->assertFalse(Str::endsWith('jason', [null]));
         $this->assertFalse(Str::endsWith('jason', null));
-        $this->assertFalse(Str::endsWith('jason', 'N'));
+        $this->assertFalse(Str::endsWith('jason', 'ON'));
         $this->assertFalse(Str::endsWith('7', ' 7'));
         $this->assertTrue(Str::endsWith('a7', '7'));
         $this->assertTrue(Str::endsWith('a7', 7));
