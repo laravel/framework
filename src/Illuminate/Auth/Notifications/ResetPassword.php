@@ -40,7 +40,7 @@ class ResetPassword extends Notification
      * Create a notification instance.
      *
      * @param  string  $token
-     * @param  string|null $customUrl
+     * @param  string|null  $customUrl
      * @return void
      */
     public function __construct($token, $customUrl = null)
