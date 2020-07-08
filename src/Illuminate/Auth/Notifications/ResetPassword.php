@@ -16,11 +16,11 @@ class ResetPassword extends Notification
     public $token;
 
     /**
-     * The callback that should be used to create the reset password URL.
+     * The password reset custom route name.
      *
-     * @var \Closure|null
+     * @var string|null
      */
-    public static $createUrlCallback;
+    public $customRouteName;
 
     /**
      * The callback that should be used to build the mail message.
@@ -63,14 +63,10 @@ class ResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        if (static::$createUrlCallback) {
-            $url = call_user_func(static::$createUrlCallback, $notifiable, $this->token);
-        } else {
-            $url = url(route('password.reset', [
-                'token' => $this->token,
-                'email' => $notifiable->getEmailForPasswordReset(),
-            ], false));
-        }
+        $url = url(route($this->customRouteName ?? 'password.reset', [
+            'token' => $this->token,
+            'email' => $notifiable->getEmailForPasswordReset(),
+        ], false));
 
         return (new MailMessage)
             ->subject(Lang::get('Reset Password Notification'))
@@ -78,17 +74,6 @@ class ResetPassword extends Notification
             ->action(Lang::get('Reset Password'), $url)
             ->line(Lang::get('This password reset link will expire in :count minutes.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
             ->line(Lang::get('If you did not request a password reset, no further action is required.'));
-    }
-
-    /**
-     * Set a callback that should be used when creating the reset password button URL.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public static function createUrlUsing($callback)
-    {
-        static::$createUrlCallback = $callback;
     }
 
     /**
