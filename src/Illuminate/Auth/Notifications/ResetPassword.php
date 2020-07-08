@@ -72,7 +72,7 @@ class ResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        if (! empty($this->customUrl)) {
+        if (! is_null($this->customUrl)) {
             $url = $this->customUrl;
         } else {
             $url = url(route('password.reset', [
