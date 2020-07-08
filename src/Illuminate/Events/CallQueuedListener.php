@@ -2,6 +2,7 @@
 
 namespace Illuminate\Events;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -9,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 
 class CallQueuedListener implements ShouldQueue
 {
-    use InteractsWithQueue;
+    use InteractsWithQueue, Queueable;
 
     /**
      * The listener class name.

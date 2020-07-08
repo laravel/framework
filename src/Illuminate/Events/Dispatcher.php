@@ -77,6 +77,10 @@ class Dispatcher implements DispatcherContract
     {
         if ($events instanceof Closure) {
             return $this->listen($this->firstClosureParameterType($events), $events);
+        } elseif ($events instanceof QueuedClosure) {
+            return $this->listen($this->firstClosureParameterType($events->closure), $events->resolve());
+        } elseif ($listener instanceof QueuedClosure) {
+            $listener = $listener->resolve();
         }
 
         foreach ((array) $events as $event) {
