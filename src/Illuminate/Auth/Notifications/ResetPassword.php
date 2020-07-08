@@ -33,11 +33,13 @@ class ResetPassword extends Notification
      * Create a notification instance.
      *
      * @param  string  $token
+     * @param  string  string|null
      * @return void
      */
-    public function __construct($token)
+    public function __construct($token, $customRouteName = null)
     {
         $this->token = $token;
+        $this->customRouteName = $customRouteName;
     }
 
     /**
