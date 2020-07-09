@@ -37,7 +37,7 @@ class DownCommand extends Command
             if (file_exists(storage_path('framework/down'))) {
                 $this->comment('Application is already down.');
 
-                return true;
+                return 0;
             }
 
             file_put_contents(storage_path('framework/down'),
@@ -45,6 +45,8 @@ class DownCommand extends Command
                               JSON_PRETTY_PRINT));
 
             $this->comment('Application is now in maintenance mode.');
+
+            return 0;
         } catch (Exception $e) {
             $this->error('Failed to enter maintenance mode.');
 
