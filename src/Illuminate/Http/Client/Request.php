@@ -234,10 +234,10 @@ class Request implements ArrayAccess
     /**
      * Set the decoded data on the request.
      *
-     * @param  array  $data
+     * @param  resource|array  $data
      * @return $this
      */
-    public function withData(array $data)
+    public function withData($data)
     {
         $this->data = $data;
 
