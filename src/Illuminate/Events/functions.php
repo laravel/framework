@@ -4,7 +4,7 @@ namespace Illuminate\Events;
 
 use Closure;
 
-if (! function_exists('Illuminate\Events\queueable')) {
+if (! function_exists('queueable')) {
     /**
      * Create a new queued Closure event listener.
      *
