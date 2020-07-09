@@ -26,6 +26,10 @@ class ValidationUniqueRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertSame('unique:no_table_names,NULL,NULL,id,foo,"bar"', (string) $rule);
 
+        $rule = new Unique(ClassWithNonEmptyConstructor::class);
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:'.ClassWithNonEmptyConstructor::class.',NULL,NULL,id,foo,"bar"', (string) $rule);
+
         $rule = new Unique('table', 'column');
         $rule->ignore('Taylor, Otwell', 'id_column');
         $rule->where('foo', 'bar');
@@ -77,4 +81,16 @@ class NoTableName extends Model
 {
     protected $guarded = [];
     public $timestamps = false;
+}
+
+class ClassWithNonEmptyConstructor
+{
+    private $bar;
+    private $baz;
+
+    public function __construct($bar, $baz)
+    {
+        $this->bar = $bar;
+        $this->baz = $baz;
+    }
 }
