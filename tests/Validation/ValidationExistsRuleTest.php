@@ -58,6 +58,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule = new Exists(NoTableNameModel::class, 'column');
         $rule->where('foo', 'bar');
         $this->assertSame('exists:no_table_name_models,column,foo,"bar"', (string) $rule);
+
+        $rule = new Exists(ClassWithRequiredConstructorParameters::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:'.ClassWithRequiredConstructorParameters::class.',column,foo,"bar"', (string) $rule);
     }
 
     public function testItChoosesValidRecordsUsingWhereInRule()
@@ -202,4 +206,16 @@ class NoTableNameModel extends Eloquent
 {
     protected $guarded = [];
     public $timestamps = false;
+}
+
+class ClassWithRequiredConstructorParameters
+{
+    private $bar;
+    private $baz;
+
+    public function __construct($bar, $baz)
+    {
+        $this->bar = $bar;
+        $this->baz = $baz;
+    }
 }
