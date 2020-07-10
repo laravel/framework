@@ -63,8 +63,9 @@ abstract class ServiceProvider
     protected function mergeConfigFrom($path, $key)
     {
         if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
-            $this->app['config']->set($key, array_merge(
-                require $path, $this->app['config']->get($key, [])
+            $configService = $this->app->make('config');
+            $configService->set($key, array_merge(
+                require $path, $config_service->get($key, [])
             ));
         }
     }
