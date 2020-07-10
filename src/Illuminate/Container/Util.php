@@ -55,7 +55,7 @@ class Util
 
         $name = $type->getName();
 
-        if (!is_null($class = $parameter->getDeclaringClass())) {
+        if (! is_null($class = $parameter->getDeclaringClass())) {
             if ($name === 'self') {
                 return $class->getName();
             }
