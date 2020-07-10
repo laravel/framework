@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Query\Processors;
 
+use Exception;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 
 class SqlServerProcessor extends Processor
@@ -19,15 +21,38 @@ class SqlServerProcessor extends Processor
     {
         $connection = $query->getConnection();
 
-        $connection->recordsHaveBeenModified();
+        $connection->insert($sql, $values);
 
-        $result = $connection->selectFromWriteConnection($sql, $values)[0];
-
-        $sequence = $sequence ?: 'id';
-
-        $id = is_object($result) ? $result->{$sequence} : $result[$sequence];
+        if ($connection->getConfig('odbc') === true) {
+            $id = $this->processInsertGetIdForOdbc($connection);
+        } else {
+            $id = $connection->getPdo()->lastInsertId();
+        }
 
         return is_numeric($id) ? (int) $id : $id;
+    }
+
+    /**
+     * Process an "insert get ID" query for ODBC.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return int
+     *
+     * @throws \Exception
+     */
+    protected function processInsertGetIdForOdbc(Connection $connection)
+    {
+        $result = $connection->selectFromWriteConnection(
+            'SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid'
+        );
+
+        if (! $result) {
+            throw new Exception('Unable to retrieve lastInsertID for ODBC.');
+        }
+
+        $row = $result[0];
+
+        return is_object($row) ? $row->insertid : $row['insertid'];
     }
 
     /**

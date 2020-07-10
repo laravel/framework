@@ -324,19 +324,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile an insert and get ID statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
-     * @param  string  $sequence
-     * @return string
-     */
-    public function compileInsertGetId(Builder $query, $values, $sequence)
-    {
-        return 'set nocount on;'.$this->compileInsert($query, $values).';select scope_identity() as '.$this->wrap($sequence ?: 'id');
-    }
-
-    /**
      * Compile an update statement with joins into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
