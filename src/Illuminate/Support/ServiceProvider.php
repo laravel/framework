@@ -65,7 +65,7 @@ abstract class ServiceProvider
         if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
             $configService = $this->app->make('config');
             $configService->set($key, array_merge(
-                require $path, $config_service->get($key, [])
+                require $path, $configService->get($key, [])
             ));
         }
     }
