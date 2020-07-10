@@ -10,7 +10,6 @@ use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\PendingMailFake;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use ReflectionParameter;
 
 class SupportReflectorTest extends TestCase
 {
@@ -71,8 +70,7 @@ class B extends A
     }
 }
 
-if (PHP_MAJOR_VERSION >= 8)
-{
+if (PHP_MAJOR_VERSION >= 8) {
     eval('
 namespace Illuminate\Tests\Support;
 
