@@ -46,7 +46,7 @@ class ValidationValidatorTest extends TestCase
                     'posts' => [
                         [
                             'name' => '',
-                        ]
+                        ],
                     ],
                 ],
             ],
