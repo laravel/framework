@@ -54,6 +54,15 @@ trait MakesHttpRequests
     protected $encryptCookies = true;
 
     /**
+     * Indicated whether JSON requests should be performed "with credentials" (cookies).
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
+     *
+     * @var bool
+     */
+    protected $withCredentials = false;
+
+    /**
      * Define additional headers to be sent with the request.
      *
      * @param  array  $headers
@@ -226,6 +235,18 @@ trait MakesHttpRequests
     public function followingRedirects()
     {
         $this->followRedirects = true;
+
+        return $this;
+    }
+
+    /**
+     * Include cookies and authorization headers for JSON requests.
+     *
+     * @return $this
+     */
+    public function withCredentials()
+    {
+        $this->withCredentials = true;
 
         return $this;
     }
@@ -449,7 +470,13 @@ trait MakesHttpRequests
         ], $headers);
 
         return $this->call(
-            $method, $uri, [], [], $files, $this->transformHeadersToServerVars($headers), $content
+            $method,
+            $uri,
+            [],
+            $this->prepareCookiesForJsonRequest(),
+            $files,
+            $this->transformHeadersToServerVars($headers),
+            $content
         );
     }
 
@@ -575,6 +602,16 @@ trait MakesHttpRequests
         return collect($this->defaultCookies)->map(function ($value) {
             return encrypt($value, false);
         })->merge($this->unencryptedCookies)->all();
+    }
+
+    /**
+     * If enabled, add cookies for JSON requests.
+     *
+     * @return array
+     */
+    protected function prepareCookiesForJsonRequest()
+    {
+        return $this->withCredentials ? $this->prepareCookiesForRequest() : [];
     }
 
     /**
