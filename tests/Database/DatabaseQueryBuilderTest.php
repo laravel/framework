@@ -2071,7 +2071,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->insertGetId([]);
 
         $builder = $this->getSqlServerBuilder();
-        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'set nocount on;insert into [users] default values;select scope_identity() as [id]', [], null);
+        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into [users] default values', [], null);
         $builder->from('users')->insertGetId([]);
     }
 
@@ -2406,14 +2406,6 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getPostgresBuilder();
         $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email") values (?) returning "id"', ['foo'], 'id')->andReturn(1);
-        $result = $builder->from('users')->insertGetId(['email' => 'foo'], 'id');
-        $this->assertEquals(1, $result);
-    }
-
-    public function testSqlServerInsertGetId()
-    {
-        $builder = $this->getSqlServerBuilder();
-        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'set nocount on;insert into [users] ([email]) values (?);select scope_identity() as [id]', ['foo'], 'id')->andReturn(1);
         $result = $builder->from('users')->insertGetId(['email' => 'foo'], 'id');
         $this->assertEquals(1, $result);
     }
