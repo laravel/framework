@@ -54,13 +54,13 @@ trait MakesHttpRequests
     protected $encryptCookies = true;
 
     /**
-     * Indicated whether json-requests should behave like
-     * the XHR withCredentials-flag was set.
+     * Indicated whether JSON requests should be performed "with credentials" (cookies).
+     *
      * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
      *
      * @var bool
      */
-    protected $withCredentials;
+    protected $withCredentials = false;
 
     /**
      * Define additional headers to be sent with the request.
@@ -240,7 +240,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Include cookies and authorization headers in json-requests.
+     * Include cookies and authorization headers for JSON requests.
      *
      * @return $this
      */
@@ -470,8 +470,13 @@ trait MakesHttpRequests
         ], $headers);
 
         return $this->call(
-            $method, $uri, [], $this->prepareCookiesForJsonRequest(),
-            $files, $this->transformHeadersToServerVars($headers), $content
+            $method,
+            $uri,
+            [],
+            $this->prepareCookiesForJsonRequest(),
+            $files,
+            $this->transformHeadersToServerVars($headers),
+            $content
         );
     }
 
@@ -600,17 +605,13 @@ trait MakesHttpRequests
     }
 
     /**
-     * If enabled, add cookies for Json requests.
+     * If enabled, add cookies for JSON requests.
      *
      * @return array
      */
     protected function prepareCookiesForJsonRequest()
     {
-        if ($this->withCredentials) {
-            return $this->prepareCookiesForRequest();
-        } else {
-            return [];
-        }
+        return $this->withCredentials ? $this->prepareCookiesForRequest() : [];
     }
 
     /**
