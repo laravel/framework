@@ -103,6 +103,17 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('baz', $this->unencryptedCookies['foo']);
         $this->assertSame('new-value', $this->unencryptedCookies['new-cookie']);
     }
+
+    public function testWithoutAndWithCredentials()
+    {
+        $this->encryptCookies = false;
+
+        $this->assertSame([], $this->prepareCookiesForJsonRequest());
+
+        $this->withCredentials();
+        $this->defaultCookies = ['foo' => 'bar'];
+        $this->assertSame(['foo' => 'bar'], $this->prepareCookiesForJsonRequest());
+    }
 }
 
 class MyMiddleware
