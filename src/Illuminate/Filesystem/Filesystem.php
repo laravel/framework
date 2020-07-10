@@ -123,6 +123,21 @@ class Filesystem
     }
 
     /**
+     * Get the number of lines in a given file.
+     *
+     * @param  string  $path
+     * @return int
+     */
+    public function numberOfLines($path)
+    {
+        $file = new \SplFileObject($path, 'r');
+
+        $file->seek(PHP_INT_MAX);
+
+        return $file->key();
+    }
+
+    /**
      * Write the contents of a file.
      *
      * @param  string  $path
