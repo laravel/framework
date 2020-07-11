@@ -58,4 +58,11 @@ interface Validator extends MessageProvider
      * @return \Illuminate\Support\MessageBag
      */
     public function errors();
+
+    /**
+     * Get the data under validation.
+     *
+     * @return array
+     */
+    public function getData();
 }
