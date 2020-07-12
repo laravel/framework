@@ -14,7 +14,7 @@ class RequestHandled
     /**
      * The response instance.
      *
-     * @var \Illuminate\Http\Response
+     * @var \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public $response;
 
@@ -22,7 +22,7 @@ class RequestHandled
      * Create a new event instance.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response  $response
      * @return void
      */
     public function __construct($request, $response)
