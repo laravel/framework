@@ -58,6 +58,11 @@ trait DatabaseRule
      */
     public function resolveTableName($table)
     {
+        
+        if ( Str::contains($table, '/')) {
+            $table = str_replace('/', '\\', $table);
+        }
+        
         if (! Str::contains($table, '\\') || ! class_exists($table)) {
             return $table;
         }
