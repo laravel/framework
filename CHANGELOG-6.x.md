@@ -1,9 +1,19 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.24...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.25...6.x)
+
+
+## [v6.18.25 (2020-07-10)](https://github.com/laravel/framework/compare/v6.18.24...v6.18.25)
 
 ### Fixed
 - Fixed `Illuminate\Cache\FileStore::flush()` ([#33458](https://github.com/laravel/framework/pull/33458))
+- Fixed auto creating model by class name ([#33481](https://github.com/laravel/framework/pull/33481))
+- Don't return nested data from validator when failing an exclude rule ([#33435](https://github.com/laravel/framework/pull/33435))
+- Fixed validation nested error messages ([6615371](https://github.com/laravel/framework/commit/6615371d7c0a7431372244d21eae54696b3c19f2))
+- Fixed `Illuminate\Support\Reflector` to handle parent ([#33502](https://github.com/laravel/framework/pull/33502))
+  
+### Revert
+- Revert [Improve SQL Server last insert id retrieval](https://github.com/laravel/framework/pull/33453) ([#33496](https://github.com/laravel/framework/pull/33496))
 
 
 ## [v6.18.24 (2020-07-07)](https://github.com/laravel/framework/compare/v6.18.23...v6.18.24)
