@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use Foo\Bar\EloquentModelNamespacedStub;
+use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -101,6 +102,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('intAttribute'));
     }
 
+    public function testFloatAndNullComparisonWhenDirty()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->floatAttribute = null;
+        $model->syncOriginal();
+        $this->assertFalse($model->isDirty('floatAttribute'));
+        $model->forceFill(['floatAttribute' => 0.0]);
+        $this->assertTrue($model->isDirty('floatAttribute'));
+    }
+
     public function testDirtyOnCastOrDateAttributes()
     {
         $model = new EloquentModelCastingStub;
@@ -156,6 +167,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isClean('bar'));
         $this->assertFalse($model->isClean('foo', 'bar'));
         $this->assertFalse($model->isClean(['foo', 'bar']));
+    }
+
+    public function testCleanWhenFloatUpdateAttribute()
+    {
+        // test is equivalent
+        $model = new EloquentModelStub(['castedFloat' => 8 - 6.4]);
+        $model->syncOriginal();
+        $model->castedFloat = 1.6;
+        $this->assertTrue($model->originalIsEquivalent('castedFloat'));
+
+        // test is not equivalent
+        $model = new EloquentModelStub(['castedFloat' => 5.6]);
+        $model->syncOriginal();
+        $model->castedFloat = 5.5;
+        $this->assertFalse($model->originalIsEquivalent('castedFloat'));
     }
 
     public function testCalculatedAttributes()
@@ -224,7 +250,7 @@ class DatabaseEloquentModelTest extends TestCase
         $newInstance = $model->newInstance();
 
         $this->assertArrayHasKey('foo', $newInstance->getCasts());
-        $this->assertEquals('date', $newInstance->getCasts()['foo']);
+        $this->assertSame('date', $newInstance->getCasts()['foo']);
     }
 
     public function testCreateMethodSavesNewModel()
@@ -949,6 +975,65 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
+    public function testMakeVisibleIf()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(true, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(false, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(function ($model) {
+            return ! is_null($model->name);
+        }, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+    }
+
+    public function testMakeHiddenIf()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'address' => 'foobar', 'id' => 'baz']);
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHiddenIf(true, 'address')->toArray();
+        $this->assertArrayNotHasKey('address', $array);
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $model->makeVisible('address');
+
+        $array = $model->makeHiddenIf(false, ['name', 'age'])->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHiddenIf(function ($model) {
+            return ! is_null($model->id);
+        }, ['name', 'age'])->toArray();
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayNotHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
+    }
+
     public function testFillable()
     {
         $model = new EloquentModelStub;
@@ -1518,6 +1603,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('camelCased', $model->camelCased);
         $this->assertSame('StudlyCased', $model->StudlyCased);
 
+        $this->assertTrue($model->hasAppended('is_admin'));
+        $this->assertTrue($model->hasAppended('camelCased'));
+        $this->assertTrue($model->hasAppended('StudlyCased'));
+        $this->assertFalse($model->hasAppended('not_appended'));
+
         $model->setHidden(['is_admin', 'camelCased', 'StudlyCased']);
         $this->assertEquals([], $model->toArray());
 
@@ -1799,7 +1889,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('foo', $model->getCasts());
 
         $model->mergeCasts(['foo' => 'date']);
-        $this->assertEquals($castCount + 1, count($model->getCasts()));
+        $this->assertCount($castCount + 1, $model->getCasts());
         $this->assertArrayHasKey('foo', $model->getCasts());
     }
 
@@ -1990,12 +2080,6 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
-    /**
-     * Test that the getOriginal method on an Eloquent model also uses the casts array.
-     *
-     * @param void
-     * @return void
-     */
     public function testGetOriginalCastsAttributes()
     {
         $model = new EloquentModelCastingStub();
@@ -2043,8 +2127,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(0.443, $model->floatAttribute);
 
         $this->assertIsString($model->getOriginal('stringAttribute'));
-        $this->assertEquals('432', $model->getOriginal('stringAttribute'));
-        $this->assertEquals('12', $model->stringAttribute);
+        $this->assertSame('432', $model->getOriginal('stringAttribute'));
+        $this->assertSame('12', $model->stringAttribute);
 
         $this->assertIsBool($model->getOriginal('boolAttribute'));
         $this->assertTrue($model->getOriginal('boolAttribute'));
@@ -2067,6 +2151,14 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertEquals(['foo' => 'bar'], $model->getOriginal('collectionAttribute')->toArray());
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
+    }
+
+    public function testUnsavedModel()
+    {
+        $user = new UnsavedModel;
+        $user->name = null;
+
+        $this->assertNull($user->name);
     }
 }
 
@@ -2103,6 +2195,7 @@ class EloquentModelStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = EloquentModelSaveStub::class;
+    protected $casts = ['castedFloat' => 'float'];
 
     public function getListItemsAttribute($value)
     {
@@ -2492,4 +2585,17 @@ class EloquentModelWithUpdatedAtNull extends Model
 {
     protected $table = 'stub';
     const UPDATED_AT = null;
+}
+
+class UnsavedModel extends Model
+{
+    protected $casts = ['name' => Uppercase::class];
+}
+
+class Uppercase implements CastsInboundAttributes
+{
+    public function set($model, string $key, $value, array $attributes)
+    {
+        return is_string($value) ? strtoupper($value) : $value;
+    }
 }

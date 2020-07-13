@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Http;
 
 use Illuminate\Http\Client\Factory;
-use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
@@ -30,6 +29,23 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://laravel.com/test-missing-page');
 
         $this->assertTrue($response->ok());
+    }
+
+    public function testResponseBodyCasting()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+        $this->assertSame('{"result":{"foo":"bar"}}', (string) $response);
+        $this->assertIsArray($response->json());
+        $this->assertSame(['foo' => 'bar'], $response->json()['result']);
+        $this->assertSame(['foo' => 'bar'], $response['result']);
+        $this->assertIsObject($response->object());
+        $this->assertSame('bar', $response->object()->result->foo);
     }
 
     public function testUrlsCanBeStubbedByPath()
@@ -60,6 +76,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->withHeaders([
             'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
         ])->post('http://foo.com/json', [
             'name' => 'Taylor',
         ]);
@@ -68,6 +85,7 @@ class HttpClientTest extends TestCase
             return $request->url() === 'http://foo.com/json' &&
                    $request->hasHeader('Content-Type', 'application/json') &&
                    $request->hasHeader('X-Test-Header', 'foo') &&
+                   $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
                    $request['name'] === 'Taylor';
         });
     }
@@ -86,6 +104,45 @@ class HttpClientTest extends TestCase
                    $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
                    $request['name'] === 'Taylor';
         });
+    }
+
+    public function testSpecificRequestIsNotBeingSent()
+    {
+        $this->factory->fake();
+
+        $this->factory->post('http://foo.com/form', [
+            'name' => 'Taylor',
+        ]);
+
+        $this->factory->assertNotSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                $request['name'] === 'Peter';
+        });
+    }
+
+    public function testNoRequestIsNotBeingSent()
+    {
+        $this->factory->fake();
+
+        $this->factory->assertNothingSent();
+    }
+
+    public function testRequestCount()
+    {
+        $this->factory->fake();
+        $this->factory->assertSentCount(0);
+
+        $this->factory->post('http://foo.com/form', [
+            'name' => 'Taylor',
+        ]);
+
+        $this->factory->assertSentCount(1);
+
+        $this->factory->post('http://foo.com/form', [
+            'name' => 'Jim',
+        ]);
+
+        $this->factory->assertSentCount(2);
     }
 
     public function testCanSendMultipartData()
@@ -122,6 +179,46 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendMultipartDataWithSimplifiedParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'foo' => 'bar',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'foo' &&
+                $request[0]['contents'] === 'bar';
+        });
+    }
+
+    public function testCanSendMultipartDataWithBothSimplifiedAndExtendedParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'foo' => 'bar',
+            [
+                'name' => 'foobar',
+                'contents' => 'data',
+                'headers' => ['X-Test-Header' => 'foo'],
+            ],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'foo' &&
+                $request[0]['contents'] === 'bar' &&
+                $request[1]['name'] === 'foobar' &&
+                $request[1]['contents'] === 'data' &&
+                $request[1]['headers']['X-Test-Header'] === 'foo';
+        });
+    }
+
     public function testItCanSendToken()
     {
         $this->factory->fake();
@@ -144,7 +241,6 @@ class HttpClientTest extends TestCase
                 ->pushStatus(403),
         ]);
 
-        /** @var PendingRequest */
         $response = $this->factory->get('https://example.com');
         $this->assertSame('Ok', $response->body());
         $this->assertSame(201, $response->status());
@@ -154,7 +250,7 @@ class HttpClientTest extends TestCase
         $this->assertSame(200, $response->status());
 
         $response = $this->factory->get('https://example.com');
-        $this->assertSame('This is a story about something that happened long ago when your grandfather was a child.'.PHP_EOL, $response->body());
+        $this->assertSame("This is a story about something that happened long ago when your grandfather was a child.\n", $response->body());
         $this->assertSame(200, $response->status());
 
         $response = $this->factory->get('https://example.com');
@@ -216,11 +312,119 @@ class HttpClientTest extends TestCase
 
         $this->assertCount(1, $response->cookies()->toArray());
 
-        /** @var CookieJarInterface $responseCookies */
+        /** @var \GuzzleHttp\Cookie\CookieJarInterface $responseCookies */
         $responseCookie = $response->cookies()->toArray()[0];
 
         $this->assertSame('foo', $responseCookie['Name']);
         $this->assertSame('bar', $responseCookie['Value']);
         $this->assertSame('https://laravel.com', $responseCookie['Domain']);
+    }
+
+    public function testGetWithArrayQueryParam()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get', ['foo' => 'bar']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo=bar'
+                && $request['foo'] === 'bar';
+        });
+    }
+
+    public function testGetWithStringQueryParam()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get', 'foo=bar');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo=bar'
+                && $request['foo'] === 'bar';
+        });
+    }
+
+    public function testGetWithQuery()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get?foo=bar&page=1');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo=bar&page=1'
+                && $request['foo'] === 'bar'
+                && $request['page'] === '1';
+        });
+    }
+
+    public function testGetWithQueryWontEncode()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get?foo;bar;1;5;10&page=1');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo;bar;1;5;10&page=1'
+                && ! isset($request['foo'])
+                && ! isset($request['bar'])
+                && $request['page'] === '1';
+        });
+    }
+
+    public function testGetWithArrayQueryParamOverwrites()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get?foo=bar&page=1', ['hello' => 'world']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?hello=world'
+                && $request['hello'] === 'world';
+        });
+    }
+
+    public function testGetWithArrayQueryParamEncodes()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get', ['foo;bar; space test' => 'laravel']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo%3Bbar%3B%20space%20test=laravel'
+                && $request['foo;bar; space test'] === 'laravel';
+        });
+    }
+
+    public function testCanConfirmManyHeaders()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders([
+                       'X-Test-Header' => 'foo',
+                       'X-Test-ArrayHeader' => ['bar', 'baz'],
+                   ]);
+        });
+    }
+
+    public function testCanConfirmManyHeadersUsingAString()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders('X-Test-Header');
+        });
     }
 }

@@ -30,7 +30,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
 
     public function testStringsAreCastable()
     {
-        /** @var JsonCast $object */
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $object */
         $object = JsonCast::create([
             'basic_string_as_json_field' => 'this is a string',
             'json_string_as_json_field' => '{"key1":"value1"}',
@@ -42,7 +42,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
 
     public function testArraysAreCastable()
     {
-        /** @var JsonCast $object */
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $object */
         $object = JsonCast::create([
             'array_as_json_field' => ['key1' => 'value1'],
         ]);
@@ -55,7 +55,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $object = new stdClass();
         $object->key1 = 'value1';
 
-        /** @var JsonCast $user */
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */
         $user = JsonCast::create([
             'object_as_json_field' => $object,
         ]);
@@ -66,7 +66,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
 
     public function testCollectionsAreCastable()
     {
-        /** @var JsonCast $user */
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */
         $user = JsonCast::create([
             'collection_as_json_field' => new Collection(['key1' => 'value1']),
         ]);

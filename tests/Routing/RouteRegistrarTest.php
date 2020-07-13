@@ -60,6 +60,17 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['seven'], $this->getRoute()->middleware());
     }
 
+    public function testWithoutMiddlewareRegistration()
+    {
+        $this->router->middleware(['one', 'two'])->get('users', function () {
+            return 'all-users';
+        })->withoutMiddleware('one');
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+
+        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+    }
+
     public function testCanRegisterGetRouteWithClosureAction()
     {
         $this->router->middleware('get-middleware')->get('users', function () {
@@ -500,6 +511,18 @@ class RouteRegistrarTest extends TestCase
                      ->middleware(RouteRegistrarMiddlewareStub::class);
 
         $this->seeMiddleware(RouteRegistrarMiddlewareStub::class);
+    }
+
+    public function testResourceWithoutMiddlewareRegistration()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->only('index')
+                     ->middleware(['one', 'two'])
+                     ->withoutMiddleware('one');
+
+        $this->seeResponse('controller', Request::create('users', 'GET'));
+
+        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
     }
 
     public function testCanSetRouteName()

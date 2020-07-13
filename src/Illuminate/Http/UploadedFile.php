@@ -98,7 +98,7 @@ class UploadedFile extends SymfonyUploadedFile
     public function get()
     {
         if (! $this->isValid()) {
-            throw new FileNotFoundException("File does not exist at path {$this->getPathname()}");
+            throw new FileNotFoundException("File does not exist at path {$this->getPathname()}.");
         }
 
         return file_get_contents($this->getPathname());

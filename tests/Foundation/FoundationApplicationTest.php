@@ -87,6 +87,18 @@ class FoundationApplicationTest extends TestCase
         $this->assertArrayHasKey($class, $app->getLoadedProviders());
     }
 
+    public function testServiceProvidersCouldBeLoaded()
+    {
+        $provider = m::mock(ServiceProvider::class);
+        $class = get_class($provider);
+        $provider->shouldReceive('register')->once();
+        $app = new Application;
+        $app->register($provider);
+
+        $this->assertTrue($app->providerIsLoaded($class));
+        $this->assertFalse($app->providerIsLoaded(ApplicationBasicServiceProviderStub::class));
+    }
+
     public function testDeferredServicesMarkedAsBound()
     {
         $app = new Application;
@@ -359,11 +371,12 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application('/base/path');
 
-        $this->assertSame('/base/path/bootstrap/cache/services.php', $app->getCachedServicesPath());
-        $this->assertSame('/base/path/bootstrap/cache/packages.php', $app->getCachedPackagesPath());
-        $this->assertSame('/base/path/bootstrap/cache/config.php', $app->getCachedConfigPath());
-        $this->assertSame('/base/path/bootstrap/cache/routes-v7.php', $app->getCachedRoutesPath());
-        $this->assertSame('/base/path/bootstrap/cache/events.php', $app->getCachedEventsPath());
+        $ds = DIRECTORY_SEPARATOR;
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/services.php', $app->getCachedServicesPath());
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/config.php', $app->getCachedConfigPath());
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/routes-v7.php', $app->getCachedRoutesPath());
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/events.php', $app->getCachedEventsPath());
     }
 
     public function testEnvPathsAreUsedForCachePathsWhenSpecified()
@@ -375,6 +388,7 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_ROUTES_CACHE'] = '/absolute/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = '/absolute/path/events.php';
 
+        $ds = DIRECTORY_SEPARATOR;
         $this->assertSame('/absolute/path/services.php', $app->getCachedServicesPath());
         $this->assertSame('/absolute/path/packages.php', $app->getCachedPackagesPath());
         $this->assertSame('/absolute/path/config.php', $app->getCachedConfigPath());
@@ -399,11 +413,12 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
 
-        $this->assertSame('/base/path/relative/path/services.php', $app->getCachedServicesPath());
-        $this->assertSame('/base/path/relative/path/packages.php', $app->getCachedPackagesPath());
-        $this->assertSame('/base/path/relative/path/config.php', $app->getCachedConfigPath());
-        $this->assertSame('/base/path/relative/path/routes.php', $app->getCachedRoutesPath());
-        $this->assertSame('/base/path/relative/path/events.php', $app->getCachedEventsPath());
+        $ds = DIRECTORY_SEPARATOR;
+        $this->assertSame('/base/path'.$ds.'relative/path/services.php', $app->getCachedServicesPath());
+        $this->assertSame('/base/path'.$ds.'relative/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/base/path'.$ds.'relative/path/config.php', $app->getCachedConfigPath());
+        $this->assertSame('/base/path'.$ds.'relative/path/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('/base/path'.$ds.'relative/path/events.php', $app->getCachedEventsPath());
 
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
@@ -423,11 +438,37 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
 
-        $this->assertSame('/relative/path/services.php', $app->getCachedServicesPath());
-        $this->assertSame('/relative/path/packages.php', $app->getCachedPackagesPath());
-        $this->assertSame('/relative/path/config.php', $app->getCachedConfigPath());
-        $this->assertSame('/relative/path/routes.php', $app->getCachedRoutesPath());
-        $this->assertSame('/relative/path/events.php', $app->getCachedEventsPath());
+        $ds = DIRECTORY_SEPARATOR;
+        $this->assertSame($ds.'relative/path/services.php', $app->getCachedServicesPath());
+        $this->assertSame($ds.'relative/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame($ds.'relative/path/config.php', $app->getCachedConfigPath());
+        $this->assertSame($ds.'relative/path/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame($ds.'relative/path/events.php', $app->getCachedEventsPath());
+
+        unset(
+            $_SERVER['APP_SERVICES_CACHE'],
+            $_SERVER['APP_PACKAGES_CACHE'],
+            $_SERVER['APP_CONFIG_CACHE'],
+            $_SERVER['APP_ROUTES_CACHE'],
+            $_SERVER['APP_EVENTS_CACHE']
+        );
+    }
+
+    public function testEnvPathsAreAbsoluteInWindows()
+    {
+        $app = new Application(__DIR__);
+        $app->addAbsoluteCachePathPrefix('C:');
+        $_SERVER['APP_SERVICES_CACHE'] = 'C:\framework\services.php';
+        $_SERVER['APP_PACKAGES_CACHE'] = 'C:\framework\packages.php';
+        $_SERVER['APP_CONFIG_CACHE'] = 'C:\framework\config.php';
+        $_SERVER['APP_ROUTES_CACHE'] = 'C:\framework\routes.php';
+        $_SERVER['APP_EVENTS_CACHE'] = 'C:\framework\events.php';
+
+        $this->assertSame('C:\framework\services.php', $app->getCachedServicesPath());
+        $this->assertSame('C:\framework\packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('C:\framework\config.php', $app->getCachedConfigPath());
+        $this->assertSame('C:\framework\routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('C:\framework\events.php', $app->getCachedEventsPath());
 
         unset(
             $_SERVER['APP_SERVICES_CACHE'],

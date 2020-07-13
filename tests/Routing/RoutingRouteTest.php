@@ -193,6 +193,30 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testMiddlewareCanBeSkipped()
+    {
+        $router = $this->getRouter();
+        $router->aliasMiddleware('web', RoutingTestMiddlewareGroupTwo::class);
+
+        $router->get('foo/bar', ['middleware' => 'web', function () {
+            return 'hello';
+        }])->withoutMiddleware(RoutingTestMiddlewareGroupTwo::class);
+
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
+    public function testMiddlewareCanBeSkippedFromResources()
+    {
+        $router = $this->getRouter();
+        $router->aliasMiddleware('web', RoutingTestMiddlewareGroupTwo::class);
+
+        $router->resource('foo', RouteTestControllerMiddlewareGroupStub::class)
+            ->middleware('web')
+            ->withoutMiddleware(RoutingTestMiddlewareGroupTwo::class);
+
+        $this->assertEquals('Hello World', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
     public function testMiddlewareWorksIfControllerThrowsHttpResponseException()
     {
         // Before calling controller
@@ -383,7 +407,7 @@ class RoutingRouteTest extends TestCase
             return 'foo';
         })->name('foo');
 
-        $this->assertEquals('slug', $route->bindingFieldFor('bar'));
+        $this->assertSame('slug', $route->bindingFieldFor('bar'));
 
         $route = $router->get('foo/{bar:slug}/{baz}', function () {
             return 'foo';
@@ -439,6 +463,29 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('bar', $_SERVER['__test.route_inject'][1]);
 
         unset($_SERVER['__test.route_inject']);
+    }
+
+    public function testNullValuesCanBeInjectedIntoRoutes()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $container->bind(RoutingTestUserModel::class, function () {
+        });
+
+        $router->get('foo/{team}/{post}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (?RoutingTestUserModel $userFromContainer, RoutingTestTeamModel $team, $postId) {
+                $this->assertNull($userFromContainer);
+                $this->assertInstanceOf(RoutingTestTeamModel::class, $team);
+                $this->assertSame('bar', $team->value);
+                $this->assertSame('baz', $postId);
+            },
+        ]);
+        $router->dispatch(Request::create('foo/bar/baz', 'GET'))->getContent();
     }
 
     public function testOptionsResponsesAreGeneratedByDefault()
@@ -797,7 +844,7 @@ class RoutingRouteTest extends TestCase
             //
         }]);
 
-        $this->assertEquals('profiles/{user}/portfolios/foo', $route->uri());
+        $this->assertSame('profiles/{user}/portfolios/foo', $route->uri());
     }
 
     public function testDotDoesNotMatchEverything()
@@ -1081,14 +1128,30 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
             $router->group(['prefix' => 'bar'], function () use ($router) {
-                $router->get('baz', ['as' => 'baz', function () {
+                $router->prefix('foz')->get('baz', ['as' => 'baz', function () {
                     return 'hello';
                 }]);
             });
         });
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::baz');
-        $this->assertSame('foo/bar/baz', $route->uri());
+        $this->assertSame('foz/foo/bar/baz', $route->uri());
+    }
+
+    public function testNestedRouteGroupingPrefixing()
+    {
+        /*
+         * nested with layer skipped
+         */
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->prefix('bar')->get('baz', ['as' => 'baz', function () {
+                return 'hello';
+            }]);
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::baz');
+        $this->assertSame('bar/foo', $route->getAction('prefix'));
     }
 
     public function testRouteMiddlewareMergeWithMiddlewareAttributesAsStrings()
@@ -1575,6 +1638,23 @@ class RoutingRouteTest extends TestCase
         ]);
 
         $this->assertSame('1|test-slug', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
+    }
+
+    public function testParentChildImplicitBindingsProperlyCamelCased()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{user}/{test_team:id}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $user, RoutingTestTeamModel $testTeam) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $user);
+                $this->assertInstanceOf(RoutingTestTeamModel::class, $testTeam);
+
+                return $user->value.'|'.$testTeam->value;
+            },
+        ]);
+
+        $this->assertSame('1|4', $router->dispatch(Request::create('foo/1/4', 'GET'))->getContent());
     }
 
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
@@ -2083,6 +2163,11 @@ class RoutingTestUserModel extends Model
     public function posts()
     {
         return new RoutingTestPostModel;
+    }
+
+    public function testTeams()
+    {
+        return new RoutingTestTeamModel;
     }
 
     public function getRouteKeyName()

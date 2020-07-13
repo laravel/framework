@@ -121,6 +121,8 @@ class FoundationFormRequestTest extends TestCase
      * @param  string  $class
      * @param  \Closure  $excecutor
      * @return \Exception
+     *
+     * @throws \Exception
      */
     protected function catchException($class, $excecutor)
     {
@@ -134,7 +136,7 @@ class FoundationFormRequestTest extends TestCase
             throw $e;
         }
 
-        throw new Exception("No exception thrown. Expected exception {$class}");
+        throw new Exception("No exception thrown. Expected exception {$class}.");
     }
 
     /**

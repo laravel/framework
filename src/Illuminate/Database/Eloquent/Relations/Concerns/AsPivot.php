@@ -77,7 +77,7 @@ trait AsPivot
 
         $instance->timestamps = $instance->hasTimestampAttributes($attributes);
 
-        $instance->setRawAttributes($attributes, true);
+        $instance->setRawAttributes($attributes, $exists);
 
         return $instance;
     }
@@ -121,6 +121,8 @@ trait AsPivot
         $this->touchOwners();
 
         return tap($this->getDeleteQuery()->delete(), function () {
+            $this->exists = false;
+
             $this->fireModelEvent('deleted', false);
         });
     }
@@ -300,5 +302,18 @@ trait AsPivot
         }
 
         return $query;
+    }
+
+    /**
+     * Unset all the loaded relations for the instance.
+     *
+     * @return $this
+     */
+    public function unsetRelations()
+    {
+        $this->pivotParent = null;
+        $this->relations = [];
+
+        return $this;
     }
 }

@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\Constraints\CountInDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
@@ -43,6 +44,23 @@ trait InteractsWithDatabase
         );
 
         $this->assertThat($table, $constraint);
+
+        return $this;
+    }
+
+    /**
+     * Assert the count of table entries.
+     *
+     * @param  string  $table
+     * @param  int  $count
+     * @param  string|null  $connection
+     * @return $this
+     */
+    protected function assertDatabaseCount($table, int $count, $connection = null)
+    {
+        $this->assertThat(
+            $table, new CountInDatabase($this->getConnection($connection), $count)
+        );
 
         return $this;
     }

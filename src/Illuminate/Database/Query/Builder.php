@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
@@ -225,7 +226,7 @@ class Builder
     public function select($columns = ['*'])
     {
         $this->columns = [];
-
+        $this->bindings['select'] = [];
         $columns = is_array($columns) ? $columns : func_get_args();
 
         foreach ($columns as $as => $column) {
@@ -242,7 +243,7 @@ class Builder
     /**
      * Add a subselect expression to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
+     * @param  \Closure|$this|string  $query
      * @param  string  $as
      * @return $this
      *
@@ -337,7 +338,7 @@ class Builder
      */
     protected function parseSub($query)
     {
-        if ($query instanceof self || $query instanceof EloquentBuilder) {
+        if ($query instanceof self || $query instanceof EloquentBuilder || $query instanceof Relation) {
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
             return [$query, []];
@@ -984,6 +985,18 @@ class Builder
     }
 
     /**
+     * Add an "or where in raw" clause for integer values to the query.
+     *
+     * @param  string  $column
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @return $this
+     */
+    public function orWhereIntegerInRaw($column, $values)
+    {
+        return $this->whereIntegerInRaw($column, $values, 'or');
+    }
+
+    /**
      * Add a "where not in raw" clause for integer values to the query.
      *
      * @param  string  $column
@@ -994,6 +1007,18 @@ class Builder
     public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
     {
         return $this->whereIntegerInRaw($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not in raw" clause for integer values to the query.
+     *
+     * @param  string  $column
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @return $this
+     */
+    public function orWhereIntegerNotInRaw($column, $values)
+    {
+        return $this->whereIntegerNotInRaw($column, $values, 'or');
     }
 
     /**
@@ -1819,7 +1844,7 @@ class Builder
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
      * @param  string  $direction
      * @return $this
      *
@@ -2015,6 +2040,25 @@ class Builder
 
         return $this->orderBy($column, 'asc')
                     ->limit($perPage);
+    }
+
+    /**
+     * Remove all existing orders and optionally add a new order.
+     *
+     * @return $this
+     */
+    public function reorder($column = null, $direction = 'asc')
+    {
+        $this->orders = null;
+        $this->unionOrders = null;
+        $this->bindings['order'] = [];
+        $this->bindings['unionOrder'] = [];
+
+        if ($column) {
+            return $this->orderBy($column, $direction);
+        }
+
+        return $this;
     }
 
     /**
@@ -2219,9 +2263,7 @@ class Builder
         // Once we have run the pagination count query, we will get the resulting count and
         // take into account what type of query it was. When there is a group by we will
         // just return the count of the entire results set since that will be correct.
-        if (isset($this->groups)) {
-            return count($results);
-        } elseif (! isset($results[0])) {
+        if (! isset($results[0])) {
             return 0;
         } elseif (is_object($results[0])) {
             return (int) $results[0]->aggregate;
@@ -2238,12 +2280,37 @@ class Builder
      */
     protected function runPaginationCountQuery($columns = ['*'])
     {
+        if ($this->groups || $this->havings) {
+            $clone = $this->cloneForPaginationCount();
+
+            if (is_null($clone->columns) && ! empty($this->joins)) {
+                $clone->select($this->from.'.*');
+            }
+
+            return $this->newQuery()
+                ->from(new Expression('('.$clone->toSql().') as '.$this->grammar->wrap('aggregate_table')))
+                ->mergeBindings($clone)
+                ->setAggregate('count', $this->withoutSelectAliases($columns))
+                ->get()->all();
+        }
+
         $without = $this->unions ? ['orders', 'limit', 'offset'] : ['columns', 'orders', 'limit', 'offset'];
 
         return $this->cloneWithout($without)
                     ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
                     ->setAggregate('count', $this->withoutSelectAliases($columns))
                     ->get()->all();
+    }
+
+    /**
+     * Clone the existing query instance for usage in a pagination subquery.
+     *
+     * @return self
+     */
+    protected function cloneForPaginationCount()
+    {
+        return $this->cloneWithout(['orders', 'limit', 'offset'])
+                    ->cloneWithoutBindings(['order']);
     }
 
     /**
@@ -2341,9 +2408,9 @@ class Builder
             return $column;
         }
 
-        $seperator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
+        $separator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
 
-        return last(preg_split('~'.$seperator.'~i', $column));
+        return last(preg_split('~'.$separator.'~i', $column));
     }
 
     /**
@@ -3020,6 +3087,7 @@ class Builder
     {
         return $value instanceof self ||
                $value instanceof EloquentBuilder ||
+               $value instanceof Relation ||
                $value instanceof Closure;
     }
 

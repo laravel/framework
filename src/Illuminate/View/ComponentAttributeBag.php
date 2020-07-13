@@ -8,10 +8,13 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 
 class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 {
+    use Macroable;
+
     /**
      * The raw array of attributes.
      *
@@ -28,6 +31,17 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     public function __construct(array $attributes = [])
     {
         $this->attributes = $attributes;
+    }
+
+    /**
+     * Get the first attribute's value.
+     *
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function first($default = null)
+    {
+        return $this->getIterator()->current() ?? value($default);
     }
 
     /**
@@ -81,6 +95,41 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
+     * Filter the attributes, returning a bag of attributes that pass the filter.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function filter($callback)
+    {
+        return new static(collect($this->attributes)->filter($callback)->all());
+    }
+
+    /**
+     * Return a bag of attributes that have keys starting with the given value / pattern.
+     *
+     * @param  string  $string
+     * @return static
+     */
+    public function whereStartsWith($string)
+    {
+        return $this->filter(function ($value, $key) use ($string) {
+            return Str::startsWith($key, $string);
+        });
+    }
+
+    /**
+     * Return a bag of attributes that have keys starting with the given value / pattern.
+     *
+     * @param  string  $string
+     * @return static
+     */
+    public function thatStartWith($string)
+    {
+        return $this->whereStartsWith($string);
+    }
+
+    /**
      * Exclude the given attribute from the attribute array.
      *
      * @param  mixed|array  $keys
@@ -90,7 +139,9 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         $props = [];
 
-        foreach ($keys as $key) {
+        foreach ($keys as $key => $defaultValue) {
+            $key = is_numeric($key) ? $defaultValue : $key;
+
             $props[] = $key;
             $props[] = Str::kebab($key);
         }
@@ -108,15 +159,17 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         $attributes = [];
 
-        foreach ($this->attributes as $key => $value) {
-            if ($value === true) {
-                $attributes[$key] = $key;
-
-                continue;
+        $attributeDefaults = array_map(function ($value) {
+            if (is_null($value) || is_bool($value)) {
+                return $value;
             }
 
+            return e($value);
+        }, $attributeDefaults);
+
+        foreach ($this->attributes as $key => $value) {
             if ($key !== 'class') {
-                $attributes[$key] = $attributeDefaults[$key] ?? $value;
+                $attributes[$key] = $value;
 
                 continue;
             }
@@ -126,7 +179,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             ));
         }
 
-        return new static(array_merge($attributeDefaults, array_filter($attributes)));
+        return new static(array_merge($attributeDefaults, $attributes));
     }
 
     /**
@@ -226,9 +279,15 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         $string = '';
 
         foreach ($this->attributes as $key => $value) {
-            $string .= $value === true
-                    ? ' '.$key
-                    : ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+            if ($value === false || is_null($value)) {
+                continue;
+            }
+
+            if ($value === true) {
+                $value = $key;
+            }
+
+            $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
         }
 
         return trim($string);

@@ -10,6 +10,7 @@ use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Support\ServiceProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class FoundationProviderRepositoryTest extends TestCase
 {

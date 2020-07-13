@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentMorphToManyTest extends TestCase
 {

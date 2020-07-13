@@ -10,6 +10,7 @@ use Illuminate\Database\Connectors\SqlServerConnector;
 use Mockery as m;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseConnectorTest extends TestCase
 {

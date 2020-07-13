@@ -318,7 +318,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         return (new ComponentTagCompiler(
-            $this->classComponentAliases
+            $this->classComponentAliases, $this
         ))->compile($value);
     }
 
@@ -358,8 +358,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function addFooters($result)
     {
-        return ltrim($result, PHP_EOL)
-                .PHP_EOL.implode(PHP_EOL, array_reverse($this->footer));
+        return ltrim($result, "\n")
+                ."\n".implode("\n", array_reverse($this->footer));
     }
 
     /**
@@ -538,6 +538,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function component($class, $alias = null, $prefix = '')
     {
+        if (! is_null($alias) && Str::contains($alias, '\\')) {
+            [$class, $alias] = [$alias, $class];
+        }
+
         if (is_null($alias)) {
             $alias = Str::contains($class, '\\View\\Components\\')
                             ? collect(explode('\\', Str::after($class, '\\View\\Components\\')))->map(function ($segment) {

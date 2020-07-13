@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {

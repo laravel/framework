@@ -28,7 +28,7 @@ class RedisCacheIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testRedisCacheAddTwice($driver)
     {
@@ -44,7 +44,7 @@ class RedisCacheIntegrationTest extends TestCase
      *
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testRedisCacheAddFalse($driver)
     {
@@ -60,7 +60,7 @@ class RedisCacheIntegrationTest extends TestCase
      *
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testRedisCacheAddNull($driver)
     {

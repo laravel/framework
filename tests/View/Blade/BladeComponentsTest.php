@@ -10,17 +10,13 @@ class BladeComponentsTest extends AbstractBladeTestCase
         $this->assertSame('<?php $__env->startComponent(\'foo\'); ?>', $this->compiler->compileString('@component(\'foo\')'));
     }
 
-    public function testExtraAttributesCanBePassedToComponents()
-    {
-        $this->assertSame('<?php $__env->startComponent(\'foo\', ["foo" => "bar"], ["foo" => "bar"]); ?>', $this->compiler->compileString('@component(\'foo\', ["foo" => "bar"], ["foo" => "bar"])'));
-    }
-
     public function testClassComponentsAreCompiled()
     {
         $this->assertSame('<?php if (isset($component)) { $__componentOriginal35bda42cbf6f9717b161c4f893644ac7a48b0d98 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Test::class, ["foo" => "bar"]); ?>
+<?php $component->withName(\'test\'); ?>
 <?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', ["foo" => "bar"])'));
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])'));
     }
 
     public function testEndComponentsAreCompiled()

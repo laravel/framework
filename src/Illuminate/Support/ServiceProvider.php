@@ -63,8 +63,10 @@ abstract class ServiceProvider
     protected function mergeConfigFrom($path, $key)
     {
         if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
-            $this->app['config']->set($key, array_merge(
-                require $path, $this->app['config']->get($key, [])
+            $config = $this->app->make('config');
+
+            $config->set($key, array_merge(
+                require $path, $config->get($key, [])
             ));
         }
     }
@@ -115,8 +117,8 @@ abstract class ServiceProvider
     protected function loadViewComponentsAs($prefix, array $components)
     {
         $this->callAfterResolving(BladeCompiler::class, function ($blade) use ($prefix, $components) {
-            foreach ($components as $component) {
-                $blade->component($component, null, $prefix);
+            foreach ($components as $alias => $component) {
+                $blade->component($component, is_string($alias) ? $alias : null, $prefix);
             }
         });
     }

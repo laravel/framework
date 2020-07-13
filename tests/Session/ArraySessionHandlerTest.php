@@ -34,7 +34,7 @@ class ArraySessionHandlerTest extends TestCase
 
         $handler->write('foo', 'bar');
 
-        $this->assertEquals('bar', $handler->read('foo'));
+        $this->assertSame('bar', $handler->read('foo'));
     }
 
     public function test_it_reads_data_from_an_almost_expired_session()
@@ -44,7 +44,7 @@ class ArraySessionHandlerTest extends TestCase
         $handler->write('foo', 'bar');
 
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
-        $this->assertEquals('bar', $handler->read('foo'));
+        $this->assertSame('bar', $handler->read('foo'));
         Carbon::setTestNow();
     }
 
@@ -55,7 +55,7 @@ class ArraySessionHandlerTest extends TestCase
         $handler->write('foo', 'bar');
 
         Carbon::setTestNow(Carbon::now()->addMinutes(10)->addSecond());
-        $this->assertEquals('', $handler->read('foo'));
+        $this->assertSame('', $handler->read('foo'));
         Carbon::setTestNow();
     }
 
@@ -63,7 +63,7 @@ class ArraySessionHandlerTest extends TestCase
     {
         $handler = new ArraySessionHandler(10);
 
-        $this->assertEquals('', $handler->read('foo'));
+        $this->assertSame('', $handler->read('foo'));
     }
 
     public function test_it_writes_session_data()
@@ -71,10 +71,10 @@ class ArraySessionHandlerTest extends TestCase
         $handler = new ArraySessionHandler(10);
 
         $this->assertTrue($handler->write('foo', 'bar'));
-        $this->assertEquals('bar', $handler->read('foo'));
+        $this->assertSame('bar', $handler->read('foo'));
 
         $this->assertTrue($handler->write('foo', 'baz'));
-        $this->assertEquals('baz', $handler->read('foo'));
+        $this->assertSame('baz', $handler->read('foo'));
     }
 
     public function test_it_destroys_a_session()
@@ -86,7 +86,7 @@ class ArraySessionHandlerTest extends TestCase
         $handler->write('foo', 'bar');
 
         $this->assertTrue($handler->destroy('foo'));
-        $this->assertEquals('', $handler->read('foo'));
+        $this->assertSame('', $handler->read('foo'));
     }
 
     public function test_it_cleans_up_old_sessions()
@@ -97,7 +97,7 @@ class ArraySessionHandlerTest extends TestCase
 
         $handler->write('foo', 'bar');
         $this->assertTrue($handler->gc(300));
-        $this->assertEquals('bar', $handler->read('foo'));
+        $this->assertSame('bar', $handler->read('foo'));
 
         Carbon::setTestNow(Carbon::now()->addSecond());
 
@@ -106,8 +106,8 @@ class ArraySessionHandlerTest extends TestCase
         Carbon::setTestNow(Carbon::now()->addMinutes(5));
 
         $this->assertTrue($handler->gc(300));
-        $this->assertEquals('', $handler->read('foo'));
-        $this->assertEquals('qux', $handler->read('baz'));
+        $this->assertSame('', $handler->read('foo'));
+        $this->assertSame('qux', $handler->read('baz'));
 
         Carbon::setTestNow();
     }

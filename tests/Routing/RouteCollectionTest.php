@@ -3,10 +3,12 @@
 namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use LogicException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RouteCollectionTest extends TestCase
 {
@@ -261,5 +263,22 @@ class RouteCollectionTest extends TestCase
         $this->expectException(LogicException::class);
 
         $this->routeCollection->compile();
+    }
+
+    public function testRouteCollectionDontMatchNonMatchingDoubleSlashes()
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->routeCollection->add(new Route('GET', 'foo', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+        ]));
+
+        $request = Request::create('', 'GET');
+        // We have to set uri in REQUEST_URI otherwise Request uses parse_url() which trim the slashes
+        $request->server->set(
+            'REQUEST_URI', '//foo'
+        );
+        $this->routeCollection->match($request);
     }
 }

@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class SqlServerGrammar extends Grammar
 {
@@ -230,6 +231,23 @@ class SqlServerGrammar extends Grammar
         }
 
         return ">= {$start}";
+    }
+
+    /**
+     * Compile a delete statement without joins into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @param  string  $where
+     * @return string
+     */
+    protected function compileDeleteWithoutJoins(Builder $query, $table, $where)
+    {
+        $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
+
+        return ! is_null($query->limit) && $query->limit > 0 && $query->offset <= 0
+                        ? Str::replaceFirst('delete', 'delete top ('.$query->limit.')', $sql)
+                        : $sql;
     }
 
     /**

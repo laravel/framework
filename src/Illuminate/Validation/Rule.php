@@ -27,7 +27,7 @@ class Rule
     }
 
     /**
-     * Get a exists constraint builder instance.
+     * Get an exists constraint builder instance.
      *
      * @param  string  $table
      * @param  string  $column

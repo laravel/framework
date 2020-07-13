@@ -2,12 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
@@ -386,6 +388,15 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals([], $c[0]->getHidden());
     }
 
+    public function testAppendsAddsTestOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->makeVisible('test');
+        $c = $c->append('test');
+
+        $this->assertEquals(['test' => 'test'], $c[0]->toArray());
+    }
+
     public function testNonModelRelatedMethods()
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
@@ -422,10 +433,52 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c->getQueueableClass();
     }
 
+    public function testQueueableRelationshipsReturnsOnlyRelationsCommonToAllModels()
+    {
+        // This is needed to prevent loading non-existing relationships on polymorphic model collections (#26126)
+        $c = new Collection([new class {
+            public function getQueueableRelations()
+            {
+                return ['user'];
+            }
+        }, new class {
+            public function getQueueableRelations()
+            {
+                return ['user', 'comments'];
+            }
+        }]);
+
+        $this->assertEquals(['user'], $c->getQueueableRelations());
+    }
+
     public function testEmptyCollectionStayEmptyOnFresh()
     {
         $c = new Collection;
         $this->assertEquals($c, $c->fresh());
+    }
+
+    public function testCanConvertCollectionOfModelsToEloquentQueryBuilder()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturn(1);
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturn(2);
+
+        $c = new Collection([$one, $two]);
+
+        $mocBuilder = m::mock(Builder::class);
+        $one->shouldReceive('newModelQuery')->once()->andReturn($mocBuilder);
+        $mocBuilder->shouldReceive('whereKey')->once()->with($c->modelKeys())->andReturn($mocBuilder);
+        $this->assertInstanceOf(Builder::class, $c->toQuery());
+    }
+
+    public function testConvertingEmptyCollectionToQueryThrowsException()
+    {
+        $this->expectException(LogicException::class);
+
+        $c = new Collection;
+        $c->toQuery();
     }
 }
 
@@ -433,4 +486,9 @@ class TestEloquentCollectionModel extends Model
 {
     protected $visible = ['visible'];
     protected $hidden = ['hidden'];
+
+    public function getTestAttribute()
+    {
+        return 'test';
+    }
 }

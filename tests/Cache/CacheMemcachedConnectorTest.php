@@ -6,6 +6,7 @@ use Illuminate\Cache\MemcachedConnector;
 use Memcached;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheMemcachedConnectorTest extends TestCase
 {

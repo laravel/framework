@@ -22,6 +22,13 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('ù')->isAscii());
     }
 
+    public function testIsEmpty()
+    {
+        $this->assertTrue($this->stringable('')->isEmpty());
+        $this->assertFalse($this->stringable('A')->isEmpty());
+        $this->assertFalse($this->stringable('0')->isEmpty());
+    }
+
     public function testPluralStudly()
     {
         $this->assertSame('LaraCon', (string) $this->stringable('LaraCon')->pluralStudly(1));
@@ -51,6 +58,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo', (string) $this->stringable(' foo ')->trim());
     }
 
+    public function testLtrim()
+    {
+        $this->assertSame('foo ', (string) $this->stringable(' foo ')->ltrim());
+    }
+
+    public function testRtrim()
+    {
+        $this->assertSame(' foo', (string) $this->stringable(' foo ')->rtrim());
+    }
+
     public function testCanBeLimitedByWords()
     {
         $this->assertSame('Taylor...', (string) $this->stringable('Taylor Otwell')->words(1));
@@ -60,12 +77,44 @@ class SupportStringableTest extends TestCase
 
     public function testWhenEmpty()
     {
+        tap($this->stringable(), function ($stringable) {
+            $this->assertSame($stringable, $stringable->whenEmpty(function () {
+                //
+            }));
+        });
+
         $this->assertSame('empty', (string) $this->stringable()->whenEmpty(function () {
             return 'empty';
         }));
 
         $this->assertSame('not-empty', (string) $this->stringable('not-empty')->whenEmpty(function () {
             return 'empty';
+        }));
+    }
+
+    public function testWhenFalse()
+    {
+        $this->assertSame('when', (string) $this->stringable('when')->when(false, function ($stringable, $value) {
+            return $stringable->append($value)->append('false');
+        }));
+
+        $this->assertSame('when false fallbacks to default', (string) $this->stringable('when false ')->when(false, function ($stringable, $value) {
+            return $stringable->append($value);
+        }, function ($stringable) {
+            return $stringable->append('fallbacks to default');
+        }));
+    }
+
+    public function testWhenTrue()
+    {
+        $this->assertSame('when true', (string) $this->stringable('when ')->when(true, function ($stringable) {
+            return $stringable->append('true');
+        }));
+
+        $this->assertSame('gets a value from if', (string) $this->stringable('gets a value ')->when('from if', function ($stringable, $value) {
+            return $stringable->append($value);
+        }, function ($stringable) {
+            return $stringable->append('fallbacks to default');
         }));
     }
 
@@ -307,7 +356,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable($valueObject)->is('foo/bar/baz'));
         $this->assertTrue($this->stringable($valueObject)->is($patternObject));
 
-        //empty patterns
+        // empty patterns
         $this->assertFalse($this->stringable('test')->is([]));
     }
 
@@ -446,5 +495,19 @@ class SupportStringableTest extends TestCase
         $this->assertSame('БГДЖ', (string) $this->stringable('БГДЖИЛЁ')->substr(0, 4));
         $this->assertSame('Ё', (string) $this->stringable('БГДЖИЛЁ')->substr(-1, 1));
         $this->assertSame('', (string) $this->stringable('Б')->substr(2));
+    }
+
+    public function testSubstrCount()
+    {
+        $this->assertSame(3, $this->stringable('laravelPHPFramework')->substrCount('a'));
+        $this->assertSame(0, $this->stringable('laravelPHPFramework')->substrCount('z'));
+        $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('l', 2));
+        $this->assertSame(0, $this->stringable('laravelPHPFramework')->substrCount('z', 2));
+        $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('k', -1));
+        $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('k', -1));
+        $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', 1, 2));
+        $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', 1, 2));
+        $this->assertSame(3, $this->stringable('laravelPHPFramework')->substrCount('a', 1, -2));
+        $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
     }
 }

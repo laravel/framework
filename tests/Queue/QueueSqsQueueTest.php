@@ -153,4 +153,12 @@ class QueueSqsQueueTest extends TestCase
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix;
         $this->assertEquals($queueUrl, $queue->getQueue('test'));
     }
+
+    public function testGetQueueEnsuresTheQueueIsOnlySuffixedOnce()
+    {
+        $queue = new SqsQueue($this->sqs, "{$this->queueName}-staging", $this->prefix, $suffix = '-staging');
+        $this->assertEquals($this->queueUrl.$suffix, $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix;
+        $this->assertEquals($queueUrl, $queue->getQueue('test-staging'));
+    }
 }

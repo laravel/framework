@@ -320,7 +320,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true)
     {
-        $parameters = $this->formatParameters($parameters);
+        $parameters = Arr::wrap($parameters);
 
         if (array_key_exists('signature', $parameters)) {
             throw new InvalidArgumentException(
@@ -699,7 +699,14 @@ class UrlGenerator implements UrlGeneratorContract
 
         $this->cachedRoot = null;
         $this->cachedScheme = null;
-        $this->routeGenerator = null;
+
+        tap(optional($this->routeGenerator)->defaultParameters ?: [], function ($defaults) {
+            $this->routeGenerator = null;
+
+            if (! empty($defaults)) {
+                $this->defaults($defaults);
+            }
+        });
     }
 
     /**

@@ -358,7 +358,7 @@ class Mailer implements MailerContract, MailQueueContract
         if (isset($plain)) {
             $method = isset($view) ? 'addPart' : 'setBody';
 
-            $message->$method($this->renderView($plain, $data), 'text/plain');
+            $message->$method($this->renderView($plain, $data) ?: ' ', 'text/plain');
         }
 
         if (isset($raw)) {
@@ -515,6 +515,8 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function sendSwiftMessage($message)
     {
+        $this->failedRecipients = [];
+
         try {
             return $this->swift->send($message, $this->failedRecipients);
         } finally {

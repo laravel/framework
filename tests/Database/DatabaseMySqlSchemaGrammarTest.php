@@ -363,6 +363,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `geo` add spatial index `geo_coordinates_spatialindex`(`coordinates`)', $statements[1]);
     }
 
+    public function testAddingRawIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->rawIndex('(function(column))', 'raw_index');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `raw_index`((function(column)))', $statements[0]);
+    }
+
     public function testAddingForeignKey()
     {
         $blueprint = new Blueprint('users');
@@ -422,6 +432,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $foreignId = $blueprint->foreignId('foo');
         $blueprint->foreignId('company_id')->constrained();
+        $blueprint->foreignId('laravel_idea_id')->constrained();
         $blueprint->foreignId('team_id')->references('id')->on('teams');
         $blueprint->foreignId('team_column_id')->constrained('teams');
 
@@ -429,8 +440,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
         $this->assertSame([
-            'alter table `users` add `foo` bigint unsigned not null, add `company_id` bigint unsigned not null, add `team_id` bigint unsigned not null, add `team_column_id` bigint unsigned not null',
+            'alter table `users` add `foo` bigint unsigned not null, add `company_id` bigint unsigned not null, add `laravel_idea_id` bigint unsigned not null, add `team_id` bigint unsigned not null, add `team_column_id` bigint unsigned not null',
             'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
+            'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
             'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
             'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
         ], $statements);
@@ -827,6 +839,15 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("alter table `users` add `created_at` timestamp not null default '2015-07-22 11:43:17'", $statements[0]);
     }
 
+    public function testAddingTimestampWithDefaultCurrentSpecifyingPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('created_at', 1)->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP(1) not null', $statements[0]);
+    }
+
     public function testAddingTimestampTz()
     {
         $blueprint = new Blueprint('users');
@@ -900,6 +921,27 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `foo` char(36) not null', $statements[0]);
+    }
+
+    public function testAddingForeignUuid()
+    {
+        $blueprint = new Blueprint('users');
+        $foreignUuid = $blueprint->foreignUuid('foo');
+        $blueprint->foreignUuid('company_id')->constrained();
+        $blueprint->foreignUuid('laravel_idea_id')->constrained();
+        $blueprint->foreignUuid('team_id')->references('id')->on('teams');
+        $blueprint->foreignUuid('team_column_id')->constrained('teams');
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignUuid);
+        $this->assertSame([
+            'alter table `users` add `foo` char(36) not null, add `company_id` char(36) not null, add `laravel_idea_id` char(36) not null, add `team_id` char(36) not null, add `team_column_id` char(36) not null',
+            'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
+            'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
+            'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
+            'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
+        ], $statements);
     }
 
     public function testAddingIpAddress()

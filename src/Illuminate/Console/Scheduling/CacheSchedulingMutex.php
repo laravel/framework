@@ -5,7 +5,7 @@ namespace Illuminate\Console\Scheduling;
 use DateTimeInterface;
 use Illuminate\Contracts\Cache\Factory as Cache;
 
-class CacheSchedulingMutex implements SchedulingMutex
+class CacheSchedulingMutex implements SchedulingMutex, CacheAware
 {
     /**
      * The cache factory implementation.

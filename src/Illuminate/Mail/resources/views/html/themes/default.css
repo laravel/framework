@@ -281,3 +281,9 @@ img {
     margin-bottom: 0;
     padding-bottom: 0;
 }
+
+/* Utilities */
+
+.break-all {
+    word-break: break-all;
+}

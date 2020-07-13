@@ -6,7 +6,7 @@ use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
 use PHPUnit\Framework\TestCase;
 
-class UsePusherChannelConventionsTest extends TestCase
+class UsePusherChannelsNamesTest extends TestCase
 {
     /**
      * @dataProvider channelsProvider

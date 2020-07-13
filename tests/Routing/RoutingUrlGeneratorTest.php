@@ -369,6 +369,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $model->key = 'routable';
 
         $this->assertSame('/foo/test-slug', $url->route('routable', ['bar' => $model], false));
+        $this->assertSame('/foo/test-slug', $url->route('routable', [$model], false));
     }
 
     public function testRoutableInterfaceRoutingWithSingleParameter()

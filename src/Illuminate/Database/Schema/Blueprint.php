@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
@@ -51,11 +52,15 @@ class Blueprint
 
     /**
      * The default character set that should be used for the table.
+     *
+     * @var string
      */
     public $charset;
 
     /**
      * The collation that should be used for the table.
+     *
+     * @var string
      */
     public $collation;
 
@@ -515,6 +520,18 @@ class Blueprint
     public function spatialIndex($columns, $name = null)
     {
         return $this->indexCommand('spatialIndex', $columns, $name);
+    }
+
+    /**
+     * Specify a raw index for the table.
+     *
+     * @param  string  $expression
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function rawIndex($expression, $name)
+    {
+        return $this->index([new Expression($expression)], $name);
     }
 
     /**
@@ -1131,6 +1148,20 @@ class Blueprint
     public function uuid($column)
     {
         return $this->addColumn('uuid', $column);
+    }
+
+    /**
+     * Create a new UUID column on the table with a foreign key constraint.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignUuid($column)
+    {
+        return $this->columns[] = new ForeignIdColumnDefinition($this, [
+            'type' => 'uuid',
+            'name' => $column,
+        ]);
     }
 
     /**

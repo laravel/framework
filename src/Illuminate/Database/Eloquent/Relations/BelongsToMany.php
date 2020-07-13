@@ -78,6 +78,13 @@ class BelongsToMany extends Relation
     protected $pivotWhereIns = [];
 
     /**
+     * Any pivot table restrictions for whereNull clauses.
+     *
+     * @var array
+     */
+    protected $pivotWhereNulls = [];
+
+    /**
      * The default values for the pivot columns.
      *
      * @var array
@@ -345,7 +352,7 @@ class BelongsToMany extends Relation
      * Set a where clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  string|null  $operator
+     * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
@@ -355,6 +362,57 @@ class BelongsToMany extends Relation
         $this->pivotWheres[] = func_get_args();
 
         return $this->where($this->table.'.'.$column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Set a "where between" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function wherePivotBetween($column, array $values, $boolean = 'and', $not = false)
+    {
+        return $this->whereBetween($this->table.'.'.$column, $values, $boolean, $not);
+    }
+
+    /**
+     * Set a "or where between" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return $this
+     */
+    public function orWherePivotBetween($column, array $values)
+    {
+        return $this->wherePivotBetween($column, $values, 'or');
+    }
+
+    /**
+     * Set a "where pivot not between" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function wherePivotNotBetween($column, array $values, $boolean = 'and')
+    {
+        return $this->wherePivotBetween($column, $values, $boolean, true);
+    }
+
+    /**
+     * Set a "or where not between" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return $this
+     */
+    public function orWherePivotNotBetween($column, array $values)
+    {
+        return $this->wherePivotBetween($column, $values, 'or', true);
     }
 
     /**
@@ -377,7 +435,7 @@ class BelongsToMany extends Relation
      * Set an "or where" clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  string|null  $operator
+     * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
      */
@@ -451,6 +509,57 @@ class BelongsToMany extends Relation
     public function orWherePivotNotIn($column, $values)
     {
         return $this->wherePivotNotIn($column, $values, 'or');
+    }
+
+    /**
+     * Set a "where null" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function wherePivotNull($column, $boolean = 'and', $not = false)
+    {
+        $this->pivotWhereNulls[] = func_get_args();
+
+        return $this->whereNull($this->table.'.'.$column, $boolean, $not);
+    }
+
+    /**
+     * Set a "where not null" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function wherePivotNotNull($column, $boolean = 'and')
+    {
+        return $this->wherePivotNull($column, $boolean, true);
+    }
+
+    /**
+     * Set a "or where null" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWherePivotNull($column, $not = false)
+    {
+        return $this->wherePivotNull($column, 'or', $not);
+    }
+
+    /**
+     * Set a "or where not null" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWherePivotNotNull($column)
+    {
+        return $this->orWherePivotNull($column, true);
     }
 
     /**
@@ -532,7 +641,7 @@ class BelongsToMany extends Relation
      */
     public function find($id, $columns = ['*'])
     {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (! $id instanceof Model && (is_array($id) || $id instanceof Arrayable)) {
             return $this->findMany($id, $columns);
         }
 
@@ -585,6 +694,20 @@ class BelongsToMany extends Relation
         }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->related), $id);
+    }
+
+    /**
+     * Add a basic where clause to the query, and return the first result.
+     *
+     * @param  \Closure|string|array  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->first();
     }
 
     /**

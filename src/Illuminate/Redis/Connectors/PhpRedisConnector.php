@@ -28,7 +28,7 @@ class PhpRedisConnector implements Connector
             ));
         };
 
-        return new PhpRedisConnection($connector(), $connector);
+        return new PhpRedisConnection($connector(), $connector, $config);
     }
 
     /**

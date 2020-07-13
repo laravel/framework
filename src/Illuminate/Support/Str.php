@@ -210,7 +210,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if (substr($haystack, -strlen($needle)) === (string) $needle) {
+            if ($needle !== '' && substr($haystack, -strlen($needle)) === (string) $needle) {
                 return true;
             }
         }
@@ -604,7 +604,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ((string) $needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
+            if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
                 return true;
             }
         }
@@ -642,6 +642,24 @@ class Str
     public static function substr($string, $start, $length = null)
     {
         return mb_substr($string, $start, $length, 'UTF-8');
+    }
+
+    /**
+     * Returns the number of substring occurrences.
+     *
+     * @param  string  $haystack
+     * @param  string  $needle
+     * @param  int  $offset
+     * @param  int|null  $length
+     * @return int
+     */
+    public static function substrCount($haystack, $needle, $offset = 0, $length = null)
+    {
+        if (! is_null($length)) {
+            return substr_count($haystack, $needle, $offset, $length);
+        } else {
+            return substr_count($haystack, $needle, $offset);
+        }
     }
 
     /**

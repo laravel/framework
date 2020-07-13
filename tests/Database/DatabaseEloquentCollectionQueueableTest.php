@@ -60,8 +60,8 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
             'ids' => $c->getQueueableIds(),
         ];
 
-        $this->assertTrue(
-            json_encode($payload) !== false,
+        $this->assertNotFalse(
+            json_encode($payload),
             'EloquentCollection is not using the QueueableEntity::getQueueableId() method.'
         );
     }

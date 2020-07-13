@@ -15,7 +15,7 @@ class JobSchedulingTest extends TestCase
     {
         Queue::fake();
 
-        /** @var Schedule $scheduler */
+        /** @var \Illuminate\Console\Scheduling\Schedule $scheduler */
         $scheduler = $this->app->make(Schedule::class);
 
         // all job names were set to an empty string so that the registered shutdown function in CallbackEvent does nothing
@@ -43,7 +43,7 @@ class JobSchedulingTest extends TestCase
     {
         Queue::fake();
 
-        /** @var Schedule $scheduler */
+        /** @var \Illuminate\Console\Scheduling\Schedule $scheduler */
         $scheduler = $this->app->make(Schedule::class);
 
         // all job names were set to an empty string so that the registered shutdown function in CallbackEvent does nothing

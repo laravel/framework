@@ -74,7 +74,7 @@ class Route
     /**
      * The array of matched parameters.
      *
-     * @var array
+     * @var array|null
      */
     public $parameters;
 
@@ -91,6 +91,20 @@ class Route
      * @var array
      */
     protected $originalParameters;
+
+    /**
+     * Indicates the maximum number of seconds the route should acquire a session lock for.
+     *
+     * @var int|null
+     */
+    protected $lockSeconds;
+
+    /**
+     * Indicates the maximum number of seconds the route should wait while attempting to acquire a session lock.
+     *
+     * @var int|null
+     */
+    protected $waitSeconds;
 
     /**
      * The computed gathered middleware.
@@ -146,13 +160,13 @@ class Route
     {
         $this->uri = $uri;
         $this->methods = (array) $methods;
-        $this->action = $this->parseAction($action);
+        $this->action = Arr::except($this->parseAction($action), ['prefix']);
 
         if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
         }
 
-        $this->prefix($this->action['prefix'] ?? '');
+        $this->prefix(is_array($action) ? Arr::get($action, 'prefix') : '');
     }
 
     /**
@@ -347,8 +361,8 @@ class Route
      * Get a given parameter from the route.
      *
      * @param  string  $name
-     * @param  mixed  $default
-     * @return string|object
+     * @param  string|object|null  $default
+     * @return string|object|null
      */
     public function parameter($name, $default = null)
     {
@@ -359,8 +373,8 @@ class Route
      * Get original value of a given parameter from the route.
      *
      * @param  string  $name
-     * @param  mixed  $default
-     * @return string
+     * @param  string|null  $default
+     * @return string|null
      */
     public function originalParameter($name, $default = null)
     {
@@ -371,7 +385,7 @@ class Route
      * Set a parameter to the given value.
      *
      * @param  string  $name
-     * @param  mixed  $value
+     * @param  string|object|null  $value
      * @return void
      */
     public function setParameter($name, $value)
@@ -480,12 +494,14 @@ class Route
     /**
      * Get the binding field for the given parameter.
      *
-     * @param  string  $parameter
+     * @param  string|int  $parameter
      * @return string|null
      */
     public function bindingFieldFor($parameter)
     {
-        return $this->bindingFields[$parameter] ?? null;
+        $fields = is_int($parameter) ? array_values($this->bindingFields) : $this->bindingFields;
+
+        return $fields[$parameter] ?? null;
     }
 
     /**
@@ -675,7 +691,13 @@ class Route
             return $this->getDomain();
         }
 
-        $this->action['domain'] = $domain;
+        $parsed = RouteUri::parse($domain);
+
+        $this->action['domain'] = $parsed->uri;
+
+        $this->bindingFields = array_merge(
+            $this->bindingFields, $parsed->bindingFields
+        );
 
         return $this;
     }
@@ -709,9 +731,24 @@ class Route
      */
     public function prefix($prefix)
     {
+        $this->updatePrefixOnAction($prefix);
+
         $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
 
         return $this->setUri($uri !== '/' ? trim($uri, '/') : $uri);
+    }
+
+    /**
+     * Update the "prefix" attribute on the action array.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    protected function updatePrefixOnAction($prefix)
+    {
+        if (! empty($newPrefix = trim(rtrim($prefix, '/').'/'.ltrim($this->action['prefix'] ?? '', '/'), '/'))) {
+            $this->action['prefix'] = $newPrefix;
+        }
     }
 
     /**
@@ -870,6 +907,10 @@ class Route
     {
         $this->action = $action;
 
+        if (isset($this->action['domain'])) {
+            $this->domain($this->action['domain']);
+        }
+
         return $this;
     }
 
@@ -928,6 +969,76 @@ class Route
         return $this->controllerDispatcher()->getMiddleware(
             $this->getController(), $this->getControllerMethod()
         );
+    }
+
+    /**
+     * Specify middleware that should be removed from the given route.
+     *
+     * @param  array|string  $middleware
+     * @return $this|array
+     */
+    public function withoutMiddleware($middleware)
+    {
+        $this->action['excluded_middleware'] = array_merge(
+            (array) ($this->action['excluded_middleware'] ?? []), Arr::wrap($middleware)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get the middleware should be removed from the route.
+     *
+     * @return array
+     */
+    public function excludedMiddleware()
+    {
+        return (array) ($this->action['excluded_middleware'] ?? []);
+    }
+
+    /**
+     * Specify that the route should not allow concurrent requests from the same session.
+     *
+     * @param  int|null  $lockSeconds
+     * @param  int|null  $waitSeconds
+     * @return $this
+     */
+    public function block($lockSeconds = 10, $waitSeconds = 10)
+    {
+        $this->lockSeconds = $lockSeconds;
+        $this->waitSeconds = $waitSeconds;
+
+        return $this;
+    }
+
+    /**
+     * Specify that the route should allow concurrent requests from the same session.
+     *
+     * @return $this
+     */
+    public function withoutBlocking()
+    {
+        return $this->block(null, null);
+    }
+
+    /**
+     * Get the maximum number of seconds the route's session lock should be held for.
+     *
+     * @return int|null
+     */
+    public function locksFor()
+    {
+        return $this->lockSeconds;
+    }
+
+    /**
+     * Get the maximum number of seconds to wait while attempting to acquire a session lock.
+     *
+     * @return int|null
+     */
+    public function waitsFor()
+    {
+        return $this->waitSeconds;
     }
 
     /**

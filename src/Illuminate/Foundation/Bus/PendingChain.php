@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Bus;
 
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Queue\SerializableClosure;
 
 class PendingChain
 {
@@ -45,7 +44,7 @@ class PendingChain
         if (is_string($this->job)) {
             $firstJob = new $this->job(...func_get_args());
         } elseif ($this->job instanceof Closure) {
-            $firstJob = new CallQueuedClosure(new SerializableClosure($this->job));
+            $firstJob = CallQueuedClosure::create($this->job);
         } else {
             $firstJob = $this->job;
         }

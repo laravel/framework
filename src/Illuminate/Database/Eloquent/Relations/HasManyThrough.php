@@ -115,7 +115,9 @@ class HasManyThrough extends Relation
         $query->join($this->throughParent->getTable(), $this->getQualifiedParentKeyName(), '=', $farKey);
 
         if ($this->throughParentSoftDeletes()) {
-            $query->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
+            $query->withGlobalScope('SoftDeletableHasManyThrough', function ($query) {
+                $query->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
+            });
         }
     }
 
@@ -137,6 +139,18 @@ class HasManyThrough extends Relation
     public function throughParentSoftDeletes()
     {
         return in_array(SoftDeletes::class, class_uses_recursive($this->throughParent));
+    }
+
+    /**
+     * Indicate that trashed "through" parents should be included in the query.
+     *
+     * @return $this
+     */
+    public function withTrashedParents()
+    {
+        $this->query->withoutGlobalScope('SoftDeletableHasManyThrough');
+
+        return $this;
     }
 
     /**
@@ -245,6 +259,20 @@ class HasManyThrough extends Relation
         $instance->fill($values)->save();
 
         return $instance;
+    }
+
+    /**
+     * Add a basic where clause to the query, and return the first result.
+     *
+     * @param  \Closure|string|array  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->first();
     }
 
     /**

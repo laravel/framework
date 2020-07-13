@@ -119,7 +119,7 @@ class CookieJar implements JarContract
      * @param  string  $key
      * @param  mixed  $default
      * @param  string|null  $path
-     * @return \Symfony\Component\HttpFoundation\Cookie
+     * @return \Symfony\Component\HttpFoundation\Cookie|null
      */
     public function queued($key, $default = null, $path = null)
     {

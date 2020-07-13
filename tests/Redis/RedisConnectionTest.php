@@ -329,6 +329,10 @@ class RedisConnectionTest extends TestCase
                     'count' => 2,
                 ],
             ]));
+            $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->zrangebyscore('set', 0, 11, [
+                'withscores' => true,
+                'limit' => [1, 2],
+            ]));
 
             $redis->flushall();
         }
@@ -345,6 +349,10 @@ class RedisConnectionTest extends TestCase
                     'offset' => 1,
                     'count' => 2,
                 ],
+            ]));
+            $this->assertEquals(['matt' => 5, 'jeffrey' => 1], $redis->ZREVRANGEBYSCORE('set', 10, 0, [
+                'withscores' => true,
+                'limit' => [1, 2],
             ]));
 
             $redis->flushall();
@@ -569,9 +577,122 @@ class RedisConnectionTest extends TestCase
                 }
 
                 foreach ($returnedKeys as $returnedKey) {
-                    $this->assertTrue(in_array($returnedKey, $initialKeys));
+                    $this->assertContains($returnedKey, $initialKeys);
                 }
             } while ($iterator > 0);
+
+            $redis->flushAll();
+        }
+    }
+
+    public function testItZscansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $members = [100 => 'test:zscan:1', 200 => 'test:zscan:2'];
+
+            foreach ($members as $score => $member) {
+                $redis->zadd('set', $score, $member);
+            }
+
+            $iterator = null;
+            $result = [];
+
+            do {
+                [$iterator, $returnedMembers] = $redis->zscan('set', $iterator);
+
+                if (! is_array($returnedMembers)) {
+                    $returnedMembers = [$returnedMembers];
+                }
+
+                foreach ($returnedMembers as $member => $score) {
+                    $this->assertArrayHasKey((int) $score, $members);
+                    $this->assertContains($member, $members);
+                }
+
+                $result += $returnedMembers;
+            } while ($iterator > 0);
+
+            $this->assertCount(2, $result);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->zscan('set', $iterator, ['match' => 'test:unmatch:*']);
+            $this->assertEmpty($returned);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->zscan('set', $iterator, ['count' => 5]);
+            $this->assertCount(2, $returned);
+
+            $redis->flushAll();
+        }
+    }
+
+    public function testItHscansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $fields = ['name' => 'mohamed', 'hobby' => 'diving'];
+
+            foreach ($fields as $field => $value) {
+                $redis->hset('hash', $field, $value);
+            }
+
+            $iterator = null;
+            $result = [];
+
+            do {
+                [$iterator, $returnedFields] = $redis->hscan('hash', $iterator);
+
+                foreach ($returnedFields as $field => $value) {
+                    $this->assertArrayHasKey($field, $fields);
+                    $this->assertContains($value, $fields);
+                }
+
+                $result += $returnedFields;
+            } while ($iterator > 0);
+
+            $this->assertCount(2, $result);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->hscan('hash', $iterator, ['match' => 'test:unmatch:*']);
+            $this->assertEmpty($returned);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->hscan('hash', $iterator, ['count' => 5]);
+            $this->assertCount(2, $returned);
+
+            $redis->flushAll();
+        }
+    }
+
+    public function testItSscansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $members = ['test:sscan:1', 'test:sscan:2'];
+
+            foreach ($members as $member) {
+                $redis->sadd('set', $member);
+            }
+
+            $iterator = null;
+            $result = [];
+
+            do {
+                [$iterator, $returnedMembers] = $redis->sscan('set', $iterator);
+
+                foreach ($returnedMembers as $member) {
+                    $this->assertContains($member, $members);
+                    array_push($result, $member);
+                }
+            } while ($iterator > 0);
+
+            $this->assertCount(2, $result);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->sscan('set', $iterator, ['match' => 'test:unmatch:*']);
+            $this->assertEmpty($returned);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->sscan('set', $iterator, ['count' => 5]);
+            $this->assertCount(2, $returned);
 
             $redis->flushAll();
         }

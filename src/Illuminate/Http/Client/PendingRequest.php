@@ -6,6 +6,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
 class PendingRequest
@@ -32,6 +34,13 @@ class PendingRequest
      * @var string
      */
     protected $bodyFormat;
+
+    /**
+     * The raw body for the request.
+     *
+     * @var string
+     */
+    protected $pendingBody;
 
     /**
      * The pending files for the request.
@@ -90,6 +99,13 @@ class PendingRequest
     protected $stubCallbacks;
 
     /**
+     * The middleware callables added by users that will handle requests.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $middleware;
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -98,6 +114,7 @@ class PendingRequest
     public function __construct(Factory $factory = null)
     {
         $this->factory = $factory;
+        $this->middleware = new Collection;
 
         $this->asJson();
 
@@ -119,6 +136,24 @@ class PendingRequest
     public function baseUrl(string $url)
     {
         $this->baseUrl = $url;
+
+        return $this;
+    }
+
+    /**
+     * Attach a raw body to the request.
+     *
+     * @param  resource|string  $content
+     * @param  string  $contentType
+     * @return $this
+     */
+    public function withBody($content, $contentType)
+    {
+        $this->bodyFormat('body');
+
+        $this->pendingBody = $content;
+
+        $this->contentType($contentType);
 
         return $this;
     }
@@ -360,6 +395,19 @@ class PendingRequest
     }
 
     /**
+     * Add new middleware the client handler stack.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function withMiddleware(callable $middleware)
+    {
+        $this->middleware->push($middleware);
+
+        return $this;
+    }
+
+    /**
      * Add a new "before sending" callback to the request.
      *
      * @param  callable  $callback
@@ -376,12 +424,26 @@ class PendingRequest
      * Issue a GET request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $query
+     * @param  array|string|null  $query
      * @return \Illuminate\Http\Client\Response
      */
-    public function get(string $url, array $query = [])
+    public function get(string $url, $query = null)
     {
         return $this->send('GET', $url, [
+            'query' => $query,
+        ]);
+    }
+
+    /**
+     * Issue a HEAD request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array|string|null  $query
+     * @return \Illuminate\Http\Client\Response
+     */
+    public function head(string $url, $query = null)
+    {
+        return $this->send('HEAD', $url, [
             'query' => $query,
         ]);
     }
@@ -457,18 +519,27 @@ class PendingRequest
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
 
         if (isset($options[$this->bodyFormat])) {
-            $options[$this->bodyFormat] = array_merge(
-                $options[$this->bodyFormat], $this->pendingFiles
-            );
+            if ($this->bodyFormat === 'multipart') {
+                $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
+            } elseif ($this->bodyFormat === 'body') {
+                $options[$this->bodyFormat] = $this->pendingBody;
+            }
+
+            if (is_array($options[$this->bodyFormat])) {
+                $options[$this->bodyFormat] = array_merge(
+                    $options[$this->bodyFormat], $this->pendingFiles
+                );
+            }
         }
 
-        $this->pendingFiles = [];
+        [$this->pendingBody, $this->pendingFiles] = [null, []];
 
         return retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {
+                $laravelData = $this->parseRequestData($method, $url, $options);
+
                 return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
-                    'laravel_data' => $options[$this->bodyFormat] ?? [],
-                    'query' => $this->parseQueryParams($url),
+                    'laravel_data' => $laravelData,
                     'on_stats' => function ($transferStats) {
                         $this->transferStats = $transferStats;
                     },
@@ -484,6 +555,46 @@ class PendingRequest
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
         }, $this->retryDelay ?? 100);
+    }
+
+    /**
+     * Parse multi-part form data.
+     *
+     * @param  array  $data
+     * @return array|array[]
+     */
+    protected function parseMultipartBodyFormat(array $data)
+    {
+        return collect($data)->map(function ($value, $key) {
+            return is_array($value) ? $value : ['name' => $key, 'contents' => $value];
+        })->values()->all();
+    }
+
+    /**
+     * Get the request data as an array so that we can attach it to the request for convenient assertions.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return array
+     */
+    protected function parseRequestData($method, $url, array $options)
+    {
+        $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
+
+        $urlString = Str::of($url);
+
+        if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
+            $laravelData = (string) $urlString->after('?');
+        }
+
+        if (is_string($laravelData)) {
+            parse_str($laravelData, $parsedData);
+
+            $laravelData = is_array($parsedData) ? $parsedData : [];
+        }
+
+        return $laravelData;
     }
 
     /**
@@ -510,6 +621,10 @@ class PendingRequest
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());
             $stack->push($this->buildStubHandler());
+
+            $this->middleware->each(function ($middleware) use ($stack) {
+                $stack->push($middleware);
+            });
         });
     }
 
@@ -579,7 +694,7 @@ class PendingRequest
     /**
      * Execute the "before sending" callbacks.
      *
-     * @param  \GuzzleHttp\Psr7\RequestInterface
+     * @param  \GuzzleHttp\Psr7\RequestInterface  $request
      * @param  array  $options
      * @return \Closure
      */
@@ -602,19 +717,6 @@ class PendingRequest
     public function mergeOptions(...$options)
     {
         return array_merge_recursive($this->options, ...$options);
-    }
-
-    /**
-     * Parse the query parameters in the given URL.
-     *
-     * @param  string  $url
-     * @return array
-     */
-    public function parseQueryParams(string $url)
-    {
-        return tap([], function (&$query) use ($url) {
-            parse_str(parse_url($url, PHP_URL_QUERY), $query);
-        });
     }
 
     /**

@@ -23,6 +23,82 @@ abstract class GeneratorCommand extends Command
     protected $type;
 
     /**
+     * Reserved names that cannot be used for generation.
+     *
+     * @var array
+     */
+    protected $reservedNames = [
+        '__halt_compiler',
+        'abstract',
+        'and',
+        'array',
+        'as',
+        'break',
+        'callable',
+        'case',
+        'catch',
+        'class',
+        'clone',
+        'const',
+        'continue',
+        'declare',
+        'default',
+        'die',
+        'do',
+        'echo',
+        'else',
+        'elseif',
+        'empty',
+        'enddeclare',
+        'endfor',
+        'endforeach',
+        'endif',
+        'endswitch',
+        'endwhile',
+        'eval',
+        'exit',
+        'extends',
+        'final',
+        'finally',
+        'fn',
+        'for',
+        'foreach',
+        'function',
+        'global',
+        'goto',
+        'if',
+        'implements',
+        'include',
+        'include_once',
+        'instanceof',
+        'insteadof',
+        'interface',
+        'isset',
+        'list',
+        'namespace',
+        'new',
+        'or',
+        'print',
+        'private',
+        'protected',
+        'public',
+        'require',
+        'require_once',
+        'return',
+        'static',
+        'switch',
+        'throw',
+        'trait',
+        'try',
+        'unset',
+        'use',
+        'var',
+        'while',
+        'xor',
+        'yield',
+    ];
+
+    /**
      * Create a new controller creator command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -51,11 +127,20 @@ abstract class GeneratorCommand extends Command
      */
     public function handle()
     {
+        // First we need to ensure that the given name is not a reserved word within the PHP
+        // language and that the class name will actually be valid. If it is not valid we
+        // can error now and prevent from polluting the filesystem using invalid files.
+        if ($this->isReservedName($this->getNameInput())) {
+            $this->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
+
+            return false;
+        }
+
         $name = $this->qualifyClass($this->getNameInput());
 
         $path = $this->getPath($name);
 
-        // First we will check to see if the class already exists. If it does, we don't want
+        // Next, We will check to see if the class already exists. If it does, we don't want
         // to create the class and overwrite the user's code. So, we will bail out so the
         // code is untouched. Otherwise, we will continue generating this class' files.
         if ((! $this->hasOption('force') ||
@@ -261,11 +346,24 @@ abstract class GeneratorCommand extends Command
      */
     protected function userProviderModel()
     {
-        $guard = config('auth.defaults.guard');
+        $config = $this->laravel['config'];
 
-        $provider = config("auth.guards.{$guard}.provider");
+        $provider = $config->get('auth.guards.'.$config->get('auth.defaults.guard').'.provider');
 
-        return config("auth.providers.{$provider}.model");
+        return $config->get("auth.providers.{$provider}.model");
+    }
+
+    /**
+     * Checks whether the given name is reserved.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function isReservedName($name)
+    {
+        $name = strtolower($name);
+
+        return in_array($name, $this->reservedNames);
     }
 
     /**

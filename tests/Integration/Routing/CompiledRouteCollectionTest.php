@@ -1,17 +1,20 @@
 <?php
 
-namespace Illuminate\Tests\Routing;
+namespace Illuminate\Tests\Integration\Routing;
 
 use ArrayIterator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
-use Illuminate\Tests\Integration\IntegrationTest;
+use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class CompiledRouteCollectionTest extends IntegrationTest
+/**
+ * @group integration
+ */
+class CompiledRouteCollectionTest extends TestCase
 {
     /**
      * @var \Illuminate\Routing\RouteCollection
@@ -30,10 +33,6 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->router = $this->app['router'];
 
         $this->routeCollection = new RouteCollection;
-
-        // $this->routeCollection = (new CompiledRouteCollection([], []))
-        //     ->setRouter($this->router)
-        //     ->setContainer($this->app);
     }
 
     protected function tearDown(): void
@@ -318,7 +317,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'bar']));
 
-        $this->assertEquals('foo', $routes->match(Request::create('/', 'GET'))->getName());
+        $this->assertSame('foo', $routes->match(Request::create('/', 'GET'))->getName());
     }
 
     public function testMatchingFindsRouteWithDifferentMethodDynamically()
@@ -360,7 +359,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->newRoute('GET', '/bar/{id}', ['uses' => 'FooController@index', 'as' => 'bar']));
 
-        $this->assertEquals('bar', $routes->match(Request::create('/bar/1', 'GET'))->getName());
+        $this->assertSame('bar', $routes->match(Request::create('/bar/1', 'GET'))->getName());
     }
 
     public function testMatchingFallbackRouteCatchesAll()
@@ -374,7 +373,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->newRoute('GET', '/bar/{id}', ['uses' => 'FooController@index', 'as' => 'bar']));
 
-        $this->assertEquals('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
+        $this->assertSame('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
     }
 
     public function testMatchingCachedFallbackTakesPrecedenceOverDynamicFallback()
@@ -385,7 +384,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->fallbackRoute(['uses' => 'FooController@index', 'as' => 'dynamic_fallback']));
 
-        $this->assertEquals('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
+        $this->assertSame('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
     }
 
     public function testMatchingCachedFallbackTakesPrecedenceOverDynamicRouteWithWrongMethod()
@@ -396,7 +395,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->newRoute('POST', '/bar/{id}', ['uses' => 'FooController@index', 'as' => 'bar']));
 
-        $this->assertEquals('fallback', $routes->match(Request::create('/bar/1', 'GET'))->getName());
+        $this->assertSame('fallback', $routes->match(Request::create('/bar/1', 'GET'))->getName());
     }
 
     public function testSlashPrefixIsProperlyHandled()
@@ -405,7 +404,35 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $route = $this->collection()->getByAction('FooController@index');
 
-        $this->assertEquals('foo/bar', $route->uri());
+        $this->assertSame('foo/bar', $route->uri());
+    }
+
+    public function testRouteWithoutNamespaceIsFound()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['controller' => '\App\FooController']));
+
+        $route = $this->collection()->getByAction('App\FooController');
+
+        $this->assertSame('foo/bar', $route->uri());
+    }
+
+    public function testGroupPrefixAndRoutePrefixAreProperlyHandled()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'prefix' => '{locale}'])->prefix('pre'));
+
+        $route = $this->collection()->getByAction('FooController@index');
+
+        $this->assertSame('pre/{locale}', $route->getPrefix());
+    }
+
+    public function testGroupGenerateNameForDuplicateRouteNamesThatEndWithDot()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo', ['uses' => 'FooController@index'])->name('foo.'));
+        $this->routeCollection->add($route = $this->newRoute('GET', 'bar', ['uses' => 'BarController@index'])->name('foo.'));
+
+        $routes = $this->collection();
+
+        $this->assertSame('BarController@index', $routes->match(Request::create('/bar', 'GET'))->getAction()['uses']);
     }
 
     public function testRouteBindingsAreProperlySaved()
@@ -418,7 +445,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $route = $this->collection()->getByName('foo');
 
-        $this->assertEquals('profile/{user}/posts/{post}/show', $route->uri());
+        $this->assertSame('profile/{user}/posts/{post}/show', $route->uri());
         $this->assertSame(['user' => 'username', 'post' => 'slug'], $route->bindingFields());
     }
 
@@ -429,6 +456,38 @@ class CompiledRouteCollectionTest extends IntegrationTest
         );
 
         $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/'))->getName());
+    }
+
+    public function testMatchingUriWithQuery()
+    {
+        $this->routeCollection->add(
+            $route = $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/?foo=bar'))->getName());
+    }
+
+    public function testMatchingRootUri()
+    {
+        $this->routeCollection->add(
+            $route = $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $this->assertSame('foo', $this->collection()->match(Request::create('http://example.com'))->getName());
+    }
+
+    public function testTrailingSlashIsTrimmedWhenMatchingCachedRoutes()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $request = Request::create('/foo/bar/');
+
+        // Access to request path info before matching route
+        $request->getPathInfo();
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
     }
 
     /**

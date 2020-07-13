@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -43,6 +44,28 @@ trait HasRelationships
     public static $manyMethods = [
         'belongsToMany', 'morphToMany', 'morphedByMany',
     ];
+
+    /**
+     * The relation resolver callbacks.
+     *
+     * @var array
+     */
+    protected static $relationResolvers = [];
+
+    /**
+     * Define a dynamic relation resolver.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function resolveRelationUsing($name, Closure $callback)
+    {
+        static::$relationResolvers = array_replace_recursive(
+            static::$relationResolvers,
+            [static::class => [$name => $callback]]
+        );
+    }
 
     /**
      * Define a one-to-one relationship.
@@ -369,8 +392,12 @@ trait HasRelationships
         $secondKey = $secondKey ?: $through->getForeignKey();
 
         return $this->newHasManyThrough(
-            $this->newRelatedInstance($related)->newQuery(), $this, $through,
-            $firstKey, $secondKey, $localKey ?: $this->getKeyName(),
+            $this->newRelatedInstance($related)->newQuery(),
+            $this,
+            $through,
+            $firstKey,
+            $secondKey,
+            $localKey ?: $this->getKeyName(),
             $secondLocalKey ?: $through->getKeyName()
         );
     }

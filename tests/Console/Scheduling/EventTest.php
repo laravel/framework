@@ -14,22 +14,54 @@ class EventTest extends TestCase
         m::close();
     }
 
-    public function testBuildCommand()
+    public function testBuildCommandUsingUnix()
     {
-        $isWindows = DIRECTORY_SEPARATOR == '\\';
-        $quote = ($isWindows) ? '"' : "'";
+        if (windows_os()) {
+            $this->markTestSkipped('Skipping since operating system is Windows');
+        }
 
         $event = new Event(m::mock(EventMutex::class), 'php -i');
 
-        $defaultOutput = ($isWindows) ? 'NUL' : '/dev/null';
-        $this->assertSame("php -i > {$quote}{$defaultOutput}{$quote} 2>&1", $event->buildCommand());
+        $this->assertSame("php -i > '/dev/null' 2>&1", $event->buildCommand());
+    }
+
+    public function testBuildCommandUsingWindows()
+    {
+        if (! windows_os()) {
+            $this->markTestSkipped('Skipping since operating system is not Windows');
+        }
+
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $this->assertSame('php -i > "NUL" 2>&1', $event->buildCommand());
+    }
+
+    public function testBuildCommandInBackgroundUsingUnix()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Skipping since operating system is Windows');
+        }
 
         $event = new Event(m::mock(EventMutex::class), 'php -i');
         $event->runInBackground();
 
-        $commandSeparator = ($isWindows ? '&' : ';');
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
-        $this->assertSame("(php -i > {$quote}{$defaultOutput}{$quote} 2>&1 {$commandSeparator} {$quote}".PHP_BINARY."{$quote} artisan schedule:finish {$scheduleId}) > {$quote}{$defaultOutput}{$quote} 2>&1 &", $event->buildCommand());
+
+        $this->assertSame("(php -i > '/dev/null' 2>&1 ; '".PHP_BINARY."' artisan schedule:finish {$scheduleId} \"$?\") > '/dev/null' 2>&1 &", $event->buildCommand());
+    }
+
+    public function testBuildCommandInBackgroundUsingWindows()
+    {
+        if (! windows_os()) {
+            $this->markTestSkipped('Skipping since operating system is not Windows');
+        }
+
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->runInBackground();
+
+        $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
+
+        $this->assertSame('start /b cmd /c "(php -i & "'.PHP_BINARY.'" artisan schedule:finish '.$scheduleId.' "%errorlevel%") > "NUL" 2>&1"', $event->buildCommand());
     }
 
     public function testBuildCommandSendOutputTo()

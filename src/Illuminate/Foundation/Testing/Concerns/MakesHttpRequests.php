@@ -54,6 +54,15 @@ trait MakesHttpRequests
     protected $encryptCookies = true;
 
     /**
+     * Indicated whether JSON requests should be performed "with credentials" (cookies).
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
+     *
+     * @var bool
+     */
+    protected $withCredentials = false;
+
+    /**
      * Define additional headers to be sent with the request.
      *
      * @param  array  $headers
@@ -78,6 +87,18 @@ trait MakesHttpRequests
         $this->defaultHeaders[$name] = $value;
 
         return $this;
+    }
+
+    /**
+     * Add an authorization token for the request.
+     *
+     * @param  string  $token
+     * @param  string  $type
+     * @return $this
+     */
+    public function withToken(string $token, string $type = 'Bearer')
+    {
+        return $this->withHeader('Authorization', $type.' '.$token);
     }
 
     /**
@@ -214,6 +235,18 @@ trait MakesHttpRequests
     public function followingRedirects()
     {
         $this->followRedirects = true;
+
+        return $this;
+    }
+
+    /**
+     * Include cookies and authorization headers for JSON requests.
+     *
+     * @return $this
+     */
+    public function withCredentials()
+    {
+        $this->withCredentials = true;
 
         return $this;
     }
@@ -387,7 +420,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Visit the given URI with a OPTIONS request.
+     * Visit the given URI with an OPTIONS request.
      *
      * @param  string  $uri
      * @param  array  $data
@@ -403,7 +436,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Visit the given URI with a OPTIONS request, expecting a JSON response.
+     * Visit the given URI with an OPTIONS request, expecting a JSON response.
      *
      * @param  string  $uri
      * @param  array  $data
@@ -437,7 +470,13 @@ trait MakesHttpRequests
         ], $headers);
 
         return $this->call(
-            $method, $uri, [], [], $files, $this->transformHeadersToServerVars($headers), $content
+            $method,
+            $uri,
+            [],
+            $this->prepareCookiesForJsonRequest(),
+            $files,
+            $this->transformHeadersToServerVars($headers),
+            $content
         );
     }
 
@@ -489,11 +528,7 @@ trait MakesHttpRequests
             $uri = substr($uri, 1);
         }
 
-        if (! Str::startsWith($uri, 'http')) {
-            $uri = config('app.url').'/'.$uri;
-        }
-
-        return trim($uri, '/');
+        return trim(url($uri), '/');
     }
 
     /**
@@ -567,6 +602,16 @@ trait MakesHttpRequests
         return collect($this->defaultCookies)->map(function ($value) {
             return encrypt($value, false);
         })->merge($this->unencryptedCookies)->all();
+    }
+
+    /**
+     * If enabled, add cookies for JSON requests.
+     *
+     * @return array
+     */
+    protected function prepareCookiesForJsonRequest()
+    {
+        return $this->withCredentials ? $this->prepareCookiesForRequest() : [];
     }
 
     /**

@@ -33,6 +33,13 @@ abstract class Lock implements LockContract
     protected $owner;
 
     /**
+     * The number of milliseconds to wait before re-attempting to acquire a lock while blocking.
+     *
+     * @var int
+     */
+    protected $sleepMilliseconds = 250;
+
+    /**
      * Create a new lock instance.
      *
      * @param  string  $name
@@ -107,7 +114,7 @@ abstract class Lock implements LockContract
         $starting = $this->currentTime();
 
         while (! $this->acquire()) {
-            usleep(250 * 1000);
+            usleep($this->sleepMilliseconds * 1000);
 
             if ($this->currentTime() - $seconds >= $starting) {
                 throw new LockTimeoutException;
@@ -143,5 +150,18 @@ abstract class Lock implements LockContract
     protected function isOwnedByCurrentProcess()
     {
         return $this->getCurrentOwner() === $this->owner;
+    }
+
+    /**
+     * Specify the number of milliseconds to sleep in between blocked lock aquisition attempts.
+     *
+     * @param  int  $milliseconds
+     * @return $this
+     */
+    public function betweenBlockedAttemptsSleepFor($milliseconds)
+    {
+        $this->sleepMilliseconds = $milliseconds;
+
+        return $this;
     }
 }

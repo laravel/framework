@@ -12,7 +12,7 @@ class StubPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'stub:publish';
+    protected $signature = 'stub:publish {--force : Overwrite any existing files}';
 
     /**
      * The console command description.
@@ -37,11 +37,18 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
             __DIR__.'/stubs/model.pivot.stub' => $stubsPath.'/model.pivot.stub',
             __DIR__.'/stubs/model.stub' => $stubsPath.'/model.stub',
+            __DIR__.'/stubs/request.stub' => $stubsPath.'/request.stub',
             __DIR__.'/stubs/test.stub' => $stubsPath.'/test.stub',
             __DIR__.'/stubs/test.unit.stub' => $stubsPath.'/test.unit.stub',
+            realpath(__DIR__.'/../../Database/Console/Factories/stubs/factory.stub') => $stubsPath.'/factory.stub',
+            realpath(__DIR__.'/../../Database/Console/Seeds/stubs/seeder.stub') => $stubsPath.'/seeder.stub',
             realpath(__DIR__.'/../../Database/Migrations/stubs/migration.create.stub') => $stubsPath.'/migration.create.stub',
             realpath(__DIR__.'/../../Database/Migrations/stubs/migration.stub') => $stubsPath.'/migration.stub',
             realpath(__DIR__.'/../../Database/Migrations/stubs/migration.update.stub') => $stubsPath.'/migration.update.stub',
+            realpath(__DIR__.'/../../Foundation/Console/stubs/console.stub') => $stubsPath.'/console.stub',
+            realpath(__DIR__.'/../../Foundation/Console/stubs/policy.plain.stub') => $stubsPath.'/policy.plain.stub',
+            realpath(__DIR__.'/../../Foundation/Console/stubs/policy.stub') => $stubsPath.'/policy.stub',
+            realpath(__DIR__.'/../../Foundation/Console/stubs/rule.stub') => $stubsPath.'/rule.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.api.stub') => $stubsPath.'/controller.api.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.invokable.stub') => $stubsPath.'/controller.invokable.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.model.api.stub') => $stubsPath.'/controller.model.api.stub',
@@ -50,10 +57,13 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.nested.stub') => $stubsPath.'/controller.nested.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.plain.stub') => $stubsPath.'/controller.plain.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.stub') => $stubsPath.'/controller.stub',
+            realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => $stubsPath.'/middleware.stub',
         ];
 
         foreach ($files as $from => $to) {
-            file_put_contents($to, file_get_contents($from));
+            if (! file_exists($to) || $this->option('force')) {
+                file_put_contents($to, file_get_contents($from));
+            }
         }
 
         $this->info('Stubs published successfully.');

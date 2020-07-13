@@ -187,7 +187,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
     {
         $this->migrator->setConnection('default');
         $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->assertEquals('default', $this->migrator->getConnection());
+        $this->assertSame('default', $this->migrator->getConnection());
     }
 
     public function testConnectionPriorToMigrationIsNotChangedAfterRollback()
@@ -195,7 +195,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->setConnection('default');
         $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
         $this->migrator->rollback([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->assertEquals('default', $this->migrator->getConnection());
+        $this->assertSame('default', $this->migrator->getConnection());
     }
 
     public function testConnectionPriorToMigrationIsNotChangedWhenNoOutstandingMigrationsExist()
@@ -204,7 +204,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
         $this->migrator->setConnection('default');
         $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->assertEquals('default', $this->migrator->getConnection());
+        $this->assertSame('default', $this->migrator->getConnection());
     }
 
     public function testConnectionPriorToMigrationIsNotChangedWhenNothingToRollback()
@@ -213,7 +213,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
         $this->migrator->rollback([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
         $this->migrator->rollback([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->assertEquals('default', $this->migrator->getConnection());
+        $this->assertSame('default', $this->migrator->getConnection());
     }
 
     public function testConnectionPriorToMigrationIsNotChangedAfterMigrateReset()
@@ -221,6 +221,6 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->setConnection('default');
         $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
         $this->migrator->reset([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->assertEquals('default', $this->migrator->getConnection());
+        $this->assertSame('default', $this->migrator->getConnection());
     }
 }

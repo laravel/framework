@@ -42,6 +42,9 @@ trait DetectsLostConnections
             'Login timeout expired',
             'Connection refused',
             'running with the --read-only option so it cannot execute this statement',
+            'The connection is broken and recovery is not possible. The connection is marked by the client driver as unrecoverable. No attempt was made to restore the connection.',
+            'SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo failed: Try again',
+            'SQLSTATE[HY000]: General error: 7 SSL SYSCALL error: EOF detected',
         ]);
     }
 }

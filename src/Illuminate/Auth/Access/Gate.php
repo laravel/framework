@@ -126,6 +126,10 @@ class Gate implements GateContract
      */
     public function define($ability, $callback)
     {
+        if (is_array($callback) && isset($callback[0]) && is_string($callback[0])) {
+            $callback = $callback[0].'@'.$callback[1];
+        }
+
         if (is_callable($callback)) {
             $this->abilities[$ability] = $callback;
         } elseif (is_string($callback)) {
@@ -450,7 +454,7 @@ class Gate implements GateContract
      */
     protected function parameterAllowsGuests($parameter)
     {
-        return ($parameter->getClass() && $parameter->allowsNull()) ||
+        return ($parameter->hasType() && $parameter->allowsNull()) ||
                ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
     }
 

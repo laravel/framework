@@ -5,10 +5,13 @@ namespace Illuminate\Support\Testing\Fakes;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class EventFake implements Dispatcher
 {
+    use ReflectsClosures;
+
     /**
      * The original event dispatcher.
      *
@@ -47,12 +50,16 @@ class EventFake implements Dispatcher
     /**
      * Assert if an event was dispatched based on a truth-test callback.
      *
-     * @param  string  $event
+     * @param  string|\Closure  $event
      * @param  callable|int|null  $callback
      * @return void
      */
     public function assertDispatched($event, $callback = null)
     {
+        if ($event instanceof Closure) {
+            [$event, $callback] = [$this->firstClosureParameterType($event), $event];
+        }
+
         if (is_int($callback)) {
             return $this->assertDispatchedTimes($event, $callback);
         }
@@ -64,7 +71,7 @@ class EventFake implements Dispatcher
     }
 
     /**
-     * Assert if a event was dispatched a number of times.
+     * Assert if an event was dispatched a number of times.
      *
      * @param  string  $event
      * @param  int  $times
@@ -72,8 +79,10 @@ class EventFake implements Dispatcher
      */
     public function assertDispatchedTimes($event, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->dispatched($event)->count()) === $times,
+        $count = $this->dispatched($event)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
             "The expected [{$event}] event was dispatched {$count} times instead of {$times} times."
         );
     }
@@ -81,14 +90,18 @@ class EventFake implements Dispatcher
     /**
      * Determine if an event was dispatched based on a truth-test callback.
      *
-     * @param  string  $event
+     * @param  string|\Closure  $event
      * @param  callable|null  $callback
      * @return void
      */
     public function assertNotDispatched($event, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->dispatched($event, $callback)->count() === 0,
+        if ($event instanceof Closure) {
+            [$event, $callback] = [$this->firstClosureParameterType($event), $event];
+        }
+
+        PHPUnit::assertCount(
+            0, $this->dispatched($event, $callback),
             "The unexpected [{$event}] event was dispatched."
         );
     }

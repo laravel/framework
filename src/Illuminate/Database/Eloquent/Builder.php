@@ -74,7 +74,7 @@ class Builder
      */
     protected $passthru = [
         'insert', 'insertOrIgnore', 'insertGetId', 'insertUsing', 'getBindings', 'toSql', 'dump', 'dd',
-        'exists', 'doesntExist', 'count', 'min', 'max', 'avg', 'average', 'sum', 'getConnection', 'raw',
+        'exists', 'doesntExist', 'count', 'min', 'max', 'avg', 'average', 'sum', 'getConnection', 'raw', 'getGrammar',
     ];
 
     /**
@@ -891,6 +891,17 @@ class Builder
     }
 
     /**
+     * Determine if the given model has a scope.
+     *
+     * @param  string  $scope
+     * @return bool
+     */
+    public function hasNamedScope($scope)
+    {
+        return $this->model && $this->model->hasNamedScope($scope);
+    }
+
+    /**
      * Call the given local model scopes.
      *
      * @param  array|string  $scopes
@@ -911,10 +922,7 @@ class Builder
             // Next we'll pass the scope callback to the callScope method which will take
             // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
-            $builder = $builder->callScope(
-                [$this->model, 'scope'.ucfirst($scope)],
-                (array) $parameters
-            );
+            $builder = $builder->callNamedScope($scope, (array) $parameters);
         }
 
         return $builder;
@@ -965,7 +973,7 @@ class Builder
      * @param  array  $parameters
      * @return mixed
      */
-    protected function callScope(callable $scope, $parameters = [])
+    protected function callScope(callable $scope, array $parameters = [])
     {
         array_unshift($parameters, $this);
 
@@ -984,6 +992,20 @@ class Builder
         }
 
         return $result;
+    }
+
+    /**
+     * Apply the given named scope on the current builder instance.
+     *
+     * @param  string  $scope
+     * @param  array  $parameters
+     * @return mixed
+     */
+    protected function callNamedScope($scope, array $parameters = [])
+    {
+        return $this->callScope(function (...$parameters) use ($scope) {
+            return $this->model->callNamedScope($scope, $parameters);
+        }, $parameters);
     }
 
     /**
@@ -1373,8 +1395,8 @@ class Builder
             return call_user_func_array(static::$macros[$method], $parameters);
         }
 
-        if (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
-            return $this->callScope([$this->model, $scope], $parameters);
+        if ($this->hasNamedScope($method)) {
+            return $this->callNamedScope($method, $parameters);
         }
 
         if (in_array($method, $this->passthru)) {

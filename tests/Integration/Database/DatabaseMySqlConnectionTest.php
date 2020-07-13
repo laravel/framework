@@ -5,28 +5,20 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Orchestra\Testbench\TestCase;
 
-class DatabaseMySqlConnectionTest extends TestCase
+class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
 {
     const TABLE = 'player';
     const FLOAT_COL = 'float_col';
     const JSON_COL = 'json_col';
-
     const FLOAT_VAL = 0.2;
-
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-        $app['config']->set('database.default', 'mysql');
-    }
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        if (! isset($_SERVER['CI'])) {
-            $this->markTestSkipped('This test is only executed on CI.');
+        if (! isset($_SERVER['CI']) || windows_os()) {
+            $this->markTestSkipped('This test is only executed on CI in Linux.');
         }
 
         if (! Schema::hasTable(self::TABLE)) {
@@ -46,12 +38,8 @@ class DatabaseMySqlConnectionTest extends TestCase
 
     /**
      * @dataProvider floatComparisonsDataProvider
-     *
-     * @param float  $value       the value to compare against the JSON value
-     * @param string $operator    the comparison operator to use. e.g. '<', '>', '='
-     * @param bool   $shouldMatch true if the comparison should match, false if not
      */
-    public function testJsonFloatComparison(float $value, string $operator, bool $shouldMatch): void
+    public function testJsonFloatComparison($value, $operator, $shouldMatch)
     {
         DB::table(self::TABLE)->insert([self::JSON_COL => '{"rank":'.self::FLOAT_VAL.'}']);
 
@@ -62,7 +50,7 @@ class DatabaseMySqlConnectionTest extends TestCase
         );
     }
 
-    public function floatComparisonsDataProvider(): array
+    public function floatComparisonsDataProvider()
     {
         return [
             [0.2, '=', true],
@@ -77,10 +65,44 @@ class DatabaseMySqlConnectionTest extends TestCase
         ];
     }
 
-    public function testFloatValueStoredCorrectly(): void
+    public function testFloatValueStoredCorrectly()
     {
         DB::table(self::TABLE)->insert([self::FLOAT_COL => self::FLOAT_VAL]);
 
         $this->assertEquals(self::FLOAT_VAL, DB::table(self::TABLE)->value(self::FLOAT_COL));
+    }
+
+    /**
+     * @dataProvider jsonWhereNullDataProvider
+     */
+    public function testJsonWhereNull($expected, $key, array $value = ['value' => 123])
+    {
+        DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
+
+        $this->assertSame($expected, DB::table(self::TABLE)->whereNull(self::JSON_COL.'->'.$key)->exists());
+    }
+
+    /**
+     * @dataProvider jsonWhereNullDataProvider
+     */
+    public function testJsonWhereNotNull($expected, $key, array $value = ['value' => 123])
+    {
+        DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
+
+        $this->assertSame(! $expected, DB::table(self::TABLE)->whereNotNull(self::JSON_COL.'->'.$key)->exists());
+    }
+
+    public function jsonWhereNullDataProvider()
+    {
+        return [
+            'key not exists' => [true, 'invalid'],
+            'key exists and null' => [true, 'value', ['value' => null]],
+            'key exists and "null"' => [false, 'value', ['value' => 'null']],
+            'key exists and not null' => [false, 'value', ['value' => false]],
+            'nested key not exists' => [true, 'nested->invalid'],
+            'nested key exists and null' => [true, 'nested->value', ['nested' => ['value' => null]]],
+            'nested key exists and "null"' => [false, 'nested->value', ['nested' => ['value' => 'null']]],
+            'nested key exists and not null' => [false, 'nested->value', ['nested' => ['value' => false]]],
+        ];
     }
 }

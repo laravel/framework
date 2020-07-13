@@ -5,6 +5,7 @@ namespace Illuminate\View\Compilers;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Illuminate\View\AnonymousComponent;
 use InvalidArgumentException;
@@ -17,6 +18,13 @@ use ReflectionClass;
 class ComponentTagCompiler
 {
     /**
+     * The Blade compiler instance.
+     *
+     * @var \Illuminate\View\Compilers\BladeCompiler
+     */
+    protected $blade;
+
+    /**
      * The component class aliases.
      *
      * @var array
@@ -24,14 +32,24 @@ class ComponentTagCompiler
     protected $aliases = [];
 
     /**
+     * The "bind:" attributes that have been compiled for the current component.
+     *
+     * @var array
+     */
+    protected $boundAttributes = [];
+
+    /**
      * Create new component tag compiler.
      *
      * @param  array  $aliases
+     * @param  \Illuminate\View\Compilers\BladeCompiler|null
      * @return void
      */
-    public function __construct(array $aliases = [])
+    public function __construct(array $aliases = [], ?BladeCompiler $blade = null)
     {
         $this->aliases = $aliases;
+
+        $this->blade = $blade ?: new BladeCompiler(new Filesystem, sys_get_temp_dir());
     }
 
     /**
@@ -52,6 +70,8 @@ class ComponentTagCompiler
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function compileTags(string $value)
     {
@@ -67,6 +87,8 @@ class ComponentTagCompiler
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileOpeningTags(string $value)
     {
@@ -96,6 +118,8 @@ class ComponentTagCompiler
         /x";
 
         return preg_replace_callback($pattern, function (array $matches) {
+            $this->boundAttributes = [];
+
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
             return $this->componentString($matches[1], $attributes);
@@ -107,6 +131,8 @@ class ComponentTagCompiler
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileSelfClosingTags(string $value)
     {
@@ -136,9 +162,11 @@ class ComponentTagCompiler
         /x";
 
         return preg_replace_callback($pattern, function (array $matches) {
+            $this->boundAttributes = [];
+
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
-            return $this->componentString($matches[1], $attributes)."\n@endcomponentClass";
+            return $this->componentString($matches[1], $attributes)."\n@endcomponentClass ";
         }, $value);
     }
 
@@ -148,6 +176,8 @@ class ComponentTagCompiler
      * @param  string  $component
      * @param  array  $attributes
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function componentString(string $component, array $attributes)
     {
@@ -165,7 +195,7 @@ class ComponentTagCompiler
         if (! class_exists($class)) {
             $parameters = [
                 'view' => "'$class'",
-                'data' => '['.$this->attributesToString($data->all()).']',
+                'data' => '['.$this->attributesToString($data->all(), $escapeBound = false).']',
             ];
 
             $class = AnonymousComponent::class;
@@ -173,7 +203,7 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        return " @component('{$class}', [".$this->attributesToString($parameters).'])
+        return " @component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
 <?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
     }
 
@@ -182,19 +212,32 @@ class ComponentTagCompiler
      *
      * @param  string  $component
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function componentClass(string $component)
     {
+        $viewFactory = Container::getInstance()->make(Factory::class);
+
         if (isset($this->aliases[$component])) {
-            return $this->aliases[$component];
+            if (class_exists($alias = $this->aliases[$component])) {
+                return $alias;
+            }
+
+            if ($viewFactory->exists($alias)) {
+                return $alias;
+            }
+
+            throw new InvalidArgumentException(
+                "Unable to locate class or view [{$alias}] for component [{$component}]."
+            );
         }
 
         if (class_exists($class = $this->guessClassName($component))) {
             return $class;
         }
 
-        if (Container::getInstance()->make(Factory::class)
-                    ->exists($view = "components.{$component}")) {
+        if ($viewFactory->exists($view = "components.{$component}")) {
             return $view;
         }
 
@@ -257,7 +300,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endcomponentClass', $value);
+        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endcomponentClass ', $value);
     }
 
     /**
@@ -319,8 +362,10 @@ class ComponentTagCompiler
 
             if (Str::startsWith($attribute, 'bind:')) {
                 $attribute = Str::after($attribute, 'bind:');
+
+                $this->boundAttributes[$attribute] = true;
             } else {
-                $value = "'".str_replace("'", "\\'", $value)."'";
+                $value = "'".$this->compileAttributeEchos($value)."'";
             }
 
             return [$attribute => $value];
@@ -346,22 +391,67 @@ class ComponentTagCompiler
     }
 
     /**
+     * Compile any Blade echo statements that are present in the attribute string.
+     *
+     * These echo statements need to be converted to string concatenation statements.
+     *
+     * @param  string  $attributeString
+     * @return string
+     */
+    protected function compileAttributeEchos(string $attributeString)
+    {
+        $value = $this->blade->compileEchos($attributeString);
+
+        $value = $this->escapeSingleQuotesOutsideOfPhpBlocks($value);
+
+        $value = str_replace('<?php echo ', '\'.', $value);
+        $value = str_replace('; ?>', '.\'', $value);
+
+        return $value;
+    }
+
+    /**
+     * Escape the single quotes in the given string that are outside of PHP blocks.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function escapeSingleQuotesOutsideOfPhpBlocks(string $value)
+    {
+        return collect(token_get_all($value))->map(function ($token) {
+            if (! is_array($token)) {
+                return $token;
+            }
+
+            return $token[0] === T_INLINE_HTML
+                        ? str_replace("'", "\\'", $token[1])
+                        : $token[1];
+        })->implode('');
+    }
+
+    /**
      * Convert an array of attributes to a string.
      *
      * @param  array  $attributes
+     * @param  bool  $escapeBound
      * @return string
      */
-    protected function attributesToString(array $attributes)
+    protected function attributesToString(array $attributes, $escapeBound = true)
     {
         return collect($attributes)
-                ->map(function (string $value, string $attribute) {
-                    return "'{$attribute}' => {$value}";
+                ->map(function (string $value, string $attribute) use ($escapeBound) {
+                    return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
+                                ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
+                                : "'{$attribute}' => {$value}";
                 })
                 ->implode(',');
     }
 
     /**
      * Strip any quotes from the given string.
+     *
+     * @param  string  $value
+     * @return string
      */
     public function stripQuotes(string $value)
     {
