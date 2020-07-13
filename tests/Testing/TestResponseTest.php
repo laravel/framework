@@ -866,8 +866,7 @@ class TestResponseTest extends TestCase
     public function testAssertJsonResource()
     {
         $data = ['foo' => 'bar'];
-        $jsonResource = new class($data) extends JsonResource
-        {
+        $jsonResource = new class($data) extends JsonResource {
             public function toArray($request)
             {
                 return ['resource_foo' => $this->foo];
