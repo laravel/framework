@@ -914,7 +914,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Return a new collection where each item only contains the selected keys
+     * Return a new collection where each item only contains the selected keys.
      *
      * @param  array  $keys
      * @return static
