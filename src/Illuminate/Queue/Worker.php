@@ -192,7 +192,11 @@ class Worker
         pcntl_signal(SIGALRM, function () use ($job, $options) {
             if ($job) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int) $options->maxTries, $this->maxAttemptsExceededException($job)
+                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->maxAttemptsExceededException($job)
+                );
+
+                $this->markJobAsFailedIfWillExceedMaxExceptions(
+                    $job->getConnectionName(), $job, $e
                 );
             }
 
