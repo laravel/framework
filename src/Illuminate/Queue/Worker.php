@@ -164,7 +164,7 @@ class Worker
                 );
 
                 $this->markJobAsFailedIfWillExceedMaxExceptions(
-                    $connectionName, $job, $e
+                    $job->getConnectionName(), $job, $e
                 );
             }
 
