@@ -15,16 +15,6 @@ use Illuminate\Support\Fluent;
 class ForeignKeyDefinition extends Fluent
 {
     /**
-     * Indicate that deletes should cascade.
-     *
-     * @return $this
-     */
-    public function cascadeOnDelete()
-    {
-        return $this->onDelete('cascade');
-    }
-
-    /**
      * Indicate that updates should cascade.
      *
      * @return $this
@@ -32,5 +22,15 @@ class ForeignKeyDefinition extends Fluent
     public function cascadeOnUpdate()
     {
         return $this->onUpdate('cascade');
+    }
+
+    /**
+     * Indicate that deletes should cascade.
+     *
+     * @return $this
+     */
+    public function cascadeOnDelete()
+    {
+        return $this->onDelete('cascade');
     }
 }
