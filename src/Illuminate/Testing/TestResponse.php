@@ -1159,7 +1159,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertJsonResource($jsonResource)
     {
-        return $this->assertExactJson($jsonResource->toResponse(app('request'))->getData(true));
+        return $this->assertExactJson($jsonResource->response()->getData(true));
     }
 
     /**
