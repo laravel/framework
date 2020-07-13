@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Foundation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use Illuminate\Testing\TestResponse;
 use JsonSerializable;
@@ -859,6 +861,22 @@ class TestResponseTest extends TestCase
         );
 
         $testResponse->assertJsonMissingValidationErrors('bar', 'data');
+    }
+
+    public function testAssertJsonResource()
+    {
+        $data = ['foo' => 'bar'];
+        $jsonResource = new class($data) extends JsonResource
+        {
+            public function toArray($request)
+            {
+                return ['resource_foo' => $this->foo];
+            }
+        };
+
+        $testResponse = TestResponse::fromBaseResponse($jsonResource->toResponse(new Request()));
+
+        $testResponse->assertJsonResource($jsonResource);
     }
 
     public function testMacroable()

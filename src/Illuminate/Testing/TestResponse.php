@@ -1152,6 +1152,17 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response is a JsonResource.
+     *
+     * @param  \Illuminate\Http\Resources\Json\JsonResource  $jsonResource
+     * @return $this
+     */
+    public function assertJsonResource($jsonResource)
+    {
+        return $this->assertExactJson($jsonResource->toResponse(app('request'))->getData(true));
+    }
+
+    /**
      * Get the current session store.
      *
      * @return \Illuminate\Session\Store
