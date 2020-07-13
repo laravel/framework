@@ -1,9 +1,23 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.19.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.19.1...7.x)
+
+
+## [v7.19.1 (2020-07-10)](https://github.com/laravel/framework/compare/v7.19.0...v7.19.1)
+
+### Added
+- Added support for SQL Server LoginTimeout to specify seconds to wait before failing connection attempt ([#33472](https://github.com/laravel/framework/pull/33472))
+- Added ability to simulate "withCredentials" in test requests ([#33497](https://github.com/laravel/framework/pull/33497), [aa17e75](https://github.com/laravel/framework/commit/aa17e75f216c58f03652625866f5ac5c2fcbcab7))
 
 ### Fixed
 - Fixed `Illuminate\Cache\FileStore::flush()` ([#33458](https://github.com/laravel/framework/pull/33458))
+- Fixed auto creating model by class name ([#33481](https://github.com/laravel/framework/pull/33481))
+- Don't return nested data from validator when failing an exclude rule ([#33435](https://github.com/laravel/framework/pull/33435))
+- Fixed validation nested error messages ([6615371](https://github.com/laravel/framework/commit/6615371d7c0a7431372244d21eae54696b3c19f2))
+- Fixed `Illuminate\Support\Reflector` to handle parent ([#33502](https://github.com/laravel/framework/pull/33502))
+
+### Revert
+- Revert [Improve SQL Server last insert id retrieval](https://github.com/laravel/framework/pull/33453) ([#33496](https://github.com/laravel/framework/pull/33496))
 
 
 ## [v7.19.0 (2020-07-07)](https://github.com/laravel/framework/compare/v7.18.0...v7.19.0)
