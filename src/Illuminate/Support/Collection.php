@@ -947,6 +947,25 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Return a new collection where each item only contains the selected keys
+     *
+     * @param  array  $keys
+     * @return static
+     */
+    public function select($keys)
+    {
+        if ($keys instanceof Enumerable) {
+            $keys = $keys->all();
+        }
+
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        return $this->map(function ($item) use ($keys) {
+            return Arr::only($item, $keys);
+        });
+    }
+
+    /**
      * Get and remove the first item from the collection.
      *
      * @return mixed

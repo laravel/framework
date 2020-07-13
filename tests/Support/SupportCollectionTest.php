@@ -3024,6 +3024,55 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSelect($collection)
+    {
+        $people = new $collection([
+            [
+                'first' => 'John',
+                'last' => 'Doe',
+                'name' => 'John Doe',
+                'email' => 'john.doe@gmail.com',
+            ],
+            [
+                'first' => 'Jane',
+                'last' => 'Doe',
+                'name' => 'Jane Doe',
+                'email' => 'jane.doe@gmail.com',
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'first' => 'John',
+                'name' => 'John Doe',
+                'email' => 'john.doe@gmail.com',
+            ],
+            [
+                'first' => 'Jane',
+                'name' => 'Jane Doe',
+                'email' => 'jane.doe@gmail.com',
+            ],
+        ], $people->select(['first', 'name', 'email'])->all());
+
+        $this->assertEquals([
+            [
+                'name' => 'John Doe',
+                'email' => 'john.doe@gmail.com',
+            ],
+            [
+                'name' => 'Jane Doe',
+                'email' => 'jane.doe@gmail.com',
+            ],
+        ], $people->select(['missing-key', 'name', 'email'])->all());
+
+        $this->assertEquals($people->all(), $people->select('first', 'last', 'name', 'email')->all());
+        $this->assertEquals($people->all(), $people->select(['first', 'last', 'name', 'email'])->all());
+        $this->assertEquals($people->all(), $people->select(collect(['first', 'last', 'name', 'email']))->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testKeys($collection)
     {
         $c = new $collection(['name' => 'taylor', 'framework' => 'laravel']);

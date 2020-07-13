@@ -914,6 +914,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Return a new collection where each item only contains the selected keys
+     *
+     * @param  array  $keys
+     * @return static
+     */
+    public function select($keys)
+    {
+        return $this->passthru('select', func_get_args());
+    }
+
+    /**
      * Shuffle the items in the collection.
      *
      * @param  int|null  $seed
