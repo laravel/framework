@@ -15,6 +15,16 @@ use Illuminate\Support\Fluent;
 class ForeignKeyDefinition extends Fluent
 {
     /**
+     * Indicate that updates should cascade.
+     *
+     * @return $this
+     */
+    public function cascadeOnUpdate()
+    {
+        return $this->onUpdate('cascade');
+    }
+
+    /**
      * Indicate that deletes should cascade.
      *
      * @return $this
