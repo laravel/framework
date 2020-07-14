@@ -1202,7 +1202,7 @@ trait HasAttributes
     public function except($attributes)
     {
         $attributes = is_array($attributes) ? $attributes : func_get_args();
-        $results    = [];
+        $results = [];
 
         foreach (array_diff(array_keys($this->attributes), $attributes) as $attribute) {
             $results[$attribute] = $this->getAttribute($attribute);
