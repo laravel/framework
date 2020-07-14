@@ -381,6 +381,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  \Closure  $closure
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function extend($abstract, Closure $closure)
     {
