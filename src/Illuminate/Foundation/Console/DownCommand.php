@@ -40,9 +40,11 @@ class DownCommand extends Command
                 return 0;
             }
 
-            file_put_contents(storage_path('framework/down'),
-                              json_encode($this->getDownFilePayload(),
-                              JSON_PRETTY_PRINT));
+            file_put_contents(
+                storage_path('framework/down'),
+                json_encode($this->getDownFilePayload(),
+                JSON_PRETTY_PRINT)
+            );
 
             $this->comment('Application is now in maintenance mode.');
         } catch (Exception $e) {
