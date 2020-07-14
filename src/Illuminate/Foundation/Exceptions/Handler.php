@@ -181,6 +181,19 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Indicate that the given exception type should not be reported.
+     *
+     * @param  string  $class
+     * @return $this
+     */
+    protected function ignore(string $class)
+    {
+        $this->dontReport[] = $class;
+
+        return $this;
+    }
+
+    /**
      * Report or log an exception.
      *
      * @param  \Throwable  $e
