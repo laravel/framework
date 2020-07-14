@@ -175,6 +175,7 @@ class ContainerCallTest extends TestCase
         $result = $container->call(ContainerCallCallableClassStringStub::class);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
         $this->assertSame('jeffrey', $result[1]);
+        $this->assertInstanceOf(ContainerTestCallStub::class, $result[2]);
     }
 
     public function testCallWithoutRequiredParamsThrowsException()
@@ -254,8 +255,8 @@ class ContainerCallCallableClassStringStub
         $this->default = $default;
     }
 
-    public function __invoke()
+    public function __invoke(ContainerTestCallStub $dependency)
     {
-        return [$this->stub, $this->default];
+        return [$this->stub, $this->default, $dependency];
     }
 }
