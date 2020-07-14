@@ -189,6 +189,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse(isset($model['with']));
     }
 
+    public function testExcept()
+    {
+        $model = new EloquentModelStub;
+        $model->first_name = 'taylor';
+        $model->last_name = 'otwell';
+        $model->project = 'laravel';
+
+        $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->except('project'));
+        $this->assertEquals(['project' => 'laravel'], $model->except('first_name', 'last_name'));
+        $this->assertEquals(['project' => 'laravel'], $model->except(['first_name', 'last_name']));
+    }
+
     public function testOnly()
     {
         $model = new EloquentModelStub;

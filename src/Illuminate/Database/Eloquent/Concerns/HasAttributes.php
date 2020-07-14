@@ -1194,6 +1194,24 @@ trait HasAttributes
     }
 
     /**
+     * Get all attributes except the specified ones.
+     *
+     * @param  array|mixed  $attributes
+     * @return array
+     */
+    public function except($attributes)
+    {
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+        $results    = [];
+
+        foreach (array_diff(array_keys($this->attributes), $attributes) as $attribute) {
+            $results[$attribute] = $this->getAttribute($attribute);
+        }
+
+        return $results;
+    }
+
+    /**
      * Get a subset of the model's attributes.
      *
      * @param  array|mixed  $attributes
