@@ -122,7 +122,7 @@ class ContainerTest extends TestCase
 
     public function testBindFailsLoudlyWithInvalidArgument()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
         $container = new Container;
 
         $concrete = new ContainerConcreteStub();

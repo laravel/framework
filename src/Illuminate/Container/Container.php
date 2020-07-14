@@ -218,8 +218,6 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
-     *
-     * @throws \InvalidArgumentException
      */
     public function bind($abstract, $concrete = null, $shared = false)
     {
@@ -237,7 +235,7 @@ class Container implements ArrayAccess, ContainerContract
         // up inside its own Closure to give us more convenience when extending.
         if (! $concrete instanceof Closure) {
             if (! is_string($concrete)) {
-                throw new \InvalidArgumentException('Concrete implementation must be a string or closure');
+                throw new \TypeError(self::class.'::bind(): Argument #2 ($concrete) must be of type Closure|string|null');
             }
 
             $concrete = $this->getClosure($abstract, $concrete);
@@ -343,8 +341,6 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
-     *
-     * @throws \InvalidArgumentException
      */
     public function bindIf($abstract, $concrete = null, $shared = false)
     {
@@ -359,8 +355,6 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
-     *
-     * @throws \InvalidArgumentException
      */
     public function singleton($abstract, $concrete = null)
     {
@@ -387,8 +381,6 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  \Closure  $closure
      * @return void
-     *
-     * @throws \InvalidArgumentException
      */
     public function extend($abstract, Closure $closure)
     {
