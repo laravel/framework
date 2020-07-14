@@ -127,31 +127,16 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Register reportable and renderable callbacks.
-     *
-     * @param  callable  $reportUsing
-     * @param  callable  $renderUsing
-     * @return $this
-     */
-    public function on(callable $reportUsing, callable $renderUsing)
-    {
-        $this->reportCallbacks[] = $reportUsing;
-        $this->renderCallbacks[] = $renderUsing;
-
-        return $this;
-    }
-
-    /**
      * Register a reportable callback.
      *
      * @param  callable  $reportUsing
-     * @return $this
+     * @return \Illuminate\Foundation\Exceptions\ReportableHandler
      */
     public function reportable(callable $reportUsing)
     {
-        $this->reportCallbacks[] = $reportUsing;
-
-        return $this;
+        return tap(new ReportableHandler($reportUsing), function ($callback) {
+            $this->reportCallbacks[] = $callback;
+        });
     }
 
     /**
@@ -218,7 +203,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         foreach ($this->reportCallbacks as $reportCallback) {
-            if (is_a($e, $this->firstClosureParameterType($reportCallback))) {
+            if ($reportCallback->handles($e)) {
                 if ($reportCallback($e) === false) {
                     return;
                 }
