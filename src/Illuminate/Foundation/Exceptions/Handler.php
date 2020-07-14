@@ -19,6 +19,7 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use Psr\Log\LoggerInterface;
@@ -37,6 +38,8 @@ use Whoops\Run as Whoops;
 
 class Handler implements ExceptionHandlerContract
 {
+    use ReflectsClosures;
+
     /**
      * The container implementation.
      *
@@ -50,6 +53,20 @@ class Handler implements ExceptionHandlerContract
      * @var array
      */
     protected $dontReport = [];
+
+    /**
+     * The callbacks that should be used during reporting.
+     *
+     * @var array
+     */
+    protected $reportCallbacks = [];
+
+    /**
+     * The callbacks that should be used during rendering.
+     *
+     * @var array
+     */
+    protected $renderCallbacks = [];
 
     /**
      * A list of the internal exception types that should not be reported.
@@ -86,6 +103,59 @@ class Handler implements ExceptionHandlerContract
     public function __construct(Container $container)
     {
         $this->container = $container;
+
+        $this->register();
+    }
+
+    /**
+     * Register the exception handling callbacks for the application.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
+
+    /**
+     * Register reportable and renderable callbacks.
+     *
+     * @param  callable  $reportUsing
+     * @param  callable  $renderUsing
+     * @return $this
+     */
+    public function on(callable $reportUsing, callable $renderUsing)
+    {
+        $this->reportCallbacks[] = $reportUsing;
+        $this->renderCallbacks[] = $renderUsing;
+
+        return $this;
+    }
+
+    /**
+     * Register a reportable callback.
+     *
+     * @param  callable  $reportUsing
+     * @return $this
+     */
+    public function reportable(callable $reportUsing)
+    {
+        $this->reportCallbacks[] = $reportUsing;
+
+        return $this;
+    }
+
+    /**
+     * Register a renderable callback.
+     *
+     * @param  callable  $renderUsing
+     * @return $this
+     */
+    public function renderable(callable $renderUsing)
+    {
+        $this->renderCallbacks[] = $renderUsing;
+
+        return $this;
     }
 
     /**
@@ -105,6 +175,14 @@ class Handler implements ExceptionHandlerContract
         if (is_callable($reportCallable = [$e, 'report'])) {
             if ($this->container->call($reportCallable) !== false) {
                 return;
+            }
+        }
+
+        foreach ($this->reportCallbacks as $reportCallback) {
+            if (is_a($e, $this->firstClosureParameterType($reportCallback))) {
+                if ($reportCallback($e) === false) {
+                    return;
+                }
             }
         }
 
@@ -196,6 +274,16 @@ class Handler implements ExceptionHandlerContract
         }
 
         $e = $this->prepareException($e);
+
+        foreach ($this->renderCallbacks as $renderCallback) {
+            if (is_a($e, $this->firstClosureParameterType($renderCallback))) {
+                $response = $renderCallback($e);
+
+                if (! is_null($response)) {
+                    return $response;
+                }
+            }
+        }
 
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
