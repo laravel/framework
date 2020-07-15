@@ -2,11 +2,14 @@
 
 namespace Illuminate\Testing;
 
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\View\View;
 
 class TestView
 {
+    use Macroable;
+
     /**
      * The original view.
      *
