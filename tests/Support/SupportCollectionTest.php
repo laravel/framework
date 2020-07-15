@@ -227,7 +227,7 @@ class SupportCollectionTest extends TestCase
         // Item at the middle of the collection
         $this->assertSame([3, 3, 4, 4], $data->skipUntil(3)->values()->all());
 
-         // Item not in the collection
+        // Item not in the collection
         $this->assertSame([], $data->skipUntil(5)->values()->all());
 
         // Item at the beginning of the collection
@@ -245,7 +245,7 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([3, 3, 4, 4], $data->all());
 
         // Item not in the collection
-         $data = $data->skipUntil(function ($value, $key) {
+        $data = $data->skipUntil(function ($value, $key) {
             return $value >= 5;
         })->values();
 
