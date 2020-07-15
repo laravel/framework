@@ -9,7 +9,7 @@ use Illuminate\View\View;
 class TestView
 {
     use Macroable;
-    
+
     /**
      * The original view.
      *
