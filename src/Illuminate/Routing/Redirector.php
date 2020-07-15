@@ -30,7 +30,7 @@ class Redirector
      * @param  \Illuminate\Routing\UrlGenerator  $generator
      * @return void
      */
-    public function __construct(UrlGenerator $generator)
+    public function __construct($generator)
     {
         $this->generator = $generator;
     }

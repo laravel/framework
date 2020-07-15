@@ -227,7 +227,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @param  \Illuminate\Routing\Redirector  $redirector
      * @return $this
      */
-    public function setRedirector(Redirector $redirector)
+    public function setRedirector($redirector)
     {
         $this->redirector = $redirector;
 

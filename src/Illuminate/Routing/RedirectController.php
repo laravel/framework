@@ -15,7 +15,7 @@ class RedirectController extends Controller
      * @param  \Illuminate\Routing\UrlGenerator  $url
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function __invoke(Request $request, UrlGenerator $url)
+    public function __invoke(Request $request, $url)
     {
         $parameters = collect($request->route()->parameters());
 
