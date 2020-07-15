@@ -64,10 +64,11 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
-            'time' => $this->currentTime(),
+            'allowed' => $this->option('allow'),
+            'key' => substr(config('app.key'), 7),
             'message' => $this->option('message'),
             'retry' => $this->getRetryTime(),
-            'allowed' => $this->option('allow'),
+            'time' => $this->currentTime(),
         ];
     }
 
