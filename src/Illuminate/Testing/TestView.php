@@ -40,12 +40,12 @@ class TestView
      * Assert that the given string is contained within the view.
      *
      * @param  string  $value
-     * @param  bool  $escaped
+     * @param  bool  $escape
      * @return $this
      */
-    public function assertSee($value, $escaped = true)
+    public function assertSee($value, $escape = true)
     {
-        $value = $escaped ? e($value) : $value;
+        $value = $escape ? e($value) : $value;
 
         PHPUnit::assertStringContainsString((string) $value, $this->rendered);
 
