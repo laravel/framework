@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -15,7 +16,7 @@ class RedirectController extends Controller
      * @param  \Illuminate\Routing\UrlGenerator  $url
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function __invoke(Request $request, $url)
+    public function __invoke(Request $request, UrlGeneratorContract $url)
     {
         $parameters = collect($request->route()->parameters());
 

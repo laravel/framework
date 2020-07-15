@@ -9,6 +9,7 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -1765,7 +1766,7 @@ class RoutingRouteTest extends TestCase
             return $request;
         });
         $urlGenerator = new UrlGenerator(new RouteCollection, $request);
-        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+        $container->singleton(UrlGeneratorContract::class, function () use ($urlGenerator) {
             return $urlGenerator;
         });
         $router->get('contact_us', function () {
@@ -1790,7 +1791,7 @@ class RoutingRouteTest extends TestCase
             return $request;
         });
         $urlGenerator = new UrlGenerator(new RouteCollection, $request);
-        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+        $container->singleton(UrlGeneratorContract::class, function () use ($urlGenerator) {
             return $urlGenerator;
         });
         $router->get('contact_us', function () {
@@ -1815,7 +1816,7 @@ class RoutingRouteTest extends TestCase
             return $request;
         });
         $urlGenerator = new UrlGenerator(new RouteCollection, $request);
-        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+        $container->singleton(UrlGeneratorContract::class, function () use ($urlGenerator) {
             return $urlGenerator;
         });
         $router->get('contact_us', function () {
@@ -1843,7 +1844,7 @@ class RoutingRouteTest extends TestCase
             return $request;
         });
         $urlGenerator = new UrlGenerator(new RouteCollection, $request);
-        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+        $container->singleton(UrlGeneratorContract::class, function () use ($urlGenerator) {
             return $urlGenerator;
         });
         $router->get('users', function () {
@@ -1866,7 +1867,7 @@ class RoutingRouteTest extends TestCase
             return $request;
         });
         $urlGenerator = new UrlGenerator(new RouteCollection, $request);
-        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+        $container->singleton(UrlGeneratorContract::class, function () use ($urlGenerator) {
             return $urlGenerator;
         });
         $router->get('contact_us', function () {
@@ -1891,7 +1892,7 @@ class RoutingRouteTest extends TestCase
             return $request;
         });
         $urlGenerator = new UrlGenerator(new RouteCollection, $request);
-        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+        $container->singleton(UrlGeneratorContract::class, function () use ($urlGenerator) {
             return $urlGenerator;
         });
         $router->get('contact_us', function () {
