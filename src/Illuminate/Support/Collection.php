@@ -177,6 +177,10 @@ class Collection implements ArrayAccess, Enumerable
                 return $this->first($key, $placeholder) !== $placeholder;
             }
 
+            if (is_array($key) || $key instanceof self) {
+                return empty(array_diff($this->getArrayableItems($key), $this->items));
+            }
+
             return in_array($key, $this->items);
         }
 

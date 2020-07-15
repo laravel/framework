@@ -2791,6 +2791,19 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
+    public function testContainsArrayOrCollection()
+    {
+        $c1 = new Collection([1, 3, 5]);
+        $c2 = new Collection([3, 5]);
+        $this->assertTrue($c1->contains($c2));
+
+        $c2 = new Collection([1, 4, 3]);
+        $this->assertFalse($c1->contains($c2));
+
+        $this->assertTrue($c1->contains([1, 3]));
+        $this->assertFalse($c1->contains([1, 4]));
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
