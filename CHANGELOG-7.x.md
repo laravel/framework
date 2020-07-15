@@ -1,6 +1,19 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.19.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.20.0...7.x)
+
+### Fixed
+- Fixed `Illuminate/Redis/Connections/PhpRedisConnection::*scan()` returns ([d3d36f0](https://github.com/laravel/framework/commit/d3d36f059ef1c56e17d8e434e9fd3dfd6cbe6e53))
+
+
+## [v7.20.0 (2020-07-14)](https://github.com/laravel/framework/compare/v7.19.1...v7.20.0)
+
+### Added
+- Added `Illuminate\Database\Schema\ForeignKeyDefinition::cascadeOnUpdate()` ([#33522](https://github.com/laravel/framework/pull/33522))
+
+### Changed
+- Apply model connection name to Database validation rules ([#33525](https://github.com/laravel/framework/pull/33525))
+- Allow calling invokable classes using FQN in `Illuminate\Container\BoundMethod.php::call()` ([#33535](https://github.com/laravel/framework/pull/33535))
 
 
 ## [v7.19.1 (2020-07-10)](https://github.com/laravel/framework/compare/v7.19.0...v7.19.1)
