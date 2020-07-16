@@ -236,7 +236,6 @@ class TestJson
         return $this;
     }
 
-
     /**
      * Assert that the response is a superset of the given JSON.
      *
