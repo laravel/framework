@@ -37,6 +37,10 @@ class UpCommand extends Command
 
             unlink(storage_path('framework/down'));
 
+            if (is_file(base_path('bootstrap/maintenance.php'))) {
+                unlink(base_path('bootstrap/maintenance.php'));
+            }
+
             $this->info('Application is now live.');
         } catch (Exception $e) {
             $this->error('Failed to disable maintenance mode.');
