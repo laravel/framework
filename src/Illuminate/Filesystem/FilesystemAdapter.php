@@ -123,7 +123,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Get the contents of a file.
      *
      * @param  string  $path
-     * @return string
+     * @return string|false
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
