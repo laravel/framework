@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
 use Illuminate\Support\Facades\View;
 
 class DownCommand extends Command
@@ -97,9 +98,7 @@ class DownCommand extends Command
      */
     protected function prerenderView()
     {
-        View::replaceNamespace('errors', collect(config('view.paths'))->map(function ($path) {
-            return "{$path}/errors";
-        })->push(__DIR__.'/../Exceptions/views')->all());
+        (new RegisterErrorViewPaths)();
 
         return view($this->option('render'))->render();
     }
