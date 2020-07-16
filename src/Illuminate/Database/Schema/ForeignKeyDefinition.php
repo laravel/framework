@@ -33,4 +33,14 @@ class ForeignKeyDefinition extends Fluent
     {
         return $this->onDelete('cascade');
     }
+
+    /**
+     * Indicate that deletes should null.
+     *
+     * @return $this
+     */
+    public function setNullOnDelete()
+    {
+        return $this->onDelete('set null');
+    }
 }
