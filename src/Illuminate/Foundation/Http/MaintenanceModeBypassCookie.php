@@ -15,7 +15,7 @@ class MaintenanceModeBypassCookie
      */
     public static function create(string $key)
     {
-        $expiresAt = Carbon::now()->addHours(24);
+        $expiresAt = Carbon::now()->addHours(12);
 
         return new Cookie('laravel_maintenance', base64_encode(json_encode([
             'expires_at' => $expiresAt->getTimestamp(),
