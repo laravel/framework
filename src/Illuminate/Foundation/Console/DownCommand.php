@@ -68,7 +68,6 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
-            'key' => substr(config('app.key'), 7),
             'redirect' => $this->redirectPath(),
             'retry' => $this->getRetryTime(),
             'secret' => $this->option('secret'),

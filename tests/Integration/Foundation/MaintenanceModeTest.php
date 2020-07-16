@@ -95,7 +95,7 @@ class MaintenanceModeTest extends TestCase
             'secret' => 'foo',
         ]));
 
-        $cookie = MaintenanceModeBypassCookie::create(base64_decode(substr(config('app.key'), 7)));
+        $cookie = MaintenanceModeBypassCookie::create('foo');
 
         Route::get('/test', function () {
             return 'Hello World';

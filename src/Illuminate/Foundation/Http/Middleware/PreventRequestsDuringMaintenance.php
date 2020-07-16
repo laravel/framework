@@ -46,15 +46,15 @@ class PreventRequestsDuringMaintenance
      */
     public function handle($request, Closure $next)
     {
-        if ($this->app->isDownForMaintenance() &&
-            ! $this->hasValidBypassCookie($request)) {
+        if ($this->app->isDownForMaintenance()) {
             $data = json_decode(file_get_contents($this->app->storagePath().'/framework/down'), true);
 
             if (isset($data['secret']) && $request->path() === $data['secret']) {
-                return $this->bypassResponse();
+                return $this->bypassResponse($data['secret']);
             }
 
-           if ($this->inExceptArray($request)) {
+            if ($this->hasValidBypassCookie($request, $data) ||
+                $this->inExceptArray($request)) {
                 return $next($request);
             }
 
@@ -93,12 +93,13 @@ class PreventRequestsDuringMaintenance
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    protected function hasValidBypassCookie($request)
+    protected function hasValidBypassCookie($request, array $data)
     {
-        return $request->cookie('laravel_maintenance') &&
+        return isset($data['secret']) &&
+                $request->cookie('laravel_maintenance') &&
                 MaintenanceModeBypassCookie::isValid(
                     $request->cookie('laravel_maintenance'),
-                    base64_decode(substr(config('app.key'), 7))
+                    $data['secret']
                 );
     }
 
@@ -126,12 +127,13 @@ class PreventRequestsDuringMaintenance
     /**
      * Redirect the user back to the root of the application with a maintenance mode bypass cookie.
      *
+     * @param  string  $secret
      * @return \Illuminate\Http\RedirectResponse
      */
-    protected function bypassResponse()
+    protected function bypassResponse(string $secret)
     {
         return redirect('/')->withCookie(
-            MaintenanceModeBypassCookie::create(base64_decode(substr(config('app.key'), 7)))
+            MaintenanceModeBypassCookie::create($secret)
         );
     }
 }
