@@ -35,11 +35,11 @@ class ForeignKeyDefinition extends Fluent
     }
 
     /**
-     * Indicate that deletes should null.
+     * Indicate that deletes should set the foreign key value to null.
      *
      * @return $this
      */
-    public function setNullOnDelete()
+    public function nullOnDelete()
     {
         return $this->onDelete('set null');
     }
