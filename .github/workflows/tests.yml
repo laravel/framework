@@ -29,12 +29,10 @@ jobs:
       fail-fast: true
       matrix:
         php: [7.2, 7.3, 7.4]
-        dbal: [^2.6]
         stability: [prefer-lowest, prefer-stable]
         experimental: [false]
         include:
           - php: 8.0
-            dbal: ^3.0
             stability: ignore-platform-req=php
             experimental: true
 
@@ -57,7 +55,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "doctrine/dbal:${{ matrix.dbal }}" --no-update --no-interaction
+          composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0 --no-update --no-interaction
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
