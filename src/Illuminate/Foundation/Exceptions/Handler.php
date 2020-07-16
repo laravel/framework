@@ -558,7 +558,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @return void
      */
-    public function registerErrorViewPaths()
+    protected function registerErrorViewPaths()
     {
         (new RegisterErrorViewPaths)();
     }
