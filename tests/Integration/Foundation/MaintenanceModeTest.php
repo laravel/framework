@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class MaintenanceModeTest extends TestCase
 {
-    public function tearDown() : void
+    public function tearDown(): void
     {
         @unlink(storage_path('framework/down'));
     }
@@ -102,7 +102,7 @@ class MaintenanceModeTest extends TestCase
         })->middleware(PreventRequestsDuringMaintenance::class);
 
         $response = $this->withUnencryptedCookies([
-            'laravel_maintenance' => $cookie->getValue()
+            'laravel_maintenance' => $cookie->getValue(),
         ])->get('/test');
 
         $response->assertStatus(200);
@@ -123,7 +123,7 @@ class MaintenanceModeTest extends TestCase
         })->middleware(PreventRequestsDuringMaintenance::class);
 
         $response = $this->withUnencryptedCookies([
-            'laravel_maintenance' => $cookie->getValue()
+            'laravel_maintenance' => $cookie->getValue(),
         ])->get('/test');
 
         $response->assertStatus(503);
