@@ -558,7 +558,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @return void
      */
-    protected function registerErrorViewPaths()
+    public function registerErrorViewPaths()
     {
         $paths = collect(config('view.paths'));
 
