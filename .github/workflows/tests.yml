@@ -60,43 +60,43 @@ jobs:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
 
-  windows_tests:
-
-    runs-on: windows-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [7.2, 7.3, 7.4]
-        include:
-          - php: 7.2
-            stability: prefer-lowest
-          - php: 7.3
-            stability: prefer-stable
-          - php: 7.4
-            stability: prefer-stable
-
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
-
-    steps:
-      - name: Set git to use LF
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp
-          tools: composer:v2
-          coverage: none
-          ini-values: memory_limit=512M
-
-      - name: Install dependencies
-        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
-
-      - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+#  windows_tests:
+#
+#    runs-on: windows-latest
+#    strategy:
+#      fail-fast: true
+#      matrix:
+#        php: [7.2, 7.3, 7.4]
+#        include:
+#          - php: 7.2
+#            stability: prefer-lowest
+#          - php: 7.3
+#            stability: prefer-stable
+#          - php: 7.4
+#            stability: prefer-stable
+#
+#    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
+#
+#    steps:
+#      - name: Set git to use LF
+#        run: |
+#          git config --global core.autocrlf false
+#          git config --global core.eol lf
+#
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Setup PHP
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: ${{ matrix.php }}
+#          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp
+#          tools: composer:v2
+#          coverage: none
+#          ini-values: memory_limit=512M
+#
+#      - name: Install dependencies
+#        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+#
+#      - name: Execute tests
+#        run: vendor/bin/phpunit --verbose
