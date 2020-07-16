@@ -29,12 +29,8 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.0]
-        stability: [prefer-lowest, prefer-stable]
-        experimental: [false]
-        include:
-          - php: 8.0
-            stability: ignore-platform-req=php
-            experimental: true
+        stability: [ignore-platform-req=php]
+        experimental: [true]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
@@ -55,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0 --no-update --no-interaction
+          composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
