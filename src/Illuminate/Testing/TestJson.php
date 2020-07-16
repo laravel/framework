@@ -38,6 +38,8 @@ class TestJson
             $this->decoded = $jsonable->jsonSerialize();
         } elseif ($jsonable instanceof Jsonable) {
             $this->decoded = json_decode($jsonable->toJson(), true);
+        } elseif (is_array($jsonable)) {
+            $this->decoded = $jsonable;
         } else {
             $this->decoded = json_decode($jsonable, true);
         }
@@ -227,7 +229,7 @@ class TestJson
             } elseif (is_array($value)) {
                 PHPUnit::assertArrayHasKey($key, $this->decoded);
 
-                $this->assertStructure($structure[$key], $responseData[$key]);
+                $this->assertStructure($structure[$key], $this->decoded[$key]);
             } else {
                 PHPUnit::assertArrayHasKey($value, $this->decoded);
             }
