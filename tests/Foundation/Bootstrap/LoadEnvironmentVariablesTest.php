@@ -2,15 +2,18 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
 {
     protected function tearDown(): void
     {
+        unset($_ENV['FOO']);
+        unset($_SERVER['FOO']);
+        putenv('FOO');
         m::close();
     }
 

@@ -14,10 +14,12 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
-        "illuminate/contracts": "5.8.*",
-        "illuminate/support": "5.8.*",
+        "php": "^7.2.5",
+        "illuminate/contracts": "^7.0",
         "psr/container": "^1.0"
+    },
+    "provide": {
+        "psr/container-implementation": "1.0"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.8-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "config": {

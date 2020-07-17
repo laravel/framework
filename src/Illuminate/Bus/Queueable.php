@@ -2,6 +2,11 @@
 
 namespace Illuminate\Bus;
 
+use Closure;
+use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Arr;
+use RuntimeException;
+
 trait Queueable
 {
     /**
@@ -38,6 +43,13 @@ trait Queueable
      * @var \DateTimeInterface|\DateInterval|int|null
      */
     public $delay;
+
+    /**
+     * The middleware the job should be dispatched through.
+     *
+     * @var array
+     */
+    public $middleware = [];
 
     /**
      * The jobs that should run if this job is successful.
@@ -114,6 +126,19 @@ trait Queueable
     }
 
     /**
+     * Specify the middleware the job should be dispatched through.
+     *
+     * @param  array|object  $middleware
+     * @return $this
+     */
+    public function through($middleware)
+    {
+        $this->middleware = Arr::wrap($middleware);
+
+        return $this;
+    }
+
+    /**
      * Set the jobs that should run if this job is successful.
      *
      * @param  array  $chain
@@ -122,10 +147,31 @@ trait Queueable
     public function chain($chain)
     {
         $this->chained = collect($chain)->map(function ($job) {
-            return serialize($job);
+            return $this->serializeJob($job);
         })->all();
 
         return $this;
+    }
+
+    /**
+     * Serialize a job for queuing.
+     *
+     * @param  mixed  $job
+     * @return string
+     */
+    protected function serializeJob($job)
+    {
+        if ($job instanceof Closure) {
+            if (! class_exists(CallQueuedClosure::class)) {
+                throw new RuntimeException(
+                    'To enable support for closure jobs, please install the illuminate/queue package.'
+                );
+            }
+
+            $job = CallQueuedClosure::create($job);
+        }
+
+        return serialize($job);
     }
 
     /**

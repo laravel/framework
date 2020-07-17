@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Queue;
 
-use stdClass;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Queue\RedisQueue;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class QueueRedisJobTest extends TestCase
 {

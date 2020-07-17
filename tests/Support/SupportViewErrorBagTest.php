@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use PHPUnit\Framework\TestCase;
 
 class SupportViewErrorBagTest extends TestCase
 {
@@ -123,6 +123,6 @@ class SupportViewErrorBagTest extends TestCase
     {
         $viewErrorBag = new ViewErrorBag;
         $viewErrorBag = $viewErrorBag->put('default', new MessageBag(['message' => 'content']));
-        $this->assertEquals('{"message":["content"]}', (string) $viewErrorBag);
+        $this->assertSame('{"message":["content"]}', (string) $viewErrorBag);
     }
 }

@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Faker\Factory;
+use Faker\Generator;
 
 trait WithFaker
 {
@@ -42,6 +43,12 @@ trait WithFaker
      */
     protected function makeFaker($locale = null)
     {
-        return Factory::create($locale ?? Factory::DEFAULT_LOCALE);
+        $locale = $locale ?? config('app.faker_locale', Factory::DEFAULT_LOCALE);
+
+        if (isset($this->app) && $this->app->bound(Generator::class)) {
+            return $this->app->make(Generator::class, ['locale' => $locale]);
+        }
+
+        return Factory::create($locale);
     }
 }

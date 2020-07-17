@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature request
+    url: https://github.com/laravel/framework/discussions/new
+    about: 'For ideas or feature requests'
+  - name: Support Questions & Other
+    url: https://github.com/laravel/framework/discussions/new
+    about: 'If you have a question or need help using the library'
+  - name: Documentation issue
+    url: https://github.com/laravel/docs
+    about: For documentation issues, open a pull request at the laravel/docs repository

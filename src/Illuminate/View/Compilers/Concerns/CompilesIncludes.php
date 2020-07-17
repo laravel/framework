@@ -55,6 +55,19 @@ trait CompilesIncludes
     }
 
     /**
+     * Compile the include-unless statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileIncludeUnless($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        return "<?php echo \$__env->renderWhen(! $expression, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path'])); ?>";
+    }
+
+    /**
      * Compile the include-first statements into valid PHP.
      *
      * @param  string  $expression

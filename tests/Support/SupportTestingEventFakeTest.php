@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use PHPUnit\Framework\ExpectationFailedException;
+use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingEventFakeTest extends TestCase
 {
@@ -29,6 +29,15 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->dispatch(EventStub::class);
 
         $this->fake->assertDispatched(EventStub::class);
+    }
+
+    public function testAssertDispatchedWithClosure()
+    {
+        $this->fake->dispatch(new EventStub);
+
+        $this->fake->assertDispatched(function (EventStub $event) {
+            return true;
+        });
     }
 
     public function testAssertDispatchedWithCallbackInt()
@@ -69,6 +78,20 @@ class SupportTestingEventFakeTest extends TestCase
 
         try {
             $this->fake->assertNotDispatched(EventStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\EventStub] event was dispatched.'));
+        }
+    }
+
+    public function testAssertNotDispatchedWithClosure()
+    {
+        $this->fake->dispatch(new EventStub);
+
+        try {
+            $this->fake->assertNotDispatched(function (EventStub $event) {
+                return true;
+            });
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\EventStub] event was dispatched.'));

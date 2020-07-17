@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class RedisCacheIntegrationTest extends TestCase
 {
@@ -21,14 +21,14 @@ class RedisCacheIntegrationTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        m::close();
         $this->tearDownRedis();
+        m::close();
     }
 
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testRedisCacheAddTwice($driver)
     {
@@ -44,7 +44,7 @@ class RedisCacheIntegrationTest extends TestCase
      *
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testRedisCacheAddFalse($driver)
     {
@@ -60,7 +60,7 @@ class RedisCacheIntegrationTest extends TestCase
      *
      * @dataProvider redisDriverProvider
      *
-     * @param string $driver
+     * @param  string  $driver
      */
     public function testRedisCacheAddNull($driver)
     {

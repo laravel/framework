@@ -101,6 +101,103 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
     }
 
+    public function testItIgnoresDuplicatedRawAttachments()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->attachData('content1', 'report-1.txt');
+        $this->assertCount(1, $mailable->rawAttachments);
+
+        $mailable->attachData('content2', 'report-2.txt');
+        $this->assertCount(2, $mailable->rawAttachments);
+
+        $mailable->attachData('content1', 'report-1.txt');
+        $mailable->attachData('content2', 'report-2.txt');
+        $this->assertCount(2, $mailable->rawAttachments);
+
+        $mailable->attachData('content1', 'report-3.txt');
+        $mailable->attachData('content2', 'report-4.txt');
+        $this->assertCount(4, $mailable->rawAttachments);
+
+        $this->assertSame([
+            [
+                'data' => 'content1',
+                'name' => 'report-1.txt',
+                'options' => [],
+            ],
+            [
+                'data' => 'content2',
+                'name' => 'report-2.txt',
+                'options' => [],
+            ],
+            [
+                'data' => 'content1',
+                'name' => 'report-3.txt',
+                'options' => [],
+            ],
+            [
+                'data' => 'content2',
+                'name' => 'report-4.txt',
+                'options' => [],
+            ],
+        ], $mailable->rawAttachments);
+    }
+
+    public function testItIgnoresDuplicateStorageAttachments()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->attachFromStorageDisk('disk1', 'sample/file.txt');
+        $this->assertCount(1, $mailable->diskAttachments);
+
+        $mailable->attachFromStorageDisk('disk1', 'sample/file2.txt');
+        $this->assertCount(2, $mailable->diskAttachments);
+
+        $mailable->attachFromStorageDisk('disk1', 'sample/file.txt', 'file.txt');
+        $mailable->attachFromStorageDisk('disk1', 'sample/file2.txt');
+        $this->assertCount(2, $mailable->diskAttachments);
+
+        $mailable->attachFromStorageDisk('disk2', 'sample/file.txt', 'file.txt');
+        $mailable->attachFromStorageDisk('disk2', 'sample/file2.txt');
+        $this->assertCount(4, $mailable->diskAttachments);
+
+        $mailable->attachFromStorageDisk('disk1', 'sample/file.txt', 'custom.txt');
+        $this->assertCount(5, $mailable->diskAttachments);
+
+        $this->assertSame([
+            [
+                'disk' => 'disk1',
+                'path' => 'sample/file.txt',
+                'name' => 'file.txt',
+                'options' => [],
+            ],
+            [
+                'disk' => 'disk1',
+                'path' => 'sample/file2.txt',
+                'name' => 'file2.txt',
+                'options' => [],
+            ],
+            [
+                'disk' => 'disk2',
+                'path' => 'sample/file.txt',
+                'name' => 'file.txt',
+                'options' => [],
+            ],
+            [
+                'disk' => 'disk2',
+                'path' => 'sample/file2.txt',
+                'name' => 'file2.txt',
+                'options' => [],
+            ],
+            [
+                'disk' => 'disk1',
+                'path' => 'sample/file.txt',
+                'name' => 'custom.txt',
+                'options' => [],
+            ],
+        ], $mailable->diskAttachments);
+    }
+
     public function testMailableBuildsViewData()
     {
         $mailable = new WelcomeMailableStub;
@@ -114,6 +211,17 @@ class MailMailableTest extends TestCase
         ];
 
         $this->assertSame($expected, $mailable->buildViewData());
+    }
+
+    public function testMailerMayBeSet()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->mailer('array');
+
+        $mailable = unserialize(serialize($mailable));
+
+        $this->assertSame('array', $mailable->mailer);
     }
 }
 

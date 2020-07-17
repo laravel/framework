@@ -25,7 +25,9 @@ class PaginatedResourceResponse extends ResourceResponse
             ),
             $this->calculateStatus()
         ), function ($response) use ($request) {
-            $response->original = $this->resource->resource->pluck('resource');
+            $response->original = $this->resource->resource->map(function ($item) {
+                return is_array($item) ? Arr::get($item, 'resource') : $item->resource;
+            });
 
             $this->resource->withResponse($request, $response);
         });

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Translation;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Translation\FileLoader;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class TranslationFileLoaderTest extends TestCase
 {

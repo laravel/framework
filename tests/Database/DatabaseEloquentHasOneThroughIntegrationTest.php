@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 {
@@ -75,7 +75,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->seedData();
         $contract = HasOneThroughTestPosition::first()->contract;
 
-        $this->assertEquals('A title', $contract->title);
+        $this->assertSame('A title', $contract->title);
     }
 
     public function testItLoadsADefaultHasOneThroughRelation()
@@ -84,7 +84,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->seedDefaultData();
 
         $contract = HasOneThroughDefaultTestPosition::first()->contract;
-        $this->assertEquals('A title', $contract->title);
+        $this->assertSame('A title', $contract->title);
         $this->assertArrayNotHasKey('email', $contract->getAttributes());
 
         $this->resetDefault();
@@ -95,7 +95,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->seedData();
         $contract = HasOneThroughIntermediateTestPosition::first()->contract;
 
-        $this->assertEquals('A title', $contract->title);
+        $this->assertSame('A title', $contract->title);
     }
 
     public function testEagerLoadingARelationWithCustomIntermediateAndLocalKey()
@@ -103,7 +103,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->seedData();
         $contract = HasOneThroughIntermediateTestPosition::with('contract')->first()->contract;
 
-        $this->assertEquals('A title', $contract->title);
+        $this->assertSame('A title', $contract->title);
     }
 
     public function testWhereHasOnARelationWithCustomIntermediateAndLocalKey()
@@ -143,7 +143,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $contract = HasOneThroughTestPosition::first()->contract()->first();
 
         $this->assertNotNull($contract);
-        $this->assertEquals('A title', $contract->title);
+        $this->assertSame('A title', $contract->title);
     }
 
     public function testAllColumnsAreRetrievedByDefault()
@@ -241,7 +241,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 
         $contract = HasOneThroughSoftDeletesTestPosition::first()->contract;
 
-        $this->assertEquals('A title', $contract->title);
+        $this->assertSame('A title', $contract->title);
     }
 
     public function testEagerLoadingLoadsRelatedModelsCorrectly()
@@ -249,8 +249,8 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->seedData();
         $position = HasOneThroughSoftDeletesTestPosition::with('contract')->first();
 
-        $this->assertEquals('ps', $position->shortname);
-        $this->assertEquals('A title', $position->contract->title);
+        $this->assertSame('ps', $position->shortname);
+        $this->assertSame('A title', $position->contract->title);
     }
 
     /**

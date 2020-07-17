@@ -2,30 +2,28 @@
 
 namespace Illuminate\Tests\Http;
 
-use stdClass;
-use JsonSerializable;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Http\JsonResponse;
+use InvalidArgumentException;
+use JsonSerializable;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class HttpJsonResponseTest extends TestCase
 {
     /**
      * @dataProvider setAndRetrieveDataProvider
-     *
-     * @param  $data
      */
-    public function testSetAndRetrieveData($data): void
+    public function testSetAndRetrieveData($data)
     {
         $response = new JsonResponse($data);
 
         $this->assertInstanceOf(stdClass::class, $response->getData());
-        $this->assertEquals('bar', $response->getData()->foo);
+        $this->assertSame('bar', $response->getData()->foo);
     }
 
-    public function setAndRetrieveDataProvider(): array
+    public function setAndRetrieveDataProvider()
     {
         return [
             'Jsonable data' => [new JsonResponseTestJsonableObject],
@@ -79,8 +77,6 @@ class HttpJsonResponseTest extends TestCase
     }
 
     /**
-     * @param mixed $data
-     *
      * @dataProvider jsonErrorDataProvider
      */
     public function testGracefullyHandledSomeJsonErrorsWithPartialOutputOnError($data)
@@ -88,9 +84,6 @@ class HttpJsonResponseTest extends TestCase
         new JsonResponse(['data' => $data], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
 
-    /**
-     * @return array
-     */
     public function jsonErrorDataProvider()
     {
         // Resources can't be encoded

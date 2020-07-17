@@ -14,9 +14,9 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
-        "illuminate/contracts": "5.8.*",
-        "illuminate/support": "5.8.*"
+        "php": "^7.2.5",
+        "illuminate/contracts": "^7.0",
+        "illuminate/support": "^7.0"
     },
     "autoload": {
         "psr-4": {
@@ -25,13 +25,15 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.8-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "suggest": {
-        "illuminate/database": "Required to use the database cache driver (5.8.*).",
-        "illuminate/filesystem": "Required to use the file cache driver (5.8.*).",
-        "illuminate/redis": "Required to use the redis cache driver (5.8.*)."
+        "ext-memcached": "Required to use the memcache cache driver.",
+        "illuminate/database": "Required to use the database cache driver (^7.0).",
+        "illuminate/filesystem": "Required to use the file cache driver (^7.0).",
+        "illuminate/redis": "Required to use the redis cache driver (^7.0).",
+        "symfony/cache": "Required to PSR-6 cache bridge (^5.0)."
     },
     "config": {
         "sort-packages": true

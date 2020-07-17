@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery as m;
-use Illuminate\Support\Fluent;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class SupportCapsuleManagerTraitTest extends TestCase
 {

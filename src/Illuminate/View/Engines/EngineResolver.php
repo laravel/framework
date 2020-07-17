@@ -26,7 +26,7 @@ class EngineResolver
      *
      * The engine string typically corresponds to a file extension.
      *
-     * @param  string   $engine
+     * @param  string  $engine
      * @param  \Closure  $resolver
      * @return void
      */

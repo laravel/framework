@@ -2,14 +2,14 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\View\Factory as ViewFactory;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResponseFactory implements FactoryContract
 {
@@ -70,7 +70,7 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new response for a given view.
      *
-     * @param  string  $view
+     * @param  string|array  $view
      * @param  array  $data
      * @param  int  $status
      * @param  array  $headers
@@ -78,6 +78,10 @@ class ResponseFactory implements FactoryContract
      */
     public function view($view, $data = [], $status = 200, array $headers = [])
     {
+        if (is_array($view)) {
+            return $this->make($this->view->first($view, $data), $status, $headers);
+        }
+
         return $this->make($this->view->make($view, $data), $status, $headers);
     }
 
@@ -208,7 +212,7 @@ class ResponseFactory implements FactoryContract
      * Create a new redirect response to a named route.
      *
      * @param  string  $route
-     * @param  array  $parameters
+     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
@@ -222,7 +226,7 @@ class ResponseFactory implements FactoryContract
      * Create a new redirect response to a controller action.
      *
      * @param  string  $action
-     * @param  array  $parameters
+     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse

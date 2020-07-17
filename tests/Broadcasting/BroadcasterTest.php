@@ -3,12 +3,13 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Exception;
+use Illuminate\Broadcasting\Broadcasters\Broadcaster;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\BindingRegistrar;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Routing\BindingRegistrar;
-use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BroadcasterTest extends TestCase
@@ -111,6 +112,7 @@ class BroadcasterTest extends TestCase
     public function testCanRegisterChannelsWithoutOptions()
     {
         $this->broadcaster->channel('somechannel', function () {
+            //
         });
     }
 
@@ -118,6 +120,7 @@ class BroadcasterTest extends TestCase
     {
         $options = ['a' => ['b', 'c']];
         $this->broadcaster->channel('somechannel', function () {
+            //
         }, $options);
     }
 
@@ -125,6 +128,7 @@ class BroadcasterTest extends TestCase
     {
         $options = ['a' => ['b', 'c']];
         $this->broadcaster->channel('somechannel', function () {
+            //
         }, $options);
 
         $this->assertEquals(
@@ -137,6 +141,7 @@ class BroadcasterTest extends TestCase
     {
         $options = ['a' => ['b', 'c']];
         $this->broadcaster->channel('somechannel.{id}.test.{text}', function () {
+            //
         }, $options);
 
         $this->assertEquals(
@@ -149,8 +154,10 @@ class BroadcasterTest extends TestCase
     {
         $options = ['a' => ['b', 'c']];
         $this->broadcaster->channel('somechannel', function () {
+            //
         });
         $this->broadcaster->channel('someotherchannel', function () {
+            //
         }, $options);
 
         $this->assertEquals(
@@ -163,6 +170,7 @@ class BroadcasterTest extends TestCase
     {
         $options = ['a' => ['b', 'c']];
         $this->broadcaster->channel('somechannel', function () {
+            //
         }, $options);
 
         $this->assertEquals(
@@ -174,9 +182,10 @@ class BroadcasterTest extends TestCase
     public function testRetrieveUserWithoutGuard()
     {
         $this->broadcaster->channel('somechannel', function () {
+            //
         });
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->withNoArgs()
@@ -191,9 +200,10 @@ class BroadcasterTest extends TestCase
     public function testRetrieveUserWithOneGuardUsingAStringForSpecifyingGuard()
     {
         $this->broadcaster->channel('somechannel', function () {
+            //
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard')
@@ -208,11 +218,13 @@ class BroadcasterTest extends TestCase
     public function testRetrieveUserWithMultipleGuardsAndRespectGuardsOrder()
     {
         $this->broadcaster->channel('somechannel', function () {
+            //
         }, ['guards' => ['myguard1', 'myguard2']]);
         $this->broadcaster->channel('someotherchannel', function () {
+            //
         }, ['guards' => ['myguard2', 'myguard1']]);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard1')
@@ -237,9 +249,10 @@ class BroadcasterTest extends TestCase
     public function testRetrieveUserDontUseDefaultGuardWhenOneGuardSpecified()
     {
         $this->broadcaster->channel('somechannel', function () {
+            //
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard')
@@ -253,9 +266,10 @@ class BroadcasterTest extends TestCase
     public function testRetrieveUserDontUseDefaultGuardWhenMultipleGuardsSpecified()
     {
         $this->broadcaster->channel('somechannel', function () {
+            //
         }, ['guards' => ['myguard1', 'myguard2']]);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard1')
@@ -384,4 +398,5 @@ class DummyBroadcastingChannel
 
 class DummyUser
 {
+    //
 }

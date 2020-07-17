@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\View\Engines\PhpEngine;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\View\Engines\PhpEngine;
 
 class ViewPhpEngineTest extends TestCase
 {
@@ -16,7 +16,7 @@ class ViewPhpEngineTest extends TestCase
     public function testViewsMayBeProperlyRendered()
     {
         $engine = new PhpEngine;
-        $this->assertEquals('Hello World
+        $this->assertSame('Hello World
 ', $engine->get(__DIR__.'/fixtures/basic.php'));
     }
 }

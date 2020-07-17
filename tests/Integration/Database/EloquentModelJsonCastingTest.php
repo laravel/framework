@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest;
 
-use stdClass;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use stdClass;
 
 /**
  * @group integration
@@ -28,21 +28,21 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         });
     }
 
-    public function test_strings_are_castable()
+    public function testStringsAreCastable()
     {
-        /** @var JsonCast $object */
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $object */
         $object = JsonCast::create([
             'basic_string_as_json_field' => 'this is a string',
             'json_string_as_json_field' => '{"key1":"value1"}',
         ]);
 
-        $this->assertEquals('this is a string', $object->basic_string_as_json_field);
-        $this->assertEquals('{"key1":"value1"}', $object->json_string_as_json_field);
+        $this->assertSame('this is a string', $object->basic_string_as_json_field);
+        $this->assertSame('{"key1":"value1"}', $object->json_string_as_json_field);
     }
 
-    public function test_arrays_are_castable()
+    public function testArraysAreCastable()
     {
-        /** @var JsonCast $object */
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $object */
         $object = JsonCast::create([
             'array_as_json_field' => ['key1' => 'value1'],
         ]);
@@ -50,29 +50,29 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $this->assertEquals(['key1' => 'value1'], $object->array_as_json_field);
     }
 
-    public function test_objects_are_castable()
+    public function testObjectsAreCastable()
     {
         $object = new stdClass();
         $object->key1 = 'value1';
 
-        /** @var JsonCast $user */
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */
         $user = JsonCast::create([
             'object_as_json_field' => $object,
         ]);
 
         $this->assertInstanceOf(stdClass::class, $user->object_as_json_field);
-        $this->assertEquals('value1', $user->object_as_json_field->key1);
+        $this->assertSame('value1', $user->object_as_json_field->key1);
     }
 
-    public function test_collections_are_castable()
+    public function testCollectionsAreCastable()
     {
-        /** @var JsonCast $user */
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */
         $user = JsonCast::create([
             'collection_as_json_field' => new Collection(['key1' => 'value1']),
         ]);
 
         $this->assertInstanceOf(Collection::class, $user->collection_as_json_field);
-        $this->assertEquals('value1', $user->collection_as_json_field->get('key1'));
+        $this->assertSame('value1', $user->collection_as_json_field->get('key1'));
     }
 }
 

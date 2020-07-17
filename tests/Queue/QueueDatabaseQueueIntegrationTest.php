@@ -2,18 +2,18 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Queue\DatabaseQueue;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\TestCase;
 
 class QueueDatabaseQueueIntegrationTest extends TestCase
 {
     /**
-     * @var DatabaseQueue The queue instance.
+     * @var \Illuminate\Queue\DatabaseQueue
      */
     protected $queue;
 
@@ -23,7 +23,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     protected $table;
 
     /**
-     * @var Container The IOC container.
+     * @var \Illuminate\Container\Container
      */
     protected $container;
 

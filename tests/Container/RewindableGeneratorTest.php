@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Container;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\RewindableGenerator;
+use PHPUnit\Framework\TestCase;
 
 class RewindableGeneratorTest extends TestCase
 {
@@ -13,7 +13,7 @@ class RewindableGeneratorTest extends TestCase
             yield 'foo';
         }, 999);
 
-        $this->assertSame(999, count($generator));
+        $this->assertCount(999, $generator);
     }
 
     public function testCountUsesProvidedValueAsCallback()

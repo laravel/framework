@@ -3,10 +3,11 @@
 namespace Illuminate\Tests\Container;
 
 use Closure;
-use stdClass;
-use ReflectionException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use PHPUnit\Framework\TestCase;
+use ReflectionException;
+use stdClass;
 
 class ContainerCallTest extends TestCase
 {
@@ -28,12 +29,12 @@ class ContainerCallTest extends TestCase
         $container = new Container;
         $result = $container->call(ContainerTestCallStub::class.'@inject');
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
 
         $container = new Container;
         $result = $container->call(ContainerTestCallStub::class.'@inject', ['default' => 'foo']);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('foo', $result[1]);
+        $this->assertSame('foo', $result[1]);
 
         $container = new Container;
         $result = $container->call(ContainerTestCallStub::class, ['foo', 'bar'], 'work');
@@ -53,7 +54,7 @@ class ContainerCallTest extends TestCase
         $container = new Container;
         $result = $container->call('Illuminate\Tests\Container\ContainerStaticMethodStub::inject');
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
     }
 
     public function testCallWithGlobalMethodName()
@@ -61,7 +62,7 @@ class ContainerCallTest extends TestCase
         $container = new Container;
         $result = $container->call('Illuminate\Tests\Container\containerTestInject');
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
     }
 
     public function testCallWithBoundMethod()
@@ -83,12 +84,12 @@ class ContainerCallTest extends TestCase
         $container = new Container;
         $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo', 'default' => 'bar']);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('bar', $result[1]);
+        $this->assertSame('bar', $result[1]);
 
         $container = new Container;
         $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo']);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
     }
 
     public function testBindMethodAcceptsAnArray()
@@ -112,9 +113,11 @@ class ContainerCallTest extends TestCase
     {
         $container = new Container;
         $container->call(function (ContainerCallConcreteStub $stub) {
+            //
         }, ['foo' => 'bar']);
 
         $container->call(function (ContainerCallConcreteStub $stub) {
+            //
         }, ['foo' => 'bar', 'stub' => new ContainerCallConcreteStub]);
     }
 
@@ -133,7 +136,7 @@ class ContainerCallTest extends TestCase
         }, ['bar' => 'taylor']);
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
 
         $stub = new ContainerCallConcreteStub;
         $result = $container->call(function (stdClass $foo, ContainerCallConcreteStub $bar) {
@@ -154,7 +157,45 @@ class ContainerCallTest extends TestCase
         $result = $result();
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
+    }
+
+    public function testCallWithCallableObject()
+    {
+        $container = new Container;
+        $callable = new ContainerCallCallableStub;
+        $result = $container->call($callable);
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
+        $this->assertSame('jeffrey', $result[1]);
+    }
+
+    public function testCallWithCallableClassString()
+    {
+        $container = new Container;
+        $result = $container->call(ContainerCallCallableClassStringStub::class);
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
+        $this->assertSame('jeffrey', $result[1]);
+        $this->assertInstanceOf(ContainerTestCallStub::class, $result[2]);
+    }
+
+    public function testCallWithoutRequiredParamsThrowsException()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
+
+        $container = new Container;
+        $container->call(ContainerTestCallStub::class.'@unresolvable');
+    }
+
+    public function testCallWithoutRequiredParamsOnClosureThrowsException()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerCallTest');
+
+        $container = new Container;
+        $foo = $container->call(function ($foo, $bar = 'default') {
+            return $foo;
+        });
     }
 }
 
@@ -191,5 +232,31 @@ class ContainerStaticMethodStub
     public static function inject(ContainerCallConcreteStub $stub, $default = 'taylor')
     {
         return func_get_args();
+    }
+}
+
+class ContainerCallCallableStub
+{
+    public function __invoke(ContainerCallConcreteStub $stub, $default = 'jeffrey')
+    {
+        return func_get_args();
+    }
+}
+
+class ContainerCallCallableClassStringStub
+{
+    public $stub;
+
+    public $default;
+
+    public function __construct(ContainerCallConcreteStub $stub, $default = 'jeffrey')
+    {
+        $this->stub = $stub;
+        $this->default = $default;
+    }
+
+    public function __invoke(ContainerTestCallStub $dependency)
+    {
+        return [$this->stub, $this->default, $dependency];
     }
 }

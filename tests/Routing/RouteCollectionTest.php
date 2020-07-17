@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\RouteCollection;
+use LogicException;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RouteCollectionTest extends TestCase
 {
@@ -19,11 +22,6 @@ class RouteCollectionTest extends TestCase
         parent::setUp();
 
         $this->routeCollection = new RouteCollection;
-    }
-
-    public function testRouteCollectionCanBeConstructed()
-    {
-        $this->assertInstanceOf(RouteCollection::class, $this->routeCollection);
     }
 
     public function testRouteCollectionCanAddRoute()
@@ -190,6 +188,42 @@ class RouteCollectionTest extends TestCase
         $this->assertSame($routesByName, $this->routeCollection->getRoutesByName());
     }
 
+    public function testRouteCollectionCanGetRoutesByMethod()
+    {
+        $routes = [
+            'foo_index' => new Route('GET', 'foo/index', [
+                'uses' => 'FooController@index',
+                'as' => 'foo_index',
+            ]),
+            'foo_show' => new Route('GET', 'foo/show', [
+                'uses' => 'FooController@show',
+                'as' => 'foo_show',
+            ]),
+            'bar_create' => new Route('POST', 'bar', [
+                'uses' => 'BarController@create',
+                'as' => 'bar_create',
+            ]),
+        ];
+
+        $this->routeCollection->add($routes['foo_index']);
+        $this->routeCollection->add($routes['foo_show']);
+        $this->routeCollection->add($routes['bar_create']);
+
+        $this->assertSame([
+            'GET' => [
+                'foo/index' => $routes['foo_index'],
+                'foo/show' => $routes['foo_show'],
+            ],
+            'HEAD' => [
+                'foo/index' => $routes['foo_index'],
+                'foo/show' => $routes['foo_show'],
+            ],
+            'POST' => [
+                'bar' => $routes['bar_create'],
+            ],
+        ], $this->routeCollection->getRoutesByMethod());
+    }
+
     public function testRouteCollectionCleansUpOverwrittenRoutes()
     {
         // Create two routes with the same path and method.
@@ -215,5 +249,36 @@ class RouteCollectionTest extends TestCase
         // The lookups of $routeB are still there.
         $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
         $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
+    }
+
+    public function testCannotCacheDuplicateRouteNames()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+        $this->routeCollection->add(
+            new Route('GET', 'users/{user}', ['uses' => 'UsersController@show', 'as' => 'users'])
+        );
+
+        $this->expectException(LogicException::class);
+
+        $this->routeCollection->compile();
+    }
+
+    public function testRouteCollectionDontMatchNonMatchingDoubleSlashes()
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->routeCollection->add(new Route('GET', 'foo', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+        ]));
+
+        $request = Request::create('', 'GET');
+        // We have to set uri in REQUEST_URI otherwise Request uses parse_url() which trim the slashes
+        $request->server->set(
+            'REQUEST_URI', '//foo'
+        );
+        $this->routeCollection->match($request);
     }
 }

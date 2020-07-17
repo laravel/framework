@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentWhereHasTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -41,7 +41,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         (new Comment)->commentable()->associate($post)->save();
     }
 
-    public function test_with_count()
+    public function testWithCount()
     {
         $users = User::whereHas('posts', function ($query) {
             $query->where('public', true);

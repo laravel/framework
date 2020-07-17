@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseSQLiteProcessorTest extends TestCase
 {

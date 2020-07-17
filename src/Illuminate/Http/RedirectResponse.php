@@ -2,13 +2,13 @@
 
 namespace Illuminate\Http;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\MessageBag;
-use Illuminate\Support\ViewErrorBag;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\ForwardsCalls;
-use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
+use Illuminate\Session\Store as SessionStore;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
@@ -143,6 +143,28 @@ class RedirectResponse extends BaseRedirectResponse
         );
 
         return $this;
+    }
+
+    /**
+     * Add a fragment identifier to the URL.
+     *
+     * @param  string  $fragment
+     * @return $this
+     */
+    public function withFragment($fragment)
+    {
+        return $this->withoutFragment()
+                ->setTargetUrl($this->getTargetUrl().'#'.Str::after($fragment, '#'));
+    }
+
+    /**
+     * Remove any fragment identifier from the response URL.
+     *
+     * @return $this
+     */
+    public function withoutFragment()
+    {
+        return $this->setTargetUrl(Str::before($this->getTargetUrl(), '#'));
     }
 
     /**

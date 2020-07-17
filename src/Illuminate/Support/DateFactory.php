@@ -115,6 +115,7 @@ class DateFactory
      * Use the given handler when generating dates (class name, callable, or factory).
      *
      * @param  mixed  $handler
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */

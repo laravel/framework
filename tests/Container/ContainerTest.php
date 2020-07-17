@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Container;
 
-use stdClass;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Psr\Container\ContainerExceptionInterface;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
+use stdClass;
 
 class ContainerTest extends TestCase
 {
@@ -36,7 +36,7 @@ class ContainerTest extends TestCase
         $container->bind('name', function () {
             return 'Taylor';
         });
-        $this->assertEquals('Taylor', $container->make('name'));
+        $this->assertSame('Taylor', $container->make('name'));
     }
 
     public function testBindIfDoesntRegisterIfServiceAlreadyRegistered()
@@ -49,7 +49,7 @@ class ContainerTest extends TestCase
             return 'Dayle';
         });
 
-        $this->assertEquals('Taylor', $container->make('name'));
+        $this->assertSame('Taylor', $container->make('name'));
     }
 
     public function testBindIfDoesRegisterIfServiceNotRegisteredYet()
@@ -62,17 +62,46 @@ class ContainerTest extends TestCase
             return 'Dayle';
         });
 
-        $this->assertEquals('Dayle', $container->make('name'));
+        $this->assertSame('Dayle', $container->make('name'));
+    }
+
+    public function testSingletonIfDoesntRegisterIfBindingAlreadyRegistered()
+    {
+        $container = new Container;
+        $container->singleton('class', function () {
+            return new stdClass;
+        });
+        $firstInstantiation = $container->make('class');
+        $container->singletonIf('class', function () {
+            return new ContainerConcreteStub;
+        });
+        $secondInstantiation = $container->make('class');
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testSingletonIfDoesRegisterIfBindingNotRegisteredYet()
+    {
+        $container = new Container;
+        $container->singleton('class', function () {
+            return new stdClass;
+        });
+        $container->singletonIf('otherClass', function () {
+            return new ContainerConcreteStub;
+        });
+        $firstInstantiation = $container->make('otherClass');
+        $secondInstantiation = $container->make('otherClass');
+        $this->assertSame($firstInstantiation, $secondInstantiation);
     }
 
     public function testSharedClosureResolution()
     {
         $container = new Container;
-        $class = new stdClass;
-        $container->singleton('class', function () use ($class) {
-            return $class;
+        $container->singleton('class', function () {
+            return new stdClass;
         });
-        $this->assertSame($class, $container->make('class'));
+        $firstInstantiation = $container->make('class');
+        $secondInstantiation = $container->make('class');
+        $this->assertSame($firstInstantiation, $secondInstantiation);
     }
 
     public function testAutoConcreteResolution()
@@ -125,7 +154,7 @@ class ContainerTest extends TestCase
             return 'foo';
         };
         $this->assertTrue(isset($container['something']));
-        $this->assertEquals('foo', $container['something']);
+        $this->assertSame('foo', $container['something']);
         unset($container['something']);
         $this->assertFalse(isset($container['something']));
     }
@@ -136,9 +165,9 @@ class ContainerTest extends TestCase
         $container['foo'] = 'bar';
         $container->alias('foo', 'baz');
         $container->alias('baz', 'bat');
-        $this->assertEquals('bar', $container->make('foo'));
-        $this->assertEquals('bar', $container->make('baz'));
-        $this->assertEquals('bar', $container->make('bat'));
+        $this->assertSame('bar', $container->make('foo'));
+        $this->assertSame('bar', $container->make('baz'));
+        $this->assertSame('bar', $container->make('bat'));
     }
 
     public function testAliasesWithArrayOfParameters()
@@ -156,7 +185,7 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container['foo'] = 'bar';
         $container['foo'] = 'baz';
-        $this->assertEquals('baz', $container['foo']);
+        $this->assertSame('baz', $container['foo']);
     }
 
     public function testBindingAnInstanceReturnsTheInstance()
@@ -169,12 +198,21 @@ class ContainerTest extends TestCase
         $this->assertSame($bound, $resolved);
     }
 
+    public function testBindingAnInstanceAsShared()
+    {
+        $container = new Container;
+        $bound = new stdClass;
+        $container->instance('foo', $bound);
+        $object = $container->make('foo');
+        $this->assertSame($bound, $object);
+    }
+
     public function testResolutionOfDefaultParameters()
     {
         $container = new Container;
         $instance = $container->make(ContainerDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
-        $this->assertEquals('taylor', $instance->default);
+        $this->assertSame('taylor', $instance->default);
     }
 
     public function testUnsetRemoveBoundInstances()
@@ -272,6 +310,15 @@ class ContainerTest extends TestCase
 
         $container = new Container;
         $container->make(ContainerDependentStub::class, []);
+    }
+
+    public function testBindingResolutionExceptionMessageWhenClassDoesNotExist()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Target class [Foo\Bar\Baz\DummyClass] does not exist.');
+
+        $container = new Container;
+        $container->build('Foo\Bar\Baz\DummyClass');
     }
 
     public function testForgetInstanceForgetsInstance()
@@ -374,7 +421,7 @@ class ContainerTest extends TestCase
         $mock->expects($this->once())
              ->method('make')
              ->with(ContainerDefaultValueStub::class, ['default' => 'laurence'])
-             ->will($this->returnValue(new stdClass));
+             ->willReturn(new stdClass);
 
         $result = $mock->makeWith(ContainerDefaultValueStub::class, ['default' => 'laurence']);
 
@@ -385,10 +432,10 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $instance = $container->make(ContainerDefaultValueStub::class, ['default' => 'adam']);
-        $this->assertEquals('adam', $instance->default);
+        $this->assertSame('adam', $instance->default);
 
         $instance = $container->make(ContainerDefaultValueStub::class);
-        $this->assertEquals('taylor', $instance->default);
+        $this->assertSame('taylor', $instance->default);
 
         $container->bind('foo', function ($app, $config) {
             return $config;
@@ -402,7 +449,7 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->bind(IContainerContractStub::class, ContainerInjectVariableStubWithInterfaceImplementation::class);
         $instance = $container->make(IContainerContractStub::class, ['something' => 'laurence']);
-        $this->assertEquals('laurence', $instance->something);
+        $this->assertSame('laurence', $instance->something);
     }
 
     public function testNestedParameterOverride()

@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use Throwable;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
+use Throwable;
 
 /**
  * @group integration
@@ -27,7 +27,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
-    public function test_lock_opens_immediately_after_decay()
+    public function testLockOpensImmediatelyAfterDecay()
     {
         $this->ifRedisAvailable(function () {
             $now = Carbon::now();
@@ -39,12 +39,12 @@ class ThrottleRequestsWithRedisTest extends TestCase
             })->middleware(ThrottleRequestsWithRedis::class.':2,1');
 
             $response = $this->withoutExceptionHandling()->get('/');
-            $this->assertEquals('yes', $response->getContent());
+            $this->assertSame('yes', $response->getContent());
             $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
             $this->assertEquals(1, $response->headers->get('X-RateLimit-Remaining'));
 
             $response = $this->withoutExceptionHandling()->get('/');
-            $this->assertEquals('yes', $response->getContent());
+            $this->assertSame('yes', $response->getContent());
             $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
             $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
 

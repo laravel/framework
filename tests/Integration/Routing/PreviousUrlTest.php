@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Session\SessionServiceProvider;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
 
 class PreviousUrlTest extends TestCase
 {
-    public function test_previous_url_without_session()
+    public function testPreviousUrlWithoutSession()
     {
         Route::post('/previous-url', function (DummyFormRequest $request) {
             return 'OK';

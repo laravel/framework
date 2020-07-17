@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
-use stdClass;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {
@@ -24,6 +24,27 @@ class DatabaseEloquentHasManyTest extends TestCase
         $instance->expects($this->never())->method('save');
 
         $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
+    }
+
+    public function testMakeManyCreatesARelatedModelForEachRecord()
+    {
+        $records = [
+            'taylor' => ['name' => 'taylor'],
+            'colin' => ['name' => 'colin'],
+        ];
+
+        $relation = $this->getRelation();
+        $relation->getRelated()->shouldReceive('newCollection')->once()->andReturn(new Collection);
+
+        $taylor = $this->expectNewModel($relation, ['name' => 'taylor']);
+        $taylor->expects($this->never())->method('save');
+        $colin = $this->expectNewModel($relation, ['name' => 'colin']);
+        $colin->expects($this->never())->method('save');
+
+        $instances = $relation->makeMany($records);
+        $this->assertInstanceOf(Collection::class, $instances);
+        $this->assertEquals($taylor, $instances[0]);
+        $this->assertEquals($colin, $instances[1]);
     }
 
     public function testCreateMethodProperlyCreatesNewModel()
@@ -180,7 +201,6 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getIncrementing')->once()->andReturn(true);
         $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
         $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('table.foreign_key', [1, 2]);
         $model1 = new EloquentHasManyModelStub;
@@ -194,7 +214,7 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getIncrementing')->once()->andReturn(false);
+        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('string');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
         $model1 = new EloquentHasManyModelStub;
         $model1->id = 1;

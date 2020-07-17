@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class DatabaseEloquentCollectionQueueableTest extends TestCase
 {
@@ -60,8 +60,8 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
             'ids' => $c->getQueueableIds(),
         ];
 
-        $this->assertTrue(
-            json_encode($payload) !== false,
+        $this->assertNotFalse(
+            json_encode($payload),
             'EloquentCollection is not using the QueueableEntity::getQueueableId() method.'
         );
     }

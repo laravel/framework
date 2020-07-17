@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Console;
 
-use Mockery as m;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class ConsoleScheduledEventTest extends TestCase
 {
@@ -38,7 +38,7 @@ class ConsoleScheduledEventTest extends TestCase
         $app->shouldReceive('environment')->andReturn('production');
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertSame('* * * * *', $event->getExpression());
         $this->assertTrue($event->isDue($app));
         $this->assertTrue($event->skip(function () {
             return true;
@@ -48,17 +48,17 @@ class ConsoleScheduledEventTest extends TestCase
         })->filtersPass($app));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertSame('* * * * *', $event->getExpression());
         $this->assertFalse($event->environments('local')->isDue($app));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertSame('* * * * *', $event->getExpression());
         $this->assertFalse($event->when(function () {
             return false;
         })->filtersPass($app));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertSame('* * * * *', $event->getExpression());
         $this->assertFalse($event->when(false)->filtersPass($app));
 
         // chained rules should be commutative
@@ -83,11 +83,11 @@ class ConsoleScheduledEventTest extends TestCase
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * 4', $event->thursdays()->getExpression());
+        $this->assertSame('* * * * 4', $event->thursdays()->getExpression());
         $this->assertTrue($event->isDue($app));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('0 19 * * 3', $event->wednesdays()->at('19:00')->timezone('EST')->getExpression());
+        $this->assertSame('0 19 * * 3', $event->wednesdays()->at('19:00')->timezone('EST')->getExpression());
         $this->assertTrue($event->isDue($app));
     }
 
@@ -96,15 +96,52 @@ class ConsoleScheduledEventTest extends TestCase
         $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
+
         Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
 
-        $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $event->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->between('8:00', '10:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->between('9:00', '9:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->between('23:00', '10:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->between('8:00', '6:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertFalse($event->between('10:00', '11:00')->filtersPass($app));
 
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertFalse($event->between('10:00', '8:00')->filtersPass($app));
+    }
+
+    public function testTimeUnlessBetweenChecks()
+    {
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
+        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
+        $app->shouldReceive('environment')->andReturn('production');
+
+        Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertFalse($event->unlessBetween('8:00', '10:00')->filtersPass($app));
-        $this->assertTrue($event->unlessBetween('10:00', '11:00')->isDue($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertFalse($event->unlessBetween('9:00', '9:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertFalse($event->unlessBetween('23:00', '10:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertFalse($event->unlessBetween('8:00', '6:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->unlessBetween('10:00', '11:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->unlessBetween('10:00', '8:00')->filtersPass($app));
     }
 }

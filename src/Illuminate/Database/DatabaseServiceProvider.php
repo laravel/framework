@@ -4,15 +4,22 @@ namespace Illuminate\Database;
 
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Queue\EntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
-use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\QueueEntityResolver;
+use Illuminate\Support\ServiceProvider;
 
 class DatabaseServiceProvider extends ServiceProvider
 {
+    /**
+     * The array of resolved Faker instances.
+     *
+     * @var array
+     */
+    protected static $fakers = [];
+
     /**
      * Bootstrap the application events.
      *
@@ -74,8 +81,16 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     protected function registerEloquentFactory()
     {
-        $this->app->singleton(FakerGenerator::class, function ($app) {
-            return FakerFactory::create($app['config']->get('app.faker_locale', 'en_US'));
+        $this->app->singleton(FakerGenerator::class, function ($app, $parameters) {
+            $locale = $parameters['locale'] ?? $app['config']->get('app.faker_locale', 'en_US');
+
+            if (! isset(static::$fakers[$locale])) {
+                static::$fakers[$locale] = FakerFactory::create($locale);
+            }
+
+            static::$fakers[$locale]->unique(true);
+
+            return static::$fakers[$locale];
         });
 
         $this->app->singleton(EloquentFactory::class, function ($app) {

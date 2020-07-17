@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\View;
 
-use Mockery as m;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\FileViewFinder;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\View\FileViewFinder;
+use InvalidArgumentException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class ViewFileViewFinderTest extends TestCase
 {
@@ -113,7 +113,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder = $this->getFinder();
         $finder->addExtension('baz');
         $extensions = $finder->getExtensions();
-        $this->assertEquals('baz', reset($extensions));
+        $this->assertSame('baz', reset($extensions));
     }
 
     public function testAddingExtensionsReplacesOldOnes()

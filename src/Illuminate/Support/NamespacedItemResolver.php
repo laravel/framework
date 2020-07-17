@@ -92,7 +92,7 @@ class NamespacedItemResolver
      * Set the parsed value of a key.
      *
      * @param  string  $key
-     * @param  array   $parsed
+     * @param  array  $parsed
      * @return void
      */
     public function setParsedKey($key, $parsed)

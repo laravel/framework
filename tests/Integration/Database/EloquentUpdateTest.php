@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @group integration
@@ -73,8 +73,8 @@ class EloquentUpdateTest extends TestCase
 
         TestUpdateModel1::latest('id')->limit(3)->update(['title'=>'Dr.']);
 
-        $this->assertEquals('Dr.', TestUpdateModel1::find(8)->title);
-        $this->assertNotEquals('Dr.', TestUpdateModel1::find(7)->title);
+        $this->assertSame('Dr.', TestUpdateModel1::find(8)->title);
+        $this->assertNotSame('Dr.', TestUpdateModel1::find(7)->title);
     }
 
     public function testUpdatedAtWithJoins()
@@ -95,7 +95,7 @@ class EloquentUpdateTest extends TestCase
 
         $record = TestUpdateModel2::find(1);
 
-        $this->assertEquals('Engineer: Abdul', $record->job.': '.$record->name);
+        $this->assertSame('Engineer: Abdul', $record->job.': '.$record->name);
     }
 
     public function testSoftDeleteWithJoins()

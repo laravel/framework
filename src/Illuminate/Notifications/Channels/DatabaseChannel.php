@@ -2,8 +2,8 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use RuntimeException;
 use Illuminate\Notifications\Notification;
+use RuntimeException;
 
 class DatabaseChannel
 {

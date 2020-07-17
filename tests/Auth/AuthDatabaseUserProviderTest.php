@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Auth;
 
-use stdClass;
+use Illuminate\Auth\DatabaseUserProvider;
+use Illuminate\Auth\GenericUser;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Database\Connection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\GenericUser;
-use Illuminate\Database\Connection;
-use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Auth\DatabaseUserProvider;
-use Illuminate\Contracts\Auth\Authenticatable;
+use stdClass;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
@@ -29,7 +29,7 @@ class AuthDatabaseUserProviderTest extends TestCase
 
         $this->assertInstanceOf(GenericUser::class, $user);
         $this->assertEquals(1, $user->getAuthIdentifier());
-        $this->assertEquals('Dayle', $user->name);
+        $this->assertSame('Dayle', $user->name);
     }
 
     public function testRetrieveByIDReturnsNullWhenUserIsNotFound()
@@ -99,7 +99,7 @@ class AuthDatabaseUserProviderTest extends TestCase
 
         $this->assertInstanceOf(GenericUser::class, $user);
         $this->assertEquals(1, $user->getAuthIdentifier());
-        $this->assertEquals('taylor', $user->name);
+        $this->assertSame('taylor', $user->name);
     }
 
     public function testRetrieveByCredentialsReturnsNullWhenUserIsFound()

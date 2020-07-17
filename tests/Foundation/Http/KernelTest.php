@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Foundation\Http;
 
-use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\Kernel;
+use Illuminate\Routing\Router;
+use PHPUnit\Framework\TestCase;
 
 class KernelTest extends TestCase
 {

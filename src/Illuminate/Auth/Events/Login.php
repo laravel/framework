@@ -32,7 +32,7 @@ class Login
     /**
      * Create a new event instance.
      *
-     * @param  string $guard
+     * @param  string  $guard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  bool  $remember
      * @return void

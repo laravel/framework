@@ -2,11 +2,12 @@
 
 namespace Illuminate\Http;
 
-use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Http\Testing\FileFactory;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class UploadedFile extends SymfonyUploadedFile
@@ -20,7 +21,7 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public static function fake()
     {
-        return new Testing\FileFactory;
+        return new FileFactory;
     }
 
     /**
@@ -97,7 +98,7 @@ class UploadedFile extends SymfonyUploadedFile
     public function get()
     {
         if (! $this->isValid()) {
-            throw new FileNotFoundException("File does not exist at path {$this->getPathname()}");
+            throw new FileNotFoundException("File does not exist at path {$this->getPathname()}.");
         }
 
         return file_get_contents($this->getPathname());
@@ -117,7 +118,7 @@ class UploadedFile extends SymfonyUploadedFile
      * Create a new file instance from a base instance.
      *
      * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
-     * @param  bool $test
+     * @param  bool  $test
      * @return static
      */
     public static function createFromBase(SymfonyUploadedFile $file, $test = false)

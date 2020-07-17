@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Traits\Tappable;
+use PHPUnit\Framework\TestCase;
 
 class SupportTappableTest extends TestCase
 {
@@ -13,14 +13,14 @@ class SupportTappableTest extends TestCase
             $tappable->setName('MyName');
         })->getName();
 
-        $this->assertEquals('MyName', $name);
+        $this->assertSame('MyName', $name);
     }
 
     public function testTappableClassWithoutCallback()
     {
         $name = TappableClass::make()->tap()->setName('MyName')->getName();
 
-        $this->assertEquals('MyName', $name);
+        $this->assertSame('MyName', $name);
     }
 }
 

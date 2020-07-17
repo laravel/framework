@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use Illuminate\Support\Str;
 
 class EventListCommand extends Command
 {
@@ -48,7 +48,7 @@ class EventListCommand extends Command
         $events = [];
 
         foreach ($this->laravel->getProviders(EventServiceProvider::class) as $provider) {
-            $providerEvents = array_merge_recursive($provider->discoverEvents(), $provider->listens());
+            $providerEvents = array_merge_recursive($provider->shouldDiscoverEvents() ? $provider->discoverEvents() : [], $provider->listens());
 
             $events = array_merge_recursive($events, $providerEvents);
         }

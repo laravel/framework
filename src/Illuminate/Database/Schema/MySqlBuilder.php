@@ -93,7 +93,7 @@ class MySqlBuilder extends Builder
      *
      * @return array
      */
-    protected function getAllTables()
+    public function getAllTables()
     {
         return $this->connection->select(
             $this->grammar->compileGetAllTables()
@@ -105,7 +105,7 @@ class MySqlBuilder extends Builder
      *
      * @return array
      */
-    protected function getAllViews()
+    public function getAllViews()
     {
         return $this->connection->select(
             $this->grammar->compileGetAllViews()

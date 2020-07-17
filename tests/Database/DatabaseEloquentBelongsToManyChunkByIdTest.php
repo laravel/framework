@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
 {
@@ -58,10 +58,10 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
 
         $user->articles()->chunkById(1, function (Collection $collection) use (&$i) {
             $i++;
-            $this->assertTrue($collection->first()->aid == $i);
+            $this->assertEquals($i, $collection->first()->aid);
         });
 
-        $this->assertTrue($i === 3);
+        $this->assertSame(3, $i);
     }
 
     /**
@@ -94,7 +94,7 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
     /**
      * Get a database connection instance.
      *
-     * @return Connection
+     * @return \Illuminate\Database\ConnectionInterface
      */
     protected function connection()
     {
@@ -104,7 +104,7 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
     /**
      * Get a schema builder instance.
      *
-     * @return Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema()
     {

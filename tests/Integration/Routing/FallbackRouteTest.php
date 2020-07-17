@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
 class FallbackRouteTest extends TestCase
 {
-    public function test_basic_fallback()
+    public function testBasicFallback()
     {
         Route::fallback(function () {
             return response('fallback', 404);
@@ -25,7 +25,7 @@ class FallbackRouteTest extends TestCase
         $this->assertEquals(404, $this->get('/non-existing')->getStatusCode());
     }
 
-    public function test_fallback_with_prefix()
+    public function testFallbackWithPrefix()
     {
         Route::group(['prefix' => 'prefix'], function () {
             Route::fallback(function () {
@@ -43,7 +43,7 @@ class FallbackRouteTest extends TestCase
         $this->assertStringContainsString('Not Found', $this->get('/non-existing')->getContent());
     }
 
-    public function test_fallback_with_wildcards()
+    public function testFallbackWithWildcards()
     {
         Route::fallback(function () {
             return response('fallback', 404);
@@ -62,7 +62,7 @@ class FallbackRouteTest extends TestCase
         $this->assertEquals(200, $this->get('/non-existing')->getStatusCode());
     }
 
-    public function test_no_routes()
+    public function testNoRoutes()
     {
         Route::fallback(function () {
             return response('fallback', 404);
@@ -72,7 +72,7 @@ class FallbackRouteTest extends TestCase
         $this->assertEquals(404, $this->get('/non-existing')->getStatusCode());
     }
 
-    public function test_respond_with_named_fallback_route()
+    public function testRespondWithNamedFallbackRoute()
     {
         Route::fallback(function () {
             return response('fallback', 404);
@@ -86,7 +86,7 @@ class FallbackRouteTest extends TestCase
         $this->assertStringContainsString('fallback', $this->get('/one')->getContent());
     }
 
-    public function test_no_fallbacks()
+    public function testNoFallbacks()
     {
         Route::get('one', function () {
             return 'one';

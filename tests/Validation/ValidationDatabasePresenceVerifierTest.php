@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Validation;
 
 use Closure;
-use stdClass;
+use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Validation\DatabasePresenceVerifier;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Validation\DatabasePresenceVerifier;
-use Illuminate\Database\ConnectionResolverInterface;
+use stdClass;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
 {

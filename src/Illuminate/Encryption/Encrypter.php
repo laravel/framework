@@ -2,10 +2,10 @@
 
 namespace Illuminate\Encryption;
 
-use RuntimeException;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Encryption\EncryptException;
+use RuntimeException;
 
 class Encrypter implements EncrypterContract
 {
@@ -100,7 +100,7 @@ class Encrypter implements EncrypterContract
         // its authenticity. Then, we'll JSON the data into the "payload" array.
         $mac = $this->hash($iv = base64_encode($iv), $value);
 
-        $json = json_encode(compact('iv', 'value', 'mac'));
+        $json = json_encode(compact('iv', 'value', 'mac'), JSON_UNESCAPED_SLASHES);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptException('Could not encrypt the data.');
@@ -125,7 +125,7 @@ class Encrypter implements EncrypterContract
     /**
      * Decrypt the given value.
      *
-     * @param  mixed  $payload
+     * @param  string  $payload
      * @param  bool  $unserialize
      * @return mixed
      *

@@ -2,20 +2,20 @@
 
 namespace Illuminate\Tests\Console;
 
-use Mockery as m;
 use Illuminate\Console\Command;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\CacheEventMutex;
-use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Console\Scheduling\CacheSchedulingMutex;
+use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Console\Scheduling\SchedulingMutex;
+use Illuminate\Container\Container;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class ConsoleEventSchedulerTest extends TestCase
 {
     /**
-     * @var Schedule
+     * @var \Illuminate\Console\Scheduling\Schedule
      */
     private $schedule;
 
@@ -59,16 +59,22 @@ class ConsoleEventSchedulerTest extends TestCase
         $schedule->exec('path/to/command', ['--title' => 'A "real" test']);
         $schedule->exec('path/to/command', [['one', 'two']]);
         $schedule->exec('path/to/command', ['-1 minute']);
+        $schedule->exec('path/to/command', ['foo' => ['bar', 'baz']]);
+        $schedule->exec('path/to/command', ['--foo' => ['bar', 'baz']]);
+        $schedule->exec('path/to/command', ['-F' => ['bar', 'baz']]);
 
         $events = $schedule->events();
-        $this->assertEquals('path/to/command', $events[0]->command);
-        $this->assertEquals('path/to/command -f --foo="bar"', $events[1]->command);
-        $this->assertEquals('path/to/command -f', $events[2]->command);
-        $this->assertEquals("path/to/command --foo={$escape}bar{$escape}", $events[3]->command);
-        $this->assertEquals("path/to/command -f --foo={$escape}bar{$escape}", $events[4]->command);
-        $this->assertEquals("path/to/command --title={$escape}A {$escapeReal}real{$escapeReal} test{$escape}", $events[5]->command);
-        $this->assertEquals("path/to/command {$escape}one{$escape} {$escape}two{$escape}", $events[6]->command);
-        $this->assertEquals("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
+        $this->assertSame('path/to/command', $events[0]->command);
+        $this->assertSame('path/to/command -f --foo="bar"', $events[1]->command);
+        $this->assertSame('path/to/command -f', $events[2]->command);
+        $this->assertSame("path/to/command --foo={$escape}bar{$escape}", $events[3]->command);
+        $this->assertSame("path/to/command -f --foo={$escape}bar{$escape}", $events[4]->command);
+        $this->assertSame("path/to/command --title={$escape}A {$escapeReal}real{$escapeReal} test{$escape}", $events[5]->command);
+        $this->assertSame("path/to/command {$escape}one{$escape} {$escape}two{$escape}", $events[6]->command);
+        $this->assertSame("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
+        $this->assertSame("path/to/command {$escape}bar{$escape} {$escape}baz{$escape}", $events[8]->command);
+        $this->assertSame("path/to/command --foo={$escape}bar{$escape} --foo={$escape}baz{$escape}", $events[9]->command);
+        $this->assertSame("path/to/command -F {$escape}bar{$escape} -F {$escape}baz{$escape}", $events[10]->command);
     }
 
     public function testExecCreatesNewCommandWithTimezone()
@@ -76,12 +82,12 @@ class ConsoleEventSchedulerTest extends TestCase
         $schedule = new Schedule('UTC');
         $schedule->exec('path/to/command');
         $events = $schedule->events();
-        $this->assertEquals('UTC', $events[0]->timezone);
+        $this->assertSame('UTC', $events[0]->timezone);
 
         $schedule = new Schedule('Asia/Tokyo');
         $schedule->exec('path/to/command');
         $events = $schedule->events();
-        $this->assertEquals('Asia/Tokyo', $events[0]->timezone);
+        $this->assertSame('Asia/Tokyo', $events[0]->timezone);
     }
 
     public function testCommandCreatesNewArtisanCommand()

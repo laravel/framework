@@ -2,9 +2,10 @@
 
 namespace Illuminate\Routing;
 
-use ReflectionMethod;
-use ReflectionFunction;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
+use ReflectionFunction;
+use ReflectionMethod;
 
 class RouteSignatureParameters
 {
@@ -22,7 +23,7 @@ class RouteSignatureParameters
                         : (new ReflectionFunction($action['uses']))->getParameters();
 
         return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
-            return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
+            return Reflector::isParameterSubclassOf($p, $subClass);
         });
     }
 

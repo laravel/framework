@@ -25,10 +25,10 @@ trait UsePusherChannelConventions
      */
     public function normalizeChannelName($channel)
     {
-        if ($this->isGuardedChannel($channel)) {
-            return Str::startsWith($channel, 'private-')
-                ? Str::replaceFirst('private-', '', $channel)
-                : Str::replaceFirst('presence-', '', $channel);
+        foreach (['private-encrypted-', 'private-', 'presence-'] as $prefix) {
+            if (Str::startsWith($channel, $prefix)) {
+                return Str::replaceFirst($prefix, '', $channel);
+            }
         }
 
         return $channel;

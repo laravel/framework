@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use PDO;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Processors\Processor;
+use Mockery as m;
+use PDO;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseProcessorTest extends TestCase
 {
@@ -19,7 +19,7 @@ class DatabaseProcessorTest extends TestCase
     public function testInsertGetIdProcessing()
     {
         $pdo = $this->createMock(ProcessorTestPDOStub::class);
-        $pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->will($this->returnValue('1'));
+        $pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->willReturn('1');
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('insert')->once()->with('sql', ['foo']);
         $connection->shouldReceive('getPdo')->once()->andReturn($pdo);

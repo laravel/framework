@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentHasManyThroughTest;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -43,23 +43,35 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         });
     }
 
-    public function test_basic_create_and_retrieve()
+    public function testBasicCreateAndRetrieve()
     {
         $user = User::create(['name' => Str::random()]);
 
         $team1 = Team::create(['id' => 10, 'owner_id' => $user->id]);
         $team2 = Team::create(['owner_id' => $user->id]);
 
-        $mate1 = User::create(['name' => Str::random(), 'team_id' => $team1->id]);
-        $mate2 = User::create(['name' => Str::random(), 'team_id' => $team2->id]);
+        $mate1 = User::create(['name' => 'John', 'team_id' => $team1->id]);
+        $mate2 = User::create(['name' => 'Jack', 'team_id' => $team2->id, 'slug' => null]);
 
         User::create(['name' => Str::random()]);
 
         $this->assertEquals([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
         $this->assertEquals([$user->id], User::has('teamMates')->pluck('id')->toArray());
+
+        $result = $user->teamMates()->first();
+        $this->assertEquals(
+            $mate1->refresh()->getAttributes() + ['laravel_through_key' => '1'],
+            $result->getAttributes()
+        );
+
+        $result = $user->teamMates()->firstWhere('name', 'Jack');
+        $this->assertEquals(
+            $mate2->refresh()->getAttributes() + ['laravel_through_key' => '1'],
+            $result->getAttributes()
+        );
     }
 
-    public function test_global_scope_columns()
+    public function testGlobalScopeColumns()
     {
         $user = User::create(['name' => Str::random()]);
 
@@ -72,7 +84,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertEquals(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
     }
 
-    public function test_has_self()
+    public function testHasSelf()
     {
         $user = User::create(['name' => Str::random()]);
 
@@ -82,10 +94,10 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         $users = User::has('teamMates')->get();
 
-        $this->assertEquals(1, $users->count());
+        $this->assertCount(1, $users);
     }
 
-    public function test_has_self_custom_owner_key()
+    public function testHasSelfCustomOwnerKey()
     {
         $user = User::create(['slug' => Str::random(), 'name' => Str::random()]);
 
@@ -95,10 +107,10 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         $users = User::has('teamMatesBySlug')->get();
 
-        $this->assertEquals(1, $users->count());
+        $this->assertCount(1, $users);
     }
 
-    public function test_has_same_parent_and_through_parent_table()
+    public function testHasSameParentAndThroughParentTable()
     {
         Category::create();
         Category::create();

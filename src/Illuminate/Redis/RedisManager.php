@@ -2,10 +2,13 @@
 
 namespace Illuminate\Redis;
 
-use InvalidArgumentException;
+use Closure;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Redis\Connectors\PhpRedisConnector;
+use Illuminate\Redis\Connectors\PredisConnector;
 use Illuminate\Support\ConfigurationUrlParser;
+use InvalidArgumentException;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
@@ -25,6 +28,13 @@ class RedisManager implements Factory
      * @var string
      */
     protected $driver;
+
+    /**
+     * The registered custom driver creators.
+     *
+     * @var array
+     */
+    protected $customCreators = [];
 
     /**
      * The Redis server configurations.
@@ -147,15 +157,21 @@ class RedisManager implements Factory
     /**
      * Get the connector instance for the current driver.
      *
-     * @return \Illuminate\Redis\Connectors\PhpRedisConnector|\Illuminate\Redis\Connectors\PredisConnector
+     * @return \Illuminate\Contracts\Redis\Connector
      */
     protected function connector()
     {
+        $customCreator = $this->customCreators[$this->driver] ?? null;
+
+        if ($customCreator) {
+            return $customCreator();
+        }
+
         switch ($this->driver) {
             case 'predis':
-                return new Connectors\PredisConnector;
+                return new PredisConnector;
             case 'phpredis':
-                return new Connectors\PhpRedisConnector;
+                return new PhpRedisConnector;
         }
     }
 
@@ -170,7 +186,7 @@ class RedisManager implements Factory
         $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
 
         return array_filter($parsed, function ($key) {
-            return ! in_array($key, ['driver', 'username']);
+            return ! in_array($key, ['driver', 'username'], true);
         }, ARRAY_FILTER_USE_KEY);
     }
 
@@ -202,6 +218,31 @@ class RedisManager implements Factory
     public function disableEvents()
     {
         $this->events = false;
+    }
+
+    /**
+     * Set the default driver.
+     *
+     * @param  string  $driver
+     * @return void
+     */
+    public function setDriver($driver)
+    {
+        $this->driver = $driver;
+    }
+
+    /**
+     * Register a custom driver creator Closure.
+     *
+     * @param  string  $driver
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function extend($driver, Closure $callback)
+    {
+        $this->customCreators[$driver] = $callback->bindTo($this, $this);
+
+        return $this;
     }
 
     /**

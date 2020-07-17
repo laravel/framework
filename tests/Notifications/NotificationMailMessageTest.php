@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Messages\MailMessage;
+use PHPUnit\Framework\TestCase;
 
 class NotificationMailMessageTest extends TestCase
 {
@@ -11,11 +11,11 @@ class NotificationMailMessageTest extends TestCase
     {
         $message = new MailMessage;
 
-        $this->assertEquals('notifications::email', $message->markdown);
+        $this->assertSame('notifications::email', $message->markdown);
 
         $message->template('notifications::foo');
 
-        $this->assertEquals('notifications::foo', $message->markdown);
+        $this->assertSame('notifications::foo', $message->markdown);
     }
 
     public function testCcIsSetCorrectly()

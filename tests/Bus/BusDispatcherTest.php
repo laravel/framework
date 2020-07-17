@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Bus;
 
-use Mockery as m;
-use RuntimeException;
-use Illuminate\Bus\Queueable;
 use Illuminate\Bus\Dispatcher;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Bus\Queueable;
+use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class BusDispatcherTest extends TestCase
 {

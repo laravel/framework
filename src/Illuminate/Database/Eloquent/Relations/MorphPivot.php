@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class MorphPivot extends Pivot
 {
@@ -45,11 +45,21 @@ class MorphPivot extends Pivot
      */
     public function delete()
     {
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return (int) parent::delete();
+        }
+
+        if ($this->fireModelEvent('deleting') === false) {
+            return 0;
+        }
+
         $query = $this->getDeleteQuery();
 
         $query->where($this->morphType, $this->morphClass);
 
-        return $query->delete();
+        return tap($query->delete(), function () {
+            $this->fireModelEvent('deleted', false);
+        });
     }
 
     /**

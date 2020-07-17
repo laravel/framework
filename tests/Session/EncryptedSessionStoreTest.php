@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Session;
 
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Session\EncryptedStore;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Session\EncryptedStore;
-use Illuminate\Contracts\Encryption\Encrypter;
 
 class EncryptedSessionStoreTest extends TestCase
 {

@@ -3,11 +3,11 @@
 namespace Illuminate\Foundation\Console;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Illuminate\Console\Command;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class RouteListCommand extends Command
@@ -153,6 +153,12 @@ class RouteListCommand extends Command
      */
     protected function displayRoutes(array $routes)
     {
+        if ($this->option('json')) {
+            $this->line(json_encode(array_values($routes)));
+
+            return;
+        }
+
         $this->table($this->getHeaders(), $routes);
     }
 
@@ -164,9 +170,9 @@ class RouteListCommand extends Command
      */
     protected function getMiddleware($route)
     {
-        return collect($route->gatherMiddleware())->map(function ($middleware) {
+        return collect($this->router->gatherRouteMiddleware($route))->map(function ($middleware) {
             return $middleware instanceof Closure ? 'Closure' : $middleware;
-        })->implode(',');
+        })->implode("\n");
     }
 
     /**
@@ -234,7 +240,7 @@ class RouteListCommand extends Command
             }
         }
 
-        return $results;
+        return array_map('strtolower', $results);
     }
 
     /**
@@ -247,6 +253,7 @@ class RouteListCommand extends Command
         return [
             ['columns', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Columns to include in the route table'],
             ['compact', 'c', InputOption::VALUE_NONE, 'Only show method, URI and action columns'],
+            ['json', null, InputOption::VALUE_NONE, 'Output the route list as JSON'],
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],

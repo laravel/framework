@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Cache;
 
-use DateTime;
-use stdClass;
 use DateInterval;
-use Mockery as m;
-use Illuminate\Cache\TagSet;
-use PHPUnit\Framework\TestCase;
+use DateTime;
 use Illuminate\Cache\ArrayStore;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Cache\RedisTaggedCache;
+use Illuminate\Cache\TagSet;
+use Illuminate\Contracts\Cache\Store;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheTaggedCacheTest extends TestCase
 {
@@ -24,7 +24,7 @@ class CacheTaggedCacheTest extends TestCase
         $store = new ArrayStore;
         $tags = ['bop', 'zap'];
         $store->tags($tags)->put('foo', 'bar', 10);
-        $this->assertEquals('bar', $store->tags($tags)->get('foo'));
+        $this->assertSame('bar', $store->tags($tags)->get('foo'));
     }
 
     public function testCacheCanBeSetWithDatetimeArgument()
@@ -34,7 +34,7 @@ class CacheTaggedCacheTest extends TestCase
         $duration = new DateTime;
         $duration->add(new DateInterval('PT10M'));
         $store->tags($tags)->put('foo', 'bar', $duration);
-        $this->assertEquals('bar', $store->tags($tags)->get('foo'));
+        $this->assertSame('bar', $store->tags($tags)->get('foo'));
     }
 
     public function testCacheSavedWithMultipleTagsCanBeFlushed()
@@ -46,14 +46,14 @@ class CacheTaggedCacheTest extends TestCase
         $store->tags($tags2)->put('foo', 'bar', 10);
         $store->tags('zap')->flush();
         $this->assertNull($store->tags($tags1)->get('foo'));
-        $this->assertEquals('bar', $store->tags($tags2)->get('foo'));
+        $this->assertSame('bar', $store->tags($tags2)->get('foo'));
     }
 
     public function testTagsWithStringArgument()
     {
         $store = new ArrayStore;
         $store->tags('bop')->put('foo', 'bar', 10);
-        $this->assertEquals('bar', $store->tags('bop')->get('foo'));
+        $this->assertSame('bar', $store->tags('bop')->get('foo'));
     }
 
     public function testTagsWithIncrementCanBeFlushed()
@@ -79,7 +79,7 @@ class CacheTaggedCacheTest extends TestCase
         $store = new ArrayStore;
         $tags = ['bop', 'zap'];
         $store->tags($tags)->forever('foo', 'bar');
-        $this->assertEquals('bar', $store->tags($tags)->get('foo'));
+        $this->assertSame('bar', $store->tags($tags)->get('foo'));
     }
 
     public function testRedisCacheTagsPushForeverKeysCorrectly()

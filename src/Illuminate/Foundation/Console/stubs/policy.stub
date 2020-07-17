@@ -1,93 +1,93 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
-use NamespacedDummyUserModel;
-use NamespacedDummyModel;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use {{ namespacedModel }};
+use {{ namespacedUserModel }};
 
-class DummyClass
+class {{ class }}
 {
     use HandlesAuthorization;
-    
+
     /**
-     * Determine whether the user can view any DocDummyPluralModel.
+     * Determine whether the user can view any models.
      *
-     * @param  \NamespacedDummyUserModel  $user
+     * @param  \{{ namespacedUserModel }}  $user
      * @return mixed
      */
-    public function viewAny(DummyUser $user)
+    public function viewAny({{ user }} $user)
     {
         //
     }
 
     /**
-     * Determine whether the user can view the DocDummyModel.
+     * Determine whether the user can view the model.
      *
-     * @param  \NamespacedDummyUserModel  $user
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return mixed
      */
-    public function view(DummyUser $user, DummyModel $dummyModel)
+    public function view({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
         //
     }
 
     /**
-     * Determine whether the user can create DocDummyPluralModel.
+     * Determine whether the user can create models.
      *
-     * @param  \NamespacedDummyUserModel  $user
+     * @param  \{{ namespacedUserModel }}  $user
      * @return mixed
      */
-    public function create(DummyUser $user)
+    public function create({{ user }} $user)
     {
         //
     }
 
     /**
-     * Determine whether the user can update the DocDummyModel.
+     * Determine whether the user can update the model.
      *
-     * @param  \NamespacedDummyUserModel  $user
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return mixed
      */
-    public function update(DummyUser $user, DummyModel $dummyModel)
+    public function update({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
         //
     }
 
     /**
-     * Determine whether the user can delete the DocDummyModel.
+     * Determine whether the user can delete the model.
      *
-     * @param  \NamespacedDummyUserModel  $user
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return mixed
      */
-    public function delete(DummyUser $user, DummyModel $dummyModel)
+    public function delete({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
         //
     }
 
     /**
-     * Determine whether the user can restore the DocDummyModel.
+     * Determine whether the user can restore the model.
      *
-     * @param  \NamespacedDummyUserModel  $user
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return mixed
      */
-    public function restore(DummyUser $user, DummyModel $dummyModel)
+    public function restore({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
         //
     }
 
     /**
-     * Determine whether the user can permanently delete the DocDummyModel.
+     * Determine whether the user can permanently delete the model.
      *
-     * @param  \NamespacedDummyUserModel  $user
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return mixed
      */
-    public function forceDelete(DummyUser $user, DummyModel $dummyModel)
+    public function forceDelete({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
         //
     }

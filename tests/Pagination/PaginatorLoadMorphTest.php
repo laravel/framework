@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractPaginator;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class PaginatorLoadMorphTest extends TestCase
 {

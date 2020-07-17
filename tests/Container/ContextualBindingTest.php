@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Container;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use PHPUnit\Framework\TestCase;
 
 class ContextualBindingTest extends TestCase
 {
@@ -209,9 +209,164 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
     }
+
+    public function testContextualBindingWorksForNestedOptionalDependencies()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectTwoInstances::class)->needs(ContainerTestContextInjectTwo::class)->give(function () {
+            return new ContainerTestContextInjectTwo(new ContainerContextImplementationStubTwo);
+        });
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectTwoInstances::class);
+        $this->assertInstanceOf(
+            ContainerTestContextWithOptionalInnerDependency::class,
+            $resolvedInstance->implOne
+        );
+        $this->assertNull($resolvedInstance->implOne->inner);
+
+        $this->assertInstanceOf(
+            ContainerTestContextInjectTwo::class,
+            $resolvedInstance->implTwo
+        );
+        $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->implTwo->impl);
+    }
+
+    public function testContextualBindingWorksForVariadicDependencies()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectVariadic::class)->needs(IContainerContextContractStub::class)->give(function ($c) {
+            return [
+                $c->make(ContainerContextImplementationStub::class),
+                $c->make(ContainerContextImplementationStubTwo::class),
+            ];
+        });
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectVariadic::class);
+
+        $this->assertCount(2, $resolvedInstance->stubs);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $resolvedInstance->stubs[0]);
+        $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->stubs[1]);
+    }
+
+    public function testContextualBindingWorksForVariadicDependenciesWithNothingBound()
+    {
+        $container = new Container;
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectVariadic::class);
+
+        $this->assertCount(0, $resolvedInstance->stubs);
+    }
+
+    public function testContextualBindingWorksForVariadicAfterNonVariadicDependencies()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectVariadicAfterNonVariadic::class)->needs(IContainerContextContractStub::class)->give(function ($c) {
+            return [
+                $c->make(ContainerContextImplementationStub::class),
+                $c->make(ContainerContextImplementationStubTwo::class),
+            ];
+        });
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectVariadicAfterNonVariadic::class);
+
+        $this->assertCount(2, $resolvedInstance->stubs);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $resolvedInstance->stubs[0]);
+        $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->stubs[1]);
+    }
+
+    public function testContextualBindingWorksForVariadicAfterNonVariadicDependenciesWithNothingBound()
+    {
+        $container = new Container;
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectVariadicAfterNonVariadic::class);
+
+        $this->assertCount(0, $resolvedInstance->stubs);
+    }
+
+    public function testContextualBindingWorksForVariadicDependenciesWithoutFactory()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectVariadic::class)->needs(IContainerContextContractStub::class)->give([
+            ContainerContextImplementationStub::class,
+            ContainerContextImplementationStubTwo::class,
+        ]);
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectVariadic::class);
+
+        $this->assertCount(2, $resolvedInstance->stubs);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $resolvedInstance->stubs[0]);
+        $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->stubs[1]);
+    }
+
+    public function testContextualBindingGivesTagsForArrayWithNoTagsDefined()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectArray::class)->needs('$stubs')->giveTagged('stub');
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectArray::class);
+
+        $this->assertCount(0, $resolvedInstance->stubs);
+    }
+
+    public function testContextualBindingGivesTagsForVariadicWithNoTagsDefined()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectVariadic::class)->needs(IContainerContextContractStub::class)->giveTagged('stub');
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectVariadic::class);
+
+        $this->assertCount(0, $resolvedInstance->stubs);
+    }
+
+    public function testContextualBindingGivesTagsForArray()
+    {
+        $container = new Container;
+
+        $container->tag([
+            ContainerContextImplementationStub::class,
+            ContainerContextImplementationStubTwo::class,
+        ], ['stub']);
+
+        $container->when(ContainerTestContextInjectArray::class)->needs('$stubs')->giveTagged('stub');
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectArray::class);
+
+        $this->assertCount(2, $resolvedInstance->stubs);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $resolvedInstance->stubs[0]);
+        $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->stubs[1]);
+    }
+
+    public function testContextualBindingGivesTagsForVariadic()
+    {
+        $container = new Container;
+
+        $container->tag([
+            ContainerContextImplementationStub::class,
+            ContainerContextImplementationStubTwo::class,
+        ], ['stub']);
+
+        $container->when(ContainerTestContextInjectVariadic::class)->needs(IContainerContextContractStub::class)->giveTagged('stub');
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectVariadic::class);
+
+        $this->assertCount(2, $resolvedInstance->stubs);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $resolvedInstance->stubs[0]);
+        $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->stubs[1]);
+    }
 }
 
 interface IContainerContextContractStub
+{
+    //
+}
+
+class ContainerContextNonContractStub
 {
     //
 }
@@ -263,5 +418,59 @@ class ContainerTestContextInjectThree
     public function __construct(IContainerContextContractStub $impl)
     {
         $this->impl = $impl;
+    }
+}
+
+class ContainerTestContextInjectTwoInstances
+{
+    public $implOne;
+    public $implTwo;
+
+    public function __construct(ContainerTestContextWithOptionalInnerDependency $implOne, ContainerTestContextInjectTwo $implTwo)
+    {
+        $this->implOne = $implOne;
+        $this->implTwo = $implTwo;
+    }
+}
+
+class ContainerTestContextWithOptionalInnerDependency
+{
+    public $inner;
+
+    public function __construct(ContainerTestContextInjectOne $inner = null)
+    {
+        $this->inner = $inner;
+    }
+}
+
+class ContainerTestContextInjectArray
+{
+    public $stubs;
+
+    public function __construct(array $stubs)
+    {
+        $this->stubs = $stubs;
+    }
+}
+
+class ContainerTestContextInjectVariadic
+{
+    public $stubs;
+
+    public function __construct(IContainerContextContractStub ...$stubs)
+    {
+        $this->stubs = $stubs;
+    }
+}
+
+class ContainerTestContextInjectVariadicAfterNonVariadic
+{
+    public $other;
+    public $stubs;
+
+    public function __construct(ContainerContextNonContractStub $other, IContainerContextContractStub ...$stubs)
+    {
+        $this->other = $other;
+        $this->stubs = $stubs;
     }
 }

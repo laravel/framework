@@ -14,10 +14,10 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
-        "illuminate/contracts": "5.8.*",
-        "illuminate/support": "5.8.*",
-        "symfony/finder": "^4.2"
+        "php": "^7.2.5",
+        "illuminate/contracts": "^7.0",
+        "illuminate/support": "^7.0",
+        "symfony/finder": "^5.0"
     },
     "autoload": {
         "psr-4": {
@@ -26,15 +26,18 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.8-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "suggest": {
-        "league/flysystem": "Required to use the Flysystem local and FTP drivers (^1.0).",
+        "ext-ftp": "Required to use the Flysystem FTP driver.",
+        "illuminate/http": "Required for handling uploaded files (^7.0).",
+        "league/flysystem": "Required to use the Flysystem local and FTP drivers (^1.0.34).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^1.0).",
         "league/flysystem-cached-adapter": "Required to use the Flysystem cache (^1.0).",
-        "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (^1.0).",
-        "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0)."
+        "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
+        "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
+        "symfony/mime": "Required to enable support for guessing extensions (^5.0)."
     },
     "config": {
         "sort-packages": true

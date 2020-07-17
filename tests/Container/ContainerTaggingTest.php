@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Container;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use PHPUnit\Framework\TestCase;
 
 class ContainerTaggingTest extends TestCase
 {

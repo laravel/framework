@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Bus\Queueable;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Queue;
+use Orchestra\Testbench\TestCase;
 
 class JobSchedulingTest extends TestCase
 {
@@ -15,7 +15,7 @@ class JobSchedulingTest extends TestCase
     {
         Queue::fake();
 
-        /** @var Schedule $scheduler */
+        /** @var \Illuminate\Console\Scheduling\Schedule $scheduler */
         $scheduler = $this->app->make(Schedule::class);
 
         // all job names were set to an empty string so that the registered shutdown function in CallbackEvent does nothing
@@ -43,7 +43,7 @@ class JobSchedulingTest extends TestCase
     {
         Queue::fake();
 
-        /** @var Schedule $scheduler */
+        /** @var \Illuminate\Console\Scheduling\Schedule $scheduler */
         $scheduler = $this->app->make(Schedule::class);
 
         // all job names were set to an empty string so that the registered shutdown function in CallbackEvent does nothing

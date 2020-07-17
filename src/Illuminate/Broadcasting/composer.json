@@ -14,13 +14,13 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2.5",
         "ext-json": "*",
         "psr/log": "^1.0",
-        "illuminate/bus": "5.8.*",
-        "illuminate/contracts": "5.8.*",
-        "illuminate/queue": "5.8.*",
-        "illuminate/support": "5.8.*"
+        "illuminate/bus": "^7.0",
+        "illuminate/contracts": "^7.0",
+        "illuminate/queue": "^7.0",
+        "illuminate/support": "^7.0"
     },
     "autoload": {
         "psr-4": {
@@ -29,11 +29,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.8-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "suggest": {
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^3.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0)."
     },
     "config": {
         "sort-packages": true

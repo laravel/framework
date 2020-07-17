@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Database;
 
 use Closure;
-use stdClass;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Illuminate\Support\Collection;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseMigrationRepositoryTest extends TestCase
 {
@@ -38,7 +38,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getMockBuilder(DatabaseMigrationRepository::class)->setMethods(['getLastBatchNumber'])->setConstructorArgs([
             $resolver = m::mock(ConnectionResolverInterface::class), 'migrations',
         ])->getMock();
-        $repo->expects($this->once())->method('getLastBatchNumber')->will($this->returnValue(1));
+        $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
@@ -84,7 +84,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getMockBuilder(DatabaseMigrationRepository::class)->setMethods(['getLastBatchNumber'])->setConstructorArgs([
             m::mock(ConnectionResolverInterface::class), 'migrations',
         ])->getMock();
-        $repo->expects($this->once())->method('getLastBatchNumber')->will($this->returnValue(1));
+        $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
 
         $this->assertEquals(2, $repo->getNextBatchNumber());
     }

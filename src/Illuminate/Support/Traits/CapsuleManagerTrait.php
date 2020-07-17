@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Traits;
 
-use Illuminate\Support\Fluent;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Fluent;
 
 trait CapsuleManagerTrait
 {

@@ -3,12 +3,12 @@
 namespace Illuminate\Tests\Auth;
 
 use Closure;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Routing\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AuthorizesResourcesTest extends TestCase
 {
@@ -69,7 +69,7 @@ class AuthorizesResourcesTest extends TestCase
         $router->aliasMiddleware('can', AuthorizesResourcesMiddleware::class);
         $router->get($method)->uses(AuthorizesResourcesController::class.'@'.$method);
 
-        $this->assertEquals(
+        $this->assertSame(
             'caught '.$middleware,
             $router->dispatch(Request::create($method, 'GET'))->getContent(),
             "The [{$middleware}] middleware was not registered for method [{$method}]"

@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Mockery as m;
-use Illuminate\Http\Request;
 use Illuminate\Auth\TokenGuard;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Http\Request;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class AuthTokenGuardTest extends TestCase
 {

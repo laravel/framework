@@ -3,13 +3,13 @@
 namespace Illuminate\Auth\Access;
 
 use Exception;
-use ReflectionClass;
-use ReflectionFunction;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use ReflectionClass;
+use ReflectionFunction;
 
 class Gate implements GateContract
 {
@@ -126,6 +126,10 @@ class Gate implements GateContract
      */
     public function define($ability, $callback)
     {
+        if (is_array($callback) && isset($callback[0]) && is_string($callback[0])) {
+            $callback = $callback[0].'@'.$callback[1];
+        }
+
         if (is_callable($callback)) {
             $this->abilities[$ability] = $callback;
         } elseif (is_string($callback)) {
@@ -144,7 +148,7 @@ class Gate implements GateContract
      *
      * @param  string  $name
      * @param  string  $class
-     * @param  array|null   $abilities
+     * @param  array|null  $abilities
      * @return $this
      */
     public function resource($name, $class, array $abilities = null)
@@ -274,11 +278,7 @@ class Gate implements GateContract
     public function check($abilities, $arguments = [])
     {
         return collect($abilities)->every(function ($ability) use ($arguments) {
-            try {
-                return (bool) $this->raw($ability, $arguments);
-            } catch (AuthorizationException $e) {
-                return false;
-            }
+            return $this->inspect($ability, $arguments)->allowed();
         });
     }
 
@@ -319,13 +319,29 @@ class Gate implements GateContract
      */
     public function authorize($ability, $arguments = [])
     {
-        $result = $this->raw($ability, $arguments);
+        return $this->inspect($ability, $arguments)->authorize();
+    }
 
-        if ($result instanceof Response) {
-            return $result;
+    /**
+     * Inspect the user for the given ability.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public function inspect($ability, $arguments = [])
+    {
+        try {
+            $result = $this->raw($ability, $arguments);
+
+            if ($result instanceof Response) {
+                return $result;
+            }
+
+            return $result ? Response::allow() : Response::deny();
+        } catch (AuthorizationException $e) {
+            return $e->toResponse();
         }
-
-        return $result ? $this->allow() : $this->deny();
     }
 
     /**
@@ -334,6 +350,8 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array|mixed  $arguments
      * @return mixed
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function raw($ability, $arguments = [])
     {
@@ -365,7 +383,7 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  \Closure|string|array  $class
-     * @param  string|null $method
+     * @param  string|null  $method
      * @return bool
      */
     protected function canBeCalledWithUser($user, $class, $method = null)
@@ -436,7 +454,7 @@ class Gate implements GateContract
      */
     protected function parameterAllowsGuests($parameter)
     {
-        return ($parameter->getClass() && $parameter->allowsNull()) ||
+        return ($parameter->hasType() && $parameter->allowsNull()) ||
                ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
     }
 
@@ -530,6 +548,7 @@ class Gate implements GateContract
         }
 
         return function () {
+            //
         };
     }
 

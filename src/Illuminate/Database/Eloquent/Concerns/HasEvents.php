@@ -2,9 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use Illuminate\Contracts\Events\Dispatcher;
 
 trait HasEvents
 {
@@ -46,7 +47,7 @@ trait HasEvents
     /**
      * Register a single observer with the model.
      *
-     * @param  object|string $class
+     * @param  object|string  $class
      * @return void
      *
      * @throws \RuntimeException
@@ -68,7 +69,7 @@ trait HasEvents
     /**
      * Resolve the observer's class name from an object or string.
      *
-     * @param  object|string $class
+     * @param  object|string  $class
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -399,7 +400,9 @@ trait HasEvents
     {
         $dispatcher = static::getEventDispatcher();
 
-        static::unsetEventDispatcher();
+        if ($dispatcher) {
+            static::setEventDispatcher(new NullDispatcher($dispatcher));
+        }
 
         try {
             return $callback();

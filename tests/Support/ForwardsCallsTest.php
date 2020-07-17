@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use Error;
 use BadMethodCallException;
-use PHPUnit\Framework\TestCase;
+use Error;
 use Illuminate\Support\Traits\ForwardsCalls;
+use PHPUnit\Framework\TestCase;
 
 class ForwardsCallsTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Illuminate\View\Concerns;
 
-use InvalidArgumentException;
 use Illuminate\Contracts\View\View;
+use InvalidArgumentException;
 
 trait ManagesLayouts
 {

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest;
+use PHPUnit\Framework\TestCase;
 
 class FoundationPackageManifestTest extends TestCase
 {

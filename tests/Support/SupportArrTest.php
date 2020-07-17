@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
 use ArrayObject;
 use Illuminate\Support\Arr;
-use InvalidArgumentException;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class SupportArrTest extends TestCase
 {
@@ -143,12 +143,37 @@ class SupportArrTest extends TestCase
     {
         $array = [100, 200, 300];
 
+        // Callback is null and array is empty
+        $this->assertNull(Arr::first([], null));
+        $this->assertSame('foo', Arr::first([], null, 'foo'));
+        $this->assertSame('bar', Arr::first([], null, function () {
+            return 'bar';
+        }));
+
+        // Callback is null and array is not empty
+        $this->assertEquals(100, Arr::first($array));
+
+        // Callback is not null and array is not empty
         $value = Arr::first($array, function ($value) {
             return $value >= 150;
         });
-
         $this->assertEquals(200, $value);
-        $this->assertEquals(100, Arr::first($array));
+
+        // Callback is not null, array is not empty but no satisfied item
+        $value2 = Arr::first($array, function ($value) {
+            return $value > 300;
+        });
+        $value3 = Arr::first($array, function ($value) {
+            return $value > 300;
+        }, 'bar');
+        $value4 = Arr::first($array, function ($value) {
+            return $value > 300;
+        }, function () {
+            return 'baz';
+        });
+        $this->assertNull($value2);
+        $this->assertSame('bar', $value3);
+        $this->assertSame('baz', $value4);
     }
 
     public function testLast()
@@ -294,13 +319,13 @@ class SupportArrTest extends TestCase
                 ['name' => 'chair'],
             ],
         ];
-        $this->assertEquals('desk', Arr::get($array, 'products.0.name'));
-        $this->assertEquals('chair', Arr::get($array, 'products.1.name'));
+        $this->assertSame('desk', Arr::get($array, 'products.0.name'));
+        $this->assertSame('chair', Arr::get($array, 'products.1.name'));
 
         // Test return default value for non-existing key.
         $array = ['names' => ['developer' => 'taylor']];
-        $this->assertEquals('dayle', Arr::get($array, 'names.otherDeveloper', 'dayle'));
-        $this->assertEquals('dayle', Arr::get($array, 'names.otherDeveloper', function () {
+        $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', 'dayle'));
+        $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', function () {
             return 'dayle';
         }));
     }
@@ -366,6 +391,28 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::has([''], ''));
         $this->assertFalse(Arr::has([], ''));
         $this->assertFalse(Arr::has([], ['']));
+    }
+
+    public function testHasAnyMethod()
+    {
+        $array = ['name' => 'Taylor', 'age' => '', 'city' => null];
+        $this->assertTrue(Arr::hasAny($array, 'name'));
+        $this->assertTrue(Arr::hasAny($array, 'age'));
+        $this->assertTrue(Arr::hasAny($array, 'city'));
+        $this->assertFalse(Arr::hasAny($array, 'foo'));
+        $this->assertTrue(Arr::hasAny($array, 'name', 'email'));
+        $this->assertTrue(Arr::hasAny($array, ['name', 'email']));
+
+        $array = ['name' => 'Taylor', 'email' => 'foo'];
+        $this->assertTrue(Arr::hasAny($array, 'name', 'email'));
+        $this->assertFalse(Arr::hasAny($array, 'surname', 'password'));
+        $this->assertFalse(Arr::hasAny($array, ['surname', 'password']));
+
+        $array = ['foo' => ['bar' => null, 'baz' => '']];
+        $this->assertTrue(Arr::hasAny($array, 'foo.bar'));
+        $this->assertTrue(Arr::hasAny($array, 'foo.baz'));
+        $this->assertFalse(Arr::hasAny($array, 'foo.bax'));
+        $this->assertTrue(Arr::hasAny($array, ['foo.bax', 'foo.baz']));
     }
 
     public function testIsAssoc()
@@ -523,13 +570,13 @@ class SupportArrTest extends TestCase
     {
         $array = ['name' => 'Desk', 'price' => 100];
         $name = Arr::pull($array, 'name');
-        $this->assertEquals('Desk', $name);
+        $this->assertSame('Desk', $name);
         $this->assertEquals(['price' => 100], $array);
 
         // Only works on first level keys
         $array = ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane'];
         $name = Arr::pull($array, 'joe@example.com');
-        $this->assertEquals('Joe', $name);
+        $this->assertSame('Joe', $name);
         $this->assertEquals(['jane@localhost' => 'Jane'], $array);
 
         // Does not work for nested keys
@@ -626,6 +673,38 @@ class SupportArrTest extends TestCase
         $array = ['products' => ['desk' => ['price' => 100]]];
         Arr::set($array, 'products.desk.price', 200);
         $this->assertEquals(['products' => ['desk' => ['price' => 200]]], $array);
+
+        // No key is given
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::set($array, null, ['price' => 300]);
+        $this->assertSame(['price' => 300], $array);
+
+        // The key doesn't exist at the depth
+        $array = ['products' => 'desk'];
+        Arr::set($array, 'products.desk.price', 200);
+        $this->assertSame(['products' => ['desk' => ['price' => 200]]], $array);
+
+        // No corresponding key exists
+        $array = ['products'];
+        Arr::set($array, 'products.desk.price', 200);
+        $this->assertSame(['products', 'products' => ['desk' => ['price' => 200]]], $array);
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::set($array, 'table', 500);
+        $this->assertSame(['products' => ['desk' => ['price' => 100]], 'table' => 500], $array);
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::set($array, 'table.price', 350);
+        $this->assertSame(['products' => ['desk' => ['price' => 100]], 'table' => ['price' => 350]], $array);
+
+        $array = [];
+        Arr::set($array, 'products.desk.price', 200);
+        $this->assertSame(['products' => ['desk' => ['price' => 200]]], $array);
+
+        // Override
+        $array = ['products' => 'table'];
+        Arr::set($array, 'products.desk.price', 300);
+        $this->assertSame(['products' => ['desk' => ['price' => 300]]], $array);
     }
 
     public function testShuffleWithSeed()

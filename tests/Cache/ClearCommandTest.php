@@ -2,36 +2,36 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\ClearCommand;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use InvalidArgumentException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class ClearCommandTest extends TestCase
 {
     /**
-     * @var ClearCommandTestStub
+     * @var \Illuminate\Tests\Cache\ClearCommandTestStub
      */
     private $command;
 
     /**
-     * @var CacheManager|m\Mock
+     * @var \Illuminate\Cache\CacheManager|\Mockery\MockInterface
      */
     private $cacheManager;
 
     /**
-     * @var Filesystem|m\Mock
+     * @var \Illuminate\Filesystem\Filesystem|\Mockery\MockInterface
      */
     private $files;
 
     /**
-     * @var Repository|m\Mock
+     * @var \Illuminate\Contracts\Cache\Repository|\Mockery\MockInterface
      */
     private $cacheRepository;
 
@@ -150,6 +150,6 @@ class ClearCommandTestStub extends ClearCommand
 {
     public function call($command, array $arguments = [])
     {
-        //
+        return 0;
     }
 }

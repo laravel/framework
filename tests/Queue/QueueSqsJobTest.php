@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Queue;
 
-use stdClass;
-use Mockery as m;
 use Aws\Sqs\SqsClient;
-use Illuminate\Queue\SqsQueue;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Container\Container;
+use Illuminate\Queue\Jobs\SqsJob;
+use Illuminate\Queue\SqsQueue;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class QueueSqsJobTest extends TestCase
 {
