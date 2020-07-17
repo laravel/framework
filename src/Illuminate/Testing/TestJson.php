@@ -27,7 +27,7 @@ class TestJson
     /**
      * Create a new test json instance.
      *
-     * @param  \Illuminate\Contracts\Support\Jsonable|array  $jsonable
+     * @param  \Illuminate\Contracts\Support\Jsonable|\JsonSerializable|string  $jsonable
      * @return void
      */
     public function __construct($jsonable)
