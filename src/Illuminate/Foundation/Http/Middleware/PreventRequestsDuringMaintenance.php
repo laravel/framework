@@ -91,6 +91,7 @@ class PreventRequestsDuringMaintenance
      * Determine if the incoming request has a maintenance mode bypass cookie.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  array  $data
      * @return bool
      */
     protected function hasValidBypassCookie($request, array $data)
