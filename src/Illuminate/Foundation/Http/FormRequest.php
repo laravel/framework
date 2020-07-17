@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
+use Illuminate\Contracts\Routing\Redirector;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -26,7 +26,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * The redirector instance.
      *
-     * @var \Illuminate\Routing\Redirector
+     * @var \Illuminate\Contracts\Routing\Redirector
      */
     protected $redirector;
 
@@ -224,7 +224,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Set the Redirector instance.
      *
-     * @param  \Illuminate\Routing\Redirector  $redirector
+     * @param  \Illuminate\Contracts\Routing\Redirector  $redirector
      * @return $this
      */
     public function setRedirector(Redirector $redirector)

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Contracts\Routing\Redirector;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\ServiceProvider;
 
 class FormRequestServiceProvider extends ServiceProvider

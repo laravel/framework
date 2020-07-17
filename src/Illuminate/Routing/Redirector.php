@@ -2,11 +2,12 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Contracts\Routing\Redirector as RedirectorContract;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\Traits\Macroable;
 
-class Redirector
+class Redirector implements RedirectorContract
 {
     use Macroable;
 
