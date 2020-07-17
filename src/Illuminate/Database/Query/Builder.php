@@ -2405,7 +2405,7 @@ class Builder
     protected function stripTableForPluck($column)
     {
         if (is_null($column)) {
-            return $column;
+            return null;
         }
 
         $separator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';

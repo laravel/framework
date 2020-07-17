@@ -512,7 +512,7 @@ trait HasAttributes
         $castType = $this->getCastType($key);
 
         if (is_null($value) && in_array($castType, static::$primitiveCastTypes)) {
-            return $value;
+            return null;
         }
 
         switch ($castType) {
