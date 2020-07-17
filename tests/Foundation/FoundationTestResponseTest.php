@@ -78,6 +78,20 @@ class FoundationTestResponseTest extends TestCase
         $response->assertViewHas('foo', 'bar');
     }
 
+    public function testAssertViewHasNested()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => [
+                'foo' => [
+                    'nested' => 'bar',
+                ],
+            ],
+        ]);
+
+        $response->assertViewHas('foo.nested');
+    }
+
     public function testAssertViewHasWithNestedValue()
     {
         $response = $this->makeMockResponse([
@@ -90,6 +104,30 @@ class FoundationTestResponseTest extends TestCase
         ]);
 
         $response->assertViewHas('foo.nested', 'bar');
+    }
+
+    public function testAssertViewMissing()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foo' => 'bar'],
+        ]);
+
+        $response->assertViewMissing('baz');
+    }
+
+    public function testAssertViewMissingNested()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => [
+                'foo' => [
+                    'nested' => 'bar',
+                ],
+            ],
+        ]);
+
+        $response->assertViewMissing('foo.baz');
     }
 
     public function testAssertSeeInOrder()
