@@ -1274,6 +1274,31 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Remove any duplicate middleware from the given array.
+     *
+     * @param  array  $middleware
+     * @return array
+     */
+    public static function uniqueMiddleware(array $middleware)
+    {
+        $seen = [];
+
+        foreach ($middleware as $key => $value) {
+            if (\is_object($value)) {
+                $value = spl_object_id($value);
+            }
+
+            if (isset($seen[$value])) {
+                unset($array[$key]);
+            } else {
+                $seen[$value] = true;
+            }
+        }
+
+        return array_values($array);
+    }
+
+    /**
      * Dynamically handle calls into the router instance.
      *
      * @param  string  $method
