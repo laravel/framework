@@ -1282,20 +1282,20 @@ class Router implements BindingRegistrar, RegistrarContract
     public static function uniqueMiddleware(array $middleware)
     {
         $seen = [];
+        $result = [];
 
-        foreach ($middleware as $key => $value) {
+        foreach ($middleware as $value) {
             if (\is_object($value)) {
-                $value = spl_object_id($value);
+                $value = \spl_object_id($value);
             }
 
-            if (isset($seen[$value])) {
-                unset($middleware[$key]);
-            } else {
+            if (!isset($seen[$value])) {
                 $seen[$value] = true;
+                $result[] = $value;
             }
         }
 
-        return array_values($middleware);
+        return $result;
     }
 
     /**
