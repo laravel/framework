@@ -1289,13 +1289,13 @@ class Router implements BindingRegistrar, RegistrarContract
             }
 
             if (isset($seen[$value])) {
-                unset($array[$key]);
+                unset($middleware[$key]);
             } else {
                 $seen[$value] = true;
             }
         }
 
-        return array_values($array);
+        return array_values($middleware);
     }
 
     /**
