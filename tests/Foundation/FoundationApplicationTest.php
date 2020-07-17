@@ -388,7 +388,6 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_ROUTES_CACHE'] = '/absolute/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = '/absolute/path/events.php';
 
-        $ds = DIRECTORY_SEPARATOR;
         $this->assertSame('/absolute/path/services.php', $app->getCachedServicesPath());
         $this->assertSame('/absolute/path/packages.php', $app->getCachedPackagesPath());
         $this->assertSame('/absolute/path/config.php', $app->getCachedConfigPath());
