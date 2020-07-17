@@ -465,7 +465,6 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  int  $maxTries
      * @param  \Throwable  $e
      * @return void
      */

@@ -117,7 +117,7 @@ trait HidesAttributes
     /**
      * Make the given, typically visible, attributes hidden if the given truth test passes.
      *
-     * @param  bool|Closure  $truthTest
+     * @param  bool|Closure  $condition
      * @param  array|string|null  $attributes
      * @return $this
      */
