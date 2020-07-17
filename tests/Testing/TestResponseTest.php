@@ -106,6 +106,30 @@ class TestResponseTest extends TestCase
         $response->assertViewHas('foo.nested', 'bar');
     }
 
+    public function testAssertViewMissing()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foo' => 'bar'],
+        ]);
+
+        $response->assertViewMissing('baz');
+    }
+
+    public function testAssertViewMissingNested()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => [
+                'foo' => [
+                    'nested' => 'bar',
+                ],
+            ],
+        ]);
+
+        $response->assertViewMissing('foo.baz');
+    }
+
     public function testAssertSeeInOrder()
     {
         $response = $this->makeMockResponse([

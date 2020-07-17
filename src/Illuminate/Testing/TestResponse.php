@@ -924,7 +924,7 @@ class TestResponse implements ArrayAccess
     {
         $this->ensureResponseHasView();
 
-        PHPUnit::assertArrayNotHasKey($key, $this->original->gatherData());
+        PHPUnit::assertFalse(Arr::has($this->original->gatherData(), $key));
 
         return $this;
     }
