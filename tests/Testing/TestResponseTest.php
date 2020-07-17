@@ -78,6 +78,20 @@ class TestResponseTest extends TestCase
         $response->assertViewHas('foo', 'bar');
     }
 
+    public function testAssertViewHasNested()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => [
+                'foo' => [
+                    'nested' => 'bar',
+                ],
+            ],
+        ]);
+
+        $response->assertViewHas('foo.nested');
+    }
+
     public function testAssertViewHasWithNestedValue()
     {
         $response = $this->makeMockResponse([
