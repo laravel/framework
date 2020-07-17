@@ -477,7 +477,7 @@ class LogManager implements LoggerInterface
     /**
      * Unset the given channel instance.
      *
-     * @param  string|null  $name
+     * @param  string|null  $driver
      * @return $this
      */
     public function forgetChannel($driver = null)
