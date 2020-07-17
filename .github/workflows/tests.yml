@@ -10,7 +10,6 @@ jobs:
   linux_tests:
 
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
     services:
       mysql:
         image: mysql:5.7
@@ -26,11 +25,10 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        php: [8.0]
-        stability: [ignore-platform-req=php]
-        experimental: [true]
+        php: [7.2, 7.3, 7.4, 8.0]
+        stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
@@ -49,54 +47,89 @@ jobs:
       - name: Setup Memcached
         uses: niden/actions-memcached@v7
 
-      - name: Install dependencies
-        run: |
-          composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
-          composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+      - name: Setup problem matchers
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Install PHP 7 dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-dist --no-interaction --no-progress
+        if: "matrix.php < 8"
+
+      - name: Install PHP 8 dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: |
+            composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
+            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+        if: "matrix.php >= 8"
 
       - name: Execute tests
-        run: vendor/bin/phpunit --verbose --stop-on-failure
+        run: vendor/bin/phpunit --verbose
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
 
-#  windows_tests:
-#
-#    runs-on: windows-latest
-#    strategy:
-#      fail-fast: true
-#      matrix:
-#        php: [7.2, 7.3, 7.4]
-#        include:
-#          - php: 7.2
-#            stability: prefer-lowest
-#          - php: 7.3
-#            stability: prefer-stable
-#          - php: 7.4
-#            stability: prefer-stable
-#
-#    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
-#
-#    steps:
-#      - name: Set git to use LF
-#        run: |
-#          git config --global core.autocrlf false
-#          git config --global core.eol lf
-#
-#      - name: Checkout code
-#        uses: actions/checkout@v2
-#
-#      - name: Setup PHP
-#        uses: shivammathur/setup-php@v2
-#        with:
-#          php-version: ${{ matrix.php }}
-#          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp
-#          tools: composer:v2
-#          coverage: none
-#          ini-values: memory_limit=512M
-#
-#      - name: Install dependencies
-#        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
-#
-#      - name: Execute tests
-#        run: vendor/bin/phpunit --verbose
+  windows_tests:
+
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.2, 7.3, 7.4, 8.0]
+        include:
+          - php: 7.2
+            stability: prefer-lowest
+          - php: 7.3
+            stability: prefer-stable
+          - php: 7.4
+            stability: prefer-stable
+          - php: 8.0
+            stability: prefer-stable
+
+    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
+
+    steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup problem matchers
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Install PHP 7 Dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-dist --no-interaction --no-progress
+        if: "matrix.php < 8"
+
+      - name: Install PHP 8 Dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: |
+            composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
+            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+        if: "matrix.php >= 8"
+
+      - name: Execute tests
+        run: vendor/bin/phpunit --verbose
