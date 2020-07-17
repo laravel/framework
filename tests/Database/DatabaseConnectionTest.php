@@ -178,6 +178,7 @@ class DatabaseConnectionTest extends TestCase
         $pdo->expects($this->once())->method('exec')->will($this->throwException(new Exception));
         $connection = $this->getMockConnection(['reconnect'], $pdo);
         $queryGrammar = $this->createMock(Grammar::class);
+        $queryGrammar->expects($this->once())->method('compileSavepoint')->willReturn('trans1');
         $queryGrammar->expects($this->once())->method('supportsSavepoints')->willReturn(true);
         $connection->setQueryGrammar($queryGrammar);
         $connection->expects($this->never())->method('reconnect');
