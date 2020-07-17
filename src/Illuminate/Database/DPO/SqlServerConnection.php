@@ -11,7 +11,7 @@ use PDO;
 
 class SqlServerConnection implements ServerInfoAwareConnection
 {
-    /** 
+    /**
      * @var \Illuminate\Database\PDO\Connection
      */
     private $connection;

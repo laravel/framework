@@ -2,13 +2,12 @@
 
 namespace Illuminate\Database\DPO;
 
-use Doctrine\DBAL\Driver\Exception as ExceptionInterface;
-use Doctrine\DBAL\Driver\Result as ResultInterface;
-use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
-use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Driver\PDO\Result;
 use Doctrine\DBAL\Driver\PDO\Statement;
+use Doctrine\DBAL\Driver\Result as ResultInterface;
+use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
+use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
 use PDO;
 use PDOException;
