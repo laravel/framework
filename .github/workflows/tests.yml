@@ -65,7 +65,7 @@ jobs:
           max_attempts: 5
           command: |
             composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
-            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --ignore-platform-req=php
         if: "matrix.php >= 8"
 
       - name: Execute tests
@@ -128,7 +128,7 @@ jobs:
           max_attempts: 5
           command: |
             composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
-            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --ignore-platform-req=php
         if: "matrix.php >= 8"
 
       - name: Execute tests
