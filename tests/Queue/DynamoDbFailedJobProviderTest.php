@@ -144,8 +144,6 @@ class DynamoDbFailedJobProviderTest extends TestCase
     {
         $dynamoDbClient = m::mock(DynamoDbClient::class);
 
-        $time = time();
-
         $dynamoDbClient->shouldReceive('getItem')->once()->with([
             'TableName' => 'table',
             'Key' => [
@@ -164,8 +162,6 @@ class DynamoDbFailedJobProviderTest extends TestCase
     public function testJobsCanBeDeleted()
     {
         $dynamoDbClient = m::mock(DynamoDbClient::class);
-
-        $time = time();
 
         $dynamoDbClient->shouldReceive('deleteItem')->once()->with([
             'TableName' => 'table',
