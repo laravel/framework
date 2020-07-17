@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOMySql\Driver as DoctrineDriver;
 use Doctrine\DBAL\Version;
 use Illuminate\Database\DPO\MySqlDriver;
