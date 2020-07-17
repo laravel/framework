@@ -37,8 +37,8 @@ class UpCommand extends Command
 
             unlink(storage_path('framework/down'));
 
-            if (is_file(base_path('bootstrap/maintenance.php'))) {
-                unlink(base_path('bootstrap/maintenance.php'));
+            if (is_file(storage_path('framework/maintenance.php'))) {
+                unlink(storage_path('framework/maintenance.php'));
             }
 
             $this->info('Application is now live.');

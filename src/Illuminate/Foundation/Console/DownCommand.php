@@ -47,7 +47,7 @@ class DownCommand extends Command
             );
 
             file_put_contents(
-                base_path('bootstrap/maintenance.php'),
+                storage_path('framework/maintenance.php'),
                 file_get_contents(__DIR__.'/stubs/maintenance-mode.stub')
             );
 
