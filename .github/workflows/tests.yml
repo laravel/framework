@@ -58,14 +58,20 @@ jobs:
           command: composer update --prefer-dist --no-interaction --no-progress
         if: "matrix.php < 8"
 
-      - name: Install PHP 8 dependencies
+      - name: Setup PHP 8 Dependencies
         uses: nick-invision/retry@v1
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: |
-            composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
-            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --ignore-platform-req=php
+          command: composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
+        if: "matrix.php >= 8"
+
+      - name: Install PHP 8 Dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --ignore-platform-req=php
         if: "matrix.php >= 8"
 
       - name: Execute tests
@@ -121,14 +127,20 @@ jobs:
           command: composer update --prefer-dist --no-interaction --no-progress
         if: "matrix.php < 8"
 
+      - name: Setup PHP 8 Dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
+        if: "matrix.php >= 8"
+
       - name: Install PHP 8 Dependencies
         uses: nick-invision/retry@v1
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: |
-            composer require "phpunit/phpunit:^9.3" "phpdocumentor/reflection-docblock:^5.2" "doctrine/dbal:^3.0" --no-update --no-interaction
-            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --ignore-platform-req=php
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --ignore-platform-req=php
         if: "matrix.php >= 8"
 
       - name: Execute tests

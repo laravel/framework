@@ -18,7 +18,9 @@
         </testsuite>
     </testsuites>
     <coverage processUncoveredFiles="true">
-        <directory suffix=".php">./src</directory>
+        <include>
+            <directory suffix=".php">./src</directory>
+        </include>
         <exclude>
             <directory suffix=".blade.php">./src/</directory>
         </exclude>
