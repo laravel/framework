@@ -66,7 +66,7 @@ trait DatabaseRule
             $model = new $table;
 
             return implode('.', array_map(function (string $part) {
-                return trim($parts, '.');
+                return trim($part, '.');
             }, array_filter([$model->getConnectionName(), $model->getTable()])));
         }
 
