@@ -50,12 +50,12 @@ trait CompilesConditionals
     /**
      * Compile the env statements into valid PHP.
      *
-     * @param  string  $environment
+     * @param  string  $environments
      * @return string
      */
-    protected function compileEnv($environment)
+    protected function compileEnv($environments)
     {
-        return "<?php if(app()->environment{$environment}): ?>";
+        return "<?php if(app()->environment{$environments}): ?>";
     }
 
     /**
