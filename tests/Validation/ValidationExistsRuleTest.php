@@ -51,6 +51,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertSame('exists:users,column,foo,"bar"', (string) $rule);
 
+        $rule = new Exists(UserWithConnection::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:mysql.users,column,foo,"bar"', (string) $rule);
+
         $rule = new Exists('Illuminate\Tests\Validation\User', 'column');
         $rule->where('foo', 'bar');
         $this->assertSame('exists:users,column,foo,"bar"', (string) $rule);
@@ -200,6 +204,11 @@ class User extends Eloquent
     protected $table = 'users';
     protected $guarded = [];
     public $timestamps = false;
+}
+
+class UserWithConnection extends User
+{
+    protected $connection = 'mysql';
 }
 
 class NoTableNameModel extends Eloquent

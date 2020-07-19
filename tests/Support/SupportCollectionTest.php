@@ -207,9 +207,11 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([1, 2, 3, 4, 5, 6]);
 
-        $data = $data->skip(4)->values();
+        // Total items to skip is smaller than collection length
+        $this->assertSame([5, 6], $data->skip(4)->values()->all());
 
-        $this->assertSame([5, 6], $data->all());
+        // Total items to skip is more than collection length
+        $this->assertSame([], $data->skip(10)->values()->all());
     }
 
     /**
@@ -219,15 +221,35 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([1, 1, 2, 2, 3, 3, 4, 4]);
 
-        $data = $data->skipUntil(3)->values();
+        // Item at the beginning of the collection
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $data->skipUntil(1)->values()->all());
+
+        // Item at the middle of the collection
+        $this->assertSame([3, 3, 4, 4], $data->skipUntil(3)->values()->all());
+
+        // Item not in the collection
+        $this->assertSame([], $data->skipUntil(5)->values()->all());
+
+        // Item at the beginning of the collection
+        $data = $data->skipUntil(function ($value, $key) {
+            return $value <= 1;
+        })->values();
+
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $data->all());
+
+        // Item at the middle of the collection
+        $data = $data->skipUntil(function ($value, $key) {
+            return $value >= 3;
+        })->values();
 
         $this->assertSame([3, 3, 4, 4], $data->all());
 
+        // Item not in the collection
         $data = $data->skipUntil(function ($value, $key) {
-            return $value > 3;
+            return $value >= 5;
         })->values();
 
-        $this->assertSame([4, 4], $data->all());
+        $this->assertSame([], $data->all());
     }
 
     /**
@@ -237,10 +259,30 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([1, 1, 2, 2, 3, 3, 4, 4]);
 
-        $data = $data->skipWhile(1)->values();
+        // Item at the beginning of the collection
+        $this->assertSame([2, 2, 3, 3, 4, 4], $data->skipWhile(1)->values()->all());
 
-        $this->assertSame([2, 2, 3, 3, 4, 4], $data->all());
+        // Item not in the collection
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $data->skipWhile(5)->values()->all());
 
+        // Item in the collection but not at the beginning
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $data->skipWhile(2)->values()->all());
+
+        // Item not in the collection
+        $data = $data->skipWhile(function ($value, $key) {
+            return $value >= 5;
+        })->values();
+
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $data->all());
+
+        // Item in the collection but not at the beginning
+        $data = $data->skipWhile(function ($value, $key) {
+            return $value >= 2;
+        })->values();
+
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $data->all());
+
+        // Item at the beginning of the collection
         $data = $data->skipWhile(function ($value, $key) {
             return $value < 3;
         })->values();
