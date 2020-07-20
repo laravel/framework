@@ -118,7 +118,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         $adapter = $this->driver->getAdapter();
         if ($adapter instanceof CachedAdapter) {
-             $adapter = $adapter->getAdapter();
+            $adapter = $adapter->getAdapter();
         }
         return $adapter->getPathPrefix().$path;
     }
