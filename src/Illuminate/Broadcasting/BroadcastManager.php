@@ -3,6 +3,7 @@
 namespace Illuminate\Broadcasting;
 
 use Closure;
+use Illuminate\Broadcasting\Broadcasters\LarasocketBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
@@ -218,6 +219,17 @@ class BroadcastManager implements FactoryContract
         }
 
         return new PusherBroadcaster($pusher);
+    }
+
+    /**
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createLarasocketDriver(array $config)
+    {
+        return new LarasocketBroadcaster($config);
     }
 
     /**
