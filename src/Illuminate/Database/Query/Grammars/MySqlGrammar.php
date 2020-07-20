@@ -17,9 +17,8 @@ class MySqlGrammar extends Grammar
     /**
      * Add a "where null" clause to the query.
      *
-     * @param  string|array  $columns
-     * @param  string  $boolean
-     * @param  bool  $not
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return $this
      */
     protected function whereNull(Builder $query, $where)
@@ -36,8 +35,8 @@ class MySqlGrammar extends Grammar
     /**
      * Add a "where not null" clause to the query.
      *
-     * @param  string|array  $columns
-     * @param  string  $boolean
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return $this
      */
     protected function whereNotNull(Builder $query, $where)

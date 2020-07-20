@@ -599,7 +599,7 @@ class Builder
     /**
      * Get a new join clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $parentQuery
+     * @param  self  $parentQuery
      * @param  string  $type
      * @param  string  $table
      * @return \Illuminate\Database\Query\JoinClause
@@ -1382,7 +1382,7 @@ class Builder
     /**
      * Add another query builder as a nested where to the query builder.
      *
-     * @param  $this  $query
+     * @param  static  $query
      * @param  string  $boolean
      * @return $this
      */
@@ -1484,7 +1484,7 @@ class Builder
     /**
      * Add an exists clause to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  self  $query
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -3004,7 +3004,7 @@ class Builder
     /**
      * Merge an array of bindings into our bindings.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  self  $query
      * @return $this
      */
     public function mergeBindings(self $query)

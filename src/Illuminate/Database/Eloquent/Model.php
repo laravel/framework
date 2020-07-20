@@ -1128,7 +1128,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Create a new pivot model instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  self  $parent
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists

@@ -16,7 +16,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Determine if there are more items in the data source.
      *
-     * @return bool
+     * @var bool
      */
     protected $hasMore;
 

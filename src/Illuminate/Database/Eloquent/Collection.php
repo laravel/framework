@@ -139,7 +139,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a relationship path if it is not already eager loaded.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection  $models
+     * @param  static $models
      * @param  array  $path
      * @return void
      */
