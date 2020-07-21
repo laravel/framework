@@ -442,6 +442,17 @@ class ViewFactoryTest extends TestCase
         $this->assertFalse($factory->hasSection('bar'));
     }
 
+    public function testSectionMissing()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        echo 'hello world';
+        $factory->stopSection();
+
+        $this->assertTrue($factory->sectionMissing('bar'));
+        $this->assertFalse($factory->sectionMissing('foo'));
+    }
+
     public function testGetSection()
     {
         $factory = $this->getFactory();
