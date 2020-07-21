@@ -136,6 +136,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the section-missing statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileSectionMissing($expression)
+    {
+        return "<?php if (empty(trim(\$__env->yieldContent{$expression}))): ?>";
+    }
+
+    /**
      * Compile the if statements into valid PHP.
      *
      * @param  string  $expression
