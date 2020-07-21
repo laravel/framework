@@ -685,12 +685,11 @@ class TestResponse implements ArrayAccess
     /**
      * Validate and return the decoded response JSON.
      *
-     * @param  string|null  $key
      * @return \Illuminate\Testing\TestJson
      *
      * @throws \Throwable
      */
-    public function decodeResponseJson($key = null)
+    public function decodeResponseJson()
     {
         $testJson = new TestJson($this->getContent());
 
