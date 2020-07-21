@@ -52,7 +52,7 @@ interface Filesystem
      * @param  string  $path
      * @param  string|resource  $contents
      * @param  mixed  $options
-     * @return bool
+     * @return void
      */
     public function put($path, $contents, $options = []);
 
