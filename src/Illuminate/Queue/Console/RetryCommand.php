@@ -53,10 +53,31 @@ class RetryCommand extends Command
         $ids = (array) $this->argument('id');
 
         if (count($ids) === 1 && $ids[0] === 'all') {
-            $ids = Arr::pluck($this->laravel['queue.failer']->all(), 'id');
+            return Arr::pluck($this->laravel['queue.failer']->all(), 'id');
         }
 
-        return $ids;
+        return $this->getJobIdsByList($ids);
+    }
+
+    /**
+     * Get the job IDs to be retried from argument array list
+     *
+     * @param  array $list
+     * @return array
+     */
+    protected function getJobIdsByList(array $list)
+    {
+        $ids = [];
+
+        foreach ($list as $id) {
+            if (preg_match('/^[0-9]+\-[0-9]+$/', $id)) {
+                $ids = array_merge($ids, range(...explode('-', $id)));
+            } else {
+                $ids[] = $id;
+            }
+        }
+
+        return array_unique(array_filter($ids));
     }
 
     /**
