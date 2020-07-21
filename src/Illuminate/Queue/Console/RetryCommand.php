@@ -60,7 +60,7 @@ class RetryCommand extends Command
     }
 
     /**
-     * Get the job IDs to be retried from argument array list
+     * Get the job IDs to be retried from argument array list.
      *
      * @param  array $list
      * @return array
@@ -77,7 +77,7 @@ class RetryCommand extends Command
             }
         }
 
-        return array_unique(array_filter($ids));
+        return array_unique(array_filter(array_map('intval', $ids)));
     }
 
     /**
