@@ -84,6 +84,40 @@ class Command extends SymfonyCommand
         if (! isset($this->signature)) {
             $this->specifyParameters();
         }
+
+        $this->boot();
+    }
+
+    /**
+     * Bootstrap the command and its traits.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->bootTraits();
+    }
+
+    /**
+     * Boot all of the bootable traits on the command.
+     *
+     * @return void
+     */
+    protected function bootTraits()
+    {
+        $class = $this;
+
+        $booted = [];
+
+        foreach (class_uses_recursive($class) as $trait) {
+            $method = 'boot'.class_basename($trait);
+
+            if (method_exists($class, $method) && ! in_array($method, $booted)) {
+                call_user_func([$class, $method]);
+
+                $booted[] = $method;
+            }
+        }
     }
 
     /**
