@@ -121,7 +121,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'required']);
 
-        $v->validate();
+        $this->assertSame(['foo' => 'bar'], $v->validate());
     }
 
     public function testHasFailedValidationRules()

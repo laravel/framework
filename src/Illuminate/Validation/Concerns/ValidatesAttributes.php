@@ -14,7 +14,6 @@ use Egulias\EmailValidator\Validation\SpoofCheckValidation;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
@@ -185,19 +184,9 @@ trait ValidatesAttributes
      */
     protected function getDateTimestamp($value)
     {
-        if ($value instanceof DateTimeInterface) {
-            return $value->getTimestamp();
-        }
+        $date = is_null($value) ? null : $this->getDateTime($value);
 
-        if ($this->isTestingRelativeDateTime($value)) {
-            $date = $this->getDateTime($value);
-
-            if (! is_null($date)) {
-                return $date->getTimestamp();
-            }
-        }
-
-        return strtotime($value);
+        return $date ? $date->getTimestamp() : null;
     }
 
     /**
@@ -245,27 +234,10 @@ trait ValidatesAttributes
     protected function getDateTime($value)
     {
         try {
-            if ($this->isTestingRelativeDateTime($value)) {
-                return Date::parse($value);
-            }
-
-            return date_create($value) ?: null;
+            return Date::parse($value);
         } catch (Exception $e) {
             //
         }
-    }
-
-    /**
-     * Check if the given value should be adjusted to Carbon::getTestNow().
-     *
-     * @param  mixed  $value
-     * @return bool
-     */
-    protected function isTestingRelativeDateTime($value)
-    {
-        return Carbon::hasTestNow() && is_string($value) && (
-            $value === 'now' || Carbon::hasRelativeKeywords($value)
-        );
     }
 
     /**
