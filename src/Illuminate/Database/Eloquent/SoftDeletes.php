@@ -83,7 +83,9 @@ trait SoftDeletes
 
         $time = $this->freshTimestamp();
 
-        $columns = [$this->getDeletedAtColumn() => $this->fromDateTime($time)];
+        $columns = array_merge($query->getModel()->getDirty(), [
+            $this->getDeletedAtColumn() => $this->fromDateTime($time)
+        ]);
 
         $this->{$this->getDeletedAtColumn()} = $time;
 
