@@ -834,18 +834,14 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingGeneratedColumn()
     {
         $blueprint = new Blueprint('products');
+        $blueprint->create();
         $blueprint->integer('price');
         $blueprint->integer('discounted_virtual')->virtualAs('price - 5');
         $blueprint->integer('discounted_stored')->storedAs('price - 5');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(3, $statements);
-        $expected = [
-            'alter table "products" add column "price" integer not null',
-            'alter table "products" add column "discounted_virtual" integer as (price - 5)',
-            'alter table "products" add column "discounted_stored" integer as (price - 5) stored',
-        ];
-        $this->assertSame($expected, $statements);
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "products" ("price" integer not null, "discounted_virtual" integer as (price - 5), "discounted_stored" integer as (price - 5) stored)', $statements[0]);
 
         $blueprint = new Blueprint('products');
         $blueprint->integer('price');
@@ -853,11 +849,10 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->integer('discounted_stored')->storedAs('price - 5')->nullable(false);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(3, $statements);
+        $this->assertCount(2, $statements);
         $expected = [
             'alter table "products" add column "price" integer not null',
             'alter table "products" add column "discounted_virtual" integer as (price - 5) not null',
-            'alter table "products" add column "discounted_stored" integer as (price - 5) stored not null',
         ];
         $this->assertSame($expected, $statements);
     }
