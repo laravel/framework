@@ -84,18 +84,6 @@ class Command extends SymfonyCommand
         if (! isset($this->signature)) {
             $this->specifyParameters();
         }
-
-        $this->boot();
-    }
-
-    /**
-     * Bootstrap the command and its traits.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->bootTraits();
     }
 
     /**
@@ -165,6 +153,8 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->bootTraits();
+
         return (int) $this->laravel->call([$this, 'handle']);
     }
 
