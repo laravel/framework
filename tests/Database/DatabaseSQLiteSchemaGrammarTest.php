@@ -831,6 +831,37 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "geo" add column "coordinates" multipolygon not null', $statements[0]);
     }
 
+    public function testAddingGeneratedColumn()
+    {
+        $blueprint = new Blueprint('products');
+        $blueprint->integer('price');
+        $blueprint->integer('discounted_virtual')->virtualAs('price - 5');
+        $blueprint->integer('discounted_stored')->storedAs('price - 5');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(3, $statements);
+        $expected = [
+            'alter table "products" add column "price" integer not null',
+            'alter table "products" add column "discounted_virtual" integer as (price - 5)',
+            'alter table "products" add column "discounted_stored" integer as (price - 5) stored',
+        ];
+        $this->assertSame($expected, $statements);
+
+        $blueprint = new Blueprint('products');
+        $blueprint->integer('price');
+        $blueprint->integer('discounted_virtual')->virtualAs('price - 5')->nullable(false);
+        $blueprint->integer('discounted_stored')->storedAs('price - 5')->nullable(false);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(3, $statements);
+        $expected = [
+            'alter table "products" add column "price" integer not null',
+            'alter table "products" add column "discounted_virtual" integer as (price - 5) not null',
+            'alter table "products" add column "discounted_stored" integer as (price - 5) stored not null',
+        ];
+        $this->assertSame($expected, $statements);
+    }
+
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.
