@@ -4,7 +4,7 @@ namespace Illuminate\Database;
 
 use Doctrine\DBAL\Driver\PDOMySql\Driver as DoctrineDriver;
 use Doctrine\DBAL\Version;
-use Illuminate\Database\DPO\MySqlDriver;
+use Illuminate\Database\PDO\MySqlDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
@@ -59,7 +59,7 @@ class MySqlConnection extends Connection
     /**
      * Get the Doctrine DBAL driver.
      *
-     * @return \Doctrine\DBAL\Driver\PDOMySql\Driver|\Illuminate\Database\DPO\MySqlDriver
+     * @return \Doctrine\DBAL\Driver\PDOMySql\Driver|\Illuminate\Database\PDO\MySqlDriver
      */
     protected function getDoctrineDriver()
     {

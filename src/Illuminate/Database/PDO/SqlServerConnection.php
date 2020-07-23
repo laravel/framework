@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Database\DPO;
+namespace Illuminate\Database\PDO;
 
 use Doctrine\DBAL\Driver\PDO\SQLSrv\Statement;
 use Doctrine\DBAL\Driver\Result;

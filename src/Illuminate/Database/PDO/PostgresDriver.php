@@ -1,11 +1,11 @@
 <?php
 
-namespace Illuminate\Database\DPO;
+namespace Illuminate\Database\PDO;
 
-use Doctrine\DBAL\Driver\AbstractSQLiteDriver;
+use Doctrine\DBAL\Driver\AbstractPostgreSQLDriver;
 use PDO;
 
-class SQLiteDriver extends AbstractSQLiteDriver
+class PostgresDriver extends AbstractPostgreSQLDriver
 {
     public function connect(array $params)
     {
