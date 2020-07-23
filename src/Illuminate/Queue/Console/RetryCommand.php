@@ -14,7 +14,7 @@ class RetryCommand extends Command
      */
     protected $signature = 'queue:retry
                             {id?* : The ID of the failed job or "all" to retry all jobs}
-                            {--range=* : Range of ids (only numeric are allowed) to be retried}';
+                            {--range=* : Range of job IDs (numeric) to be retried}';
 
     /**
      * The console command description.
@@ -66,9 +66,9 @@ class RetryCommand extends Command
     }
 
     /**
-     * Get the job IDs from range option.
+     * Get the job IDs ranges, if applicable.
      *
-     * @param  array $ranges
+     * @param  array  $ranges
      * @return array
      */
     protected function getJobIdsByRanges(array $ranges)
