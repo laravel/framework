@@ -3,7 +3,6 @@
 namespace Illuminate\Filesystem;
 
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
-use Illuminate\Contracts\Filesystem\FileExistsException as ContractFileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
@@ -12,10 +11,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use League\Flysystem\Adapter\Ftp;
-use League\Flysystem\Adapter\Local as LocalAdapter;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\FTP\FtpAdapter;
+use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
+use League\Flysystem\PathPrefixer;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToDeleteDirectory;
@@ -43,14 +43,40 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected $driver;
 
     /**
+     * The Flysystem adapter implementation.
+     *
+     * @var \League\Flysystem\FilesystemAdapter
+     */
+    protected $adapter;
+
+    /**
+     * The filesystem configuration.
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * The Flysystem PathPrefixer instance.
+     *
+     * @var \League\Flysystem\PathPrefixer
+     */
+    protected $prefixer;
+
+    /**
      * Create a new filesystem adapter instance.
      *
      * @param  \League\Flysystem\FilesystemOperator  $driver
+     * @param  \League\Flysystem\FilesystemAdapter  $adapter
+     * @param  array  $config
      * @return void
      */
-    public function __construct(FilesystemOperator $driver)
+    public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config)
     {
         $this->driver = $driver;
+        $this->adapter = $adapter;
+        $this->config = $config;
+        $this->prefixer = new PathPrefixer($config['root'] ?? '');
     }
 
     /**
@@ -121,7 +147,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function path($path)
     {
-        return $this->driver->getAdapter()->getPathPrefix().$path;
+        return $this->prefixer->prefixPath($path);
     }
 
     /**
@@ -361,9 +387,7 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         foreach ($paths as $path) {
             try {
-                if (! $this->driver->delete($path)) {
-                    $success = false;
-                }
+                $this->driver->delete($path);
             } catch (UnableToDeleteFile $e) {
                 $success = false;
             }
@@ -442,41 +466,14 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * Get the URL for the file at the given path.
-     *
-     * @param  string  $path
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    public function url($path)
-    {
-        $adapter = $this->driver->getAdapter();
-
-        if (method_exists($adapter, 'getUrl')) {
-            return $adapter->getUrl($path);
-        } elseif (method_exists($this->driver, 'getUrl')) {
-            return $this->driver->getUrl($path);
-        } elseif ($adapter instanceof AwsS3Adapter) {
-            return $this->getAwsUrl($adapter, $path);
-        } elseif ($adapter instanceof Ftp) {
-            return $this->getFtpUrl($path);
-        } elseif ($adapter instanceof LocalAdapter) {
-            return $this->getLocalUrl($path);
-        } else {
-            throw new RuntimeException('This driver does not support retrieving URLs.');
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function readStream($path)
     {
         try {
-            return $this->driver->readStream($path) ?: null;
+            return $this->driver->readStream($path);
         } catch (UnableToReadFile $e) {
-            throw new ContractFileNotFoundException($e->getMessage(), $e->getCode(), $e);
+            return null;
         }
     }
 
@@ -486,31 +483,37 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function writeStream($path, $resource, array $options = [])
     {
         try {
-            return $this->driver->writeStream($path, $resource, $options);
+            $this->driver->writeStream($path, $resource, $options);
         } catch (UnableToWriteFile $e) {
-            throw new ContractFileExistsException($e->getMessage(), $e->getCode(), $e);
+            return false;
         }
+
+        return true;
     }
 
     /**
      * Get the URL for the file at the given path.
      *
-     * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
      * @param  string  $path
      * @return string
+     *
+     * @throws \RuntimeException
      */
-    protected function getAwsUrl($adapter, $path)
+    public function url($path)
     {
-        // If an explicit base URL has been set on the disk configuration then we will use
-        // it as the base URL instead of the default path. This allows the developer to
-        // have full control over the base path for this filesystem's generated URLs.
-        if (! is_null($url = $this->driver->getConfig()->get('url'))) {
-            return $this->concatPathToUrl($url, $adapter->getPathPrefix().$path);
-        }
+        $adapter = $this->adapter;
 
-        return $adapter->getClient()->getObjectUrl(
-            $adapter->getBucket(), $adapter->getPathPrefix().$path
-        );
+        if (method_exists($adapter, 'getUrl')) {
+            return $adapter->getUrl($path);
+        } elseif (method_exists($this->driver, 'getUrl')) {
+            return $this->driver->getUrl($path);
+        } elseif ($adapter instanceof FtpAdapter) {
+            return $this->getFtpUrl($path);
+        } elseif ($adapter instanceof LocalAdapter) {
+            return $this->getLocalUrl($path);
+        } else {
+            throw new RuntimeException('This driver does not support retrieving URLs.');
+        }
     }
 
     /**
@@ -521,10 +524,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     protected function getFtpUrl($path)
     {
-        $config = $this->driver->getConfig();
-
-        return $config->has('url')
-                ? $this->concatPathToUrl($config->get('url'), $path)
+        return isset($this->config['url'])
+                ? $this->concatPathToUrl($this->config['url'], $path)
                 : $path;
     }
 
@@ -536,13 +537,11 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     protected function getLocalUrl($path)
     {
-        $config = $this->driver->getConfig();
-
         // If an explicit base URL has been set on the disk configuration then we will use
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
-        if ($config->has('url')) {
-            return $this->concatPathToUrl($config->get('url'), $path);
+        if (isset($this->config['url'])) {
+            return $this->concatPathToUrl($this->config['url'], $path);
         }
 
         $path = '/storage/'.$path;
@@ -569,38 +568,11 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function temporaryUrl($path, $expiration, array $options = [])
     {
-        $adapter = $this->driver->getAdapter();
-
-        if (method_exists($adapter, 'getTemporaryUrl')) {
-            return $adapter->getTemporaryUrl($path, $expiration, $options);
-        } elseif ($adapter instanceof AwsS3Adapter) {
-            return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
-        } else {
+        if (! method_exists($this->adapter, 'getTemporaryUrl')) {
             throw new RuntimeException('This driver does not support creating temporary URLs.');
         }
-    }
 
-    /**
-     * Get a temporary URL for the file at the given path.
-     *
-     * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
-     * @param  string  $path
-     * @param  \DateTimeInterface  $expiration
-     * @param  array  $options
-     * @return string
-     */
-    public function getAwsTemporaryUrl($adapter, $path, $expiration, $options)
-    {
-        $client = $adapter->getClient();
-
-        $command = $client->getCommand('GetObject', array_merge([
-            'Bucket' => $adapter->getBucket(),
-            'Key' => $adapter->getPathPrefix().$path,
-        ], $options));
-
-        return (string) $client->createPresignedRequest(
-            $command, $expiration
-        )->getUri();
+        return $this->adapter->getTemporaryUrl($path, $expiration, $options);
     }
 
     /**

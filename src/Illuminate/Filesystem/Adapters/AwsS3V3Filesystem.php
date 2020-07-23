@@ -1,0 +1,80 @@
+<?php
+
+namespace Illuminate\Filesystem\Adapters;
+
+use Aws\S3\S3Client;
+use Illuminate\Filesystem\FilesystemAdapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Filesystem as FlysystemAwsS3V3Filesystem;
+use League\Flysystem\FilesystemOperator;
+
+class AwsS3V3Filesystem extends FilesystemAdapter
+{
+    /**
+     * The AWS S3 client.
+     *
+     * @var S3Client
+     */
+    protected $client;
+
+    /**
+     * Create a new AwsS3V3FilesystemAdapter instance.
+     *
+     * @param  \League\Flysystem\FilesystemOperator  $driver
+     * @param  \League\Flysystem\AwsS3V3\AwsS3V3Filesystem  $adapter
+     * @param  array  $config
+     * @param  \Aws\S3\S3Client  $client
+     * @return void
+     */
+    public function __construct(
+        FilesystemOperator $driver,
+        FlysystemAwsS3V3Filesystem $adapter,
+        array $config,
+        S3Client $client
+    ) {
+        parent::__construct($driver, $adapter, $config);
+
+        $this->client = $client;
+    }
+
+    /**
+     * Get the URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function url($path)
+    {
+        // If an explicit base URL has been set on the disk configuration then we will use
+        // it as the base URL instead of the default path. This allows the developer to
+        // have full control over the base path for this filesystem's generated URLs.
+        if (isset($this->config['url'])) {
+            return $this->concatPathToUrl($this->config['url'], $this->prefixer->prefixPath($path));
+        }
+
+        return $this->client->getObjectUrl(
+            $this->config['bucket'], $this->prefixer->prefixPath($path)
+        );
+    }
+
+    /**
+     * Get a temporary URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
+     * @return string
+     */
+    public function temporaryUrl($path, $expiration, array $options = [])
+    {
+        $command = $this->client->getCommand('GetObject', array_merge([
+            'Bucket' => $this->config['bucket'],
+            'Key' => $this->prefixer->prefixPath($path),
+        ], $options));
+
+        return (string) $this->client->createPresignedRequest(
+            $command, $expiration
+        )->getUri();
+    }
+}

@@ -5,13 +5,13 @@ namespace Illuminate\Filesystem;
 use Aws\S3\S3Client;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
+use Illuminate\Filesystem\Adapters\AwsS3V3Filesystem;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3V3\AwsS3V3Filesystem as S3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter as AwsS3PortableVisibilityConverter;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
-use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FTP\FtpAdapter as FtpAdapter;
 use League\Flysystem\FTP\FtpConnectionOptions;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
@@ -143,13 +143,7 @@ class FilesystemManager implements FactoryContract
      */
     protected function callCustomCreator(array $config)
     {
-        $driver = $this->customCreators[$config['driver']]($this->app, $config);
-
-        if ($driver instanceof FilesystemOperator) {
-            return $this->adapt($driver);
-        }
-
-        return $driver;
+        return $this->customCreators[$config['driver']]($this->app, $config);
     }
 
     /**
@@ -168,9 +162,11 @@ class FilesystemManager implements FactoryContract
             ? LocalAdapter::SKIP_LINKS
             : LocalAdapter::DISALLOW_LINKS;
 
-        return $this->adapt($this->createFlysystem(new LocalAdapter(
+        $adapter = new LocalAdapter(
             $config['root'], $visibility, $config['lock'] ?? LOCK_EX, $links
-        ), $config));
+        );
+
+        return new FilesystemAdapter($this->createFlysystem($adapter, $config), $adapter, $config);
     }
 
     /**
@@ -181,9 +177,9 @@ class FilesystemManager implements FactoryContract
      */
     public function createFtpDriver(array $config)
     {
-        return $this->adapt($this->createFlysystem(
-            new FtpAdapter(FtpConnectionOptions::fromArray($config)), $config
-        ));
+        $adapter = new FtpAdapter(FtpConnectionOptions::fromArray($config));
+
+        return new FilesystemAdapter($this->createFlysystem($adapter, $config), $adapter, $config);
     }
 
     /**
@@ -211,9 +207,9 @@ class FilesystemManager implements FactoryContract
             $config['permissions'] ?? []
         );
 
-        return $this->adapt($this->createFlysystem(
-            new SftpAdapter($provider, $root, $visibility), $config
-        ));
+        $adapter = new SftpAdapter($provider, $root, $visibility);
+
+        return new FilesystemAdapter($this->createFlysystem($adapter, $config), $adapter, $config);
     }
 
     /**
@@ -232,9 +228,13 @@ class FilesystemManager implements FactoryContract
             $config['visibility'] ?? Visibility::PUBLIC
         );
 
-        return $this->adapt($this->createFlysystem(
-            new S3Adapter(new S3Client($s3Config), $s3Config['bucket'], $root, $visibility), $config
-        ));
+        $client = new S3Client($s3Config);
+
+        $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility);
+
+        return new AwsS3V3Filesystem(
+            $this->createFlysystem($adapter, $config), $adapter, $s3Config, $client
+        );
     }
 
     /**
@@ -266,17 +266,6 @@ class FilesystemManager implements FactoryContract
         $config = Arr::only($config, ['visibility', 'disable_asserts', 'url']);
 
         return new Flysystem($adapter, count($config) > 0 ? $config : null);
-    }
-
-    /**
-     * Adapt the filesystem implementation.
-     *
-     * @param  \League\Flysystem\FilesystemOperator  $filesystem
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
-     */
-    protected function adapt(FilesystemOperator $filesystem)
-    {
-        return new FilesystemAdapter($filesystem);
     }
 
     /**

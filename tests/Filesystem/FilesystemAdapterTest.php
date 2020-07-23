@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Filesystem;
 
 use GuzzleHttp\Psr7\Stream;
-use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
@@ -95,13 +94,6 @@ class FilesystemAdapterTest extends TestCase
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertTrue($filesystemAdapter->missing('file.txt'));
-    }
-
-    public function testPath()
-    {
-        $this->filesystem->write('file.txt', 'Hello World');
-        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
-        $this->assertEquals($this->tempDir.DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->path('file.txt'));
     }
 
     public function testGet()
@@ -206,14 +198,13 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($original_content, $secondFilesystemAdapter->get('copy.txt'));
     }
 
-    public function testStreamToExistingFileThrows()
+    public function testStreamToExistingFileReturnsFalse()
     {
-        $this->expectException(FileExistsException::class);
         $this->filesystem->write('file.txt', 'Hello World');
         $this->filesystem->write('existing.txt', 'Dear Kate');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $readStream = $filesystemAdapter->readStream('file.txt');
-        $filesystemAdapter->writeStream('existing.txt', $readStream);
+        $this->assertFalse($filesystemAdapter->writeStream('existing.txt', $readStream));
     }
 
     public function testReadStreamNonExistentFileThrows()
