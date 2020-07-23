@@ -77,7 +77,7 @@ class RetryCommand extends Command
             }
         }
 
-        return array_unique(array_filter(array_map('intval', $ids)));
+        return array_filter(array_unique($ids));
     }
 
     /**
