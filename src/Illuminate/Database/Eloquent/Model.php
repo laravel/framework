@@ -377,7 +377,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
     
     /**
-     * This will return the next available record
      * @param int $id
      * @param null|default ['*'] $columns
      * @return \Illuminate\Database\Eloquent\Builder|Model
@@ -388,7 +387,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
     
     /**
-     * This will return the previous available record
      * @param int $id
      * @param null|default ['*'] $columns
      * @return \Illuminate\Database\Eloquent\Builder|Model
