@@ -863,7 +863,7 @@ class BelongsToMany extends Relation
 
         return $this->query->chunk($count, function ($results, $page) use ($callback) {
             return $callback($results, $page);
-        });
+        }, $columns);
     }
 
     /**
