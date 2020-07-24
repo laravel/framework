@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Schema;
 
-use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Fluent;
 
 /**
@@ -21,12 +20,12 @@ use Illuminate\Support\Fluent;
  * @method $this persisted() Mark the computed generated column as persistent (SQL Server)
  * @method $this primary() Add a primary index
  * @method $this spatialIndex() Add a spatial index
- * @method $this storedAs(string $expression) Create a stored generated column (MySQL)
+ * @method $this storedAs(string $expression) Create a stored generated column (MySQL/SQLite)
  * @method $this type(string $type) Specify a type for the column
  * @method $this unique(string $indexName = null) Add a unique index
  * @method $this unsigned() Set the INTEGER column as UNSIGNED (MySQL)
  * @method $this useCurrent() Set the TIMESTAMP column to use CURRENT_TIMESTAMP as default value
- * @method $this virtualAs(string $expression) Create a virtual generated column (MySQL)
+ * @method $this virtualAs(string $expression) Create a virtual generated column (MySQL/SQLite)
  */
 class ColumnDefinition extends Fluent
 {
