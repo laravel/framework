@@ -977,6 +977,7 @@ trait HasAttributes
                 $this->getCreatedAtColumn(),
                 $this->getUpdatedAtColumn(),
             ];
+
             return array_unique(array_merge($this->dates, $defaults));
         }
 
