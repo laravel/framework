@@ -455,11 +455,12 @@ class HasManyThrough extends Relation
      *
      * @param  int  $count
      * @param  callable  $callback
+     * @param  array|string  $columns
      * @return bool
      */
-    public function chunk($count, callable $callback)
+    public function chunk($count, callable $callback, $columns = ['*'])
     {
-        return $this->prepareQueryBuilder()->chunk($count, $callback);
+        return $this->prepareQueryBuilder()->chunk($count, $callback, $columns);
     }
 
     /**
@@ -469,15 +470,16 @@ class HasManyThrough extends Relation
      * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
+     * @param  array|string  $columns
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = null, $alias = null)
+    public function chunkById($count, callable $callback, $column = null, $alias = null, $columns = ['*'])
     {
         $column = $column ?? $this->getRelated()->getQualifiedKeyName();
 
         $alias = $alias ?? $this->getRelated()->getKeyName();
 
-        return $this->prepareQueryBuilder()->chunkById($count, $callback, $column, $alias);
+        return $this->prepareQueryBuilder()->chunkById($count, $callback, $column, $alias, $columns);
     }
 
     /**
@@ -495,9 +497,10 @@ class HasManyThrough extends Relation
      *
      * @param  callable  $callback
      * @param  int  $count
+     * @param  array|string  $columns
      * @return bool
      */
-    public function each(callable $callback, $count = 1000)
+    public function each(callable $callback, $count = 1000, $columns = ['*'])
     {
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
@@ -505,7 +508,7 @@ class HasManyThrough extends Relation
                     return false;
                 }
             }
-        });
+        }, $columns);
     }
 
     /**

@@ -13,9 +13,10 @@ trait BuildsQueries
      *
      * @param  int  $count
      * @param  callable  $callback
+     * @param  array|string  $columns
      * @return bool
      */
-    public function chunk($count, callable $callback)
+    public function chunk($count, callable $callback, $columns = ['*'])
     {
         $this->enforceOrderBy();
 
@@ -25,7 +26,7 @@ trait BuildsQueries
             // We'll execute the query for the given page and get the results. If there are
             // no results we can just break and return from here. When there are results
             // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, $count)->get();
+            $results = $this->forPage($page, $count)->get($columns);
 
             $countResults = $results->count();
 
@@ -53,9 +54,10 @@ trait BuildsQueries
      *
      * @param  callable  $callback
      * @param  int  $count
+     * @param  array|string  $columns
      * @return bool
      */
-    public function each(callable $callback, $count = 1000)
+    public function each(callable $callback, $count = 1000, $columns = ['*'])
     {
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
@@ -63,7 +65,7 @@ trait BuildsQueries
                     return false;
                 }
             }
-        });
+        }, $columns);
     }
 
     /**
@@ -73,9 +75,10 @@ trait BuildsQueries
      * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
+     * @param  array|string  $columns
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = null, $alias = null)
+    public function chunkById($count, callable $callback, $column = null, $alias = null, $columns = ['*'])
     {
         $column = $column ?? $this->defaultKeyName();
 
@@ -89,7 +92,7 @@ trait BuildsQueries
             // We'll execute the query for the given page and get the results. If there are
             // no results we can just break and return from here. When there are results
             // we will call the callback with the current chunk of these results here.
-            $results = $clone->forPageAfterId($count, $lastId, $column)->get();
+            $results = $clone->forPageAfterId($count, $lastId, $column)->get($columns);
 
             $countResults = $results->count();
 
@@ -119,9 +122,10 @@ trait BuildsQueries
      * @param  int  $count
      * @param  string|null  $column
      * @param  string|null  $alias
+     * @param  array|string  $columns
      * @return bool
      */
-    public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
+    public function eachById(callable $callback, $count = 1000, $column = null, $alias = null, $columns = ['*'])
     {
         return $this->chunkById($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
@@ -129,7 +133,7 @@ trait BuildsQueries
                     return false;
                 }
             }
-        }, $column, $alias);
+        }, $column, $alias, $columns);
     }
 
     /**

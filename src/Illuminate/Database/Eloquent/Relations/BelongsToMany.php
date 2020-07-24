@@ -854,9 +854,10 @@ class BelongsToMany extends Relation
      *
      * @param  int  $count
      * @param  callable  $callback
+     * @param  array|string  $columns
      * @return bool
      */
-    public function chunk($count, callable $callback)
+    public function chunk($count, callable $callback, $columns = ['*'])
     {
         $this->query->addSelect($this->shouldSelect());
 
@@ -864,7 +865,7 @@ class BelongsToMany extends Relation
             $this->hydratePivotRelation($results->all());
 
             return $callback($results);
-        });
+        }, $columns);
     }
 
     /**
@@ -874,9 +875,10 @@ class BelongsToMany extends Relation
      * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
+     * @param  array|string  $columns
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = null, $alias = null)
+    public function chunkById($count, callable $callback, $column = null, $alias = null, $columns = ['*'])
     {
         $this->query->addSelect($this->shouldSelect());
 
@@ -890,7 +892,7 @@ class BelongsToMany extends Relation
             $this->hydratePivotRelation($results->all());
 
             return $callback($results);
-        }, $column, $alias);
+        }, $column, $alias, $columns);
     }
 
     /**
@@ -898,9 +900,10 @@ class BelongsToMany extends Relation
      *
      * @param  callable  $callback
      * @param  int  $count
+     * @param  array|string  $columns
      * @return bool
      */
-    public function each(callable $callback, $count = 1000)
+    public function each(callable $callback, $count = 1000, $columns = ['*'])
     {
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
@@ -908,7 +911,7 @@ class BelongsToMany extends Relation
                     return false;
                 }
             }
-        });
+        }, $columns);
     }
 
     /**
