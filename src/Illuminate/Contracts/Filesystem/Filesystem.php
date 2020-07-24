@@ -30,9 +30,7 @@ interface Filesystem
      * Get the contents of a file.
      *
      * @param  string  $path
-     * @return string
-     *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @return string|null
      */
     public function get($path);
 

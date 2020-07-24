@@ -3,12 +3,10 @@
 namespace Illuminate\Filesystem;
 
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
-use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
@@ -16,6 +14,7 @@ use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FTP\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\PathPrefixer;
+use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToDeleteDirectory;
@@ -154,16 +153,14 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Get the contents of a file.
      *
      * @param  string  $path
-     * @return string
-     *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @return string|null
      */
     public function get($path)
     {
         try {
             return $this->driver->read($path);
         } catch (UnableToReadFile $e) {
-            throw new ContractFileNotFoundException($path, $e->getCode(), $e);
+            return null;
         }
     }
 
@@ -473,7 +470,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->readStream($path);
         } catch (UnableToReadFile $e) {
-            return;
+            return null;
         }
     }
 
@@ -596,9 +593,14 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function files($directory = null, $recursive = false)
     {
-        $contents = $this->driver->listContents($directory, $recursive);
-
-        return $this->filterContentsByType($contents, 'file');
+        return $this->driver->listContents($directory, $recursive)
+            ->filter(function (StorageAttributes $attributes) {
+               return $attributes->isFile();
+            })
+            ->map(function (StorageAttributes $attributes) {
+                return $attributes->path();
+            })
+            ->toArray();
     }
 
     /**
@@ -621,9 +623,14 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function directories($directory = null, $recursive = false)
     {
-        $contents = $this->driver->listContents($directory, $recursive);
-
-        return $this->filterContentsByType($contents, 'dir');
+        return $this->driver->listContents($directory, $recursive)
+            ->filter(function (StorageAttributes $attributes) {
+                return $attributes->isDir();
+            })
+            ->map(function (StorageAttributes $attributes) {
+                return $attributes->path();
+            })
+            ->toArray();
     }
 
     /**
@@ -679,22 +686,6 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function getDriver()
     {
         return $this->driver;
-    }
-
-    /**
-     * Filter directory contents by type.
-     *
-     * @param  array  $contents
-     * @param  string  $type
-     * @return array
-     */
-    protected function filterContentsByType($contents, $type)
-    {
-        return Collection::make($contents)
-            ->where('type', $type)
-            ->pluck('path')
-            ->values()
-            ->all();
     }
 
     /**
