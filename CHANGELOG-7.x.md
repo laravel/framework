@@ -1,9 +1,21 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.20.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.21.0...7.x)
+
+
+## [v7.21.0 (2020-07-21)](https://github.com/laravel/framework/compare/v7.20.0...v7.21.0)
+
+### Added
+- Added `Illuminate\Database\Schema\ForeignKeyDefinition::nullOnDelete()` ([#33551](https://github.com/laravel/framework/pull/33551))
+- Added `getFallbackLocale()` and `setFallbackLocale()` methods to `Illuminate\Foundation\Application` ([#33595](https://github.com/laravel/framework/pull/33595))
 
 ### Fixed
 - Fixed `Illuminate/Redis/Connections/PhpRedisConnection::*scan()` returns ([d3d36f0](https://github.com/laravel/framework/commit/d3d36f059ef1c56e17d8e434e9fd3dfd6cbe6e53))
+- Align (fix) nested arrays support for `assertViewHas` & `assertViewMissing` in `Illuminate\Testing\TestResponse` ([#33566](https://github.com/laravel/framework/pull/33566))
+- Fixed issue where Storage::path breaks when using cache due to missing method in CachedAdapter ([#33602](https://github.com/laravel/framework/pull/33602))
+
+### Changed
+- Added a base exception for Http Client exceptions ([#33581](https://github.com/laravel/framework/pull/33581))
 
 
 ## [v7.20.0 (2020-07-14)](https://github.com/laravel/framework/compare/v7.19.1...v7.20.0)
