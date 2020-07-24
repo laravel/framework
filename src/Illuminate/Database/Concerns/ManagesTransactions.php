@@ -45,13 +45,23 @@ trait ManagesTransactions
             }
 
             try {
-                $this->commit();
+                if ($this->transactions == 1) {
+                    $this->getPdo()->commit();
+                }
+
+                $this->transactions = max(0, $this->transactions - 1);
             } catch (Exception $e) {
+                $commitFailed = true;
+
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
                 );
 
                 continue;
+            }
+
+            if (! isset($commitFailed)) {
+                $this->fireConnectionEvent('committed');
             }
 
             return $callbackResult;
