@@ -99,18 +99,26 @@ class ComponentTagCompiler
                 (?<attributes>
                     (?:
                         \s+
-                        [\w\-:.@]+
-                        (
-                            =
+                        (?:
                             (?:
-                                \\\"[^\\\"]*\\\"
-                                |
-                                \'[^\']*\'
-                                |
-                                [^\'\\\"=<>]+
+                                \{\{\s*\\\$attributes(?:[^}]+?)?\s*\}\}
+                            )
+                            |
+                            (?:
+                                [\w\-:.@]+
+                                (
+                                    =
+                                    (?:
+                                        \\\"[^\\\"]*\\\"
+                                        |
+                                        \'[^\']*\'
+                                        |
+                                        [^\'\\\"=<>]+
+                                    )
+                                )?
                             )
                         )
-                    ?)*
+                    )*
                     \s*
                 )
                 (?<![\/=\-])
@@ -144,17 +152,25 @@ class ComponentTagCompiler
                 (?<attributes>
                     (?:
                         \s+
-                        [\w\-:.@]+
-                        (
-                            =
+                        (?:
                             (?:
-                                \\\"[^\\\"]*\\\"
-                                |
-                                \'[^\']*\'
-                                |
-                                [^\'\\\"=<>]+
+                                \{\{\s*\\\$attributes(?:[^}]+?)?\s*\}\}
                             )
-                        )?
+                            |
+                            (?:
+                                [\w\-:.@]+
+                                (
+                                    =
+                                    (?:
+                                        \\\"[^\\\"]*\\\"
+                                        |
+                                        \'[^\']*\'
+                                        |
+                                        [^\'\\\"=<>]+
+                                    )
+                                )?
+                            )
+                        )
                     )*
                     \s*
                 )
@@ -215,7 +231,7 @@ class ComponentTagCompiler
      *
      * @throws \InvalidArgumentException
      */
-    protected function componentClass(string $component)
+    public function componentClass(string $component)
     {
         $viewFactory = Container::getInstance()->make(Factory::class);
 
@@ -272,7 +288,7 @@ class ComponentTagCompiler
      * @param  array  $attributes
      * @return array
      */
-    protected function partitionDataAndAttributes($class, array $attributes)
+    public function partitionDataAndAttributes($class, array $attributes)
     {
         // If the class doesn't exists, we'll assume it's a class-less component and
         // return all of the attributes as both data and attributes since we have
@@ -326,6 +342,8 @@ class ComponentTagCompiler
      */
     protected function getAttributesFromAttributeString(string $attributeString)
     {
+        $attributeString = $this->parseAttributeBag($attributeString);
+
         $attributeString = $this->parseBindAttributes($attributeString);
 
         $pattern = '/
@@ -370,6 +388,22 @@ class ComponentTagCompiler
 
             return [$attribute => $value];
         })->toArray();
+    }
+
+    /**
+     * Parse the attribute bag in a given attribute string into it's fully-qualified syntax.
+     *
+     * @param  string  $attributeString
+     * @return string
+     */
+    protected function parseAttributeBag(string $attributeString)
+    {
+        $pattern = "/
+            (?:^|\s+)                                        # start of the string or whitespace between attributes
+            \{\{\s*(\\\$attributes(?:[^}]+?(?<!\s))?)\s*\}\} # exact match of attributes variable being echoed
+        /x";
+
+        return preg_replace($pattern, ' :attributes="$1"', $attributeString);
     }
 
     /**

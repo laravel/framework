@@ -160,7 +160,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         $attributes = [];
 
         $attributeDefaults = array_map(function ($value) {
-            if (is_null($value) || is_bool($value)) {
+            if (is_object($value) || is_null($value) || is_bool($value)) {
                 return $value;
             }
 
@@ -183,6 +183,16 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
+     * Get all of the raw attributes.
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
      * Set the underlying attributes.
      *
      * @param  array  $attributes
@@ -190,6 +200,15 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function setAttributes(array $attributes)
     {
+        if (isset($attributes['attributes']) &&
+            $attributes['attributes'] instanceof self) {
+            $parentBag = $attributes['attributes'];
+
+            unset($attributes['attributes']);
+
+            $attributes = $parentBag->merge($attributes);
+        }
+
         $this->attributes = $attributes;
     }
 

@@ -14,11 +14,13 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "illuminate/contracts": "^7.0",
-        "illuminate/support": "^7.0",
-        "symfony/http-foundation": "^5.0",
-        "symfony/http-kernel": "^5.0"
+        "php": "^7.3",
+        "illuminate/collections": "^8.0",
+        "illuminate/contracts": "^8.0",
+        "illuminate/macroable": "^8.0",
+        "illuminate/support": "^8.0",
+        "symfony/http-foundation": "^5.1",
+        "symfony/http-kernel": "^5.1"
     },
     "autoload": {
         "psr-4": {
@@ -27,7 +29,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "8.x-dev"
         }
     },
     "config": {

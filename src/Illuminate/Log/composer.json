@@ -14,9 +14,9 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "illuminate/contracts": "^7.0",
-        "illuminate/support": "^7.0",
+        "php": "^7.3",
+        "illuminate/contracts": "^8.0",
+        "illuminate/support": "^8.0",
         "monolog/monolog": "^2.0"
     },
     "autoload": {
@@ -26,7 +26,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "8.x-dev"
         }
     },
     "config": {

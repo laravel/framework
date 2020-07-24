@@ -16,15 +16,6 @@ abstract class Manager
     protected $container;
 
     /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     *
-     * @deprecated Use the $container property instead.
-     */
-    protected $app;
-
-    /**
      * The configuration repository instance.
      *
      * @var \Illuminate\Contracts\Config\Repository

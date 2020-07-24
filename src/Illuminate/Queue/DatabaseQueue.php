@@ -322,6 +322,25 @@ class DatabaseQueue extends Queue implements QueueContract
     }
 
     /**
+     * Delete a reserved job from the reserved queue and release it.
+     *
+     * @param  string  $queue
+     * @param  \Illuminate\Queue\Jobs\DatabaseJob  $job
+     * @param  int  $delay
+     * @return void
+     */
+    public function deleteAndRelease($queue, $job, $delay)
+    {
+        $this->database->transaction(function () use ($queue, $job, $delay) {
+            if ($this->database->table($this->table)->lockForUpdate()->find($job->getJobId())) {
+                $this->database->table($this->table)->where('id', $job->getJobId())->delete();
+            }
+
+            $this->release($queue, $job->getJobRecord(), $delay);
+        });
+    }
+
+    /**
      * Get the queue or return the default.
      *
      * @param  string|null  $queue

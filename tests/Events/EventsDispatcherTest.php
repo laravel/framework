@@ -7,7 +7,6 @@ use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class EventsDispatcherTest extends TestCase
 {
@@ -108,9 +107,8 @@ class EventsDispatcherTest extends TestCase
     public function testContainerResolutionOfEventHandlers()
     {
         $d = new Dispatcher($container = m::mock(Container::class));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock(stdClass::class));
-        $handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar')->andReturn('baz');
-        $d->listen('foo', 'FooHandler@onFooEvent');
+        $container->shouldReceive('make')->once()->with(TestEventListener::class)->andReturn(new TestEventListener);
+        $d->listen('foo', TestEventListener::class.'@onFooEvent');
         $response = $d->dispatch('foo', ['foo', 'bar']);
 
         $this->assertEquals(['baz'], $response);
@@ -118,11 +116,10 @@ class EventsDispatcherTest extends TestCase
 
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
     {
-        $d = new Dispatcher($container = m::mock(Container::class));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock(stdClass::class));
-        $handler->shouldReceive('handle')->once()->with('foo', 'bar');
-        $d->listen('foo', 'FooHandler');
-        $d->dispatch('foo', ['foo', 'bar']);
+        $d = new Dispatcher(new Container);
+        $d->listen('foo', TestEventListener::class);
+        $response = $d->dispatch('foo', ['foo', 'bar']);
+        $this->assertEquals(['baz'], $response);
     }
 
     public function testQueuedEventsAreFired()
@@ -327,6 +324,18 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('baz', $_SERVER['__event.test']);
     }
 
+    public function testClassesWorkWithAnonymousListeners()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen(function (ExampleEvent $event) {
+            $_SERVER['__event.test'] = 'qux';
+        });
+        $d->dispatch(new ExampleEvent);
+
+        $this->assertSame('qux', $_SERVER['__event.test']);
+    }
+
     public function testEventClassesArePayload()
     {
         unset($_SERVER['__event.test']);
@@ -389,4 +398,17 @@ interface SomeEventInterface
 class AnotherEvent implements SomeEventInterface
 {
     //
+}
+
+class TestEventListener
+{
+    public function handle($foo, $bar)
+    {
+        return 'baz';
+    }
+
+    public function onFooEvent($foo, $bar)
+    {
+        return 'baz';
+    }
 }

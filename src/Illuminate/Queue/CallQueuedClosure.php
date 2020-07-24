@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Closure;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,6 +20,13 @@ class CallQueuedClosure implements ShouldQueue
      * @var \Illuminate\Queue\SerializableClosure
      */
     public $closure;
+
+    /**
+     * The callbacks that should be executed on failure.
+     *
+     * @var array
+     */
+    public $failureCallbacks = [];
 
     /**
      * Indicate if the job should be deleted when models are missing.
@@ -58,6 +66,32 @@ class CallQueuedClosure implements ShouldQueue
     public function handle(Container $container)
     {
         $container->call($this->closure->getClosure());
+    }
+
+    /**
+     * Add a callback to be executed if the job fails.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function onFailure(Closure $callback)
+    {
+        $this->failureCallbacks[] = new SerializableClosure($callback);
+
+        return $this;
+    }
+
+    /**
+     * Handle a job failure.
+     *
+     * @param  \Exception  $exception
+     * @return void
+     */
+    public function failed(Exception $e)
+    {
+        foreach ($this->failureCallbacks as $callback) {
+            call_user_func($callback->getClosure(), $e);
+        }
     }
 
     /**

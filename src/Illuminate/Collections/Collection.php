@@ -135,7 +135,7 @@ class Collection implements ArrayAccess, Enumerable
 
         $collection = isset($key) ? $this->pluck($key) : $this;
 
-        $counts = new self;
+        $counts = new static;
 
         $collection->each(function ($value) use ($counts) {
             $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
@@ -412,11 +412,11 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function get($key, $default = null)
     {
-        if ($this->offsetExists($key)) {
+        if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
 
-        return value($default);
+        return Util::value($default);
     }
 
     /**
@@ -501,7 +501,7 @@ class Collection implements ArrayAccess, Enumerable
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
-            if (! $this->offsetExists($value)) {
+            if (! array_key_exists($value, $this->items)) {
                 return false;
             }
         }
@@ -1337,7 +1337,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function offsetExists($key)
     {
-        return array_key_exists($key, $this->items);
+        return isset($this->items[$key]);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Support\Providers;
 
+use Closure;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
@@ -22,24 +23,56 @@ class RouteServiceProvider extends ServiceProvider
     protected $namespace;
 
     /**
+     * The callback that should be used to load the application's routes.
+     *
+     * @var \Closure|null
+     */
+    protected $loadRoutesUsing;
+
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->booted(function () {
+            $this->setRootControllerNamespace();
+
+            if ($this->routesAreCached()) {
+                $this->loadCachedRoutes();
+            } else {
+                $this->loadRoutes();
+
+                $this->app->booted(function () {
+                    $this->app['router']->getRoutes()->refreshNameLookups();
+                    $this->app['router']->getRoutes()->refreshActionLookups();
+                });
+            }
+        });
+    }
+
+    /**
      * Bootstrap any application services.
      *
      * @return void
      */
     public function boot()
     {
-        $this->setRootControllerNamespace();
+        //
+    }
 
-        if ($this->routesAreCached()) {
-            $this->loadCachedRoutes();
-        } else {
-            $this->loadRoutes();
+    /**
+     * Register the callback that will be used to load the application's routes.
+     *
+     * @param  \Closure  $routesCallback
+     * @return $this
+     */
+    protected function routes(Closure $routesCallback)
+    {
+        $this->loadRoutesUsing = $routesCallback;
 
-            $this->app->booted(function () {
-                $this->app['router']->getRoutes()->refreshNameLookups();
-                $this->app['router']->getRoutes()->refreshActionLookups();
-            });
-        }
+        return $this;
     }
 
     /**
@@ -83,7 +116,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function loadRoutes()
     {
-        if (method_exists($this, 'map')) {
+        if (! is_null($this->loadRoutesUsing)) {
+            $this->app->call($this->loadRoutesUsing);
+        } elseif (method_exists($this, 'map')) {
             $this->app->call([$this, 'map']);
         }
     }

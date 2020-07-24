@@ -47,10 +47,10 @@ abstract class Seeder
 
             $seeder->__invoke();
 
-            $runTime = round(microtime(true) - $startTime, 2);
+            $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
 
             if ($silent === false && isset($this->command)) {
-                $this->command->getOutput()->writeln("<info>Seeded:</info>  {$name} ({$runTime} seconds)");
+                $this->command->getOutput()->writeln("<info>Seeded:</info>  {$name} ({$runTime}ms)");
             }
         }
 

@@ -71,6 +71,7 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $middlewarePriority = [
+        \Illuminate\Cookie\Middleware\EncryptCookies::class,
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,

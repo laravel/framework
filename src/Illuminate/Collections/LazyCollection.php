@@ -379,7 +379,7 @@ class LazyCollection implements Enumerable
 
         if (is_null($callback)) {
             if (! $iterator->valid()) {
-                return value($default);
+                return Util::value($default);
             }
 
             return $iterator->current();
@@ -391,7 +391,7 @@ class LazyCollection implements Enumerable
             }
         }
 
-        return value($default);
+        return Util::value($default);
     }
 
     /**
@@ -450,7 +450,7 @@ class LazyCollection implements Enumerable
             }
         }
 
-        return value($default);
+        return Util::value($default);
     }
 
     /**
@@ -595,7 +595,7 @@ class LazyCollection implements Enumerable
             }
         }
 
-        return $needle === $placeholder ? value($default) : $needle;
+        return $needle === $placeholder ? Util::value($default) : $needle;
     }
 
     /**
@@ -1183,7 +1183,9 @@ class LazyCollection implements Enumerable
     {
         $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
 
-        return $this->takeUntil($this->negate($callback));
+        return $this->takeUntil(function ($item, $key) use ($callback) {
+            return ! $callback($item, $key);
+        });
     }
 
     /**

@@ -14,18 +14,19 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": "^7.3",
         "ext-json": "*",
-        "illuminate/console": "^7.0",
-        "illuminate/container": "^7.0",
-        "illuminate/contracts": "^7.0",
-        "illuminate/database": "^7.0",
-        "illuminate/filesystem": "^7.0",
-        "illuminate/pipeline": "^7.0",
-        "illuminate/support": "^7.0",
-        "opis/closure": "^3.1",
-        "ramsey/uuid": "^3.7|^4.0",
-        "symfony/process": "^5.0"
+        "illuminate/collections": "^8.0",
+        "illuminate/console": "^8.0",
+        "illuminate/container": "^8.0",
+        "illuminate/contracts": "^8.0",
+        "illuminate/database": "^8.0",
+        "illuminate/filesystem": "^8.0",
+        "illuminate/pipeline": "^8.0",
+        "illuminate/support": "^8.0",
+        "opis/closure": "^3.5.3",
+        "ramsey/uuid": "^4.0",
+        "symfony/process": "^5.1"
     },
     "autoload": {
         "psr-4": {
@@ -34,14 +35,14 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "8.x-dev"
         }
     },
     "suggest": {
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.0).",
-        "illuminate/redis": "Required to use the Redis queue driver (^7.0).",
+        "illuminate/redis": "Required to use the Redis queue driver (^8.0).",
         "pda/pheanstalk": "Required to use the Beanstalk queue driver (^4.0)."
     },
     "config": {
