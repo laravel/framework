@@ -112,6 +112,29 @@ class Builder
     {
         return $this->newModelInstance($attributes);
     }
+    
+    /**
+     * This will return the next available record
+     * @param int $id
+     * @param null|default ['*'] $columns
+     * @return \Illuminate\Database\Eloquent\Builder|Model
+     */
+    public function next($id, $columns = ['*'])
+    {
+        return $this->where('id', '>', $id)->firstOrFail($columns);
+    }
+    
+    /**
+     * This will return the previous available record
+     * @param int $id
+     * @param null|default ['*'] $columns
+     * @return \Illuminate\Database\Eloquent\Builder|Model
+     */
+
+    public function previous($id, $columns = ['*'])
+    {
+        return $this->where('id', '<', $id)->firstOrFail($columns);
+    }
 
     /**
      * Register a new global scope.
