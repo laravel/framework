@@ -375,6 +375,28 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return $this->fill($attributes);
         });
     }
+    
+    /**
+     * This will return the next available record
+     * @param int $id
+     * @param null|default ['*'] $columns
+     * @return \Illuminate\Database\Eloquent\Builder|Model
+     */
+    public static function next($id, $columns = ['*'])
+    {
+        return static::query()->next($id, $columns = ['*']);
+    }
+    
+    /**
+     * This will return the previous available record
+     * @param int $id
+     * @param null|default ['*'] $columns
+     * @return \Illuminate\Database\Eloquent\Builder|Model
+     */
+    public static function previous($id, $columns = ['*'])
+    {
+        return static::query()->previous($id, $columns = ['*']);
+    }
 
     /**
      * Qualify the given column name by the model's table.
