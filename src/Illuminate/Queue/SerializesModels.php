@@ -65,7 +65,7 @@ trait SerializesModels
                 continue;
             }
             
-            if(! $property->isInitialized($this)) {
+            if (! $property->isInitialized($this)) {
                 continue;
             }
 
