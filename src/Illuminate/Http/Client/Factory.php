@@ -190,10 +190,10 @@ class Factory
             'An expected request was not recorded.'
         );
     }
-    
+
     /**
      * Assert that a specific request / response pair was recorded matching a given truth test.
-     * 
+     *
      * @param callable $callback
      * @param int $index
      * @return void
