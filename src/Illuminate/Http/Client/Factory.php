@@ -190,6 +190,21 @@ class Factory
             'An expected request was not recorded.'
         );
     }
+    
+    /**
+     * Assert that a specific request / response pair was recorded matching a given truth test.
+     * 
+     * @param callable $callback
+     * @param int $index
+     * @return void
+     */
+    public function assertSentByIndex($callback, $index)
+    {
+        PHPUnit::assertTrue(
+            $callback($this->recorded[$index][0], $this->recorded[$index][1]),
+            'An expected request was not recorded.'
+        );
+    }
 
     /**
      * Assert that a request / response pair was not recorded matching a given truth test.
