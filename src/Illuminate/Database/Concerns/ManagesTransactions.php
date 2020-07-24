@@ -186,7 +186,7 @@ trait ManagesTransactions
      */
     protected function handleCommitTransactionException($e, $currentAttempt, $maxAttempts)
     {
-        $this->transactions--;
+        $this->transactions = max(0, $this->transactions - 1);
 
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
