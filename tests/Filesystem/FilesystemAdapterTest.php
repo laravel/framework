@@ -3,16 +3,15 @@
 namespace Illuminate\Tests\Filesystem;
 
 use GuzzleHttp\Psr7\Stream;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
+use League\Flysystem\Filesystem;
 use League\Flysystem\FTP\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
-use League\Flysystem\Filesystem;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\StreamedResponse;
