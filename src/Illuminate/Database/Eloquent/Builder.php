@@ -114,7 +114,6 @@ class Builder
     }
     
     /**
-     * This will return the next available record
      * @param int $id
      * @param null|default ['*'] $columns
      * @return \Illuminate\Database\Eloquent\Builder|Model
@@ -125,7 +124,6 @@ class Builder
     }
     
     /**
-     * This will return the previous available record
      * @param int $id
      * @param null|default ['*'] $columns
      * @return \Illuminate\Database\Eloquent\Builder|Model
