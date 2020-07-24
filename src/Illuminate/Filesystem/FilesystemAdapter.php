@@ -70,7 +70,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  array  $config
      * @return void
      */
-    public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config)
+    public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config = [])
     {
         $this->driver = $driver;
         $this->adapter = $adapter;
@@ -686,6 +686,26 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function getDriver()
     {
         return $this->driver;
+    }
+
+    /**
+     * Get the Flysystem adapter.
+     *
+     * @return \League\Flysystem\FilesystemAdapter
+     */
+    public function getAdapter()
+    {
+        return $this->adapter;
+    }
+
+    /**
+     * Get the configuration values.
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->config;
     }
 
     /**

@@ -255,7 +255,7 @@ class FilesystemManager implements FactoryContract
     {
         $config = Arr::only($config, ['visibility', 'disable_asserts', 'url']);
 
-        return new Flysystem($adapter, count($config) > 0 ? $config : null);
+        return new Flysystem($adapter, $config);
     }
 
     /**
