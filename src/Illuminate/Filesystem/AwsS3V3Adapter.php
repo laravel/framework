@@ -1,13 +1,12 @@
 <?php
 
-namespace Illuminate\Filesystem\Adapters;
+namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
-use Illuminate\Filesystem\FilesystemAdapter;
-use League\Flysystem\AwsS3V3\AwsS3V3Filesystem as FlysystemAwsS3V3Filesystem;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\FilesystemOperator;
 
-class AwsS3V3Filesystem extends FilesystemAdapter
+class AwsS3V3Adapter extends FilesystemAdapter
 {
     /**
      * The AWS S3 client.
@@ -20,14 +19,14 @@ class AwsS3V3Filesystem extends FilesystemAdapter
      * Create a new AwsS3V3FilesystemAdapter instance.
      *
      * @param  \League\Flysystem\FilesystemOperator  $driver
-     * @param  \League\Flysystem\AwsS3V3\AwsS3V3Filesystem  $adapter
+     * @param  \League\Flysystem\AwsS3V3\AwsS3V3Adapter  $adapter
      * @param  array  $config
      * @param  \Aws\S3\S3Client  $client
      * @return void
      */
     public function __construct(
         FilesystemOperator $driver,
-        FlysystemAwsS3V3Filesystem $adapter,
+        S3Adapter $adapter,
         array $config,
         S3Client $client
     ) {

@@ -5,10 +5,9 @@ namespace Illuminate\Filesystem;
 use Aws\S3\S3Client;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
-use Illuminate\Filesystem\Adapters\AwsS3V3Filesystem;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use League\Flysystem\AwsS3V3\AwsS3V3Filesystem as S3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter as AwsS3PortableVisibilityConverter;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
@@ -190,16 +189,7 @@ class FilesystemManager implements FactoryContract
      */
     public function createSftpDriver(array $config)
     {
-        $provider = new SftpConnectionProvider(
-            $config['host'],
-            $config['username'],
-            $config['host'] ?? null,
-            $config['port'] ?? 22,
-            $config['useAgent'] ?? false,
-            $config['timeout'] ?? 10,
-            $config['hostFingerprint'] ?? null,
-            $config['connectivityChecker'] ?? null,
-        );
+        $provider = SftpConnectionProvider::fromArray($config);
 
         $root = $config['root'] ?? '/';
 
@@ -232,7 +222,7 @@ class FilesystemManager implements FactoryContract
 
         $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility);
 
-        return new AwsS3V3Filesystem(
+        return new AwsS3V3Adapter(
             $this->createFlysystem($adapter, $config), $adapter, $s3Config, $client
         );
     }
