@@ -160,7 +160,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->read($path);
         } catch (UnableToReadFile $e) {
-            return null;
+            return;
         }
     }
 
@@ -470,7 +470,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->readStream($path);
         } catch (UnableToReadFile $e) {
-            return null;
+            return;
         }
     }
 
@@ -595,7 +595,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         return $this->driver->listContents($directory, $recursive)
             ->filter(function (StorageAttributes $attributes) {
-               return $attributes->isFile();
+                return $attributes->isFile();
             })
             ->map(function (StorageAttributes $attributes) {
                 return $attributes->path();
