@@ -202,7 +202,7 @@ class Factory
     {
         PHPUnit::assertTrue(
             $callback($this->recorded[$index][0], $this->recorded[$index][1]),
-            'An expected request was not recorded.'
+            "An expected request was not recorded at index {$index}."
         );
     }
 
