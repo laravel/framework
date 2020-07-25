@@ -388,11 +388,12 @@ if (! function_exists('retry')) {
      * @param  callable  $callback
      * @param  int  $sleep
      * @param  callable|null  $when
+     * @param  bool  $exponential
      * @return mixed
      *
      * @throws \Exception
      */
-    function retry($times, callable $callback, $sleep = 0, $when = null)
+    function retry($times, callable $callback, $sleep = 0, $when = null, $exponential = false)
     {
         $attempts = 0;
 
@@ -408,7 +409,8 @@ if (! function_exists('retry')) {
             }
 
             if ($sleep) {
-                usleep($sleep * 1000);
+                $exponent = $exponential && $attempts != 1 ? pow(2, $attempts) : 1;
+                usleep($sleep * 1000 * $exponent);
             }
 
             goto beginning;
