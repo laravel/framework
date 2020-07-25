@@ -4,6 +4,9 @@ namespace Illuminate\Auth;
 
 use Illuminate\Auth\Notifications\VerifyEmail;
 
+/**
+ * @property \Illuminate\Support\Carbon email_verified_at
+ */
 trait MustVerifyEmail
 {
     /**
