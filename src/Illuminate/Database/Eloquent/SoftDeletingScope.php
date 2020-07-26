@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Carbon\Carbon;
+
 class SoftDeletingScope implements Scope
 {
     /**
@@ -20,7 +22,7 @@ class SoftDeletingScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->whereNull($model->getQualifiedDeletedAtColumn());
+        $builder->whereNull($model->getQualifiedDeletedAtColumn())->orWhere($model->getQualifiedDeletedAtColumn(), '>=', Carbon::now());
     }
 
     /**
