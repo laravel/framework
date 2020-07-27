@@ -142,7 +142,7 @@ class EncryptCookies
             $response->headers->setCookie($this->duplicate(
                 $cookie,
                 $this->encrypter->encrypt(
-                    sha1($cookie->getName().'v2').'|'.$cookie->getValue(),
+                    hash_hmac('sha1', $cookie->getName().'v2', $this->encrypter->getKey()).'|'.$cookie->getValue(),
                     static::serialized($cookie->getName())
                 )
             ));
