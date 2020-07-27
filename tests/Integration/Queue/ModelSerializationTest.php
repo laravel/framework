@@ -127,6 +127,19 @@ class ModelSerializationTest extends TestCase
         $this->assertSame('taylor@laravel.com', $unSerialized->users[1]->email);
     }
 
+    public function testItSerializesNotStoredUserModel()
+    {
+        $user = new ModelSerializationTestUser([
+            'email' => 'mohamed@laravel.com',
+        ]);
+
+        $serialized = serialize(new ModelSerializationTestClass($user));
+
+        $unSerialized = unserialize($serialized);
+
+        $this->assertSame('mohamed@laravel.com', $unSerialized->user->email);
+    }
+
     public function testItFailsIfModelsOnMultiConnections()
     {
         $this->expectException(LogicException::class);
