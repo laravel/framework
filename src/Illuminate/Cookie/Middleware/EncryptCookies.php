@@ -83,7 +83,7 @@ class EncryptCookies
             try {
                 $value = $this->decryptCookie($key, $cookie);
 
-                $hashValidPrefix = strpos($value, CookieValuePrefix::create($key, $this->encrypter->getKey())) === 0;
+                $hasValidPrefix = strpos($value, CookieValuePrefix::create($key, $this->encrypter->getKey())) === 0;
 
                 $request->cookies->set(
                     $key, $hasValidPrefix ? CookieValuePrefix::remove($value) : null
