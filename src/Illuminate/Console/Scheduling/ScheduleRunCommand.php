@@ -98,7 +98,7 @@ class ScheduleRunCommand extends Command
                 continue;
             }
 
-            if($event->channel !== $currentChannel) {
+            if ($event->channel !== $currentChannel) {
                 continue;
             }
 

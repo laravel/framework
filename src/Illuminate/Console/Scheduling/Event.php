@@ -155,7 +155,7 @@ class Event
     public $exitCode;
 
     /**
-     * The channel name of the command
+     * The channel name of the command.
      *
      * @var int|null
      */
