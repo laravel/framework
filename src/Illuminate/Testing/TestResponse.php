@@ -531,6 +531,44 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has the exact given JSON.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertExactJson(array $data)
+    {
+        $actual = $this->reorderAssocKeys((array) $this->decodeResponseJson());
+
+        $expected = $this->reorderAssocKeys($data);
+
+        PHPUnit::assertEquals(json_encode($expected), json_encode($actual));
+
+        return $this;
+    }
+
+    /**
+     * Reorder associative array keys to make it easy to compare arrays.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function reorderAssocKeys(array $data)
+    {
+        $data = Arr::dot($data);
+        ksort($data);
+
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            Arr::set($result, $key, $value);
+        }
+
+        return $result;
+    }
+
+    /**
      * Assert that the response has the similar JSON as given.
      *
      * @param  array  $data
