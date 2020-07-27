@@ -599,8 +599,8 @@ trait MakesHttpRequests
             return array_merge($this->defaultCookies, $this->unencryptedCookies);
         }
 
-        return collect($this->defaultCookies)->map(function ($value) {
-            return encrypt($value, false);
+        return collect($this->defaultCookies)->map(function ($value, $key) {
+            return encrypt(sha1($key.'v2').'|'.$value, false);
         })->merge($this->unencryptedCookies)->all();
     }
 
