@@ -531,12 +531,12 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Assert that the response has the exact given JSON.
+     * Assert that the response has the similar JSON as given.
      *
      * @param  array  $data
      * @return $this
      */
-    public function assertExactJson(array $data)
+    public function assertSimilarJson(array $data)
     {
         $actual = json_encode(Arr::sortRecursive(
             (array) $this->decodeResponseJson()
@@ -662,7 +662,7 @@ class TestResponse implements ArrayAccess
     public function assertJsonStructure(array $structure = null, $responseData = null)
     {
         if (is_null($structure)) {
-            return $this->assertExactJson($this->json());
+            return $this->assertSimilarJson($this->json());
         }
 
         if (is_null($responseData)) {
