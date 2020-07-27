@@ -83,7 +83,7 @@ class EncryptCookies
                 $value = $this->decryptCookie($key, $cookie);
 
                 $request->cookies->set(
-                    $key, strpos($value, sha1($key.'v2').'|') !== 0 ? null : substr($value, 41)
+                    $key, strpos($value, hash_hmac('sha1', $key.'v2', $this->encrypter->getKey()).'|') !== 0 ? null : substr($value, 41)
                 );
             } catch (DecryptException $e) {
                 $request->cookies->set($key, null);

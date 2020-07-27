@@ -561,7 +561,7 @@ trait MakesHttpRequests
         }
 
         return collect($this->defaultCookies)->map(function ($value, $key) {
-            return encrypt(sha1($key.'v2').'|'.$value, false);
+            return encrypt(hash_hmac('sha1', $key.'v2', base64_decode(substr(config('app.key'), 7))).'|'.$value, false);
         })->merge($this->unencryptedCookies)->all();
     }
 
