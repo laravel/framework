@@ -80,7 +80,7 @@ trait SerializesModels
             }
 
             $values[$name] = $this->getSerializedPropertyValue(
-                $this->getValue($this)
+                $property->getValue($this)
             );
         }
 
