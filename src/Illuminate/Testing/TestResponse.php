@@ -5,6 +5,7 @@ namespace Illuminate\Testing;
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -302,7 +303,7 @@ class TestResponse implements ArrayAccess
             ? app('encrypter')->decrypt($cookieValue, $unserialize) : $cookieValue;
 
         PHPUnit::assertEquals(
-            $value, $actual,
+            CookieValuePrefix::create($cookie->getName(), app('encrypter')->getKey()).$value, $actual,
             "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
         );
 
