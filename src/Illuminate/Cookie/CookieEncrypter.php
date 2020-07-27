@@ -36,7 +36,7 @@ class CookieEncrypter
      */
     public static function decryptValue($value, $key = null)
     {
-        if ($key !== null && CookieEncrypter::hasEncryptedKey($key, $value)) {
+        if ($key !== null && self::hasEncryptedKey($key, $value)) {
             return;
         }
 
