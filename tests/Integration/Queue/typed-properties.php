@@ -11,6 +11,8 @@ class TypedPropertyTestClass
 
     public ModelSerializationTestUser $user;
 
+    public ModelSerializationTestUser $unitializedUser;
+
     protected int $id;
 
     private array $names;
