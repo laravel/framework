@@ -5,6 +5,7 @@ namespace Illuminate\Cookie\Middleware;
 use Closure;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Cookie\CookieValuePrefix;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -82,8 +83,10 @@ class EncryptCookies
             try {
                 $value = $this->decryptCookie($key, $cookie);
 
+                $hashValidPrefix = strpos($value, CookieValuePrefix::create($key, $this->encrypter->getKey())) === 0;
+
                 $request->cookies->set(
-                    $key, strpos($value, hash_hmac('sha1', $key.'v2', $this->encrypter->getKey()).'|') !== 0 ? null : substr($value, 41)
+                    $key, $hasValidPrefix ? CookieValuePrefix::remove($value) : null
                 );
             } catch (DecryptException $e) {
                 $request->cookies->set($key, null);
@@ -142,7 +145,7 @@ class EncryptCookies
             $response->headers->setCookie($this->duplicate(
                 $cookie,
                 $this->encrypter->encrypt(
-                    hash_hmac('sha1', $cookie->getName().'v2', $this->encrypter->getKey()).'|'.$cookie->getValue(),
+                    CookieValuePrefix::create($cookie->getName(), $this->encrypter->getKey()).$cookie->getValue(),
                     static::serialized($cookie->getName())
                 )
             ));
