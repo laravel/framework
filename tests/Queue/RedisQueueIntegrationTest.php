@@ -91,7 +91,7 @@ class RedisQueueIntegrationTest extends TestCase
             $this->setQueue('phpredis');
             sleep(1);
             $this->queue->push(new RedisQueueIntegrationTestJob(12));
-            die;
+            exit;
         } else {
             $this->fail('Cannot fork');
         }
