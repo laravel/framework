@@ -155,6 +155,13 @@ class Event
     public $exitCode;
 
     /**
+     * The channel name of the command
+     *
+     * @var int|null
+     */
+    public $channel = 'default';
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -894,6 +901,19 @@ class Event
     public function preventOverlapsUsing(EventMutex $mutex)
     {
         $this->mutex = $mutex;
+
+        return $this;
+    }
+
+    /**
+     * Set the channel name of the command.
+     *
+     * @param  string $channel
+     * @return $this
+     */
+    public function channel($channel)
+    {
+        $this->channel = $channel;
 
         return $this;
     }

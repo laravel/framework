@@ -19,7 +19,7 @@ class ScheduleRunCommand extends Command
      *
      * @var string
      */
-    protected $name = 'schedule:run';
+    protected $signature = 'schedule:run {channel=default}';
 
     /**
      * The console command description.
@@ -89,10 +89,16 @@ class ScheduleRunCommand extends Command
         $this->dispatcher = $dispatcher;
         $this->handler = $handler;
 
+        $currentChannel = $this->argument('channel');
+
         foreach ($this->schedule->dueEvents($this->laravel) as $event) {
             if (! $event->filtersPass($this->laravel)) {
                 $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
 
+                continue;
+            }
+
+            if($event->channel !== $currentChannel) {
                 continue;
             }
 
