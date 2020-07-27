@@ -171,7 +171,7 @@ trait EnumeratesValues
     {
         call_user_func_array([$this, 'dump'], $args);
 
-        die(1);
+        exit(1);
     }
 
     /**
