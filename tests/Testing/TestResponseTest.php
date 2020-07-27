@@ -415,13 +415,20 @@ class TestResponseTest extends TestCase
         $response->assertJson($resource->jsonSerialize());
     }
 
-    public function testAssertJsonWithMixed()
+    public function testAssertExactJsonWithMixed()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $resource = new JsonSerializableMixedResourcesStub;
 
-        $response->assertExactJson($resource->jsonSerialize());
+        $expected = $resource->jsonSerialize();
+
+        $response->assertExactJson($expected);
+
+        $expected['bars'][0] = ['bar' => 'foo 2', 'foo' => 'bar 2'];
+        $expected['bars'][2] = ['bar' => 'foo 0', 'foo' => 'bar 0'];
+
+        $response->assertExactJson($expected);
     }
 
     public function testAssertJsonPath()
