@@ -77,9 +77,9 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testIdsInEagerConstraintsCanBeZero()
     {
-        if (version_compare(PHP_VERSION, '8.0.0-dev', '>=')) {
-            $keys = ['foreign.value', 0];
+        $keys = ['foreign.value', 0];
 
+        if (version_compare(PHP_VERSION, '8.0.0-dev', '>=')) {
             sort($keys);
         }
 
