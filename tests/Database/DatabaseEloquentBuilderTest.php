@@ -1255,6 +1255,20 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->withCasts(['foo' => 'bar']);
     }
 
+    public function testWithoutEagerLoads()
+    {
+        $builder = $this->getBuilder();
+        $builder->with(['orders', 'orders.lines']);
+        $eagers = $builder->getEagerLoads();
+        $this->assertEquals(['orders', 'orders.lines'], array_keys($eagers));
+
+
+        $builder->withoutEagerLoads();
+        $eagers = $builder->getEagerLoads();
+
+        $this->assertEquals([], array_keys($eagers));
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';

@@ -1103,6 +1103,16 @@ class Builder
     }
 
     /**
+     * Prevent all relations from being eager loaded.
+     *
+     * @return $this
+     */
+    public function withoutEagerLoads()
+    {
+        return $this->setEagerLoads([]);
+    }
+
+    /**
      * Create a new instance of the model being queried.
      *
      * @param  array  $attributes
