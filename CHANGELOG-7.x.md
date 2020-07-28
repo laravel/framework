@@ -1,6 +1,49 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.21.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.22.3...7.x)
+
+
+## [v7.22.4 (2020-07-27)](https://github.com/laravel/framework/compare/v7.22.3...v7.22.4)
+
+### Update
+- Update cookies encryption ([release](https://github.com/laravel/framework/compare/v7.22.3...v7.22.4))
+
+
+## [v7.22.3 (2020-07-27)](https://github.com/laravel/framework/compare/v7.22.2...v7.22.3)
+
+### Update
+- Update cookies encryption ([release](https://github.com/laravel/framework/compare/v7.22.2...v7.22.3))
+
+
+## [v7.22.2 (2020-07-27)](https://github.com/laravel/framework/compare/v7.22.1...v7.22.2)
+
+### Fixed
+- Fixed cookie issues encryption ([c9ce261](https://github.com/laravel/framework/commit/c9ce261a9f7b8e07c9ebc8a7d45651ee1cf86215), [5786aa4](https://github.com/laravel/framework/commit/5786aa4a388adfcc62862573275bd37d49aa07d7))
+
+
+## [v7.22.1 (2020-07-27)](https://github.com/laravel/framework/compare/v7.22.0...v7.22.1)
+
+### Fixed
+- Fixed cookie issues ([bb9db21](https://github.com/laravel/framework/commit/bb9db21af137344feffa192fcabe4e439c8b0f60))
+
+
+## [v7.22.0 (2020-07-27)](https://github.com/laravel/framework/compare/v7.21.0...v7.22.0)
+
+### Added
+- Added `sectionMissing` Blade Directive ([#33614](https://github.com/laravel/framework/pull/33614))
+- Added range option to queue:retry command ([#33627](https://github.com/laravel/framework/pull/33627))
+
+### Fixed
+- Prevent usage of get*AtColumn() when model has no timestamps ([#33634](https://github.com/laravel/framework/pull/33634))
+- Dont decrement transaction below 0 in `Illuminate\Database\Concerns\ManagesTransactions::handleCommitTransactionException()` ([7681795](https://github.com/laravel/framework/commit/768179578e5492b5f80c391bd43b233938e16e27))
+- Fixed transaction problems on closure transaction ([c4cdfc7](https://github.com/laravel/framework/commit/c4cdfc7c54127b772ef10f37cfc9ef8e9d6b3227))
+- Prevent to serialize uninitialized properties ([#33644](https://github.com/laravel/framework/pull/33644))
+- Fixed missing statement preventing deletion in `Illuminate\Database\Eloquent\Relations\MorphPivot::delete()` ([#33648](https://github.com/laravel/framework/pull/33648))
+
+### Changed
+- Throw a TypeError if concrete is not a string or closure in `Illuminate\Container\Container::bind()` ([#33539](https://github.com/laravel/framework/pull/33539))
+- Add HTML comment block around inline inspiring quote for consistency with blade template version ([#33625](https://github.com/laravel/framework/pull/33625))
+- Improve cookie encryption ([#33662](https://github.com/laravel/framework/pull/33662))
 
 
 ## [v7.21.0 (2020-07-21)](https://github.com/laravel/framework/compare/v7.20.0...v7.21.0)
