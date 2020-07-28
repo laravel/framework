@@ -137,8 +137,6 @@ class BelongsTo extends Relation
             }
         }
 
-        // sort($keys);
-
         return array_values(array_unique($keys));
     }
 
