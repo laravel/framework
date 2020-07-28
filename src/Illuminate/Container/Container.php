@@ -1236,6 +1236,84 @@ class Container implements ArrayAccess, ContainerContract
         $this->instances = [];
         $this->abstractAliases = [];
     }
+    
+    /**
+     * When forgetting a (singleton) instance, also forget its dependencies.
+     *
+     * @param  string  $abstract
+     */
+    public function forgetInstanceDependencies(string $abstract)
+    {
+        $abstract = $this->getAlias($abstract);
+        $concrete = $this->getConcrete($abstract);
+
+        $this->forgetInstance($abstract);
+
+        foreach ($this->getExtenders($abstract) as $extender) {
+            $this->forgetClosureDependencies($extender);
+        }
+
+        if ($this->isBuildable($concrete, $abstract)) {
+            if ($concrete instanceof \Closure) {
+                $this->forgetClosureDependencies($concrete);
+            } else { // It is a string.
+                $this->forgetClassDependencies($concrete);
+            }
+        }
+    }
+
+    /**
+     * Extract class constructor and pass to @see forgetFunctionDependencies()
+     *
+     * @param  string  $abstract
+     */
+    protected function forgetClassDependencies(string $concrete)
+    {
+        $classReflection = new \ReflectionClass($concrete);
+        $constructorReflection = $classReflection->getConstructor();
+        if ($constructorReflection !== null) {
+            $this->forgetFunctionDependencies($constructorReflection);
+        }
+    }
+
+    /**
+     * Extract Closure function and pass to @see forgetFunctionDependencies()
+     *
+     * @param  string  $abstract
+     */
+    protected function forgetClosureDependencies(\Closure $closure)
+    {
+        $closureReflection = new \ReflectionFunction($closure);
+        $this->forgetFunctionDependencies($closureReflection);
+    }
+
+    /**
+     * Recursively forget all parameter instances and dependencies.
+     *
+     * @param  string  $abstract
+     */    
+    protected function forgetFunctionDependencies(\ReflectionFunctionAbstract $functionReflection)
+    {
+        $closureParameters = $functionReflection->getParameters();
+
+        foreach ($closureParameters as $closureParameter) {
+            $class = $closureParameter->getClass();
+
+            if ($class !== null) {
+                $this->forgetInstanceDependencies($class->name);
+            } else {
+                // Application::contextual and Application::abstractAliases contain \Closures|string|null.
+                $concrete = $this->getContextualConcrete('$' . $closureParameter->name);
+                $this->removeAbstractAlias('$' . $closureParameter->name);
+
+                if ($concrete instanceof \Closure) {
+                    $this->forgetClosureDependencies($concrete);
+                } elseif (is_string($concrete)) {
+                    $this->forgetInstanceDependencies($concrete);
+                }
+            }
+        }
+    }
 
     /**
      * Get the globally available instance of the container.
