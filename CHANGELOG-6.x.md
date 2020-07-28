@@ -1,6 +1,42 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.26...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.31...6.x)
+
+
+## [v6.18.31 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.30...v6.18.31)
+
+### Update
+- Update cookies encryption ([release](https://github.com/laravel/framework/compare/v6.18.30...v6.18.31))
+
+
+## [v6.18.30 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.29...v6.18.30)
+
+### Update
+- Update cookies encryption ([release](https://github.com/laravel/framework/compare/v6.18.29...v6.18.30))
+
+
+## [v6.18.29 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.28...v6.18.29)
+
+### Fixed
+- Fixed cookie issues encryption ([c9ce261](https://github.com/laravel/framework/commit/c9ce261a9f7b8e07c9ebc8a7d45651ee1cf86215), [5786aa4](https://github.com/laravel/framework/commit/5786aa4a388adfcc62862573275bd37d49aa07d7))
+
+
+## [v6.18.28 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.27...v6.18.28)
+
+### Fixed
+- Fixed cookie issues ([bb9db21](https://github.com/laravel/framework/commit/bb9db21af137344feffa192fcabe4e439c8b0f60))
+
+
+## [v6.18.27 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.26...v6.18.27)
+
+### Fixed
+- Dont decrement transaction below 0 in `Illuminate\Database\Concerns\ManagesTransactions::handleCommitTransactionException()` ([7681795](https://github.com/laravel/framework/commit/768179578e5492b5f80c391bd43b233938e16e27))
+- Fixed transaction problems on closure transaction ([c4cdfc7](https://github.com/laravel/framework/commit/c4cdfc7c54127b772ef10f37cfc9ef8e9d6b3227))
+- Prevent to serialize uninitialized properties ([#33644](https://github.com/laravel/framework/pull/33644))
+- Fixed missing statement preventing deletion in `Illuminate\Database\Eloquent\Relations\MorphPivot::delete()` ([#33648](https://github.com/laravel/framework/pull/33648))
+
+### Changed
+- Improve cookie encryption ([#33662](https://github.com/laravel/framework/pull/33662))
 
 
 ## [v6.18.26 (2020-07-21)](https://github.com/laravel/framework/compare/v6.18.25...v6.18.26)
