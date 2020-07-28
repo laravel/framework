@@ -1262,7 +1262,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $eagers = $builder->getEagerLoads();
         $this->assertEquals(['orders', 'orders.lines'], array_keys($eagers));
 
-
         $builder->withoutEagerLoads();
         $eagers = $builder->getEagerLoads();
 
