@@ -46,6 +46,9 @@ class HttpClientTest extends TestCase
         $this->assertSame('{"result":{"foo":"bar"}}', (string) $response);
         $this->assertIsArray($response->json());
         $this->assertSame(['foo' => 'bar'], $response->json()['result']);
+        $this->assertSame(['foo' => 'bar'], $response->json('result'));
+        $this->assertSame('bar', $response->json('result.foo'));
+        $this->assertSame('default', $response->json('missing_key', 'default'));
         $this->assertSame(['foo' => 'bar'], $response['result']);
         $this->assertIsObject($response->object());
         $this->assertSame('bar', $response->object()->result->foo);
