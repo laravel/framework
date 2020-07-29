@@ -331,9 +331,11 @@ trait ValidatesAttributes
      */
     public function validateBoolean($attribute, $value)
     {
-        $acceptable = [true, false, 0, 1, '0', '1'];
+        if ($value === null) {
+            return false;
+        }
 
-        return in_array($value, $acceptable, true);
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
     }
 
     /**
