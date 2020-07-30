@@ -1280,6 +1280,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|gt:10']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['lhs' => 5, 10 => 1], ['lhs' => 'numeric|gt:10']);
+        $this->assertTrue($v->fails());
+
         $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|gt:10']);
         $this->assertTrue($v->passes());
 
