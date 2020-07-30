@@ -3,10 +3,15 @@
 namespace Illuminate\Validation;
 
 use Closure;
+use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\NotIn;
+use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
 
 class ValidationRuleParser
@@ -24,6 +29,13 @@ class ValidationRuleParser
      * @var array
      */
     public $implicitAttributes = [];
+
+    /**
+     * Cache for already parsed rules.
+     *
+     * @var array
+     */
+    private static $parsedRules = [];
 
     /**
      * Create a new validation rule parser.
@@ -191,19 +203,47 @@ class ValidationRuleParser
      */
     public static function parse($rules)
     {
-        if ($rules instanceof RuleContract) {
-            return [$rules, []];
+        // Only parse $rules if it has not been parsed yet
+        $fn = function ($rules) {
+            if ($rules instanceof RuleContract) {
+                return [$rules, []];
+            }
+
+            if (is_array($rules)) {
+                $rules = static::parseArrayRule($rules);
+            } else {
+                $rules = static::parseStringRule($rules);
+            }
+
+            $rules[0] = static::normalizeRule($rules[0]);
+
+            return $rules;
+        };
+
+        // Exclude rule-classes from being cached
+        if (
+            $rules instanceof Dimensions ||
+            $rules instanceof Rule ||
+            $rules instanceof Unique ||
+            $rules instanceof Exists ||
+            $rules instanceof In ||
+            $rules instanceof NotIn ||
+            $rules instanceof RequiredIf
+
+        ) {
+            return $fn($rules);
         }
 
-        if (is_array($rules)) {
-            $rules = static::parseArrayRule($rules);
-        } else {
-            $rules = static::parseStringRule($rules);
+        $cacheKey = \is_string($rules) ? $rules : md5(serialize($rules));
+
+        if (isset(static::$parsedRules[$cacheKey])) {
+            return static::$parsedRules[$cacheKey];
         }
+        $parsedRule = $fn($rules);
 
-        $rules[0] = static::normalizeRule($rules[0]);
+        static::$parsedRules[$cacheKey] = $parsedRule;
 
-        return $rules;
+        return $parsedRule;
     }
 
     /**
