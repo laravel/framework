@@ -601,7 +601,7 @@ trait MakesHttpRequests
         }
 
         return collect($this->defaultCookies)->map(function ($value, $key) {
-            return encrypt(CookieValuePrefix::create($key, base64_decode(substr(config('app.key'), 7))).$value, false);
+            return encrypt(CookieValuePrefix::create($key, app('encrypter')->getKey()).$value, false);
         })->merge($this->unencryptedCookies)->all();
     }
 
