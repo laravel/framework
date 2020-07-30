@@ -26,6 +26,13 @@ class ValidationRuleParser
     public $implicitAttributes = [];
 
     /**
+     * Cache for already parsed rules.
+     *
+     * @var array
+     */
+    private static $parsedRules = [];
+
+    /**
      * Create a new validation rule parser.
      *
      * @param  array  $data
@@ -191,19 +198,34 @@ class ValidationRuleParser
      */
     public static function parse($rules)
     {
-        if ($rules instanceof RuleContract) {
-            return [$rules, []];
+        // Only parse $rules if it has not been parsed yet
+        $fn = function($rules) {
+            if ($rules instanceof RuleContract) {
+                return [$rules, []];
+            }
+
+            if (is_array($rules)) {
+                $rules = static::parseArrayRule($rules);
+            } else {
+                $rules = static::parseStringRule($rules);
+            }
+
+            $rules[0] = static::normalizeRule($rules[0]);
+
+            return $rules;
+        };
+
+        $cacheKey = \is_string($rules) ? $rules : md5(serialize($rules));
+
+        if (isset(static::$parsedRules[$cacheKey])) {
+            return static::$parsedRules[$cacheKey];
         }
 
-        if (is_array($rules)) {
-            $rules = static::parseArrayRule($rules);
-        } else {
-            $rules = static::parseStringRule($rules);
-        }
+        $parsedRule = $fn($rules);
 
-        $rules[0] = static::normalizeRule($rules[0]);
+        static::$parsedRules[$cacheKey] = $parsedRule;
 
-        return $rules;
+        return $parsedRule;
     }
 
     /**
