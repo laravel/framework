@@ -363,3 +363,18 @@ class TestMailNotificationWithMailable extends Notification
         return $mailable;
     }
 }
+
+class TestMailNotificationWithPlain extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->view('html')
+            ->text('plain');
+    }
+}
