@@ -354,7 +354,7 @@ class PendingRequest
     }
 
     /**
-     * Specify where the body of the response will be saved.
+     * Specify the path where the body of the response should be stored.
      *
      * @param  $to  string|resource
      * @return $this
@@ -702,22 +702,33 @@ class PendingRequest
                 $sink = $options['sink'] ?? null;
 
                 if ($sink) {
-                    $response->then(function ($response) use ($sink) {
-                        $body = $response->getBody()->getContents();
-
-                        if (is_string($sink)) {
-                            file_put_contents($sink, $body);
-
-                            return;
-                        }
-
-                        fwrite($sink, $body);
-                        rewind($sink);
-                    });
+                    $response->then($this->sinkStubHandler($sink));
                 }
 
                 return $response;
             };
+        };
+    }
+
+    /**
+     * Get the sink stub handler callback.
+     *
+     * @param  string  $sink
+     * @return \Closure
+     */
+    protected function sinkStubHandler($sink)
+    {
+        return function ($response) use ($sink) {
+            $body = $response->getBody()->getContents();
+
+            if (is_string($sink)) {
+                file_put_contents($sink, $body);
+
+                return;
+            }
+
+            fwrite($sink, $body);
+            rewind($sink);
         };
     }
 
