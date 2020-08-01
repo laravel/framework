@@ -14,6 +14,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -61,6 +62,8 @@ class SendingMailNotificationsTest extends TestCase
         $app->extend(MailFactory::class, function () {
             return $this->mailFactory;
         });
+
+        View::addLocation(__DIR__.'/Fixtures');
     }
 
     protected function setUp(): void
@@ -245,6 +248,38 @@ class SendingMailNotificationsTest extends TestCase
 
         $user->notify($notification);
     }
+
+    public function testMailIsSentUsingMailMessageWithPlain()
+    {
+        $notification = new TestMailNotificationWithPlain;
+        $notification->id = Str::uuid()->toString();
+
+        $user = NotifiableUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $this->mailer->shouldReceive('send')->once()->with(
+            ['html' => 'html', 'text' => 'plain'],
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
+
+                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+
+                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Plain');
+
+                $closure($message);
+
+                return true;
+            })
+        );
+
+        $user->notify($notification);
+    }
 }
 
 class NotifiableUser extends Model
@@ -326,5 +361,20 @@ class TestMailNotificationWithMailable extends Notification
         $mailable->shouldReceive('send')->once();
 
         return $mailable;
+    }
+}
+
+class TestMailNotificationWithPlain extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->view('html')
+            ->text('plain');
     }
 }

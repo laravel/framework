@@ -18,6 +18,36 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame('notifications::foo', $message->markdown);
     }
 
+    public function testHtmlView()
+    {
+        $message = new MailMessage;
+
+        $this->assertSame(null, $message->view);
+        $this->assertSame([], $message->viewData);
+
+        $message->view('notifications::foo', [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('notifications::foo', $message->view);
+        $this->assertSame(['foo' => 'bar'], $message->viewData);
+    }
+
+    public function testPlainView()
+    {
+        $message = new MailMessage;
+
+        $this->assertSame(null, $message->textView);
+        $this->assertSame([], $message->viewData);
+
+        $message->text('notifications::foo', [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('notifications::foo', $message->textView);
+        $this->assertSame(['foo' => 'bar'], $message->viewData);
+    }
+
     public function testCcIsSetCorrectly()
     {
         $message = new MailMessage;
