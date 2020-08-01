@@ -1527,6 +1527,66 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSortByMany($collection)
+    {
+        $data = new $collection([
+            ['price' => 5.00, 'rating' => 5],
+            ['price' => 4.00, 'rating' => 5],
+            ['price' => 4.00, 'rating' => 4],
+        ]);
+        $data = $data->sortByMany('rating', true, 'price');
+
+        $this->assertEquals([
+            ['price' => 4.00, 'rating' => 5],
+            ['price' => 5.00, 'rating' => 5],
+            ['price' => 4.00, 'rating' => 4],
+        ], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSortByManyWithOptions($collection)
+    {
+        $data = new $collection([
+            ['price' => '$5.00', 'rating' => 5],
+            ['price' => '$14.00', 'rating' => 5],
+            ['price' => '$4.00', 'rating' => 4],
+        ]);
+        $data = $data->sortByMany('rating', SORT_DESC, 'price', SORT_NATURAL);
+
+        $this->assertEquals([
+            ['price' => '$5.00', 'rating' => 5],
+            ['price' => '$14.00', 'rating' => 5],
+            ['price' => '$4.00', 'rating' => 4],
+        ], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSortByManyWithCallback($collection)
+    {
+        // todo
+        $data = new $collection([
+            ['price' => 4.00, 'rating' => 4, 'markup' => 1.20],
+            ['price' => 4.00, 'rating' => 5, 'markup' => 1.50],
+            ['price' => 5.00, 'rating' => 5, 'markup' => 1.10],
+        ]);
+        $data = $data->sortByMany('rating', true, function ($item) {
+            return $item['price'] * $item['markup'];
+        });
+
+        $this->assertEquals([
+            ['price' => 5.00, 'rating' => 5, 'markup' => 1.10],
+            ['price' => 4.00, 'rating' => 5, 'markup' => 1.50],
+            ['price' => 4.00, 'rating' => 4, 'markup' => 1.20],
+        ], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSortKeys($collection)
     {
         $data = new $collection(['b' => 'dayle', 'a' => 'taylor']);

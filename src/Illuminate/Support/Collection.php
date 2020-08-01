@@ -1149,6 +1149,32 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Sort the collection using the given callbacks.
+     *
+     * @param mixed ...$parameters
+     * @return static
+     */
+    public function sortByMany(...$parameters)
+    {
+        $parameters = array_map(function ($parameter) {
+            if (is_bool($parameter)) {
+                return $parameter ? SORT_DESC : SORT_ASC;
+            }
+            if (is_int($parameter)) {
+                return $parameter;
+            }
+
+            return $this->map($this->valueRetriever($parameter))->toArray();
+        }, $parameters);
+
+        $parameters[] = $this->items;
+
+        array_multisort(...$parameters);
+
+        return new static(Arr::last($parameters));
+    }
+
+    /**
      * Sort the collection keys.
      *
      * @param  int  $options
