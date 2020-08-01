@@ -17,6 +17,7 @@ class NotificationMailMessageTest extends TestCase
 
         $this->assertSame('notifications::foo', $message->markdown);
     }
+
     public function testHtmlView()
     {
         $message = new MailMessage;
@@ -46,7 +47,6 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame('notifications::foo', $message->textView);
         $this->assertSame(['foo' => 'bar'], $message->viewData);
     }
-
 
     public function testCcIsSetCorrectly()
     {
