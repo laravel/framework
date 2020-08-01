@@ -457,4 +457,17 @@ class HttpClientTest extends TestCase
         $this->assertSame(0, ftell($resource));
         $this->assertSame('abc123', stream_get_contents($resource));
     }
+
+    public function testSinkWhenStubbedByPath()
+    {
+        $this->factory->fake([
+            'foo.com/*' => ['page' => 'foo'],
+        ]);
+
+        $resource = fopen('php://temp', 'w');
+
+        $this->factory->sink($resource)->get('http://foo.com/test');
+
+        $this->assertSame(json_encode(['page' => 'foo']), stream_get_contents($resource));
+    }
 }

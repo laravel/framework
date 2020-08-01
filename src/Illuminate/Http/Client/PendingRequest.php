@@ -695,9 +695,9 @@ class PendingRequest
 
                 if (is_null($response)) {
                     return $handler($request, $options);
-                } elseif (is_array($response)) {
-                    return Factory::response($response);
                 }
+
+                $response = is_array($response) ? Factory::response($response) : $response;
 
                 $sink = $options['sink'] ?? null;
 
