@@ -26,16 +26,6 @@ class TestDepsSeeder extends Seeder
     }
 }
 
-
-class TestChildSeeder extends Seeder
-{
-    public function run($someParam = '')
-    {
-        //
-        print_r($someParam);
-    }
-}
-
 class DatabaseSeederTest extends TestCase
 {
     protected function tearDown(): void
