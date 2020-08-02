@@ -28,9 +28,10 @@ abstract class Seeder
      *
      * @param  array|string  $class
      * @param  bool  $silent
+     * @param  mixed ...$params
      * @return $this
      */
-    public function call($class, $silent = false)
+    public function call($class, $silent = false, ...$params)
     {
         $classes = Arr::wrap($class);
 
@@ -45,7 +46,7 @@ abstract class Seeder
 
             $startTime = microtime(true);
 
-            $seeder->__invoke();
+            $seeder->__invoke(...$params);
 
             $runTime = round(microtime(true) - $startTime, 2);
 
@@ -61,11 +62,12 @@ abstract class Seeder
      * Silently seed the given connection from the given path.
      *
      * @param  array|string  $class
+     * @param  mixed ...$params
      * @return void
      */
-    public function callSilent($class)
+    public function callSilent($class, ...$params)
     {
-        $this->call($class, true);
+        $this->call($class, true, ...$params);
     }
 
     /**
@@ -120,18 +122,19 @@ abstract class Seeder
     /**
      * Run the database seeds.
      *
+     * @param  mixed ...$params
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public function __invoke()
+    public function __invoke(...$params)
     {
         if (! method_exists($this, 'run')) {
             throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
         return isset($this->container)
-                    ? $this->container->call([$this, 'run'])
-                    : $this->run();
+                    ? $this->container->call([$this, 'run'], $params)
+                    : $this->run(...$params);
     }
 }
