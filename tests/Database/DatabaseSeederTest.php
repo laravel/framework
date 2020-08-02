@@ -20,9 +20,19 @@ class TestSeeder extends Seeder
 
 class TestDepsSeeder extends Seeder
 {
-    public function run(Mock $someDependency)
+    public function run(Mock $someDependency, $someParam = '')
     {
         //
+    }
+}
+
+
+class TestChildSeeder extends Seeder
+{
+    public function run($someParam = '')
+    {
+        //
+        print_r($someParam);
     }
 }
 
@@ -76,6 +86,19 @@ class DatabaseSeederTest extends TestCase
 
         $seeder->__invoke();
 
-        $container->shouldHaveReceived('call')->once()->with([$seeder, 'run']);
+        $container->shouldHaveReceived('call')->once()->with([$seeder, 'run'], []);
+    }
+
+    public function testSendParamsOnCallMethodWithDeps()
+    {
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+
+        $seeder = new TestDepsSeeder;
+        $seeder->setContainer($container);
+
+        $seeder->__invoke('test1', 'test2');
+
+        $container->shouldHaveReceived('call')->once()->with([$seeder, 'run'], ['test1', 'test2']);
     }
 }

@@ -46,7 +46,7 @@ abstract class Seeder
 
             $startTime = microtime(true);
 
-            call_user_func_array([$seeder, '__invoke'], $params);
+            $seeder->__invoke(...$params);
 
             $runTime = round(microtime(true) - $startTime, 2);
 
@@ -135,6 +135,6 @@ abstract class Seeder
 
         return isset($this->container)
                     ? $this->container->call([$this, 'run'], $params)
-                    : call_user_func_array([$this, 'run'], $params);
+                    : $this->run(...$params);
     }
 }
