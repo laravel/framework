@@ -44,7 +44,25 @@ class Response implements ArrayAccess
      */
     public function body()
     {
-        return (string) $this->response->getBody();
+        return $this->utf8WithoutBom((string) $this->response->getBody());
+    }
+
+    /**
+     * Get UTF-8 Without BOM string if UTF-8 string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public function utf8WithoutBom($string)
+    {
+        if (
+            mb_detect_encoding($string) === "UTF-8"
+            && substr($string, 0, 3) === "\xEF\xBB\xBF"
+        ) {
+            return substr($string, 3);
+        }
+
+        return $string;
     }
 
     /**

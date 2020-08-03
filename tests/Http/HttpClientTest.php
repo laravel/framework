@@ -470,4 +470,15 @@ class HttpClientTest extends TestCase
 
         $this->assertSame(json_encode(['page' => 'foo']), stream_get_contents($resource));
     }
+
+    public function testResponseUtf8WithoutBom()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response("\xEF\xBB\xBFFooBar"),
+        ]);
+
+        $response = $this->factory->get('https://laravel.com');
+
+        $this->assertSame('FooBar', $response->body());
+    }
 }
