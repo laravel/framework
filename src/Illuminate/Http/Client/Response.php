@@ -56,7 +56,7 @@ class Response implements ArrayAccess
     public function utf8WithoutBom($string)
     {
         if (
-            mb_detect_encoding($string) === "UTF-8"
+            mb_detect_encoding($string) === 'UTF-8'
             && substr($string, 0, 3) === "\xEF\xBB\xBF"
         ) {
             return substr($string, 3);
