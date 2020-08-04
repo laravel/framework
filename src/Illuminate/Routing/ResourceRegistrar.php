@@ -99,7 +99,9 @@ class ResourceRegistrar
                 $name, $base, $controller, $options
             );
 
-            $this->setResourceBindingFields($route, $options);
+            if (isset($options['bindingFields'])) {
+                $this->setResourceBindingFields($route, $options['bindingFields']);
+            }
 
             $collection->add($route);
         }
@@ -321,20 +323,18 @@ class ResourceRegistrar
      * Set the route's binding fields if the resource is scoped.
      *
      * @param  \Illuminate\Routing\Route  $route
-     * @param  array  $options
+     * @param  array  $bindingFields
      * @return void
      */
-    protected function setResourceBindingFields($route, $options)
+    protected function setResourceBindingFields($route, $bindingFields)
     {
-        if (isset($options['bindingFields'])) {
-            preg_match_all('/(?<=\{).*?(?=\})/', $route->uri, $matches);
+        preg_match_all('/(?<={).*?(?=})/', $route->uri, $matches);
 
-            $fields = array_fill_keys($matches[0], null);
+        $fields = array_fill_keys($matches[0], null);
 
-            $route->setBindingFields(array_replace(
-                $fields, array_intersect_key((array) $options['bindingFields'], $fields)
-            ));
-        }
+        $route->setBindingFields(array_replace(
+            $fields, array_intersect_key($bindingFields, $fields)
+        ));
     }
 
     /**
