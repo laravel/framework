@@ -342,10 +342,10 @@ class Builder
                 $databaseName = $query->getConnection()->getDatabaseName();
 
                 if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
-                    $query->from($databaseName .'.'.$query->from);
+                    $query->from($databaseName.'.'.$query->from);
                 }
             }
-            
+
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
             return [$query, []];
