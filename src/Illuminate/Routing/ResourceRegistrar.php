@@ -95,9 +95,13 @@ class ResourceRegistrar
         $collection = new RouteCollection;
 
         foreach ($this->getResourceMethods($defaults, $options) as $m) {
-            $collection->add($this->{'addResource'.ucfirst($m)}(
+            $route = $this->{'addResource'.ucfirst($m)}(
                 $name, $base, $controller, $options
-            ));
+            );
+
+            $this->setResourceBindingFields($route, $options);
+
+            $collection->add($route);
         }
 
         return $collection;
@@ -311,6 +315,26 @@ class ResourceRegistrar
         return isset($options['shallow']) && $options['shallow']
                     ? last(explode('.', $name))
                     : $name;
+    }
+
+    /**
+     * Set the route's binding fields if the resource is scoped.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @param  array  $options
+     * @return void
+     */
+    protected function setResourceBindingFields($route, $options)
+    {
+        if (isset($options['bindingFields'])) {
+            preg_match_all('/(?<=\{).*?(?=\})/', $route->uri, $matches);
+
+            $fields = array_fill_keys($matches[0], null);
+
+            $route->setBindingFields(array_replace(
+                $fields, array_intersect_key($options['bindingFields'], $fields)
+            ));
+        }
     }
 
     /**
