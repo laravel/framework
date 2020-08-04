@@ -356,7 +356,7 @@ class PendingRequest
     /**
      * Specify the path where the body of the response should be stored.
      *
-     * @param  $to  string|resource
+     * @param  string|resource  $to
      * @return $this
      */
     public function sink($to)
