@@ -660,6 +660,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testWhereBetweenColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetweenColumns('id', ['users.created_at', 'users.updated_at']);
+        $this->assertSame('select * from "users" where "id" between "users"."created_at" and "users"."updated_at"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotBetweenColumns('id', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where "id" not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetweenColumns('id', [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "users" where "id" between 1 and 2', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testBasicOrWheres()
     {
         $builder = $this->getBuilder();
