@@ -3663,12 +3663,20 @@ SQL;
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
+    protected function getConnection()
+    {
+        $connection = m::mock(ConnectionInterface::class);
+        $connection->shouldReceive('getDatabaseName')->andReturn('database');
+
+        return $connection;
+    }
+
     protected function getBuilder()
     {
         $grammar = new Grammar;
         $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($this->getConnection(), $grammar, $processor);
     }
 
     protected function getPostgresBuilder()
@@ -3676,7 +3684,7 @@ SQL;
         $grammar = new PostgresGrammar;
         $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($this->getConnection(), $grammar, $processor);
     }
 
     protected function getMySqlBuilder()
