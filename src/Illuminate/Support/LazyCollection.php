@@ -1103,7 +1103,7 @@ class LazyCollection implements Enumerable
     /**
      * Sort the collection using the given callbacks.
      *
-     * @param mixed ...$parameters
+     * @param  mixed  ...$parameters
      * @return static
      */
     public function sortByMany(...$parameters)
