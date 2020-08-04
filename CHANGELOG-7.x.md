@@ -1,6 +1,19 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.22.3...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.23.0...7.x)
+
+
+## [v7.23.0 (2020-08-04)](https://github.com/laravel/framework/compare/v7.22.4...v7.23.0)
+
+### Added
+- Added dynamic slot (directive) name support ([#33724](https://github.com/laravel/framework/pull/33724))
+- Added plain mail to notifications ([#33725](https://github.com/laravel/framework/pull/33725))
+- Support the `sink` option when using Http::fake() ([#33720](https://github.com/laravel/framework/pull/33720), [fba984b](https://github.com/laravel/framework/commit/fba984b05081f8aee19447caa0d92624bcf04312))
+- Added whereBetweenColumns | orWhereBetweenColumns | whereNotBetweenColumns | orWhereNotBetweenColumns methods to `Illuminate\Database\Query\Builder` ([#33728](https://github.com/laravel/framework/pull/33728))
+
+### Changed
+- Ignore numeric field names in validators ([#33712](https://github.com/laravel/framework/pull/33712))
+- Fixed validation rule 'required_unless' when other field value is boolean. ([#33715](https://github.com/laravel/framework/pull/33715))
 
 
 ## [v7.22.4 (2020-07-27)](https://github.com/laravel/framework/compare/v7.22.3...v7.22.4)
