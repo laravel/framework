@@ -332,7 +332,7 @@ class ResourceRegistrar
             $fields = array_fill_keys($matches[0], null);
 
             $route->setBindingFields(array_replace(
-                $fields, array_intersect_key($options['bindingFields'], $fields)
+                $fields, array_intersect_key((array) $options['bindingFields'], $fields)
             ));
         }
     }
