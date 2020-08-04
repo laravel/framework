@@ -368,21 +368,21 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->filled('foo.bar'));
     }
 
-    public function testEmptyMethod()
+    public function testIsNotFilledMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
-        $this->assertFalse($request->empty('name'));
-        $this->assertTrue($request->empty('age'));
-        $this->assertTrue($request->empty('city'));
-        $this->assertTrue($request->empty('foo'));
-        $this->assertFalse($request->empty(['name', 'email']));
-        $this->assertTrue($request->empty(['foo', 'age']));
-        $this->assertTrue($request->empty(['age', 'city']));
+        $this->assertFalse($request->isNotFilled('name'));
+        $this->assertTrue($request->isNotFilled('age'));
+        $this->assertTrue($request->isNotFilled('city'));
+        $this->assertTrue($request->isNotFilled('foo'));
+        $this->assertFalse($request->isNotFilled(['name', 'email']));
+        $this->assertTrue($request->isNotFilled(['foo', 'age']));
+        $this->assertTrue($request->isNotFilled(['age', 'city']));
 
         $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz' => '0']]);
-        $this->assertFalse($request->empty('foo'));
-        $this->assertTrue($request->empty('foo.bar'));
-        $this->assertFalse($request->empty('foo.baz'));
+        $this->assertFalse($request->isNotFilled('foo'));
+        $this->assertTrue($request->isNotFilled('foo.bar'));
+        $this->assertFalse($request->isNotFilled('foo.baz'));
     }
 
     public function testFilledAnyMethod()

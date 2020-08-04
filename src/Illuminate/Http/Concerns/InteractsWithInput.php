@@ -131,7 +131,7 @@ trait InteractsWithInput
      * @param  string|array  $key
      * @return bool
      */
-    public function empty($key)
+    public function isNotFilled($key)
     {
         $keys = is_array($key) ? $key : func_get_args();
 
