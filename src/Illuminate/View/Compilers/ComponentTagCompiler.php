@@ -289,7 +289,7 @@ class ComponentTagCompiler
 
         return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
             return in_array(Str::camel($key), $parameterNames);
-        });
+        })->all();
     }
 
     /**
