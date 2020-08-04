@@ -37,7 +37,7 @@ class ImplicitRouteBinding
 
             $parent = $route->parentOfParameter($parameterName);
 
-            if ($parent instanceof UrlRoutable && $route->bindingFieldFor($parameterName)) {
+            if ($parent instanceof UrlRoutable) {
                 if (! $model = $parent->resolveChildRouteBinding(
                     $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
                 )) {
