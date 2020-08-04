@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\FilesystemOperator;
-use League\Flysystem\FTP\FtpAdapter;
+use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\PathPrefixer;
 use League\Flysystem\StorageAttributes;
