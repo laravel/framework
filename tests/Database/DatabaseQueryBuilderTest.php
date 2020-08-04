@@ -3681,12 +3681,19 @@ SQL;
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
-    protected function getConnection()
+    public function testFromQuestionMarkOperatorOnPostgres()
     {
-        $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getDatabaseName')->andReturn('database');
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('roles', '?', 'superuser');
+        $this->assertSame('select * from "users" where "roles" ?? ?', $builder->toSql());
 
-        return $connection;
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('roles', '?|', 'superuser');
+        $this->assertSame('select * from "users" where "roles" ??| ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('roles', '?&', 'superuser');
+        $this->assertSame('select * from "users" where "roles" ??& ?', $builder->toSql());
     }
 
     protected function getBuilder()
