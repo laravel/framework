@@ -249,8 +249,14 @@ class Grammar extends BaseGrammar
     protected function whereBasic(Builder $query, $where)
     {
         $value = $this->parameter($where['value']);
+        $operator = $where['operator'];
 
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+        // @see https://wiki.php.net/rfc/pdo_escape_placeholders
+        if (Str::contains(strtolower($operator), '?')) {
+            $operator = str_replace('?', '??', $operator);
+        }
+
+        return $this->wrap($where['column']).' '.$operator.' '.$value;
     }
 
     /**
