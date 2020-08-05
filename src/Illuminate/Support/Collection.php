@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Closure;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
@@ -1149,29 +1150,30 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Sort the collection using the given callbacks.
+     * Sort the collection on one or more attributes using the given callback.
      *
-     * @param  mixed  ...$parameters
+     * @param  Closure  $callback
      * @return static
      */
-    public function sortByMany(...$parameters)
+    public function sortUsing(Closure $callback)
     {
-        $parameters = array_map(function ($parameter) {
-            if (is_bool($parameter)) {
-                return $parameter ? SORT_DESC : SORT_ASC;
-            }
-            if (is_int($parameter)) {
-                return $parameter;
-            }
+        $items = $this->items;
 
-            return $this->map($this->valueRetriever($parameter))->toArray();
-        }, $parameters);
+        $sorts = tap(new Sort, $callback)->all();
 
-        $parameters[] = $this->items;
+        $parameters = [];
+
+        foreach ($sorts as [$callback, $options, $direction]) {
+            $column = $this->map($this->valueRetriever($callback))->toArray();
+
+            $parameters = array_merge($parameters, [$column, $options, $direction]);
+        }
+
+        $parameters[] = &$items;
 
         array_multisort(...$parameters);
 
-        return new static(Arr::last($parameters));
+        return new static($items);
     }
 
     /**

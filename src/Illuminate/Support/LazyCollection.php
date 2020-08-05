@@ -1101,14 +1101,14 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Sort the collection using the given callbacks.
+     * Sort the collection on one or more attributes using the given callback.
      *
-     * @param  mixed  ...$parameters
+     * @param  Closure  $callback
      * @return static
      */
-    public function sortByMany(...$parameters)
+    public function sortUsing(Closure $callback)
     {
-        return $this->passthru('sortByMany', func_get_args());
+        return $this->passthru('sortUsing', func_get_args());
     }
 
     /**
