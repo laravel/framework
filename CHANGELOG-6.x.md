@@ -1,6 +1,13 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.31...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.32...6.x)
+
+
+## [v6.18.32 (2020-08-04)](https://github.com/laravel/framework/compare/v6.18.31...v6.18.32)
+
+### Changed
+- Ignore numeric field names in validators ([#33712](https://github.com/laravel/framework/pull/33712))
+- Fixed validation rule 'required_unless' when other field value is boolean. ([#33715](https://github.com/laravel/framework/pull/33715))
 
 
 ## [v6.18.31 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.30...v6.18.31)
