@@ -189,7 +189,7 @@ trait GuardsAttributes
      */
     public function isGuarded($key)
     {
-        return in_array($key, $this->getGuarded()) || $this->getGuarded() == ['*'];
+        return $this->getGuarded() == ['*'] || ! empty(preg_grep('/^'.preg_quote($key).'$/i', $this->getGuarded()));
     }
 
     /**
