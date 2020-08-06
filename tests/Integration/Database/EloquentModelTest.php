@@ -35,6 +35,15 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertNull($model->ID);
     }
 
+    public function test_cant_update_guarded_attribute_using_json()
+    {
+        $model = new TestModel2;
+
+        $model->fill(['id->foo' => 123]);
+
+        $this->assertNull($model->id);
+    }
+
     public function test_user_can_update_nullable_date()
     {
         $user = TestModel1::create([

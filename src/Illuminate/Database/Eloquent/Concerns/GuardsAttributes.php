@@ -163,6 +163,10 @@ trait GuardsAttributes
      */
     public function isGuarded($key)
     {
+        if (strpos($key, '->')) {
+            $key = Str::before($key, '->');
+        }
+
         return $this->getGuarded() == ['*'] || ! empty(preg_grep('/^'.preg_quote($key).'$/i', $this->getGuarded()));
     }
 
