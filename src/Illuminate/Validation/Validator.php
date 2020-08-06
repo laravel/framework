@@ -536,10 +536,14 @@ class Validator implements ValidatorContract
         // attribute is invalid and we will add a failure message for this failing attribute.
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
-        if ($rule instanceof RuleContract) {
+        if (is_subclass_of($rule, RuleContract::class)) {
+            if (is_string($rule)) {
+                $rule = $this->container->make($rule);
+            }
+
             return $validatable
-                    ? $this->validateUsingCustomRule($attribute, $value, $rule)
-                    : null;
+                ? $this->validateUsingCustomRule($attribute, $value, $rule)
+                : null;
         }
 
         $method = "validate{$rule}";
