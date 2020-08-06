@@ -163,7 +163,7 @@ trait GuardsAttributes
      */
     public function isGuarded($key)
     {
-        if (strpos($key, '->')) {
+        if (strpos($key, '->') !== false) {
             $key = Str::before($key, '->');
         }
 
