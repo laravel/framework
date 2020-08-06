@@ -379,7 +379,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         if (strpos($key, '.') !== false) {
             if (! empty($this->getGuarded()) &&
                 $this->getGuarded() !== ['*']) {
-                throw new LogicException("Mass assignment of Eloquent attributes including table names is unsafe when guarding attributes.");
+                throw new LogicException('Mass assignment of Eloquent attributes including table names is unsafe when guarding attributes.');
             }
 
             return last(explode('.', $key));
