@@ -46,11 +46,11 @@ class EloquentModelTest extends DatabaseTestCase
 
     public function test_cant_mass_fill_attributes_with_table_names_when_using_guarded()
     {
-        $this->expectException(\LogicException::class);
-
         $model = new TestModel2;
 
         $model->fill(['foo.bar' => 123]);
+
+        $this->assertCount(0, $model->getAttributes());
     }
 
     public function test_user_can_update_nullable_date()
