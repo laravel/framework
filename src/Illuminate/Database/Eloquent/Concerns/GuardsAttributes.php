@@ -171,10 +171,6 @@ trait GuardsAttributes
      */
     public function isGuarded($key)
     {
-        if (strpos($key, '->') !== false) {
-            $key = Str::before($key, '->');
-        }
-
         if (empty($this->getGuarded())) {
             return false;
         }
