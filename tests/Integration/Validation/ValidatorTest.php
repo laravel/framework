@@ -100,14 +100,14 @@ class ValidatorTest extends DatabaseTestCase
 class User extends Model
 {
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }
 
 class UserWithUuid extends Model
 {
     protected $table = 'users';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
     protected $keyType = 'string';
     public $incrementing = false;
 
