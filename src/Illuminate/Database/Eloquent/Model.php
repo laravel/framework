@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use Exception;
 use ArrayAccess;
+use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -272,7 +273,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function removeTableFromKey($key)
     {
-        return Str::contains($key, '.') ? last(explode('.', $key)) : $key;
+        if (strpos($key, '.') !== false) {
+            if (! empty($this->getGuarded()) &&
+                $this->getGuarded() !== ['*']) {
+                throw new LogicException("Mass assignment of Eloquent attributes including table names is unsafe when guarding attributes.");
+            }
+
+            return last(explode('.', $key));
+        }
+
+        return $key;
     }
 
     /**
