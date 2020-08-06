@@ -4,7 +4,6 @@ namespace Illuminate\Database\Eloquent;
 
 use Exception;
 use ArrayAccess;
-use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
