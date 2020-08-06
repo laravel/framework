@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
@@ -11,6 +10,7 @@ use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
