@@ -178,6 +178,7 @@ trait GuardsAttributes
         }
 
         return empty($this->getFillable()) &&
+            strpos($key, '.') === false &&
             ! Str::startsWith($key, '_');
     }
 
