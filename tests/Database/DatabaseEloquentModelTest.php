@@ -1089,20 +1089,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals([], $model->getAttributes());
     }
 
-    public function testGuarded()
-    {
-        $model = new EloquentModelStub;
-        $model->guard(['name', 'age']);
-        $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
-        $this->assertFalse(isset($model->name));
-        $this->assertFalse(isset($model->age));
-        $this->assertSame('bar', $model->foo);
-    }
-
     public function testFillableOverridesGuarded()
     {
         $model = new EloquentModelStub;
-        $model->guard(['name', 'age']);
+        $model->guard([]);
         $model->fillable(['age', 'foo']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
         $this->assertFalse(isset($model->name));
@@ -2310,7 +2300,7 @@ class EloquentDateModelStub extends EloquentModelStub
 class EloquentModelSaveStub extends Model
 {
     protected $table = 'save_stub';
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function save(array $options = [])
     {

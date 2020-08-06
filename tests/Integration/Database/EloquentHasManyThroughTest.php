@@ -130,7 +130,7 @@ class User extends Model
 {
     public $table = 'users';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function teamMates()
     {
@@ -152,7 +152,7 @@ class UserWithGlobalScope extends Model
 {
     public $table = 'users';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public static function boot()
     {

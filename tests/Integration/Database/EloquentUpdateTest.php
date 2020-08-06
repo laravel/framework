@@ -139,7 +139,7 @@ class TestUpdateModel1 extends Model
 {
     public $table = 'test_model1';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }
 
 class TestUpdateModel2 extends Model

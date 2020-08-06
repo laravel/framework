@@ -342,6 +342,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function fill(array $attributes)
     {
+        $this->ensureModelHasValidGuardState();
+
         $totallyGuarded = $this->totallyGuarded();
 
         foreach ($this->fillableFromArray($attributes) as $key => $value) {

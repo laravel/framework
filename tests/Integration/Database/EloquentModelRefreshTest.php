@@ -81,7 +81,7 @@ class Post extends Model
 {
     public $table = 'posts';
     public $timestamps = true;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     use SoftDeletes;
 
