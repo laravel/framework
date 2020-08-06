@@ -233,8 +233,7 @@ trait GuardsAttributes
     {
         if (! empty($this->getGuarded()) &&
             $this->getGuarded() !== ['*']) {
-
-            throw new LogicException("For added security, guarded attributes are no longer supported. Please use fillable instead.");
+            throw new LogicException('For added security, guarded attributes are no longer supported. Please use fillable instead.');
         }
     }
 }
