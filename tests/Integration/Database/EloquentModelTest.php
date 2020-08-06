@@ -47,6 +47,15 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertNull($model->id);
     }
 
+    public function testCantMassFillAttributesWithTableNamesWhenUsingGuarded()
+    {
+        $this->expectException(\LogicException::class);
+
+        $model = new TestModel2;
+
+        $model->fill(['foo.bar' => 123]);
+    }
+
     public function testUserCanUpdateNullableDate()
     {
         $user = TestModel1::create([

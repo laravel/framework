@@ -19,6 +19,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
+use LogicException;
 
 abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -399,7 +400,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     protected function removeTableFromKey($key)
     {
-        return Str::contains($key, '.') ? last(explode('.', $key)) : $key;
+        if (strpos($key, '.') !== false) {
+            if (! empty($this->getGuarded()) &&
+                $this->getGuarded() !== ['*']) {
+                throw new LogicException('Mass assignment of Eloquent attributes including table names is unsafe when guarding attributes.');
+            }
+
+            return last(explode('.', $key));
+        }
+
+        return $key;
     }
 
     /**
