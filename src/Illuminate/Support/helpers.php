@@ -139,7 +139,7 @@ if (! function_exists('data_get')) {
         if (is_null($key)) {
             return $target;
         }
-        
+
         if (Arr::accessible($target) && Arr::exists($target, $key)) {
             return $target[$key];
         }
