@@ -27,6 +27,8 @@ class MySqlConnector extends Connector implements ConnectorInterface
             $connection->exec("use `{$config['database']}`;");
         }
 
+        $this->configureIsolationLevel($connection, $config);
+
         $this->configureEncoding($connection, $config);
 
         // Next, we will check to see if a timezone has been specified in this config
@@ -44,7 +46,25 @@ class MySqlConnector extends Connector implements ConnectorInterface
      *
      * @param  \PDO  $connection
      * @param  array  $config
-     * @return void
+     * @return void|\PDO
+     */
+    protected function configureIsolationLevel($connection, array $config)
+    {
+        if (! isset($config['isolation_level'])) {
+            return $connection;
+        }
+
+        $connection->prepare(
+            "SET SESSION TRANSACTION ISOLATION LEVEL '{$config['isolation_level']}'"
+        )->execute();
+    }
+
+    /**
+     * Set the connection character set and collation.
+     *
+     * @param  \PDO  $connection
+     * @param  array  $config
+     * @return void|\PDO
      */
     protected function configureEncoding($connection, array $config)
     {
