@@ -251,7 +251,7 @@ class SendingMailNotificationsTest extends TestCase
 
     public function testMailIsSentUsingMailMessageWithHtmlAndPlain()
     {
-        $notification = new TestMailNotificationWithPlain;
+        $notification = new TestMailNotificationWithHtmlAndPlain;
         $notification->id = Str::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
@@ -270,7 +270,7 @@ class SendingMailNotificationsTest extends TestCase
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
-                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Plain');
+                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Html And Plain');
 
                 $closure($message);
 
@@ -428,7 +428,7 @@ class TestMailNotificationWithMailable extends Notification
     }
 }
 
-class TestMailNotificationWithPlain extends Notification
+class TestMailNotificationWithHtmlAndPlain extends Notification
 {
     public function via($notifiable)
     {
