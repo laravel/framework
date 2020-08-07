@@ -342,7 +342,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function fill(array $attributes)
     {
-        $this->ensureModelHasValidGuardState();
+        // $this->ensureModelHasValidGuardState();
 
         $totallyGuarded = $this->totallyGuarded();
 

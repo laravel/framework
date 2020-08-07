@@ -11,6 +11,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -1087,6 +1088,26 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $model->fill(['_method' => 'PUT']);
         $this->assertEquals([], $model->getAttributes());
+    }
+
+    public function testGuarded()
+    {
+        $model = new EloquentModelStub;
+
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+
+        $model->guard(['name', 'age']);
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
+        $this->assertFalse(isset($model->name));
+        $this->assertFalse(isset($model->age));
+        $this->assertSame('bar', $model->foo);
+
+        $model = new EloquentModelStub;
+        $model->guard(['name', 'age']);
+        $model->fill(['Foo' => 'bar']);
+        $this->assertFalse(isset($model->Foo));
     }
 
     public function testFillableOverridesGuarded()
