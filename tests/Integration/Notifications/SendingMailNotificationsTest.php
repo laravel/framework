@@ -249,9 +249,9 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function testMailIsSentUsingMailMessageWithPlain()
+    public function testMailIsSentUsingMailMessageWithHtmlAndPlain()
     {
-        $notification = new TestMailNotificationWithPlain;
+        $notification = new TestMailNotificationWithHtmlAndPlain;
         $notification->id = Str::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
@@ -270,7 +270,71 @@ class SendingMailNotificationsTest extends TestCase
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
-                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Plain');
+                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Html And Plain');
+
+                $closure($message);
+
+                return true;
+            })
+        );
+
+        $user->notify($notification);
+    }
+
+    public function testMailIsSentUsingMailMessageWithHtmlOnly()
+    {
+        $notification = new TestMailNotificationWithHtmlOnly;
+        $notification->id = Str::uuid()->toString();
+
+        $user = NotifiableUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $this->mailer->shouldReceive('send')->once()->with(
+            ['html' => 'html', 'text' => null],
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
+
+                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+
+                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Html Only');
+
+                $closure($message);
+
+                return true;
+            })
+        );
+
+        $user->notify($notification);
+    }
+
+    public function testMailIsSentUsingMailMessageWithPlainOnly()
+    {
+        $notification = new TestMailNotificationWithPlainOnly;
+        $notification->id = Str::uuid()->toString();
+
+        $user = NotifiableUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $this->mailer->shouldReceive('send')->once()->with(
+            ['html' => null, 'text' => 'plain'],
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
+
+                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+
+                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Plain Only');
 
                 $closure($message);
 
@@ -364,7 +428,7 @@ class TestMailNotificationWithMailable extends Notification
     }
 }
 
-class TestMailNotificationWithPlain extends Notification
+class TestMailNotificationWithHtmlAndPlain extends Notification
 {
     public function via($notifiable)
     {
@@ -375,6 +439,36 @@ class TestMailNotificationWithPlain extends Notification
     {
         return (new MailMessage)
             ->view('html')
+            ->text('plain');
+    }
+}
+
+class TestMailNotificationWithHtmlOnly extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->view('html')
+            ->text(null);
+    }
+}
+
+class TestMailNotificationWithPlainOnly extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->view(null)
             ->text('plain');
     }
 }

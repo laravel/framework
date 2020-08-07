@@ -89,7 +89,7 @@ class MailChannel
      */
     protected function buildView($message)
     {
-        if ($message->view) {
+        if ($message->view || $message->textView) {
             return [
                 'html' => $message->view,
                 'text' => $message->textView,
