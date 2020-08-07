@@ -42,16 +42,16 @@ class MySqlConnector extends Connector implements ConnectorInterface
     }
 
     /**
-     * Set the connection character set and collation.
+     * Set the connection transaction isolation level.
      *
      * @param  \PDO  $connection
      * @param  array  $config
-     * @return void|\PDO
+     * @return void
      */
     protected function configureIsolationLevel($connection, array $config)
     {
         if (! isset($config['isolation_level'])) {
-            return $connection;
+            return;
         }
 
         $connection->prepare(
