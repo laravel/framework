@@ -525,6 +525,22 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
     }
 
+    public function testResourceWheres()
+    {
+        $wheres = [
+            'user' => '\d+',
+            'test' => '[a-z]+',
+        ];
+
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->wheres($wheres);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {

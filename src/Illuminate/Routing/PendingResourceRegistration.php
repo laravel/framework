@@ -183,6 +183,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Add wheres to the resource routes.
+     *
+     * @param  mixed  $wheres
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function wheres($wheres)
+    {
+        $this->options['wheres'] = $wheres;
+
+        return $this;
+    }
+
+    /**
      * Register the resource route.
      *
      * @return \Illuminate\Routing\RouteCollection
