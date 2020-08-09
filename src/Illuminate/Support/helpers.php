@@ -385,7 +385,7 @@ if (! function_exists('retry')) {
     {
         $attempts = 0;
 
-        beginning:
+        beginning :
         $attempts++;
         $times--;
 
