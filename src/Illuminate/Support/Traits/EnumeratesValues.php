@@ -412,13 +412,9 @@ trait EnumeratesValues
      */
     public function sum($callback = null)
     {
-        if (is_null($callback)) {
-            $callback = function ($value) {
-                return $value;
-            };
-        } else {
-            $callback = $this->valueRetriever($callback);
-        }
+        $callback = is_null($callback)
+            ? $this->identity()
+            : $this->valueRetriever($callback);
 
         return $this->reduce(function ($result, $item) use ($callback) {
             return $result + $callback($item);
@@ -815,9 +811,7 @@ trait EnumeratesValues
     public function countBy($countBy = null)
     {
         if (is_null($countBy)) {
-            $countBy = function ($value) {
-                return $value;
-            };
+            $countBy = $this->identity();
         }
 
         return new static($this->groupBy($countBy)->map(function ($value) {
@@ -975,6 +969,18 @@ trait EnumeratesValues
     {
         return function ($item) use ($value) {
             return $item === $value;
+        };
+    }
+
+    /**
+     * Make a function that returns what's passed to it.
+     *
+     * @return \Closure
+     */
+    protected function identity()
+    {
+        return function ($value) {
+            return $value;
         };
     }
 
