@@ -222,7 +222,7 @@ class Store implements Session
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
-     * @param  string|null  $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function pull($key, $default = null)
