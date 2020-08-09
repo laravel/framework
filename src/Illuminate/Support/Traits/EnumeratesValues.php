@@ -803,23 +803,6 @@ trait EnumeratesValues
     }
 
     /**
-     * Count the number of items in the collection by a field or using a callback.
-     *
-     * @param  array|callable|string $countBy
-     * @return static
-     */
-    public function countBy($countBy = null)
-    {
-        if (is_null($countBy)) {
-            $countBy = $this->identity();
-        }
-
-        return new static($this->groupBy($countBy)->map(function ($value) {
-            return $value->count();
-        }));
-    }
-
-    /**
      * Convert the collection to its string representation.
      *
      * @return string
