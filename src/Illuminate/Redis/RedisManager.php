@@ -184,6 +184,11 @@ class RedisManager implements Factory
     protected function parseConnectionConfiguration($config)
     {
         $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
+        $driver = strtolower($parsed['driver'] ?? '');
+
+        if (in_array($driver, ['tcp', 'tls'])) {
+            $parsed['host'] = "{$driver}://" . $parsed['host'];
+        }
 
         return array_filter($parsed, function ($key) {
             return ! in_array($key, ['driver', 'username'], true);
