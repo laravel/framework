@@ -59,6 +59,16 @@ class ViewFactoryTest extends TestCase
         $this->assertTrue($factory->exists('bar'));
     }
 
+    public function testRenderingOnceChecks()
+    {
+        $factory = $this->getFactory();
+        $this->assertFalse($factory->hasRenderedOnce('foo'));
+        $factory->markAsRenderedOnce('foo');
+        $this->assertTrue($factory->hasRenderedOnce('foo'));
+        $factory->flushState();
+        $this->assertFalse($factory->hasRenderedOnce('foo'));
+    }
+
     public function testFirstCreatesNewViewInstanceWithProperPath()
     {
         unset($_SERVER['__test.view']);
