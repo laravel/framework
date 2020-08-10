@@ -283,7 +283,7 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile an once block into valid PHP.
+     * Compile the once statements into valid PHP.
      *
      * @return string
      */
@@ -295,7 +295,7 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile an end-once block into valid PHP.
+     * Compile the end-once statements into valid PHP.
      *
      * @return string
      */
