@@ -2,6 +2,8 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
+use Illuminate\Support\Str;
+
 trait CompilesConditionals
 {
     /**
@@ -278,5 +280,27 @@ trait CompilesConditionals
     protected function compileEndSwitch()
     {
         return '<?php endswitch; ?>';
+    }
+
+    /**
+     * Compile an once block into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileOnce()
+    {
+        $uuid = (string) Str::uuid();
+
+        return '<?php if (! $__env->hasRenderedOnce(\''.$uuid.'\')): $__env->markAsRenderedOnce(\''.$uuid.'\'); ?>';
+    }
+
+    /**
+     * Compile an end-once block into valid PHP.
+     *
+     * @return string
+     */
+    public function compileEndOnce()
+    {
+        return '<?php endif; ?>';
     }
 }

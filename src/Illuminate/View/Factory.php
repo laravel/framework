@@ -84,6 +84,13 @@ class Factory implements FactoryContract
     protected $renderCount = 0;
 
     /**
+     * The "once" block IDs that have been rendered.
+     *
+     * @var array
+     */
+    protected $renderedOnce = [];
+
+    /**
      * Create a new view factory instance.
      *
      * @param  \Illuminate\View\Engines\EngineResolver  $engines
@@ -350,6 +357,28 @@ class Factory implements FactoryContract
     public function doneRendering()
     {
         return $this->renderCount == 0;
+    }
+
+    /**
+     * Determine if the given once token has been rendered.
+     *
+     * @param  string  $id
+     * @return bool
+     */
+    public function hasRenderedOnce(string $id)
+    {
+        return isset($this->renderedOnce[$id]);
+    }
+
+    /**
+     * Mark the given once token as having been rendered.
+     *
+     * @param  string  $id
+     * @return void
+     */
+    public function markAsRenderedOnce(string $id)
+    {
+        $this->renderedOnce[$id] = true;
     }
 
     /**
