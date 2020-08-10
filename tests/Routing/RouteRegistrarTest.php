@@ -533,7 +533,7 @@ class RouteRegistrarTest extends TestCase
         ];
 
         $this->router->resource('users', RouteRegistrarControllerStub::class)
-                     ->wheres($wheres);
+                     ->where($wheres);
 
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
