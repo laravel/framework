@@ -956,18 +956,6 @@ trait EnumeratesValues
     }
 
     /**
-     * Make a function that returns what's passed to it.
-     *
-     * @return \Closure
-     */
-    protected function identity()
-    {
-        return function ($value) {
-            return $value;
-        };
-    }
-
-    /**
      * Make a function using another function, by negating its result.
      *
      * @param  \Closure  $callback
@@ -977,6 +965,18 @@ trait EnumeratesValues
     {
         return function (...$params) use ($callback) {
             return ! $callback(...$params);
+        };
+    }
+
+    /**
+     * Make a function that returns what's passed to it.
+     *
+     * @return \Closure
+     */
+    protected function identity()
+    {
+        return function ($value) {
+            return $value;
         };
     }
 }
