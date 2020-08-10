@@ -170,6 +170,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Add "where" constraints to the resource routes.
+     *
+     * @param  mixed  $wheres
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function where($wheres)
+    {
+        $this->options['wheres'] = $wheres;
+
+        return $this;
+    }
+
+    /**
      * Indicate that the resource routes should have "shallow" nesting.
      *
      * @param  bool  $shallow
