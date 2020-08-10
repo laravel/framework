@@ -40,6 +40,8 @@ class LengthAwarePaginatorTest extends TestCase
     {
         $this->assertEquals(2, $this->p->lastPage());
         $this->assertEquals(2, $this->p->currentPage());
+        $this->assertEquals(3, $this->p->firstNumber());
+        $this->assertEquals(4, $this->p->lastNumber());
         $this->assertTrue($this->p->hasPages());
         $this->assertFalse($this->p->hasMorePages());
         $this->assertEquals(['item1', 'item2', 'item3', 'item4'], $this->p->items());
@@ -51,6 +53,8 @@ class LengthAwarePaginatorTest extends TestCase
 
         $this->assertEquals(1, $paginator->lastPage());
         $this->assertEquals(1, $paginator->currentPage());
+        $this->assertEquals(null, $paginator->firstNumber());
+        $this->assertEquals(null, $paginator->lastNumber());
         $this->assertFalse($paginator->hasPages());
         $this->assertFalse($paginator->hasMorePages());
         $this->assertEmpty($paginator->items());

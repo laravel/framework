@@ -341,6 +341,26 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Get the first number of current page.
+     *
+     * @return int|null
+     */
+    public function firstNumber()
+    {
+        return count($this->items) ? ($this->currentPage - 1) * $this->perPage + 1 : null;
+    }
+
+    /**
+     * Get the last number of current page.
+     *
+     * @return int|null
+     */
+    public function lastNumber()
+    {
+        return count($this->items) > 0 ? $this->currentPage * $this->perPage : null;
+    }
+
+    /**
      * Get the query string variable used to store the page.
      *
      * @return string
