@@ -196,6 +196,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Indicate that the resource routes should be scoped using the given binding fields.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function scoped(array $fields = [])
+    {
+        $this->options['bindingFields'] = $fields;
+
+        return $this;
+    }
+
+    /**
      * Register the resource route.
      *
      * @return \Illuminate\Routing\RouteCollection

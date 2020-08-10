@@ -1581,6 +1581,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         $relationship = $this->{Str::plural(Str::camel($childType))}();
 
+        $field = $field ?: $relationship->getRelated()->getRouteKeyName();
+
         if ($relationship instanceof HasManyThrough ||
             $relationship instanceof BelongsToMany) {
             return $relationship->where($relationship->getRelated()->getTable().'.'.$field, $value)->first();
