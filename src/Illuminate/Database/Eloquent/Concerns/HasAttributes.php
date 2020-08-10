@@ -598,7 +598,8 @@ trait HasAttributes
      */
     protected function getCastType($key)
     {
-        if (is_subclass_of($cast = $this->getCasts()[$key], CastsAttributes::class)) {
+        if (is_subclass_of($cast = $this->getCasts()[$key], CastsAttributes::class)
+            && !is_string($this->getCasts()[$key])) {
             return trim(strtolower(get_class($cast)));
         }
 
@@ -1091,7 +1092,7 @@ trait HasAttributes
      */
     protected function isClassCastable($key)
     {
-        if (is_subclass_of($this->getCasts()[$key], CastsAttributes::class)) {
+        if (is_subclass_of($this->getCasts()[$key] ?? null, CastsAttributes::class)) {
             return true;
         }
 
