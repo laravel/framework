@@ -52,6 +52,24 @@ class DatabaseConnectorTest extends TestCase
         ];
     }
 
+    public function testMySqlConnectCallsCreateConnectionWithIsolationLevel()
+    {
+        $dsn = 'mysql:host=foo;dbname=bar';
+        $config = ['host' => 'foo', 'database' => 'bar', 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8', 'isolation_level' => 'REPEATABLE READ'];
+
+        $connector = $this->getMockBuilder(MySqlConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($connection);
+        $connection->shouldReceive('prepare')->once()->with('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ')->andReturn($connection);
+        $connection->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->shouldReceive('exec')->zeroOrMoreTimes();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     public function testPostgresConnectCallsCreateConnectionWithProperArguments()
     {
         $dsn = 'pgsql:host=foo;dbname=bar;port=111';
