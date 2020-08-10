@@ -565,7 +565,7 @@ class Filesystem
                 }
             }
 
-            // If the current items is just a regular file, we will just copy this to the new
+            // If the current item is just a normal file, we will simply copy this to the new
             // location and keep looping. If for some reason the copy fails we'll bail out
             // and return false, so the developer is aware that the copy process failed.
             else {

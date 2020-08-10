@@ -572,7 +572,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Determine if the items is empty or not.
+     * Determine if the items are empty or not.
      *
      * @return bool
      */

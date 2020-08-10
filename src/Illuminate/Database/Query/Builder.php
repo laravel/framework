@@ -650,8 +650,8 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        // If the columns is actually a Closure instance, we will assume the developer
-        // wants to begin a nested where statement which is wrapped in parenthesis.
+        // If the column is actually a Closure instance, we will assume the developer
+        // wants to begin a nested where statement that is wrapped in parentheses.
         // We'll add that Closure to the query then return back out immediately.
         if ($column instanceof Closure && is_null($operator)) {
             return $this->whereNested($column, $boolean);
@@ -1582,7 +1582,7 @@ class Builder
     }
 
     /**
-     * Add a or where condition using row values.
+     * Add an or where condition using row values.
      *
      * @param  array  $columns
      * @param  string  $operator
@@ -2543,9 +2543,9 @@ class Builder
             $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
         );
 
-        // If the results has rows, we will get the row and see if the exists column is a
-        // boolean true. If there is no results for this query we will return false as
-        // there are no rows for this query at all and we can return that info here.
+        // If the results have rows, we will take the first row and see if the exists column
+        // is a boolean true. If there are no results for this query we will return false
+        // as there are no rows for this query at all and we can return that info here.
         if (isset($results[0])) {
             $results = (array) $results[0];
 
