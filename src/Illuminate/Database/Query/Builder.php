@@ -277,7 +277,7 @@ class Builder
     }
 
     /**
-     * Makes "from" fetch from a subquery.
+     * Make "from" fetch from a subquery.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
@@ -309,7 +309,7 @@ class Builder
     }
 
     /**
-     * Creates a subquery and parse it.
+     * Create a subquery and parse it.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @return array
@@ -1556,7 +1556,7 @@ class Builder
     }
 
     /**
-     * Adds a where condition using row values.
+     * Add a where condition using row values.
      *
      * @param  array  $columns
      * @param  string  $operator
@@ -1582,7 +1582,7 @@ class Builder
     }
 
     /**
-     * Adds a or where condition using row values.
+     * Add a or where condition using row values.
      *
      * @param  array  $columns
      * @param  string  $operator
@@ -1617,7 +1617,7 @@ class Builder
     }
 
     /**
-     * Add a "or where JSON contains" clause to the query.
+     * Add an "or where JSON contains" clause to the query.
      *
      * @param  string  $column
      * @param  mixed  $value
@@ -1642,7 +1642,7 @@ class Builder
     }
 
     /**
-     * Add a "or where JSON not contains" clause to the query.
+     * Add an "or where JSON not contains" clause to the query.
      *
      * @param  string  $column
      * @param  mixed  $value
@@ -1680,7 +1680,7 @@ class Builder
     }
 
     /**
-     * Add a "or where JSON length" clause to the query.
+     * Add an "or where JSON length" clause to the query.
      *
      * @param  string  $column
      * @param  mixed  $operator
@@ -1697,7 +1697,7 @@ class Builder
     }
 
     /**
-     * Handles dynamic "where" clauses to the query.
+     * Handle dynamic "where" clauses to the query.
      *
      * @param  string  $method
      * @param  array  $parameters
@@ -1829,7 +1829,7 @@ class Builder
     }
 
     /**
-     * Add a "or having" clause to the query.
+     * Add an "or having" clause to the query.
      *
      * @param  string  $column
      * @param  string|null  $operator
