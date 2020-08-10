@@ -3696,6 +3696,14 @@ SQL;
         $this->assertSame('select * from "users" where "roles" ??& ?', $builder->toSql());
     }
 
+    protected function getConnection()
+    {
+        $connection = m::mock(ConnectionInterface::class);
+        $connection->shouldReceive('getDatabaseName')->andReturn('database');
+
+        return $connection;
+    }
+
     protected function getBuilder()
     {
         $grammar = new Grammar;
