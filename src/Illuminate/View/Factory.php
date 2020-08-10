@@ -463,11 +463,10 @@ class Factory implements FactoryContract
     public function flushState()
     {
         $this->renderCount = 0;
+        $this->renderedOnce = [];
 
         $this->flushSections();
         $this->flushStacks();
-
-        $this->renderedOnce = [];
     }
 
     /**
