@@ -159,8 +159,8 @@ class MailMailableTest extends TestCase
         $mailable = new WelcomeMailableStub;
         $mailable->bcc(['taylor@laravel.com', 'not-taylor@laravel.com']);
         $this->assertEquals([
-            ['name' => null, 'address' =>'taylor@laravel.com',],
-            ['name' => null, 'address' =>'not-taylor@laravel.com',],
+            ['name' => null, 'address' =>'taylor@laravel.com'],
+            ['name' => null, 'address' =>'not-taylor@laravel.com'],
         ], $mailable->bcc);
         $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
         $this->assertTrue($mailable->hasBcc('not-taylor@laravel.com'));
