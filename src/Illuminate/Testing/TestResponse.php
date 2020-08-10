@@ -540,6 +540,43 @@ class TestResponse implements ArrayAccess
      */
     public function assertExactJson(array $data)
     {
+        PHPUnit::assertEquals(
+            json_encode($this->sortAssociativeKeys($data)),
+            json_encode($this->sortAssociativeKeys((array) $this->decodeResponseJson()))
+        );
+
+        return $this;
+    }
+
+    /**
+     * Sort associative array keys to make it easy to compare arrays.
+     *
+     * @param  array  $data
+     * @return array
+     */
+    protected function sortAssociativeKeys(array $data)
+    {
+        $data = Arr::dot($data);
+
+        ksort($data);
+
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            Arr::set($result, $key, $value);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Assert that the response has the similar JSON as given.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertSimilarJson(array $data)
+    {
         $actual = json_encode(Arr::sortRecursive(
             (array) $this->decodeResponseJson()
         ));
@@ -664,7 +701,7 @@ class TestResponse implements ArrayAccess
     public function assertJsonStructure(array $structure = null, $responseData = null)
     {
         if (is_null($structure)) {
-            return $this->assertExactJson($this->json());
+            return $this->assertSimilarJson($this->json());
         }
 
         if (is_null($responseData)) {

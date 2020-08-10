@@ -415,13 +415,47 @@ class TestResponseTest extends TestCase
         $response->assertJson($resource->jsonSerialize());
     }
 
-    public function testAssertJsonWithMixed()
+    public function testAssertSimilarJsonWithMixed()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $resource = new JsonSerializableMixedResourcesStub;
 
-        $response->assertExactJson($resource->jsonSerialize());
+        $expected = $resource->jsonSerialize();
+
+        $response->assertSimilarJson($expected);
+
+        $expected['bars'][0] = ['bar' => 'foo 2', 'foo' => 'bar 2'];
+        $expected['bars'][2] = ['bar' => 'foo 0', 'foo' => 'bar 0'];
+
+        $response->assertSimilarJson($expected);
+    }
+
+    public function testAssertExactJsonWithMixedWhenDataIsExactlySame()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $resource = new JsonSerializableMixedResourcesStub;
+
+        $expected = $resource->jsonSerialize();
+
+        $response->assertExactJson($expected);
+    }
+
+    public function testAssertExactJsonWithMixedWhenDataIsSimilar()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two strings are equal.');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $resource = new JsonSerializableMixedResourcesStub;
+
+        $expected = $resource->jsonSerialize();
+        $expected['bars'][0] = ['bar' => 'foo 2', 'foo' => 'bar 2'];
+        $expected['bars'][2] = ['bar' => 'foo 0', 'foo' => 'bar 0'];
+
+        $response->assertExactJson($expected);
     }
 
     public function testAssertJsonPath()
