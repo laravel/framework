@@ -102,7 +102,7 @@ class ParentModel extends Model
 {
     public $table = 'parent';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function children()
     {
@@ -119,7 +119,7 @@ class ChildModel extends Model
 {
     public $table = 'child';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function parent()
     {
@@ -132,7 +132,7 @@ class ChildModelDefaultConn2 extends Model
     public $connection = 'conn2';
     public $table = 'child';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function parent()
     {

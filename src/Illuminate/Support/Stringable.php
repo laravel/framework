@@ -669,7 +669,7 @@ class Stringable
     {
         $this->dump();
 
-        die(1);
+        exit(1);
     }
 
     /**

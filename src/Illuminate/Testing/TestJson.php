@@ -90,6 +90,23 @@ class TestJson
      */
     public function assertExact(array $data)
     {
+        $actual = $this->reorderAssocKeys((array) $this->decoded);
+
+        $expected = $this->reorderAssocKeys($data);
+
+        PHPUnit::assertEquals(json_encode($expected), json_encode($actual));
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has the similar JSON as given.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertSimilar(array $data)
+    {
         $actual = json_encode(Arr::sortRecursive(
             (array) $this->decoded
         ));
@@ -212,7 +229,7 @@ class TestJson
     public function assertStructure(array $structure = null, $responseData = null)
     {
         if (is_null($structure)) {
-            return $this->assertExact($this->decoded);
+            return $this->assertSimilar($this->decoded);
         }
 
         if (! is_null($responseData)) {
@@ -252,6 +269,27 @@ class TestJson
         );
 
         return $this;
+    }
+
+    /**
+     * Reorder associative array keys to make it easy to compare arrays.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function reorderAssocKeys(array $data)
+    {
+        $data = Arr::dot($data);
+        ksort($data);
+
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            Arr::set($result, $key, $value);
+        }
+
+        return $result;
     }
 
     /**

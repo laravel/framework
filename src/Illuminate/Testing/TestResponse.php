@@ -5,6 +5,7 @@ namespace Illuminate\Testing;
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -299,7 +300,8 @@ class TestResponse implements ArrayAccess
         $cookieValue = $cookie->getValue();
 
         $actual = $encrypted
-            ? app('encrypter')->decrypt($cookieValue, $unserialize) : $cookieValue;
+            ? CookieValuePrefix::remove(app('encrypter')->decrypt($cookieValue, $unserialize))
+            : $cookieValue;
 
         PHPUnit::assertEquals(
             $value, $actual,
@@ -519,6 +521,19 @@ class TestResponse implements ArrayAccess
     public function assertExactJson(array $data)
     {
         $this->decodeResponseJson()->assertExact($data);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has the similar JSON as given.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertSimilarJson(array $data)
+    {
+        $this->decodeResponseJson()->assertSimilar($data);
 
         return $this;
     }
@@ -748,7 +763,7 @@ class TestResponse implements ArrayAccess
         $this->ensureResponseHasView();
 
         if (is_null($value)) {
-            PHPUnit::assertArrayHasKey($key, $this->original->gatherData());
+            PHPUnit::assertTrue(Arr::has($this->original->gatherData(), $key));
         } elseif ($value instanceof Closure) {
             PHPUnit::assertTrue($value(Arr::get($this->original->gatherData(), $key)));
         } elseif ($value instanceof Model) {
@@ -802,7 +817,7 @@ class TestResponse implements ArrayAccess
     {
         $this->ensureResponseHasView();
 
-        PHPUnit::assertArrayNotHasKey($key, $this->original->gatherData());
+        PHPUnit::assertFalse(Arr::has($this->original->gatherData(), $key));
 
         return $this;
     }

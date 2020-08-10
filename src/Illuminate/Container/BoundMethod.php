@@ -24,6 +24,10 @@ class BoundMethod
      */
     public static function call($container, $callback, array $parameters = [], $defaultMethod = null)
     {
+        if (is_string($callback) && ! $defaultMethod && method_exists($callback, '__invoke')) {
+            $defaultMethod = '__invoke';
+        }
+
         if (static::isCallableWithAtSign($callback) || $defaultMethod) {
             return static::callClass($container, $callback, $parameters, $defaultMethod);
         }

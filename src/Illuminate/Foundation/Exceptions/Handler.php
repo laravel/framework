@@ -560,11 +560,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function registerErrorViewPaths()
     {
-        $paths = collect(config('view.paths'));
-
-        View::replaceNamespace('errors', $paths->map(function ($path) {
-            return "{$path}/errors";
-        })->push(__DIR__.'/views')->all());
+        (new RegisterErrorViewPaths)();
     }
 
     /**

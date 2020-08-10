@@ -1155,7 +1155,7 @@ class LazyCollection implements Enumerable
     /**
      * Take items in the collection until the given condition is met.
      *
-     * @param  mixed  $key
+     * @param  mixed  $value
      * @return static
      */
     public function takeUntil($value)
@@ -1176,7 +1176,7 @@ class LazyCollection implements Enumerable
     /**
      * Take items in the collection while the given condition is met.
      *
-     * @param  mixed  $key
+     * @param  mixed  $value
      * @return static
      */
     public function takeWhile($value)

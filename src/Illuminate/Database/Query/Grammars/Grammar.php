@@ -250,7 +250,9 @@ class Grammar extends BaseGrammar
     {
         $value = $this->parameter($where['value']);
 
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+        $operator = str_replace('?', '??', $where['operator']);
+
+        return $this->wrap($where['column']).' '.$operator.' '.$value;
     }
 
     /**
@@ -359,6 +361,24 @@ class Grammar extends BaseGrammar
         $min = $this->parameter(reset($where['values']));
 
         $max = $this->parameter(end($where['values']));
+
+        return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
+     * Compile a "between" where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBetweenColumns(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $min = $this->wrap(reset($where['values']));
+
+        $max = $this->wrap(end($where['values']));
 
         return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
     }
@@ -1199,7 +1219,7 @@ class Grammar extends BaseGrammar
      */
     protected function wrapJsonPath($value, $delimiter = '->')
     {
-        $value = preg_replace("/([\\\\]+)?\\'/", "\\'", $value);
+        $value = preg_replace("/([\\\\]+)?\\'/", "''", $value);
 
         return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
     }

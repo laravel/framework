@@ -46,6 +46,9 @@ class HttpClientTest extends TestCase
         $this->assertSame('{"result":{"foo":"bar"}}', (string) $response);
         $this->assertIsArray($response->json());
         $this->assertSame(['foo' => 'bar'], $response->json()['result']);
+        $this->assertSame(['foo' => 'bar'], $response->json('result'));
+        $this->assertSame('bar', $response->json('result.foo'));
+        $this->assertSame('default', $response->json('missing_key', 'default'));
         $this->assertSame(['foo' => 'bar'], $response['result']);
         $this->assertIsObject($response->object());
         $this->assertSame('bar', $response->object()->result->foo);
@@ -471,5 +474,48 @@ class HttpClientTest extends TestCase
         $response = new Psr7Response(403);
 
         throw new RequestException(new Response($response));
+    }
+
+    public function testSinkToFile()
+    {
+        $this->factory->fakeSequence()->push('abc123');
+
+        $destination = __DIR__.'/fixtures/sunk.txt';
+
+        if (file_exists($destination)) {
+            unlink($destination);
+        }
+
+        $this->factory->withOptions(['sink' => $destination])->get('https://example.com');
+
+        $this->assertFileExists($destination);
+        $this->assertSame('abc123', file_get_contents($destination));
+
+        unlink($destination);
+    }
+
+    public function testSinkToResource()
+    {
+        $this->factory->fakeSequence()->push('abc123');
+
+        $resource = fopen('php://temp', 'w');
+
+        $this->factory->sink($resource)->get('https://example.com');
+
+        $this->assertSame(0, ftell($resource));
+        $this->assertSame('abc123', stream_get_contents($resource));
+    }
+
+    public function testSinkWhenStubbedByPath()
+    {
+        $this->factory->fake([
+            'foo.com/*' => ['page' => 'foo'],
+        ]);
+
+        $resource = fopen('php://temp', 'w');
+
+        $this->factory->sink($resource)->get('http://foo.com/test');
+
+        $this->assertSame(json_encode(['page' => 'foo']), stream_get_contents($resource));
     }
 }

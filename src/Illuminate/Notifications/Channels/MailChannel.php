@@ -89,8 +89,11 @@ class MailChannel
      */
     protected function buildView($message)
     {
-        if ($message->view) {
-            return $message->view;
+        if ($message->view || $message->textView) {
+            return [
+                'html' => $message->view,
+                'text' => $message->textView,
+            ];
         }
 
         if (property_exists($message, 'theme') && ! is_null($message->theme)) {
@@ -115,7 +118,8 @@ class MailChannel
             '__laravel_notification_id' => $notification->id,
             '__laravel_notification' => get_class($notification),
             '__laravel_notification_queued' => in_array(
-                ShouldQueue::class, class_implements($notification)
+                ShouldQueue::class,
+                class_implements($notification)
             ),
         ];
     }

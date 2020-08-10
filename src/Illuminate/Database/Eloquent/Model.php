@@ -342,6 +342,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function fill(array $attributes)
     {
+        // $this->ensureModelHasValidGuardState();
+
         $totallyGuarded = $this->totallyGuarded();
 
         foreach ($this->fillableFromArray($attributes) as $key => $value) {
@@ -399,7 +401,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     protected function removeTableFromKey($key)
     {
-        return Str::contains($key, '.') ? last(explode('.', $key)) : $key;
+        return $key;
     }
 
     /**

@@ -75,7 +75,7 @@ class TestModel1 extends Model
 {
     public $table = 'test_model1';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
     protected $casts = ['nullable_date' => 'datetime'];
 }
 
@@ -83,5 +83,5 @@ class TestModel2 extends Model
 {
     public $table = 'test_model2';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }

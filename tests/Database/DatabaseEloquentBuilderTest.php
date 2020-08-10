@@ -1275,6 +1275,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });
+        $connection->shouldReceive('getDatabaseName')->andReturn('database');
         $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
         $class = get_class($model);
         $class::setConnectionResolver($resolver);

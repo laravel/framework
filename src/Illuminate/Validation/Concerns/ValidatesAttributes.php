@@ -14,7 +14,6 @@ use Egulias\EmailValidator\Validation\SpoofCheckValidation;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
@@ -185,19 +184,9 @@ trait ValidatesAttributes
      */
     protected function getDateTimestamp($value)
     {
-        if ($value instanceof DateTimeInterface) {
-            return $value->getTimestamp();
-        }
+        $date = is_null($value) ? null : $this->getDateTime($value);
 
-        if ($this->isTestingRelativeDateTime($value)) {
-            $date = $this->getDateTime($value);
-
-            if (! is_null($date)) {
-                return $date->getTimestamp();
-            }
-        }
-
-        return strtotime($value);
+        return $date ? $date->getTimestamp() : null;
     }
 
     /**
@@ -245,27 +234,10 @@ trait ValidatesAttributes
     protected function getDateTime($value)
     {
         try {
-            if ($this->isTestingRelativeDateTime($value)) {
-                return Date::parse($value);
-            }
-
-            return date_create($value) ?: null;
+            return Date::parse($value);
         } catch (Exception $e) {
             //
         }
-    }
-
-    /**
-     * Check if the given value should be adjusted to Carbon::getTestNow().
-     *
-     * @param  mixed  $value
-     * @return bool
-     */
-    protected function isTestingRelativeDateTime($value)
-    {
-        return Carbon::hasTestNow() && is_string($value) && (
-            $value === 'now' || Carbon::hasRelativeKeywords($value)
-        );
     }
 
     /**
@@ -933,6 +905,10 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
+        if (is_numeric($parameters[0])) {
+            return false;
+        }
+
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
             return $value > $comparedToValue;
         }
@@ -962,6 +938,10 @@ trait ValidatesAttributes
 
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) < $parameters[0];
+        }
+
+        if (is_numeric($parameters[0])) {
+            return false;
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
@@ -995,6 +975,10 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
+        if (is_numeric($parameters[0])) {
+            return false;
+        }
+
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
             return $value >= $comparedToValue;
         }
@@ -1024,6 +1008,10 @@ trait ValidatesAttributes
 
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) <= $parameters[0];
+        }
+
+        if (is_numeric($parameters[0])) {
+            return false;
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
@@ -1516,11 +1504,9 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'required_unless');
 
-        $data = Arr::get($this->data, $parameters[0]);
+        [$values, $other] = $this->prepareValuesAndOther($parameters);
 
-        $values = array_slice($parameters, 1);
-
-        if (! in_array($data, $values)) {
+        if (! in_array($other, $values)) {
             return $this->validateRequired($attribute, $value);
         }
 

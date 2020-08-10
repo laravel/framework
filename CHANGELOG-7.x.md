@@ -1,6 +1,87 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.19.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.23.0...7.x)
+
+
+## [v7.23.0 (2020-08-04)](https://github.com/laravel/framework/compare/v7.22.4...v7.23.0)
+
+### Added
+- Added dynamic slot (directive) name support ([#33724](https://github.com/laravel/framework/pull/33724))
+- Added plain mail to notifications ([#33725](https://github.com/laravel/framework/pull/33725))
+- Support the `sink` option when using Http::fake() ([#33720](https://github.com/laravel/framework/pull/33720), [fba984b](https://github.com/laravel/framework/commit/fba984b05081f8aee19447caa0d92624bcf04312))
+- Added whereBetweenColumns | orWhereBetweenColumns | whereNotBetweenColumns | orWhereNotBetweenColumns methods to `Illuminate\Database\Query\Builder` ([#33728](https://github.com/laravel/framework/pull/33728))
+
+### Changed
+- Ignore numeric field names in validators ([#33712](https://github.com/laravel/framework/pull/33712))
+- Fixed validation rule 'required_unless' when other field value is boolean. ([#33715](https://github.com/laravel/framework/pull/33715))
+
+
+## [v7.22.4 (2020-07-27)](https://github.com/laravel/framework/compare/v7.22.3...v7.22.4)
+
+### Update
+- Update cookies encryption ([release](https://github.com/laravel/framework/compare/v7.22.3...v7.22.4))
+
+
+## [v7.22.3 (2020-07-27)](https://github.com/laravel/framework/compare/v7.22.2...v7.22.3)
+
+### Update
+- Update cookies encryption ([release](https://github.com/laravel/framework/compare/v7.22.2...v7.22.3))
+
+
+## [v7.22.2 (2020-07-27)](https://github.com/laravel/framework/compare/v7.22.1...v7.22.2)
+
+### Fixed
+- Fixed cookie issues encryption ([c9ce261](https://github.com/laravel/framework/commit/c9ce261a9f7b8e07c9ebc8a7d45651ee1cf86215), [5786aa4](https://github.com/laravel/framework/commit/5786aa4a388adfcc62862573275bd37d49aa07d7))
+
+
+## [v7.22.1 (2020-07-27)](https://github.com/laravel/framework/compare/v7.22.0...v7.22.1)
+
+### Fixed
+- Fixed cookie issues ([bb9db21](https://github.com/laravel/framework/commit/bb9db21af137344feffa192fcabe4e439c8b0f60))
+
+
+## [v7.22.0 (2020-07-27)](https://github.com/laravel/framework/compare/v7.21.0...v7.22.0)
+
+### Added
+- Added `sectionMissing` Blade Directive ([#33614](https://github.com/laravel/framework/pull/33614))
+- Added range option to queue:retry command ([#33627](https://github.com/laravel/framework/pull/33627))
+
+### Fixed
+- Prevent usage of get*AtColumn() when model has no timestamps ([#33634](https://github.com/laravel/framework/pull/33634))
+- Dont decrement transaction below 0 in `Illuminate\Database\Concerns\ManagesTransactions::handleCommitTransactionException()` ([7681795](https://github.com/laravel/framework/commit/768179578e5492b5f80c391bd43b233938e16e27))
+- Fixed transaction problems on closure transaction ([c4cdfc7](https://github.com/laravel/framework/commit/c4cdfc7c54127b772ef10f37cfc9ef8e9d6b3227))
+- Prevent to serialize uninitialized properties ([#33644](https://github.com/laravel/framework/pull/33644))
+- Fixed missing statement preventing deletion in `Illuminate\Database\Eloquent\Relations\MorphPivot::delete()` ([#33648](https://github.com/laravel/framework/pull/33648))
+
+### Changed
+- Throw a TypeError if concrete is not a string or closure in `Illuminate\Container\Container::bind()` ([#33539](https://github.com/laravel/framework/pull/33539))
+- Add HTML comment block around inline inspiring quote for consistency with blade template version ([#33625](https://github.com/laravel/framework/pull/33625))
+- Improve cookie encryption ([#33662](https://github.com/laravel/framework/pull/33662))
+
+
+## [v7.21.0 (2020-07-21)](https://github.com/laravel/framework/compare/v7.20.0...v7.21.0)
+
+### Added
+- Added `Illuminate\Database\Schema\ForeignKeyDefinition::nullOnDelete()` ([#33551](https://github.com/laravel/framework/pull/33551))
+- Added `getFallbackLocale()` and `setFallbackLocale()` methods to `Illuminate\Foundation\Application` ([#33595](https://github.com/laravel/framework/pull/33595))
+
+### Fixed
+- Fixed `Illuminate/Redis/Connections/PhpRedisConnection::*scan()` returns ([d3d36f0](https://github.com/laravel/framework/commit/d3d36f059ef1c56e17d8e434e9fd3dfd6cbe6e53))
+- Align (fix) nested arrays support for `assertViewHas` & `assertViewMissing` in `Illuminate\Testing\TestResponse` ([#33566](https://github.com/laravel/framework/pull/33566))
+- Fixed issue where Storage::path breaks when using cache due to missing method in CachedAdapter ([#33602](https://github.com/laravel/framework/pull/33602))
+
+### Changed
+- Added a base exception for Http Client exceptions ([#33581](https://github.com/laravel/framework/pull/33581))
+
+
+## [v7.20.0 (2020-07-14)](https://github.com/laravel/framework/compare/v7.19.1...v7.20.0)
+
+### Added
+- Added `Illuminate\Database\Schema\ForeignKeyDefinition::cascadeOnUpdate()` ([#33522](https://github.com/laravel/framework/pull/33522))
+
+### Changed
+- Apply model connection name to Database validation rules ([#33525](https://github.com/laravel/framework/pull/33525))
+- Allow calling invokable classes using FQN in `Illuminate\Container\BoundMethod.php::call()` ([#33535](https://github.com/laravel/framework/pull/33535))
 
 
 ## [v7.19.1 (2020-07-10)](https://github.com/laravel/framework/compare/v7.19.0...v7.19.1)

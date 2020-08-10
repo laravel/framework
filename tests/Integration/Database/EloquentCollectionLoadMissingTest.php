@@ -95,7 +95,7 @@ class Comment extends Model
 {
     public $timestamps = false;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function parent()
     {
@@ -112,7 +112,7 @@ class Post extends Model
 {
     public $timestamps = false;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function comments()
     {
@@ -129,7 +129,7 @@ class Revision extends Model
 {
     public $timestamps = false;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }
 
 class User extends Model

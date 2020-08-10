@@ -88,7 +88,7 @@ class AuthenticationTestUser extends Authenticatable
      *
      * @var array
      */
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for arrays.

@@ -660,6 +660,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testWhereBetweenColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetweenColumns('id', ['users.created_at', 'users.updated_at']);
+        $this->assertSame('select * from "users" where "id" between "users"."created_at" and "users"."updated_at"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotBetweenColumns('id', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where "id" not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetweenColumns('id', [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "users" where "id" between 1 and 2', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testBasicOrWheres()
     {
         $builder = $this->getBuilder();
@@ -2686,8 +2704,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testJsonPathEscaping()
     {
-        $expectedWithJsonEscaped = <<<SQL
-select json_unquote(json_extract(`json`, '$."\'))#"'))
+        $expectedWithJsonEscaped = <<<'SQL'
+select json_unquote(json_extract(`json`, '$."''))#"'))
 SQL;
 
         $builder = $this->getMySqlBuilder();
@@ -3663,12 +3681,35 @@ SQL;
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
+    public function testFromQuestionMarkOperatorOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('roles', '?', 'superuser');
+        $this->assertSame('select * from "users" where "roles" ?? ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('roles', '?|', 'superuser');
+        $this->assertSame('select * from "users" where "roles" ??| ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('roles', '?&', 'superuser');
+        $this->assertSame('select * from "users" where "roles" ??& ?', $builder->toSql());
+    }
+
+    protected function getConnection()
+    {
+        $connection = m::mock(ConnectionInterface::class);
+        $connection->shouldReceive('getDatabaseName')->andReturn('database');
+
+        return $connection;
+    }
+
     protected function getBuilder()
     {
         $grammar = new Grammar;
         $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($this->getConnection(), $grammar, $processor);
     }
 
     protected function getPostgresBuilder()
@@ -3676,7 +3717,7 @@ SQL;
         $grammar = new PostgresGrammar;
         $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($this->getConnection(), $grammar, $processor);
     }
 
     protected function getMySqlBuilder()

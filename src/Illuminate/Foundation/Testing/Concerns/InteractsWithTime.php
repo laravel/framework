@@ -12,7 +12,7 @@ trait InteractsWithTime
      * Begin travelling to another time.
      *
      * @param  int  $value
-     * @return \Illuminate\Testing\Wormhole
+     * @return \Illuminate\Foundation\Testing\Wormhole
      */
     public function travel($value)
     {

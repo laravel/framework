@@ -171,7 +171,7 @@ trait EnumeratesValues
     {
         call_user_func_array([$this, 'dump'], $args);
 
-        die(1);
+        exit(1);
     }
 
     /**
@@ -732,7 +732,7 @@ trait EnumeratesValues
      *
      * This is an alias to the "takeUntil" method.
      *
-     * @param  mixed  $key
+     * @param  mixed  $value
      * @return static
      *
      * @deprecated Use the "takeUntil" method directly.
@@ -807,20 +807,20 @@ trait EnumeratesValues
     }
 
     /**
-     * Count the number of items in the collection using a given truth test.
+     * Count the number of items in the collection by a field or using a callback.
      *
-     * @param  callable|null  $callback
+     * @param  array|callable|string $countBy
      * @return static
      */
-    public function countBy($callback = null)
+    public function countBy($countBy = null)
     {
-        if (is_null($callback)) {
-            $callback = function ($value) {
+        if (is_null($countBy)) {
+            $countBy = function ($value) {
                 return $value;
             };
         }
 
-        return new static($this->groupBy($callback)->map(function ($value) {
+        return new static($this->groupBy($countBy)->map(function ($value) {
             return $value->count();
         }));
     }

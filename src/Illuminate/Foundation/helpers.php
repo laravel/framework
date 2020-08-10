@@ -50,7 +50,7 @@ if (! function_exists('abort_if')) {
      * Throw an HttpException with the given data if the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  int  $code
+     * @param  \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Support\Responsable|int  $code
      * @param  string  $message
      * @param  array  $headers
      * @return void
@@ -71,7 +71,7 @@ if (! function_exists('abort_unless')) {
      * Throw an HttpException with the given data unless the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  int  $code
+     * @param  \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Support\Responsable|int  $code
      * @param  string  $message
      * @param  array  $headers
      * @return void

@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Str;
+use LogicException;
 
 trait GuardsAttributes
 {
@@ -26,6 +27,13 @@ trait GuardsAttributes
      * @var bool
      */
     protected static $unguarded = false;
+
+    /**
+     * The actual columns that exist on the database and can be guarded.
+     *
+     * @var array
+     */
+    protected static $guardableColumns = [];
 
     /**
      * Get the fillable attributes for the model.
@@ -70,7 +78,9 @@ trait GuardsAttributes
      */
     public function getGuarded()
     {
-        return $this->guarded;
+        return $this->guarded === false
+                    ? []
+                    : $this->guarded;
     }
 
     /**
@@ -178,6 +188,7 @@ trait GuardsAttributes
         }
 
         return empty($this->getFillable()) &&
+            strpos($key, '.') === false &&
             ! Str::startsWith($key, '_');
     }
 
@@ -189,7 +200,30 @@ trait GuardsAttributes
      */
     public function isGuarded($key)
     {
-        return in_array($key, $this->getGuarded()) || $this->getGuarded() == ['*'];
+        if (empty($this->getGuarded())) {
+            return false;
+        }
+
+        return $this->getGuarded() == ['*'] ||
+               ! empty(preg_grep('/^'.preg_quote($key).'$/i', $this->getGuarded())) ||
+               ! $this->isGuardableColumn($key);
+    }
+
+    /**
+     * Determine if the given column is a valid, guardable column.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isGuardableColumn($key)
+    {
+        if (! isset(static::$guardableColumns[get_class($this)])) {
+            static::$guardableColumns[get_class($this)] = $this->getConnection()
+                        ->getSchemaBuilder()
+                        ->getColumnListing($this->getTable());
+        }
+
+        return in_array($key, static::$guardableColumns[get_class($this)]);
     }
 
     /**
@@ -215,5 +249,18 @@ trait GuardsAttributes
         }
 
         return $attributes;
+    }
+
+    /**
+     * Ensure the model has a valid guarded configuration.
+     *
+     * @return void
+     */
+    protected function ensureModelHasValidGuardState()
+    {
+        if (! empty($this->getGuarded()) &&
+            $this->getGuarded() !== ['*']) {
+            throw new LogicException('For added security, guarded attributes are no longer supported. Please use fillable instead.');
+        }
     }
 }
