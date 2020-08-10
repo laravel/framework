@@ -1157,21 +1157,9 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function sortUsing(Closure $callback)
     {
-        $items = $this->items;
-
-        $sorts = tap(new Sort, $callback)->all();
-
-        $parameters = [];
-
-        foreach ($sorts as [$callback, $options, $direction]) {
-            $column = $this->map($this->valueRetriever($callback))->toArray();
-
-            $parameters = array_merge($parameters, [$column, $options, $direction]);
-        }
-
-        $parameters[] = &$items;
-
-        array_multisort(...$parameters);
+        $items = tap(new Sort($this->items, function ($key) {
+            return $this->valueRetriever($key);
+        }), $callback)->get();
 
         return new static($items);
     }

@@ -4,7 +4,36 @@ namespace Illuminate\Support;
 
 class Sort
 {
+    /**
+     * The items to be sorted.
+     *
+     * @var array
+     */
+    protected $items = [];
+
+    /**
+     * The sort parameters.
+     *
+     * @var array
+     */
     protected $parameters = [];
+
+    /**
+     * @var callable
+     */
+    private $valueRetriever;
+
+    /**
+     * Create a new sort.
+     *
+     * @param  array  $items
+     * @param  callable  $valueRetriever
+     */
+    public function __construct(array $items, callable $valueRetriever)
+    {
+        $this->items = $items;
+        $this->valueRetriever = $valueRetriever;
+    }
 
     /**
      * Add a sort in ascending order using the given callback.
@@ -46,12 +75,27 @@ class Sort
     }
 
     /**
-     * Get all of the sort parameters as an array.
+     * Get the sorted items.
      *
      * @return array
      */
-    public function all()
+    public function get()
     {
-        return $this->parameters;
+        $parameters = [];
+
+        foreach ($this->parameters as [$callback, $options, $direction]) {
+            $column = array_map(
+                ($this->valueRetriever)($callback),
+                $this->items,
+                array_keys($this->items)
+            );
+
+            $parameters = array_merge($parameters, [$column, $options, $direction]);
+        }
+        $parameters[] = &$this->items;
+
+        array_multisort(...$parameters);
+
+        return $this->items;
     }
 }
