@@ -81,6 +81,15 @@ interface Session
     public function get($key, $default = null);
 
     /**
+     * Get the value of a given key and then forget it.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function pull($key, $default = null);
+
+    /**
      * Put a key / value pair or array of key / value pairs in the session.
      *
      * @param  string|array  $key
