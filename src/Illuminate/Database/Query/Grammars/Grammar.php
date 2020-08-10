@@ -250,7 +250,6 @@ class Grammar extends BaseGrammar
     {
         $value = $this->parameter($where['value']);
 
-        // @see https://wiki.php.net/rfc/pdo_escape_placeholders
         $operator = str_replace('?', '??', $where['operator']);
 
         return $this->wrap($where['column']).' '.$operator.' '.$value;
