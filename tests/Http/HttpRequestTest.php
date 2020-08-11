@@ -300,6 +300,37 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->has('foo.baz'));
     }
 
+    public function testWhenMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
+
+        $name = null;
+        $age  = null;
+        $city = '';
+        $foo  = null;
+
+        $request->when('name', function ($value) use (&$name) {
+            $name = $value;
+        });
+
+        $request->when('age', function ($value) use (&$age) {
+            $age = $value;
+        });
+
+        $request->when('city', function ($value) use (&$city) {
+            $city = $value;
+        });
+
+        $request->when('foo', function () use (&$foo) {
+            $foo = 'test';
+        });
+
+        $this->assertSame('Taylor', $name);
+        $this->assertSame('', $age);
+        $this->assertNull($city);
+        $this->assertNull($foo);
+    }
+
     public function testMissingMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);

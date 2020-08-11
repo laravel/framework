@@ -430,4 +430,20 @@ trait InteractsWithInput
 
         return $this->$source->get($key, $default);
     }
+
+    /**
+     * Apply the callback if the request contains a given input item key.
+     *
+     * @param  string  $key
+     * @param  callable|null  $callback
+     * @return $this
+     */
+    public function when($key, callable $callback)
+    {
+        if ($this->has($key)) {
+            $callback(data_get($this->all(), $key));
+        }
+
+        return $this;
+    }
 }
