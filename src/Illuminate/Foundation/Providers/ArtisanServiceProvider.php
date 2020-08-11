@@ -168,7 +168,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerCommands(array $commands)
     {
         foreach (array_keys($commands) as $command) {
-            call_user_func_array([$this, "register{$command}Command"], []);
+            $this->{"register{$command}Command"}();
         }
 
         $this->commands(array_values($commands));

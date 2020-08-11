@@ -1352,10 +1352,10 @@ class Builder
 
         if (static::hasGlobalMacro($method)) {
             if (static::$macros[$method] instanceof Closure) {
-                return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
+                return {static::$macros[$method]->bindTo($this, static::class)}(...$parameters);
             }
 
-            return call_user_func_array(static::$macros[$method], $parameters);
+            return {static::$macros[$method]}(...$parameters);
         }
 
         if ($this->model !== null && method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
@@ -1397,10 +1397,10 @@ class Builder
         }
 
         if (static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(Closure::bind(static::$macros[$method], null, static::class), $parameters);
+            return {Closure::bind(static::$macros[$method], null, static::class)}(...$parameters);
         }
 
-        return call_user_func_array(static::$macros[$method], $parameters);
+        return {static::$macros[$method]}(...$parameters);
     }
 
     /**
