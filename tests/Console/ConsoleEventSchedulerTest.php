@@ -90,6 +90,19 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertSame('Asia/Tokyo', $events[0]->timezone);
     }
 
+    public function testCallCreatesNewJobWithTimezone()
+    {
+        $schedule = new Schedule('UTC');
+        $schedule->call('path/to/command');
+        $events = $schedule->events();
+        $this->assertSame('UTC', $events[0]->timezone);
+
+        $schedule = new Schedule('Asia/Tokyo');
+        $schedule->call('path/to/command');
+        $events = $schedule->events();
+        $this->assertSame('Asia/Tokyo', $events[0]->timezone);
+    }
+
     public function testCommandCreatesNewArtisanCommand()
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';

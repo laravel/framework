@@ -91,7 +91,7 @@ class Schedule
     public function call($callback, array $parameters = [])
     {
         $this->events[] = $event = new CallbackEvent(
-            $this->eventMutex, $callback, $parameters
+            $this->eventMutex, $callback, $parameters, $this->timezone
         );
 
         return $event;
