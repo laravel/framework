@@ -305,9 +305,9 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
         $name = null;
-        $age  = null;
+        $age = null;
         $city = '';
-        $foo  = null;
+        $foo = null;
 
         $request->when('name', function ($value) use (&$name) {
             $name = $value;
