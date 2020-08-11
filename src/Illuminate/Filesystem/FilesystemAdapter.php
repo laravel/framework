@@ -132,7 +132,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->read($path);
         } catch (FileNotFoundException $e) {
-            throw new ContractFileNotFoundException($path, $e->getCode(), $e);
+            throw new ContractFileNotFoundException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
