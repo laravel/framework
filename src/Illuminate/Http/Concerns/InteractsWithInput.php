@@ -434,8 +434,8 @@ trait InteractsWithInput
     /**
      * Apply the callback if the request contains a given input item key.
      *
-     * @param  string  $key
-     * @param  callable|null  $callback
+     * @param  string    $key
+     * @param  callable  $callback
      * @return $this
      */
     public function when($key, callable $callback)
