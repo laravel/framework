@@ -1351,11 +1351,13 @@ class Builder
         }
 
         if (static::hasGlobalMacro($method)) {
-            if (static::$macros[$method] instanceof Closure) {
-                return {static::$macros[$method]->bindTo($this, static::class)}(...$parameters);
+            $callable = static::$macros[$method];
+
+            if ($callable instanceof Closure) {
+                $callable = $callable->bindTo($this, static::class);
             }
 
-            return {static::$macros[$method]}(...$parameters);
+            return $callable(...$parameters);
         }
 
         if ($this->model !== null && method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
@@ -1396,11 +1398,13 @@ class Builder
             static::throwBadMethodCallException($method);
         }
 
-        if (static::$macros[$method] instanceof Closure) {
-            return {Closure::bind(static::$macros[$method], null, static::class)}(...$parameters);
+        $callable = static::$macros[$method];
+
+        if ($callable instanceof Closure) {
+            $callable = Closure::bind($callable, null, static::class);
         }
 
-        return {static::$macros[$method]}(...$parameters);
+        return $callable(...$parameters);
     }
 
     /**

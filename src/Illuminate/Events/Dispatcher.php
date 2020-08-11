@@ -384,7 +384,9 @@ class Dispatcher implements DispatcherContract
                 return call_user_func($this->createClassCallable($listener), $event, $payload);
             }
 
-            return {$this->createClassCallable($listener)}(...array_values($payload));
+            $callable = $this->createClassCallable($listener);
+
+            return $callable(...array_values($payload));
         };
     }
 
