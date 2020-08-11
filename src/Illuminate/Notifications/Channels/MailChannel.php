@@ -89,11 +89,8 @@ class MailChannel
      */
     protected function buildView($message)
     {
-        if ($message->view || $message->textView) {
-            return [
-                'html' => $message->view,
-                'text' => $message->textView,
-            ];
+        if ($message->view) {
+            return $message->view;
         }
 
         if (property_exists($message, 'theme') && ! is_null($message->theme)) {
