@@ -170,6 +170,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Add "where" constraints to the resource routes.
+     *
+     * @param  mixed  $wheres
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function where($wheres)
+    {
+        $this->options['wheres'] = $wheres;
+
+        return $this;
+    }
+
+    /**
      * Indicate that the resource routes should have "shallow" nesting.
      *
      * @param  bool  $shallow
@@ -178,6 +191,19 @@ class PendingResourceRegistration
     public function shallow($shallow = true)
     {
         $this->options['shallow'] = $shallow;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the resource routes should be scoped using the given binding fields.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function scoped(array $fields = [])
+    {
+        $this->options['bindingFields'] = $fields;
 
         return $this;
     }

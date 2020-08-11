@@ -1459,7 +1459,7 @@ class Builder
     /**
      * Add another query builder as a nested where to the query builder.
      *
-     * @param  $this  $query
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $boolean
      * @return $this
      */

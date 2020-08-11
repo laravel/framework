@@ -333,7 +333,10 @@ class MailMessage extends SimpleMessage implements Renderable
     {
         if (isset($this->view) || isset($this->textView)) {
             return Container::getInstance()->make('mailer')->render(
-                [$this->view, $this->textView],
+                [
+                    'html' => $this->view,
+                    'text' => $this->textView,
+                ],
                 $this->data()
             );
         }

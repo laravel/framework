@@ -357,6 +357,31 @@ class RouteRegistrarTest extends TestCase
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.tasks.show'));
     }
 
+    public function testCanSetScopedOptionOnRegisteredResource()
+    {
+        $this->router->resource('users.tasks', RouteRegistrarControllerStub::class)->scoped();
+        $this->assertSame(
+            ['user' => null],
+            $this->router->getRoutes()->getByName('users.tasks.index')->bindingFields()
+        );
+        $this->assertSame(
+            ['user' => null, 'task' => null],
+            $this->router->getRoutes()->getByName('users.tasks.show')->bindingFields()
+        );
+
+        $this->router->resource('users.tasks', RouteRegistrarControllerStub::class)->scoped([
+            'task' => 'slug',
+        ]);
+        $this->assertSame(
+            ['user' => null],
+            $this->router->getRoutes()->getByName('users.tasks.index')->bindingFields()
+        );
+        $this->assertSame(
+            ['user' => null, 'task' => 'slug'],
+            $this->router->getRoutes()->getByName('users.tasks.show')->bindingFields()
+        );
+    }
+
     public function testCanExcludeMethodsOnRegisteredApiResource()
     {
         $this->router->apiResource('users', RouteRegistrarControllerStub::class)
@@ -523,6 +548,22 @@ class RouteRegistrarTest extends TestCase
         $this->seeResponse('controller', Request::create('users', 'GET'));
 
         $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+    }
+
+    public function testResourceWheres()
+    {
+        $wheres = [
+            'user' => '\d+',
+            'test' => '[a-z]+',
+        ];
+
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->where($wheres);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
     }
 
     public function testCanSetRouteName()

@@ -55,7 +55,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
         }
 
         $connection->prepare(
-            "SET SESSION TRANSACTION ISOLATION LEVEL '{$config['isolation_level']}'"
+            "SET SESSION TRANSACTION ISOLATION LEVEL {$config['isolation_level']}"
         )->execute();
     }
 

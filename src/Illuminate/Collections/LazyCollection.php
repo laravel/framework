@@ -241,6 +241,35 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Count the number of items in the collection by a field or using a callback.
+     *
+     * @param  callable|string  $countBy
+     * @return static
+     */
+    public function countBy($countBy = null)
+    {
+        if (is_null($countBy)) {
+            $countBy = $this->identity();
+        }
+
+        return new static(function () use ($countBy) {
+            $counts = [];
+
+            foreach ($this as $key => $value) {
+                $group = $countBy($value, $key);
+
+                if (empty($counts[$group])) {
+                    $counts[$group] = 0;
+                }
+
+                $counts[$group]++;
+            }
+
+            yield from $counts;
+        });
+    }
+
+    /**
      * Get the items that are not present in the given items.
      *
      * @param  mixed  $items
