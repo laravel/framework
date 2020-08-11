@@ -54,6 +54,118 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
     }
 
+    public function testMailableSetsCcRecipientsCorrectly()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->cc('taylor@laravel.com');
+        $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->cc);
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->cc('taylor@laravel.com', 'Taylor Otwell');
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->cc);
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->cc(['taylor@laravel.com']);
+        $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->cc);
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
+        $this->assertFalse($mailable->hasCc('taylor@laravel.com', 'Taylor Otwell'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->cc([['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com']]);
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->cc);
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->cc(new MailableTestUserStub);
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->cc);
+        $this->assertTrue($mailable->hasCc(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->cc(collect([new MailableTestUserStub]));
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->cc);
+        $this->assertTrue($mailable->hasCc(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->cc(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $this->assertEquals([
+            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+        ], $mailable->cc);
+        $this->assertTrue($mailable->hasCc(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->cc(['taylor@laravel.com', 'not-taylor@laravel.com']);
+        $this->assertEquals([
+            ['name' => null, 'address' =>'taylor@laravel.com'],
+            ['name' => null, 'address' =>'not-taylor@laravel.com'],
+        ], $mailable->cc);
+        $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
+        $this->assertTrue($mailable->hasCc('not-taylor@laravel.com'));
+    }
+
+    public function testMailableSetsBccRecipientsCorrectly()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->bcc('taylor@laravel.com');
+        $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->bcc);
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->bcc('taylor@laravel.com', 'Taylor Otwell');
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->bcc);
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->bcc(['taylor@laravel.com']);
+        $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->bcc);
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
+        $this->assertFalse($mailable->hasBcc('taylor@laravel.com', 'Taylor Otwell'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->bcc([['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com']]);
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->bcc);
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->bcc(new MailableTestUserStub);
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->bcc);
+        $this->assertTrue($mailable->hasBcc(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->bcc(collect([new MailableTestUserStub]));
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->bcc);
+        $this->assertTrue($mailable->hasBcc(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->bcc(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $this->assertEquals([
+            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+        ], $mailable->bcc);
+        $this->assertTrue($mailable->hasBcc(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->bcc(['taylor@laravel.com', 'not-taylor@laravel.com']);
+        $this->assertEquals([
+            ['name' => null, 'address' =>'taylor@laravel.com'],
+            ['name' => null, 'address' =>'not-taylor@laravel.com'],
+        ], $mailable->bcc);
+        $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
+        $this->assertTrue($mailable->hasBcc('not-taylor@laravel.com'));
+    }
+
     public function testMailableSetsReplyToCorrectly()
     {
         $mailable = new WelcomeMailableStub;
