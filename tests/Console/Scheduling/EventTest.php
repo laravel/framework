@@ -96,12 +96,4 @@ class EventTest extends TestCase
 
         $this->assertSame('10:15:00', $event->nextRunDate()->toTimeString());
     }
-
-    public function testBetweenFilter()
-    {
-        $event = new Event(m::mock(EventMutex::class), 'php -i');
-        $event->dailyAt('10:15');
-
-        $this->assertSame('10:15:00', $event->nextRunDate()->toTimeString());
-    }
 }
