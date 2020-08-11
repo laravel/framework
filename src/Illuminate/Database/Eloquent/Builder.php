@@ -1401,7 +1401,7 @@ class Builder
         $callable = static::$macros[$method];
 
         if ($callable instanceof Closure) {
-            $callable = Closure::bind($callable, null, static::class);
+            $callable = $callable->bindTo(null, static::class);
         }
 
         return $callable(...$parameters);

@@ -96,8 +96,8 @@ class CallQueuedListener implements ShouldQueue
      * Set the job instance of the given class if necessary.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  mixed  $instance
-     * @return mixed
+     * @param  object  $instance
+     * @return object
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {

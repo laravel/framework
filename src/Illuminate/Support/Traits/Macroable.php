@@ -82,9 +82,7 @@ trait Macroable
         $macro = static::$macros[$method];
 
         if ($macro instanceof Closure) {
-            $callable = Closure::bind($macro, null, static::class);
-
-            return $callable(...$parameters);
+            $macro = $macro->bindTo(null, static::class);
         }
 
         return $macro(...$parameters);
