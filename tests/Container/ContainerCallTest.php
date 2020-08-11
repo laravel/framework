@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Container;
 
-use Error;
 use Closure;
+use Error;
 use Illuminate\Container\Container;
 use PHPUnit\Framework\TestCase;
 use stdClass;
