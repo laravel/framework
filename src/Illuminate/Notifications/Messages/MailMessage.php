@@ -18,13 +18,6 @@ class MailMessage extends SimpleMessage implements Renderable
     public $view;
 
     /**
-     * The plain text view to use for the message.
-     *
-     * @var string
-     */
-    public $textView;
-
-    /**
      * The view data for the message.
      *
      * @var array
@@ -111,24 +104,9 @@ class MailMessage extends SimpleMessage implements Renderable
     public function view($view, array $data = [])
     {
         $this->view = $view;
-        $this->viewData = array_merge($this->viewData, $data);
+        $this->viewData = $data;
 
         $this->markdown = null;
-
-        return $this;
-    }
-
-    /**
-     * Set the plain text view for the message.
-     *
-     * @param  string  $textView
-     * @param  array  $data
-     * @return $this
-     */
-    public function text($textView, array $data = [])
-    {
-        $this->textView = $textView;
-        $this->viewData = array_merge($this->viewData, $data);
 
         return $this;
     }
@@ -331,13 +309,9 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function render()
     {
-        if (isset($this->view) || isset($this->textView)) {
+        if (isset($this->view)) {
             return Container::getInstance()->make('mailer')->render(
-                [
-                    'html' => $this->view,
-                    'text' => $this->textView,
-                ],
-                $this->data()
+                $this->view, $this->data()
             );
         }
 
