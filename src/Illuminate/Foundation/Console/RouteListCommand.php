@@ -170,7 +170,13 @@ class RouteListCommand extends Command
      */
     protected function getMiddleware($route)
     {
-        return collect($this->router->gatherRouteMiddleware($route))->map(function ($middleware) {
+        if ($this->option('expand-middleware')) {
+            return collect($this->router->gatherRouteMiddleware($route))->map(function ($middleware) {
+                return $middleware instanceof Closure ? 'Closure' : $middleware;
+            })->implode("\n");
+        }
+
+        return collect($route->gatherMiddleware())->map(function ($middleware) {
             return $middleware instanceof Closure ? 'Closure' : $middleware;
         })->implode("\n");
     }
@@ -259,6 +265,7 @@ class RouteListCommand extends Command
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
+            ['expand-middleware', null, InputOption::VALUE_NONE, 'Expand and display each middleware associated with each route'],
         ];
     }
 }
