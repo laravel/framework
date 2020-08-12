@@ -432,15 +432,31 @@ trait InteractsWithInput
     }
 
     /**
-     * Apply the callback if the request contains a given input item key.
+     * Apply the callback if the request contains the given input item key.
      *
      * @param  string    $key
      * @param  callable  $callback
      * @return $this
      */
-    public function when($key, callable $callback)
+    public function whenHas($key, callable $callback)
     {
         if ($this->has($key)) {
+            $callback(data_get($this->all(), $key));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Apply the callback if the request contains a non-empty value for the given input item key.
+     *
+     * @param  string    $key
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function whenFilled($key, callable $callback)
+    {
+        if ($this->filled($key)) {
             $callback(data_get($this->all(), $key));
         }
 
