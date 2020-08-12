@@ -117,6 +117,19 @@ class ConsoleEventSchedulerTest extends TestCase
         $binary = $escape.PHP_BINARY.$escape;
         $this->assertEquals($binary.' artisan foo:bar --force', $events[0]->command);
     }
+
+    public function testCallCreatesNewJobWithTimezone()
+    {
+        $schedule = new Schedule('UTC');
+        $schedule->call('path/to/command');
+        $events = $schedule->events();
+        $this->assertSame('UTC', $events[0]->timezone);
+
+        $schedule = new Schedule('Asia/Tokyo');
+        $schedule->call('path/to/command');
+        $events = $schedule->events();
+        $this->assertSame('Asia/Tokyo', $events[0]->timezone);
+    }
 }
 
 class FooClassStub
