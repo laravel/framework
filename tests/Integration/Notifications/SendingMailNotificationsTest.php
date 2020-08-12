@@ -259,7 +259,7 @@ class SendingMailNotificationsTest extends TestCase
         ]);
 
         $this->mailer->shouldReceive('send')->once()->with(
-            ['html' => 'html', 'text' => 'plain'],
+            ['html', 'plain'],
             array_merge($notification->toMail($user)->toArray(), [
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
@@ -291,7 +291,7 @@ class SendingMailNotificationsTest extends TestCase
         ]);
 
         $this->mailer->shouldReceive('send')->once()->with(
-            ['html' => 'html', 'text' => null],
+            'html',
             array_merge($notification->toMail($user)->toArray(), [
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
@@ -323,7 +323,7 @@ class SendingMailNotificationsTest extends TestCase
         ]);
 
         $this->mailer->shouldReceive('send')->once()->with(
-            ['html' => null, 'text' => 'plain'],
+            [null, 'plain'],
             array_merge($notification->toMail($user)->toArray(), [
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
@@ -438,8 +438,7 @@ class TestMailNotificationWithHtmlAndPlain extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->view('html')
-            ->text('plain');
+            ->view(['html', 'plain']);
     }
 }
 
@@ -453,8 +452,7 @@ class TestMailNotificationWithHtmlOnly extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->view('html')
-            ->text(null);
+            ->view('html');
     }
 }
 
@@ -468,7 +466,6 @@ class TestMailNotificationWithPlainOnly extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->view(null)
-            ->text('plain');
+            ->view([null, 'plain']);
     }
 }

@@ -3,11 +3,12 @@
 namespace Illuminate\Tests\Notifications;
 
 use Illuminate\Contracts\Database\ModelIdentifier;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Support\Collection;
-use Illuminate\Tests\Integration\Notifications\NotifiableUser;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -51,4 +52,12 @@ class NotificationSendQueuedNotificationTest extends TestCase
 
         $this->assertStringContainsString($serializedNotifiable, $serialized);
     }
+}
+
+class NotifiableUser extends Model
+{
+    use Notifiable;
+
+    public $table = 'users';
+    public $timestamps = false;
 }
