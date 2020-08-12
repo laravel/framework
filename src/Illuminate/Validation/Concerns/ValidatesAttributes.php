@@ -628,6 +628,8 @@ trait ValidatesAttributes
                     return new FilterEmailValidation();
                 } elseif ($validation === 'filter_unicode') {
                     return FilterEmailValidation::unicode();
+                } elseif (is_string($validation) && class_exists($validation)) {
+                    return $this->container->make($validation);
                 }
             })
             ->values()

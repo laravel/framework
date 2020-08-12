@@ -862,7 +862,7 @@ class Container implements ArrayAccess, ContainerContract
         $results = [];
 
         foreach ($dependencies as $dependency) {
-            // If this dependency has a override for this particular build we will use
+            // If the dependency has an override for this particular build we will use
             // that instead as the value. Otherwise, we will continue with this run
             // of resolutions and let reflection attempt to determine the result.
             if ($this->hasParameterOverride($dependency)) {

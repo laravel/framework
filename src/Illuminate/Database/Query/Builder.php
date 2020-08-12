@@ -1604,7 +1604,7 @@ class Builder
     }
 
     /**
-     * Adds a or where condition using row values.
+     * Adds an or where condition using row values.
      *
      * @param  array  $columns
      * @param  string  $operator
@@ -1639,7 +1639,7 @@ class Builder
     }
 
     /**
-     * Add a "or where JSON contains" clause to the query.
+     * Add an "or where JSON contains" clause to the query.
      *
      * @param  string  $column
      * @param  mixed  $value
@@ -1664,7 +1664,7 @@ class Builder
     }
 
     /**
-     * Add a "or where JSON not contains" clause to the query.
+     * Add an "or where JSON not contains" clause to the query.
      *
      * @param  string  $column
      * @param  mixed  $value
@@ -1702,7 +1702,7 @@ class Builder
     }
 
     /**
-     * Add a "or where JSON length" clause to the query.
+     * Add an "or where JSON length" clause to the query.
      *
      * @param  string  $column
      * @param  mixed  $operator
@@ -1851,7 +1851,7 @@ class Builder
     }
 
     /**
-     * Add a "or having" clause to the query.
+     * Add an "or having" clause to the query.
      *
      * @param  string  $column
      * @param  string|null  $operator

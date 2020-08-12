@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Validation;
 
 use DateTime;
 use DateTimeImmutable;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
@@ -2419,6 +2420,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'exämple@exämple.com'], ['x' => 'email:filter_unicode']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateEmailWithCustomClassCheck()
+    {
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar '], ['x' => 'email:'.NoRFCWarningsValidation::class]);
+        $v->setContainer($container);
+
         $this->assertFalse($v->passes());
     }
 
