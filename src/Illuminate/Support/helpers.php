@@ -559,7 +559,7 @@ if (! function_exists('dd')) {
             (new Dumper)->dump($x);
         }
 
-        die(1);
+        exit(1);
     }
 }
 
