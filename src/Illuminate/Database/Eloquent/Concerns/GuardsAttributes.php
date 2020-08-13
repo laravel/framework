@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Str;
-use LogicException;
 
 trait GuardsAttributes
 {
