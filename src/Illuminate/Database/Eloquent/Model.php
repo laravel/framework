@@ -345,8 +345,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         $totallyGuarded = $this->totallyGuarded();
 
         foreach ($this->fillableFromArray($attributes) as $key => $value) {
-            $key = $this->removeTableFromKey($key);
-
             // The developers may choose to place some attributes in the "fillable" array
             // which means only those attributes may be set through mass assignment to
             // the model, and all others will just get ignored for security reasons.
@@ -389,19 +387,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         }
 
         return $this->getTable().'.'.$column;
-    }
-
-    /**
-     * Remove the table name from a given key.
-     *
-     * @param  string  $key
-     * @return string
-     *
-     * @deprecated This method is deprecated and will be removed in a future Laravel version.
-     */
-    protected function removeTableFromKey($key)
-    {
-        return $key;
     }
 
     /**
