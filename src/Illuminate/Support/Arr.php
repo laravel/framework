@@ -494,11 +494,12 @@ class Arr
      *
      * @param  array  $array
      * @param  int|null  $number
+     * @param  bool|false  $preserveKeys
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public static function random($array, $number = null)
+    public static function random($array, $number = null, $preserveKeys = false)
     {
         $requested = is_null($number) ? 1 : $number;
 
@@ -522,8 +523,8 @@ class Arr
 
         $results = [];
 
-        foreach ((array) $keys as $key) {
-            $results[] = $array[$key];
+        foreach ((array) $keys as $index => $key) {
+            $results[$preserveKeys ? $key : $index] = $array[$key];
         }
 
         return $results;

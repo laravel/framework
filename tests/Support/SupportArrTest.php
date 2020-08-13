@@ -630,6 +630,12 @@ class SupportArrTest extends TestCase
         $this->assertCount(2, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
         $this->assertContains($random[1], ['foo', 'bar', 'baz']);
+
+        // preserve keys
+        $random = Arr::random(['one' => 1, 'two' => 2, 'three' => 3], 2, true);
+        $this->assertIsArray($random);
+        $this->assertCount(2, $random);
+        $this->assertCount(2, array_intersect_assoc(['one' => 1, 'two' => 2, 'three' => 3], $random));
     }
 
     public function testRandomOnEmptyArray()
