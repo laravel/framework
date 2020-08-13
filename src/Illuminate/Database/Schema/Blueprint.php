@@ -1055,14 +1055,20 @@ class Blueprint
     }
 
     /**
-     * Add nullable creation and update timestamps to the table.
+     * Add creation and update timestamps to the table.
      *
      * @param  int  $precision
      * @return void
      */
-    public function timestamps($precision = 0)
+    public function timestamps($precision = 0, $defaultTime = false)
     {
-        $this->timestamp('created_at', $precision)->nullable();
+        if ($defaultTime) {
+            $date = date(DateTime::ISO8601);
+
+            $this->timestamp('created_at', $precision)->default($date);
+        } else {
+            $this->timestamp('created_at', $precision)->nullable();
+        }
 
         $this->timestamp('updated_at', $precision)->nullable();
     }
