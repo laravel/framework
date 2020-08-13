@@ -250,17 +250,4 @@ trait GuardsAttributes
 
         return $attributes;
     }
-
-    /**
-     * Ensure the model has a valid guarded configuration.
-     *
-     * @return void
-     */
-    protected function ensureModelHasValidGuardState()
-    {
-        if (! empty($this->getGuarded()) &&
-            $this->getGuarded() !== ['*']) {
-            throw new LogicException('For added security, guarded attributes are no longer supported. Please use fillable instead.');
-        }
-    }
 }
