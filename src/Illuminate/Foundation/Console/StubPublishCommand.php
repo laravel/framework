@@ -38,6 +38,8 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/model.pivot.stub' => $stubsPath.'/model.pivot.stub',
             __DIR__.'/stubs/model.stub' => $stubsPath.'/model.stub',
             __DIR__.'/stubs/request.stub' => $stubsPath.'/request.stub',
+            __DIR__.'/stubs/resource.stub' => $stubsPath.'/resource.stub',
+            __DIR__.'/stubs/resource-collection.stub' => $stubsPath.'/resource-collection.stub',
             __DIR__.'/stubs/test.stub' => $stubsPath.'/test.stub',
             __DIR__.'/stubs/test.unit.stub' => $stubsPath.'/test.unit.stub',
             realpath(__DIR__.'/../../Database/Console/Factories/stubs/factory.stub') => $stubsPath.'/factory.stub',

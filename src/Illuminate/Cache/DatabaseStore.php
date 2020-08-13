@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Exception;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\PostgresConnection;
@@ -11,7 +12,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
-class DatabaseStore implements Store
+class DatabaseStore implements LockProvider, Store
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 

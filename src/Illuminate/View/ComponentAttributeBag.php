@@ -119,6 +119,19 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
+     * Return a bag of attributes with keys that do not start with the given value / pattern.
+     *
+     * @param  string  $string
+     * @return static
+     */
+    public function whereDoesntStartWith($string)
+    {
+        return $this->reject(function ($value, $key) use ($string) {
+            return Str::startsWith($key, $string);
+        });
+    }
+
+    /**
      * Return a bag of attributes that have keys starting with the given value / pattern.
      *
      * @param  string  $string
