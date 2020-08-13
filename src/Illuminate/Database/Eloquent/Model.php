@@ -396,6 +396,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      *
      * @param  string  $key
      * @return string
+     *
+     * @deprecated This method is deprecated and will be removed in a future Laravel version.
      */
     protected function removeTableFromKey($key)
     {
