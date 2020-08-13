@@ -527,8 +527,14 @@ class Arr
 
         $results = [];
 
-        foreach ((array) $keys as $index => $key) {
-            $results[$preserveKeys ? $key : $index] = $array[$key];
+        if ($preserveKeys) {
+            foreach ((array) $keys as $key) {
+                $results[$key] = $array[$key];
+            }
+        } else {
+            foreach ((array) $keys as $key) {
+                $results[] = $array[$key];
+            }
         }
 
         return $results;
