@@ -248,9 +248,9 @@ class LazyCollection implements Enumerable
      */
     public function countBy($countBy = null)
     {
-        if (is_null($countBy)) {
-            $countBy = $this->identity();
-        }
+        $countBy = is_null($countBy)
+            ? $this->identity()
+            : $this->valueRetriever($countBy);
 
         return new static(function () use ($countBy) {
             $counts = [];
