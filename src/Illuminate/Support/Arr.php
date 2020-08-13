@@ -122,6 +122,23 @@ class Arr
     }
 
     /**
+     * Expand a "dot" notated array into a multi-dimensional array.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function undot($array)
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            static::set($result, $key, $value);
+        }
+
+        return $result;
+    }
+
+    /**
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
