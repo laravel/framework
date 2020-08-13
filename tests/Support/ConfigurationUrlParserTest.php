@@ -380,6 +380,23 @@ class ConfigurationUrlParserTest extends TestCase
                     'password' => 'asdfqwer1234asdf',
                 ],
             ],
+            'Redis Example with scheme' => [
+                [
+                    'url' => 'tls://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
+                    'host' => '127.0.0.1',
+                    'password' =>  null,
+                    'port' =>  6379,
+                    'database' => 0,
+                ],
+                [
+                    'driver' => 'tls',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 0,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
+                ],
+            ],
         ];
     }
 }
