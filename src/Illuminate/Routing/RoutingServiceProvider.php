@@ -137,7 +137,7 @@ class RoutingServiceProvider extends ServiceProvider
                     ->createRequest($app->make('request'));
             }
 
-            throw new BindingResolutionException('Unable to resolve PSR request. Please install symfony/psr-http-message-bridge and nyholm/psr7.');
+            throw new BindingResolutionException('Unable to resolve PSR request. Please install the symfony/psr-http-message-bridge and nyholm/psr7 packages.');
         });
     }
 
@@ -153,7 +153,7 @@ class RoutingServiceProvider extends ServiceProvider
                 return new PsrResponse;
             }
 
-            throw new BindingResolutionException('Unable to resolve PSR response. Please install nyholm/psr7.');
+            throw new BindingResolutionException('Unable to resolve PSR response. Please install the nyholm/psr7 package.');
         });
     }
 

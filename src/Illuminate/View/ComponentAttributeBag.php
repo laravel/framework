@@ -8,10 +8,13 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 
 class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 {
+    use Macroable;
+
     /**
      * The raw array of attributes.
      *
@@ -28,6 +31,17 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     public function __construct(array $attributes = [])
     {
         $this->attributes = $attributes;
+    }
+
+    /**
+     * Get the first attribute's value.
+     *
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function first($default = null)
+    {
+        return $this->getIterator()->current() ?? value($default);
     }
 
     /**
@@ -81,6 +95,41 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
+     * Filter the attributes, returning a bag of attributes that pass the filter.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function filter($callback)
+    {
+        return new static(collect($this->attributes)->filter($callback)->all());
+    }
+
+    /**
+     * Return a bag of attributes that have keys starting with the given value / pattern.
+     *
+     * @param  string  $string
+     * @return static
+     */
+    public function whereStartsWith($string)
+    {
+        return $this->filter(function ($value, $key) use ($string) {
+            return Str::startsWith($key, $string);
+        });
+    }
+
+    /**
+     * Return a bag of attributes that have keys starting with the given value / pattern.
+     *
+     * @param  string  $string
+     * @return static
+     */
+    public function thatStartWith($string)
+    {
+        return $this->whereStartsWith($string);
+    }
+
+    /**
      * Exclude the given attribute from the attribute array.
      *
      * @param  mixed|array  $keys
@@ -103,7 +152,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     /**
      * Merge additional attributes / values into the attribute bag.
      *
-     * @param  array  $attributes
+     * @param  array  $attributeDefaults
      * @return static
      */
     public function merge(array $attributeDefaults = [])
@@ -157,7 +206,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     /**
      * Merge additional attributes / values into the attribute bag.
      *
-     * @param  array  $attributes
+     * @param  array  $attributeDefaults
      * @return \Illuminate\Support\HtmlString
      */
     public function __invoke(array $attributeDefaults = [])

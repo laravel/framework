@@ -50,6 +50,22 @@ class QueuedEventsTest extends TestCase
 
         $fakeQueue->assertPushedOn('my_queue', CallQueuedListener::class);
     }
+
+    public function testQueueIsSetByGetQueue()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container());
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherGetQueue::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushedOn('some_other_queue', CallQueuedListener::class);
+    }
 }
 
 class TestDispatcherQueuedHandler implements ShouldQueue
@@ -71,5 +87,20 @@ class TestDispatcherConnectionQueuedHandler implements ShouldQueue
     public function handle()
     {
         //
+    }
+}
+
+class TestDispatcherGetQueue implements ShouldQueue
+{
+    public $queue = 'my_queue';
+
+    public function handle()
+    {
+        //
+    }
+
+    public function viaQueue()
+    {
+        return 'some_other_queue';
     }
 }

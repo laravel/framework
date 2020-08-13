@@ -601,6 +601,25 @@ class Stringable
     }
 
     /**
+     * Apply the callback's string changes if the given "value" is true.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return mixed|$this
+     */
+    public function when($value, $callback, $default = null)
+    {
+        if ($value) {
+            return $callback($this, $value) ?: $this;
+        } elseif ($default) {
+            return $default($this, $value) ?: $this;
+        }
+
+        return $this;
+    }
+
+    /**
      * Execute the given callback if the string is empty.
      *
      * @param  callable  $callback
@@ -650,7 +669,7 @@ class Stringable
     {
         $this->dump();
 
-        die(1);
+        exit(1);
     }
 
     /**

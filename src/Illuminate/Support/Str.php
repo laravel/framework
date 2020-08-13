@@ -210,7 +210,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if (substr($haystack, -strlen($needle)) === (string) $needle) {
+            if ($needle !== '' && substr($haystack, -strlen($needle)) === (string) $needle) {
                 return true;
             }
         }

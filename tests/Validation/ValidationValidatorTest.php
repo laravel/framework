@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Validation;
 
 use DateTime;
 use DateTimeImmutable;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
@@ -35,6 +36,32 @@ class ValidationValidatorTest extends TestCase
     {
         Carbon::setTestNow();
         m::close();
+    }
+
+    public function testNestedErrorMessagesAreRetrievedFromLocalArray()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'users' => [
+                [
+                    'name' => 'Taylor Otwell',
+                    'posts' => [
+                        [
+                            'name' => '',
+                        ],
+                    ],
+                ],
+            ],
+        ], [
+            'users.*.name' => ['required'],
+            'users.*.posts.*.name' => ['required'],
+        ], [
+            'users.*.name.required' => 'user name is required',
+            'users.*.posts.*.name.required' => 'post name is required',
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertEquals('post name is required', $v->errors()->all()[0]);
     }
 
     public function testSometimesWorksOnNestedArrays()
@@ -1103,6 +1130,14 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['first' => 'sven'], ['last' => 'required_unless:first,taylor,sven']);
         $this->assertTrue($v->passes());
 
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,false']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->fails());
+
         // error message when passed multiple values (required_unless:foo,bar,baz)
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_unless' => 'The :attribute field is required unless :other is in :values.'], 'en');
@@ -1253,6 +1288,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|gt:10']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => 5, 10 => 1], ['lhs' => 'numeric|gt:10']);
+        $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|gt:10']);
         $this->assertTrue($v->passes());
@@ -2382,6 +2420,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'exämple@exämple.com'], ['x' => 'email:filter_unicode']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateEmailWithCustomClassCheck()
+    {
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar '], ['x' => 'email:'.NoRFCWarningsValidation::class]);
+        $v->setContainer($container);
+
         $this->assertFalse($v->passes());
     }
 
@@ -3880,6 +3929,32 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testPlaceholdersAreReplaced()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'matrix' => ['\\' => ['invalid'], '1\\' => ['invalid']],
+        ], [
+            'matrix.*.*' => 'integer',
+        ]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [
+            'matrix' => ['\\' => [1], '1\\' => [1]],
+        ], [
+            'matrix.*.*' => 'integer',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'foo' => ['bar' => 'valid'], 'foo.bar' => 'invalid', 'foo->bar' => 'valid',
+        ], [
+            'foo\.bar' => 'required|in:valid',
+        ]);
+        $this->assertTrue($v->fails());
+    }
+
     public function testCoveringEmptyKeys()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3891,35 +3966,8 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'size:4']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'size:4']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo.*' => 'integer', 'foo.0' => 'required']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'size:4']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans,
-            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'min:3']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans,
-            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'between:3,6']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans,
-            ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
-            ['foo.*.votes' => ['Required', 'Size:2']]);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans,
-            ['foo' => [['name' => 'first', 'votes' => [1, 2, 3]], ['name' => 'second', 'votes' => ['something', 2]]]],
-            ['foo.*.votes' => ['Required', 'Size:2']]);
-        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['foo' => ['bar.baz' => '']], ['foo' => 'required']);
+        $this->assertEquals(['foo' => ['bar.baz' => '']], $v->validated());
     }
 
     public function testValidateNestedArrayWithCommonParentChildKey()
@@ -5224,13 +5272,10 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         [
                             'type' => 'car', 'wheels' => [
-                                // The shape field for these blue wheels were correctly excluded (if they weren't, they would
-                                // fail the validation). They still appear in the validated data. This behaviour is unrelated
-                                // to the "exclude" type rules.
                                 ['color' => 'red', 'shape' => 'square'],
-                                ['color' => 'blue', 'shape' => 'hexagon'],
+                                ['color' => 'blue'],
                                 ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
-                                ['color' => 'blue', 'shape' => 'triangle'],
+                                ['color' => 'blue'],
                             ],
                         ],
                         ['type' => 'boat'],

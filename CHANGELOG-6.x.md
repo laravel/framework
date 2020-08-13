@@ -1,10 +1,139 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.14...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.32...6.x)
+
+
+## [v6.18.32 (2020-08-04)](https://github.com/laravel/framework/compare/v6.18.31...v6.18.32)
+
+### Changed
+- Ignore numeric field names in validators ([#33712](https://github.com/laravel/framework/pull/33712))
+- Fixed validation rule 'required_unless' when other field value is boolean. ([#33715](https://github.com/laravel/framework/pull/33715))
+
+
+## [v6.18.31 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.30...v6.18.31)
+
+### Update
+- Update cookies encryption ([release](https://github.com/laravel/framework/compare/v6.18.30...v6.18.31))
+
+
+## [v6.18.30 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.29...v6.18.30)
+
+### Update
+- Update cookies encryption ([release](https://github.com/laravel/framework/compare/v6.18.29...v6.18.30))
+
+
+## [v6.18.29 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.28...v6.18.29)
+
+### Fixed
+- Fixed cookie issues encryption ([c9ce261](https://github.com/laravel/framework/commit/c9ce261a9f7b8e07c9ebc8a7d45651ee1cf86215), [5786aa4](https://github.com/laravel/framework/commit/5786aa4a388adfcc62862573275bd37d49aa07d7))
+
+
+## [v6.18.28 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.27...v6.18.28)
+
+### Fixed
+- Fixed cookie issues ([bb9db21](https://github.com/laravel/framework/commit/bb9db21af137344feffa192fcabe4e439c8b0f60))
+
+
+## [v6.18.27 (2020-07-27)](https://github.com/laravel/framework/compare/v6.18.26...v6.18.27)
+
+### Fixed
+- Dont decrement transaction below 0 in `Illuminate\Database\Concerns\ManagesTransactions::handleCommitTransactionException()` ([7681795](https://github.com/laravel/framework/commit/768179578e5492b5f80c391bd43b233938e16e27))
+- Fixed transaction problems on closure transaction ([c4cdfc7](https://github.com/laravel/framework/commit/c4cdfc7c54127b772ef10f37cfc9ef8e9d6b3227))
+- Prevent to serialize uninitialized properties ([#33644](https://github.com/laravel/framework/pull/33644))
+- Fixed missing statement preventing deletion in `Illuminate\Database\Eloquent\Relations\MorphPivot::delete()` ([#33648](https://github.com/laravel/framework/pull/33648))
+
+### Changed
+- Improve cookie encryption ([#33662](https://github.com/laravel/framework/pull/33662))
+
+
+## [v6.18.26 (2020-07-21)](https://github.com/laravel/framework/compare/v6.18.25...v6.18.26)
+
+### Fixed
+- Align (fix) nested arrays support for `assertViewHas` & `assertViewMissing` in `Illuminate\Testing\TestResponse` ([#33566](https://github.com/laravel/framework/pull/33566))
+
+
+## [v6.18.25 (2020-07-10)](https://github.com/laravel/framework/compare/v6.18.24...v6.18.25)
+
+### Fixed
+- Fixed `Illuminate\Cache\FileStore::flush()` ([#33458](https://github.com/laravel/framework/pull/33458))
+- Fixed auto creating model by class name ([#33481](https://github.com/laravel/framework/pull/33481))
+- Don't return nested data from validator when failing an exclude rule ([#33435](https://github.com/laravel/framework/pull/33435))
+- Fixed validation nested error messages ([6615371](https://github.com/laravel/framework/commit/6615371d7c0a7431372244d21eae54696b3c19f2))
+- Fixed `Illuminate\Support\Reflector` to handle parent ([#33502](https://github.com/laravel/framework/pull/33502))
+  
+### Revert
+- Revert [Improve SQL Server last insert id retrieval](https://github.com/laravel/framework/pull/33453) ([#33496](https://github.com/laravel/framework/pull/33496))
+
+
+## [v6.18.24 (2020-07-07)](https://github.com/laravel/framework/compare/v6.18.23...v6.18.24)
+
+### Fixed
+- Fixed notifications database channel for anonymous notifiables ([#33409](https://github.com/laravel/framework/pull/33409))
+- Added float comparison null checks ([#33421](https://github.com/laravel/framework/pull/33421))
+- Improve SQL Server last insert id retrieval ([#33453](https://github.com/laravel/framework/pull/33453))
+
+
+## [v6.18.23 (2020-06-30)](https://github.com/laravel/framework/compare/v6.18.22...v6.18.23)
+
+### Fixed
+- Fixed `ConfigurationUrlParser` query decoding ([#33340](https://github.com/laravel/framework/pull/33340))
+- Correct implementation of float casting comparison ([#33322](https://github.com/laravel/framework/pull/33322))
+
+
+## [v6.18.22 (2020-06-24)](https://github.com/laravel/framework/compare/v6.18.21...v6.18.22)
+
+### Revert
+- Revert "Fixed `Model::originalIsEquivalent()` with floats ([#33259](https://github.com/laravel/framework/pull/33259), [d68d915](https://github.com/laravel/framework/commit/d68d91516db6d1b9cba8a72f99b2c7e8223e988f))" [bf3cb6f](https://github.com/laravel/framework/commit/bf3cb6f6979df2d6965d2e0aa731724d0e2b15e5)
+
+
+## [v6.18.21 (2020-06-23)](https://github.com/laravel/framework/compare/v6.18.20...v6.18.21)
+
+### Fixed
+- Fixed `Model::originalIsEquivalent()` with floats ([#33259](https://github.com/laravel/framework/pull/33259), [d68d915](https://github.com/laravel/framework/commit/d68d91516db6d1b9cba8a72f99b2c7e8223e988f))
+
+
+## [v6.18.20 (2020-06-16)](https://github.com/laravel/framework/compare/v6.18.19...v6.18.20)
+
+### Changed
+- Improved the reflector ([#33184](https://github.com/laravel/framework/pull/33184))
+
+
+## [v6.18.19 (2020-06-09)](https://github.com/laravel/framework/compare/v6.18.18...v6.18.19)
+
+### Fixed
+- Fixed `Model::withoutEvents()` not registering listeners inside boot() ([#33149](https://github.com/laravel/framework/pull/33149), [4bb32ae](https://github.com/laravel/framework/commit/4bb32aea50eec4c3cc8b77f463e4a96213a0af09))
+
+
+## [v6.18.18 (2020-06-03)](https://github.com/laravel/framework/compare/v6.18.17...v6.18.18)
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Relations\MorphToMany::getCurrentlyAttachedPivots()` ([110b129](https://github.com/laravel/framework/commit/110b129531df172f03bf163f561c71123fac6296))
+
+
+## [v6.18.17 (2020-06-02)](https://github.com/laravel/framework/compare/v6.18.16...v6.18.17)
+
+### Added
+- Support PHP 8's reflection API ([#33039](https://github.com/laravel/framework/pull/33039))
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Collection::getQueueableRelations()` ([00e9ed7](https://github.com/laravel/framework/commit/00e9ed76483ea6ad1264676e7b1095b23e16a433))
+- Fixed bug with update existing pivot and polymorphic many to many ([684208b](https://github.com/laravel/framework/commit/684208b10460b49fa34354cc42f33b9b7135814f))
+
+
+## [v6.18.15 (2020-05-19)](https://github.com/laravel/framework/compare/v6.18.14...v6.18.15)
+
+### Added
+- Added `Illuminate\Http\Middleware\TrustHosts` ([9229264](https://github.com/laravel/framework/commit/92292649621f2aadc84ab94376244650a9f55696))
 
 ### Fixed
 - Revert of ["Remove `strval` from `Illuminate/Validation/ValidationRuleParser::explodeWildcardRules()`"](https://github.com/laravel/framework/commit/1c76a6f3a80fa8f756740566dffd9fa1be65c123) ([52940cf](https://github.com/laravel/framework/commit/52940cf3275cfebd47ec008fd8ae5bc6d6a42dfd))
 - Fixed Queued Mail MessageSent Listener With Attachments ([#32795](https://github.com/laravel/framework/pull/32795))
+- Added error clearing before sending in `Illuminate\Mail\Mailer::sendSwiftMessage()` ([#32799](https://github.com/laravel/framework/pull/32799))
+- Avoid foundation function call in the auth component ([#32805](https://github.com/laravel/framework/pull/32805))
+
+### Changed
+- Added explicit `symfony/polyfill-php73` dependency ([5796b1e](https://github.com/laravel/framework/commit/5796b1e43dfe14914050a7e5dd24ddf803ec99b8))
+- Set `Cache\FileStore` file permissions only once ([#32845](https://github.com/laravel/framework/pull/32845), [11c533b](https://github.com/laravel/framework/commit/11c533b9aa062f4cba1dd0fe3673bf33d275480f))
 
 
 ## [v6.18.14 (2020-05-12)](https://github.com/laravel/framework/compare/v6.18.13...v6.18.14)

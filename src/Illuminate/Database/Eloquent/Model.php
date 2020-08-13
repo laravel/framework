@@ -399,7 +399,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     protected function removeTableFromKey($key)
     {
-        return Str::contains($key, '.') ? last(explode('.', $key)) : $key;
+        return $key;
     }
 
     /**
@@ -1581,6 +1581,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         $relationship = $this->{Str::plural(Str::camel($childType))}();
 
+        $field = $field ?: $relationship->getRelated()->getRouteKeyName();
+
         if ($relationship instanceof HasManyThrough ||
             $relationship instanceof BelongsToMany) {
             return $relationship->where($relationship->getRelated()->getTable().'.'.$field, $value)->first();
@@ -1723,6 +1725,10 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->$method(...$parameters);
+        }
+
+        if ($resolver = (static::$relationResolvers[get_class($this)][$method] ?? null)) {
+            return $resolver($this);
         }
 
         return $this->forwardCallTo($this->newQuery(), $method, $parameters);

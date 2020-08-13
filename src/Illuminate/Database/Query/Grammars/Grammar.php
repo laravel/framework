@@ -364,6 +364,24 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "between" where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBetweenColumns(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $min = $this->wrap(reset($where['values']));
+
+        $max = $this->wrap(end($where['values']));
+
+        return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -1199,7 +1217,7 @@ class Grammar extends BaseGrammar
      */
     protected function wrapJsonPath($value, $delimiter = '->')
     {
-        $value = preg_replace("/([\\\\]+)?\\'/", "\\'", $value);
+        $value = preg_replace("/([\\\\]+)?\\'/", "''", $value);
 
         return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
     }

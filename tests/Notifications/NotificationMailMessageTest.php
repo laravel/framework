@@ -18,6 +18,52 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame('notifications::foo', $message->markdown);
     }
 
+    public function testHtmlAndPlainView()
+    {
+        $message = new MailMessage;
+
+        $this->assertNull($message->view);
+        $this->assertSame([], $message->viewData);
+
+        $message->view(['notifications::foo', 'notifications::bar'], [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('notifications::foo', $message->view[0]);
+        $this->assertSame('notifications::bar', $message->view[1]);
+        $this->assertSame(['foo' => 'bar'], $message->viewData);
+    }
+
+    public function testHtmlView()
+    {
+        $message = new MailMessage;
+
+        $this->assertNull($message->view);
+        $this->assertSame([], $message->viewData);
+
+        $message->view('notifications::foo', [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('notifications::foo', $message->view);
+        $this->assertSame(['foo' => 'bar'], $message->viewData);
+    }
+
+    public function testPlainView()
+    {
+        $message = new MailMessage;
+
+        $this->assertNull($message->view);
+        $this->assertSame([], $message->viewData);
+
+        $message->view([null, 'notifications::foo'], [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('notifications::foo', $message->view[1]);
+        $this->assertSame(['foo' => 'bar'], $message->viewData);
+    }
+
     public function testCcIsSetCorrectly()
     {
         $message = new MailMessage;

@@ -59,6 +59,16 @@ class ViewFactoryTest extends TestCase
         $this->assertTrue($factory->exists('bar'));
     }
 
+    public function testRenderingOnceChecks()
+    {
+        $factory = $this->getFactory();
+        $this->assertFalse($factory->hasRenderedOnce('foo'));
+        $factory->markAsRenderedOnce('foo');
+        $this->assertTrue($factory->hasRenderedOnce('foo'));
+        $factory->flushState();
+        $this->assertFalse($factory->hasRenderedOnce('foo'));
+    }
+
     public function testFirstCreatesNewViewInstanceWithProperPath()
     {
         unset($_SERVER['__test.view']);
@@ -440,6 +450,17 @@ class ViewFactoryTest extends TestCase
 
         $this->assertTrue($factory->hasSection('foo'));
         $this->assertFalse($factory->hasSection('bar'));
+    }
+
+    public function testSectionMissing()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        echo 'hello world';
+        $factory->stopSection();
+
+        $this->assertTrue($factory->sectionMissing('bar'));
+        $this->assertFalse($factory->sectionMissing('foo'));
     }
 
     public function testGetSection()

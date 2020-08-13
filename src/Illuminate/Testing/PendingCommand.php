@@ -103,7 +103,7 @@ class PendingCommand
      * Specify an expected choice question with expected answers that will be asked/shown when the command runs.
      *
      * @param  string  $question
-     * @param  string  $answer
+     * @param  string|array  $answer
      * @param  array  $answers
      * @param  bool  $strict
      * @return $this
@@ -158,6 +158,8 @@ class PendingCommand
      * Execute the command.
      *
      * @return int
+     *
+     * @throws \Mockery\Exception\NoMatchingExpectationException
      */
     public function run()
     {

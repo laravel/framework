@@ -120,6 +120,15 @@ class ContainerTest extends TestCase
         $this->assertSame($var1, $var2);
     }
 
+    public function testBindFailsLoudlyWithInvalidArgument()
+    {
+        $this->expectException(\TypeError::class);
+        $container = new Container;
+
+        $concrete = new ContainerConcreteStub();
+        $container->bind(ContainerConcreteStub::class, $concrete);
+    }
+
     public function testAbstractToConcreteResolution()
     {
         $container = new Container;

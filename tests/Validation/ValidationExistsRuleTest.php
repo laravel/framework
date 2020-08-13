@@ -51,6 +51,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertSame('exists:users,column,foo,"bar"', (string) $rule);
 
+        $rule = new Exists(UserWithConnection::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:mysql.users,column,foo,"bar"', (string) $rule);
+
         $rule = new Exists('Illuminate\Tests\Validation\User', 'column');
         $rule->where('foo', 'bar');
         $this->assertSame('exists:users,column,foo,"bar"', (string) $rule);
@@ -58,6 +62,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule = new Exists(NoTableNameModel::class, 'column');
         $rule->where('foo', 'bar');
         $this->assertSame('exists:no_table_name_models,column,foo,"bar"', (string) $rule);
+
+        $rule = new Exists(ClassWithRequiredConstructorParameters::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:'.ClassWithRequiredConstructorParameters::class.',column,foo,"bar"', (string) $rule);
     }
 
     public function testItChoosesValidRecordsUsingWhereInRule()
@@ -198,8 +206,25 @@ class User extends Eloquent
     public $timestamps = false;
 }
 
+class UserWithConnection extends User
+{
+    protected $connection = 'mysql';
+}
+
 class NoTableNameModel extends Eloquent
 {
     protected $guarded = [];
     public $timestamps = false;
+}
+
+class ClassWithRequiredConstructorParameters
+{
+    private $bar;
+    private $baz;
+
+    public function __construct($bar, $baz)
+    {
+        $this->bar = $bar;
+        $this->baz = $baz;
+    }
 }

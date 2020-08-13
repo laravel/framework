@@ -74,9 +74,9 @@ class PhpRedisConnector implements Connector
         return tap(new Redis, function ($client) use ($config) {
             if ($client instanceof RedisFacade) {
                 throw new LogicException(
-                        extension_loaded('redis')
-                                ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
-                                : 'Please make sure the PHP Redis extension is installed and enabled.'
+                    extension_loaded('redis')
+                        ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
+                        : 'Please make sure the PHP Redis extension is installed and enabled.'
                 );
             }
 
@@ -127,6 +127,10 @@ class PhpRedisConnector implements Connector
             $parameters[] = Arr::get($config, 'read_timeout', 0.0);
         }
 
+        if (version_compare(phpversion('redis'), '5.3.0', '>=')) {
+            $parameters[] = Arr::get($config, 'context', []);
+        }
+
         $client->{($persistent ? 'pconnect' : 'connect')}(...$parameters);
     }
 
@@ -149,6 +153,10 @@ class PhpRedisConnector implements Connector
 
         if (version_compare(phpversion('redis'), '4.3.0', '>=')) {
             $parameters[] = $options['password'] ?? null;
+        }
+
+        if (version_compare(phpversion('redis'), '5.3.2', '>=')) {
+            $parameters[] = Arr::get($options, 'context', []);
         }
 
         return tap(new RedisCluster(...$parameters), function ($client) use ($options) {

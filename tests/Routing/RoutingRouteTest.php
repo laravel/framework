@@ -205,6 +205,18 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testMiddlewareCanBeSkippedFromResources()
+    {
+        $router = $this->getRouter();
+        $router->aliasMiddleware('web', RoutingTestMiddlewareGroupTwo::class);
+
+        $router->resource('foo', RouteTestControllerMiddlewareGroupStub::class)
+            ->middleware('web')
+            ->withoutMiddleware(RoutingTestMiddlewareGroupTwo::class);
+
+        $this->assertEquals('Hello World', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
     public function testMiddlewareWorksIfControllerThrowsHttpResponseException()
     {
         // Before calling controller

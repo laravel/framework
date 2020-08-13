@@ -171,7 +171,7 @@ trait EnumeratesValues
     {
         call_user_func_array([$this, 'dump'], $args);
 
-        die(1);
+        exit(1);
     }
 
     /**
@@ -412,13 +412,9 @@ trait EnumeratesValues
      */
     public function sum($callback = null)
     {
-        if (is_null($callback)) {
-            $callback = function ($value) {
-                return $value;
-            };
-        } else {
-            $callback = $this->valueRetriever($callback);
-        }
+        $callback = is_null($callback)
+            ? $this->identity()
+            : $this->valueRetriever($callback);
 
         return $this->reduce(function ($result, $item) use ($callback) {
             return $result + $callback($item);
@@ -732,7 +728,7 @@ trait EnumeratesValues
      *
      * This is an alias to the "takeUntil" method.
      *
-     * @param  mixed  $key
+     * @param  mixed  $value
      * @return static
      *
      * @deprecated Use the "takeUntil" method directly.
@@ -804,25 +800,6 @@ trait EnumeratesValues
     public function getCachingIterator($flags = CachingIterator::CALL_TOSTRING)
     {
         return new CachingIterator($this->getIterator(), $flags);
-    }
-
-    /**
-     * Count the number of items in the collection using a given truth test.
-     *
-     * @param  callable|null  $callback
-     * @return static
-     */
-    public function countBy($callback = null)
-    {
-        if (is_null($callback)) {
-            $callback = function ($value) {
-                return $value;
-            };
-        }
-
-        return new static($this->groupBy($callback)->map(function ($value) {
-            return $value->count();
-        }));
     }
 
     /**
@@ -988,6 +965,18 @@ trait EnumeratesValues
     {
         return function (...$params) use ($callback) {
             return ! $callback(...$params);
+        };
+    }
+
+    /**
+     * Make a function that returns what's passed to it.
+     *
+     * @return \Closure
+     */
+    protected function identity()
+    {
+        return function ($value) {
+            return $value;
         };
     }
 }

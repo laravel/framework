@@ -554,7 +554,6 @@ class BelongsToMany extends Relation
      * Set a "or where not null" clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  bool  $not
      * @return $this
      */
     public function orWherePivotNotNull($column)
@@ -641,7 +640,7 @@ class BelongsToMany extends Relation
      */
     public function find($id, $columns = ['*'])
     {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (! $id instanceof Model && (is_array($id) || $id instanceof Arrayable)) {
             return $this->findMany($id, $columns);
         }
 

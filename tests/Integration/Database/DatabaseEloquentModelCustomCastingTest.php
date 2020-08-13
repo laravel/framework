@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @group integration
@@ -86,6 +87,50 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model->syncOriginal();
         $model->options = ['foo' => 'bar'];
         $this->assertTrue($model->isDirty('options'));
+
+        $model = new TestEloquentModelWithCustomCast;
+        $model->birthday_at = now();
+        $this->assertTrue(is_string($model->toArray()['birthday_at']));
+    }
+
+    public function testGetOriginalWithCastValueObjects()
+    {
+        $model = new TestEloquentModelWithCustomCast([
+            'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
+        ]);
+
+        $model->syncOriginal();
+
+        $model->address = new Address('117 Spencer St.', 'Another house.');
+
+        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal('address')->lineOne);
+        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+
+        $model = new TestEloquentModelWithCustomCast([
+            'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
+        ]);
+
+        $model->syncOriginal();
+
+        $model->address = new Address('117 Spencer St.', 'Another house.');
+
+        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
+        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
+
+        $model = new TestEloquentModelWithCustomCast([
+            'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
+        ]);
+
+        $model->syncOriginal();
+
+        $model->address = null;
+
+        $this->assertNull($model->address);
+        $this->assertInstanceOf(Address::class, $model->getOriginal('address'));
+        $this->assertNull($model->address);
     }
 
     public function testOneWayCasting()
@@ -174,6 +219,7 @@ class TestEloquentModelWithCustomCast extends Model
         'value_object_with_caster' => ValueObject::class,
         'value_object_caster_with_argument' => ValueObject::class.':argument',
         'value_object_caster_with_caster_instance' => ValueObjectWithCasterInstance::class,
+        'birthday_at' => DateObjectCaster::class,
     ];
 }
 
@@ -207,11 +253,22 @@ class AddressCaster implements CastsAttributes
 {
     public function get($model, $key, $value, $attributes)
     {
+        if (is_null($attributes['address_line_one'])) {
+            return;
+        }
+
         return new Address($attributes['address_line_one'], $attributes['address_line_two']);
     }
 
     public function set($model, $key, $value, $attributes)
     {
+        if (is_null($value)) {
+            return [
+                'address_line_one' => null,
+                'address_line_two' => null,
+            ];
+        }
+
         return ['address_line_one' => $value->lineOne, 'address_line_two' => $value->lineTwo];
     }
 }
@@ -285,5 +342,25 @@ class Address
     {
         $this->lineOne = $lineOne;
         $this->lineTwo = $lineTwo;
+    }
+}
+
+class DateObjectCaster implements CastsAttributes
+{
+    private $argument;
+
+    public function __construct($argument = null)
+    {
+        $this->argument = $argument;
+    }
+
+    public function get($model, $key, $value, $attributes)
+    {
+        return Carbon::parse($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return $value->format('Y-m-d');
     }
 }

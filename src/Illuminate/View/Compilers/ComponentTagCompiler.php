@@ -289,7 +289,7 @@ class ComponentTagCompiler
 
         return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
             return in_array(Str::camel($key), $parameterNames);
-        });
+        })->all();
     }
 
     /**
@@ -311,8 +311,14 @@ class ComponentTagCompiler
      */
     public function compileSlots(string $value)
     {
-        $value = preg_replace_callback('/<\s*x[\-\:]slot\s+name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+))\s*>/', function ($matches) {
-            return " @slot('".$this->stripQuotes($matches['name'])."') ";
+        $value = preg_replace_callback('/<\s*x[\-\:]slot\s+(:?)name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+))\s*>/', function ($matches) {
+            $name = $this->stripQuotes($matches['name']);
+
+            if ($matches[1] !== ':') {
+                $name = "'{$name}'";
+            }
+
+            return " @slot({$name}) ";
         }, $value);
 
         return preg_replace('/<\/\s*x[\-\:]slot[^>]*>/', ' @endslot', $value);

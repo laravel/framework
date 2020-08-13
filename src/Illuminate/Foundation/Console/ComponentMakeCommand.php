@@ -80,7 +80,7 @@ class ComponentMakeCommand extends GeneratorCommand
         if ($this->option('inline')) {
             return str_replace(
                 'DummyView',
-                "<<<'blade'\n<div>\n    ".Inspiring::quote()."\n</div>\nblade",
+                "<<<'blade'\n<div>\n    <!-- ".Inspiring::quote()." -->\n</div>\nblade",
                 parent::buildClass($name)
             );
         }
@@ -99,7 +99,9 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function getView()
     {
-        return collect(explode('/', $this->argument('name')))
+        $name = str_replace('\\', '/', $this->argument('name'));
+
+        return collect(explode('/', $name))
             ->map(function ($part) {
                 return Str::kebab($part);
             })

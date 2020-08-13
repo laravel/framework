@@ -511,7 +511,7 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
-        $this->assertTrue(microtime(true) - $startTime >= 0.1);
+        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.02);
     }
 
     public function testRetryWithPassingWhenCallback()
@@ -532,7 +532,7 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
-        $this->assertTrue(microtime(true) - $startTime >= 0.1);
+        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.02);
     }
 
     public function testRetryWithFailingWhenCallback()

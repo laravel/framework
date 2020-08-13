@@ -62,11 +62,15 @@ trait DatabaseRule
             return $table;
         }
 
-        $model = new $table;
+        if (is_subclass_of($table, Model::class)) {
+            $model = new $table;
 
-        return $model instanceof Model
-                ? $model->getTable()
-                : $table;
+            return implode('.', array_filter(
+                [$model->getConnectionName(), $model->getTable()]
+            ));
+        }
+
+        return $table;
     }
 
     /**

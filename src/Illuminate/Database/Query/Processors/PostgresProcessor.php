@@ -17,7 +17,11 @@ class PostgresProcessor extends Processor
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
     {
-        $result = $query->getConnection()->selectFromWriteConnection($sql, $values)[0];
+        $connection = $query->getConnection();
+
+        $connection->recordsHaveBeenModified();
+
+        $result = $connection->selectFromWriteConnection($sql, $values)[0];
 
         $sequence = $sequence ?: 'id';
 

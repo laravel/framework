@@ -33,7 +33,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '7.11.0';
+    const VERSION = '7.25.0';
 
     /**
      * The base path for the Laravel installation.
@@ -152,7 +152,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var array
      */
-    protected $absoluteCachePathPrefixes = [DIRECTORY_SEPARATOR];
+    protected $absoluteCachePathPrefixes = ['/', '\\'];
 
     /**
      * Create a new Illuminate application instance.
@@ -1103,6 +1103,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the given service provider is loaded.
+     *
+     * @param  string  $provider
+     * @return bool
+     */
+    public function providerIsLoaded(string $provider)
+    {
+        return isset($this->loadedProviders[$provider]);
+    }
+
+    /**
      * Get the application's deferred services.
      *
      * @return array
@@ -1167,6 +1178,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Get the current application fallback locale.
+     *
+     * @return string
+     */
+    public function getFallbackLocale()
+    {
+        return $this['config']->get('app.fallback_locale');
+    }
+
+    /**
      * Set the current application locale.
      *
      * @param  string  $locale
@@ -1179,6 +1200,19 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this['translator']->setLocale($locale);
 
         $this['events']->dispatch(new LocaleUpdated($locale));
+    }
+
+    /**
+     * Set the current application fallback locale.
+     *
+     * @param  string  $fallbackLocale
+     * @return void
+     */
+    public function setFallbackLocale($fallbackLocale)
+    {
+        $this['config']->set('app.fallback_locale', $fallbackLocale);
+
+        $this['translator']->setFallback($fallbackLocale);
     }
 
     /**
