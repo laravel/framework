@@ -47,11 +47,11 @@ class AuthenticateSession
             }
         }
 
-        if (! $request->session()->has('password_hash')) {
+        if (! $request->session()->has($this->auth->getDefaultDriver().'_password_hash')) {
             $this->storePasswordHashInSession($request);
         }
 
-        if ($request->session()->get('password_hash') !== $request->user()->getAuthPassword()) {
+        if ($request->session()->get($this->auth->getDefaultDriver().'_password_hash') !== $request->user()->getAuthPassword()) {
             $this->logout($request);
         }
 
@@ -73,7 +73,7 @@ class AuthenticateSession
         }
 
         $request->session()->put([
-            'password_hash' => $request->user()->getAuthPassword(),
+            $this->auth->getDefaultDriver().'_password_hash' => $request->user()->getAuthPassword(),
         ]);
     }
 
@@ -91,6 +91,6 @@ class AuthenticateSession
 
         $request->session()->flush();
 
-        throw new AuthenticationException;
+        throw new AuthenticationException('Unauthenticated.', [$this->auth->getDefaultDriver()]);
     }
 }
