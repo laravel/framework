@@ -57,9 +57,7 @@ class AuthenticateSession
             $this->logout($request);
         }
 
-        return tap($next($request), function () use ($request) {
-            $this->storePasswordHashInSession($request);
-        });
+        return $next($request);
     }
 
     /**
