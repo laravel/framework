@@ -7,6 +7,7 @@ use FilesystemIterator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Mime\MimeTypes;
 
@@ -277,10 +278,21 @@ class Filesystem
      *
      * @param  string  $target
      * @param  string  $link
+     * @param  bool  $relative
      * @return void
      */
-    public function link($target, $link)
+    public function link($target, $link, $relative = false)
     {
+        if ($relative) {
+            if (! class_exists(SymfonyFilesystem::class)) {
+                throw new RuntimeException(
+                    'To enable support for relative links, please install the symfony/filesystem package.'
+                );
+            }
+
+            $target = (new SymfonyFilesystem)->makePathRelative($target, dirname($link));
+        }
+
         if (! windows_os()) {
             return symlink($target, $link);
         }
