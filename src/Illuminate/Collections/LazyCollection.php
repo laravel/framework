@@ -408,7 +408,7 @@ class LazyCollection implements Enumerable
 
         if (is_null($callback)) {
             if (! $iterator->valid()) {
-                return Util::value($default);
+                return value($default);
             }
 
             return $iterator->current();
@@ -420,7 +420,7 @@ class LazyCollection implements Enumerable
             }
         }
 
-        return Util::value($default);
+        return value($default);
     }
 
     /**
@@ -479,7 +479,7 @@ class LazyCollection implements Enumerable
             }
         }
 
-        return Util::value($default);
+        return value($default);
     }
 
     /**
@@ -624,7 +624,7 @@ class LazyCollection implements Enumerable
             }
         }
 
-        return $needle === $placeholder ? Util::value($default) : $needle;
+        return $needle === $placeholder ? value($default) : $needle;
     }
 
     /**
