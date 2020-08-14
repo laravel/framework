@@ -25,7 +25,10 @@
     "autoload": {
         "psr-4": {
             "Illuminate\\Events\\": ""
-        }
+        },
+        "files": [
+            "functions.php"
+        ]
     },
     "extra": {
         "branch-alias": {
