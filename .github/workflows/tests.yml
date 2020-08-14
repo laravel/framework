@@ -25,9 +25,9 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        php: [7.2, 7.3, 7.4]
+        php: [7.2, 7.3, 7.4, 8.0]
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -47,8 +47,32 @@ jobs:
       - name: Setup Memcached
         uses: niden/actions-memcached@v7
 
-      - name: Install dependencies
-        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+      - name: Setup problem matchers
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Install PHP 7 dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-dist --no-interaction --no-progress
+        if: "matrix.php < 8"
+
+      - name: Setup PHP 8 Dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "phpunit/phpunit:^9.3.2" "doctrine/dbal:^3.0" --no-update --no-interaction
+        if: "matrix.php >= 8"
+
+      - name: Install PHP 8 Dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --ignore-platform-req=php
+        if: "matrix.php >= 8"
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
@@ -60,15 +84,17 @@ jobs:
 
     runs-on: windows-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        php: [7.2, 7.3, 7.4]
+        php: [7.2, 7.3, 7.4, 8.0]
         include:
           - php: 7.2
             stability: prefer-lowest
           - php: 7.3
             stability: prefer-stable
           - php: 7.4
+            stability: prefer-stable
+          - php: 8.0
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
@@ -89,10 +115,33 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp
           tools: composer:v2
           coverage: none
-          ini-values: memory_limit=512M
 
-      - name: Install dependencies
-        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+      - name: Setup problem matchers
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Install PHP 7 Dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-dist --no-interaction --no-progress
+        if: "matrix.php < 8"
+
+      - name: Setup PHP 8 Dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "phpunit/phpunit:^9.3.2" "doctrine/dbal:^3.0" --no-update --no-interaction
+        if: "matrix.php >= 8"
+
+      - name: Install PHP 8 Dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --ignore-platform-req=php
+        if: "matrix.php >= 8"
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose

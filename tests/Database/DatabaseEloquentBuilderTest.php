@@ -449,7 +449,9 @@ class DatabaseEloquentBuilderTest extends TestCase
             return $bar;
         });
 
-        Builder::macro('bam', [Builder::class, 'getQuery']);
+        Builder::macro('bam', function () {
+            return $this->getQuery();
+        });
 
         $builder = $this->getBuilder();
 

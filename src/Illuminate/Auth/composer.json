@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2|^8.0",
         "illuminate/contracts": "^6.0",
         "illuminate/http": "^6.0",
         "illuminate/queue": "^6.0",
