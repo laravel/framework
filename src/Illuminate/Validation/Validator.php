@@ -435,13 +435,16 @@ class Validator implements ValidatorContract
     /**
      * Run the validator's rules against its data.
      *
-     * @return array
-     *
+     * @param  \Closure|null  $onFail
      * @throws \Illuminate\Validation\ValidationException
+     * @return array
      */
-    public function validate()
+    public function validate($onFail = null)
     {
         if ($this->fails()) {
+            if ($onFail) {
+                $onFail($this);
+            }
             throw new ValidationException($this);
         }
 
