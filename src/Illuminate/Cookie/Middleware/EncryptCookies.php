@@ -3,8 +3,8 @@
 namespace Illuminate\Cookie\Middleware;
 
 use Closure;
-use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Cookie\CookieValuePrefix;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -152,7 +152,7 @@ class EncryptCookies
             }
 
             $response->headers->setCookie($this->duplicate(
-                $cookie, $this->encrypter->encrypt($prefix . $cookie->getValue(), static::serialized($cookie->getName()))
+                $cookie, $this->encrypter->encrypt($prefix.$cookie->getValue(), static::serialized($cookie->getName()))
             ));
         }
 
