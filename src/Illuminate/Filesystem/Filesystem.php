@@ -278,21 +278,10 @@ class Filesystem
      *
      * @param  string  $target
      * @param  string  $link
-     * @param  bool  $relative
      * @return void
      */
-    public function link($target, $link, $relative = false)
+    public function link($target, $link)
     {
-        if ($relative) {
-            if (! class_exists(SymfonyFilesystem::class)) {
-                throw new RuntimeException(
-                    'To enable support for relative links, please install the symfony/filesystem package.'
-                );
-            }
-
-            $target = (new SymfonyFilesystem)->makePathRelative($target, dirname($link));
-        }
-
         if (! windows_os()) {
             return symlink($target, $link);
         }
@@ -300,6 +289,26 @@ class Filesystem
         $mode = $this->isDirectory($target) ? 'J' : 'H';
 
         exec("mklink /{$mode} ".escapeshellarg($link).' '.escapeshellarg($target));
+    }
+
+    /**
+     * Create a relative symlink to the target file or directory.
+     *
+     * @param string $target
+     * @param string $link
+     * @return void
+     */
+    public function relativeLink($target, $link)
+    {
+        if (! class_exists(SymfonyFilesystem::class)) {
+            throw new RuntimeException(
+                'To enable support for relative links, please install the symfony/filesystem package.'
+            );
+        }
+
+        $relativeTarget = (new SymfonyFilesystem)->makePathRelative($target, dirname($link));
+
+        $this->link($relativeTarget, $link);
     }
 
     /**
