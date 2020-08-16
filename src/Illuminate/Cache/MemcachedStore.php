@@ -188,7 +188,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return new MemcachedLock($this->memcached, $this->prefix.$name, $seconds, $owner);
+        return new MemcachedLock($this->memcached, $name, $seconds, $owner);
     }
 
     /**
