@@ -294,8 +294,8 @@ class Filesystem
     /**
      * Create a relative symlink to the target file or directory.
      *
-     * @param string $target
-     * @param string $link
+     * @param  string  $target
+     * @param  string  $link
      * @return void
      */
     public function relativeLink($target, $link)
