@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
+use Exception;
 use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Console\Scheduling\EventMutex;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
-use Exception;
 
 class CallbackEventTest extends TestCase
 {
@@ -17,7 +17,8 @@ class CallbackEventTest extends TestCase
 
     public function testDefaultResultIsSuccess()
     {
-        $event = new CallbackEvent(m::mock(EventMutex::class), function() {});
+        $event = new CallbackEvent(m::mock(EventMutex::class), function () {
+        });
 
         $event->run($this->app);
 
@@ -26,7 +27,7 @@ class CallbackEventTest extends TestCase
 
     public function testFalseResponseIsFailure()
     {
-        $event = new CallbackEvent(m::mock(EventMutex::class), function() {
+        $event = new CallbackEvent(m::mock(EventMutex::class), function () {
             return false;
         });
 
@@ -37,20 +38,21 @@ class CallbackEventTest extends TestCase
 
     public function testExceptionIsFailure()
     {
-        $event = new CallbackEvent(m::mock(EventMutex::class), function() {
+        $event = new CallbackEvent(m::mock(EventMutex::class), function () {
             throw new \Exception;
         });
 
         try {
             $event->run($this->app);
-        } catch(Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         $this->assertSame(1, $event->exitCode);
     }
 
     public function testExceptionBubbles()
     {
-        $event = new CallbackEvent(m::mock(EventMutex::class), function() {
+        $event = new CallbackEvent(m::mock(EventMutex::class), function () {
             throw new Exception;
         });
 
