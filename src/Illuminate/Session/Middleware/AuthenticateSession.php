@@ -47,11 +47,11 @@ class AuthenticateSession
             }
         }
 
-        if (! $request->session()->has($this->auth->getDefaultDriver().'_password_hash')) {
+        if (! $request->session()->has('password_hash_'.$this->auth->getDefaultDriver())) {
             $this->storePasswordHashInSession($request);
         }
 
-        if ($request->session()->get($this->auth->getDefaultDriver().'_password_hash') !== $request->user()->getAuthPassword()) {
+        if ($request->session()->get('password_hash_'.$this->auth->getDefaultDriver()) !== $request->user()->getAuthPassword()) {
             $this->logout($request);
         }
 
@@ -73,7 +73,7 @@ class AuthenticateSession
         }
 
         $request->session()->put([
-            $this->auth->getDefaultDriver().'_password_hash' => $request->user()->getAuthPassword(),
+            'password_hash_'.$this->auth->getDefaultDriver() => $request->user()->getAuthPassword(),
         ]);
     }
 
