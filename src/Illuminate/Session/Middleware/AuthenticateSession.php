@@ -45,6 +45,8 @@ class AuthenticateSession
             if ($passwordHash != $request->user()->getAuthPassword()) {
                 $this->logout($request);
             }
+
+            return $next($request);
         }
 
         if (! $request->session()->has($this->auth->getDefaultDriver().'_password_hash')) {
