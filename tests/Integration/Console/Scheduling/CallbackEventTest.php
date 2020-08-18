@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Console\Scheduling;
+namespace Illuminate\Tests\Integration\Console\Scheduling;
 
 use Exception;
 use Illuminate\Console\Scheduling\CallbackEvent;
@@ -8,10 +8,15 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
+/**
+ * @group integration
+ */
 class CallbackEventTest extends TestCase
 {
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         m::close();
     }
 
