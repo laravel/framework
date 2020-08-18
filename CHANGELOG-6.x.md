@@ -1,6 +1,13 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.33...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.34...6.x)
+
+
+## [v6.18.33 (2020-08-06)](https://github.com/laravel/framework/compare/v6.18.33...v6.18.34)
+
+### Fixed
+- Fixed `Illuminate\Support\Arr::query()` ([c6f9ae2](https://github.com/laravel/framework/commit/c6f9ae2b6fdc3c1716938223de731b97f6a5a255))
+- Dont allow mass filling with table names ([9240404](https://github.com/laravel/framework/commit/9240404b22ef6f9e827577b3753e4713ddce7471), [f5fa6e3](https://github.com/laravel/framework/commit/f5fa6e3a0fbf9a93eab45b9ae73265b4dbfc3ad7))
 
 
 ## [v6.18.33 (2020-08-06)](https://github.com/laravel/framework/compare/v6.18.32...v6.18.33)
