@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v7.23.2...7.x)
 
 
-## [v7.23.1 (2020-08-06)](https://github.com/laravel/framework/compare/v7.23.1...v7.23.2)
+## [v7.23.2 (2020-08-06)](https://github.com/laravel/framework/compare/v7.23.1...v7.23.2)
 
 ### Fixed
 - Fixed `Illuminate\Support\Arr::query()` ([c6f9ae2](https://github.com/laravel/framework/commit/c6f9ae2b6fdc3c1716938223de731b97f6a5a255))
