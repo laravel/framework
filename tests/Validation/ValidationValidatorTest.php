@@ -1797,6 +1797,24 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => [1, 2]], ['foo' => 'Array|Min:3']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'String|Min:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'String|Min:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '01'], ['foo' => 'String|Numeric|Min:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'String|Numeric|Min:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '12'], ['foo' => 'String|Numeric|Min:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'String|Numeric|Min:3']);
+        $this->assertTrue($v->passes());
+
         $file = $this->getMockBuilder(File::class)->setMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $file->expects($this->any())->method('getSize')->willReturn(3072);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Min:2']);
@@ -1828,6 +1846,21 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Max:2']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'aslksd'], ['foo' => 'String|Max:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'String|Max:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'String|Numeric|Max:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '12'], ['foo' => 'String|Numeric|Max:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'String|Numeric|Max:3']);
+        $this->assertTrue($v->passes());
 
         $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, basename(__FILE__)])->getMock();
         $file->expects($this->any())->method('isValid')->willReturn(true);

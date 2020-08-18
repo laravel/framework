@@ -1774,15 +1774,18 @@ trait ValidatesAttributes
         $hasNumeric = $this->hasRule($attribute, $this->numericRules);
 
         // This method will determine if the attribute is a number, string, or file and
-        // return the proper size accordingly. If it is a number, then number itself
-        // is the size. If it is a file, we take kilobytes, and for a string the
-        // entire length of the string will be considered the attribute size.
-        if (is_numeric($value) && $hasNumeric) {
-            return $value;
-        } elseif (is_array($value)) {
-            return count($value);
-        } elseif ($value instanceof File) {
-            return $value->getSize() / 1024;
+        // return the proper size accordingly. If the attrbute must validate as a string,
+        // the length of the string is returned. If it is a number, then number itself
+        // is the size. If it is a file, we take kilobytes, for all others a string is
+        // assumed and the entire length of the string will be considered the attribute size.
+        if (! $this->hasRule($attribute, ['String'])) {
+            if (is_numeric($value) && $hasNumeric) {
+                return $value;
+            } elseif (is_array($value)) {
+                return count($value);
+            } elseif ($value instanceof File) {
+                return $value->getSize() / 1024;
+            }
         }
 
         return mb_strlen($value);
