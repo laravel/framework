@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.18.34...6.x)
 
 
-## [v6.18.33 (2020-08-06)](https://github.com/laravel/framework/compare/v6.18.33...v6.18.34)
+## [v6.18.34 (2020-08-06)](https://github.com/laravel/framework/compare/v6.18.33...v6.18.34)
 
 ### Fixed
 - Fixed `Illuminate\Support\Arr::query()` ([c6f9ae2](https://github.com/laravel/framework/commit/c6f9ae2b6fdc3c1716938223de731b97f6a5a255))
