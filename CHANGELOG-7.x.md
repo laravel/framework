@@ -1,6 +1,24 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.24.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.25.0...7.x)
+
+
+## [v7.25.0 (2020-08-11)](https://github.com/laravel/framework/compare/v7.24.0...v7.25.0)
+
+### Added
+- Added support to use `where` in `apiResource` method ([#33790](https://github.com/laravel/framework/pull/33790), [3dcc4a6](https://github.com/laravel/framework/commit/3dcc4a6bc6640b3d577c6740d63b6ef3df42e124))
+- Support `tls://` scheme when using `url` in Redis config ([#33800](https://github.com/laravel/framework/pull/33800))
+- Scoped resource routes ([#33752](https://github.com/laravel/framework/pull/33752))
+- Added Once blade Blocks ([#33812](https://github.com/laravel/framework/pull/33812))
+- Let mailables accept a simple array of email addresses as cc or bcc ([#33810](https://github.com/laravel/framework/pull/33810))
+- Added support for PhpRedis 5.3 options parameter ([#33799](https://github.com/laravel/framework/pull/33799))
+
+### Changed
+- Removed quotes when setting isolation level for mysql connections ([#33805](https://github.com/laravel/framework/pull/33805))
+- Make LazyCollection#countBy be lazy ([#33801](https://github.com/laravel/framework/pull/33801))
+
+### Fixed
+- Revert changes to MailMessage ([#33816](https://github.com/laravel/framework/pull/33816))
 
 
 ## [v7.24.0 (2020-08-07)](https://github.com/laravel/framework/compare/v7.23.2...v7.24.0)
