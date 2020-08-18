@@ -1,6 +1,16 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.23.2...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.24.0...7.x)
+
+
+## [v7.24.0 (2020-08-07)](https://github.com/laravel/framework/compare/v7.23.2...v7.24.0)
+
+### Added
+- Added possibility to configure isolation level for mysql connections ([#33783](https://github.com/laravel/framework/pull/33783), [c6a3174](https://github.com/laravel/framework/commit/c6a317405e5e9075206a019246a8a79d0c68def4))
+- Added plain text only notifications ([#33781](https://github.com/laravel/framework/pull/33781))
+
+### Changed
+- Verify column names are actual columns when using guarded ([#33777](https://github.com/laravel/framework/pull/33777))
 
 
 ## [v7.23.2 (2020-08-06)](https://github.com/laravel/framework/compare/v7.23.1...v7.23.2)
