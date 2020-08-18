@@ -36,6 +36,19 @@ class LazyCollection implements Enumerable
             $this->source = $this->getArrayableItems($source);
         }
     }
+    
+    /**
+     * Convert source to iterable
+     *
+     * @param $source
+     * @return static
+     */
+    private function push($source)
+    {
+        return (new static(function () use ($source) {
+            yield from $source;
+        }));
+    }
 
     /**
      * Create a new instance with no items.
