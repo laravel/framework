@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Exception;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 use LogicException;
@@ -76,11 +77,17 @@ class CallbackEvent extends Event
             $response = is_object($this->callback)
                         ? $container->call([$this->callback, '__invoke'], $this->parameters)
                         : $container->call($this->callback, $this->parameters);
+        } catch (Exception $e) {
+            $this->exitCode = 1;
+
+            throw $e;
         } finally {
             $this->removeMutex();
 
             parent::callAfterCallbacks($container);
         }
+
+        $this->exitCode = $response === false ? 1 : 0;
 
         return $response;
     }
