@@ -38,7 +38,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Convert source to iterable
+     * Convert source to iterable.
      *
      * @param $source
      * @return static
