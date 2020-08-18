@@ -1,6 +1,16 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.23.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.23.1...7.x)
+
+
+## [v7.23.1 (2020-08-06)](https://github.com/laravel/framework/compare/v7.23.0...v7.23.1)
+
+### Added
+- Added isNotFilled() method to Request ([#33732](https://github.com/laravel/framework/pull/33732))
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Concerns\GuardsAttributes::isGuarded()` ([1b70bef](https://github.com/laravel/framework/commit/1b70bef5fd7cc5da74abcdf79e283f830fa3b0a4), [624d873](https://github.com/laravel/framework/commit/624d873733388aa2246553a3b465e38554953180), [b70876a](https://github.com/laravel/framework/commit/b70876ac80759fbf168c91cdffd7a2b2305e27cb))
+- Fixed escaping quotes ([687df01](https://github.com/laravel/framework/commit/687df01fa19c99546c1ae1dd53c2a465459b50dc))
 
 
 ## [v7.23.0 (2020-08-04)](https://github.com/laravel/framework/compare/v7.22.4...v7.23.0)
