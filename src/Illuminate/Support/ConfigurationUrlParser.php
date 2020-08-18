@@ -17,6 +17,8 @@ class ConfigurationUrlParser
         'postgres' => 'pgsql',
         'postgresql' => 'pgsql',
         'sqlite3' => 'sqlite',
+        'redis' => 'tcp',
+        'rediss' => 'tls',
     ];
 
     /**

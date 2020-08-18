@@ -21,6 +21,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest stub(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
  * @method static \Illuminate\Http\Client\PendingRequest withBasicAuth(string $username, string $password)
+ * @method static \Illuminate\Http\Client\PendingRequest withBody(resource|string $content, string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest withCookies(array $cookies, string $domain)
  * @method static \Illuminate\Http\Client\PendingRequest withDigestAuth(string $username, string $password)
  * @method static \Illuminate\Http\Client\PendingRequest withHeaders(array $headers)
