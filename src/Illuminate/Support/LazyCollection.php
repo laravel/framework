@@ -36,7 +36,7 @@ class LazyCollection implements Enumerable
             $this->source = $this->getArrayableItems($source);
         }
     }
-    
+
     /**
      * Convert source to iterable
      *
@@ -45,9 +45,9 @@ class LazyCollection implements Enumerable
      */
     private function push($source)
     {
-        return (new static(function () use ($source) {
+        return new static(function () use ($source) {
             yield from $source;
-        }));
+        });
     }
 
     /**
