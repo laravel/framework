@@ -34,7 +34,7 @@ class CastMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->formatStubPath('/stubs/cast.stub');
+        return $this->resolveStubPath('/stubs/cast.stub');
     }
 
     /**

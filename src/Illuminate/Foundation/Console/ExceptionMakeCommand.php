@@ -36,16 +36,14 @@ class ExceptionMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('render')) {
-            $relativePath = $this->option('report')
-                ? '/stubs/exception-render-report.stub'
-                : '/stubs/exception-render.stub';
-        } else {
-            $relativePath = $this->option('report')
-                ? '/stubs/exception-report.stub'
-                : '/stubs/exception.stub';
+            return $this->option('report')
+                ? $this->resolveStubPath('/stubs/exception-render-report.stub')
+                : $this->resolveStubPath('/stubs/exception-render.stub');
         }
 
-        return $this->formatStubPath($relativePath);
+        return $this->option('report')
+            ? $this->resolveStubPath('/stubs/exception-report.stub')
+            : $this->resolveStubPath('/stubs/exception.stub');
     }
 
     /**

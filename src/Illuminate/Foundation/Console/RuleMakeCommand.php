@@ -34,7 +34,7 @@ class RuleMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->formatStubPath('/stubs/rule.stub');
+        return $this->resolveStubPath('/stubs/rule.stub');
     }
 
     /**
