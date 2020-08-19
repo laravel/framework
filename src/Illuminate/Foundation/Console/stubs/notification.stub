@@ -1,13 +1,13 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class DummyClass extends Notification
+class {{ class }} extends Notification
 {
     use Queueable;
 

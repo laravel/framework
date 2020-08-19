@@ -57,7 +57,7 @@ class NotificationMakeCommand extends GeneratorCommand
             $this->files->makeDirectory(dirname($path), 0755, true);
         }
 
-        $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
+        $this->files->put($path, file_get_contents($this->resolveStubPath('/stubs/markdown.stub')));
     }
 
     /**
@@ -71,7 +71,7 @@ class NotificationMakeCommand extends GeneratorCommand
         $class = parent::buildClass($name);
 
         if ($this->option('markdown')) {
-            $class = str_replace('DummyView', $this->option('markdown'), $class);
+            $class = str_replace(['DummyView', '{{ view }}'], $this->option('markdown'), $class);
         }
 
         return $class;
@@ -85,8 +85,8 @@ class NotificationMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->option('markdown')
-                        ? __DIR__.'/stubs/markdown-notification.stub'
-                        : __DIR__.'/stubs/notification.stub';
+            ? $this->resolveStubPath('/stubs/markdown-notification.stub')
+            : $this->resolveStubPath('/stubs/notification.stub');
     }
 
     /**
