@@ -2,9 +2,9 @@
 
 namespace Illuminate\Console;
 
-use ReflectionClass;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
+use ReflectionClass;
 use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command
