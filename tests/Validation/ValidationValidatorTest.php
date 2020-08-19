@@ -3953,6 +3953,15 @@ class ValidationValidatorTest extends TestCase
             'foo\.bar' => 'required|in:valid',
         ]);
         $this->assertTrue($v->fails());
+        $this->assertArrayHasKey('foo.bar', $v->errors()->getMessages());
+
+        $v = new Validator($trans, [
+            'foo.bar' => 'valid',
+        ], [
+            'foo\.bar' => 'required|in:valid',
+        ]);
+        $this->assertTrue($v->passes());
+        $this->assertArrayHasKey('foo.bar', $v->validated());
     }
 
     public function testCoveringEmptyKeys()
