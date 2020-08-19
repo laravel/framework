@@ -57,9 +57,7 @@ class MailMakeCommand extends GeneratorCommand
             $this->files->makeDirectory(dirname($path), 0755, true);
         }
 
-        $markdownPath = $this->formatStubPath('/stubs/markdown.stub');
-
-        $this->files->put($path, file_get_contents($markdownPath));
+        $this->files->put($path, file_get_contents($this->resolveStubPath('/stubs/markdown.stub')));
     }
 
     /**
@@ -86,11 +84,9 @@ class MailMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $relativePath = $this->option('markdown')
-                        ? '/stubs/markdown-mail.stub'
-                        : '/stubs/mail.stub';
-
-        return $this->formatStubPath($relativePath);
+        return $this->option('markdown')
+            ? $this->resolveStubPath('/stubs/markdown-mail.stub')
+            : $this->resolveStubPath('/stubs/mail.stub');
     }
 
     /**
