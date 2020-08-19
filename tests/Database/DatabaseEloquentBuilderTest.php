@@ -1043,6 +1043,19 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey($int);
     }
 
+    public function testWhereKeyMethodWithStringZero()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 0;
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', (string) $int);
+
+        $builder->whereKey($int);
+    }
+
     public function testWhereKeyMethodWithArray()
     {
         $model = $this->getMockModel();
@@ -1068,6 +1081,19 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->whereKey($collection);
     }
+
+    public function testWhereKeyNotMethodWithStringZero()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 0;
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', (string) $int);
+
+        $builder->whereKeyNot($int);
+   }
 
     public function testWhereKeyNotMethodWithInt()
     {
@@ -1444,4 +1470,13 @@ class EloquentBuilderTestStubWithoutTimestamp extends Model
     const UPDATED_AT = null;
 
     protected $table = 'table';
+}
+
+class EloquentBuilderTestStubStringPrimaryKey extends Model
+{
+    public $incrementing = false;
+
+    protected $table = 'foo_table';
+
+    protected $keyType = 'string';
 }
