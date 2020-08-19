@@ -40,7 +40,7 @@ class LazyCollection implements Enumerable
     /**
      * Convert source to iterable.
      *
-     * @param $source
+     * @param mixed $source
      * @return static
      */
     private function push($source)
