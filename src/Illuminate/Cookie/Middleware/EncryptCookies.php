@@ -80,7 +80,11 @@ class EncryptCookies
             }
 
             try {
-                $request->cookies->set($key, $this->decryptCookie($key, $cookie));
+                $value = $this->decryptCookie($key, $cookie);
+
+                $request->cookies->set(
+                    $key, strpos($value, sha1($key).'|') !== 0 ? null : substr($value, 41)
+                );
             } catch (DecryptException $e) {
                 $request->cookies->set($key, null);
             }
@@ -136,7 +140,11 @@ class EncryptCookies
             }
 
             $response->headers->setCookie($this->duplicate(
-                $cookie, $this->encrypter->encrypt($cookie->getValue(), static::serialized($cookie->getName()))
+                $cookie,
+                $this->encrypter->encrypt(
+                    sha1($cookie->getName()).'|'.$cookie->getValue(),
+                    static::serialized($cookie->getName())
+                )
             ));
         }
 
