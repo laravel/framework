@@ -52,8 +52,8 @@ class ObserverMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->option('model')
-                    ? __DIR__.'/stubs/observer.stub'
-                    : __DIR__.'/stubs/observer.plain.stub';
+            ? $this->resolveStubPath('/stubs/observer.stub')
+            : $this->resolveStubPath('/stubs/observer.plain.stub');
     }
 
     /**
@@ -70,9 +70,17 @@ class ObserverMakeCommand extends GeneratorCommand
         $namespaceModel = $this->laravel->getNamespace().$model;
 
         if (Str::startsWith($model, '\\')) {
-            $stub = str_replace('NamespacedDummyModel', trim($model, '\\'), $stub);
+            $stub = str_replace(
+                ['NamespacedDummyModel', '{{ namespacedModel }}', '{{namespacedModel}}'],
+                trim($model, '\\'),
+                $stub
+            );
         } else {
-            $stub = str_replace('NamespacedDummyModel', $namespaceModel, $stub);
+            $stub = str_replace(
+                ['NamespacedDummyModel', '{{ namespacedModel }}', '{{namespacedModel}}'],
+                $namespaceModel,
+                $stub
+            );
         }
 
         $stub = str_replace(
@@ -81,11 +89,15 @@ class ObserverMakeCommand extends GeneratorCommand
 
         $model = class_basename(trim($model, '\\'));
 
-        $stub = str_replace('DocDummyModel', Str::snake($model, ' '), $stub);
+        $stub = str_replace(
+            ['DocDummyModel', '{{ docModel }}', '{{docModel}}'],
+            Str::snake($model, ' '),
+            $stub
+        );
 
-        $stub = str_replace('DummyModel', $model, $stub);
+        $stub = str_replace(['DummyModel', '{{ model }}', '{{model}}'], $model, $stub);
 
-        return str_replace('dummyModel', Str::camel($model), $stub);
+        return str_replace(['dummyModel', '{{ variableModel }}', '{{variableModel}}'], Str::camel($model), $stub);
     }
 
     /**
