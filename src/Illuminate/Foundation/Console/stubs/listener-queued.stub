@@ -1,8 +1,8 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
-use DummyFullEvent;
+use {{ namespacedEvent }};
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -23,10 +23,10 @@ class DummyClass implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  DummyEvent  $event
+     * @param  \{{ namespacedEvent }}  $event
      * @return void
      */
-    public function handle(DummyEvent $event)
+    public function handle({{ event }} $event)
     {
         //
     }
