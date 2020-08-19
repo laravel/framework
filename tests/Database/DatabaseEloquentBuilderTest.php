@@ -78,6 +78,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindOrNewMethodModelFound()
     {
         $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $model->shouldReceive('findOrNew')->once()->andReturn('baz');
 
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
@@ -93,6 +94,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindOrNewMethodModelNotFound()
     {
         $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $model->shouldReceive('findOrNew')->once()->andReturn(m::mock(Model::class));
 
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
@@ -111,7 +113,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->expectException(ModelNotFoundException::class);
 
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
-        $builder->setModel($this->getMockModel());
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->setModel($model);
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
         $builder->findOrFail('bar', ['column']);
@@ -1040,6 +1044,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $int = 1;
 
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', $int);
 
         $builder->whereKey($int);
@@ -1105,6 +1110,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $int = 1;
 
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', $int);
 
         $builder->whereKeyNot($int);
