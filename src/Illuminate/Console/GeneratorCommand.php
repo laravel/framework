@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use ReflectionClass;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -129,7 +130,7 @@ abstract class GeneratorCommand extends Command
     {
         return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
             ? $customPath
-            : __DIR__.$relativePath;
+            : dirname((new ReflectionClass(static::class))->getFileName()).$relativePath;
     }
 
     /**
