@@ -119,6 +119,20 @@ abstract class GeneratorCommand extends Command
     abstract protected function getStub();
 
     /**
+     * Get the absolute stub file path.
+     *
+     * @param string $relativePath
+     *
+     * @return string
+     */
+    protected function formatStubPath(string $relativePath)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
+            ? $customPath
+            : __DIR__.$relativePath;
+    }
+
+    /**
      * Execute the console command.
      *
      * @return bool|null
