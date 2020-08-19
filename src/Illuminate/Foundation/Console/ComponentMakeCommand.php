@@ -79,14 +79,14 @@ class ComponentMakeCommand extends GeneratorCommand
     {
         if ($this->option('inline')) {
             return str_replace(
-                'DummyView',
+                ['DummyView', '{{ view }}'],
                 "<<<'blade'\n<div>\n    <!-- ".Inspiring::quote()." -->\n</div>\nblade",
                 parent::buildClass($name)
             );
         }
 
         return str_replace(
-            'DummyView',
+            ['DummyView', '{{ view }}'],
             'view(\'components.'.$this->getView().'\')',
             parent::buildClass($name)
         );
@@ -115,7 +115,7 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/view-component.stub';
+        return $this->resolveStubPath('/stubs/view-component.stub');
     }
 
     /**
