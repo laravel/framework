@@ -36,7 +36,7 @@ class ChannelMakeCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         return str_replace(
-            'DummyUser',
+            ['DummyUser', '{{ userModel }}'],
             class_basename($this->userProviderModel()),
             parent::buildClass($name)
         );
@@ -49,7 +49,11 @@ class ChannelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/channel.stub';
+        $relativePath = '/stubs/channel.stub';
+
+        return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
+            ? $customPath
+            : __DIR__.$relativePath;
     }
 
     /**
