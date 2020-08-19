@@ -34,11 +34,7 @@ class CastMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $relativePath = '/stubs/cast.stub';
-
-        return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
-            ? $customPath
-            : __DIR__.$relativePath;
+        return $this->formatStubPath('/stubs/cast.stub');
     }
 
     /**

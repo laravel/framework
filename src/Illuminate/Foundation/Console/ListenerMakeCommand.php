@@ -73,9 +73,7 @@ class ListenerMakeCommand extends GeneratorCommand
                 : '/stubs/listener-duck.stub';
         }
 
-        return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
-            ? $customPath
-            : __DIR__.$relativePath;
+        return $this->formatStubPath($relativePath);
     }
 
     /**
