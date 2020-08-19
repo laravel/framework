@@ -31,7 +31,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindMethod()
     {
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
-        $builder->setModel($this->getMockModel());
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn('baz');
 
@@ -1093,7 +1095,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', (string) $int);
 
         $builder->whereKeyNot($int);
-   }
+    }
 
     public function testWhereKeyNotMethodWithInt()
     {
