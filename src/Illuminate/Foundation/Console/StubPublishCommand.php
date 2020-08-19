@@ -62,6 +62,8 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Foundation/Console/stubs/listener-duck.stub') => $stubsPath.'/listener-duck.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/listener-queued.stub') => $stubsPath.'/listener-queued.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/listener-queued-duck.stub') => $stubsPath.'/listener-queued-duck.stub',
+            realpath(__DIR__.'/../../Foundation/Console/stubs/mail.stub') => $stubsPath.'/mail.stub',
+            realpath(__DIR__.'/../../Foundation/Console/stubs/markdown.stub') => $stubsPath.'/markdown.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.api.stub') => $stubsPath.'/controller.api.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.invokable.stub') => $stubsPath.'/controller.invokable.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.model.api.stub') => $stubsPath.'/controller.model.api.stub',
