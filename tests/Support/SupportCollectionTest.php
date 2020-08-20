@@ -18,6 +18,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
 
 class SupportCollectionTest extends TestCase
 {
@@ -3417,6 +3418,24 @@ class SupportCollectionTest extends TestCase
         $actual = $firstCollection->concat($thirdCollection)->toArray();
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testDump($collection)
+    {
+        $log = new Collection();
+
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        (new $collection([1, 2, 3]))->dump('one', 'two');
+
+        $this->assertSame(['one', 'two', [1, 2, 3]], $log->all());
+
+        VarDumper::setHandler(null);
     }
 
     /**
