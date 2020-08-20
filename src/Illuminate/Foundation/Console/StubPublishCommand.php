@@ -58,7 +58,7 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Foundation/Console/stubs/exception-render.stub') => $stubsPath.'/exception-render.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/exception-render-report.stub') => $stubsPath.'/exception-render-report.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/exception-report.stub') => $stubsPath.'/exception-report.stub',
-            realpath(__DIR__.'/../../Foundation/Console/stubs/listener.stub') => $stubsPath.'/listener.stu',
+            realpath(__DIR__.'/../../Foundation/Console/stubs/listener.stub') => $stubsPath.'/listener.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/listener-duck.stub') => $stubsPath.'/listener-duck.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/listener-queued.stub') => $stubsPath.'/listener-queued.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/listener-queued-duck.stub') => $stubsPath.'/listener-queued-duck.stub',
