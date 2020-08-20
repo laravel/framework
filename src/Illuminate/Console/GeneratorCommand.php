@@ -125,7 +125,7 @@ abstract class GeneratorCommand extends Command
      * @param  string  $stub
      * @return string
      */
-    protected function resolveStubPath(string $stub)
+    protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
