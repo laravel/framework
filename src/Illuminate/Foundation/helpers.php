@@ -758,13 +758,17 @@ if (! function_exists('route')) {
     /**
      * Generate the URL to a named route.
      *
-     * @param  array|string  $name
+     * @param  array|string|null  $name
      * @param  mixed  $parameters
      * @param  bool  $absolute
-     * @return string
+     * @return string|\Illuminate\Routing\Router
      */
-    function route($name, $parameters = [], $absolute = true)
+    function route($name = null, $parameters = [], $absolute = true)
     {
+        if (is_null($name)) {
+            return app('router');
+        }
+
         return app('url')->route($name, $parameters, $absolute);
     }
 }
