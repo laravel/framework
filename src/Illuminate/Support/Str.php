@@ -371,6 +371,21 @@ class Str
     }
 
     /**
+     * Wrap a string with a given value or values.
+     *
+     * @param  string  $value
+     * @param  string  $start
+     * @param  string|null  $end
+     * @return string
+     */
+    public static function wrap($value, $start, $end = null)
+    {
+        $end = $end !== null ? $end : $start;
+
+        return $start.$value.$end;
+    }
+
+    /**
      * Parse a Class[@]method style callback into class and method.
      *
      * @param  string  $callback

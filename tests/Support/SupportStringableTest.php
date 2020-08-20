@@ -68,6 +68,14 @@ class SupportStringableTest extends TestCase
         $this->assertSame(' foo', (string) $this->stringable(' foo ')->rtrim());
     }
 
+    public function testCanBeWrapped()
+    {
+        $this->assertSame('"Illia"', (string) $this->stringable('Illia')->wrap('"'));
+        $this->assertSame('(Sakovich)', (string) $this->stringable('Sakovich')->wrap('(', ')'));
+        $this->assertSame('|Taylor|', (string) $this->stringable('Taylor')->wrap('|'));
+        $this->assertSame('\\Otwell/', (string) $this->stringable('Otwell')->wrap('\\', '/'));
+    }
+
     public function testCanBeLimitedByWords()
     {
         $this->assertSame('Taylor...', (string) $this->stringable('Taylor Otwell')->words(1));

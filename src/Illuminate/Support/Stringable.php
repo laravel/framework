@@ -649,6 +649,18 @@ class Stringable
     }
 
     /**
+     * Wrap a string with a given value or values.
+     *
+     * @param  string  $start
+     * @param  string|null  $end
+     * @return string
+     */
+    public function wrap($start, $end = null)
+    {
+        return new static(Str::wrap($this->value, $start, $end));
+    }
+
+    /**
      * Dump the string.
      *
      * @return $this

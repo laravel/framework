@@ -8,6 +8,14 @@ use Ramsey\Uuid\UuidInterface;
 
 class SupportStrTest extends TestCase
 {
+    public function testStringCanBeWrapped()
+    {
+        $this->assertSame('"Illia"', Str::wrap('Illia', '"'));
+        $this->assertSame('(Sakovich)', Str::wrap('Sakovich', '(', ')'));
+        $this->assertSame('|Taylor|', Str::wrap('Taylor', '|'));
+        $this->assertSame('\\Otwell/', Str::wrap('Otwell', '\\', '/'));
+    }
+
     public function testStringCanBeLimitedByWords()
     {
         $this->assertSame('Taylor...', Str::words('Taylor Otwell', 1));
