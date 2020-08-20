@@ -153,7 +153,7 @@ abstract class Factory
      */
     public static function times(int $count)
     {
-        return new static($count);
+        return static::new()->count($count);
     }
 
     /**
