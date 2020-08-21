@@ -3120,10 +3120,22 @@ class SupportCollectionTest extends TestCase
     public function testPrepend()
     {
         $c = new Collection(['one', 'two', 'three', 'four']);
-        $this->assertEquals(['zero', 'one', 'two', 'three', 'four'], $c->prepend('zero')->all());
+        $this->assertEquals(
+            ['zero', 'one', 'two', 'three', 'four'],
+            $c->prepend('zero')->all()
+        );
 
         $c = new Collection(['one' => 1, 'two' => 2]);
-        $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $c->prepend(0, 'zero')->all());
+        $this->assertEquals(
+            ['zero' => 0, 'one' => 1, 'two' => 2],
+            $c->prepend(0, 'zero')->all()
+        );
+
+        $c = new Collection(['one' => 1, 'two' => 2]);
+        $this->assertEquals(
+            [null => 0, 'one' => 1, 'two' => 2],
+            $c->prepend(0, null)->all()
+        );
     }
 
     public function testPushWithOneItem()

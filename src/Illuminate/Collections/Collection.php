@@ -800,7 +800,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function prepend($value, $key = null)
     {
-        $this->items = Arr::prepend($this->items, $value, $key);
+        $this->items = Arr::prepend($this->items, ...func_get_args());
 
         return $this;
     }
