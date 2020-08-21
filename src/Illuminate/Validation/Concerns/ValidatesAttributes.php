@@ -1505,11 +1505,7 @@ trait ValidatesAttributes
     protected function convertValuesToNull($values)
     {
         return array_map(function ($value) {
-            if (Str::lower($value) === 'null') {
-                return null;
-            }
-
-            return $value;
+            return Str::lower($value) === 'null' ? null : $value;
         }, $values);
     }
 
