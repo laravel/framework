@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Testing\Assert as PHPUnit;
 use JsonSerializable;
 
-class TestJson
+class AssertableJsonString
 {
     /**
      * The original encoded json.
@@ -25,7 +25,7 @@ class TestJson
     protected $decoded;
 
     /**
-     * Create a new test json instance.
+     * Create a new assertable JSON string instance.
      *
      * @param  \Illuminate\Contracts\Support\Jsonable|\JsonSerializable|string  $jsonable
      * @return void

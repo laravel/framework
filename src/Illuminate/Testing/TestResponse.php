@@ -700,13 +700,13 @@ class TestResponse implements ArrayAccess
     /**
      * Validate and return the decoded response JSON.
      *
-     * @return \Illuminate\Testing\TestJson
+     * @return \Illuminate\Testing\AssertableJsonString
      *
      * @throws \Throwable
      */
     public function decodeResponseJson()
     {
-        $testJson = new TestJson($this->getContent());
+        $testJson = new AssertableJsonString($this->getContent());
 
         $decodedResponse = $testJson->json();
 
