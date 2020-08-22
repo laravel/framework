@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\SeederNotAuthorizedException;
 use Mockery as m;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
@@ -15,6 +16,19 @@ class TestSeeder extends Seeder
     public function run()
     {
         //
+    }
+}
+
+class DisabledTestSeeder extends Seeder
+{
+    public function run()
+    {
+        //
+    }
+
+    protected function authorize(): bool
+    {
+        return false;
     }
 }
 
@@ -77,5 +91,16 @@ class DatabaseSeederTest extends TestCase
         $seeder->__invoke();
 
         $container->shouldHaveReceived('call')->once()->with([$seeder, 'run']);
+    }
+
+    public function testDisabledSeeder()
+    {
+        $container = m::mock(Container::class);
+
+        $seeder = new DisabledTestSeeder();
+        $seeder->setContainer($container);
+
+        $this->expectException(SeederNotAuthorizedException::class);
+        $seeder->__invoke();
     }
 }
