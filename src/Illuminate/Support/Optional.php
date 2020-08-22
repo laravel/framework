@@ -55,7 +55,7 @@ class Optional implements ArrayAccess
     public function __isset($name)
     {
         if (is_array($this->value) || $this->value instanceof ArrayAccess) {
-            return $this->value[$name] ?? null;
+            return isset($this->value[$name]);
         }
 
         if (is_object($this->value)) {
