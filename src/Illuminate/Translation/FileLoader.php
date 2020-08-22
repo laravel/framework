@@ -128,7 +128,7 @@ class FileLoader implements Loader
 
     /**
      * Load all JSON files from the given directory path recursively.
-     * Date modified: 22 August 2020
+     * 
      * @param  string  $locale
      * @return array
      *
