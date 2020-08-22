@@ -37,6 +37,10 @@ class Optional implements ArrayAccess
      */
     public function __get($key)
     {
+        if (is_array($this->value) || $this->value instanceof ArrayAccess) {
+            return $this->value[$key] ?? null;
+        }
+
         if (is_object($this->value)) {
             return $this->value->{$key} ?? null;
         }
@@ -50,12 +54,12 @@ class Optional implements ArrayAccess
      */
     public function __isset($name)
     {
-        if (is_object($this->value)) {
-            return isset($this->value->{$name});
+        if (is_array($this->value) || $this->value instanceof ArrayAccess) {
+            return $this->value[$name] ?? null;
         }
 
-        if (is_array($this->value) || $this->value instanceof ArrayObject) {
-            return isset($this->value[$name]);
+        if (is_object($this->value)) {
+            return isset($this->value->{$name});
         }
 
         return false;
