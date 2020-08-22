@@ -139,7 +139,7 @@ abstract class Seeder
         }
 
         if (! $this->authorize()) {
-            throw new SeederNotAuthorizedException();
+            throw new SeederNotAuthorizedException(get_class($this) . ' was not authorized to run.');
         }
 
         return isset($this->container)
