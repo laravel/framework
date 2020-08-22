@@ -100,4 +100,15 @@ class SupportOptionalTest extends TestCase
 
         $this->assertFalse(isset($optional->item));
     }
+
+    public function testArrayObject()
+    {
+        $obj = new \ArrayObject(['id' => $id = uniqid()]);
+
+        $optional = new Optional($obj);
+
+        $this->assertTrue(isset($optional->id));
+        $this->assertFalse(isset($optional->name));
+        $this->assertSame($id, $optional->id);
+    }
 }
