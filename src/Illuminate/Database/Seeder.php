@@ -114,7 +114,7 @@ abstract class Seeder
     /**
      * Set the console command instance.
      *
-     * @param \Illuminate\Console\Command $command
+     * @param  \Illuminate\Console\Command  $command
      * @return $this
      */
     public function setCommand(Command $command)
@@ -134,11 +134,11 @@ abstract class Seeder
      */
     public function __invoke()
     {
-        if (!method_exists($this, 'run')) {
+        if (! method_exists($this, 'run')) {
             throw new InvalidArgumentException('Method [run] missing from ' . get_class($this));
         }
 
-        if (!$this->authorize()) {
+        if (! $this->authorize()) {
             throw new SeederNotAuthorizedException();
         }
 
