@@ -39,17 +39,24 @@ abstract class Seeder
 
             $name = get_class($seeder);
 
-            if ($silent === false && isset($this->command)) {
+            if ($this->shouldBeWritten($silent)) {
                 $this->command->getOutput()->writeln("<comment>Seeding:</comment> {$name}");
             }
 
             $startTime = microtime(true);
 
-            $seeder->__invoke();
+            try {
+                $seeder->__invoke();
+            } catch (SeederNotAuthorizedException $e) {
+                if ($this->shouldBeWritten($silent)) {
+                    $this->command->getOutput()->writeln("<info>Skipped:</info>  {$name}");
+                }
+                continue;
+            }
 
             $runTime = round(microtime(true) - $startTime, 2);
 
-            if ($silent === false && isset($this->command)) {
+            if ($this->shouldBeWritten($silent)) {
                 $this->command->getOutput()->writeln("<info>Seeded:</info>  {$name} ({$runTime} seconds)");
             }
         }
@@ -107,7 +114,7 @@ abstract class Seeder
     /**
      * Set the console command instance.
      *
-     * @param  \Illuminate\Console\Command  $command
+     * @param \Illuminate\Console\Command $command
      * @return $this
      */
     public function setCommand(Command $command)
@@ -123,15 +130,41 @@ abstract class Seeder
      * @return mixed
      *
      * @throws \InvalidArgumentException
+     * @throws SeederNotAuthorizedException
      */
     public function __invoke()
     {
-        if (! method_exists($this, 'run')) {
-            throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
+        if (!method_exists($this, 'run')) {
+            throw new InvalidArgumentException('Method [run] missing from ' . get_class($this));
+        }
+
+        if (!$this->authorize()) {
+            throw new SeederNotAuthorizedException();
         }
 
         return isset($this->container)
-                    ? $this->container->call([$this, 'run'])
-                    : $this->run();
+            ? $this->container->call([$this, 'run'])
+            : $this->run();
+    }
+
+    /**
+     * Authorize call
+     *
+     * @return bool
+     */
+    protected function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Checks if anything should be written in the console output
+     *
+     * @param  bool  $silent
+     * @return $this
+     */
+    protected function shouldBeWritten(bool $silent): bool
+    {
+        return $silent === false && isset($this->command);
     }
 }
