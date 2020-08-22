@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
-use ArrayObject;
 
 class Optional implements ArrayAccess
 {
