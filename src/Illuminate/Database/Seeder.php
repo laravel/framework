@@ -135,11 +135,11 @@ abstract class Seeder
     public function __invoke()
     {
         if (! method_exists($this, 'run')) {
-            throw new InvalidArgumentException('Method [run] missing from ' . get_class($this));
+            throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
         if (! $this->authorize()) {
-            throw new SeederNotAuthorizedException(get_class($this) . ' was not authorized to run.');
+            throw new SeederNotAuthorizedException(get_class($this).' was not authorized to run.');
         }
 
         return isset($this->container)
@@ -148,7 +148,7 @@ abstract class Seeder
     }
 
     /**
-     * Authorize call
+     * Authorizes call.
      *
      * @return bool
      */
@@ -158,7 +158,7 @@ abstract class Seeder
     }
 
     /**
-     * Checks if anything should be written in the console output
+     * Checks if anything should be written in the console output.
      *
      * @param  bool  $silent
      * @return $this
