@@ -127,8 +127,8 @@ class FileLoader implements Loader
     }
 
     /**
-     * Load a locale from the given JSON file path.
-     *
+     * Load all JSON files from the given directory path recursively.
+     * Date modified: 22 August 2020
      * @param  string  $locale
      * @return array
      *
@@ -136,16 +136,22 @@ class FileLoader implements Loader
      */
     protected function loadJsonPaths($locale)
     {
+
         return collect(array_merge($this->jsonPaths, [$this->path]))
             ->reduce(function ($output, $path) use ($locale) {
-                if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-                    $decoded = json_decode($this->files->get($full), true);
 
-                    if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
-                        throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
+                $files = $this->files->allFiles("{$path}/$locale");
+
+                foreach ($files as $file) {
+                    if ($this->files->exists($file) && $this->files->extension($file) === 'json') {
+                        $decoded = json_decode($this->files->get($file), true);
+
+                        if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+                            throw new RuntimeException("Translation file [{$file}] contains an invalid JSON structure.");
+                        }
                     }
-
-                    $output = array_merge($output, $decoded);
+                    // If $decoded return an empty string, replace with an empty array
+                    $output = array_merge($output, ($decoded ?? []));
                 }
 
                 return $output;
