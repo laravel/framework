@@ -1095,7 +1095,7 @@ class LazyCollection implements Enumerable
 
             $chunk = [];
             while ($iterator->valid()) {
-                if (isset($previous) && !$callback($previous, $iterator->current())) {
+                if (isset($previous) && ! $callback($previous, $iterator->current())) {
                     yield new static($chunk);
                     $chunk = [];
                 }

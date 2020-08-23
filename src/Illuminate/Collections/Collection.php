@@ -1082,7 +1082,7 @@ class Collection implements ArrayAccess, Enumerable
 
         $chunk = [];
         foreach ($this->items as $current) {
-            if (isset($previous) && !$callback($previous, $current)) {
+            if (isset($previous) && ! $callback($previous, $current)) {
                 $chunks[] = new static($chunk);
                 $chunk = [];
             }

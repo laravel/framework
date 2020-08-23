@@ -1656,7 +1656,7 @@ class SupportCollectionTest extends TestCase
         $this->assertInstanceOf($collection, $data);
         $this->assertInstanceOf($collection, $data->first());
         $this->assertEquals(['A', 'A'], $data->first()->toArray());
-        $this->assertEquals(['B','B'], $data->get(1)->toArray());
+        $this->assertEquals(['B', 'B'], $data->get(1)->toArray());
         $this->assertEquals(['C', 'C', 'C'], $data->last()->toArray());
     }
 
