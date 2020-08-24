@@ -25,7 +25,7 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         php: [7.2, 7.3, 7.4, 8.0]
         stability: [prefer-lowest, prefer-stable]
@@ -84,7 +84,7 @@ jobs:
 
     runs-on: windows-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         php: [7.2, 7.3, 7.4, 8.0]
         include:
