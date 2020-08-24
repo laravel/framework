@@ -1081,6 +1081,7 @@ class Collection implements ArrayAccess, Enumerable
         $chunks = [];
 
         $chunk = [];
+
         foreach ($this->items as $current) {
             if (isset($previous) && ! $callback($previous, $current)) {
                 $chunks[] = new static($chunk);
@@ -1090,7 +1091,8 @@ class Collection implements ArrayAccess, Enumerable
             $chunk[] = $current;
             $previous = $current;
         }
-        // Add the last chunk before closing.
+
+
         $chunks[] = new static($chunk);
 
         return new static($chunks);
