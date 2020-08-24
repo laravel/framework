@@ -15,6 +15,16 @@ trait HasDatabaseNotifications
     }
 
     /**
+     * Get the entity's oldest notifications.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function oldestNotifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')->orderBy('created_at', 'asc');
+    }
+
+    /**
      * Get the entity's read notifications.
      *
      * @return \Illuminate\Database\Query\Builder
