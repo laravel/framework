@@ -35,12 +35,14 @@ class AuthenticateSession
      */
     public function handle($request, Closure $next)
     {
+        $guard = $this->guard();
+
         if (! $request->hasSession() || ! $request->user()) {
             return $next($request);
         }
 
-        if ($this->auth->viaRemember()) {
-            $passwordHash = explode('|', $request->cookies->get($this->auth->getRecallerName()))[2];
+        if ($guard->viaRemember()) {
+            $passwordHash = explode('|', $request->cookies->get($guard->getRecallerName()))[2];
 
             if ($passwordHash != $request->user()->getAuthPassword()) {
                 $this->logout($request);
@@ -87,10 +89,20 @@ class AuthenticateSession
      */
     protected function logout($request)
     {
-        $this->auth->logoutCurrentDevice();
+        $this->guard()->logoutCurrentDevice();
 
         $request->session()->flush();
 
         throw new AuthenticationException('Unauthenticated.', [$this->auth->getDefaultDriver()]);
+    }
+
+    /**
+     * Get the guard instance that should be used by the middleware.
+     *
+     * @return \Illuminate\Contracts\Auth\Factory|\Illuminate\Contracts\Auth\Guard
+     */
+    protected function guard()
+    {
+        return $this->auth;
     }
 }
