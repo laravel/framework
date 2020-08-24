@@ -324,6 +324,7 @@ class SupportArrTest extends TestCase
 
         // Test return default value for non-existing key.
         $array = ['names' => ['developer' => 'taylor']];
+        $this->assertSame('dayle', Arr::get($array, 'name', 'dayle'));
         $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', 'dayle'));
         $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', function () {
             return 'dayle';
