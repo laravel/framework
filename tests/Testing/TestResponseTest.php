@@ -611,6 +611,20 @@ class TestResponseTest extends TestCase
         $testResponse->assertJsonValidationErrors('foo', 'data');
     }
 
+    public function testAssertJsonValidationErrorsCustomNestedErrorsName()
+    {
+        $data = [
+            'status' => 'ok',
+            'data' => ['errors' => ['foo' => 'oops']],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors('foo', 'data.errors');
+    }
+
     public function testAssertJsonValidationErrorsCanFail()
     {
         $this->expectException(AssertionFailedError::class);
