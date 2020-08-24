@@ -1092,7 +1092,6 @@ class Collection implements ArrayAccess, Enumerable
             $previous = $current;
         }
 
-
         $chunks[] = new static($chunk);
 
         return new static($chunks);
