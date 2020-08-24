@@ -32,11 +32,11 @@ class UpdatedBatchJobCounts
     }
 
     /**
-     * Determine if all jobs have ran exactly once.
+     * Determine if all jobs have run exactly once.
      *
      * @return bool
      */
-    public function allJobsHaveRanExactlyOnce()
+    public function allJobsHaveRunExactlyOnce()
     {
         return ($this->pendingJobs - $this->failedJobs) === 0;
     }
