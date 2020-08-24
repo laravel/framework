@@ -34,7 +34,7 @@ trait HasTimestamps
      *
      * @return void
      */
-    public function updateTimestamps()
+    protected function updateTimestamps()
     {
         $time = $this->freshTimestamp();
 
