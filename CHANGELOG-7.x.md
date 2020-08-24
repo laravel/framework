@@ -1,6 +1,51 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.23.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.25.0...7.x)
+
+
+## [v7.25.0 (2020-08-11)](https://github.com/laravel/framework/compare/v7.24.0...v7.25.0)
+
+### Added
+- Added support to use `where` in `apiResource` method ([#33790](https://github.com/laravel/framework/pull/33790), [3dcc4a6](https://github.com/laravel/framework/commit/3dcc4a6bc6640b3d577c6740d63b6ef3df42e124))
+- Support `tls://` scheme when using `url` in Redis config ([#33800](https://github.com/laravel/framework/pull/33800))
+- Scoped resource routes ([#33752](https://github.com/laravel/framework/pull/33752))
+- Added Once blade Blocks ([#33812](https://github.com/laravel/framework/pull/33812))
+- Let mailables accept a simple array of email addresses as cc or bcc ([#33810](https://github.com/laravel/framework/pull/33810))
+- Added support for PhpRedis 5.3 options parameter ([#33799](https://github.com/laravel/framework/pull/33799))
+
+### Changed
+- Removed quotes when setting isolation level for mysql connections ([#33805](https://github.com/laravel/framework/pull/33805))
+- Make LazyCollection#countBy be lazy ([#33801](https://github.com/laravel/framework/pull/33801))
+
+### Fixed
+- Revert changes to MailMessage ([#33816](https://github.com/laravel/framework/pull/33816))
+
+
+## [v7.24.0 (2020-08-07)](https://github.com/laravel/framework/compare/v7.23.2...v7.24.0)
+
+### Added
+- Added possibility to configure isolation level for mysql connections ([#33783](https://github.com/laravel/framework/pull/33783), [c6a3174](https://github.com/laravel/framework/commit/c6a317405e5e9075206a019246a8a79d0c68def4))
+- Added plain text only notifications ([#33781](https://github.com/laravel/framework/pull/33781))
+
+### Changed
+- Verify column names are actual columns when using guarded ([#33777](https://github.com/laravel/framework/pull/33777))
+
+
+## [v7.23.2 (2020-08-06)](https://github.com/laravel/framework/compare/v7.23.1...v7.23.2)
+
+### Fixed
+- Fixed `Illuminate\Support\Arr::query()` ([c6f9ae2](https://github.com/laravel/framework/commit/c6f9ae2b6fdc3c1716938223de731b97f6a5a255))
+- Dont allow mass filling with table names ([9240404](https://github.com/laravel/framework/commit/9240404b22ef6f9e827577b3753e4713ddce7471), [f5fa6e3](https://github.com/laravel/framework/commit/f5fa6e3a0fbf9a93eab45b9ae73265b4dbfc3ad7))
+
+
+## [v7.23.1 (2020-08-06)](https://github.com/laravel/framework/compare/v7.23.0...v7.23.1)
+
+### Added
+- Added isNotFilled() method to Request ([#33732](https://github.com/laravel/framework/pull/33732))
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Concerns\GuardsAttributes::isGuarded()` ([1b70bef](https://github.com/laravel/framework/commit/1b70bef5fd7cc5da74abcdf79e283f830fa3b0a4), [624d873](https://github.com/laravel/framework/commit/624d873733388aa2246553a3b465e38554953180), [b70876a](https://github.com/laravel/framework/commit/b70876ac80759fbf168c91cdffd7a2b2305e27cb))
+- Fixed escaping quotes ([687df01](https://github.com/laravel/framework/commit/687df01fa19c99546c1ae1dd53c2a465459b50dc))
 
 
 ## [v7.23.0 (2020-08-04)](https://github.com/laravel/framework/compare/v7.22.4...v7.23.0)
