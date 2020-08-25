@@ -37,7 +37,7 @@ trait RefreshDatabase
      */
     protected function migrateCommandParameters()
     {
-        return [ ];
+        return [];
     }
 
     /**
@@ -53,7 +53,7 @@ trait RefreshDatabase
     }
 
     /**
-     * Parameters used on migrate fresh conventional database
+     * Parameters used on migrate fresh conventional database.
      *
      * @return array
      */
