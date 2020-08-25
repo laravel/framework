@@ -31,19 +31,19 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
     public function testChunkWhileIsLazy()
     {
-       $collection = LazyCollection::make(['A', 'A', 'B', 'B', 'C', 'C', 'C']);
+        $collection = LazyCollection::make(['A', 'A', 'B', 'B', 'C', 'C', 'C']);
 
-       $this->assertDoesNotEnumerateCollection($collection, function ($collection) {
-           $collection->chunkWhile(function ($current, $key, $chunk) {
-               return $current === $chunk->last();
-           });
-       });
+        $this->assertDoesNotEnumerateCollection($collection, function ($collection) {
+            $collection->chunkWhile(function ($current, $key, $chunk) {
+                return $current === $chunk->last();
+            });
+        });
 
-       $this->assertEnumeratesCollection($collection, 7, function ($collection) {
-           $collection->chunkWhile(function ($current, $key, $chunk) {
-               return $current === $chunk->last();
-           })->take(7)->all();
-       });
+        $this->assertEnumeratesCollection($collection, 7, function ($collection) {
+            $collection->chunkWhile(function ($current, $key, $chunk) {
+                return $current === $chunk->last();
+            })->take(7)->all();
+        });
     }
 
     public function testCollapseIsLazy()
