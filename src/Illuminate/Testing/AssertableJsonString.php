@@ -2,13 +2,14 @@
 
 namespace Illuminate\Testing;
 
+use ArrayAccess;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Assert as PHPUnit;
 use JsonSerializable;
 
-class AssertableJsonString
+class AssertableJsonString implements ArrayAccess
 {
     /**
      * The original encoded json.
@@ -326,5 +327,50 @@ class AssertableJsonString
             $needle.'}',
             $needle.',',
         ];
+    }
+
+    /**
+     * Determine whether an offset exists.
+     *
+     * @param  mixed  $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->decoded[$offset]);
+    }
+
+    /**
+     * Get the value at the given offset.
+     *
+     * @param  string  $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->decoded[$offset];
+    }
+
+    /**
+     * Set the value at the given offset.
+     *
+     * @param  string  $offset
+     * @param  mixed  $value
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->decoded[$offset] = $value;
+    }
+
+    /**
+     * Unset the value at the given offset.
+     *
+     * @param  string  $offset
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->decoded[$offset]);
     }
 }
