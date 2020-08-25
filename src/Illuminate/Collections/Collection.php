@@ -1078,23 +1078,9 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function chunkWhile(callable $callback)
     {
-        $chunks = [];
-
-        $chunk = [];
-
-        foreach ($this->items as $current) {
-            if (isset($previous) && ! $callback($previous, $current)) {
-                $chunks[] = new static($chunk);
-                $chunk = [];
-            }
-
-            $chunk[] = $current;
-            $previous = $current;
-        }
-
-        $chunks[] = new static($chunk);
-
-        return new static($chunks);
+        return new static(
+            $this->lazy()->chunkWhile($callback)->mapInto(static::class)
+        );
     }
 
     /**
