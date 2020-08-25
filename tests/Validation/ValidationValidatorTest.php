@@ -2821,7 +2821,7 @@ class ValidationValidatorTest extends TestCase
         $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image4.png', '', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
-        // Ensure validation doesn't erroneously fail when ratio has no fractional part
+        // Ensure validation doesn't erroneously fail when ratio doesn't matches
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
         $this->assertFalse($v->passes());
     }
