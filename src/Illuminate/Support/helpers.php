@@ -482,15 +482,20 @@ if (! function_exists('trait_uses_recursive')) {
     /**
      * Returns all traits used by a trait and its traits.
      *
-     * @param  string  $trait
+     * @param  string  $trait    The trait name to check.
+     * @param  array   $checked  An array of trait names that have already been
+     *                           checked.
      * @return array
      */
-    function trait_uses_recursive($trait)
+    function trait_uses_recursive($trait, &$checked = [])
     {
         $traits = class_uses($trait);
 
         foreach ($traits as $trait) {
-            $traits += trait_uses_recursive($trait);
+            if (!in_array($trait, $checked)) {
+                $checked[] = $trait;
+                $traits += trait_uses_recursive($trait, $checked);
+            }
         }
 
         return $traits;
