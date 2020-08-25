@@ -1093,22 +1093,29 @@ class LazyCollection implements Enumerable
         return new static(function () use ($callback) {
             $iterator = $this->getIterator();
 
-            $chunk = [];
+            $chunk = new Collection();
 
-            while ($iterator->valid()) {
-                if (isset($previous) && ! $callback($previous, $iterator->current())) {
-                    yield new static($chunk);
-
-                    $chunk = [];
-                }
-
-                $chunk[] = $iterator->current();
-                $previous = $iterator->current();
+            if ($iterator->valid()) {
+                $chunk[$iterator->key()] = $iterator->current();
 
                 $iterator->next();
             }
 
-            yield new static($chunk);
+            while ($iterator->valid()) {
+                if (! $callback($iterator->current(), $iterator->key(), $chunk)) {
+                    yield new static($chunk);
+
+                    $chunk = new Collection();
+                }
+
+                $chunk[$iterator->key()] = $iterator->current();
+
+                $iterator->next();
+            }
+
+            if ($chunk->isNotEmpty()) {
+                yield new static($chunk);
+            }
         });
     }
 

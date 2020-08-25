@@ -1650,15 +1650,15 @@ class SupportCollectionTest extends TestCase
     public function testChunkWhileOnEqualElements($collection)
     {
         $data = (new $collection(['A', 'A', 'B', 'B', 'C', 'C', 'C']))
-            ->chunkWhile(function ($previous, $current) {
-                return $previous === $current;
+            ->chunkWhile(function ($current, $key, $chunk) {
+                return $chunk->last() === $current;
             });
 
         $this->assertInstanceOf($collection, $data);
         $this->assertInstanceOf($collection, $data->first());
-        $this->assertEquals(['A', 'A'], $data->first()->toArray());
-        $this->assertEquals(['B', 'B'], $data->get(1)->toArray());
-        $this->assertEquals(['C', 'C', 'C'], $data->last()->toArray());
+        $this->assertEquals([0 => 'A', 1 => 'A'], $data->first()->toArray());
+        $this->assertEquals([2 => 'B', 3 => 'B'], $data->get(1)->toArray());
+        $this->assertEquals([4 => 'C', 5 => 'C', 6 => 'C'], $data->last()->toArray());
     }
 
     /**
@@ -1667,17 +1667,17 @@ class SupportCollectionTest extends TestCase
     public function testChunkWhileOnContiguouslyIncreasingIntegers($collection)
     {
         $data = (new $collection([1, 4, 9, 10, 11, 12, 15, 16, 19, 20, 21]))
-            ->chunkWhile(function ($previous, $current) {
-                return $previous + 1 == $current;
+            ->chunkWhile(function ($current, $key, $chunk) {
+                return $chunk->last() + 1 == $current;
             });
 
         $this->assertInstanceOf($collection, $data);
         $this->assertInstanceOf($collection, $data->first());
-        $this->assertEquals([1], $data->first()->toArray());
-        $this->assertEquals([4], $data->get(1)->toArray());
-        $this->assertEquals([9, 10, 11, 12], $data->get(2)->toArray());
-        $this->assertEquals([15, 16], $data->get(3)->toArray());
-        $this->assertEquals([19, 20, 21], $data->last()->toArray());
+        $this->assertEquals([0 => 1], $data->first()->toArray());
+        $this->assertEquals([1 => 4], $data->get(1)->toArray());
+        $this->assertEquals([2 => 9, 3 => 10, 4 => 11, 5 => 12], $data->get(2)->toArray());
+        $this->assertEquals([6 => 15, 7 => 16], $data->get(3)->toArray());
+        $this->assertEquals([8 => 19, 9 => 20, 10 => 21], $data->last()->toArray());
     }
 
     /**
