@@ -45,7 +45,6 @@ class Inspiring
             'Waste no more time arguing what a good man should be, be one. - Marcus Aurelius',
             'Well begun is half done. - Aristotle',
             'When there is no desire, all things are at peace. - Laozi',
-            'With faith, discipline and selfless devotion to duty, there is nothing worthwhile that you cannot achieve. - MAJ',
         ])->random();
     }
 }
