@@ -349,6 +349,14 @@ class SupportHelpersTest extends TestCase
         class_uses_recursive(SupportTestClassThree::class));
     }
 
+    public function testTraitUsesRecursiveHandlesRecursiveTraits()
+    {
+        $this->assertContains(
+            \Illuminate\Tests\Support\Declarations\SupportTestTraitRecursiveA::class,
+            trait_uses_recursive(\Illuminate\Tests\Support\Declarations\SupportTestTraitRecursiveB::class)
+        );
+    }
+
     public function testTap()
     {
         $object = (object) ['id' => 1];
