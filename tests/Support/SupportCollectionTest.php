@@ -1650,8 +1650,8 @@ class SupportCollectionTest extends TestCase
     public function testChunkWhileOnEqualElements($collection)
     {
         $data = (new $collection(['A', 'A', 'B', 'B', 'C', 'C', 'C']))
-            ->chunkWhile(function ($previous, $current) {
-                return $previous === $current;
+            ->chunkWhile(function ($current, $key, $chunk) {
+                return $chunk->last() === $current;
             });
 
         $this->assertInstanceOf($collection, $data);
