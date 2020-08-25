@@ -2798,7 +2798,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $svgXmlUploadedFile], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
 
-        $svgXmlFile = new File(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, null, true);
+        $svgXmlFile = new UploadedFile(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => $svgXmlFile], ['x' => 'dimensions:max_width=1,max_height=1']);
@@ -2811,11 +2811,19 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $svgUploadedFile], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
 
-        $svgFile = new File(__DIR__.'/fixtures/image2.svg', '', 'image/svg', null, null, true);
+        $svgFile = new UploadedFile(__DIR__.'/fixtures/image2.svg', '', 'image/svg', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => $svgFile], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
+
+        // Knowing that demo image4.png has width = 64 and height = 65
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image4.png', '', null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // Ensure validation doesn't erroneously fail when ratio doesn't matches
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
+        $this->assertFalse($v->passes());
     }
 
     /**
