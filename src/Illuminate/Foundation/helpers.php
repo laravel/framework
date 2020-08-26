@@ -582,7 +582,7 @@ if (! function_exists('notify')) {
      */
     function notify($notifiables, \Illuminate\Notifications\Notification $notification)
     {
-        return Notification::send($notifiables, $notification);
+        Notification::send($notifiables, $notification);
     }
 }
 
