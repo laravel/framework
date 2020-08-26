@@ -53,7 +53,7 @@ class FoundationHelpersTest extends TestCase
 
         touch(public_path($file));
 
-        $this->assertSame('/' . $file, elixir($file));
+        $this->assertSame('/'.$file, elixir($file));
 
         unlink(public_path($file));
     }
@@ -117,7 +117,7 @@ class FoundationHelpersTest extends TestCase
         $app['config'] = m::mock(Repository::class);
         $app['config']->shouldReceive('get')->with('app.mix_url');
 
-        mkdir($directory = __DIR__ . '/mix');
+        mkdir($directory = __DIR__.'/mix');
         $manifest = $this->makeManifest('mix');
 
         $result = mix('unversioned.css', 'mix');
@@ -130,7 +130,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixManifestDirectoryMissingStartingSlashHasItAdded()
     {
-        mkdir($directory = __DIR__ . '/mix');
+        mkdir($directory = __DIR__.'/mix');
         $manifest = $this->makeManifest('/mix');
 
         $result = mix('unversioned.css', 'mix');
@@ -165,7 +165,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixHotModuleReloadingGetsUrlFromFileWithManifestDirectoryAndHttps()
     {
-        mkdir($directory = __DIR__ . '/mix');
+        mkdir($directory = __DIR__.'/mix');
         $path = $this->makeHotModuleReloadFile('https://laravel.com/docs', 'mix');
 
         $result = mix('unversioned.css', 'mix');
@@ -178,7 +178,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixHotModuleReloadingGetsUrlFromFileWithManifestDirectoryAndHttp()
     {
-        mkdir($directory = __DIR__ . '/mix');
+        mkdir($directory = __DIR__.'/mix');
         $path = $this->makeHotModuleReloadFile('http://laravel.com/docs', 'mix');
 
         $result = mix('unversioned.css', 'mix');
@@ -202,7 +202,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixHotModuleReloadingWithManifestDirectoryUsesLocalhostIfNoHttpScheme()
     {
-        mkdir($directory = __DIR__ . '/mix');
+        mkdir($directory = __DIR__.'/mix');
         $path = $this->makeHotModuleReloadFile('', 'mix');
 
         $result = mix('unversioned.css', 'mix');
@@ -219,7 +219,7 @@ class FoundationHelpersTest extends TestCase
             return __DIR__;
         });
 
-        $path = public_path(Str::finish($directory, '/') . 'hot');
+        $path = public_path(Str::finish($directory, '/').'hot');
 
         // Laravel mix when run 'hot' has a new line after the
         // url, so for consistency this "\n" is added.
@@ -234,7 +234,7 @@ class FoundationHelpersTest extends TestCase
             return __DIR__;
         });
 
-        $path = public_path(Str::finish($directory, '/') . 'mix-manifest.json');
+        $path = public_path(Str::finish($directory, '/').'mix-manifest.json');
 
         touch($path);
 
