@@ -6,9 +6,6 @@ use Exception;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
-use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -257,39 +254,5 @@ class FoundationHelpersTest extends TestCase
         });
 
         $this->assertSame('expected', mix('asset.png'));
-    }
-
-    public function testNotifySendNotificationToNotifiableEntity()
-    {
-        NotificationFacade::fake(TestMailNotificationForAnonymousNotifiable::class);
-
-        $notifiableEntity = new AnonymousNotifiable();
-        notify($notifiableEntity, new TestMailNotificationForAnonymousNotifiable());
-
-        NotificationFacade::assertSentTo($notifiableEntity, TestMailNotificationForAnonymousNotifiable::class);
-    }
-}
-
-class TestMailNotificationForAnonymousNotifiable extends Notification
-{
-    public function via($notifiable)
-    {
-        return [TestCustomChannel::class, AnotherTestCustomChannel::class];
-    }
-}
-
-class TestCustomChannel
-{
-    public function send($notifiable, $notification)
-    {
-        $_SERVER['__notifiable.route'][] = $notifiable->routeNotificationFor('testchannel');
-    }
-}
-
-class AnotherTestCustomChannel
-{
-    public function send($notifiable, $notification)
-    {
-        $_SERVER['__notifiable.route'][] = $notifiable->routeNotificationFor('anothertestchannel');
     }
 }
