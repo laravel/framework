@@ -7,21 +7,21 @@ use Illuminate\Support\Facades\Validator;
 trait ValidatesAttributes
 {
     /**
-     * Whether the model should automatically validate on saving event
+     * Whether the model should automatically validate on saving event.
      *
      * @var bool
      */
     protected $validateOnSaving = true;
 
     /**
-     * Model attribute validation rules
+     * Model attribute validation rules.
      *
      * @var array
      */
     protected $validationRules = [];
 
     /**
-     * Model attribute validation messages
+     * Model attribute validation messages.
      *
      * @var array
      */

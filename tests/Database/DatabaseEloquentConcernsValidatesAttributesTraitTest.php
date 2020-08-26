@@ -11,12 +11,12 @@ class DatabaseEloquentConcernsValidatesAttributesTraitTest extends DatabaseTestC
     public function testValidate()
     {
         /**
-         * Test validation error
+         * Test validation error.
          */
         $model = new EloquentModelWithValidatesAttributesStub([
             'foo' => null,
             'bar' => 'abc',
-            'baz' => 'abc'
+            'baz' => 'abc',
         ]);
 
         try {
@@ -40,12 +40,11 @@ class DatabaseEloquentConcernsValidatesAttributesTraitTest extends DatabaseTestC
         }
 
         /**
-         * Test error after update
+         * Test error after update.
          */
         $model->foo = 123;
 
         try {
-
             $model->validate();
         } catch (ValidationException $e) {
             $messages = $e->validator->errors()->toArray();
@@ -64,7 +63,7 @@ class DatabaseEloquentConcernsValidatesAttributesTraitTest extends DatabaseTestC
         }
 
         /**
-         * Test success
+         * Test success.
          */
         $model->foo = 'abc';
         $model->bar = 123;
@@ -91,7 +90,7 @@ class DatabaseEloquentConcernsValidatesAttributesTraitTest extends DatabaseTestC
             EloquentModelWithValidatesAttributesStub::create([
                 'foo' => 123,
                 'bar' => 'abc',
-                'baz' => 'abc'
+                'baz' => 'abc',
             ]);
         } catch (ValidationException $e) {
             $messages = $e->validator->errors()->toArray();
@@ -102,7 +101,7 @@ class DatabaseEloquentConcernsValidatesAttributesTraitTest extends DatabaseTestC
             $model = EloquentModelWithValidatesAttributesStub::make([
                 'foo' => 123,
                 'bar' => 'abc',
-                'baz' => 'abc'
+                'baz' => 'abc',
             ]);
 
             $model->save();
@@ -114,7 +113,7 @@ class DatabaseEloquentConcernsValidatesAttributesTraitTest extends DatabaseTestC
         $model = EloquentModelWithValidatesAttributesStub::make([
             'foo' => 'abc',
             'bar' => 123,
-            'baz' => 123
+            'baz' => 123,
         ]);
 
         $model->save();
@@ -131,7 +130,7 @@ class EloquentModelWithValidatesAttributesStub extends Model
     protected $validationRules = [
         'foo' => 'required|string',
         'bar' => 'required|integer',
-        'baz' => 'nullable|integer'
+        'baz' => 'nullable|integer',
     ];
 
     protected $validationMessages = [
@@ -139,7 +138,7 @@ class EloquentModelWithValidatesAttributesStub extends Model
         'foo.string' => 'The foo attribute must be a string.',
         'bar.required' => 'The bar attribute is required.',
         'bar.integer' => 'The bar attribute must be an integer.',
-        'baz.integer' => 'The baz attribute must be an integer.'
+        'baz.integer' => 'The baz attribute must be an integer.',
     ];
 
     protected $guarded = [];
@@ -160,4 +159,3 @@ class EloquentModelWithValidatesAttributesStub extends Model
         $this->fireModelEvent('saved', false);
     }
 }
-
