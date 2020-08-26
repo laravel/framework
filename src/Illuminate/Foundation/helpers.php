@@ -18,6 +18,7 @@ use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -568,6 +569,20 @@ if (! function_exists('mix')) {
     function mix($path, $manifestDirectory = '')
     {
         return app(Mix::class)(...func_get_args());
+    }
+}
+
+if (! function_exists('notify')) {
+    /**
+     * Send the given notification to the given notifiable entities.
+     *
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return void
+     */
+    function notify($notifiables, \Illuminate\Notifications\Notification $notification)
+    {
+        return Notification::send($notifiables, $notification);
     }
 }
 
