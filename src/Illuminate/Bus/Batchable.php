@@ -34,7 +34,7 @@ trait Batchable
     {
         $batch = $this->batch();
 
-        return $batch && ! $batch->cancelled();
+        return $batch && ! $batch->canceled();
     }
 
     /**

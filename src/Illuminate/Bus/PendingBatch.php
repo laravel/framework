@@ -124,7 +124,7 @@ class PendingBatch
     }
 
     /**
-     * Indicate that the batch should not be cancelled when a job within the batch fails.
+     * Indicate that the batch should not be canceled when a job within the batch fails.
      *
      * @param  bool  $allowFailures
      * @return $this
@@ -137,7 +137,7 @@ class PendingBatch
     }
 
     /**
-     * Determine if the pending batch allows jobs to fail without cancelling the batch.
+     * Determine if the pending batch allows jobs to fail without canceling the batch.
      *
      * @return bool
      */

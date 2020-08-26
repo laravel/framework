@@ -52,7 +52,7 @@ class BusBatchTest extends TestCase
             $table->integer('failed_jobs');
             $table->text('failed_job_ids');
             $table->text('options')->nullable();
-            $table->integer('cancelled_at')->nullable();
+            $table->integer('canceled_at')->nullable();
             $table->integer('created_at');
             $table->integer('finished_at')->nullable();
         });
@@ -185,7 +185,7 @@ class BusBatchTest extends TestCase
         $this->assertEquals(2, $batch->pendingJobs);
         $this->assertEquals(2, $batch->failedJobs);
         $this->assertTrue($batch->finished());
-        $this->assertTrue($batch->cancelled());
+        $this->assertTrue($batch->canceled());
         $this->assertEquals(1, $_SERVER['__finally.count']);
         $this->assertEquals(1, $_SERVER['__catch.count']);
         $this->assertEquals('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
@@ -224,12 +224,12 @@ class BusBatchTest extends TestCase
         $this->assertEquals(2, $batch->pendingJobs);
         $this->assertEquals(2, $batch->failedJobs);
         $this->assertFalse($batch->finished());
-        $this->assertFalse($batch->cancelled());
+        $this->assertFalse($batch->canceled());
         $this->assertEquals(1, $_SERVER['__catch.count']);
         $this->assertEquals('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
-    public function test_batch_can_be_cancelled()
+    public function test_batch_can_be_canceled()
     {
         $queue = m::mock(Factory::class);
 
@@ -239,7 +239,7 @@ class BusBatchTest extends TestCase
 
         $batch = $batch->fresh();
 
-        $this->assertTrue($batch->cancelled());
+        $this->assertTrue($batch->canceled());
     }
 
     public function test_batch_can_be_deleted()
@@ -283,9 +283,9 @@ class BusBatchTest extends TestCase
         $batch->options['catch'] = [1];
         $this->assertTrue($batch->hasCatchCallbacks());
 
-        $this->assertFalse($batch->cancelled());
-        $batch->cancelledAt = now();
-        $this->assertTrue($batch->cancelled());
+        $this->assertFalse($batch->canceled());
+        $batch->canceledAt = now();
+        $this->assertTrue($batch->canceled());
 
         $this->assertTrue(is_string(json_encode($batch)));
     }

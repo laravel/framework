@@ -103,7 +103,7 @@ class DatabaseBatchRepository implements BatchRepository
             'failed_job_ids' => '[]',
             'options' => serialize($batch->options),
             'created_at' => time(),
-            'cancelled_at' => null,
+            'canceled_at' => null,
             'finished_at' => null,
         ]);
 
@@ -214,7 +214,7 @@ class DatabaseBatchRepository implements BatchRepository
     public function cancel(string $batchId)
     {
         $this->connection->table($this->table)->where('id', $batchId)->update([
-            'cancelled_at' => time(),
+            'canceled_at' => time(),
             'finished_at' => time(),
         ]);
     }
@@ -261,7 +261,7 @@ class DatabaseBatchRepository implements BatchRepository
             json_decode($batch->failed_job_ids, true),
             unserialize($batch->options),
             CarbonImmutable::createFromTimestamp($batch->created_at),
-            $batch->cancelled_at ? CarbonImmutable::createFromTimestamp($batch->cancelled_at) : $batch->cancelled_at,
+            $batch->canceled_at ? CarbonImmutable::createFromTimestamp($batch->canceled_at) : $batch->canceled_at,
             $batch->finished_at ? CarbonImmutable::createFromTimestamp($batch->finished_at) : $batch->finished_at
         );
     }

@@ -82,11 +82,11 @@ class Batch implements Arrayable, JsonSerializable
     public $createdAt;
 
     /**
-     * The date indicating when the batch was cancelled.
+     * The date indicating when the batch was canceled.
      *
      * @var \Illuminate\Support\CarbonImmutable|null
      */
-    public $cancelledAt;
+    public $canceledAt;
 
     /**
      * The date indicating when the batch was finished.
@@ -108,7 +108,7 @@ class Batch implements Arrayable, JsonSerializable
      * @param  array  $failedJobIds
      * @param  array  $options
      * @param  \Illuminate\Support\CarbonImmutable  $createdAt
-     * @param  \Illuminate\Support\CarbonImmutable|null  $cancelledAt
+     * @param  \Illuminate\Support\CarbonImmutable|null  $canceledAt
      * @param  \Illuminate\Support\CarbonImmutable|null  $finishedAt
      * @return void
      */
@@ -122,7 +122,7 @@ class Batch implements Arrayable, JsonSerializable
                                 array $failedJobIds,
                                 array $options,
                                 CarbonImmutable $createdAt,
-                                ?CarbonImmutable $cancelledAt = null,
+                                ?CarbonImmutable $canceledAt = null,
                                 ?CarbonImmutable $finishedAt = null)
     {
         $this->queue = $queue;
@@ -135,7 +135,7 @@ class Batch implements Arrayable, JsonSerializable
         $this->failedJobIds = $failedJobIds;
         $this->options = $options;
         $this->createdAt = $createdAt;
-        $this->cancelledAt = $cancelledAt;
+        $this->canceledAt = $canceledAt;
         $this->finishedAt = $finishedAt;
     }
 
@@ -253,7 +253,7 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
-     * Determine if the batch allows jobs to fail without cancelling the batch.
+     * Determine if the batch allows jobs to fail without canceling the batch.
      *
      * @return bool
      */
@@ -342,23 +342,23 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
-     * Determine if the batch has been cancelled.
+     * Determine if the batch has been canceled.
      *
      * @return bool
      */
     public function canceled()
     {
-        return $this->cancelled();
+        return ! is_null($this->canceledAt);
     }
 
     /**
-     * Determine if the batch has been cancelled.
+     * Determine if the batch has been canceled.
      *
      * @return bool
      */
     public function cancelled()
     {
-        return ! is_null($this->cancelledAt);
+        return $this->canceled();
     }
 
     /**
@@ -388,7 +388,7 @@ class Batch implements Arrayable, JsonSerializable
             'failedJobs' => $this->failedJobs,
             'options' => $this->options,
             'createdAt' => $this->createdAt,
-            'cancelledAt' => $this->cancelledAt,
+            'canceledAt' => $this->canceledAt,
             'finishedAt' => $this->finishedAt,
         ];
     }
