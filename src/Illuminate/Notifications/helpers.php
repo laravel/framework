@@ -4,7 +4,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 
-if (!function_exists('notify')) {
+if (! function_exists('notify')) {
     /**
      * Send the given notification to the given notifiable entities.
      *
