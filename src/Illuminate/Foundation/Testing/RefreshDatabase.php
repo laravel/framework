@@ -60,7 +60,7 @@ trait RefreshDatabase
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabaseState::$migrated) {
-            $this->artisan('migrate:fresh', $this->freshMigrateUsing());
+            $this->artisan('migrate:fresh', $this->migrateFreshUsing());
 
             $this->app[Kernel::class]->setArtisan(null);
 
@@ -75,7 +75,7 @@ trait RefreshDatabase
      *
      * @return array
      */
-    protected function freshMigrateUsing()
+    protected function migrateFreshUsing()
     {
         return [
             '--drop-views' => $this->shouldDropViews(),
