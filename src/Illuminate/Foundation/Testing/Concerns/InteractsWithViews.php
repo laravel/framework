@@ -68,10 +68,12 @@ trait InteractsWithViews
      *
      * @param  array  $errors
      * @param  string  $key
-     * @return void
+     * @return $this
      */
     protected function withViewErrors(array $errors, $key = 'default')
     {
         ViewFacade::share('errors', (new ViewErrorBag)->put($key, new MessageBag($errors)));
+
+        return $this;
     }
 }
