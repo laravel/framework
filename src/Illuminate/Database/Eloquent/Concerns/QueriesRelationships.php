@@ -206,7 +206,7 @@ trait QueriesRelationships
         if ($types === ['*']) {
             $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())->filter()->all();
         }
-        
+
         foreach ($types as &$type) {
             $type = Relation::getMorphedModel($type) ?? $type;
         }
