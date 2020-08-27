@@ -31,38 +31,25 @@ trait RefreshDatabase
     }
 
     /**
-     * Parameters used on refresh in-memory database.
-     *
-     * @return array
-     */
-    protected function migrateCommandParameters()
-    {
-        return [];
-    }
-
-    /**
      * Refresh the in-memory database.
      *
      * @return void
      */
     protected function refreshInMemoryDatabase()
     {
-        $this->artisan('migrate', $this->migrateCommandParameters());
+        $this->artisan('migrate', $this->migrateUsing());
 
         $this->app[Kernel::class]->setArtisan(null);
     }
 
     /**
-     * Parameters used on migrate fresh conventional database.
+     * The parameters that should be used when running "migrate".
      *
      * @return array
      */
-    protected function migrateFreshCommandParameters()
+    protected function migrateUsing()
     {
-        return [
-            '--drop-views' => $this->shouldDropViews(),
-            '--drop-types' => $this->shouldDropTypes(),
-        ];
+        return [];
     }
 
     /**
@@ -73,7 +60,7 @@ trait RefreshDatabase
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabaseState::$migrated) {
-            $this->artisan('migrate:fresh', $this->migrateFreshCommandParameters());
+            $this->artisan('migrate:fresh', $this->freshMigrateUsing());
 
             $this->app[Kernel::class]->setArtisan(null);
 
@@ -81,6 +68,19 @@ trait RefreshDatabase
         }
 
         $this->beginDatabaseTransaction();
+    }
+
+    /**
+     * The parameters that should be used when running "migrate:fresh".
+     *
+     * @return array
+     */
+    protected function freshMigrateUsing()
+    {
+        return [
+            '--drop-views' => $this->shouldDropViews(),
+            '--drop-types' => $this->shouldDropTypes(),
+        ];
     }
 
     /**
