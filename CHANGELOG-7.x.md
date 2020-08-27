@@ -1,9 +1,17 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.26.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.26.1...7.x)
 
 
-## [v7.26.0 (2020-08-11)](https://github.com/laravel/framework/compare/v7.25.0...v7.26.0)
+## [v7.26.1 (2020-08-27)](https://github.com/laravel/framework/compare/v7.26.0...v7.26.1)
+
+### Fixed
+- Fixed offset error on invalid remember token ([#34020](https://github.com/laravel/framework/pull/34020))
+- Only prepend scheme to PhpRedis host when necessary ([#34017](https://github.com/laravel/framework/pull/34017))
+- Fixed `whereKey` and `whereKeyNot` in `Illuminate\Database\Eloquent\Builder` ([#34031](https://github.com/laravel/framework/pull/34031))
+
+
+## [v7.26.0 (2020-08-25)](https://github.com/laravel/framework/compare/v7.25.0...v7.26.0)
 
 ### Added
 - Added `whenHas` and `whenFilled` methods to  `Illuminate\Http\Concerns\InteractsWithInput` class ([#33829](https://github.com/laravel/framework/pull/33829))
