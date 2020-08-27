@@ -41,4 +41,12 @@ interface Lock
      * @return void
      */
     public function forceRelease();
+    
+    /**
+     * Specify the number of milliseconds to sleep in between blocked lock aquisition attempts.
+     *
+     * @param  int  $milliseconds
+     * @return $this
+     */
+    public function betweenBlockedAttemptsSleepFor($milliseconds);
 }
