@@ -39,10 +39,16 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             });
         });
 
-        $this->assertEnumeratesCollection($collection, 7, function ($collection) {
+        $this->assertEnumeratesCollection($collection, 3, function ($collection) {
             $collection->chunkWhile(function ($current, $key, $chunk) {
                 return $current === $chunk->last();
-            })->take(7)->all();
+            })->first();
+        });
+
+        $this->assertEnumeratesCollectionOnce($collection, function ($collection) {
+            $collection->chunkWhile(function ($current, $key, $chunk) {
+                return $current === $chunk->last();
+            })->all();
         });
     }
 
