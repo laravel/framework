@@ -53,9 +53,9 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function writeView()
     {
-        $view = $this->getView();
-
-        $path = resource_path('views').'/'.str_replace('.', '/', 'components.'.$view);
+        $path = $this->viewsDirectory(
+            str_replace('.', '/', 'components.'.$this->getView())
+        );
 
         if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
@@ -67,6 +67,20 @@ class ComponentMakeCommand extends GeneratorCommand
     <!-- '.Inspiring::quote().' -->
 </div>'
         );
+    }
+
+    /**
+     * Get the views directory's path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    protected function viewsDirectory($path = '')
+    {
+        $views = config('view.paths')[0] ?? resource_path('views');
+
+        return $views.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**

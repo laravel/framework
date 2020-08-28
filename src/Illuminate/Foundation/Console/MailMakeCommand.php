@@ -51,13 +51,29 @@ class MailMakeCommand extends GeneratorCommand
      */
     protected function writeMarkdownTemplate()
     {
-        $path = resource_path('views/'.str_replace('.', '/', $this->option('markdown'))).'.blade.php';
+        $path = $this->viewsDirectory(
+            str_replace('.', '/', $this->option('markdown')).'.blade.php'
+        );
 
         if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0755, true);
         }
 
         $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
+    }
+
+    /**
+     * Get the views directory's path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    protected function viewsDirectory($path = '')
+    {
+        $views = config('view.paths')[0] ?? resource_path('views');
+
+        return $views.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
