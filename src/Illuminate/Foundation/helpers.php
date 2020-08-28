@@ -820,6 +820,20 @@ if (! function_exists('session')) {
     }
 }
 
+if (! function_exists('storage')) {
+    /**
+     * Generate a storage path for the application.
+     *
+     * @param  string  $path
+     * @param  bool|null  $secure
+     * @return string
+     */
+    function storage($path)
+    {
+        return \URL::to(\Illuminate\Support\Facades\Storage::url($path));
+    }
+}
+
 if (! function_exists('storage_path')) {
     /**
      * Get the path to the storage folder.
