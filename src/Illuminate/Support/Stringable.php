@@ -339,7 +339,7 @@ class Stringable
     }
 
     /**
-     * Pad both sides of the string with another
+     * Pad both sides of the string with another.
      *
      * @param  int  $length
      * @param  string  $pad
@@ -351,7 +351,7 @@ class Stringable
     }
 
     /**
-     * Pad the left side of the string with another
+     * Pad the left side of the string with another.
      *
      * @param  int  $length
      * @param  string  $pad
@@ -363,7 +363,7 @@ class Stringable
     }
 
     /**
-     * Pad the right side of the string with another
+     * Pad the right side of the string with another.
      *
      * @param  int  $length
      * @param  string  $pad

@@ -371,7 +371,7 @@ class Str
     }
 
     /**
-     * Pad both sides of a string with another
+     * Pad both sides of a string with another.
      *
      * @param  string  $value
      * @param  int  $length
@@ -384,7 +384,7 @@ class Str
     }
 
     /**
-     * Pad the left side of a string with another
+     * Pad the left side of a string with another.
      *
      * @param  string  $value
      * @param  int  $length
@@ -397,7 +397,7 @@ class Str
     }
 
     /**
-     * Pad the right side of a string with another
+     * Pad the right side of a string with another.
      *
      * @param  string  $value
      * @param  int  $length
