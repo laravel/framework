@@ -134,6 +134,9 @@ abstract class Component
 
             static::$propertyCache[$class] = collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
                 ->reject(function (ReflectionProperty $property) {
+                    return $property->isStatic();
+                })
+                ->reject(function (ReflectionProperty $property) {
                     return $this->shouldIgnore($property->getName());
                 })
                 ->map(function (ReflectionProperty $property) {
