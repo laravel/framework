@@ -905,7 +905,6 @@ class Blueprint
         return $column;
     }
 
-
     /**
      * Create a new float column on the table.
      *
