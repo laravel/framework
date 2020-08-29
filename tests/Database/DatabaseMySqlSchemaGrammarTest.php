@@ -434,6 +434,90 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` bigint unsigned not null auto_increment primary key', $statements[0]);
     }
 
+    public function testAddingForeignTinyID()
+    {
+        $blueprint = new Blueprint('users');
+        $foreignId = $blueprint->foreignTinyId('foo');
+        $blueprint->foreignTinyId('company_id')->constrained();
+        $blueprint->foreignTinyId('laravel_idea_id')->constrained();
+        $blueprint->foreignTinyId('team_id')->references('id')->on('teams');
+        $blueprint->foreignTinyId('team_column_id')->constrained('teams');
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
+        $this->assertSame([
+            'alter table `users` add `foo` tinyint unsigned not null, add `company_id` tinyint unsigned not null, add `laravel_idea_id` tinyint unsigned not null, add `team_id` tinyint unsigned not null, add `team_column_id` tinyint unsigned not null',
+            'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
+            'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
+            'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
+            'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
+        ], $statements);
+    }
+
+    public function testAddingForeignSmallID()
+    {
+        $blueprint = new Blueprint('users');
+        $foreignId = $blueprint->foreignSmallId('foo');
+        $blueprint->foreignSmallId('company_id')->constrained();
+        $blueprint->foreignSmallId('laravel_idea_id')->constrained();
+        $blueprint->foreignSmallId('team_id')->references('id')->on('teams');
+        $blueprint->foreignSmallId('team_column_id')->constrained('teams');
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
+        $this->assertSame([
+            'alter table `users` add `foo` smallint unsigned not null, add `company_id` smallint unsigned not null, add `laravel_idea_id` smallint unsigned not null, add `team_id` smallint unsigned not null, add `team_column_id` smallint unsigned not null',
+            'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
+            'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
+            'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
+            'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
+        ], $statements);
+    }
+
+    public function testAddingForeignMediumID()
+    {
+        $blueprint = new Blueprint('users');
+        $foreignId = $blueprint->foreignMediumId('foo');
+        $blueprint->foreignMediumId('company_id')->constrained();
+        $blueprint->foreignMediumId('laravel_idea_id')->constrained();
+        $blueprint->foreignMediumId('team_id')->references('id')->on('teams');
+        $blueprint->foreignMediumId('team_column_id')->constrained('teams');
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
+        $this->assertSame([
+            'alter table `users` add `foo` mediumint unsigned not null, add `company_id` mediumint unsigned not null, add `laravel_idea_id` mediumint unsigned not null, add `team_id` mediumint unsigned not null, add `team_column_id` mediumint unsigned not null',
+            'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
+            'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
+            'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
+            'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
+        ], $statements);
+    }
+
+    public function testAddingForeignIntegerID()
+    {
+        $blueprint = new Blueprint('users');
+        $foreignId = $blueprint->foreignIntegerId('foo');
+        $blueprint->foreignIntegerId('company_id')->constrained();
+        $blueprint->foreignIntegerId('laravel_idea_id')->constrained();
+        $blueprint->foreignIntegerId('team_id')->references('id')->on('teams');
+        $blueprint->foreignIntegerId('team_column_id')->constrained('teams');
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
+        $this->assertSame([
+            'alter table `users` add `foo` int unsigned not null, add `company_id` int unsigned not null, add `laravel_idea_id` int unsigned not null, add `team_id` int unsigned not null, add `team_column_id` int unsigned not null',
+            'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
+            'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
+            'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
+            'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
+        ], $statements);
+    }
+
     public function testAddingForeignID()
     {
         $blueprint = new Blueprint('users');

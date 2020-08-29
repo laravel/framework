@@ -816,6 +816,78 @@ class Blueprint
     }
 
     /**
+     * Create a new unsigned tiny integer (1-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignTinyId($column)
+    {
+        $this->columns[] = $column = new ForeignIdColumnDefinition($this, [
+            'type' => 'tinyInteger',
+            'name' => $column,
+            'autoIncrement' => false,
+            'unsigned' => true,
+        ]);
+
+        return $column;
+    }
+
+    /**
+     * Create a new unsigned small integer (2-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignSmallId($column)
+    {
+        $this->columns[] = $column = new ForeignIdColumnDefinition($this, [
+            'type' => 'smallInteger',
+            'name' => $column,
+            'autoIncrement' => false,
+            'unsigned' => true,
+        ]);
+
+        return $column;
+    }
+
+    /**
+     * Create a new unsigned medium integer (3-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignMediumId($column)
+    {
+        $this->columns[] = $column = new ForeignIdColumnDefinition($this, [
+            'type' => 'mediumInteger',
+            'name' => $column,
+            'autoIncrement' => false,
+            'unsigned' => true,
+        ]);
+
+        return $column;
+    }
+
+    /**
+     * Create a new unsigned integer (4-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignIntegerId($column)
+    {
+        $this->columns[] = $column = new ForeignIdColumnDefinition($this, [
+            'type' => 'integer',
+            'name' => $column,
+            'autoIncrement' => false,
+            'unsigned' => true,
+        ]);
+
+        return $column;
+    }
+
+    /**
      * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
@@ -832,6 +904,7 @@ class Blueprint
 
         return $column;
     }
+
 
     /**
      * Create a new float column on the table.
