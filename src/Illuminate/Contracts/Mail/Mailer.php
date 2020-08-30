@@ -2,8 +2,6 @@
 
 namespace Illuminate\Contracts\Mail;
 
-use Illuminate\Contracts\Mail\Mailable as MailableContract;
-
 interface Mailer
 {
     /**
@@ -23,7 +21,7 @@ interface Mailer
     public function bcc($users);
 
     /**
-     * Send a new message when only a raw text part.
+     * Send a new message with only a raw text part.
      *
      * @param  string  $text
      * @param  mixed  $callback
@@ -34,9 +32,9 @@ interface Mailer
     /**
      * Send a new message using a view.
      *
-     * @param  string|array|MailableContract  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  array  $data
-     * @param  \Closure|string  $callback
+     * @param  \Closure|string|null  $callback
      * @return void
      */
     public function send($view, array $data = [], $callback = null);

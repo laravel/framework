@@ -2,58 +2,99 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Events\CacheMissed;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Testing\Fakes\EventFake;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class SupportFacadesEventTest extends TestCase
 {
-    protected function setUp()
+    private $events;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->events = Mockery::spy(Dispatcher::class);
+        $this->events = m::mock(Dispatcher::class);
 
         $container = new Container;
         $container->instance('events', $this->events);
+        $container->alias('events', DispatcherContract::class);
+        $container->instance('cache', new CacheManager($container));
+        $container->instance('config', new ConfigRepository($this->getCacheConfig()));
 
         Facade::setFacadeApplication($container);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         Event::clearResolvedInstances();
 
-        Mockery::close();
+        m::close();
     }
 
     public function testFakeFor()
     {
         Event::fakeFor(function () {
-            (new FakeForStub())->dispatch();
+            (new FakeForStub)->dispatch();
 
             Event::assertDispatched(EventStub::class);
         });
 
         $this->events->shouldReceive('dispatch')->once();
 
-        (new FakeForStub())->dispatch();
+        (new FakeForStub)->dispatch();
     }
 
     public function testFakeForSwapsDispatchers()
     {
-        Event::fakeFor(function () {
+        $arrayRepository = Cache::store('array');
+
+        Event::fakeFor(function () use ($arrayRepository) {
             $this->assertInstanceOf(EventFake::class, Event::getFacadeRoot());
             $this->assertInstanceOf(EventFake::class, Model::getEventDispatcher());
+            $this->assertInstanceOf(EventFake::class, $arrayRepository->getEventDispatcher());
         });
 
         $this->assertSame($this->events, Event::getFacadeRoot());
         $this->assertSame($this->events, Model::getEventDispatcher());
+        $this->assertSame($this->events, $arrayRepository->getEventDispatcher());
+    }
+
+    public function testFakeSwapsDispatchersInResolvedCacheRepositories()
+    {
+        $arrayRepository = Cache::store('array');
+
+        $this->events->shouldReceive('dispatch')->once();
+        $arrayRepository->get('foo');
+
+        Event::fake();
+
+        $arrayRepository->get('bar');
+
+        Event::assertDispatched(CacheMissed::class);
+    }
+
+    protected function getCacheConfig()
+    {
+        return [
+            'cache' => [
+                'stores' => [
+                    'array' => [
+                        'driver' => 'array',
+                    ],
+                ],
+            ],
+        ];
     }
 }
 

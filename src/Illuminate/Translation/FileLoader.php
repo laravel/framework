@@ -2,9 +2,9 @@
 
 namespace Illuminate\Translation;
 
-use RuntimeException;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Filesystem\Filesystem;
+use RuntimeException;
 
 class FileLoader implements Loader
 {
@@ -25,7 +25,7 @@ class FileLoader implements Loader
     /**
      * All of the registered paths to JSON translation files.
      *
-     * @var string
+     * @var array
      */
     protected $jsonPaths = [];
 
@@ -54,16 +54,16 @@ class FileLoader implements Loader
      *
      * @param  string  $locale
      * @param  string  $group
-     * @param  string  $namespace
+     * @param  string|null  $namespace
      * @return array
      */
     public function load($locale, $group, $namespace = null)
     {
-        if ($group == '*' && $namespace == '*') {
+        if ($group === '*' && $namespace === '*') {
             return $this->loadJsonPaths($locale);
         }
 
-        if (is_null($namespace) || $namespace == '*') {
+        if (is_null($namespace) || $namespace === '*') {
             return $this->loadPath($this->path, $locale, $group);
         }
 

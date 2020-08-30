@@ -1,8 +1,10 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 
-class DummyClass extends Seeder
+class {{ class }} extends Seeder
 {
     /**
      * Run the database seeds.

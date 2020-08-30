@@ -2,16 +2,15 @@
 
 namespace Illuminate\Database\Connectors;
 
-use PDOException;
-use Illuminate\Support\Arr;
-use InvalidArgumentException;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
-use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
+use PDOException;
 
 class ConnectionFactory
 {
@@ -36,8 +35,8 @@ class ConnectionFactory
     /**
      * Establish a PDO connection based on the configuration.
      *
-     * @param  array   $config
-     * @param  string  $name
+     * @param  array  $config
+     * @param  string|null  $name
      * @return \Illuminate\Database\Connection
      */
     public function make(array $config, $name = null)
@@ -54,7 +53,7 @@ class ConnectionFactory
     /**
      * Parse and prepare the database configuration.
      *
-     * @param  array   $config
+     * @param  array  $config
      * @param  string  $name
      * @return array
      */
@@ -79,7 +78,7 @@ class ConnectionFactory
     }
 
     /**
-     * Create a single database connection instance.
+     * Create a read / write database connection instance.
      *
      * @param  array  $config
      * @return \Illuminate\Database\Connection
@@ -116,7 +115,7 @@ class ConnectionFactory
     }
 
     /**
-     * Get the read configuration for a read / write connection.
+     * Get the write configuration for a read / write connection.
      *
      * @param  array  $config
      * @return array
@@ -131,7 +130,7 @@ class ConnectionFactory
     /**
      * Get a read / write level configuration.
      *
-     * @param  array   $config
+     * @param  array  $config
      * @param  string  $type
      * @return array
      */
@@ -172,6 +171,8 @@ class ConnectionFactory
      *
      * @param  array  $config
      * @return \Closure
+     *
+     * @throws \PDOException
      */
     protected function createPdoResolverWithHosts(array $config)
     {
@@ -182,9 +183,7 @@ class ConnectionFactory
                 try {
                     return $this->createConnector($config)->connect($config);
                 } catch (PDOException $e) {
-                    if (count($hosts) - 1 === $key && $this->container->bound(ExceptionHandler::class)) {
-                        $this->container->make(ExceptionHandler::class)->report($e);
-                    }
+                    continue;
                 }
             }
 
@@ -197,6 +196,8 @@ class ConnectionFactory
      *
      * @param  array  $config
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function parseHosts(array $config)
     {
@@ -251,17 +252,17 @@ class ConnectionFactory
                 return new SqlServerConnector;
         }
 
-        throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
+        throw new InvalidArgumentException("Unsupported driver [{$config['driver']}].");
     }
 
     /**
      * Create a new connection instance.
      *
-     * @param  string   $driver
-     * @param  \PDO|\Closure     $connection
-     * @param  string   $database
-     * @param  string   $prefix
-     * @param  array    $config
+     * @param  string  $driver
+     * @param  \PDO|\Closure  $connection
+     * @param  string  $database
+     * @param  string  $prefix
+     * @param  array  $config
      * @return \Illuminate\Database\Connection
      *
      * @throws \InvalidArgumentException
@@ -283,6 +284,6 @@ class ConnectionFactory
                 return new SqlServerConnection($connection, $database, $prefix, $config);
         }
 
-        throw new InvalidArgumentException("Unsupported driver [{$driver}]");
+        throw new InvalidArgumentException("Unsupported driver [{$driver}].");
     }
 }

@@ -3,8 +3,8 @@
 namespace Illuminate\Foundation\Console;
 
 use Closure;
-use ReflectionFunction;
 use Illuminate\Console\Command;
+use ReflectionFunction;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -37,7 +37,7 @@ class ClosureCommand extends Command
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return mixed
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -46,14 +46,25 @@ class ClosureCommand extends Command
         $parameters = [];
 
         foreach ((new ReflectionFunction($this->callback))->getParameters() as $parameter) {
-            if (isset($inputs[$parameter->name])) {
-                $parameters[$parameter->name] = $inputs[$parameter->name];
+            if (isset($inputs[$parameter->getName()])) {
+                $parameters[$parameter->getName()] = $inputs[$parameter->getName()];
             }
         }
 
-        return $this->laravel->call(
+        return (int) $this->laravel->call(
             $this->callback->bindTo($this, $this), $parameters
         );
+    }
+
+    /**
+     * Set the description for the command.
+     *
+     * @param  string  $description
+     * @return $this
+     */
+    public function purpose($description)
+    {
+        return $this->describe($description);
     }
 
     /**

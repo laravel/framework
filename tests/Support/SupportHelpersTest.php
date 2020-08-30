@@ -2,347 +2,41 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
 use ArrayAccess;
-use Mockery as m;
-use RuntimeException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use stdClass;
 
 class SupportHelpersTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
-    }
-
-    public function testArrayDot()
-    {
-        $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
-        $this->assertEquals($array, ['name' => 'taylor', 'languages.php' => true]);
-    }
-
-    public function testArrayGet()
-    {
-        $array = ['names' => ['developer' => 'taylor']];
-        $this->assertEquals('taylor', Arr::get($array, 'names.developer'));
-        $this->assertEquals('dayle', Arr::get($array, 'names.otherDeveloper', 'dayle'));
-        $this->assertEquals('dayle', Arr::get($array, 'names.otherDeveloper', function () {
-            return 'dayle';
-        }));
-    }
-
-    public function testArrayHas()
-    {
-        $array = ['names' => ['developer' => 'taylor']];
-        $this->assertTrue(Arr::has($array, 'names'));
-        $this->assertTrue(Arr::has($array, 'names.developer'));
-        $this->assertFalse(Arr::has($array, 'foo'));
-        $this->assertFalse(Arr::has($array, 'foo.bar'));
-    }
-
-    public function testArraySet()
-    {
-        $array = [];
-        Arr::set($array, 'names.developer', 'taylor');
-        $this->assertEquals('taylor', $array['names']['developer']);
-    }
-
-    public function testArrayForget()
-    {
-        $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => 'dayle']];
-        Arr::forget($array, 'names.developer');
-        $this->assertFalse(isset($array['names']['developer']));
-        $this->assertTrue(isset($array['names']['otherDeveloper']));
-
-        $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => 'dayle', 'thirdDeveloper' => 'Lucas']];
-        Arr::forget($array, ['names.developer', 'names.otherDeveloper']);
-        $this->assertFalse(isset($array['names']['developer']));
-        $this->assertFalse(isset($array['names']['otherDeveloper']));
-        $this->assertTrue(isset($array['names']['thirdDeveloper']));
-
-        $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => 'dayle'], 'otherNames' => ['developer' => 'Lucas', 'otherDeveloper' => 'Graham']];
-        Arr::forget($array, ['names.developer', 'otherNames.otherDeveloper']);
-        $expected = ['names' => ['otherDeveloper' => 'dayle'], 'otherNames' => ['developer' => 'Lucas']];
-        $this->assertEquals($expected, $array);
-    }
-
-    public function testArrayPluckWithArrayAndObjectValues()
-    {
-        $array = [(object) ['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']];
-        $this->assertEquals(['taylor', 'dayle'], Arr::pluck($array, 'name'));
-        $this->assertEquals(['taylor' => 'foo', 'dayle' => 'bar'], Arr::pluck($array, 'email', 'name'));
-    }
-
-    public function testArrayPluckWithNestedKeys()
-    {
-        $array = [['user' => ['taylor', 'otwell']], ['user' => ['dayle', 'rees']]];
-        $this->assertEquals(['taylor', 'dayle'], Arr::pluck($array, 'user.0'));
-        $this->assertEquals(['taylor', 'dayle'], Arr::pluck($array, ['user', 0]));
-        $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], Arr::pluck($array, 'user.1', 'user.0'));
-        $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], Arr::pluck($array, ['user', 1], ['user', 0]));
-    }
-
-    public function testArrayPluckWithNestedArrays()
-    {
-        $array = [
-            [
-                'account' => 'a',
-                'users' => [
-                    ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
-                ],
-            ],
-            [
-                'account' => 'b',
-                'users' => [
-                    ['first' => 'abigail', 'last' => 'otwell'],
-                    ['first' => 'dayle', 'last' => 'rees'],
-                ],
-            ],
-        ];
-
-        $this->assertEquals([['taylor'], ['abigail', 'dayle']], Arr::pluck($array, 'users.*.first'));
-        $this->assertEquals(['a' => ['taylor'], 'b' => ['abigail', 'dayle']], Arr::pluck($array, 'users.*.first', 'account'));
-        $this->assertEquals([['taylorotwell@gmail.com'], [null, null]], Arr::pluck($array, 'users.*.email'));
-    }
-
-    public function testArrayExcept()
-    {
-        $array = ['name' => 'taylor', 'age' => 26];
-        $this->assertEquals(['age' => 26], Arr::except($array, ['name']));
-        $this->assertEquals(['age' => 26], Arr::except($array, 'name'));
-
-        $array = ['name' => 'taylor', 'framework' => ['language' => 'PHP', 'name' => 'Laravel']];
-        $this->assertEquals(['name' => 'taylor'], Arr::except($array, 'framework'));
-        $this->assertEquals(['name' => 'taylor', 'framework' => ['name' => 'Laravel']], Arr::except($array, 'framework.language'));
-        $this->assertEquals(['framework' => ['language' => 'PHP']], Arr::except($array, ['name', 'framework.name']));
-    }
-
-    public function testArrayOnly()
-    {
-        $array = ['name' => 'taylor', 'age' => 26];
-        $this->assertEquals(['name' => 'taylor'], Arr::only($array, ['name']));
-        $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
-    }
-
-    public function testArrayCollapse()
-    {
-        $array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
-        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
-    }
-
-    public function testArrayDivide()
-    {
-        $array = ['name' => 'taylor'];
-        list($keys, $values) = Arr::divide($array);
-        $this->assertEquals(['name'], $keys);
-        $this->assertEquals(['taylor'], $values);
-    }
-
-    public function testArrayFirst()
-    {
-        $array = ['name' => 'taylor', 'otherDeveloper' => 'dayle'];
-        $this->assertEquals('dayle', Arr::first($array, function ($value) {
-            return $value == 'dayle';
-        }));
-    }
-
-    public function testArrayLast()
-    {
-        $array = [100, 250, 290, 320, 500, 560, 670];
-        $this->assertEquals(670, Arr::last($array, function ($value) {
-            return $value > 320;
-        }));
-    }
-
-    public function testArrayPluck()
-    {
-        $data = [
-            'post-1' => [
-                'comments' => [
-                    'tags' => [
-                        '#foo', '#bar',
-                    ],
-                ],
-            ],
-            'post-2' => [
-                'comments' => [
-                    'tags' => [
-                        '#baz',
-                    ],
-                ],
-            ],
-        ];
-
-        $this->assertEquals([
-            0 => [
-                'tags' => [
-                    '#foo', '#bar',
-                ],
-            ],
-            1 => [
-                'tags' => [
-                    '#baz',
-                ],
-            ],
-        ], Arr::pluck($data, 'comments'));
-
-        $this->assertEquals([['#foo', '#bar'], ['#baz']], Arr::pluck($data, 'comments.tags'));
-        $this->assertEquals([null, null], Arr::pluck($data, 'foo'));
-        $this->assertEquals([null, null], Arr::pluck($data, 'foo.bar'));
-    }
-
-    public function testArrayPrepend()
-    {
-        $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
-        $this->assertEquals(['zero', 'one', 'two', 'three', 'four'], $array);
-
-        $array = Arr::prepend(['one' => 1, 'two' => 2], 0, 'zero');
-        $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
-    }
-
-    public function testArrayFlatten()
-    {
-        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten([['#foo', '#bar'], ['#baz']]));
-    }
-
-    public function testStrIs()
-    {
-        $this->assertTrue(Str::is('*.dev', 'localhost.dev'));
-        $this->assertTrue(Str::is('a', 'a'));
-        $this->assertTrue(Str::is('/', '/'));
-        $this->assertTrue(Str::is('*dev*', 'localhost.dev'));
-        $this->assertTrue(Str::is('foo?bar', 'foo?bar'));
-        $this->assertFalse(Str::is('*something', 'foobar'));
-        $this->assertFalse(Str::is('foo', 'bar'));
-        $this->assertFalse(Str::is('foo.*', 'foobar'));
-        $this->assertFalse(Str::is('foo.ar', 'foobar'));
-        $this->assertFalse(Str::is('foo?bar', 'foobar'));
-        $this->assertFalse(Str::is('foo?bar', 'fobar'));
-
-        $this->assertTrue(Str::is([
-            '*.dev',
-            '*oc*',
-        ], 'localhost.dev'));
-
-        $this->assertFalse(Str::is([
-            '/',
-            'a*',
-        ], 'localhost.dev'));
-
-        $this->assertFalse(Str::is([], 'localhost.dev'));
-    }
-
-    public function testStrRandom()
-    {
-        $result = Str::random(20);
-        $this->assertInternalType('string', $result);
-        $this->assertEquals(20, strlen($result));
-    }
-
-    public function testStartsWith()
-    {
-        $this->assertTrue(Str::startsWith('jason', 'jas'));
-        $this->assertTrue(Str::startsWith('jason', ['jas']));
-        $this->assertFalse(Str::startsWith('jason', 'day'));
-        $this->assertFalse(Str::startsWith('jason', ['day']));
     }
 
     public function testE()
     {
         $str = 'A \'quote\' is <b>bold</b>';
-        $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
-        $html = m::mock('Illuminate\Contracts\Support\Htmlable');
+        $this->assertSame('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
+        $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
     }
 
-    public function testEndsWith()
-    {
-        $this->assertTrue(Str::endsWith('jason', 'on'));
-        $this->assertTrue(Str::endsWith('jason', ['on']));
-        $this->assertFalse(Str::endsWith('jason', 'no'));
-        $this->assertFalse(Str::endsWith('jason', ['no']));
-    }
-
-    public function testStrAfter()
-    {
-        $this->assertEquals('nah', str_after('hannah', 'han'));
-        $this->assertEquals('nah', str_after('hannah', 'n'));
-        $this->assertEquals('hannah', str_after('hannah', 'xxxx'));
-    }
-
-    public function testStrContains()
-    {
-        $this->assertTrue(Str::contains('taylor', 'ylo'));
-        $this->assertTrue(Str::contains('taylor', ['ylo']));
-        $this->assertFalse(Str::contains('taylor', 'xxx'));
-        $this->assertFalse(Str::contains('taylor', ['xxx']));
-        $this->assertTrue(Str::contains('taylor', ['xxx', 'taylor']));
-    }
-
-    public function testStrFinish()
-    {
-        $this->assertEquals('test/string/', Str::finish('test/string', '/'));
-        $this->assertEquals('test/string/', Str::finish('test/string/', '/'));
-        $this->assertEquals('test/string/', Str::finish('test/string//', '/'));
-    }
-
-    public function testStrStart()
-    {
-        $this->assertEquals('/test/string', Str::start('test/string', '/'));
-        $this->assertEquals('/test/string', Str::start('/test/string', '/'));
-        $this->assertEquals('/test/string', Str::start('//test/string', '/'));
-    }
-
-    public function testSnakeCase()
-    {
-        $this->assertEquals('foo_bar', Str::snake('fooBar'));
-        $this->assertEquals('foo_bar', Str::snake('fooBar')); // test cache
-    }
-
-    public function testStrLimit()
-    {
-        $string = 'The PHP framework for web artisans.';
-        $this->assertEquals('The PHP...', Str::limit($string, 7));
-        $this->assertEquals('The PHP', Str::limit($string, 7, ''));
-        $this->assertEquals('The PHP framework for web artisans.', Str::limit($string, 100));
-
-        $nonAsciiString = '这是一段中文';
-        $this->assertEquals('这是一...', Str::limit($nonAsciiString, 6));
-        $this->assertEquals('这是一', Str::limit($nonAsciiString, 6, ''));
-    }
-
-    public function testCamelCase()
-    {
-        $this->assertEquals('fooBar', Str::camel('FooBar'));
-        $this->assertEquals('fooBar', Str::camel('foo_bar'));
-        $this->assertEquals('fooBar', Str::camel('foo_bar')); // test cache
-        $this->assertEquals('fooBarBaz', Str::camel('Foo-barBaz'));
-        $this->assertEquals('fooBarBaz', Str::camel('foo-bar_baz'));
-    }
-
-    public function testStudlyCase()
-    {
-        $this->assertEquals('FooBar', Str::studly('fooBar'));
-        $this->assertEquals('FooBar', Str::studly('foo_bar'));
-        $this->assertEquals('FooBar', Str::studly('foo_bar')); // test cache
-        $this->assertEquals('FooBarBaz', Str::studly('foo-barBaz'));
-        $this->assertEquals('FooBarBaz', Str::studly('foo-bar_baz'));
-    }
-
     public function testClassBasename()
     {
-        $this->assertEquals('Baz', class_basename('Foo\Bar\Baz'));
-        $this->assertEquals('Baz', class_basename('Baz'));
+        $this->assertSame('Baz', class_basename('Foo\Bar\Baz'));
+        $this->assertSame('Baz', class_basename('Baz'));
     }
 
     public function testValue()
     {
-        $this->assertEquals('foo', value('foo'));
-        $this->assertEquals('foo', value(function () {
+        $this->assertSame('foo', value('foo'));
+        $this->assertSame('foo', value(function () {
             return 'foo';
         }));
     }
@@ -353,7 +47,7 @@ class SupportHelpersTest extends TestCase
         $class->name = new stdClass;
         $class->name->first = 'Taylor';
 
-        $this->assertEquals('Taylor', object_get($class, 'name.first'));
+        $this->assertSame('Taylor', object_get($class, 'name.first'));
     }
 
     public function testDataGet()
@@ -363,20 +57,20 @@ class SupportHelpersTest extends TestCase
         $dottedArray = ['users' => ['first.name' => 'Taylor', 'middle.name' => null]];
         $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John']), 'email' => null]);
 
-        $this->assertEquals('Taylor', data_get($object, 'users.name.0'));
-        $this->assertEquals('Taylor', data_get($array, '0.users.0.name'));
+        $this->assertSame('Taylor', data_get($object, 'users.name.0'));
+        $this->assertSame('Taylor', data_get($array, '0.users.0.name'));
         $this->assertNull(data_get($array, '0.users.3'));
-        $this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
-        $this->assertEquals('Not found', data_get($array, '0.users.3', function () {
+        $this->assertSame('Not found', data_get($array, '0.users.3', 'Not found'));
+        $this->assertSame('Not found', data_get($array, '0.users.3', function () {
             return 'Not found';
         }));
-        $this->assertEquals('Taylor', data_get($dottedArray, ['users', 'first.name']));
+        $this->assertSame('Taylor', data_get($dottedArray, ['users', 'first.name']));
         $this->assertNull(data_get($dottedArray, ['users', 'middle.name']));
-        $this->assertEquals('Not found', data_get($dottedArray, ['users', 'last.name'], 'Not found'));
+        $this->assertSame('Not found', data_get($dottedArray, ['users', 'last.name'], 'Not found'));
         $this->assertEquals(56, data_get($arrayAccess, 'price'));
-        $this->assertEquals('John', data_get($arrayAccess, 'user.name'));
-        $this->assertEquals('void', data_get($arrayAccess, 'foo', 'void'));
-        $this->assertEquals('void', data_get($arrayAccess, 'user.foo', 'void'));
+        $this->assertSame('John', data_get($arrayAccess, 'user.name'));
+        $this->assertSame('void', data_get($arrayAccess, 'foo', 'void'));
+        $this->assertSame('void', data_get($arrayAccess, 'user.foo', 'void'));
         $this->assertNull(data_get($arrayAccess, 'foo'));
         $this->assertNull(data_get($arrayAccess, 'user.foo'));
         $this->assertNull(data_get($arrayAccess, 'email', 'Not found'));
@@ -404,7 +98,7 @@ class SupportHelpersTest extends TestCase
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, 'users.*.first'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
-        $this->assertEquals('not found', data_get($array, 'posts.*.date', 'not found'));
+        $this->assertSame('not found', data_get($array, 'posts.*.date', 'not found'));
         $this->assertNull(data_get($array, 'posts.*.date'));
     }
 
@@ -615,102 +309,32 @@ class SupportHelpersTest extends TestCase
         ], $data);
     }
 
-    public function testArraySort()
-    {
-        $array = [
-            ['name' => 'baz'],
-            ['name' => 'foo'],
-            ['name' => 'bar'],
-        ];
-
-        $this->assertEquals([
-            ['name' => 'bar'],
-            ['name' => 'baz'],
-            ['name' => 'foo'], ],
-        array_values(Arr::sort($array, function ($v) {
-            return $v['name'];
-        })));
-    }
-
-    public function testArraySortRecursive()
-    {
-        $array = [
-            [
-                'foo',
-                'bar',
-                'baz',
-            ],
-            [
-                'baz',
-                'foo',
-                'bar',
-            ],
-        ];
-
-        $assumedArray = [
-            [
-                'bar',
-                'baz',
-                'foo',
-            ],
-            [
-                'bar',
-                'baz',
-                'foo',
-            ],
-        ];
-
-        $this->assertEquals($assumedArray, Arr::sortRecursive($array));
-    }
-
-    public function testArrayWhere()
-    {
-        $array = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8];
-        $this->assertEquals(['b' => 2, 'd' => 4, 'f' => 6, 'h' => 8], Arr::where(
-            $array,
-            function ($value, $key) {
-                return $value % 2 === 0;
-            }
-        ));
-    }
-
-    public function testArrayWrap()
-    {
-        $string = 'a';
-        $array = ['a'];
-        $object = new stdClass;
-        $object->value = 'a';
-        $this->assertEquals(['a'], Arr::wrap($string));
-        $this->assertEquals($array, Arr::wrap($array));
-        $this->assertEquals([$object], Arr::wrap($object));
-    }
-
     public function testHead()
     {
         $array = ['a', 'b', 'c'];
-        $this->assertEquals('a', head($array));
+        $this->assertSame('a', head($array));
     }
 
     public function testLast()
     {
         $array = ['a', 'b', 'c'];
-        $this->assertEquals('c', last($array));
+        $this->assertSame('c', last($array));
     }
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
         $this->assertSame([
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+            SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
-        class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
+        class_uses_recursive(SupportTestClassTwo::class));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
         $this->assertSame([
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+            SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
         class_uses_recursive(new SupportTestClassTwo));
     }
@@ -718,24 +342,11 @@ class SupportHelpersTest extends TestCase
     public function testClassUsesRecursiveReturnParentTraitsFirst()
     {
         $this->assertSame([
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
-            'Illuminate\Tests\Support\SupportTestTraitThree' => 'Illuminate\Tests\Support\SupportTestTraitThree',
+            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+            SupportTestTraitOne::class => SupportTestTraitOne::class,
+            SupportTestTraitThree::class => SupportTestTraitThree::class,
         ],
         class_uses_recursive(SupportTestClassThree::class));
-    }
-
-    public function testArrayAdd()
-    {
-        $this->assertEquals(['surname' => 'Mövsümov'], Arr::add([], 'surname', 'Mövsümov'));
-        $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
-    }
-
-    public function testArrayPull()
-    {
-        $developer = ['firstname' => 'Ferid', 'surname' => 'Mövsümov'];
-        $this->assertEquals('Mövsümov', Arr::pull($developer, 'surname'));
-        $this->assertEquals(['firstname' => 'Ferid'], $developer);
     }
 
     public function testTap()
@@ -750,11 +361,10 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($mock, tap($mock)->foo());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testThrow()
     {
+        $this->expectException(RuntimeException::class);
+
         throw_if(true, new RuntimeException);
     }
 
@@ -763,12 +373,11 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('foo', throw_unless('foo', new RuntimeException));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Test Message
-     */
     public function testThrowWithString()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Test Message');
+
         throw_if(true, RuntimeException::class, 'Test Message');
     }
 
@@ -799,7 +408,7 @@ class SupportHelpersTest extends TestCase
 
     public function testOptionalWithArray()
     {
-        $this->assertEquals('here', optional(['present' => 'here'])['present']);
+        $this->assertSame('here', optional(['present' => 'here'])['present']);
         $this->assertNull(optional(null)['missing']);
         $this->assertNull(optional(['present' => 'here'])->missing);
     }
@@ -854,7 +463,7 @@ class SupportHelpersTest extends TestCase
 
         $this->assertNull(optional(null)->present()->something());
 
-        $this->assertEquals('$10.00', optional(new class {
+        $this->assertSame('$10.00', optional(new class {
             public function present()
             {
                 return new class {
@@ -865,6 +474,61 @@ class SupportHelpersTest extends TestCase
                 };
             }
         })->present()->something());
+    }
+
+    public function testRetry()
+    {
+        $startTime = microtime(true);
+
+        $attempts = retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, 100);
+
+        // Make sure we made two attempts
+        $this->assertEquals(2, $attempts);
+
+        // Make sure we waited 100ms for the first attempt
+        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.02);
+    }
+
+    public function testRetryWithPassingWhenCallback()
+    {
+        $startTime = microtime(true);
+
+        $attempts = retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, 100, function ($ex) {
+            return true;
+        });
+
+        // Make sure we made two attempts
+        $this->assertEquals(2, $attempts);
+
+        // Make sure we waited 100ms for the first attempt
+        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.02);
+    }
+
+    public function testRetryWithFailingWhenCallback()
+    {
+        $this->expectException(RuntimeException::class);
+
+        retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, 100, function ($ex) {
+            return false;
+        });
     }
 
     public function testTransform()
@@ -880,11 +544,11 @@ class SupportHelpersTest extends TestCase
 
     public function testTransformDefaultWhenBlank()
     {
-        $this->assertEquals('baz', transform(null, function () {
+        $this->assertSame('baz', transform(null, function () {
             return 'bar';
         }, 'baz'));
 
-        $this->assertEquals('baz', transform('', function () {
+        $this->assertSame('baz', transform('', function () {
             return 'bar';
         }, function () {
             return 'baz';
@@ -902,58 +566,116 @@ class SupportHelpersTest extends TestCase
 
     public function testEnv()
     {
-        putenv('foo=bar');
-        $this->assertEquals('bar', env('foo'));
-    }
-
-    public function testEnvWithQuotes()
-    {
-        putenv('foo="bar"');
-        $this->assertEquals('bar', env('foo'));
+        $_SERVER['foo'] = 'bar';
+        $this->assertSame('bar', env('foo'));
+        $this->assertSame('bar', Env::get('foo'));
     }
 
     public function testEnvTrue()
     {
-        putenv('foo=true');
+        $_SERVER['foo'] = 'true';
         $this->assertTrue(env('foo'));
 
-        putenv('foo=(true)');
+        $_SERVER['foo'] = '(true)';
         $this->assertTrue(env('foo'));
     }
 
     public function testEnvFalse()
     {
-        putenv('foo=false');
+        $_SERVER['foo'] = 'false';
         $this->assertFalse(env('foo'));
 
-        putenv('foo=(false)');
+        $_SERVER['foo'] = '(false)';
         $this->assertFalse(env('foo'));
     }
 
     public function testEnvEmpty()
     {
-        putenv('foo=');
-        $this->assertEquals('', env('foo'));
+        $_SERVER['foo'] = '';
+        $this->assertSame('', env('foo'));
 
-        putenv('foo=empty');
-        $this->assertEquals('', env('foo'));
+        $_SERVER['foo'] = 'empty';
+        $this->assertSame('', env('foo'));
 
-        putenv('foo=(empty)');
-        $this->assertEquals('', env('foo'));
+        $_SERVER['foo'] = '(empty)';
+        $this->assertSame('', env('foo'));
     }
 
     public function testEnvNull()
     {
-        putenv('foo=null');
-        $this->assertEquals('', env('foo'));
+        $_SERVER['foo'] = 'null';
+        $this->assertNull(env('foo'));
 
-        putenv('foo=(null)');
-        $this->assertEquals('', env('foo'));
+        $_SERVER['foo'] = '(null)';
+        $this->assertNull(env('foo'));
+    }
+
+    public function testEnvDefault()
+    {
+        $_SERVER['foo'] = 'bar';
+        $this->assertSame('bar', env('foo', 'default'));
+
+        $_SERVER['foo'] = '';
+        $this->assertSame('', env('foo', 'default'));
+
+        unset($_SERVER['foo']);
+        $this->assertSame('default', env('foo', 'default'));
+
+        $_SERVER['foo'] = null;
+        $this->assertSame('default', env('foo', 'default'));
+    }
+
+    public function testEnvEscapedString()
+    {
+        $_SERVER['foo'] = '"null"';
+        $this->assertSame('null', env('foo'));
+
+        $_SERVER['foo'] = "'null'";
+        $this->assertSame('null', env('foo'));
+
+        $_SERVER['foo'] = 'x"null"x'; // this should not be unquoted
+        $this->assertSame('x"null"x', env('foo'));
+    }
+
+    public function testGetFromSERVERFirst()
+    {
+        $_ENV['foo'] = 'From $_ENV';
+        $_SERVER['foo'] = 'From $_SERVER';
+        $this->assertSame('From $_SERVER', env('foo'));
+    }
+
+    public function providesPregReplaceArrayData()
+    {
+        $pointerArray = ['Taylor', 'Otwell'];
+
+        next($pointerArray);
+
+        return [
+            ['/:[a-z_]+/', ['8:30', '9:00'], 'The event will take place between :start and :end', 'The event will take place between 8:30 and 9:00'],
+            ['/%s/', ['Taylor'], 'Hi, %s', 'Hi, Taylor'],
+            ['/%s/', ['Taylor', 'Otwell'], 'Hi, %s %s', 'Hi, Taylor Otwell'],
+            ['/%s/', [], 'Hi, %s %s', 'Hi,  '],
+            ['/%s/', ['a', 'b', 'c'], 'Hi', 'Hi'],
+            ['//', [], '', ''],
+            ['/%s/', ['a'], '', ''],
+            // The internal pointer of this array is not at the beginning
+            ['/%s/', $pointerArray, 'Hi, %s %s', 'Hi, Taylor Otwell'],
+        ];
+    }
+
+    /** @dataProvider providesPregReplaceArrayData */
+    public function testPregReplaceArray($pattern, $replacements, $subject, $expectedOutput)
+    {
+        $this->assertSame(
+            $expectedOutput,
+            preg_replace_array($pattern, $replacements, $subject)
+        );
     }
 }
 
 trait SupportTestTraitOne
 {
+    //
 }
 
 trait SupportTestTraitTwo
@@ -968,10 +690,12 @@ class SupportTestClassOne
 
 class SupportTestClassTwo extends SupportTestClassOne
 {
+    //
 }
 
 trait SupportTestTraitThree
 {
+    //
 }
 
 class SupportTestClassThree extends SupportTestClassTwo

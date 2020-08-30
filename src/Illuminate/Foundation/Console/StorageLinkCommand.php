@@ -11,14 +11,14 @@ class StorageLinkCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'storage:link';
+    protected $signature = 'storage:link {--relative : Create the symbolic link using relative paths}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a symbolic link from "public/storage" to "storage/app/public"';
+    protected $description = 'Create the symbolic links configured for the application';
 
     /**
      * Execute the console command.
@@ -27,14 +27,34 @@ class StorageLinkCommand extends Command
      */
     public function handle()
     {
-        if (file_exists(public_path('storage'))) {
-            return $this->error('The "public/storage" directory already exists.');
+        $relative = $this->option('relative');
+
+        foreach ($this->links() as $link => $target) {
+            if (file_exists($link)) {
+                $this->error("The [$link] link already exists.");
+                continue;
+            }
+
+            if ($relative) {
+                $this->laravel->make('files')->relativeLink($target, $link);
+            } else {
+                $this->laravel->make('files')->link($target, $link);
+            }
+
+            $this->info("The [$link] link has been connected to [$target].");
         }
 
-        $this->laravel->make('files')->link(
-            storage_path('app/public'), public_path('storage')
-        );
+        $this->info('The links have been created.');
+    }
 
-        $this->info('The [public/storage] directory has been linked.');
+    /**
+     * Get the symbolic links that are configured for the application.
+     *
+     * @return array
+     */
+    protected function links()
+    {
+        return $this->laravel['config']['filesystems.links'] ??
+               [public_path('storage') => storage_path('app/public')];
     }
 }

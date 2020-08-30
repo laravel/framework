@@ -11,7 +11,7 @@ class ScheduleFinishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'schedule:finish {id}';
+    protected $signature = 'schedule:finish {id} {code=0}';
 
     /**
      * The console command description.
@@ -28,34 +28,15 @@ class ScheduleFinishCommand extends Command
     protected $hidden = true;
 
     /**
-     * The schedule instance.
-     *
-     * @var \Illuminate\Console\Scheduling\Schedule
-     */
-    protected $schedule;
-
-    /**
-     * Create a new command instance.
+     * Execute the console command.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    public function __construct(Schedule $schedule)
+    public function handle(Schedule $schedule)
     {
-        $this->schedule = $schedule;
-
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     */
-    public function handle()
-    {
-        collect($this->schedule->events())->filter(function ($value) {
+        collect($schedule->events())->filter(function ($value) {
             return $value->mutexName() == $this->argument('id');
-        })->each->callAfterCallbacks($this->laravel);
+        })->each->callAfterCallbacksWithExitCode($this->laravel, $this->argument('code'));
     }
 }

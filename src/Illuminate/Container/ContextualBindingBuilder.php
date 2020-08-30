@@ -2,6 +2,7 @@
 
 namespace Illuminate\Container;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
 
 class ContextualBindingBuilder implements ContextualBindingBuilderContract
@@ -9,14 +10,14 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * The underlying container instance.
      *
-     * @var \Illuminate\Container\Container
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 
     /**
      * The concrete instance.
      *
-     * @var string
+     * @var string|array
      */
     protected $concrete;
 
@@ -30,8 +31,8 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * Create a new contextual binding builder.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  string  $concrete
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  string|array  $concrete
      * @return void
      */
     public function __construct(Container $container, $concrete)
@@ -56,13 +57,28 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * Define the implementation for the contextual binding.
      *
-     * @param  \Closure|string  $implementation
+     * @param  \Closure|string|array  $implementation
      * @return void
      */
     public function give($implementation)
     {
-        $this->container->addContextualBinding(
-            $this->concrete, $this->needs, $implementation
-        );
+        foreach (Util::arrayWrap($this->concrete) as $concrete) {
+            $this->container->addContextualBinding($concrete, $this->needs, $implementation);
+        }
+    }
+
+    /**
+     * Define tagged services to be used as the implementation for the contextual binding.
+     *
+     * @param  string  $tag
+     * @return void
+     */
+    public function giveTagged($tag)
+    {
+        $this->give(function ($container) use ($tag) {
+            $taggedServices = $container->tagged($tag);
+
+            return is_array($taggedServices) ? $taggedServices : iterator_to_array($taggedServices);
+        });
     }
 }

@@ -12,4 +12,14 @@ class Post extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * Return whether the post is published.
+     *
+     * @return bool
+     */
+    public function getIsPublishedAttribute()
+    {
+        return true;
+    }
 }

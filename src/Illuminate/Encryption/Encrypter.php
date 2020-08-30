@@ -2,10 +2,10 @@
 
 namespace Illuminate\Encryption;
 
-use RuntimeException;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Encryption\EncryptException;
+use RuntimeException;
 
 class Encrypter implements EncrypterContract
 {
@@ -67,7 +67,7 @@ class Encrypter implements EncrypterContract
      */
     public static function generateKey($cipher)
     {
-        return random_bytes($cipher == 'AES-128-CBC' ? 16 : 32);
+        return random_bytes($cipher === 'AES-128-CBC' ? 16 : 32);
     }
 
     /**
@@ -100,7 +100,7 @@ class Encrypter implements EncrypterContract
         // its authenticity. Then, we'll JSON the data into the "payload" array.
         $mac = $this->hash($iv = base64_encode($iv), $value);
 
-        $json = json_encode(compact('iv', 'value', 'mac'));
+        $json = json_encode(compact('iv', 'value', 'mac'), JSON_UNESCAPED_SLASHES);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptException('Could not encrypt the data.');
@@ -114,6 +114,8 @@ class Encrypter implements EncrypterContract
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
     public function encryptString($value)
     {
@@ -123,7 +125,7 @@ class Encrypter implements EncrypterContract
     /**
      * Decrypt the given value.
      *
-     * @param  mixed  $payload
+     * @param  string  $payload
      * @param  bool  $unserialize
      * @return mixed
      *
@@ -154,6 +156,8 @@ class Encrypter implements EncrypterContract
      *
      * @param  string  $payload
      * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
     public function decryptString($payload)
     {
@@ -218,24 +222,8 @@ class Encrypter implements EncrypterContract
      */
     protected function validMac(array $payload)
     {
-        $calculated = $this->calculateMac($payload, $bytes = random_bytes(16));
-
         return hash_equals(
-            hash_hmac('sha256', $payload['mac'], $bytes, true), $calculated
-        );
-    }
-
-    /**
-     * Calculate the hash of the given payload.
-     *
-     * @param  array  $payload
-     * @param  string  $bytes
-     * @return string
-     */
-    protected function calculateMac($payload, $bytes)
-    {
-        return hash_hmac(
-            'sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true
+            $this->hash($payload['iv'], $payload['value']), $payload['mac']
         );
     }
 

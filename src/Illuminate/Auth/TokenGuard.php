@@ -2,9 +2,9 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Http\Request;
 
 class TokenGuard implements Guard
 {
@@ -32,16 +32,30 @@ class TokenGuard implements Guard
     protected $storageKey;
 
     /**
+     * Indicates if the API token is hashed in storage.
+     *
+     * @var bool
+     */
+    protected $hash = false;
+
+    /**
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $inputKey
      * @param  string  $storageKey
+     * @param  bool  $hash
      * @return void
      */
-    public function __construct(UserProvider $provider, Request $request, $inputKey = 'api_token', $storageKey = 'api_token')
+    public function __construct(
+        UserProvider $provider,
+        Request $request,
+        $inputKey = 'api_token',
+        $storageKey = 'api_token',
+        $hash = false)
     {
+        $this->hash = $hash;
         $this->request = $request;
         $this->provider = $provider;
         $this->inputKey = $inputKey;
@@ -67,9 +81,9 @@ class TokenGuard implements Guard
         $token = $this->getTokenForRequest();
 
         if (! empty($token)) {
-            $user = $this->provider->retrieveByCredentials(
-                [$this->storageKey => $token]
-            );
+            $user = $this->provider->retrieveByCredentials([
+                $this->storageKey => $this->hash ? hash('sha256', $token) : $token,
+            ]);
         }
 
         return $this->user = $user;

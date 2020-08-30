@@ -2,23 +2,28 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery;
-use stdClass;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Notifications\Dispatcher;
+use Illuminate\Notifications\RoutesNotifications;
+use Illuminate\Support\Facades\Notification;
+use InvalidArgumentException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
-        Mockery::close();
+        m::close();
+
+        Container::setInstance(null);
     }
 
     public function testNotificationCanBeDispatched()
     {
         $container = new Container;
-        $factory = Mockery::mock(Dispatcher::class);
+        $factory = m::mock(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
@@ -31,7 +36,7 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testNotificationCanBeSentNow()
     {
         $container = new Container;
-        $factory = Mockery::mock(Dispatcher::class);
+        $factory = m::mock(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
@@ -44,18 +49,25 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testNotificationOptionRouting()
     {
         $instance = new RoutesNotificationsTestInstance;
-        $this->assertEquals('bar', $instance->routeNotificationFor('foo'));
-        $this->assertEquals('taylor@laravel.com', $instance->routeNotificationFor('mail'));
-        $this->assertEquals('5555555555', $instance->routeNotificationFor('nexmo'));
+        $this->assertSame('bar', $instance->routeNotificationFor('foo'));
+        $this->assertSame('taylor@laravel.com', $instance->routeNotificationFor('mail'));
+    }
+
+    public function testOnDemandNotificationsCannotUseDatabaseChannel()
+    {
+        $this->expectExceptionObject(
+            new InvalidArgumentException('The database channel does not support on-demand notifications.')
+        );
+
+        Notification::route('database', 'foo');
     }
 }
 
 class RoutesNotificationsTestInstance
 {
-    use \Illuminate\Notifications\RoutesNotifications;
+    use RoutesNotifications;
 
     protected $email = 'taylor@laravel.com';
-    protected $phone_number = '5555555555';
 
     public function routeNotificationForFoo()
     {

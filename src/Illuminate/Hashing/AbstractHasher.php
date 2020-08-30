@@ -7,7 +7,7 @@ abstract class AbstractHasher
     /**
      * Get information about the given hashed value.
      *
-     * @param  string $hashedValue
+     * @param  string  $hashedValue
      * @return array
      */
     public function info($hashedValue)

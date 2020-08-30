@@ -2,8 +2,14 @@
 
 namespace Illuminate\Validation;
 
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\Dimensions;
+use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\NotIn;
+use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\Unique;
 
 class Rule
 {
@@ -17,11 +23,11 @@ class Rule
      */
     public static function dimensions(array $constraints = [])
     {
-        return new Rules\Dimensions($constraints);
+        return new Dimensions($constraints);
     }
 
     /**
-     * Get a exists constraint builder instance.
+     * Get an exists constraint builder instance.
      *
      * @param  string  $table
      * @param  string  $column
@@ -29,37 +35,48 @@ class Rule
      */
     public static function exists($table, $column = 'NULL')
     {
-        return new Rules\Exists($table, $column);
+        return new Exists($table, $column);
     }
 
     /**
      * Get an in constraint builder instance.
      *
-     * @param  array|string|\Illuminate\Support\Collection  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
      * @return \Illuminate\Validation\Rules\In
      */
     public static function in($values)
     {
-        if ($values instanceof Collection) {
+        if ($values instanceof Arrayable) {
             $values = $values->toArray();
         }
 
-        return new Rules\In(is_array($values) ? $values : func_get_args());
+        return new In(is_array($values) ? $values : func_get_args());
     }
 
     /**
      * Get a not_in constraint builder instance.
      *
-     * @param  array|string|\Illuminate\Support\Collection  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
      * @return \Illuminate\Validation\Rules\NotIn
      */
     public static function notIn($values)
     {
-        if ($values instanceof Collection) {
+        if ($values instanceof Arrayable) {
             $values = $values->toArray();
         }
 
-        return new Rules\NotIn(is_array($values) ? $values : func_get_args());
+        return new NotIn(is_array($values) ? $values : func_get_args());
+    }
+
+    /**
+     * Get a required_if constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\RequiredIf
+     */
+    public static function requiredIf($callback)
+    {
+        return new RequiredIf($callback);
     }
 
     /**
@@ -71,6 +88,6 @@ class Rule
      */
     public static function unique($table, $column = 'NULL')
     {
-        return new Rules\Unique($table, $column);
+        return new Unique($table, $column);
     }
 }

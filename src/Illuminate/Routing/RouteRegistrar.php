@@ -2,8 +2,8 @@
 
 namespace Illuminate\Routing;
 
-use Closure;
 use BadMethodCallException;
+use Closure;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
@@ -21,6 +21,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar name(string $value)
  * @method \Illuminate\Routing\RouteRegistrar namespace(string $value)
  * @method \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
+ * @method \Illuminate\Routing\RouteRegistrar where(array  $where)
  */
 class RouteRegistrar
 {
@@ -53,7 +54,7 @@ class RouteRegistrar
      * @var array
      */
     protected $allowedAttributes = [
-        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix',
+        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix', 'where',
     ];
 
     /**
@@ -107,6 +108,19 @@ class RouteRegistrar
     public function resource($name, $controller, array $options = [])
     {
         return $this->router->resource($name, $controller, $this->attributes + $options);
+    }
+
+    /**
+     * Route an API resource to a controller.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function apiResource($name, $controller, array $options = [])
+    {
+        return $this->router->apiResource($name, $controller, $this->attributes + $options);
     }
 
     /**
@@ -166,6 +180,15 @@ class RouteRegistrar
             $action = ['uses' => $action];
         }
 
+        if (is_array($action) &&
+            is_callable($action) &&
+            ! Arr::isAssoc($action)) {
+            $action = [
+                'uses' => $action[0].'@'.$action[1],
+                'controller' => $action[0].'@'.$action[1],
+            ];
+        }
+
         return array_merge($this->attributes, $action);
     }
 
@@ -175,6 +198,8 @@ class RouteRegistrar
      * @param  string  $method
      * @param  array  $parameters
      * @return \Illuminate\Routing\Route|$this
+     *
+     * @throws \BadMethodCallException
      */
     public function __call($method, $parameters)
     {
@@ -183,7 +208,7 @@ class RouteRegistrar
         }
 
         if (in_array($method, $this->allowedAttributes)) {
-            if ($method == 'middleware') {
+            if ($method === 'middleware') {
                 return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
             }
 

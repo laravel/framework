@@ -3,8 +3,8 @@
 namespace Illuminate\Support;
 
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class Composer
 {
@@ -18,7 +18,7 @@ class Composer
     /**
      * The working path to regenerate from.
      *
-     * @var string
+     * @var string|null
      */
     protected $workingPath;
 
@@ -38,16 +38,16 @@ class Composer
     /**
      * Regenerate the Composer autoloader files.
      *
-     * @param  string  $extra
+     * @param  string|array  $extra
      * @return void
      */
     public function dumpAutoloads($extra = '')
     {
-        $process = $this->getProcess();
+        $extra = $extra ? (array) $extra : [];
 
-        $process->setCommandLine(trim($this->findComposer().' dump-autoload '.$extra));
+        $command = array_merge($this->findComposer(), ['dump-autoload'], $extra);
 
-        $process->run();
+        $this->getProcess($command)->run();
     }
 
     /**
@@ -63,25 +63,36 @@ class Composer
     /**
      * Get the composer command for the environment.
      *
-     * @return string
+     * @return array
      */
     protected function findComposer()
     {
         if ($this->files->exists($this->workingPath.'/composer.phar')) {
-            return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false)).' composer.phar';
+            return [$this->phpBinary(), 'composer.phar'];
         }
 
-        return 'composer';
+        return ['composer'];
+    }
+
+    /**
+     * Get the PHP binary.
+     *
+     * @return string
+     */
+    protected function phpBinary()
+    {
+        return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
     }
 
     /**
      * Get a new Symfony process instance.
      *
+     * @param  array  $command
      * @return \Symfony\Component\Process\Process
      */
-    protected function getProcess()
+    protected function getProcess(array $command)
     {
-        return (new Process('', $this->workingPath))->setTimeout(null);
+        return (new Process($command, $this->workingPath))->setTimeout(null);
     }
 
     /**

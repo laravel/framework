@@ -1,10 +1,10 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Closure;
 
-class DummyClass
+class {{ class }}
 {
     /**
      * Handle an incoming request.

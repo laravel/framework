@@ -2,22 +2,22 @@
 
 namespace Illuminate\Http\Exceptions;
 
-use Exception;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Throwable;
 
-class ThrottleRequestsException extends HttpException
+class ThrottleRequestsException extends TooManyRequestsHttpException
 {
     /**
-     * Create a new exception instance.
+     * Create a new throttle requests exception instance.
      *
      * @param  string|null  $message
-     * @param  \Exception|null  $previous
+     * @param  \Throwable|null  $previous
      * @param  array  $headers
      * @param  int  $code
      * @return void
      */
-    public function __construct($message = null, Exception $previous = null, array $headers = [], $code = 0)
+    public function __construct($message = null, Throwable $previous = null, array $headers = [], $code = 0)
     {
-        parent::__construct(429, $message, $previous, $headers, $code);
+        parent::__construct(null, $message, $previous, $code, $headers);
     }
 }

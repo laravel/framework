@@ -1,10 +1,10 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Illuminate\Contracts\Validation\Rule;
 
-class DummyClass implements Rule
+class {{ class }} implements Rule
 {
     /**
      * Create a new rule instance.

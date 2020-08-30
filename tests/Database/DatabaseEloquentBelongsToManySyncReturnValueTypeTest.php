@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -56,7 +55,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->schema()->drop('users');
         $this->schema()->drop('articles');
@@ -86,14 +85,14 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
         $changes = $user->articles()->sync($articleIDs);
 
         collect($changes['attached'])->map(function ($id) {
-            $this->assertTrue(gettype($id) === (new BelongsToManySyncTestTestArticle)->getKeyType());
+            $this->assertSame(gettype($id), (new BelongsToManySyncTestTestArticle)->getKeyType());
         });
     }
 
     /**
      * Get a database connection instance.
      *
-     * @return Connection
+     * @return \Illuminate\Database\ConnectionInterface
      */
     protected function connection()
     {
@@ -103,7 +102,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
     /**
      * Get a schema builder instance.
      *
-     * @return Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema()
     {

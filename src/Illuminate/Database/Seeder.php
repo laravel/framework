@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Support\Arr;
-use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 abstract class Seeder
 {
@@ -28,18 +28,31 @@ abstract class Seeder
      *
      * @param  array|string  $class
      * @param  bool  $silent
+     * @param  mixed ...$parameters
      * @return $this
      */
-    public function call($class, $silent = false)
+    public function call($class, $silent = false, ...$parameters)
     {
         $classes = Arr::wrap($class);
 
         foreach ($classes as $class) {
+            $seeder = $this->resolve($class);
+
+            $name = get_class($seeder);
+
             if ($silent === false && isset($this->command)) {
-                $this->command->getOutput()->writeln("<info>Seeding:</info> $class");
+                $this->command->getOutput()->writeln("<comment>Seeding:</comment> {$name}");
             }
 
-            $this->resolve($class)->__invoke();
+            $startTime = microtime(true);
+
+            $seeder->__invoke(...$parameters);
+
+            $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
+
+            if ($silent === false && isset($this->command)) {
+                $this->command->getOutput()->writeln("<info>Seeded:</info>  {$name} ({$runTime}ms)");
+            }
         }
 
         return $this;
@@ -49,11 +62,12 @@ abstract class Seeder
      * Silently seed the given connection from the given path.
      *
      * @param  array|string  $class
+     * @param  mixed ...$parameters
      * @return void
      */
-    public function callSilent($class)
+    public function callSilent($class, ...$parameters)
     {
-        $this->call($class, true);
+        $this->call($class, true, ...$parameters);
     }
 
     /**
@@ -108,18 +122,19 @@ abstract class Seeder
     /**
      * Run the database seeds.
      *
-     * @return void
+     * @param  mixed ...$parameters
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public function __invoke()
+    public function __invoke(...$parameters)
     {
         if (! method_exists($this, 'run')) {
             throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
         return isset($this->container)
-                    ? $this->container->call([$this, 'run'])
-                    : $this->run();
+                    ? $this->container->call([$this, 'run'], $parameters)
+                    : $this->run(...$parameters);
     }
 }

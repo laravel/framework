@@ -54,11 +54,11 @@ class ComposerScripts
     {
         $laravel = new Application(getcwd());
 
-        if (file_exists($servicesPath = $laravel->getCachedServicesPath())) {
+        if (is_file($servicesPath = $laravel->getCachedServicesPath())) {
             @unlink($servicesPath);
         }
 
-        if (file_exists($packagesPath = $laravel->getCachedPackagesPath())) {
+        if (is_file($packagesPath = $laravel->getCachedPackagesPath())) {
             @unlink($packagesPath);
         }
     }

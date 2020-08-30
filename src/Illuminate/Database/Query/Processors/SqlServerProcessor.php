@@ -13,8 +13,8 @@ class SqlServerProcessor extends Processor
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $sql
-     * @param  array   $values
-     * @param  string  $sequence
+     * @param  array  $values
+     * @param  string|null  $sequence
      * @return int
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
@@ -37,6 +37,7 @@ class SqlServerProcessor extends Processor
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return int
+     *
      * @throws \Exception
      */
     protected function processInsertGetIdForOdbc(Connection $connection)

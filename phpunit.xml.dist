@@ -17,18 +17,19 @@
             <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+    <coverage processUncoveredFiles="true">
+        <include>
             <directory suffix=".php">./src</directory>
-            <exclude>
-                <directory suffix=".blade.php">./src/</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+        </include>
+        <exclude>
+            <directory suffix=".blade.php">./src/</directory>
+        </exclude>
+    </coverage>
     <php>
-      <!--
-      <env name="REDIS_HOST" value="127.0.0.1" />
-      <env name="REDIS_PORT" value="6379" />
-      -->
+        <ini name="memory_limit" value="2048M" />
+        <!--
+        <env name="REDIS_HOST" value="127.0.0.1" />
+        <env name="REDIS_PORT" value="6379" />
+        -->
     </php>
 </phpunit>

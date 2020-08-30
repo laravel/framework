@@ -2,9 +2,10 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Reflector;
+use Illuminate\Support\Str;
 
 class ImplicitRouteBinding
 {
@@ -14,13 +15,15 @@ class ImplicitRouteBinding
      * @param  \Illuminate\Container\Container  $container
      * @param  \Illuminate\Routing\Route  $route
      * @return void
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public static function resolveForRoute($container, $route)
     {
         $parameters = $route->parameters();
 
         foreach ($route->signatureParameters(UrlRoutable::class) as $parameter) {
-            if (! $parameterName = static::getParameterName($parameter->name, $parameters)) {
+            if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
                 continue;
             }
 
@@ -30,10 +33,18 @@ class ImplicitRouteBinding
                 continue;
             }
 
-            $instance = $container->make($parameter->getClass()->name);
+            $instance = $container->make(Reflector::getParameterClassName($parameter));
 
-            if (! $model = $instance->resolveRouteBinding($parameterValue)) {
-                throw (new ModelNotFoundException)->setModel(get_class($instance));
+            $parent = $route->parentOfParameter($parameterName);
+
+            if ($parent instanceof UrlRoutable && in_array($parameterName, array_keys($route->bindingFields()))) {
+                if (! $model = $parent->resolveChildRouteBinding(
+                    $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
+                )) {
+                    throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                }
+            } elseif (! $model = $instance->resolveRouteBinding($parameterValue, $route->bindingFieldFor($parameterName))) {
+                throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
             }
 
             $route->setParameter($parameterName, $model);

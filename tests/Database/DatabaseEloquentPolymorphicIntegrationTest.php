@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -66,7 +66,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
@@ -135,6 +135,31 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->assertTrue($likes[1]->relationLoaded('likeable'));
         $this->assertTrue($likes[1]->likeable->relationLoaded('owner'));
         $this->assertTrue($likes[1]->likeable->relationLoaded('comments'));
+    }
+
+    public function testItLoadsNestedMorphRelationshipCountsOnDemand()
+    {
+        $this->seedData();
+
+        TestPost::first()->likes()->create([]);
+        TestComment::first()->likes()->create([]);
+
+        $likes = TestLike::with('likeable.owner')->get()->loadMorphCount('likeable', [
+            TestComment::class => ['likes'],
+            TestPost::class => 'comments',
+        ]);
+
+        $this->assertTrue($likes[0]->relationLoaded('likeable'));
+        $this->assertTrue($likes[0]->likeable->relationLoaded('owner'));
+        $this->assertEquals(2, $likes[0]->likeable->likes_count);
+
+        $this->assertTrue($likes[1]->relationLoaded('likeable'));
+        $this->assertTrue($likes[1]->likeable->relationLoaded('owner'));
+        $this->assertEquals(1, $likes[1]->likeable->comments_count);
+
+        $this->assertTrue($likes[2]->relationLoaded('likeable'));
+        $this->assertTrue($likes[2]->likeable->relationLoaded('owner'));
+        $this->assertEquals(2, $likes[2]->likeable->likes_count);
     }
 
     /**

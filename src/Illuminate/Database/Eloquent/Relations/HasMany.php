@@ -13,13 +13,15 @@ class HasMany extends HasOneOrMany
      */
     public function getResults()
     {
-        return $this->query->get();
+        return ! is_null($this->getParentKey())
+                ? $this->query->get()
+                : $this->related->newCollection();
     }
 
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  string  $relation
      * @return array
      */
@@ -35,7 +37,7 @@ class HasMany extends HasOneOrMany
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @param  string  $relation
      * @return array

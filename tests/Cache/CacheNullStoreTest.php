@@ -26,4 +26,11 @@ class CacheNullStoreTest extends TestCase
             'bar',
         ]));
     }
+
+    public function testIncrementAndDecrementReturnFalse()
+    {
+        $store = new NullStore;
+        $this->assertFalse($store->increment('foo'));
+        $this->assertFalse($store->decrement('foo'));
+    }
 }

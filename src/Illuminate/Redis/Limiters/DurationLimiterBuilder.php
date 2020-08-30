@@ -2,8 +2,8 @@
 
 namespace Illuminate\Redis\Limiters;
 
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
+use Illuminate\Support\InteractsWithTime;
 
 class DurationLimiterBuilder
 {
@@ -73,7 +73,7 @@ class DurationLimiterBuilder
     /**
      * Set the amount of time the lock window is maintained.
      *
-     * @param  int  $decay
+     * @param  \DateTimeInterface|\DateInterval|int  $decay
      * @return $this
      */
     public function every($decay)

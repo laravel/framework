@@ -2,67 +2,70 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Illuminate\Mail\Markdown;
+use Illuminate\View\Factory;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
-        \Mockery::close();
+        m::close();
     }
 
     public function testRenderFunctionReturnsHtml()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
-        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = m::mock(Factory::class);
+        $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
-        $viewFactory->shouldReceive('make')->with('mail::themes.default')->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('mail::themes.default', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
         $result = $markdown->render('view', []);
 
-        $this->assertTrue(strpos($result, '<html></html>') !== false);
+        $this->assertNotFalse(strpos($result, '<html></html>'));
     }
 
     public function testRenderFunctionReturnsHtmlWithCustomTheme()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
-        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = m::mock(Factory::class);
+        $markdown = new Markdown($viewFactory);
         $markdown->theme('yaz');
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
-        $viewFactory->shouldReceive('make')->with('mail::themes.yaz')->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('mail::themes.yaz', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
         $result = $markdown->render('view', []);
 
-        $this->assertTrue(strpos($result, '<html></html>') !== false);
+        $this->assertNotFalse(strpos($result, '<html></html>'));
     }
 
     public function testRenderTextReturnsText()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
-        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = m::mock(Factory::class);
+        $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
-        $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->markdownComponentPaths())->andReturnSelf();
+        $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->textComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->andReturn('text');
 
-        $result = $markdown->renderText('view', []);
+        $result = $markdown->renderText('view', [])->toHtml();
 
-        $this->assertEquals('text', $result);
+        $this->assertSame('text', $result);
     }
 
     public function testParseReturnsParsedMarkdown()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
-        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = m::mock(Factory::class);
+        $markdown = new Markdown($viewFactory);
 
-        $result = $markdown->parse('# Something');
+        $result = $markdown->parse('# Something')->toHtml();
 
-        $this->assertEquals('<h1>Something</h1>', $result);
+        $this->assertSame("<h1>Something</h1>\n", $result);
     }
 }

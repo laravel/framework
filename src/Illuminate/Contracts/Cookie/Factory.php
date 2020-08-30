@@ -9,12 +9,12 @@ interface Factory
      *
      * @param  string  $name
      * @param  string  $value
-     * @param  int     $minutes
-     * @param  string  $path
-     * @param  string  $domain
-     * @param  bool|null    $secure
-     * @param  bool    $httpOnly
-     * @param  bool         $raw
+     * @param  int  $minutes
+     * @param  string|null  $path
+     * @param  string|null  $domain
+     * @param  bool|null  $secure
+     * @param  bool  $httpOnly
+     * @param  bool  $raw
      * @param  string|null  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
@@ -25,11 +25,11 @@ interface Factory
      *
      * @param  string  $name
      * @param  string  $value
-     * @param  string  $path
-     * @param  string  $domain
-     * @param  bool|null    $secure
-     * @param  bool    $httpOnly
-     * @param  bool         $raw
+     * @param  string|null  $path
+     * @param  string|null  $domain
+     * @param  bool|null  $secure
+     * @param  bool  $httpOnly
+     * @param  bool  $raw
      * @param  string|null  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
@@ -39,8 +39,8 @@ interface Factory
      * Expire the given cookie.
      *
      * @param  string  $name
-     * @param  string  $path
-     * @param  string  $domain
+     * @param  string|null  $path
+     * @param  string|null  $domain
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forget($name, $path = null, $domain = null);

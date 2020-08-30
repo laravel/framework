@@ -2,19 +2,45 @@
 
 namespace Illuminate\Http\Testing;
 
+use Illuminate\Support\Str;
+
 class FileFactory
 {
     /**
      * Create a new fake file.
      *
      * @param  string  $name
-     * @param  int  $kilobytes
+     * @param  string|int  $kilobytes
+     * @param  string|null  $mimeType
      * @return \Illuminate\Http\Testing\File
      */
-    public function create($name, $kilobytes = 0)
+    public function create($name, $kilobytes = 0, $mimeType = null)
     {
-        return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
+        if (is_string($kilobytes)) {
+            return $this->createWithContent($name, $kilobytes);
+        }
+
+        return tap(new File($name, tmpfile()), function ($file) use ($kilobytes, $mimeType) {
             $file->sizeToReport = $kilobytes * 1024;
+            $file->mimeTypeToReport = $mimeType;
+        });
+    }
+
+    /**
+     * Create a new fake file with content.
+     *
+     * @param  string  $name
+     * @param  string  $content
+     * @return \Illuminate\Http\Testing\File
+     */
+    public function createWithContent($name, $content)
+    {
+        $tmpfile = tmpfile();
+
+        fwrite($tmpfile, $content);
+
+        return tap(new File($name, $tmpfile), function ($file) use ($tmpfile) {
+            $file->sizeToReport = fstat($tmpfile)['size'];
         });
     }
 
@@ -28,7 +54,9 @@ class FileFactory
      */
     public function image($name, $width = 10, $height = 10)
     {
-        return new File($name, $this->generateImage($width, $height));
+        return new File($name, $this->generateImage(
+            $width, $height, Str::endsWith(Str::lower($name), ['.jpg', '.jpeg']) ? 'jpeg' : 'png'
+        ));
     }
 
     /**
@@ -36,14 +64,24 @@ class FileFactory
      *
      * @param  int  $width
      * @param  int  $height
+     * @param  string  $type
      * @return resource
      */
-    protected function generateImage($width, $height)
+    protected function generateImage($width, $height, $type)
     {
-        return tap(tmpfile(), function ($temp) use ($width, $height) {
+        return tap(tmpfile(), function ($temp) use ($width, $height, $type) {
             ob_start();
 
-            imagepng(imagecreatetruecolor($width, $height));
+            $image = imagecreatetruecolor($width, $height);
+
+            switch ($type) {
+                case 'jpeg':
+                    imagejpeg($image);
+                    break;
+                case 'png':
+                    imagepng($image);
+                    break;
+            }
 
             fwrite($temp, ob_get_clean());
         });

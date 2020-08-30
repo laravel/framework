@@ -26,7 +26,7 @@ interface ResponseFactory
     /**
      * Create a new response for a given view.
      *
-     * @param  string  $view
+     * @param  string|array  $view
      * @param  array  $data
      * @param  int  $status
      * @param  array  $headers
@@ -37,7 +37,7 @@ interface ResponseFactory
     /**
      * Create a new JSON response instance.
      *
-     * @param  string|array  $data
+     * @param  mixed  $data
      * @param  int  $status
      * @param  array  $headers
      * @param  int  $options
@@ -49,7 +49,7 @@ interface ResponseFactory
      * Create a new JSONP response instance.
      *
      * @param  string  $callback
-     * @param  string|array  $data
+     * @param  mixed  $data
      * @param  int  $status
      * @param  array  $headers
      * @param  int  $options
@@ -90,6 +90,15 @@ interface ResponseFactory
     public function download($file, $name = null, array $headers = [], $disposition = 'attachment');
 
     /**
+     * Return the raw contents of a binary file.
+     *
+     * @param  \SplFileInfo|string  $file
+     * @param  array  $headers
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function file($file, array $headers = []);
+
+    /**
      * Create a new redirect response to the given path.
      *
      * @param  string  $path
@@ -104,7 +113,7 @@ interface ResponseFactory
      * Create a new redirect response to a named route.
      *
      * @param  string  $route
-     * @param  array  $parameters
+     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
@@ -115,7 +124,7 @@ interface ResponseFactory
      * Create a new redirect response to a controller action.
      *
      * @param  string  $action
-     * @param  array  $parameters
+     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse

@@ -3,15 +3,15 @@
 namespace Illuminate\View\Concerns;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Support\Str;
 
 trait ManagesEvents
 {
     /**
      * Register a view creator event.
      *
-     * @param  array|string     $views
+     * @param  array|string  $views
      * @param  \Closure|string  $callback
      * @return array
      */
@@ -85,9 +85,9 @@ trait ManagesEvents
     /**
      * Register a class based view composer.
      *
-     * @param  string    $view
-     * @param  string    $class
-     * @param  string    $prefix
+     * @param  string  $view
+     * @param  string  $class
+     * @param  string  $prefix
      * @return \Closure
      */
     protected function addClassEvent($view, $class, $prefix)
@@ -115,7 +115,7 @@ trait ManagesEvents
      */
     protected function buildClassEventCallback($class, $prefix)
     {
-        list($class, $method) = $this->parseClassEvent($class, $prefix);
+        [$class, $method] = $this->parseClassEvent($class, $prefix);
 
         // Once we have the class and method name, we can build the Closure to resolve
         // the instance out of the IoC container and call the method on it with the
@@ -153,7 +153,7 @@ trait ManagesEvents
     /**
      * Add a listener to the event dispatcher.
      *
-     * @param  string    $name
+     * @param  string  $name
      * @param  \Closure  $callback
      * @return void
      */

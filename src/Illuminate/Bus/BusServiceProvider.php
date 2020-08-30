@@ -2,20 +2,14 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
-use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
 use Illuminate\Contracts\Bus\QueueingDispatcher as QueueingDispatcherContract;
+use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\ServiceProvider;
 
-class BusServiceProvider extends ServiceProvider
+class BusServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     /**
      * Register the service provider.
      *
@@ -29,6 +23,8 @@ class BusServiceProvider extends ServiceProvider
             });
         });
 
+        $this->registerBatchServices();
+
         $this->app->alias(
             Dispatcher::class, DispatcherContract::class
         );
@@ -36,6 +32,24 @@ class BusServiceProvider extends ServiceProvider
         $this->app->alias(
             Dispatcher::class, QueueingDispatcherContract::class
         );
+    }
+
+    /**
+     * Register the batch handling services.
+     *
+     * @return void
+     */
+    protected function registerBatchServices()
+    {
+        $this->app->singleton(BatchRepository::class, DatabaseBatchRepository::class);
+
+        $this->app->singleton(DatabaseBatchRepository::class, function ($app) {
+            return new DatabaseBatchRepository(
+                $app->make(BatchFactory::class),
+                $app->make('db')->connection(config('queue.batching.database')),
+                config('queue.batching.table', 'job_batches'),
+            );
+        });
     }
 
     /**
@@ -49,6 +63,7 @@ class BusServiceProvider extends ServiceProvider
             Dispatcher::class,
             DispatcherContract::class,
             QueueingDispatcherContract::class,
+            BatchRepository::class,
         ];
     }
 }

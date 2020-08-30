@@ -3,10 +3,10 @@
 namespace Illuminate\Validation;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
+use Illuminate\Support\Str;
 
 class Factory implements FactoryContract
 {
@@ -69,15 +69,15 @@ class Factory implements FactoryContract
     /**
      * The Validator resolver instance.
      *
-     * @var Closure
+     * @var \Closure
      */
     protected $resolver;
 
     /**
      * Create a new Validator factory instance.
      *
-     * @param  \Illuminate\Contracts\Translation\Translator $translator
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
     public function __construct(Translator $translator, Container $container = null)
@@ -97,13 +97,13 @@ class Factory implements FactoryContract
      */
     public function make(array $data, array $rules, array $messages = [], array $customAttributes = [])
     {
-        // The presence verifier is responsible for checking the unique and exists data
-        // for the validator. It is behind an interface so that multiple versions of
-        // it may be written besides database. We'll inject it into the validator.
         $validator = $this->resolve(
             $data, $rules, $messages, $customAttributes
         );
 
+        // The presence verifier is responsible for checking the unique and exists data
+        // for the validator. It is behind an interface so that multiple versions of
+        // it may be written besides database. We'll inject it into the validator.
         if (! is_null($this->verifier)) {
             $validator->setPresenceVerifier($this->verifier);
         }
@@ -181,7 +181,7 @@ class Factory implements FactoryContract
      *
      * @param  string  $rule
      * @param  \Closure|string  $extension
-     * @param  string  $message
+     * @param  string|null  $message
      * @return void
      */
     public function extend($rule, $extension, $message = null)
@@ -196,9 +196,9 @@ class Factory implements FactoryContract
     /**
      * Register a custom implicit validator extension.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $extension
-     * @param  string  $message
+     * @param  string|null  $message
      * @return void
      */
     public function extendImplicit($rule, $extension, $message = null)
@@ -213,9 +213,9 @@ class Factory implements FactoryContract
     /**
      * Register a custom dependent validator extension.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $extension
-     * @param  string  $message
+     * @param  string|null  $message
      * @return void
      */
     public function extendDependent($rule, $extension, $message = null)
@@ -230,7 +230,7 @@ class Factory implements FactoryContract
     /**
      * Register a custom validator message replacer.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $replacer
      * @return void
      */

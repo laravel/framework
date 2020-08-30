@@ -2,17 +2,22 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Mockery;
-use Illuminate\Mail\Markdown;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Mail\Markdown;
+use Illuminate\Mail\Message;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -20,12 +25,13 @@ use Illuminate\Notifications\Messages\MailMessage;
 class SendingMailNotificationsTest extends TestCase
 {
     public $mailer;
+    public $markdown;
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
-        Mockery::close();
+        m::close();
     }
 
     protected function getEnvironmentSetUp($app)
@@ -40,8 +46,10 @@ class SendingMailNotificationsTest extends TestCase
             'prefix' => '',
         ]);
 
-        $this->mailer = Mockery::mock(Mailer::class);
-        $this->markdown = Mockery::mock(Markdown::class);
+        $this->mailFactory = m::mock(MailFactory::class);
+        $this->mailer = m::mock(Mailer::class);
+        $this->mailFactory->shouldReceive('mailer')->andReturn($this->mailer);
+        $this->markdown = m::mock(Markdown::class);
 
         $app->extend(Markdown::class, function () {
             return $this->markdown;
@@ -50,22 +58,29 @@ class SendingMailNotificationsTest extends TestCase
         $app->extend(Mailer::class, function () {
             return $this->mailer;
         });
+
+        $app->extend(MailFactory::class, function () {
+            return $this->mailFactory;
+        });
+
+        View::addLocation(__DIR__.'/Fixtures');
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->string('name')->nullable();
         });
     }
 
-    public function test_mail_is_sent()
+    public function testMailIsSent()
     {
         $notification = new TestMailNotification;
+        $notification->id = Str::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -76,9 +91,13 @@ class SendingMailNotificationsTest extends TestCase
 
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
-            $notification->toMail($user)->toArray(),
-            Mockery::on(function ($closure) {
-                $message = Mockery::mock(\Illuminate\Mail\Message::class);
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
@@ -103,9 +122,10 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_to_named_address()
+    public function testMailIsSentToNamedAddress()
     {
         $notification = new TestMailNotification;
+        $notification->id = Str::uuid()->toString();
 
         $user = NotifiableUserWithNamedAddress::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -117,9 +137,13 @@ class SendingMailNotificationsTest extends TestCase
 
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
-            $notification->toMail($user)->toArray(),
-            Mockery::on(function ($closure) {
-                $message = Mockery::mock(\Illuminate\Mail\Message::class);
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com' => 'Taylor Otwell', 'foo_taylor@laravel.com']);
 
@@ -144,9 +168,10 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_with_subject()
+    public function testMailIsSentWithSubject()
     {
         $notification = new TestMailNotificationWithSubject;
+        $notification->id = Str::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -157,9 +182,13 @@ class SendingMailNotificationsTest extends TestCase
 
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
-            $notification->toMail($user)->toArray(),
-            Mockery::on(function ($closure) {
-                $message = Mockery::mock(\Illuminate\Mail\Message::class);
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
@@ -174,13 +203,144 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_using_mailable()
+    public function testMailIsSentToMultipleAdresses()
+    {
+        $notification = new TestMailNotificationWithSubject;
+        $notification->id = Str::uuid()->toString();
+
+        $user = NotifiableUserWithMultipleAddreses::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
+        $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
+
+        $this->mailer->shouldReceive('send')->once()->with(
+            ['html' => 'htmlContent', 'text' => 'textContent'],
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
+
+                $message->shouldReceive('to')->once()->with(['foo_taylor@laravel.com', 'bar_taylor@laravel.com']);
+
+                $message->shouldReceive('subject')->once()->with('mail custom subject');
+
+                $closure($message);
+
+                return true;
+            })
+        );
+
+        $user->notify($notification);
+    }
+
+    public function testMailIsSentUsingMailable()
     {
         $notification = new TestMailNotificationWithMailable;
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
         ]);
+
+        $user->notify($notification);
+    }
+
+    public function testMailIsSentUsingMailMessageWithHtmlAndPlain()
+    {
+        $notification = new TestMailNotificationWithHtmlAndPlain;
+        $notification->id = Str::uuid()->toString();
+
+        $user = NotifiableUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $this->mailer->shouldReceive('send')->once()->with(
+            ['html', 'plain'],
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
+
+                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+
+                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Html And Plain');
+
+                $closure($message);
+
+                return true;
+            })
+        );
+
+        $user->notify($notification);
+    }
+
+    public function testMailIsSentUsingMailMessageWithHtmlOnly()
+    {
+        $notification = new TestMailNotificationWithHtmlOnly;
+        $notification->id = Str::uuid()->toString();
+
+        $user = NotifiableUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $this->mailer->shouldReceive('send')->once()->with(
+            'html',
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
+
+                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+
+                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Html Only');
+
+                $closure($message);
+
+                return true;
+            })
+        );
+
+        $user->notify($notification);
+    }
+
+    public function testMailIsSentUsingMailMessageWithPlainOnly()
+    {
+        $notification = new TestMailNotificationWithPlainOnly;
+        $notification->id = Str::uuid()->toString();
+
+        $user = NotifiableUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $this->mailer->shouldReceive('send')->once()->with(
+            [null, 'plain'],
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
+            m::on(function ($closure) {
+                $message = m::mock(Message::class);
+
+                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+
+                $message->shouldReceive('subject')->once()->with('Test Mail Notification With Plain Only');
+
+                $closure($message);
+
+                return true;
+            })
+        );
 
         $user->notify($notification);
     }
@@ -205,6 +365,17 @@ class NotifiableUserWithNamedAddress extends NotifiableUser
     }
 }
 
+class NotifiableUserWithMultipleAddreses extends NotifiableUser
+{
+    public function routeNotificationForMail($notification)
+    {
+        return [
+            'foo_'.$this->email,
+            'bar_'.$this->email,
+        ];
+    }
+}
+
 class TestMailNotification extends Notification
 {
     public function via($notifiable)
@@ -220,7 +391,8 @@ class TestMailNotification extends Notification
             ->bcc('bcc@deepblue.com', 'bcc')
             ->from('jack@deepblue.com', 'Jacques Mayol')
             ->replyTo('jack@deepblue.com', 'Jacques Mayol')
-            ->line('The introduction to the notification.');
+            ->line('The introduction to the notification.')
+            ->mailer('foo');
     }
 }
 
@@ -248,10 +420,52 @@ class TestMailNotificationWithMailable extends Notification
 
     public function toMail($notifiable)
     {
-        $mailable = Mockery::mock(Mailable::class);
+        $mailable = m::mock(Mailable::class);
 
         $mailable->shouldReceive('send')->once();
 
         return $mailable;
+    }
+}
+
+class TestMailNotificationWithHtmlAndPlain extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->view(['html', 'plain']);
+    }
+}
+
+class TestMailNotificationWithHtmlOnly extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->view('html');
+    }
+}
+
+class TestMailNotificationWithPlainOnly extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->view([null, 'plain']);
     }
 }

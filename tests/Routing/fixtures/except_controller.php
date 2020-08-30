@@ -1,6 +1,8 @@
 <?php
 
-class FooController extends \BaseController
+use BaseController;
+
+class FooController extends BaseController
 {
     /**
      * Show the form for creating a new resource.

@@ -2,30 +2,36 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Mockery;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Bus\Dispatcher;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\Job;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Event;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
 class CallQueuedHandlerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
-        Mockery::close();
+        m::close();
     }
 
-    public function test_job_can_be_dispatched()
+    public function testJobCanBeDispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;
 
-        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job = m::mock(Job::class);
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
@@ -39,34 +45,75 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue(CallQueuedHandlerTestJob::$handled);
     }
 
-    public function test_job_is_marked_as_failed_if_model_not_found_exception_is_thrown()
+    public function testJobCanBeDispatchedThroughMiddleware()
     {
-        Event::fake();
+        CallQueuedHandlerTestJobWithMiddleware::$handled = false;
+        CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = null;
 
-        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
-        $job->shouldReceive('getConnectionName')->andReturn('connection');
-        $job->shouldReceive('resolveName')->andReturn(__CLASS__);
-        $job->shouldReceive('markAsFailed')->once();
+        $job = m::mock(Job::class);
+        $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
         $job->shouldReceive('delete')->once();
-        $job->shouldReceive('failed')->once();
+
+        $instance->call($job, [
+            'command' => serialize($command = new CallQueuedHandlerTestJobWithMiddleware),
+        ]);
+
+        $this->assertInstanceOf(CallQueuedHandlerTestJobWithMiddleware::class, CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand);
+        $this->assertTrue(CallQueuedHandlerTestJobWithMiddleware::$handled);
+    }
+
+    public function testJobCanBeDispatchedThroughMiddlewareOnDispatch()
+    {
+        $_SERVER['__test.dispatchMiddleware'] = false;
+        CallQueuedHandlerTestJobWithMiddleware::$handled = false;
+        CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = null;
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+        $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->shouldReceive('delete')->once();
+
+        $command = $command = new CallQueuedHandlerTestJobWithMiddleware;
+        $command->through([new TestJobMiddleware]);
+
+        $instance->call($job, [
+            'command' => serialize($command),
+        ]);
+
+        $this->assertInstanceOf(CallQueuedHandlerTestJobWithMiddleware::class, CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand);
+        $this->assertTrue(CallQueuedHandlerTestJobWithMiddleware::$handled);
+        $this->assertTrue($_SERVER['__test.dispatchMiddleware']);
+    }
+
+    public function testJobIsMarkedAsFailedIfModelNotFoundExceptionIsThrown()
+    {
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+        $job->shouldReceive('resolveName')->andReturn(__CLASS__);
+        $job->shouldReceive('fail')->once();
 
         $instance->call($job, [
             'command' => serialize(new CallQueuedHandlerExceptionThrower),
         ]);
-
-        Event::assertDispatched(JobFailed::class);
     }
 
-    public function test_job_is_deleted_if_has_delete_property()
+    public function testJobIsDeletedIfHasDeleteProperty()
     {
         Event::fake();
 
-        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job = m::mock(Job::class);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('resolveName')->andReturn(CallQueuedHandlerExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
@@ -84,7 +131,39 @@ class CallQueuedHandlerTest extends TestCase
 
 class CallQueuedHandlerTestJob
 {
-    use \Illuminate\Queue\InteractsWithQueue;
+    use InteractsWithQueue;
+
+    public static $handled = false;
+
+    public function handle()
+    {
+        static::$handled = true;
+    }
+}
+
+/** This exists to test that middleware can also be defined in base classes */
+abstract class AbstractCallQueuedHandlerTestJobWithMiddleware
+{
+    public static $middlewareCommand;
+
+    public function middleware()
+    {
+        return [
+            new class {
+                public function handle($command, $next)
+                {
+                    AbstractCallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = $command;
+
+                    return $next($command);
+                }
+            },
+        ];
+    }
+}
+
+class CallQueuedHandlerTestJobWithMiddleware extends AbstractCallQueuedHandlerTestJobWithMiddleware
+{
+    use InteractsWithQueue, Queueable;
 
     public static $handled = false;
 
@@ -105,6 +184,16 @@ class CallQueuedHandlerExceptionThrower
 
     public function __wakeup()
     {
-        throw new \Illuminate\Database\Eloquent\ModelNotFoundException('Foo');
+        throw new ModelNotFoundException('Foo');
+    }
+}
+
+class TestJobMiddleware
+{
+    public function handle($command, $next)
+    {
+        $_SERVER['__test.dispatchMiddleware'] = true;
+
+        return $next($command);
     }
 }
