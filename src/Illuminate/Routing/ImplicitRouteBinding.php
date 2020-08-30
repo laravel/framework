@@ -28,7 +28,7 @@ class ImplicitRouteBinding
             $model = static::resolveForRouteParameter(
                 $container, $route, $parameterName, Reflector::getParameterClassName($parameter)
             );
-            
+
             $route->setParameter($parameterName, $model);
         }
     }
