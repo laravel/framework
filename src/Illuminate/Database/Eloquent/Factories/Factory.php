@@ -325,7 +325,7 @@ abstract class Factory
                 return $this->parentResolvers();
             }], $states->all()));
         })->reduce(function ($carry, $state) use ($parent) {
-            if (is_callable($parent)) {
+            if ($state instanceof Closure) {
                 $state = $state->bindTo($this);
             }
 
