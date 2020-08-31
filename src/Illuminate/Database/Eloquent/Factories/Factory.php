@@ -326,7 +326,7 @@ abstract class Factory
             }], $states->all()));
         })->reduce(function ($carry, $state) use ($parent) {
             $state = $state->bindTo($this);
-            
+
             return array_merge($carry, $state($carry, $parent));
         }, $this->definition());
     }
