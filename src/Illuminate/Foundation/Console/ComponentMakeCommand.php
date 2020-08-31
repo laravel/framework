@@ -53,7 +53,7 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function writeView()
     {
-        $path = $this->viewsDirectory(
+        $path = $this->viewPath(
             str_replace('.', '/', 'components.'.$this->getView())
         );
 

@@ -367,12 +367,12 @@ abstract class GeneratorCommand extends Command
     }
 
     /**
-     * Get the views directory's path.
+     * Get the first view directory path from the application configuration.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
-    protected function viewsDirectory($path = '')
+    protected function viewPath($path = '')
     {
         $views = $this->laravel['config']['view.paths'][0] ?? resource_path('views');
 
