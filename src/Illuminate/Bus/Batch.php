@@ -428,11 +428,13 @@ class Batch implements Arrayable, JsonSerializable
 
             return;
         }
+
         if (is_string($handler) && class_exists($handler)) {
             dispatch(new $handler($batch, $e));
 
             return;
         }
+
         call_user_func($handler, $batch, $e);
     }
 }
