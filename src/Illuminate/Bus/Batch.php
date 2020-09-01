@@ -9,6 +9,7 @@ use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use JsonSerializable;
+use Throwable;
 
 class Batch implements Arrayable, JsonSerializable
 {
@@ -420,7 +421,7 @@ class Batch implements Arrayable, JsonSerializable
      * @param  \Throwable|null  $e
      * @return void
      */
-    protected function invoke($handler, Batch $batch, \Throwable $e = null)
+    protected function invoke($handler, Batch $batch, Throwable $e = null)
     {
         if ($handler instanceof SerializableClosure) {
             $handler->__invoke($batch, $e);
