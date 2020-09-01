@@ -214,7 +214,7 @@ class Batch implements Arrayable, JsonSerializable
             $batch = $this->fresh();
 
             collect($this->options['then'])->each(function ($handler) use ($batch) {
-                $this->invoke($handler, $batch);
+                $this->invokeHandlerCallback($handler, $batch);
             });
         }
 
@@ -222,7 +222,7 @@ class Batch implements Arrayable, JsonSerializable
             $batch = $this->fresh();
 
             collect($this->options['finally'])->each(function ($handler) use ($batch) {
-                $this->invoke($handler, $batch);
+                $this->invokeHandlerCallback($handler, $batch);
             });
         }
     }
@@ -297,7 +297,7 @@ class Batch implements Arrayable, JsonSerializable
             $batch = $this->fresh();
 
             collect($this->options['catch'])->each(function ($handler) use ($batch, $e) {
-                $this->invoke($handler, $batch, $e);
+                $this->invokeHandlerCallback($handler, $batch, $e);
             });
         }
 
@@ -305,7 +305,7 @@ class Batch implements Arrayable, JsonSerializable
             $batch = $this->fresh();
 
             collect($this->options['finally'])->each(function ($handler) use ($batch, $e) {
-                $this->invoke($handler, $batch, $e);
+                $this->invokeHandlerCallback($handler, $batch, $e);
             });
         }
     }
@@ -382,6 +382,21 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
+     * Invoke a batch callback handler.
+     *
+     * @param  \Illuminate\Queue\SerializableClosure|callable  $handler
+     * @param  \Illuminate\Bus  $batch
+     * @param  \Throwable|null  $e
+     * @return void
+     */
+    protected function invokeHandlerCallback($handler, Batch $batch, Throwable $e = null)
+    {
+        return $handler instanceof SerializableClosure
+                    ? $handler->__invoke($batch, $e)
+                    : call_user_func($handler, $batch, $e);
+    }
+
+    /**
      * Convert the batch to an array.
      *
      * @return array
@@ -411,30 +426,5 @@ class Batch implements Arrayable, JsonSerializable
     public function jsonSerialize()
     {
         return $this->toArray();
-    }
-
-    /**
-     * Invoke the handler of the batch.
-     *
-     * @param  \Illuminate\Queue\SerializableClosure|string  $handler
-     * @param  \Illuminate\Bus  $batch
-     * @param  \Throwable|null  $e
-     * @return void
-     */
-    protected function invoke($handler, Batch $batch, Throwable $e = null)
-    {
-        if ($handler instanceof SerializableClosure) {
-            $handler->__invoke($batch, $e);
-
-            return;
-        }
-
-        if (is_string($handler) && class_exists($handler)) {
-            dispatch(new $handler($batch, $e));
-
-            return;
-        }
-
-        call_user_func($handler, $batch, $e);
     }
 }

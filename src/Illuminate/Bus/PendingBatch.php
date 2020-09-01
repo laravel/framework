@@ -57,7 +57,7 @@ class PendingBatch
     /**
      * Add a callback to be executed after all jobs in the batch have executed successfully.
      *
-     * @param  callable|string  $callback
+     * @param  callable  $callback
      * @return $this
      */
     public function then($callback)
@@ -80,7 +80,7 @@ class PendingBatch
     /**
      * Add a callback to be executed after the first failing job in the batch.
      *
-     * @param  callable|string  $callback
+     * @param  callable  $callback
      * @return $this
      */
     public function catch($callback)
@@ -103,7 +103,7 @@ class PendingBatch
     /**
      * Add a callback to be executed after the batch has finished executing.
      *
-     * @param  callable|string  $callback
+     * @param  callable  $callback
      * @return $this
      */
     public function finally($callback)
