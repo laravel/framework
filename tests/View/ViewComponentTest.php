@@ -33,8 +33,10 @@ class ViewComponentTest extends TestCase
         $component = new TestSampleViewComponent;
 
         $this->assertEquals(0, $component->counter);
+        $this->assertEquals(0, TestSampleViewComponent::$publicStaticCounter);
         $variables = $component->data();
         $this->assertEquals(0, $component->counter);
+        $this->assertEquals(0, TestSampleViewComponent::$publicStaticCounter);
 
         $this->assertSame('noArgs val', $variables['noArgs']());
         $this->assertSame('noArgs val', (string) $variables['noArgs']);
@@ -46,6 +48,7 @@ class ViewComponentTest extends TestCase
         $this->assertArrayNotHasKey('protectedHello', $variables);
         $this->assertArrayNotHasKey('privateHello', $variables);
 
+        $this->assertArrayNotHasKey('publicStaticCounter', $variables);
         $this->assertArrayNotHasKey('protectedCounter', $variables);
         $this->assertArrayNotHasKey('privateCounter', $variables);
 
@@ -101,6 +104,8 @@ class TestViewComponent extends Component
 class TestSampleViewComponent extends Component
 {
     public $counter = 0;
+
+    public static $publicStaticCounter = 0;
 
     protected $protectedCounter = 0;
 

@@ -1,6 +1,45 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.25.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.26.1...7.x)
+
+
+## [v7.26.1 (2020-08-27)](https://github.com/laravel/framework/compare/v7.26.0...v7.26.1)
+
+### Fixed
+- Fixed offset error on invalid remember token ([#34020](https://github.com/laravel/framework/pull/34020))
+- Only prepend scheme to PhpRedis host when necessary ([#34017](https://github.com/laravel/framework/pull/34017))
+- Fixed `whereKey` and `whereKeyNot` in `Illuminate\Database\Eloquent\Builder` ([#34031](https://github.com/laravel/framework/pull/34031))
+
+
+## [v7.26.0 (2020-08-25)](https://github.com/laravel/framework/compare/v7.25.0...v7.26.0)
+
+### Added
+- Added `whenHas` and `whenFilled` methods to  `Illuminate\Http\Concerns\InteractsWithInput` class ([#33829](https://github.com/laravel/framework/pull/33829))
+- Added email validating with custom class ([#33835](https://github.com/laravel/framework/pull/33835))
+- Added `Illuminate\View\ComponentAttributeBag::whereDoesntStartWith()` ([#33851](https://github.com/laravel/framework/pull/33851))
+- Allow setting synchronous_commit for Postgres ([#33897](https://github.com/laravel/framework/pull/33897))
+- Allow nested errors in `Illuminate\Testing\TestResponse::assertJsonValidationErrors()` ([#33989](https://github.com/laravel/framework/pull/33989))
+- Added support for stream reads to `FilesystemManager` ([#34001](https://github.com/laravel/framework/pull/34001))
+
+### Fixed
+- Fix defaultTimezone not respected in scheduled Events ([#33834](https://github.com/laravel/framework/pull/33834))
+- Fixed usage of Support `Collection#countBy($key)` ([#33852](https://github.com/laravel/framework/pull/33852))
+- Fixed route registerar bug ([42ba0ef](https://github.com/laravel/framework/commit/42ba0ef3e379cb1e0fa38c3d3297109ff1234a1d))
+- Fixed key composition for attribute with dot at validation error messages ([#33932](https://github.com/laravel/framework/pull/33932))
+- Fixed the `dump` method for `LazyCollection` ([#33944](https://github.com/laravel/framework/pull/33944))
+- Fixed dimension ratio calculation in `Illuminate\Validation\Concerns\ValidatesAttributes::failsRatioCheck()` ([#34003](https://github.com/laravel/framework/pull/34003))
+
+### Changed
+- Implement LockProvider on DatabaseStore ([#33844](https://github.com/laravel/framework/pull/33844))
+- Publish resources.stub in stub:publish command ([#33862](https://github.com/laravel/framework/pull/33862))
+- Handle argon failures robustly ([#33856](https://github.com/laravel/framework/pull/33856))
+- Normalize scheme in Redis connections ([#33892](https://github.com/laravel/framework/pull/33892))
+- Cast primary key to string when $keyType is string ([#33930](https://github.com/laravel/framework/pull/33930))
+- Load anonymous components from packages ([#33954](https://github.com/laravel/framework/pull/33954))
+- Check no-interaction flag exists and is true for Artisan commands ([#33950](https://github.com/laravel/framework/pull/33950))
+
+### Deprecated
+- Deprecate `Illuminate\Database\Eloquent\Model::removeTableFromKey()` ([#33859](https://github.com/laravel/framework/pull/33859))
 
 
 ## [v7.25.0 (2020-08-11)](https://github.com/laravel/framework/compare/v7.24.0...v7.25.0)

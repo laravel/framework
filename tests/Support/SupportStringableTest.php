@@ -510,4 +510,22 @@ class SupportStringableTest extends TestCase
         $this->assertSame(3, $this->stringable('laravelPHPFramework')->substrCount('a', 1, -2));
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
     }
+
+    public function testPadBoth()
+    {
+        $this->assertSame('__Alien___', (string) $this->stringable('Alien')->padBoth(10, '_'));
+        $this->assertSame('  Alien   ', (string) $this->stringable('Alien')->padBoth(10));
+    }
+
+    public function testPadLeft()
+    {
+        $this->assertSame('-=-=-Alien', (string) $this->stringable('Alien')->padLeft(10, '-='));
+        $this->assertSame('     Alien', (string) $this->stringable('Alien')->padLeft(10));
+    }
+
+    public function testPadRight()
+    {
+        $this->assertSame('Alien-----', (string) $this->stringable('Alien')->padRight(10, '-'));
+        $this->assertSame('Alien     ', (string) $this->stringable('Alien')->padRight(10));
+    }
 }

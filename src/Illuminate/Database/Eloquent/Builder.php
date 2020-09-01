@@ -193,7 +193,7 @@ class Builder
             return $this;
         }
 
-        if ($this->model->getKeyType() === 'string') {
+        if ($id !== null && $this->model->getKeyType() === 'string') {
             $id = (string) $id;
         }
 
@@ -214,7 +214,7 @@ class Builder
             return $this;
         }
 
-        if ($this->model->getKeyType() === 'string') {
+        if ($id !== null && $this->model->getKeyType() === 'string') {
             $id = (string) $id;
         }
 

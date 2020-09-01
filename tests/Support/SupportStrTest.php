@@ -462,6 +462,24 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::slug(null));
     }
 
+    public function testPadBoth()
+    {
+        $this->assertSame('__Alien___', Str::padBoth('Alien', 10, '_'));
+        $this->assertSame('  Alien   ', Str::padBoth('Alien', 10));
+    }
+
+    public function testPadLeft()
+    {
+        $this->assertSame('-=-=-Alien', Str::padLeft('Alien', 10, '-='));
+        $this->assertSame('     Alien', Str::padLeft('Alien', 10));
+    }
+
+    public function testPadRight()
+    {
+        $this->assertSame('Alien-----', Str::padRight('Alien', 10, '-'));
+        $this->assertSame('Alien     ', Str::padRight('Alien', 10));
+    }
+
     public function validUuidList()
     {
         return [
