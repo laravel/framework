@@ -5,6 +5,7 @@ namespace Illuminate\Bus;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use JsonSerializable;
@@ -211,13 +212,17 @@ class Batch implements Arrayable, JsonSerializable
         if ($counts->pendingJobs === 0 && $this->hasThenCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['then'])->each->__invoke($batch);
+            collect($this->options['then'])->each(function ($handler) use ($batch) {
+                $this->invoke($handler, $batch);
+            });
         }
 
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['finally'])->each->__invoke($batch);
+            collect($this->options['finally'])->each(function ($handler) use ($batch) {
+                $this->invoke($handler, $batch);
+            });
         }
     }
 
@@ -290,13 +295,17 @@ class Batch implements Arrayable, JsonSerializable
         if ($counts->failedJobs === 1 && $this->hasCatchCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['catch'])->each->__invoke($batch, $e);
+            collect($this->options['catch'])->each(function ($handler) use ($batch, $e) {
+                $this->invoke($handler, $batch, $e);
+            });
         }
 
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['finally'])->each->__invoke($batch, $e);
+            collect($this->options['finally'])->each(function ($handler) use ($batch, $e) {
+                $this->invoke($handler, $batch, $e);
+            });
         }
     }
 
@@ -401,5 +410,29 @@ class Batch implements Arrayable, JsonSerializable
     public function jsonSerialize()
     {
         return $this->toArray();
+    }
+
+    /**
+     * Invoke the handler of the batch.
+     *
+     * @param SerializableClosure|string $handler
+     * @param Batch $batch
+     * @param \Throwable|null $e
+     *
+     * @return void
+     */
+    protected function invoke($handler, Batch $batch, \Throwable $e = null)
+    {
+        if ($handler instanceof SerializableClosure) {
+            $handler->__invoke($batch, $e);
+
+            return;
+        }
+        if (is_string($handler) && class_exists($handler)) {
+            dispatch(new $handler($batch, $e));
+
+            return;
+        }
+        call_user_func($handler, $batch, $e);
     }
 }

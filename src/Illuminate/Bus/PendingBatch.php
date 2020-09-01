@@ -57,12 +57,12 @@ class PendingBatch
     /**
      * Add a callback to be executed after all jobs in the batch have executed successfully.
      *
-     * @param  \Closure  $callback
+     * @param  callable|string  $callback
      * @return $this
      */
-    public function then(Closure $callback)
+    public function then($callback)
     {
-        $this->options['then'][] = new SerializableClosure($callback);
+        $this->options['then'][] = $callback instanceof Closure ? new SerializableClosure($callback) : $callback;
 
         return $this;
     }
@@ -80,12 +80,12 @@ class PendingBatch
     /**
      * Add a callback to be executed after the first failing job in the batch.
      *
-     * @param  \Closure  $callback
+     * @param  callable|string  $callback
      * @return $this
      */
-    public function catch(Closure $callback)
+    public function catch($callback)
     {
-        $this->options['catch'][] = new SerializableClosure($callback);
+        $this->options['catch'][] = $callback instanceof Closure ? new SerializableClosure($callback) : $callback;
 
         return $this;
     }
@@ -103,12 +103,12 @@ class PendingBatch
     /**
      * Add a callback to be executed after the batch has finished executing.
      *
-     * @param  \Closure  $callback
+     * @param  callable|string  $callback
      * @return $this
      */
-    public function finally(Closure $callback)
+    public function finally($callback)
     {
-        $this->options['finally'][] = new SerializableClosure($callback);
+        $this->options['finally'][] = $callback instanceof Closure ? new SerializableClosure($callback) : $callback;
 
         return $this;
     }
