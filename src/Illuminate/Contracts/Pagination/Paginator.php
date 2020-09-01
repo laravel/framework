@@ -86,7 +86,7 @@ interface Paginator
     public function hasPages();
 
     /**
-     * Determine if there is more items in the data store.
+     * Determine if there are more items in the data store.
      *
      * @return bool
      */
