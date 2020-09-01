@@ -5,9 +5,11 @@ namespace Illuminate\Bus;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use JsonSerializable;
+use Throwable;
 
 class Batch implements Arrayable, JsonSerializable
 {
@@ -211,13 +213,17 @@ class Batch implements Arrayable, JsonSerializable
         if ($counts->pendingJobs === 0 && $this->hasThenCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['then'])->each->__invoke($batch);
+            collect($this->options['then'])->each(function ($handler) use ($batch) {
+                $this->invokeHandlerCallback($handler, $batch);
+            });
         }
 
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['finally'])->each->__invoke($batch);
+            collect($this->options['finally'])->each(function ($handler) use ($batch) {
+                $this->invokeHandlerCallback($handler, $batch);
+            });
         }
     }
 
@@ -290,13 +296,17 @@ class Batch implements Arrayable, JsonSerializable
         if ($counts->failedJobs === 1 && $this->hasCatchCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['catch'])->each->__invoke($batch, $e);
+            collect($this->options['catch'])->each(function ($handler) use ($batch, $e) {
+                $this->invokeHandlerCallback($handler, $batch, $e);
+            });
         }
 
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['finally'])->each->__invoke($batch, $e);
+            collect($this->options['finally'])->each(function ($handler) use ($batch, $e) {
+                $this->invokeHandlerCallback($handler, $batch, $e);
+            });
         }
     }
 
@@ -369,6 +379,21 @@ class Batch implements Arrayable, JsonSerializable
     public function delete()
     {
         $this->repository->delete($this->id);
+    }
+
+    /**
+     * Invoke a batch callback handler.
+     *
+     * @param  \Illuminate\Queue\SerializableClosure|callable  $handler
+     * @param  \Illuminate\Bus  $batch
+     * @param  \Throwable|null  $e
+     * @return void
+     */
+    protected function invokeHandlerCallback($handler, Batch $batch, Throwable $e = null)
+    {
+        return $handler instanceof SerializableClosure
+                    ? $handler->__invoke($batch, $e)
+                    : call_user_func($handler, $batch, $e);
     }
 
     /**
