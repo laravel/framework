@@ -6,6 +6,7 @@ use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\FileExistsException as ContractFileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
+use Illuminate\Contracts\Filesystem\UnreadableFileException as ContractUnreadableFileException;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
@@ -132,11 +133,18 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @return string
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws \Illuminate\Contracts\Filesystem\UnreadableFileException
      */
     public function get($path)
     {
         try {
-            return $this->driver->read($path);
+            $contents = $this->driver->read($path);
+
+            if ($contents === false) {
+                throw new ContractUnreadableFileException("Unreadable file encountered: $path");
+            }
+
+            return $contents;
         } catch (FileNotFoundException $e) {
             throw new ContractFileNotFoundException($e->getMessage(), $e->getCode(), $e);
         }
