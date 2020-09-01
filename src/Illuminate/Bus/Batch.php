@@ -415,10 +415,9 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Invoke the handler of the batch.
      *
-     * @param SerializableClosure|string $handler
-     * @param Batch $batch
-     * @param \Throwable|null $e
-     *
+     * @param  \Illuminate\Queue\SerializableClosure|string  $handler
+     * @param  \Illuminate\Bus  $batch
+     * @param  \Throwable|null  $e
      * @return void
      */
     protected function invoke($handler, Batch $batch, \Throwable $e = null)
