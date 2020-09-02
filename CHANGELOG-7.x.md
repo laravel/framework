@@ -1,6 +1,22 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.26.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.27.0...7.x)
+
+
+## [v7.27.0 (2020-09-01)](https://github.com/laravel/framework/compare/v7.26.1...v7.27.0)
+
+### Added
+- Allow to use alias of morphed model ([#34032](https://github.com/laravel/framework/pull/34032))
+- Introduced basic padding (both, left, right) methods to Str and Stringable ([#34053](https://github.com/laravel/framework/pull/34053))
+
+### Refactoring
+- RefreshDatabase migration commands parameters moved to methods ([#34007](https://github.com/laravel/framework/pull/34007), [8b35c8e](https://github.com/laravel/framework/commit/8b35c8e6ba5879e71fd81fd03b5687ee2b46c55a), [256f71c](https://github.com/laravel/framework/commit/256f71c1f81da2d4bb3e327b18389ac43fa97a72))
+
+### Changed
+- allow to reset forced scheme and root-url in UrlGenerator ([#34039](https://github.com/laravel/framework/pull/34039))
+- Updating the make commands to use a custom views path ([#34060](https://github.com/laravel/framework/pull/34060), [b593c62](https://github.com/laravel/framework/commit/b593c6242942623fcc12638d0390da7c58dbbb11))
+- Using "public static property" in View Component causes an error ([#34058](https://github.com/laravel/framework/pull/34058))
+- Changed postgres processor ([#34055](https://github.com/laravel/framework/pull/34055))
 
 
 ## [v7.26.1 (2020-08-27)](https://github.com/laravel/framework/compare/v7.26.0...v7.26.1)
