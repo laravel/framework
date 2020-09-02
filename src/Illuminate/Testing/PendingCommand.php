@@ -284,8 +284,8 @@ class PendingCommand
     private function createABufferedOutputMock()
     {
         $mock = Mockery::mock(BufferedOutput::class.'[doWrite]')
-            ->shouldAllowMockingProtectedMethods()
-            ->shouldIgnoreMissing();
+                ->shouldAllowMockingProtectedMethods()
+                ->shouldIgnoreMissing();
 
         $this->applyOutputTableExpectations($mock);
 
