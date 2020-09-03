@@ -129,7 +129,7 @@ class ComponentAttributeBag extends Collection implements Arrayable, Htmlable, I
     public function __toString()
     {
         return trim($this->filter(function ($value) {
-            return !($value === false || is_null($value));
+            return ! ($value === false || is_null($value));
         })->map(function ($value, $key) {
             return $key.'="'.str_replace('"', '\\"', trim($value === true ? $key : $value)).'"';
         })->join(' '));
