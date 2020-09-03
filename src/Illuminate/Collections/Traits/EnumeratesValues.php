@@ -724,21 +724,6 @@ trait EnumeratesValues
     }
 
     /**
-     * Take items in the collection until the given condition is met.
-     *
-     * This is an alias to the "takeUntil" method.
-     *
-     * @param  mixed  $value
-     * @return static
-     *
-     * @deprecated Use the "takeUntil" method directly.
-     */
-    public function until($value)
-    {
-        return $this->takeUntil($value);
-    }
-
-    /**
      * Collect the values into a collection.
      *
      * @return \Illuminate\Support\Collection

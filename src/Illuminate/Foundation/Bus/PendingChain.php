@@ -86,12 +86,14 @@ class PendingChain
     /**
      * Add a callback to be executed on job failure.
      *
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @return $this
      */
-    public function catch(Closure $callback)
+    public function catch($callback)
     {
-        $this->catchCallbacks[] = new SerializableClosure($callback);
+        $this->catchCallbacks[] = $callback instanceof Closure
+                        ? new SerializableClosure($callback)
+                        : $callback;
 
         return $this;
     }
