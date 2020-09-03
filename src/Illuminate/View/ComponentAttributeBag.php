@@ -95,7 +95,7 @@ class ComponentAttributeBag extends Collection implements Arrayable, Htmlable, I
      * @param  mixed  $attributes
      * @return static
      */
-    public function setAttributes(array $attributes = [])
+    public function setAttributes($attributes = [])
     {
         return new static($attributes);
     }
