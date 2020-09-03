@@ -44,7 +44,6 @@ abstract class Manager
      */
     public function __construct(Container $container)
     {
-        $this->app = $container;
         $this->container = $container;
         $this->config = $container->make('config');
     }
