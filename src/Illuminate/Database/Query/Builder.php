@@ -3097,7 +3097,7 @@ class Builder
      * @param  array  $bindings
      * @return array
      */
-    protected function cleanBindings(array $bindings)
+    public function cleanBindings(array $bindings)
     {
         return array_values(array_filter($bindings, function ($binding) {
             return ! $binding instanceof Expression;
