@@ -287,7 +287,7 @@ class PendingCommand
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldIgnoreMissing();
 
-        $this->applyOutputTableExpectations($mock);
+        $this->applyTableOutputExpectations($mock);
 
         foreach ($this->test->expectedOutput as $i => $output) {
             $mock->shouldReceive('doWrite')
@@ -308,7 +308,7 @@ class PendingCommand
      * @param  \Mockery\MockInterface  $mock
      * @return void
      */
-    private function applyOutputTableExpectations($mock)
+    private function applyTableOutputExpectations($mock)
     {
         foreach ($this->test->expectedTables as $consoleTable) {
             $table = (new Table($output = new BufferedOutput))
