@@ -77,9 +77,7 @@ class EncryptionServiceProvider extends ServiceProvider
     {
         return tap($config['key'], function ($key) {
             if (empty($key)) {
-                throw new RuntimeException(
-                    'No application encryption key has been specified.'
-                );
+                throw new MissingAppKeyException;
             }
         });
     }
