@@ -77,7 +77,7 @@ class EncryptionServiceProvider extends ServiceProvider
     {
         return tap($config['key'], function ($key) {
             if (empty($key)) {
-                throw new MissingKeyException();
+                throw new MissingAppKeyException();
             }
         });
     }

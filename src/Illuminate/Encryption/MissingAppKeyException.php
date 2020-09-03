@@ -2,7 +2,7 @@
 
 namespace Illuminate\Encryption;
 
-class MissingKeyException extends \RuntimeException
+class MissingAppKeyException extends \RuntimeException
 {
     public function __construct($message = 'No application encryption key has been specified.')
     {
