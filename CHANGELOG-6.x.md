@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.37...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.38...6.x)
+
+
+## [v6.18.38 (2020-09-01)](https://github.com/laravel/framework/compare/v6.18.37...v6.18.38)
+
+### Changed
+- Changed postgres processor ([#34055](https://github.com/laravel/framework/pull/34055))
 
 
 ## [v6.18.37 (2020-08-27)](https://github.com/laravel/framework/compare/v6.18.36...v6.18.37)
