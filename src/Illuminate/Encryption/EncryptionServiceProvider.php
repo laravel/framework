@@ -5,7 +5,6 @@ namespace Illuminate\Encryption;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Opis\Closure\SerializableClosure;
-use RuntimeException;
 
 class EncryptionServiceProvider extends ServiceProvider
 {
