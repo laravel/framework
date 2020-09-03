@@ -4,7 +4,6 @@ namespace Illuminate\Database\Schema;
 
 class MySqlSchemaState extends SchemaState
 {
-
     public $columnStatisticsOff = false;
 
     /**
