@@ -41,7 +41,6 @@ class ViewComponentAttributeBagTest extends TestCase
         ]);
 
         $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
-        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag->merge());
 
         $bag = (new ComponentAttributeBag)
             ->merge([
