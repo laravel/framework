@@ -127,7 +127,7 @@ class EloquentUpdateTest extends TestCase
             'counter' => 0,
         ])->delete();
 
-        TestUpdateModel3::increment('counter');
+        TestUpdateModel3::first()->increment('counter');
 
         $models = TestUpdateModel3::withoutGlobalScopes()->get();
         $this->assertEquals(1, $models[0]->counter);

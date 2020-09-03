@@ -1725,10 +1725,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['increment', 'decrement'])) {
-            return $this->$method(...$parameters);
-        }
-
         if ($resolver = (static::$relationResolvers[get_class($this)][$method] ?? null)) {
             return $resolver($this);
         }
