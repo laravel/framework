@@ -113,8 +113,8 @@ class ServeCommand extends Command
         return [
             (new PhpExecutableFinder)->find(false),
             '-S',
-            $this->host() . ':' . $this->port(),
-            base_path('server.php')
+            $this->host().':'.$this->port(),
+            base_path('server.php'),
         ];
     }
 
