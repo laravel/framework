@@ -105,7 +105,7 @@ class ComponentAttributeBag extends Collection implements Arrayable, Htmlable, I
      * Set the underlying attributes.
      *
      * @param  mixed  $attributes
-     * @return static
+     * @return void
      */
     public function setAttributes($attributes = [])
     {
@@ -118,7 +118,7 @@ class ComponentAttributeBag extends Collection implements Arrayable, Htmlable, I
             $attributes = $parentBag->merge($attributes);
         }
 
-        return new static($attributes);
+        $this->items = (new static($attributes))->getAttributes();
     }
 
     /**
