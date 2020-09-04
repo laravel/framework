@@ -2,9 +2,28 @@
 
 namespace Illuminate\Database\Schema;
 
+use Illuminate\Support\Str;
+
 class MySqlSchemaState extends SchemaState
 {
+    /**
+     * keep track if it is needed to turn on the statistics
+     * @var bool
+     */
     public $columnStatisticsOff = false;
+
+    /**
+     * make the process and run it for dumping the schema
+     * @param $path
+     */
+    private function makeDumpProcess($path)
+    {
+        $this->makeProcess(
+            $this->baseDumpCommand().' --routines --result-file=$LARAVEL_LOAD_PATH --no-data'
+        )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
+            'LARAVEL_LOAD_PATH' => $path,
+        ]));
+    }
 
     /**
      * Dump the database's schema into a file.
@@ -14,11 +33,14 @@ class MySqlSchemaState extends SchemaState
      */
     public function dump($path)
     {
-        $this->makeProcess(
-            $this->baseDumpCommand().' --routines --result-file=$LARAVEL_LOAD_PATH --no-data'
-        )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
-        ]));
+        try {
+            $this->makeDumpProcess($path);
+        } catch (\Exception $e) {
+            if (Str::contains($e->getMessage(),"column_statistics")) {
+                $this->columnStatisticsOff = true;
+                $this->makeDumpProcess($path);
+            }
+        }
 
         $this->removeAutoIncrementingState($path);
 
@@ -80,7 +102,7 @@ class MySqlSchemaState extends SchemaState
     protected function baseDumpCommand()
     {
         $gtidPurged = $this->connection->isMaria() ? '' : '--set-gtid-purged=OFF';
-        $columnStatisticsOption = ($this->columnStatisticsOff) ? ' --column-statistics=0' : '';
+        $columnStatisticsOption = $this->columnStatisticsOff ? ' --column-statistics=0' : '';
 
         return 'mysqldump '.$gtidPurged.$columnStatisticsOption.' --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
     }

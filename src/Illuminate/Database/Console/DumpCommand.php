@@ -19,8 +19,7 @@ class DumpCommand extends Command
     protected $signature = 'schema:dump
                 {--database= : The database connection to use}
                 {--path= : The path where the schema dump file should be stored}
-                {--prune : Delete all existing migration files}
-                {--column-statistics-off : use column-statics off in case of mysqldump 8 against mysqld 5.7}';
+                {--prune : Delete all existing migration files}';
 
     /**
      * The console command description.
@@ -36,12 +35,9 @@ class DumpCommand extends Command
      */
     public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
     {
-        $schemaState = $this->schemaState(
+        $this->schemaState(
             $connection = $connections->connection($database = $this->input->getOption('database'))
-        );
-        $schemaState->columnStatisticsOff = $this->option('column-statistics-off');
-
-        $schemaState->dump($path = $this->path($connection));
+        )->dump($path = $this->path($connection));
 
         $dispatcher->dispatch(new SchemaDumped($connection, $path));
 
