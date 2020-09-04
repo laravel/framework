@@ -98,7 +98,7 @@ class ComponentAttributeBag extends Collection implements Arrayable, Htmlable, I
      */
     public function getAttributes()
     {
-        return $this->attributes;
+        return $this->all();
     }
 
     /**
