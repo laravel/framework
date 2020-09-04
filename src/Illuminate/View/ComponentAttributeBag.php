@@ -117,7 +117,7 @@ class ComponentAttributeBag extends Collection implements Arrayable, Htmlable, I
 
             $attributes = $parentBag->merge($attributes);
         }
-      
+
         return new static($attributes);
     }
 
