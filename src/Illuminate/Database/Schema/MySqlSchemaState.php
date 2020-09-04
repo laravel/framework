@@ -4,6 +4,8 @@ namespace Illuminate\Database\Schema;
 
 class MySqlSchemaState extends SchemaState
 {
+    public $columnStatisticsOff = false;
+
     /**
      * Dump the database's schema into a file.
      *
@@ -78,8 +80,9 @@ class MySqlSchemaState extends SchemaState
     protected function baseDumpCommand()
     {
         $gtidPurged = $this->connection->isMaria() ? '' : '--set-gtid-purged=OFF';
+        $columnStatisticsOption = ($this->columnStatisticsOff) ? ' --column-statistics=0' : '';
 
-        return 'mysqldump '.$gtidPurged.' --column-statistics=0 --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
+        return 'mysqldump '.$gtidPurged.$columnStatisticsOption.' --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
     }
 
     /**
