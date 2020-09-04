@@ -1326,11 +1326,11 @@ class Blueprint
      */
     public function morphs($name, $indexName = null)
     {
-        $this->string("{$name}_type");
-
-        $this->unsignedBigInteger("{$name}_id");
-
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        if (Builder::$defaultMorphKeyType === 'uuid') {
+            $this->uuidMorphs($name, $indexName);
+        } else {
+            $this->numericMorphs($name, $indexName);
+        }
     }
 
     /**
@@ -1341,6 +1341,38 @@ class Blueprint
      * @return void
      */
     public function nullableMorphs($name, $indexName = null)
+    {
+        if (Builder::$defaultMorphKeyType === 'uuid') {
+            $this->nullableUuidMorphs($name, $indexName);
+        } else {
+            $this->nullableNumericMorphs($name, $indexName);
+        }
+    }
+
+    /**
+     * Add the proper columns for a polymorphic table using numeric IDs (incremental).
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function numericMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type");
+
+        $this->unsignedBigInteger("{$name}_id");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add nullable columns for a polymorphic table using numeric IDs (incremental).
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function nullableNumericMorphs($name, $indexName = null)
     {
         $this->string("{$name}_type")->nullable();
 
