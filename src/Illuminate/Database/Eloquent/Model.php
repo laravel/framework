@@ -1556,11 +1556,14 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      *
      * @param  mixed  $value
      * @param  string|null  $field
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value, $field = null)
+    public function resolveRouteBinding($value, $field = null, $query = null)
     {
-        return $this->where($field ?? $this->getRouteKeyName(), $value)->first();
+        $query = $query ?: $this->newQuery();
+
+        return $query->where($field ?? $this->getRouteKeyName(), $value)->first();
     }
 
     /**
@@ -1571,18 +1574,19 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveChildRouteBinding($childType, $value, $field)
+    public function resolveChildRouteBinding($childType, $value, $field = null)
     {
         $relationship = $this->{Str::plural(Str::camel($childType))}();
 
         $field = $field ?: $relationship->getRelated()->getRouteKeyName();
 
-        if ($relationship instanceof HasManyThrough ||
-            $relationship instanceof BelongsToMany) {
-            return $relationship->where($relationship->getRelated()->getTable().'.'.$field, $value)->first();
-        } else {
-            return $relationship->where($field, $value)->first();
+        if ($relationship instanceof HasManyThrough || $relationship instanceof BelongsToMany) {
+            $field = $relationship->getRelated()->getTable().'.'.$field;
         }
+
+        return $relationship->getRelated()->resolveRouteBinding(
+            $value, $field, $relationship->getQuery()
+        );
     }
 
     /**

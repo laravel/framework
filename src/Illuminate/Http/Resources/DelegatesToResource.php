@@ -34,11 +34,12 @@ trait DelegatesToResource
      *
      * @param  mixed  $value
      * @param  string|null  $field
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
      * @return void
      *
      * @throws \Exception
      */
-    public function resolveRouteBinding($value, $field = null)
+    public function resolveRouteBinding($value, $field = null, $query = null)
     {
         throw new Exception('Resources may not be implicitly resolved from route bindings.');
     }

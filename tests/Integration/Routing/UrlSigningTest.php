@@ -126,7 +126,7 @@ class RoutableInterfaceStub implements UrlRoutable
         return 'routable';
     }
 
-    public function resolveRouteBinding($routeKey, $field = null)
+    public function resolveRouteBinding($routeKey, $field = null, $query = null)
     {
         //
     }

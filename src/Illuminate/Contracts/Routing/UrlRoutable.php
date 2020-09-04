@@ -23,9 +23,10 @@ interface UrlRoutable
      *
      * @param  mixed  $value
      * @param  string|null  $field
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value, $field = null);
+    public function resolveRouteBinding($value, $field = null, $query = null);
 
     /**
      * Retrieve the child model for a bound value.
@@ -35,5 +36,5 @@ interface UrlRoutable
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveChildRouteBinding($childType, $value, $field);
+    public function resolveChildRouteBinding($childType, $value, $field = null);
 }
