@@ -11,7 +11,6 @@ use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
-use InvalidArgumentException;
 
 class Blueprint
 {
@@ -818,32 +817,6 @@ class Blueprint
     }
 
     /**
-     * Create a foreign key column on the table from a model.
-     *
-     * @param  string  $model
-     * @param  string|null  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function entangle($model, $column = null)
-    {
-        if (\is_string($model)) {
-            $model = new $model();
-        }
-
-        if (! $model instanceof Model) {
-            throw new InvalidArgumentException(sprintf('Given $model is not an instance of [%s].', Model::class));
-        }
-
-        $column = $column ?? $model->getForeignKey();
-
-        if ($model->getKeyType() === 'int' && $model->incrementing === true) {
-            return $this->unsignedBigInteger($column);
-        } else {
-            return $this->uuid($column);
-        }
-    }
-
-    /**
      * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
@@ -859,6 +832,24 @@ class Blueprint
         ]);
 
         return $column;
+    }
+
+    /**
+     * Create a foreign ID column for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignIdFor($model, $column = null)
+    {
+        if (is_string($model)) {
+            $model = new $model;
+        }
+
+        return $model->getKeyType() === 'int' && $model->incrementing
+                    ? $this->foreignId($column ?: $model->getForeignKey())
+                    : $this->foreignUuid($column ?: $model->getForeignKey());
     }
 
     /**
@@ -1338,7 +1329,7 @@ class Blueprint
         if (Builder::$defaultMorphKeyType === 'uuid') {
             $this->uuidMorphs($name, $indexName);
         } else {
-            $this->idMorphs($name, $indexName);
+            $this->numericMorphs($name, $indexName);
         }
     }
 
@@ -1354,18 +1345,18 @@ class Blueprint
         if (Builder::$defaultMorphKeyType === 'uuid') {
             $this->nullableUuidMorphs($name, $indexName);
         } else {
-            $this->nullableIdMorphs($name, $indexName);
+            $this->nullableNumericMorphs($name, $indexName);
         }
     }
 
     /**
-     * Add the proper columns for a polymorphic table using ID (incremental).
+     * Add the proper columns for a polymorphic table using numeric IDs (incremental).
      *
      * @param  string  $name
      * @param  string|null  $indexName
      * @return void
      */
-    public function idMorphs($name, $indexName = null)
+    public function numericMorphs($name, $indexName = null)
     {
         $this->string("{$name}_type");
 
@@ -1375,13 +1366,13 @@ class Blueprint
     }
 
     /**
-     * Add nullable columns for a polymorphic table using ID (incremental).
+     * Add nullable columns for a polymorphic table using numeric IDs (incremental).
      *
      * @param  string  $name
      * @param  string|null  $indexName
      * @return void
      */
-    public function nullableIdMorphs($name, $indexName = null)
+    public function nullableNumericMorphs($name, $indexName = null)
     {
         $this->string("{$name}_type")->nullable();
 

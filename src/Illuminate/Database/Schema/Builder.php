@@ -33,18 +33,18 @@ class Builder
     protected $resolver;
 
     /**
-     * The default relationship morph key type.
-     *
-     * @var string
-     */
-    public static $defaultMorphKeyType = 'int';
-
-    /**
      * The default string length for migrations.
      *
      * @var int
      */
     public static $defaultStringLength = 255;
+
+    /**
+     * The default relationship morph key type.
+     *
+     * @var string
+     */
+    public static $defaultMorphKeyType = 'int';
 
     /**
      * Create a new database Schema manager.
@@ -61,27 +61,37 @@ class Builder
     /**
      * Set the default string length for migrations.
      *
-     * @param  string  $type
-     * @return void
-     */
-    public static function defaultMorphKeyType($type)
-    {
-        if (! in_array($type, ['int', 'uuid'])) {
-            throw new InvalidArgumentException('Expect morph key type to either be int or uuid.');
-        }
-
-        static::$defaultMorphKeyType = $type;
-    }
-
-    /**
-     * Set the default string length for migrations.
-     *
      * @param  int  $length
      * @return void
      */
     public static function defaultStringLength($length)
     {
         static::$defaultStringLength = $length;
+    }
+
+    /**
+     * Set the default morph key type for migrations.
+     *
+     * @param  string  $type
+     * @return void
+     */
+    public static function defaultMorphKeyType(string $type)
+    {
+        if (! in_array($type, ['int', 'uuid'])) {
+            throw new InvalidArgumentException("Morph key type must be 'int' or 'uuid'.");
+        }
+
+        static::$defaultMorphKeyType = $type;
+    }
+
+    /**
+     * Set the default morph key type for migrations to UUIDs.
+     *
+     * @return void
+     */
+    public static function morphUsingUuids()
+    {
+        return static::defaultMorphKeyType('uuid');
     }
 
     /**

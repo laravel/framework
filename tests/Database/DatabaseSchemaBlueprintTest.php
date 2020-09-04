@@ -263,7 +263,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     public function testGenerateRelationshipColumnWithIncrementalModel()
     {
         $base = new Blueprint('posts', function ($table) {
-            $table->entangle('Illuminate\Foundation\Auth\User');
+            $table->foreignIdFor('Illuminate\Foundation\Auth\User');
         });
 
         $connection = m::mock(Connection::class);
@@ -280,7 +280,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
 
         $base = new Blueprint('posts', function ($table) {
-            $table->entangle('EloquentModelUuidStub');
+            $table->foreignIdFor('EloquentModelUuidStub');
         });
 
         $connection = m::mock(Connection::class);
