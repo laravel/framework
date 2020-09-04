@@ -36,7 +36,7 @@ class MySqlSchemaState extends SchemaState
         try {
             $this->makeDumpProcess($path);
         } catch (\Exception $e) {
-            if (Str::contains($e->getMessage(),'column_statistics')) {
+            if (Str::contains($e->getMessage(), 'column_statistics')) {
                 $this->columnStatisticsOff = true;
                 $this->makeDumpProcess($path);
             }
