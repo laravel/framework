@@ -109,7 +109,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  \Throwable  $e
      * @return void
      *
-     * @throws \Throwable
+     * @throws \Exception
      */
     protected function handleException(Job $queueJob, Throwable $e)
     {
