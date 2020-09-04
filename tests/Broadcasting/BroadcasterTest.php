@@ -355,6 +355,12 @@ class BroadcasterTestEloquentModelStub extends Model
         return 'id';
     }
 
+
+    public function resolveRouteBinding($value, $field = null, $query = null)
+    {
+        return $this->where($field, $value)->first();
+    }
+
     public function where($key, $value)
     {
         $this->value = $value;
@@ -373,6 +379,11 @@ class BroadcasterTestEloquentModelNotFoundStub extends Model
     public function getRouteKeyName()
     {
         return 'id';
+    }
+
+    public function resolveRouteBinding($value, $field = null, $query = null)
+    {
+        return $this->where($field, $value)->first();
     }
 
     public function where($key, $value)

@@ -2175,6 +2175,18 @@ class RoutingTestUserModel extends Model
         return 'id';
     }
 
+    public function resolveRouteBinding($value, $field = null, $query = null)
+    {
+        return $this->where($field, $value)->first();
+    }
+
+    public function resolveChildRouteBinding($childType, $value, $field = null)
+    {
+        $relationship = Str::plural(Str::camel($childType));
+
+        return $this->{$relationship}()->where($field, $value)->first();
+    }
+
     public function where($key, $value)
     {
         $this->value = $value;
@@ -2200,6 +2212,11 @@ class RoutingTestPostModel extends Model
         return 'id';
     }
 
+    public function resolveRouteBinding($value, $field = null, $query = null)
+    {
+        return $this->where($field, $value)->first();
+    }
+
     public function where($key, $value)
     {
         $this->value = $value;
@@ -2218,6 +2235,11 @@ class RoutingTestTeamModel extends Model
     public function getRouteKeyName()
     {
         return 'id';
+    }
+
+    public function resolveRouteBinding($value, $field = null, $query = null)
+    {
+        return $this->where($field, $value);
     }
 
     public function where($key, $value)
