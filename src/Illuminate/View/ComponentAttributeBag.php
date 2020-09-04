@@ -77,7 +77,9 @@ class ComponentAttributeBag extends Collection implements Arrayable, Htmlable, I
     public function merge($attributeDefaults)
     {
         $attributeDefaults = Collection::make($attributeDefaults)->map(function ($value) {
-            return is_null($value) || is_bool($value) ? $value : e($value);
+            return is_object($value) || is_null($value) || is_bool($value)
+                ? $value
+                : e($value);
         });
 
         $attributes = $this->map(function ($value, $key) use ($attributeDefaults) {
@@ -90,6 +92,16 @@ class ComponentAttributeBag extends Collection implements Arrayable, Htmlable, I
     }
 
     /**
+     * Get all of the raw attributes.
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
      * Set the underlying attributes.
      *
      * @param  mixed  $attributes
@@ -97,6 +109,15 @@ class ComponentAttributeBag extends Collection implements Arrayable, Htmlable, I
      */
     public function setAttributes($attributes = [])
     {
+        if (isset($attributes['attributes']) &&
+            $attributes['attributes'] instanceof self) {
+            $parentBag = $attributes['attributes'];
+
+            unset($attributes['attributes']);
+
+            $attributes = $parentBag->merge($attributes);
+        }
+      
         return new static($attributes);
     }
 

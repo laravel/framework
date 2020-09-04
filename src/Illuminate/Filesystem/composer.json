@@ -14,10 +14,12 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "illuminate/contracts": "^7.0",
-        "illuminate/support": "^7.0",
-        "symfony/finder": "^5.0"
+        "php": "^7.3",
+        "illuminate/collections": "^8.0",
+        "illuminate/contracts": "^8.0",
+        "illuminate/macroable": "^8.0",
+        "illuminate/support": "^8.0",
+        "symfony/finder": "^5.1"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "8.x-dev"
         }
     },
     "suggest": {
@@ -37,7 +39,8 @@
         "league/flysystem-cached-adapter": "Required to use the Flysystem cache (^1.0).",
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
-        "symfony/mime": "Required to enable support for guessing extensions (^5.0)."
+        "symfony/filesystem": "Required to enable support for relative symbolic links (^5.1).",
+        "symfony/mime": "Required to enable support for guessing extensions (^5.1)."
     },
     "config": {
         "sort-packages": true

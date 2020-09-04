@@ -14,8 +14,8 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "illuminate/contracts": "^7.0",
+        "php": "^7.3",
+        "illuminate/contracts": "^8.0",
         "psr/container": "^1.0"
     },
     "provide": {
@@ -28,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "8.x-dev"
         }
     },
     "config": {

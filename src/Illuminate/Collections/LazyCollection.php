@@ -1083,6 +1083,43 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Chunk the collection into chunks with a callback.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function chunkWhile(callable $callback)
+    {
+        return new static(function () use ($callback) {
+            $iterator = $this->getIterator();
+
+            $chunk = new Collection();
+
+            if ($iterator->valid()) {
+                $chunk[$iterator->key()] = $iterator->current();
+
+                $iterator->next();
+            }
+
+            while ($iterator->valid()) {
+                if (! $callback($iterator->current(), $iterator->key(), $chunk)) {
+                    yield new static($chunk);
+
+                    $chunk = new Collection();
+                }
+
+                $chunk[$iterator->key()] = $iterator->current();
+
+                $iterator->next();
+            }
+
+            if ($chunk->isNotEmpty()) {
+                yield new static($chunk);
+            }
+        });
+    }
+
+    /**
      * Sort through each item with a callback.
      *
      * @param  callable|null|int  $callback
@@ -1212,7 +1249,9 @@ class LazyCollection implements Enumerable
     {
         $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
 
-        return $this->takeUntil($this->negate($callback));
+        return $this->takeUntil(function ($item, $key) use ($callback) {
+            return ! $callback($item, $key);
+        });
     }
 
     /**

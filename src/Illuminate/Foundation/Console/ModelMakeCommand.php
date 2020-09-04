@@ -157,6 +157,17 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
+    {
+        return is_dir(app_path('Models')) ? $rootNamespace.'\\Models' : $rootNamespace;
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array

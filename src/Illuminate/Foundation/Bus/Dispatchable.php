@@ -46,6 +46,18 @@ trait Dispatchable
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
+     * Queuable jobs will be dispatched to the "sync" queue.
+     *
+     * @return mixed
+     */
+    public static function dispatchSync()
+    {
+        return app(Dispatcher::class)->dispatchSync(new static(...func_get_args()));
+    }
+
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
      * @return mixed
      */
     public static function dispatchNow()

@@ -43,21 +43,6 @@ class FoundationHelpersTest extends TestCase
         $this->assertSame('default', cache('baz', 'default'));
     }
 
-    public function testUnversionedElixir()
-    {
-        $file = 'unversioned.css';
-
-        app()->singleton('path.public', function () {
-            return __DIR__;
-        });
-
-        touch(public_path($file));
-
-        $this->assertSame('/'.$file, elixir($file));
-
-        unlink(public_path($file));
-    }
-
     public function testMixDoesNotIncludeHost()
     {
         $app = new Application;

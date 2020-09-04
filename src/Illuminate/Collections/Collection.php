@@ -135,7 +135,7 @@ class Collection implements ArrayAccess, Enumerable
 
         $collection = isset($key) ? $this->pluck($key) : $this;
 
-        $counts = new self;
+        $counts = new static;
 
         $collection->each(function ($value) use ($counts) {
             $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
@@ -412,7 +412,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function get($key, $default = null)
     {
-        if ($this->offsetExists($key)) {
+        if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
 
@@ -501,7 +501,7 @@ class Collection implements ArrayAccess, Enumerable
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
-            if (! $this->offsetExists($value)) {
+            if (! array_key_exists($value, $this->items)) {
                 return false;
             }
         }
@@ -800,7 +800,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function prepend($value, $key = null)
     {
-        $this->items = Arr::prepend($this->items, $value, $key);
+        $this->items = Arr::prepend($this->items, ...func_get_args());
 
         return $this;
     }
@@ -1068,6 +1068,19 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         return new static($chunks);
+    }
+
+    /**
+     * Chunk the collection into chunks with a callback.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function chunkWhile(callable $callback)
+    {
+        return new static(
+            $this->lazy()->chunkWhile($callback)->mapInto(static::class)
+        );
     }
 
     /**
@@ -1348,7 +1361,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function offsetExists($key)
     {
-        return array_key_exists($key, $this->items);
+        return isset($this->items[$key]);
     }
 
     /**

@@ -14,19 +14,25 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "illuminate/container": "^7.0",
-        "illuminate/contracts": "^7.0",
-        "illuminate/support": "^7.0"
+        "php": "^7.3",
+        "illuminate/bus": "^8.0",
+        "illuminate/collections": "^8.0",
+        "illuminate/container": "^8.0",
+        "illuminate/contracts": "^8.0",
+        "illuminate/macroable": "^8.0",
+        "illuminate/support": "^8.0"
     },
     "autoload": {
         "psr-4": {
             "Illuminate\\Events\\": ""
-        }
+        },
+        "files": [
+            "functions.php"
+        ]
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "8.x-dev"
         }
     },
     "config": {

@@ -519,7 +519,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Filter items where the given key is not null.
+     * Filter items where the value for the given key is null.
      *
      * @param  string|null  $key
      * @return static
@@ -530,7 +530,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Filter items where the given key is null.
+     * Filter items where the value for the given key is not null.
      *
      * @param  string|null  $key
      * @return static
@@ -721,21 +721,6 @@ trait EnumeratesValues
     public function uniqueStrict($key = null)
     {
         return $this->unique($key, true);
-    }
-
-    /**
-     * Take items in the collection until the given condition is met.
-     *
-     * This is an alias to the "takeUntil" method.
-     *
-     * @param  mixed  $value
-     * @return static
-     *
-     * @deprecated Use the "takeUntil" method directly.
-     */
-    public function until($value)
-    {
-        return $this->takeUntil($value);
     }
 
     /**

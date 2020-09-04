@@ -18,6 +18,15 @@ class GatePolicyResolutionTest extends TestCase
             AuthenticationTestUserPolicy::class,
             Gate::getPolicyFor(AuthenticationTestUser::class)
         );
+
+        $this->assertInstanceOf(
+            AuthenticationTestUserPolicy::class,
+            Gate::getPolicyFor(Fixtures\Models\AuthenticationTestUser::class)
+        );
+
+        $this->assertNull(
+            Gate::getPolicyFor(static::class)
+        );
     }
 
     public function testPolicyCanBeGuessedUsingCallback()

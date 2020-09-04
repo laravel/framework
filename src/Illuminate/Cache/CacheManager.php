@@ -358,6 +358,19 @@ class CacheManager implements FactoryContract
     }
 
     /**
+     * Disconnect the given driver and remove from local cache.
+     *
+     * @param  string|null  $name
+     * @return void
+     */
+    public function purge($name = null)
+    {
+        $name = $name ?? $this->getDefaultDriver();
+
+        unset($this->stores[$name]);
+    }
+
+    /**
      * Register a custom driver creator Closure.
      *
      * @param  string  $driver

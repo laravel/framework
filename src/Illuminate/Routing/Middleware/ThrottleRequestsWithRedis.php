@@ -3,6 +3,7 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
 
@@ -16,27 +17,30 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected $redis;
 
     /**
-     * The timestamp of the end of the current duration.
+     * The timestamp of the end of the current duration by key.
      *
-     * @var int
+     * @var array
      */
-    public $decaysAt;
+    public $decaysAt = [];
 
     /**
-     * The number of remaining slots.
+     * The number of remaining slots by key.
      *
-     * @var int
+     * @var array
      */
-    public $remaining;
+    public $remaining = [];
 
     /**
      * Create a new request throttler.
      *
+     * @param  \Illuminate\Cache\RateLimiter  $limiter
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @return void
      */
-    public function __construct(Redis $redis)
+    public function __construct(RateLimiter $limiter, Redis $redis)
     {
+        parent::__construct($limiter);
+
         $this->redis = $redis;
     }
 
@@ -45,29 +49,30 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  int|string  $maxAttempts
-     * @param  float|int  $decayMinutes
-     * @param  string  $prefix
-     * @return mixed
+     * @param  array  $limits
+     * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
-    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
+    protected function handleRequest($request, Closure $next, array $limits)
     {
-        $key = $prefix.$this->resolveRequestSignature($request);
-
-        $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
-
-        if ($this->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
-            throw $this->buildException($key, $maxAttempts);
+        foreach ($limits as $limit) {
+            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decayMinutes)) {
+                throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
+            }
         }
 
         $response = $next($request);
 
-        return $this->addHeaders(
-            $response, $maxAttempts,
-            $this->calculateRemainingAttempts($key, $maxAttempts)
-        );
+        foreach ($limits as $limit) {
+            $response = $this->addHeaders(
+                $response,
+                $limit->maxAttempts,
+                $this->calculateRemainingAttempts($limit->key, $limit->maxAttempts)
+            );
+        }
+
+        return $response;
     }
 
     /**
@@ -84,8 +89,8 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
             $this->redis, $key, $maxAttempts, $decayMinutes * 60
         );
 
-        return tap(! $limiter->acquire(), function () use ($limiter) {
-            [$this->decaysAt, $this->remaining] = [
+        return tap(! $limiter->acquire(), function () use ($key, $limiter) {
+            [$this->decaysAt[$key], $this->remaining[$key]] = [
                 $limiter->decaysAt, $limiter->remaining,
             ];
         });
@@ -101,11 +106,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      */
     protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
     {
-        if (is_null($retryAfter)) {
-            return $this->remaining;
-        }
-
-        return 0;
+        return is_null($retryAfter) ? $this->remaining[$key] : 0;
     }
 
     /**
@@ -116,6 +117,6 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      */
     protected function getTimeUntilNextRetry($key)
     {
-        return $this->decaysAt - $this->currentTime();
+        return $this->decaysAt[$key] - $this->currentTime();
     }
 }
