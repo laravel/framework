@@ -1112,4 +1112,37 @@ class HttpRequestTest extends TestCase
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
     }
+    
+    public function testCastToMethod() 
+    {
+        $postDTO = new class
+        {
+            public $title;
+            private $body;
+        
+            public function setBody($body) 
+            {
+                $this->body = $body;
+        
+                return $this;
+            }
+        
+            public function getBody() 
+            {
+                return $this->body;
+            }
+        };
+
+        $request = Request::create('/', 'GET', ['title' => 'Laravel', 'body' => 'is awesome!']);
+        $DTO = $request->castTo($postDTO);
+
+        $this->assertEquals('Laravel', $DTO->title);
+        $this->assertEquals('is awesome!', $DTO->getBody());
+
+        $request = Request::create('/', 'POST', ['title' => 'JS', 'body' => 'ES']);
+        $DTO = $request->castTo(new $postDTO, ['body' => 'ES6']);
+
+        $this->assertEquals('JS', $DTO->title);
+        $this->assertEquals('ES6', $DTO->getBody());
+    }
 }

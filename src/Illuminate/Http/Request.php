@@ -5,6 +5,7 @@ namespace Illuminate\Http;
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Concerns\CastToObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -22,7 +23,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     use Concerns\InteractsWithContentTypes,
         Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
-        Macroable;
+        Macroable,
+        CastToObject;
 
     /**
      * The decoded JSON content for the request.
