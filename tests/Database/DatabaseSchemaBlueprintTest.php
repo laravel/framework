@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
@@ -16,6 +17,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+        Builder::$defaultMorphKeyType = 'int';
     }
 
     public function testToSqlRunsCommandsFromBlueprint()
@@ -188,5 +190,105 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection = m::mock(Connection::class);
 
         $this->assertEquals(['bar'], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDefaultUsingIdMorph()
+    {
+        $base = new Blueprint('comments', function ($table) {
+            $table->morphs('commentable');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` bigint unsigned not null',
+            'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDefaultUsingNullableIdMorph()
+    {
+        $base = new Blueprint('comments', function ($table) {
+            $table->nullableMorphs('commentable');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` bigint unsigned null',
+            'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDefaultUsingUuidMorph()
+    {
+        Builder::defaultMorphKeyType('uuid');
+
+        $base = new Blueprint('comments', function ($table) {
+            $table->morphs('commentable');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` char(36) not null',
+            'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDefaultUsingNullableUuidMorph()
+    {
+        Builder::defaultMorphKeyType('uuid');
+
+        $base = new Blueprint('comments', function ($table) {
+            $table->nullableMorphs('commentable');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` char(36) null',
+            'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipColumnWithIncrementalModel()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->entangle('Illuminate\Foundation\Auth\User');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `user_id` bigint unsigned not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipColumnWithUuidModel()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        $base = new Blueprint('posts', function ($table) {
+            $table->entangle('EloquentModelUuidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 }

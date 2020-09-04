@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
+use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 
@@ -32,6 +33,13 @@ class Builder
     protected $resolver;
 
     /**
+     * The default relationship morph key type.
+     *
+     * @var string
+     */
+    public static $defaultMorphKeyType = 'int';
+
+    /**
      * The default string length for migrations.
      *
      * @var int
@@ -48,6 +56,21 @@ class Builder
     {
         $this->connection = $connection;
         $this->grammar = $connection->getSchemaGrammar();
+    }
+
+    /**
+     * Set the default string length for migrations.
+     *
+     * @param  string  $type
+     * @return void
+     */
+    public static function defaultMorphKeyType($type)
+    {
+        if (! in_array($type, ['int', 'uuid'])) {
+            throw new InvalidArgumentException('Expect morph key type to either be int or uuid.');
+        }
+
+        static::$defaultMorphKeyType = $type;
     }
 
     /**

@@ -5,11 +5,13 @@ namespace Illuminate\Database\Schema;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 class Blueprint
 {
@@ -816,6 +818,32 @@ class Blueprint
     }
 
     /**
+     * Create a foreign key column on the table from a model.
+     *
+     * @param  string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function entangle($model, $column = null)
+    {
+        if (\is_string($model)) {
+            $model = new $model();
+        }
+
+        if (! $model instanceof Model) {
+            throw new InvalidArgumentException(sprintf('Given $model is not an instance of [%s].', Model::class));
+        }
+
+        $column = $column ?? $model->getForeignKey();
+
+        if ($model->getKeyType() === 'int' && $model->incrementing === true) {
+            return $this->unsignedBigInteger($column);
+        } else {
+            return $this->uuid($column);
+        }
+    }
+
+    /**
      * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
@@ -1307,11 +1335,11 @@ class Blueprint
      */
     public function morphs($name, $indexName = null)
     {
-        $this->string("{$name}_type");
-
-        $this->unsignedBigInteger("{$name}_id");
-
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        if (Builder::$defaultMorphKeyType === 'uuid') {
+            $this->uuidMorphs($name, $indexName);
+        } else {
+            $this->idMorphs($name, $indexName);
+        }
     }
 
     /**
@@ -1322,6 +1350,38 @@ class Blueprint
      * @return void
      */
     public function nullableMorphs($name, $indexName = null)
+    {
+        if (Builder::$defaultMorphKeyType === 'uuid') {
+            $this->nullableUuidMorphs($name, $indexName);
+        } else {
+            $this->nullableIdMorphs($name, $indexName);
+        }
+    }
+
+    /**
+     * Add the proper columns for a polymorphic table using ID (incremental).
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function idMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type");
+
+        $this->unsignedBigInteger("{$name}_id");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add nullable columns for a polymorphic table using ID (incremental).
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function nullableIdMorphs($name, $indexName = null)
     {
         $this->string("{$name}_type")->nullable();
 
