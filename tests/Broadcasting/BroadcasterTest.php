@@ -355,7 +355,6 @@ class BroadcasterTestEloquentModelStub extends Model
         return 'id';
     }
 
-
     public function resolveRouteBinding($value, $field = null, $query = null)
     {
         return $this->where($field, $value)->first();
