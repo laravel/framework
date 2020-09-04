@@ -7,13 +7,13 @@ use Illuminate\Support\Str;
 class MySqlSchemaState extends SchemaState
 {
     /**
-     * keep track if it is needed to turn on the statistics
+     * Keep track if it is needed to turn on the statistics.
      * @var bool
      */
     public $columnStatisticsOff = false;
 
     /**
-     * make the process and run it for dumping the schema
+     * Make the process and run it for dumping the schema.
      * @param $path
      */
     private function makeDumpProcess($path)
@@ -36,7 +36,7 @@ class MySqlSchemaState extends SchemaState
         try {
             $this->makeDumpProcess($path);
         } catch (\Exception $e) {
-            if (Str::contains($e->getMessage(),"column_statistics")) {
+            if (Str::contains($e->getMessage(),'column_statistics')) {
                 $this->columnStatisticsOff = true;
                 $this->makeDumpProcess($path);
             }
