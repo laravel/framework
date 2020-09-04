@@ -276,6 +276,27 @@ class ComponentTagCompiler
     }
 
     /**
+     * Find the class for the given component using the registered namespaces.
+     *
+     * @param  string  $component
+     * @return string|null
+     */
+    public function findClassByComponent(string $component)
+    {
+        $segments = explode('::', $component);
+
+        $prefix = $segments[0];
+
+        if (! isset($this->namespaces[$prefix]) || ! isset($segments[1])) {
+            return;
+        }
+
+        if (class_exists($class = $this->namespaces[$prefix].'\\'.$this->formatClassName($segments[1]))) {
+            return $class;
+        }
+    }
+
+    /**
      * Guess the class name for the given component.
      *
      * @param  string  $component
@@ -290,26 +311,6 @@ class ComponentTagCompiler
         $class = $this->formatClassName($component);
 
         return $namespace.'View\\Components\\'.$class;
-    }
-
-    /**
-     * Find the class for the given component.
-     *
-     * @param  string  $component
-     * @return string|null
-     */
-    public function findClassByComponent(string $component)
-    {
-        $pieces = explode('::', $component);
-        $prefix = $pieces[0];
-
-        if (! isset($this->namespaces[$prefix]) || ! isset($pieces[1])) {
-            return;
-        }
-
-        if (class_exists($location = $this->namespaces[$prefix].'\\'.$this->formatClassName($pieces[1]))) {
-            return $location;
-        }
     }
 
     /**
