@@ -165,10 +165,10 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     /**
      * Merge additional attributes / values into the attribute bag.
      *
-     * @param  array  $attributeDefaults
+     * @param  mixed  $attributeDefaults
      * @return static
      */
-    public function merge(array $attributeDefaults = [])
+    public function merge($attributeDefaults = [])
     {
         $attributes = [];
 
@@ -178,7 +178,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             }
 
             return e($value);
-        }, $attributeDefaults);
+        }, collect($attributeDefaults)->all());
 
         foreach ($this->attributes as $key => $value) {
             if ($key !== 'class') {
