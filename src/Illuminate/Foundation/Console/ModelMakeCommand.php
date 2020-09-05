@@ -166,7 +166,7 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $class = parent::buildClass($name);
 
-        $guardedReplacement = $this->option('unguard') ? "[]": "['*']";
+        $guardedReplacement = $this->option('unguard') ? "[]" : "['*']";
 
         $class = str_replace(
             ['{{ guarded }}', '{{guarded}}'],
