@@ -6,5 +6,12 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class {{ class }} extends Pivot
 {
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array|bool
+     */
+    protected $guarded = {{ guarded }};
+
     //
 }
