@@ -156,7 +156,7 @@ class Worker
                 $jobsProcessed++;
 
                 if ($this->supportsAsyncSignals()) {
-                    $this->runJobWithForking();
+                    $this->runJobWithForking($job, $connectionName, $options);
                 } else {
                     $this->runJob($job, $connectionName, $options);
                 }
@@ -184,9 +184,12 @@ class Worker
     /**
      * Process the given job with forking.
      *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  string  $connectionName
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
-    protected function runJobWithForking()
+    protected function runJobWithForking($job, $connectionName, WorkerOptions $options)
     {
         $pid = pcntl_fork();
 
