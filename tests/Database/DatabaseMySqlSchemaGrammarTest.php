@@ -63,7 +63,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(2, $statements);
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
-        $this->assertSame("alter table `users` auto_increment = 1000", $statements[1]);
+        $this->assertSame('alter table `users` auto_increment = 1000', $statements[1]);
     }
 
     public function testEngineCreateTable()
