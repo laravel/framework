@@ -163,13 +163,7 @@ class Worker
                 $jobsProcessed++;
 
                 if ($this->supportsAsyncSignals()) {
-                    if ($this->runJobWithForking($job, $connectionName, $options)) {
-                        if (extension_loaded('posix')) {
-                            posix_kill(getmypid(), SIGQUIT);
-                        }
-
-                        exit(0);
-                    }
+                    $this->runJobWithForking($job, $connectionName, $options);
                 } else {
                     $this->runJob($job, $connectionName, $options);
                 }
@@ -200,7 +194,7 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  string  $connectionName
      * @param  \Illuminate\Queue\WorkerOptions  $options
-     * @return bool
+     * @return void
      */
     protected function runJobWithForking($job, $connectionName, WorkerOptions $options)
     {
@@ -213,13 +207,17 @@ class Worker
                 $this->shouldQuit = true;
             }
 
-            return false;
+            return;
         }
 
         $this->resetTimeoutHandler();
         $this->runJob($job, $connectionName, $options);
 
-        return true;
+        if (extension_loaded('posix')) {
+            posix_kill(getmypid(), SIGQUIT);
+        }
+
+        exit(0);
     }
 
     /**
