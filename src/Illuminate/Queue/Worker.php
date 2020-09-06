@@ -87,7 +87,7 @@ class Worker
     protected static $popCallbacks = [];
 
     /**
-     * Child worker process.
+     * Child worker process ID.
      *
      * @var int
      */
