@@ -87,6 +87,13 @@ class Worker
     protected static $popCallbacks = [];
 
     /**
+     * Child worker process.
+     *
+     * @var int
+     */
+    public $childWorkerPid;
+
+    /**
      * Create a new queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
@@ -191,10 +198,11 @@ class Worker
      */
     protected function runJobWithForking($job, $connectionName, WorkerOptions $options)
     {
-        $pid = pcntl_fork();
+        $childPid = pcntl_fork();
 
-        if ($pid) {
-            pcntl_waitpid($pid, $status, WUNTRACED);
+        if ($childPid) {
+            $this->childWorkerPid = $childPid;
+            pcntl_waitpid($childPid, $status, WUNTRACED);
             if (! pcntl_wifexited($status)) {
                 $this->shouldQuit = true;
             }
@@ -728,6 +736,7 @@ class Worker
         $this->events->dispatch(new WorkerStopping($status));
 
         if (extension_loaded('posix')) {
+            posix_kill($this->childPid, SIGKILL);
             posix_kill(getmypid(), SIGKILL);
         }
 
