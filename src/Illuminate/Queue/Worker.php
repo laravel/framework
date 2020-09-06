@@ -156,7 +156,7 @@ class Worker
                 $jobsProcessed++;
 
                 if ($this->supportsAsyncSignals()) {
-                    $this->runJobsWithForking();
+                    $this->runJobWithForking();
                 } else {
                     $this->runJob($job, $connectionName, $options);
                 }
