@@ -396,10 +396,7 @@ class Worker
     {
         if ($this->causedByLostConnection($e)) {
             if ($this->supportsAsyncSignals() && extension_loaded('posix')) {
-                $pid = pcntl_fork();
-                if (! $pid) {
-                    posix_kill(getmypid(), SIGKILL);
-                }
+                posix_kill(getmypid(), SIGKILL);
             }
 
             $this->shouldQuit = true;
