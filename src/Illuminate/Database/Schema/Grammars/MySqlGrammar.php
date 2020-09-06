@@ -70,9 +70,9 @@ class MySqlGrammar extends Grammar
         // Finally, we will append the engine configuration onto this SQL statement as
         // the final thing we do before returning this finished SQL. Once this gets
         // added the query will be ready to execute against the real connections.
-        return array_filter(array_merge([$this->compileCreateEngine(
+        return array_values(array_filter(array_merge([$this->compileCreateEngine(
             $sql, $connection, $blueprint
-        )], $this->compileAutoIncrementStartingValues($blueprint)));
+        )], $this->compileAutoIncrementStartingValues($blueprint))));
     }
 
     /**
@@ -153,10 +153,10 @@ class MySqlGrammar extends Grammar
     {
         $columns = $this->prefixArray('add', $this->getColumns($blueprint));
 
-        return array_merge(
+        return array_values(array_merge(
             ['alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns)],
             $this->compileAutoIncrementStartingValues($blueprint)
-        );
+        ));
     }
 
     /**

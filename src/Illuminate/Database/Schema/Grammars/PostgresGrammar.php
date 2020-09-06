@@ -64,11 +64,11 @@ class PostgresGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        return array_filter(array_merge([sprintf('%s table %s (%s)',
+        return array_values(array_filter(array_merge([sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint))
-        )], $this->compileAutoIncrementStartingValues($blueprint)));
+        )], $this->compileAutoIncrementStartingValues($blueprint))));
     }
 
     /**
@@ -80,10 +80,10 @@ class PostgresGrammar extends Grammar
      */
     public function compileAdd(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('alter table %s %s',
+        return array_values(array_filter(array_merge([sprintf('alter table %s %s',
             $this->wrapTable($blueprint),
             implode(', ', $this->prefixArray('add column', $this->getColumns($blueprint)))
-        );
+        )], $this->compileAutoIncrementStartingValues($blueprint))));
     }
 
     /**
