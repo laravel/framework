@@ -29,6 +29,8 @@ class StorageLinkCommand extends Command
      */
     public function handle()
     {
+        $linksCreated = 0;
+
         foreach ($this->links() as $link => $target) {
             if (file_exists($link)) {
                 $this->error("The [$link] link already exists.");
@@ -40,10 +42,12 @@ class StorageLinkCommand extends Command
                 $this->laravel->make('files')->link($target, $link);
 
                 $this->info("The [$link] link has been connected to [$target].");
+
+                $linksCreated++;
             }
         }
 
-        $this->info('The links have been created.');
+        $this->info($linksCreated . ' links have been created.');
     }
 
     /**
