@@ -195,6 +195,7 @@ class Worker
             if (! pcntl_wifexited($status)) {
                 $this->shouldQuit = true;
             }
+
             return;
         }
 
