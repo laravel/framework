@@ -155,9 +155,9 @@ class Worker
             if ($job) {
                 $jobsProcessed++;
 
-                $pid = pcntl_fork();
+                $pid = \pcntl_fork();
                 if ($pid) {
-                    pcntl_waitpid($pid, $status, WUNTRACED);
+                    \pcntl_waitpid($pid, $status, WUNTRACED);
                 } else {
                     $this->runJob($job, $connectionName, $options);
                 }
