@@ -81,8 +81,10 @@ class MySqlSchemaState extends SchemaState
         ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
+
         return $process;
     }
+    
     /**
      * Append the migration data to the schema dump.
      *
