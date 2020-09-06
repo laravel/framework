@@ -180,7 +180,6 @@ class Worker
         }
     }
 
-
     /**
      * Process the given job with forking.
      *
