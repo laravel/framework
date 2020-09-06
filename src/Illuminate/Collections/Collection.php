@@ -51,6 +51,18 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Create a collection with the given range.
+     *
+     * @param  int  $from
+     * @param  int  $to
+     * @return static
+     */
+    public static function range($from, $to)
+    {
+        return new static(range($from, $to));
+    }
+
+    /**
      * Get all of the items in the collection.
      *
      * @return array

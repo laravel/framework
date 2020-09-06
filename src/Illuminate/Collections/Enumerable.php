@@ -28,6 +28,15 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public static function times($number, callable $callback = null);
 
     /**
+     * Create a collection with the given range.
+     *
+     * @param  int  $from
+     * @param  int  $to
+     * @return static
+     */
+    public static function range($from, $to);
+
+    /**
      * Wrap the given value in a collection if applicable.
      *
      * @param  mixed  $value

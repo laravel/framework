@@ -2201,6 +2201,22 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testRangeMethod($collection)
+    {
+        $this->assertSame(
+            [1, 2, 3, 4, 5],
+            $collection::range(1, 5)->all()
+        );
+
+        $this->assertSame(
+            [-2, -1, 0, 1, 2],
+            $collection::range(-2, 2)->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testConstructMakeFromObject($collection)
     {
         $object = new stdClass;

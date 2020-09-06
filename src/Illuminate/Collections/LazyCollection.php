@@ -60,7 +60,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Create an enumerable with the given range.
+     * Create a collection with the given range.
      *
      * @param  int  $from
      * @param  int  $to
