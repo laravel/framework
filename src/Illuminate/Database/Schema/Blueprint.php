@@ -1594,6 +1594,11 @@ class Blueprint
         });
     }
 
+    /**
+     * Determine if the blueprint has auto increment columns
+     *
+     * @return bool
+     */
     public function hasAutoIncrementColumn()
     {
         return ! is_null(collect($this->getAddedColumns())->first(function ($column) {
@@ -1601,10 +1606,21 @@ class Blueprint
         }));
     }
 
+    /**
+     * Get the auto increment column starting values.
+     *
+     * @return array
+     */
     public function autoIncrementingStartingValues()
     {
+        if (! $this->hasAutoIncrementColumn()) {
+            return [];
+        }
+
         return collect($this->getAddedColumns())->mapWithKeys(function ($column) {
-            return [$column->name => $column->get('startingValue')];
+            return $column->autoIncrement === true
+                        ? [$column->name => $column->get('startingValue', $column->get('from'))]
+                        : [$column->name => null];
         })->filter()->all();
     }
 }
