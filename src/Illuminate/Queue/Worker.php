@@ -152,10 +152,6 @@ class Worker
                 $this->manager->connection($connectionName), $queue
             );
 
-            if ($this->supportsAsyncSignals()) {
-                $this->registerTimeoutHandler($job, $options);
-            }
-
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
@@ -171,10 +167,6 @@ class Worker
                 $this->sleep($options->sleep);
             }
 
-            if ($this->supportsAsyncSignals()) {
-                $this->resetTimeoutHandler();
-            }
-
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
@@ -187,6 +179,7 @@ class Worker
             }
         }
     }
+
 
     /**
      * Process the given job with forking.
@@ -202,15 +195,19 @@ class Worker
 
         if ($childPid) {
             $this->childWorkerPid = $childPid;
+
+            $this->registerTimeoutHandler($job, $options);
+
             pcntl_waitpid($childPid, $status);
             if (! pcntl_wifexited($status)) {
                 $this->shouldQuit = true;
             }
 
+            $this->resetTimeoutHandler();
+
             return;
         }
 
-        $this->resetTimeoutHandler();
         $this->runJob($job, $connectionName, $options);
 
         if (extension_loaded('posix')) {
