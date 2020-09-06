@@ -1595,7 +1595,7 @@ class Blueprint
     }
 
     /**
-     * Determine if the blueprint has auto increment columns
+     * Determine if the blueprint has auto increment columns.
      *
      * @return bool
      */
