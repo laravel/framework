@@ -30,6 +30,11 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
             $table->increments('id');
             $table->integer('one_id');
         });
+
+        Schema::create('four', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('one_id');
+        });
     }
 
     public function testItBasic()
@@ -51,6 +56,51 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
 
         $this->assertTrue($model->relationLoaded('threes'));
     }
+
+    public function testWhenCallbackWithReturn()
+    {
+        $one = Model1::create();
+        $one->threes()->create();
+
+        $model = Model1::find($one->id);
+
+        $callback = function ($model, $condition) {
+            $this->assertTrue($condition);
+
+            return $model->load('threes');
+        };
+
+        $model->when(false, $callback);
+        $this->assertFalse($model->relationLoaded('threes'));
+
+        $model->when(true, $callback);
+        $this->assertTrue($model->relationLoaded('threes'));
+    }
+
+    public function testWhenCallbackWithDefault()
+    {
+        $one = Model1::create();
+        $one->threes()->create();
+        $one->fours()->create();
+
+        $model = Model1::find($one->id);
+
+        $callback = function ($model, $condition) {
+            $this->assertTrue($condition);
+            return $model->load('threes');
+        };
+
+        $default = function ($model, $condition) {
+            $this->assertFalse($condition);
+            return $model->load('fours');
+        };
+
+        $model->when(false, $callback, $default);
+        $this->assertTrue($model->relationLoaded('fours'));
+
+        $model->when(true, $callback, $default);
+        $this->assertTrue($model->relationLoaded('threes'));
+    }
 }
 
 class Model1 extends Model
@@ -69,6 +119,10 @@ class Model1 extends Model
     {
         return $this->hasMany(Model3::class, 'one_id');
     }
+    public function fours()
+    {
+        return $this->hasMany(Model4::class, 'one_id');
+    }
 }
 
 class Model2 extends Model
@@ -86,6 +140,19 @@ class Model2 extends Model
 class Model3 extends Model
 {
     public $table = 'three';
+    public $timestamps = false;
+    protected $guarded = ['id'];
+
+    public function one()
+    {
+        return $this->belongsTo(Model1::class, 'one_id');
+    }
+}
+
+
+class Model4 extends Model
+{
+    public $table = 'four';
     public $timestamps = false;
     protected $guarded = ['id'];
 

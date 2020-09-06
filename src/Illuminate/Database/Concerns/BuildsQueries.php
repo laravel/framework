@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Concerns;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 
@@ -153,13 +154,25 @@ trait BuildsQueries
      */
     public function when($value, $callback, $default = null)
     {
-        if ($value) {
-            return $callback($this, $value) ?: $this;
-        } elseif ($default) {
-            return $default($this, $value) ?: $this;
+        [$one, $two, $class] = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
+
+        $instance = $this;
+        
+        if (
+            isset($class['object']) &&
+            $class['object'] instanceof Model &&
+            $class['object']->exists
+            ) {
+            $instance = $class['object'];
         }
 
-        return $this;
+        if ($value) {
+            return $callback($instance, $value) ?: $instance;
+        } elseif ($default) {
+            return $default($instance, $value) ?: $instance;
+        }
+
+        return $instance;
     }
 
     /**
