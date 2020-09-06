@@ -155,9 +155,13 @@ class Worker
             if ($job) {
                 $jobsProcessed++;
 
-                $pid = \pcntl_fork();
-                if ($pid) {
-                    \pcntl_waitpid($pid, $status, WUNTRACED);
+                if ($this->supportsAsyncSignals()) {
+                    $pid = pcntl_fork();
+                    if ($pid) {
+                        pcntl_waitpid($pid, $status, WUNTRACED);
+                    } else {
+                        $this->runJob($job, $connectionName, $options);
+                    }
                 } else {
                     $this->runJob($job, $connectionName, $options);
                 }
