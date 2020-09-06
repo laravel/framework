@@ -29,7 +29,7 @@ class MySqlSchemaState extends SchemaState
      * @param \Exception $e
      * @return bool
      */
-    private function isColumnStatisticsIssue(\Exception  $e)
+    private function isColumnStatisticsIssue(\Exception $e)
     {
         return Str::contains($e->getMessage(), 'column_statistics');
     }
@@ -95,17 +95,14 @@ class MySqlSchemaState extends SchemaState
         try {
             $process = $this->makeMigrationProcess();
         } catch (\Exception $e) {
-            if ($this->isColumnStatisticsIssue($e) && ! $this->columnStatisticsOff)
-            {
+            if ($this->isColumnStatisticsIssue($e) && ! $this->columnStatisticsOff) {
                 $this->columnStatisticsOff = true;
                 $process = $this->makeMigrationProcess();
-
             }
         }
-        if (! is_null($process) ) {
+        if (! is_null($process)) {
             $this->files->append($path, $process->getOutput());
         }
-
     }
 
     /**
