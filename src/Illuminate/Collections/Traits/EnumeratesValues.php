@@ -120,6 +120,24 @@ trait EnumeratesValues
     }
 
     /**
+     * Create a new collection by invoking the callback a given amount of times.
+     *
+     * @param  int  $number
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public static function times($number, callable $callback = null)
+    {
+        if ($number < 1) {
+            return new static;
+        }
+
+        return static::range(1, $number)
+            ->when($callback)
+            ->map($callback);
+    }
+
+    /**
      * Alias for the "avg" method.
      *
      * @param  callable|string|null  $callback
