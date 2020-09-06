@@ -163,7 +163,9 @@ class Worker
                 $jobsProcessed++;
 
                 if ($this->supportsAsyncSignals()) {
-                    $this->runJobWithForking($job, $connectionName, $options);
+                    if ($this->runJobWithForking($job, $connectionName, $options)) {
+                        break;
+                    }
                 } else {
                     $this->runJob($job, $connectionName, $options);
                 }
@@ -194,7 +196,7 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  string  $connectionName
      * @param  \Illuminate\Queue\WorkerOptions  $options
-     * @return void
+     * @return bool
      */
     protected function runJobWithForking($job, $connectionName, WorkerOptions $options)
     {
@@ -207,10 +209,13 @@ class Worker
                 $this->shouldQuit = true;
             }
 
-            return;
+            return false;
         }
 
+        $this->resetTimeoutHandler();
         $this->runJob($job, $connectionName, $options);
+
+        return true;
     }
 
     /**
