@@ -202,7 +202,7 @@ class Worker
 
         if ($childPid) {
             $this->childWorkerPid = $childPid;
-            pcntl_waitpid($childPid, $status, WUNTRACED);
+            pcntl_waitpid($childPid, $status);
             if (! pcntl_wifexited($status)) {
                 $this->shouldQuit = true;
             }
