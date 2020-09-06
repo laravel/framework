@@ -159,6 +159,9 @@ class Worker
                     $pid = pcntl_fork();
                     if ($pid) {
                         pcntl_waitpid($pid, $status, WUNTRACED);
+                        if (! pcntl_wifexited($status)) {
+                            $this->shouldQuit = true;
+                        }
                     } else {
                         $this->runJob($job, $connectionName, $options);
                     }
@@ -379,6 +382,13 @@ class Worker
     protected function stopWorkerIfLostConnection($e)
     {
         if ($this->causedByLostConnection($e)) {
+            if ($this->supportsAsyncSignals()) {
+                $pid = pcntl_fork();
+                if (! $pid) {
+                    posix_kill(getmypid(), SIGKILL);
+                }
+            }
+
             $this->shouldQuit = true;
         }
     }
