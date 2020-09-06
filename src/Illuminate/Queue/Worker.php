@@ -411,7 +411,10 @@ class Worker
     protected function stopWorkerIfLostConnection($e)
     {
         if ($this->causedByLostConnection($e)) {
-            if ($this->supportsAsyncSignals() && extension_loaded('posix')) {
+            if (getmypid() == $childWorkerPid &&
+                $this->supportsAsyncSignals() &&
+                extension_loaded('posix')
+            ) {
                 posix_kill(getmypid(), SIGKILL);
             }
 
