@@ -43,6 +43,8 @@ class KeyGenerateCommand extends Command
         // automatically setup for this developer. This key gets generated using a
         // secure random byte generator and is later base64 encoded for storage.
         if (! $this->setKeyInEnvironmentFile($key)) {
+            $this->error('Failed to set application key.');
+
             return;
         }
 
@@ -77,24 +79,25 @@ class KeyGenerateCommand extends Command
             return false;
         }
 
-        $this->writeNewEnvironmentFileWith($key);
-
-        return true;
+        return $this->writeNewEnvironmentFileWith($key);
     }
 
     /**
      * Write a new environment file with the given key.
      *
      * @param  string  $key
-     * @return void
+     * @return bool
      */
     protected function writeNewEnvironmentFileWith($key)
     {
-        file_put_contents($this->laravel->environmentFilePath(), preg_replace(
-            $this->keyReplacementPattern(),
-            'APP_KEY='.$key,
-            file_get_contents($this->laravel->environmentFilePath())
-        ));
+        $envContents = file_get_contents($this->laravel->environmentFilePath());
+
+        return (bool) file_put_contents(
+            $this->laravel->environmentFilePath(),
+            preg_match($this->keyReplacementPattern(), $envContents)
+                ? preg_replace($this->keyReplacementPattern(), 'APP_KEY='.$key, $envContents)
+                : $envContents.PHP_EOL.'APP_KEY='.$key
+        );
     }
 
     /**
