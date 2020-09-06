@@ -256,7 +256,7 @@ class Blueprint
      *
      * @return bool
      */
-    protected function creating()
+    public function creating()
     {
         return collect($this->commands)->contains(function ($command) {
             return $command->name === 'create';
@@ -1592,5 +1592,19 @@ class Blueprint
         return array_filter($this->columns, function ($column) {
             return (bool) $column->change;
         });
+    }
+
+    public function hasAutoIncrementColumn()
+    {
+        return ! is_null(collect($this->getAddedColumns())->first(function ($column) {
+            return $column->autoIncrement === true;
+        }));
+    }
+
+    public function autoIncrementingStartingValues()
+    {
+        return collect($this->getAddedColumns())->mapWithKeys(function ($column) {
+            return [$column->name => $column->get('startingValue')];
+        })->filter()->all();
     }
 }
