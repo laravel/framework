@@ -84,7 +84,7 @@ class MySqlSchemaState extends SchemaState
 
         return $process;
     }
-    
+
     /**
      * Append the migration data to the schema dump.
      *
