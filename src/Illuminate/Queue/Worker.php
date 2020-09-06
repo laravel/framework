@@ -164,7 +164,11 @@ class Worker
 
                 if ($this->supportsAsyncSignals()) {
                     if ($this->runJobWithForking($job, $connectionName, $options)) {
-                        break;
+                        if (extension_loaded('posix')) {
+                            posix_kill(getmypid(), SIGQUIT);
+                        }
+
+                        exit(0);
                     }
                 } else {
                     $this->runJob($job, $connectionName, $options);
