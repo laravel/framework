@@ -351,7 +351,11 @@ trait HasAttributes
      */
     public function getAttribute($key)
     {
-        if (! $key) {
+        // Here we will determine if the model base class itself contains this given key
+        // since we don't want to treat any of those methods as relationships because
+        // they are all intended as helper methods and none of these are relations.
+        
+        if (! $key or method_exists(self::class, $key)) {
             return;
         }
 
@@ -363,13 +367,6 @@ trait HasAttributes
             $this->hasGetMutator($key) ||
             $this->isClassCastable($key)) {
             return $this->getAttributeValue($key);
-        }
-
-        // Here we will determine if the model base class itself contains this given key
-        // since we don't want to treat any of those methods as relationships because
-        // they are all intended as helper methods and none of these are relations.
-        if (method_exists(self::class, $key)) {
-            return;
         }
 
         return $this->getRelationValue($key);
