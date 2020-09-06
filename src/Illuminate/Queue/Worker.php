@@ -156,15 +156,7 @@ class Worker
                 $jobsProcessed++;
 
                 if ($this->supportsAsyncSignals()) {
-                    $pid = pcntl_fork();
-                    if ($pid) {
-                        pcntl_waitpid($pid, $status, WUNTRACED);
-                        if (! pcntl_wifexited($status)) {
-                            $this->shouldQuit = true;
-                        }
-                    } else {
-                        $this->runJob($job, $connectionName, $options);
-                    }
+                    $this->runJobsWithForking();
                 } else {
                     $this->runJob($job, $connectionName, $options);
                 }
@@ -187,6 +179,26 @@ class Worker
                 return $this->stop($status);
             }
         }
+    }
+
+    /**
+     * Process the given job with forking.
+     *
+     * @return void
+     */
+    protected function runJobWithForking()
+    {
+        $pid = pcntl_fork();
+
+        if ($pid) {
+            pcntl_waitpid($pid, $status, WUNTRACED);
+            if (! pcntl_wifexited($status)) {
+                $this->shouldQuit = true;
+            }
+            return;
+        }
+
+        $this->runJob($job, $connectionName, $options);
     }
 
     /**
