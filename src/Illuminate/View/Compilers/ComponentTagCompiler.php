@@ -33,6 +33,13 @@ class ComponentTagCompiler
     protected $aliases = [];
 
     /**
+     * The component class namespaces.
+     *
+     * @var array
+     */
+    protected $namespaces = [];
+
+    /**
      * The "bind:" attributes that have been compiled for the current component.
      *
      * @var array
@@ -46,9 +53,10 @@ class ComponentTagCompiler
      * @param  \Illuminate\View\Compilers\BladeCompiler|null
      * @return void
      */
-    public function __construct(array $aliases = [], ?BladeCompiler $blade = null)
+    public function __construct(array $aliases = [], array $namespaces = [], ?BladeCompiler $blade = null)
     {
         $this->aliases = $aliases;
+        $this->namespaces = $namespaces;
 
         $this->blade = $blade ?: new BladeCompiler(new Filesystem, sys_get_temp_dir());
     }
@@ -250,6 +258,10 @@ class ComponentTagCompiler
             );
         }
 
+        if ($class = $this->findClassByComponent($component)) {
+            return $class;
+        }
+
         if (class_exists($class = $this->guessClassName($component))) {
             return $class;
         }
@@ -264,6 +276,27 @@ class ComponentTagCompiler
     }
 
     /**
+     * Find the class for the given component using the registered namespaces.
+     *
+     * @param  string  $component
+     * @return string|null
+     */
+    public function findClassByComponent(string $component)
+    {
+        $segments = explode('::', $component);
+
+        $prefix = $segments[0];
+
+        if (! isset($this->namespaces[$prefix]) || ! isset($segments[1])) {
+            return;
+        }
+
+        if (class_exists($class = $this->namespaces[$prefix].'\\'.$this->formatClassName($segments[1]))) {
+            return $class;
+        }
+    }
+
+    /**
      * Guess the class name for the given component.
      *
      * @param  string  $component
@@ -275,11 +308,24 @@ class ComponentTagCompiler
                     ->make(Application::class)
                     ->getNamespace();
 
+        $class = $this->formatClassName($component);
+
+        return $namespace.'View\\Components\\'.$class;
+    }
+
+    /**
+     * Format the class name for the given component.
+     *
+     * @param  string  $component
+     * @return string
+     */
+    public function formatClassName(string $component)
+    {
         $componentPieces = array_map(function ($componentPiece) {
             return ucfirst(Str::camel($componentPiece));
         }, explode('.', $component));
 
-        return $namespace.'View\\Components\\'.implode('\\', $componentPieces);
+        return implode('\\', $componentPieces);
     }
 
     /**
