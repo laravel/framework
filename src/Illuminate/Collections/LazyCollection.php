@@ -38,16 +38,6 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Create a new instance with no items.
-     *
-     * @return static
-     */
-    public static function empty()
-    {
-        return new static([]);
-    }
-
-    /**
      * Create a new instance by invoking the callback a given amount of times.
      *
      * @param  int  $number

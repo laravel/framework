@@ -110,6 +110,16 @@ trait EnumeratesValues
     }
 
     /**
+     * Create a new instance with no items.
+     *
+     * @return static
+     */
+    public static function empty()
+    {
+        return new static([]);
+    }
+
+    /**
      * Alias for the "avg" method.
      *
      * @param  callable|string|null  $callback

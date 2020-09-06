@@ -2166,6 +2166,16 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testEmptyMethod($collection)
+    {
+        $collection = $collection::empty();
+
+        $this->assertCount(0, $collection->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testTimesMethod($collection)
     {
         $two = $collection::times(2, function ($number) {

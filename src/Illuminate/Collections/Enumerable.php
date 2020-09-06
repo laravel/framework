@@ -44,6 +44,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public static function unwrap($value);
 
     /**
+     * Create a new instance with no items.
+     *
+     * @return static
+     */
+    public static function empty();
+
+    /**
      * Get all items in the enumerable.
      *
      * @return array
