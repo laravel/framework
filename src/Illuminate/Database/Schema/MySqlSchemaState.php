@@ -26,6 +26,15 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
+     * @param \Exception $e
+     * @return bool
+     */
+    private function isColumnStatisticsIssue(\Exception  $e)
+    {
+        return Str::contains($e->getMessage(), 'column_statistics');
+    }
+
+    /**
      * Dump the database's schema into a file.
      *
      * @param  string  $path
@@ -36,7 +45,7 @@ class MySqlSchemaState extends SchemaState
         try {
             $this->makeDumpProcess($path);
         } catch (\Exception $e) {
-            if (Str::contains($e->getMessage(), 'column_statistics')) {
+            if ($this->isColumnStatisticsIssue($e)) {
                 $this->columnStatisticsOff = true;
                 $this->makeDumpProcess($path);
             }
@@ -63,6 +72,18 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
+     * @return \Symfony\Component\Process\Process
+     */
+    private function makeMigrationProcess()
+    {
+        with($process = $this->makeProcess(
+            $this->baseDumpCommand().' migrations --no-create-info --skip-extended-insert --skip-routines --compact'
+        ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+            //
+        ]));
+        return $process;
+    }
+    /**
      * Append the migration data to the schema dump.
      *
      * @param  string  $path
@@ -70,13 +91,21 @@ class MySqlSchemaState extends SchemaState
      */
     protected function appendMigrationData(string $path)
     {
-        with($process = $this->makeProcess(
-            $this->baseDumpCommand().' migrations --no-create-info --skip-extended-insert --skip-routines --compact'
-        ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
-            //
-        ]));
+        $process = null;
+        try {
+            $process = $this->makeMigrationProcess();
+        } catch (\Exception $e) {
+            if ($this->isColumnStatisticsIssue($e) && ! $this->columnStatisticsOff)
+            {
+                $this->columnStatisticsOff = true;
+                $process = $this->makeMigrationProcess();
 
-        $this->files->append($path, $process->getOutput());
+            }
+        }
+        if (! is_null($process) ) {
+            $this->files->append($path, $process->getOutput());
+        }
+
     }
 
     /**
