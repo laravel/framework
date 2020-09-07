@@ -6,6 +6,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -54,6 +55,27 @@ class FilesystemTest extends TestCase
         $files = new Filesystem;
         $files->put(self::$tempDir.'/file.txt', 'Hello World');
         $this->assertStringEqualsFile(self::$tempDir.'/file.txt', 'Hello World');
+    }
+
+    public function testLines()
+    {
+        $path = self::$tempDir.'/file.txt';
+
+        $contents = LazyCollection::times(3)
+            ->map(function ($number) {
+                return "line-{$number}";
+            })
+            ->join("\n");
+
+        file_put_contents($path, $contents);
+
+        $files = new Filesystem;
+        $this->assertInstanceOf(LazyCollection::class, $files->lines($path));
+
+        $this->assertSame(
+            ['line-1', 'line-2', 'line-3'],
+            $files->lines($path)->all()
+        );
     }
 
     public function testReplaceCreatesFile()
