@@ -65,6 +65,7 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
 
         $callback = function ($model, $condition) {
             $this->assertTrue($condition);
+
             return $model->load('threes');
         };
 
