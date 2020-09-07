@@ -38,39 +38,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Create a new instance with no items.
-     *
-     * @return static
-     */
-    public static function empty()
-    {
-        return new static([]);
-    }
-
-    /**
-     * Create a new instance by invoking the callback a given amount of times.
-     *
-     * @param  int  $number
-     * @param  callable|null  $callback
-     * @return static
-     */
-    public static function times($number, callable $callback = null)
-    {
-        if ($number < 1) {
-            return new static;
-        }
-
-        $instance = new static(function () use ($number) {
-            for ($current = 1; $current <= $number; $current++) {
-                yield $current;
-            }
-        });
-
-        return is_null($callback) ? $instance : $instance->map($callback);
-    }
-
-    /**
-     * Create an enumerable with the given range.
+     * Create a collection with the given range.
      *
      * @param  int  $from
      * @param  int  $to

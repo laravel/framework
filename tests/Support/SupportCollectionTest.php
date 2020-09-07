@@ -2166,6 +2166,16 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testEmptyMethod($collection)
+    {
+        $collection = $collection::empty();
+
+        $this->assertCount(0, $collection->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testTimesMethod($collection)
     {
         $two = $collection::times(2, function ($number) {
@@ -2186,6 +2196,22 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($zero->isEmpty());
         $this->assertTrue($negative->isEmpty());
         $this->assertEquals(range(1, 5), $range->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testRangeMethod($collection)
+    {
+        $this->assertSame(
+            [1, 2, 3, 4, 5],
+            $collection::range(1, 5)->all()
+        );
+
+        $this->assertSame(
+            [-2, -1, 0, 1, 2],
+            $collection::range(-2, 2)->all()
+        );
     }
 
     /**

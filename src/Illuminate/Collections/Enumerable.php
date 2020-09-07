@@ -28,6 +28,15 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public static function times($number, callable $callback = null);
 
     /**
+     * Create a collection with the given range.
+     *
+     * @param  int  $from
+     * @param  int  $to
+     * @return static
+     */
+    public static function range($from, $to);
+
+    /**
      * Wrap the given value in a collection if applicable.
      *
      * @param  mixed  $value
@@ -42,6 +51,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return array
      */
     public static function unwrap($value);
+
+    /**
+     * Create a new instance with no items.
+     *
+     * @return static
+     */
+    public static function empty();
 
     /**
      * Get all items in the enumerable.
