@@ -83,13 +83,15 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
 
         $model = Model1::find($one->id);
 
-        $callback = function ($model, $condition) { 
+        $callback = function ($model, $condition) {
             $this->assertTrue($condition);
+
             return $model->load('threes');
         };
 
         $default = function ($model, $condition) {
             $this->assertFalse($condition);
+
             return $model->load('fours');
         };
 
@@ -117,7 +119,7 @@ class Model1 extends Model
     {
         return $this->hasMany(Model3::class, 'one_id');
     }
-    
+
     public function fours()
     {
         return $this->hasMany(Model4::class, 'one_id');
