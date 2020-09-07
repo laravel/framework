@@ -53,7 +53,6 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
         $model->load('threes');
 
         $this->assertCount(1, DB::getQueryLog());
-
         $this->assertTrue($model->relationLoaded('threes'));
     }
 
@@ -66,7 +65,6 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
 
         $callback = function ($model, $condition) {
             $this->assertTrue($condition);
-
             return $model->load('threes');
         };
 
@@ -85,7 +83,7 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
 
         $model = Model1::find($one->id);
 
-        $callback = function ($model, $condition) {
+        $callback = function ($model, $condition) { 
             $this->assertTrue($condition);
             return $model->load('threes');
         };
@@ -119,6 +117,7 @@ class Model1 extends Model
     {
         return $this->hasMany(Model3::class, 'one_id');
     }
+    
     public function fours()
     {
         return $this->hasMany(Model4::class, 'one_id');
@@ -148,7 +147,6 @@ class Model3 extends Model
         return $this->belongsTo(Model1::class, 'one_id');
     }
 }
-
 
 class Model4 extends Model
 {

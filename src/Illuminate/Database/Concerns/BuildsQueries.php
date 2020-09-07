@@ -157,7 +157,6 @@ trait BuildsQueries
         [$one, $two, $class] = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
 
         $instance = $this;
-        
         if (
             isset($class['object']) &&
             $class['object'] instanceof Model &&
