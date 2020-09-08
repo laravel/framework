@@ -117,11 +117,9 @@ class MySqlSchemaState extends SchemaState
             $process->mustRun($output, $variables);
         } catch (Exception $e) {
             if (Str::contains($e->getMessage(), 'column_statistics')) {
-                $process = Process::fromShellCommandLine(
+                return $this->executeDumpProcess(Process::fromShellCommandLine(
                     str_replace(' --column-statistics=0', '', $process->getCommandLine())
-                );
-
-                return $this->executeDumpProcess($process, $output, $variables);
+                ), $output, $variables);
             }
         }
 
