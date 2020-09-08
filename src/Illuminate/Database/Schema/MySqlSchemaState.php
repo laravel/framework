@@ -2,6 +2,10 @@
 
 namespace Illuminate\Database\Schema;
 
+use Exception;
+use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
+
 class MySqlSchemaState extends SchemaState
 {
     /**
@@ -12,9 +16,9 @@ class MySqlSchemaState extends SchemaState
      */
     public function dump($path)
     {
-        $this->makeProcess(
+        $this->executeDumpProcess($this->makeProcess(
             $this->baseDumpCommand().' --routines --result-file=$LARAVEL_LOAD_PATH --no-data'
-        )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
+        ), $this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
 
@@ -46,9 +50,9 @@ class MySqlSchemaState extends SchemaState
      */
     protected function appendMigrationData(string $path)
     {
-        with($process = $this->makeProcess(
+        $process = $this->executeDumpProcess($this->makeProcess(
             $this->baseDumpCommand().' migrations --no-create-info --skip-extended-insert --skip-routines --compact'
-        ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+        ), null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
 
@@ -97,5 +101,30 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_PASSWORD' => $config['password'],
             'LARAVEL_LOAD_DATABASE' => $config['database'],
         ];
+    }
+
+    /**
+     * Execute the given dump process.
+     *
+     * @param  \Symfony\Component\Process\Process  $process
+     * @param  callable  $output
+     * @param  array  $variables
+     * @return \Symfony\Component\Process\Process
+     */
+    protected function executeDumpProcess(Process $process, $output, array $variables)
+    {
+        try {
+            $process->mustRun($output, $variables);
+        } catch (Exception $e) {
+            if (Str::contains($e->getMessage(), 'column_statistics')) {
+                $process = Process::fromShellCommandLine(
+                    str_replace(' --column-statistics=0', '', $process->getCommandLine())
+                );
+
+                return $this->executeDumpProcess($process, $output, $variables);
+            }
+        }
+
+        return $process;
     }
 }
