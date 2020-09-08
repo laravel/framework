@@ -314,7 +314,7 @@ class Handler implements ExceptionHandlerContract
 
         foreach ($this->renderCallbacks as $renderCallback) {
             if (is_a($e, $this->firstClosureParameterType($renderCallback))) {
-                $response = $renderCallback($e);
+                $response = $renderCallback($e, $request);
 
                 if (! is_null($response)) {
                     return $response;
