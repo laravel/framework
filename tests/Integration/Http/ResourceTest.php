@@ -10,6 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
+use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
@@ -326,6 +327,31 @@ class ResourceTest extends TestCase
                 'name' => 'jrrmartin',
                 'posts_count' => 'not loaded',
                 'latest_post_title' => 'not loaded',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayHaveOptionalAttribute()
+    {
+        $this->partialMock(Author::class, function ($mock) {
+            $mock->shouldReceive('getOriginal')->andReturn(['name' => '']);
+            $mock->shouldReceive('getAttribute')->with('name')->andReturn('jrrmartin');
+            $mock->shouldReceive('getAttribute')->with('email')->andReturn('jrrmartin@demo.com');
+        });
+
+        Route::get('/', function () {
+            return new AuthorResourceWithOptionalAttributes($this->app->make(Author::class));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'name' => 'jrrmartin',
             ],
         ]);
     }
