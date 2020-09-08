@@ -259,6 +259,22 @@ class DatabaseEloquentFactoryTest extends TestCase
         }));
     }
 
+    public function test_resolve_nested_model_factories()
+    {
+        Factory::useNamespace('Factories\\');
+
+        $resolves = [
+            'App\\Foo' => 'Factories\\FooFactory',
+            'App\\Models\\Foo' => 'Factories\\FooFactory',
+            'App\\Models\\Nested\\Foo' => 'Factories\\Nested\\FooFactory',
+            'App\\Models\\Really\\Nested\\Foo' => 'Factories\\Really\\Nested\\FooFactory',
+        ];
+
+        foreach ($resolves as $model => $factory) {
+            $this->assertEquals($factory, Factory::resolveFactoryName($model));
+        }
+    }
+
     public function test_model_has_factory()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
