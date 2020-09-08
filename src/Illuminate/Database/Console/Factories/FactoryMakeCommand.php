@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Factories;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class FactoryMakeCommand extends GeneratorCommand
@@ -90,6 +91,8 @@ class FactoryMakeCommand extends GeneratorCommand
         $name = str_replace(
             ['\\', '/'], '', $this->argument('name')
         );
+
+        $name = Str::finish($name, 'Factory');
 
         return $this->laravel->databasePath()."/factories/{$name}.php";
     }

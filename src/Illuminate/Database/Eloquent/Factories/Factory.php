@@ -618,11 +618,7 @@ abstract class Factory
      */
     public static function factoryForModel(string $modelName)
     {
-        $resolver = static::$factoryNameResolver ?: function ($modelName) {
-            return static::$namespace.Str::singular(class_basename($modelName)).'Factory';
-        };
-
-        $factory = $resolver($modelName);
+        $factory = static::resolveFactoryName($modelName);
 
         return $factory::new();
     }
@@ -646,6 +642,25 @@ abstract class Factory
     protected function withFaker()
     {
         return Container::getInstance()->make(Generator::class);
+    }
+
+    /**
+     * Get the factory name for the given model name.
+     *
+     * @param  string  $modelName
+     * @return string
+     */
+    public static function resolveFactoryName(string $modelName)
+    {
+        $resolver = static::$factoryNameResolver ?: function (string $modelName) {
+            $modelName = Str::startsWith($modelName, 'App\\Models\\')
+                ? Str::after($modelName, 'App\\Models\\')
+                : Str::after($modelName, 'App\\');
+
+            return static::$namespace.$modelName.'Factory';
+        };
+
+        return $resolver($modelName);
     }
 
     /**

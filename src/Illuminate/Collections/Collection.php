@@ -31,23 +31,15 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Create a new collection by invoking the callback a given amount of times.
+     * Create a collection with the given range.
      *
-     * @param  int  $number
-     * @param  callable|null  $callback
+     * @param  int  $from
+     * @param  int  $to
      * @return static
      */
-    public static function times($number, callable $callback = null)
+    public static function range($from, $to)
     {
-        if ($number < 1) {
-            return new static;
-        }
-
-        if (is_null($callback)) {
-            return new static(range(1, $number));
-        }
-
-        return (new static(range(1, $number)))->map($callback);
+        return new static(range($from, $to));
     }
 
     /**
