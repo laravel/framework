@@ -121,6 +121,8 @@ class MySqlSchemaState extends SchemaState
                     str_replace(' --column-statistics=0', '', $process->getCommandLine())
                 ), $output, $variables);
             }
+
+            throw $e;
         }
 
         return $process;
