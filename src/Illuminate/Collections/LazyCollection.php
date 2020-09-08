@@ -47,8 +47,14 @@ class LazyCollection implements Enumerable
     public static function range($from, $to)
     {
         return new static(function () use ($from, $to) {
-            for (; $from <= $to; $from++) {
-                yield $from;
+            if ($from <= $to) {
+                for (; $from <= $to; $from++) {
+                    yield $from;
+                }
+            } else {
+                for (; $from >= $to; $from--) {
+                    yield $from;
+                }
             }
         });
     }
