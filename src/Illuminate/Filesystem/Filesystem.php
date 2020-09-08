@@ -5,8 +5,10 @@ namespace Illuminate\Filesystem;
 use ErrorException;
 use FilesystemIterator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use SplFileObject;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Mime\MimeTypes;
@@ -130,6 +132,33 @@ class Filesystem
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}.");
+    }
+
+    /**
+     * Get the contents of a file one line at a time.
+     *
+     * @param  string  $path
+     * @return \Illuminate\Support\LazyCollection
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function lines($path)
+    {
+        if (! $this->isFile($path)) {
+            throw new FileNotFoundException(
+                "File does not exist at path {$path}."
+            );
+        }
+
+        return LazyCollection::make(function () use ($path) {
+            $file = new SplFileObject($path);
+
+            $file->setFlags(SplFileObject::DROP_NEW_LINE);
+
+            while (! $file->eof()) {
+                yield $file->fgets();
+            }
+        });
     }
 
     /**
