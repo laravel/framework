@@ -852,7 +852,7 @@ class Route
     /**
      * Set the handler for the route.
      *
-     * @param  \Closure|string  $action
+     * @param  \Closure|array|string  $action
      * @return $this
      */
     public function uses($action)
