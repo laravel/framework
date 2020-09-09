@@ -127,7 +127,7 @@ abstract class ServiceProvider
             $config = $this->app->make('config');
 
             $config->set($key, array_merge(
-                require $path, $config->get($key, [])
+                $config->get($key, []), require $path
             ));
         }
     }
