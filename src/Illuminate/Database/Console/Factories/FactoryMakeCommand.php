@@ -66,7 +66,14 @@ class FactoryMakeCommand extends GeneratorCommand
 
         $model = class_basename($namespaceModel);
 
+        if (Str::startsWith($namespaceModel, 'App\\Models')) {
+            $namespace = Str::beforeLast('Database\\Factories\\'.Str::after($namespaceModel, 'App\\Models\\'), '\\');
+        } else {
+            $namespace = 'Database\\Factories';
+        }
+
         $replace = [
+            '{{ factoryNamespace }}' => $namespace,
             'NamespacedDummyModel' => $namespaceModel,
             '{{ namespacedModel }}' => $namespaceModel,
             '{{namespacedModel}}' => $namespaceModel,
@@ -88,13 +95,11 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        $name = str_replace(
-            ['\\', '/'], '', $this->argument('name')
-        );
+        $name = Str::replaceFirst('App\\', '', $name);
 
-        $name = Str::finish($name, 'Factory');
+        $name = Str::finish($this->argument('name'), 'Factory');
 
-        return $this->laravel->databasePath()."/factories/{$name}.php";
+        return $this->laravel->databasePath().'/factories/'.str_replace('\\', '/', $name).'.php';
     }
 
     /**
