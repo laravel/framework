@@ -514,7 +514,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         $segments = explode('/', $path);
         $lastSegment = array_pop($segments);
         $path = implode('/', $segments).'/'.rawurlencode(rawurldecode($lastSegment));
-        
+
         $config = $this->driver->getConfig();
 
         // If an explicit base URL has been set on the disk configuration then we will use
