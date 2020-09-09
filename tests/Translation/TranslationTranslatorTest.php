@@ -104,17 +104,6 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
-    public function testGetMethodProperlyLoadsAndRetrievesItemForFallbackWhenLineIsEmpty()
-    {
-        $t = new Translator($this->getLoader(), 'en');
-        $t->setFallback('lv');
-        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => '']);
-        $t->getLoader()->shouldReceive('load')->once()->with('lv', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo']);
-        $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
-        $this->assertSame('foo', $t->get('foo::bar.foo'));
-    }
-
     public function testGetMethodProperlyLoadsAndRetrievesItemForGlobalNamespace()
     {
         $t = new Translator($this->getLoader(), 'en');
