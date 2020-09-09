@@ -17,7 +17,7 @@ class Optional implements ArrayAccess
      *
      * @var mixed
      */
-    protected $value;
+    public $value;
 
     /**
      * Create a new optional instance.
