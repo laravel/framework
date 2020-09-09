@@ -852,11 +852,15 @@ class Route
     /**
      * Set the handler for the route.
      *
-     * @param  \Closure|string  $action
+     * @param  \Closure|array|string  $action
      * @return $this
      */
     public function uses($action)
     {
+        if (is_array($action)) {
+            $action = $action[0].'@'.$action[1];
+        }
+
         $action = is_string($action) ? $this->addGroupNamespaceToStringUses($action) : $action;
 
         return $this->setAction(array_merge($this->action, $this->parseAction([
