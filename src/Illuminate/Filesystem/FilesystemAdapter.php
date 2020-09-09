@@ -509,6 +509,12 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     protected function getLocalUrl($path)
     {
+        // Make sure the $path is properly URL encoded to support filenames with URL-unsafe 
+        // characters (i.e. a space character)
+        $segments = explode('/', $path);
+        $lastSegment = array_pop($segments);
+        $path = implode('/', $segments) . '/' . rawurlencode(rawurldecode($lastSegment));
+        
         $config = $this->driver->getConfig();
 
         // If an explicit base URL has been set on the disk configuration then we will use
