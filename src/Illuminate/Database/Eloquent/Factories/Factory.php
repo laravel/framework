@@ -585,7 +585,7 @@ abstract class Factory
                         : 'App\\'.$factoryBasename;
         };
 
-        return $this->model ?: $resolver($this);
+        return $resolver($this);
     }
 
     /**
