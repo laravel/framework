@@ -89,7 +89,12 @@ class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface
      */
     public function find($id)
     {
-        return $this->getTable()->where('uuid', $id)->first();
+        if ($record = $this->getTable()->where('uuid', $id)->first()) {
+            $record->id = $record->uuid;
+            unset($record->uuid);
+        }
+
+        return $record;
     }
 
     /**
