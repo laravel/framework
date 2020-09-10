@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use JsonSerializable;
 use Mockery as m;
@@ -1782,6 +1783,17 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo,bar', $data->implode('email', ','));
 
         $data = new $collection(['taylor', 'dayle']);
+        $this->assertSame('taylordayle', $data->implode(''));
+        $this->assertSame('taylor,dayle', $data->implode(','));
+
+        $data = new $collection([
+            ['name' => Str::of('taylor'), 'email' => Str::of('foo')],
+            ['name' => Str::of('dayle'), 'email' => Str::of('bar')],
+        ]);
+        $this->assertSame('foobar', $data->implode('email'));
+        $this->assertSame('foo,bar', $data->implode('email', ','));
+
+        $data = new $collection([Str::of('taylor'), Str::of('dayle')]);
         $this->assertSame('taylordayle', $data->implode(''));
         $this->assertSame('taylor,dayle', $data->implode(','));
     }
