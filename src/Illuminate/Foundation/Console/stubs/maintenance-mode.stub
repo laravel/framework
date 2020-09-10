@@ -1,7 +1,7 @@
 <?php
 
 // Check if the application is in maintenance mode...
-if (! file_exists($down = __DIR__.'/../storage/framework/down')) {
+if (! file_exists($down = __DIR__.'/down')) {
     return;
 }
 
