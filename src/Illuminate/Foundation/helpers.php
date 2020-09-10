@@ -507,6 +507,19 @@ if (! function_exists('mix')) {
     }
 }
 
+if (!function_exists('models_path')) {
+    /**
+     * Get the path to the models folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function models_path($path = '')
+    {
+        return app_path('Models' . ($path ? DIRECTORY_SEPARATOR . $path : $path));
+    }
+}
+
 if (! function_exists('now')) {
     /**
      * Create a new Carbon instance for the current time.
