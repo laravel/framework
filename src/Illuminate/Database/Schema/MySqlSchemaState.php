@@ -17,7 +17,7 @@ class MySqlSchemaState extends SchemaState
     public function dump($path)
     {
         $this->executeDumpProcess($this->makeProcess(
-            $this->baseDumpCommand().' --routines --result-file=$LARAVEL_LOAD_PATH --no-data'
+            $this->baseDumpCommand().' --routines --result-file="${:LARAVEL_LOAD_PATH}" --no-data'
         ), $this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
@@ -83,7 +83,7 @@ class MySqlSchemaState extends SchemaState
     {
         $gtidPurged = $this->connection->isMaria() ? '' : '--set-gtid-purged=OFF';
 
-        return 'mysqldump '.$gtidPurged.' --column-statistics=0 --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --user=$LARAVEL_LOAD_USER --password=$LARAVEL_LOAD_PASSWORD $LARAVEL_LOAD_DATABASE';
+        return 'mysqldump '.$gtidPurged.' --column-statistics=0 --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
