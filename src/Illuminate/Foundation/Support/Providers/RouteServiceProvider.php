@@ -53,16 +53,6 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        //
-    }
-
-    /**
      * Register the callback that will be used to load the application's routes.
      *
      * @param  \Closure  $routesCallback

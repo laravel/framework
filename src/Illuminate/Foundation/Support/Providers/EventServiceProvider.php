@@ -45,16 +45,6 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
-     * Boot any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        //
-    }
-
-    /**
      * Get the events and handlers.
      *
      * @return array
