@@ -31,7 +31,7 @@ class OptimizeCommand extends Command
         $this->call('route:cache');
         $this->call('event:cache');
         $this->call('view:cache');
-        
+
         $this->info('Files cached successfully!');
     }
 }
