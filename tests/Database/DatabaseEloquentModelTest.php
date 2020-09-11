@@ -1076,6 +1076,30 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
+    public function testGuardingJSONAttributes()
+    {
+        $model = new EloquentModelStub;
+
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+
+        $model->guard(['foo->name', 'foo->price', 'foo->size->width']);
+        $model->fill(['foo->name' => 'foo', 'foo->price' => 'bar', 'foo->size->height' => 'baz', 'foo->size->width' => 'qux', 'foo->test' => 'fred']);
+        $this->assertEquals(
+            ['foo' => json_encode(['size' => ['height' => 'baz'], 'test' => 'fred'])],
+            $model->toArray()
+        );
+
+        $model = new EloquentModelStub(['foo' => json_encode(['name' => 'Taylor'])]);
+        $model->guard(['foo->name', 'foo->size->width']);
+        $model->fill(['foo->name' => 'foo', 'foo->price' => 'bar', 'foo->size->height' => 'baz', 'foo->size->width' => 'qux', 'foo->test' => 'fred']);
+        $this->assertEquals(
+            ['foo' => json_encode(['name' => 'Taylor', 'price' => 'bar', 'size' => ['height' => 'baz'], 'test' => 'fred'])],
+            $model->toArray()
+        );
+    }
+
     public function testUnguardAllowsAnythingToBeSet()
     {
         $model = new EloquentModelStub;
