@@ -121,7 +121,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             ['name' => 'Dries Vints'],
         ]);
 
-        $this->assertCount(6, $users->flatten(1)->count());
+        $this->assertCount(6, $users->flatten(1));
     }
 
     public function test_expanded_closure_attributes_are_resolved_and_passed_to_closures()
