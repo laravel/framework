@@ -284,7 +284,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function storedAsset($path, $secure = null)
     {
-        return $this->asset('storage/' . $path, $secure);
+        return $this->asset('storage/'.$path, $secure);
     }
 
     /**
