@@ -99,6 +99,30 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(10, $users);
     }
 
+    /**
+     * @test
+     */
+    public function basic_model_can_create_many()
+    {
+        $users = FactoryTestUserFactory::new()->createMany([
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Mohammed Said'],
+            ['name' => 'Dries Vints'],
+        ]);
+
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(3, $users);
+        $this->assertEquals(['Taylor Otwell', 'Mohammed Said', 'Dries Vints'], $users->pluck('name')->toArray());
+
+        $users = FactoryTestUserFactory::new()->times(2)->createMany([
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Mohammed Said'],
+            ['name' => 'Dries Vints'],
+        ]);
+
+        $this->assertCount(6, $users->flatten(1)->count());
+    }
+
     public function test_expanded_closure_attributes_are_resolved_and_passed_to_closures()
     {
         $user = FactoryTestUserFactory::new()->create([

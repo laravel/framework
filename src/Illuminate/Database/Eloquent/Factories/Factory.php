@@ -206,6 +206,22 @@ abstract class Factory
     }
 
     /**
+     * Create a collection of models and persist them to the database.
+     *
+     * @param array $attributes
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|mixed
+     */
+    public function createMany(array $records, ?Model $parent = null)
+    {
+        $instances = array_map(function ($attribute) use ($parent) {
+            return $this->create($attribute, $parent);
+        }, $records);
+
+        return new Collection($instances);
+    }
+
+    /**
      * Set the connection name on the results and store them.
      *
      * @param  \Illuminate\Support\Collection  $results
