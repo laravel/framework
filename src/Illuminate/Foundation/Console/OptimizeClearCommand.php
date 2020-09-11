@@ -31,6 +31,7 @@ class OptimizeClearCommand extends Command
         $this->call('cache:clear');
         $this->call('route:clear');
         $this->call('config:clear');
+        $this->call('event:clear');
         $this->call('clear-compiled');
 
         $this->info('Caches cleared successfully!');
