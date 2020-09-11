@@ -133,6 +133,27 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(0, FactoryTestUser::all());
     }
 
+    public function test_basic_model_attributes_can_be_created()
+    {
+        $user = FactoryTestUserFactory::new()->raw();
+        $this->assertIsArray($user);
+
+        $user = FactoryTestUserFactory::new()->raw(['name' => 'Taylor Otwell']);
+        $this->assertIsArray($user);
+        $this->assertEquals('Taylor Otwell', $user['name']);
+    }
+
+    public function test_expanded_model_attributes_can_be_created()
+    {
+        $post = FactoryTestPostFactory::new()->raw();
+        $this->assertIsArray($post);
+
+        $post = FactoryTestPostFactory::new()->raw(['title' => 'Test Title']);
+        $this->assertIsArray($post);
+        $this->assertIsInt($post['user_id']);
+        $this->assertEquals('Test Title', $post['title']);
+    }
+
     public function test_after_creating_and_making_callbacks_are_called()
     {
         $user = FactoryTestUserFactory::new()
