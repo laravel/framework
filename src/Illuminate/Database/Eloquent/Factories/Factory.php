@@ -208,9 +208,9 @@ abstract class Factory
     /**
      * Create a collection of models and persist them to the database.
      *
-     * @param array $attributes
-     *
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|mixed
+     * @param  array  $records
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function createMany(array $records, ?Model $parent = null)
     {
