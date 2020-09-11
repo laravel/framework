@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
@@ -94,6 +95,13 @@ class DatabaseEloquentFactoryTest extends TestCase
         $user = FactoryTestUserFactory::new()->create(['name' => 'Taylor Otwell']);
         $this->assertInstanceOf(Eloquent::class, $user);
         $this->assertEquals('Taylor Otwell', $user->name);
+
+        $users = FactoryTestUserFactory::new()->createMany([
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Jeffrey Way'],
+        ]);
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(2, $users);
 
         $users = FactoryTestUserFactory::times(10)->create();
         $this->assertCount(10, $users);

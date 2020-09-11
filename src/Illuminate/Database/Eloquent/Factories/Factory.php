@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Factories;
 use Closure;
 use Faker\Generator;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -182,7 +183,7 @@ abstract class Factory
      *
      * @param  array  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|mixed
+     * @return EloquentCollection|\Illuminate\Database\Eloquent\Model|mixed
      */
     public function create($attributes = [], ?Model $parent = null)
     {
@@ -203,6 +204,21 @@ abstract class Factory
         }
 
         return $results;
+    }
+
+    /**
+     * Create a collection of models and persist them to the database.
+     *
+     * @param  iterable  $records
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     */
+    public function createMany(iterable $records)
+    {
+        return new EloquentCollection(
+            array_map(function ($attribute) {
+                return $this->create($attribute);
+            }, $records)
+        );
     }
 
     /**
@@ -255,7 +271,7 @@ abstract class Factory
      *
      * @param  array  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|mixed
+     * @return EloquentCollection|\Illuminate\Database\Eloquent\Model|mixed
      */
     public function make($attributes = [], ?Model $parent = null)
     {
