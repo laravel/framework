@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentFactoryTest extends TestCase
