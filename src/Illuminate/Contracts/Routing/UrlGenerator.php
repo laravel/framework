@@ -48,6 +48,15 @@ interface UrlGenerator
     public function asset($path, $secure = null);
 
     /**
+     * Generate the URL to an application stored asset.
+     *
+     * @param  string  $path
+     * @param  bool|null  $secure
+     * @return string
+     */
+    public function storedAsset($path, $secure = null);
+
+    /**
      * Get the URL to a named route.
      *
      * @param  string  $name

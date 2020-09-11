@@ -47,6 +47,17 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertSame('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
         $this->assertSame('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
+
+        /*
+         * Test stored asset URL generation...
+         */
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/index.php/')
+        );
+
+        $this->assertSame('http://www.foo.com/storage/foo/bar', $url->storedAsset('foo/bar'));
+        $this->assertSame('https://www.foo.com/storage/foo/bar', $url->storedAsset('foo/bar', true));
     }
 
     public function testBasicGenerationWithHostFormatting()

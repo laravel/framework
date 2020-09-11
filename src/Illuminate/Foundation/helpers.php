@@ -147,6 +147,20 @@ if (! function_exists('asset')) {
     }
 }
 
+if (! function_exists('stored_asset')) {
+    /**
+     * Generate a stored asset path for the application.
+     *
+     * @param  string  $path
+     * @param  bool|null  $secure
+     * @return string
+     */
+    function stored_asset($path, $secure = null)
+    {
+        return app('url')->storedAsset($path, $secure);
+    }
+}
+
 if (! function_exists('auth')) {
     /**
      * Get the available auth instance.

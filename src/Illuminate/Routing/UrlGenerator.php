@@ -276,6 +276,18 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Generate the URL to an application stored asset.
+     *
+     * @param  string  $path
+     * @param  bool|null  $secure
+     * @return string
+     */
+    public function storedAsset($path, $secure = null)
+    {
+        return $this->asset('storage/' . $path, $secure);
+    }
+
+    /**
      * Remove the index.php file from a path.
      *
      * @param  string  $root
