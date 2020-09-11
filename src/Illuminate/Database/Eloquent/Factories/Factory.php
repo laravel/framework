@@ -126,6 +126,7 @@ abstract class Factory
         $this->afterMaking = $afterMaking ?: new Collection;
         $this->afterCreating = $afterCreating ?: new Collection;
         $this->connection = $connection;
+        $this->faker = $this->withFaker();
     }
 
     /**
@@ -346,8 +347,6 @@ abstract class Factory
      */
     protected function getRawAttributes(?Model $parent)
     {
-        $this->faker = $this->withFaker();
-
         return $this->states->pipe(function ($states) {
             return $this->for->isEmpty() ? $states : new Collection(array_merge([function () {
                 return $this->parentResolvers();
