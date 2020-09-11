@@ -329,7 +329,7 @@ class AssertableJsonString implements ArrayAccess, Countable
             $needle.',',
         ];
     }
-    
+
     /**
      * Get the total number of items.
      *
