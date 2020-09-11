@@ -317,6 +317,8 @@ class Gate implements GateContract
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \ReflectionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function authorize($ability, $arguments = [])
     {
@@ -329,6 +331,9 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \ReflectionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function inspect($ability, $arguments = [])
     {
@@ -352,7 +357,8 @@ class Gate implements GateContract
      * @param  array|mixed  $arguments
      * @return mixed
      *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \ReflectionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function raw($ability, $arguments = [])
     {
@@ -386,6 +392,8 @@ class Gate implements GateContract
      * @param  \Closure|string|array  $class
      * @param  string|null  $method
      * @return bool
+     *
+     * @throws \ReflectionException
      */
     protected function canBeCalledWithUser($user, $class, $method = null)
     {
@@ -412,6 +420,8 @@ class Gate implements GateContract
      * @param  string  $class
      * @param  string  $method
      * @return bool
+     *
+     * @throws \ReflectionException
      */
     protected function methodAllowsGuests($class, $method)
     {
@@ -452,6 +462,8 @@ class Gate implements GateContract
      *
      * @param  \ReflectionParameter  $parameter
      * @return bool
+     *
+     * @throws \ReflectionException
      */
     protected function parameterAllowsGuests($parameter)
     {
@@ -466,6 +478,9 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array  $arguments
      * @return bool
+     *
+     * @throws \ReflectionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function callAuthCallback($user, $ability, array $arguments)
     {
@@ -481,6 +496,8 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array  $arguments
      * @return bool|null
+     *
+     * @throws \ReflectionException
      */
     protected function callBeforeCallbacks($user, $ability, array $arguments)
     {
@@ -503,6 +520,8 @@ class Gate implements GateContract
      * @param  array  $arguments
      * @param  bool  $result
      * @return bool|null
+     *
+     * @throws \ReflectionException
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
@@ -526,6 +545,9 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array  $arguments
      * @return callable
+     *
+     * @throws \ReflectionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
@@ -558,6 +580,8 @@ class Gate implements GateContract
      *
      * @param  object|string  $class
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function getPolicyFor($class)
     {
@@ -681,6 +705,8 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array  $arguments
      * @return mixed
+     *
+     * @throws \ReflectionException
      */
     protected function callPolicyBefore($policy, $user, $ability, $arguments)
     {
@@ -701,6 +727,8 @@ class Gate implements GateContract
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $arguments
      * @return mixed
+     *
+     * @throws \ReflectionException
      */
     protected function callPolicyMethod($policy, $method, $user, array $arguments)
     {
