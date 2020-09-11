@@ -201,9 +201,36 @@ trait GuardsAttributes
             return false;
         }
 
-        return $this->getGuarded() == ['*'] ||
-               ! empty(preg_grep('/^'.preg_quote($key).'$/i', $this->getGuarded())) ||
-               ! $this->isGuardableColumn($key);
+        if ($this->getGuarded() == ['*'] || $this->isInGuarded($key)) {
+            return true;
+        }
+
+        // For nested JSON columns, only the base level exists in the database.
+        $key = Str::before($key, '->');
+
+        return ! $this->isGuardableColumn($key);
+    }
+
+    /**
+     * Determines if the given column is in the guarded property,
+     * or any level of a JSON column nested key is guarded.
+     *
+     * @param $key
+     * @return bool
+     */
+    protected function isInGuarded($key)
+    {
+        $guarded = array_map('strtolower', $this->getGuarded());
+        $keyParts = explode('->', strtolower($key));
+        $combinedKey = array_shift($keyParts);
+
+        do {
+            if (in_array($combinedKey, $guarded)) {
+                return true;
+            }
+        } while (count($keyParts) && $combinedKey .= $keyPart = '->'.array_shift($keyParts));
+
+        return false;
     }
 
     /**
@@ -214,10 +241,10 @@ trait GuardsAttributes
      */
     protected function isGuardableColumn($key)
     {
-        if (! isset(static::$guardableColumns[get_class($this)])) {
+        if ( ! isset(static::$guardableColumns[get_class($this)])) {
             static::$guardableColumns[get_class($this)] = $this->getConnection()
-                        ->getSchemaBuilder()
-                        ->getColumnListing($this->getTable());
+                ->getSchemaBuilder()
+                ->getColumnListing($this->getTable());
         }
 
         return in_array($key, static::$guardableColumns[get_class($this)]);
