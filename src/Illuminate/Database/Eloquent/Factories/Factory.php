@@ -271,7 +271,7 @@ abstract class Factory
      *
      * @param  array  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return EloquentCollection|\Illuminate\Database\Eloquent\Model|mixed
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|mixed
      */
     public function make($attributes = [], ?Model $parent = null)
     {
