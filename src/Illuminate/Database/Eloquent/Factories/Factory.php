@@ -286,11 +286,13 @@ abstract class Factory
      * Get the raw attributes generated from the factory.
      *
      * @param  array  $attributes
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return array
      */
-    public function raw($attributes = [])
+    public function raw($attributes = [], ?Model $parent = null)
     {
-        return $this->state($attributes)->getExpandedAttributes(null);
+        return $this->state($attributes)
+            ->getExpandedAttributes($parent);
     }
 
     /**
