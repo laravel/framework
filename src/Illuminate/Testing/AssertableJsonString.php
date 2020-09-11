@@ -331,7 +331,7 @@ class AssertableJsonString implements ArrayAccess, Countable
     }
 
     /**
-     * Get the total number of items.
+     * Get the total number of items in the underlying JSON array.
      *
      * @return int
      */
