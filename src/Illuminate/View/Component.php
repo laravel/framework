@@ -80,7 +80,6 @@ abstract class Component
         : $resolver($view);
     }
 
-
     /**
      * Get the view name relative to the components directory.
      *
