@@ -48,20 +48,15 @@ abstract class Component
     public $attributes;
 
     /**
-     * Get the view / view contents that represent the component.
-     *
-     * @return \Illuminate\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
-     */
-    abstract public function render();
-
-    /**
      * Resolve the Blade view or view file that should be used when rendering the component.
      *
      * @return \Illuminate\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
      */
     public function resolveView()
     {
-        $view = $this->render();
+        $view = method_exists($this, 'render')
+            ? $this->render()
+            : view('components.'.$this->resolveViewName());
 
         if ($view instanceof View) {
             return $view;
@@ -83,6 +78,17 @@ abstract class Component
             return $resolver($view($data));
         }
         : $resolver($view);
+    }
+
+
+    /**
+     * Get the view name relative to the components directory.
+     *
+     * @return string view
+     */
+    protected function resolveViewName()
+    {
+        return $this->componentName ?: Str::kebab(class_basename(get_class($this)));
     }
 
     /**
