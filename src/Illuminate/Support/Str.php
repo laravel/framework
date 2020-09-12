@@ -534,6 +534,17 @@ class Str
     }
 
     /**
+     * Reverse a string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function reverse($value)
+    {
+        return strrev($value);
+    }
+    
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $value

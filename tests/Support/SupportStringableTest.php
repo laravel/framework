@@ -435,6 +435,12 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Malmö Jönköping', (string) $this->stringable('Malmö Jönköping')->replaceLast('', 'yyy'));
     }
 
+    public function testReverse()
+    {
+        $this->assertSame('fooqux foobar', (string) $this->stringable('raboof xuqoof')->reverse());
+        $this->assertSame('foo/qux? foo/bar?', (string) $this->stringable('?rab/oof ?xuq/oof')->reverse());
+    }
+    
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', (string) $this->stringable('LaravelPHPFramework')->snake());

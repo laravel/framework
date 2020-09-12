@@ -484,6 +484,16 @@ class Stringable
     }
 
     /**
+     * Reverse a string.
+     *
+     ** @return static
+     */
+    public function reverse()
+    {
+        return new static(Str::reverse($this->value));
+    }
+    
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $prefix
