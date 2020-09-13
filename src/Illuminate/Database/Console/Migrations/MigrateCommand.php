@@ -127,8 +127,7 @@ class MigrateCommand extends BaseCommand
         // First, we will make sure that the connection supports schema loading and that
         // the schema file exists before we proceed any further. If not, we will just
         // continue with the standard migration operation as normal without errors.
-        if ($connection instanceof SQLiteConnection ||
-            $connection instanceof SqlServerConnection ||
+        if ($connection instanceof SqlServerConnection ||
             ! is_file($path = $this->schemaPath($connection))) {
             return;
         }

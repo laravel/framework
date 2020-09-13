@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Grammars\SQLiteGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\SQLiteBuilder;
+use Illuminate\Database\Schema\SqliteSchemaState;
 use Illuminate\Filesystem\Filesystem;
 use RuntimeException;
 
@@ -80,7 +81,7 @@ class SQLiteConnection extends Connection
      */
     public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
     {
-        throw new RuntimeException('Schema dumping is not supported when using SQLite.');
+        return new SqliteSchemaState($this, $files, $processFactory);
     }
 
     /**
