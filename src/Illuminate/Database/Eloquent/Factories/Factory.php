@@ -407,13 +407,11 @@ abstract class Factory
      */
     public function state($state)
     {
-        return $this->newInstance([
-            'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
-                    return $state;
-                },
-            ]),
-        ]);
+        $this->states->push(is_callable($state) ? $state : function () use ($state) {
+            return $state;
+        });
+
+        return $this;
     }
 
     /**
@@ -436,11 +434,11 @@ abstract class Factory
      */
     public function has(self $factory, $relationship = null)
     {
-        return $this->newInstance([
-            'has' => $this->has->concat([new Relationship(
-                $factory, $relationship ?: $this->guessRelationship($factory->modelName())
-            )]),
-        ]);
+        $this->has->push(
+            new Relationship($factory, $relationship ?: $this->guessRelationship($factory->modelName()))
+        );
+
+        return $this;
     }
 
     /**
@@ -466,13 +464,13 @@ abstract class Factory
      */
     public function hasAttached(self $factory, $pivot = [], $relationship = null)
     {
-        return $this->newInstance([
-            'has' => $this->has->concat([new BelongsToManyRelationship(
-                $factory,
-                $pivot,
-                $relationship ?: Str::camel(Str::plural(class_basename($factory->modelName())))
-            )]),
-        ]);
+        $this->has->push(new BelongsToManyRelationship(
+            $factory,
+            $pivot,
+            $relationship ?: Str::camel(Str::plural(class_basename($factory->modelName())))
+        ));
+        
+        return $this;
     }
 
     /**
@@ -484,10 +482,11 @@ abstract class Factory
      */
     public function for(self $factory, $relationship = null)
     {
-        return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
-            $factory,
-            $relationship ?: Str::camel(class_basename($factory->modelName()))
-        )])]);
+        $this->for->push(
+            new BelongsToRelationship($factory, $relationship ?: Str::camel(class_basename($factory->modelName())))
+        );
+
+        return $this;
     }
 
     /**
@@ -498,7 +497,9 @@ abstract class Factory
      */
     public function afterMaking(Closure $callback)
     {
-        return $this->newInstance(['afterMaking' => $this->afterMaking->concat([$callback])]);
+        $this->afterMaking->push($callback);
+
+        return $this;
     }
 
     /**
@@ -509,7 +510,9 @@ abstract class Factory
      */
     public function afterCreating(Closure $callback)
     {
-        return $this->newInstance(['afterCreating' => $this->afterCreating->concat([$callback])]);
+        $this->afterCreating->push($callback);
+
+        return $this;
     }
 
     /**
@@ -551,7 +554,9 @@ abstract class Factory
      */
     public function count(?int $count)
     {
-        return $this->newInstance(['count' => $count]);
+        $this->count = $count;
+
+        return $this;
     }
 
     /**
@@ -562,26 +567,9 @@ abstract class Factory
      */
     public function connection(string $connection)
     {
-        return $this->newInstance(['connection' => $connection]);
-    }
+        $this->connection = $connection;
 
-    /**
-     * Create a new instance of the factory builder with the given mutated properties.
-     *
-     * @param  array  $arguments
-     * @return static
-     */
-    protected function newInstance(array $arguments = [])
-    {
-        return new static(...array_values(array_merge([
-            'count' => $this->count,
-            'states' => $this->states,
-            'has' => $this->has,
-            'for' => $this->for,
-            'afterMaking' => $this->afterMaking,
-            'afterCreating' => $this->afterCreating,
-            'connection' => $this->connection,
-        ], $arguments)));
+        $this;
     }
 
     /**
