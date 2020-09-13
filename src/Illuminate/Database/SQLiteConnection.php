@@ -9,7 +9,6 @@ use Illuminate\Database\Schema\Grammars\SQLiteGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Database\Schema\SqliteSchemaState;
 use Illuminate\Filesystem\Filesystem;
-use RuntimeException;
 
 class SQLiteConnection extends Connection
 {

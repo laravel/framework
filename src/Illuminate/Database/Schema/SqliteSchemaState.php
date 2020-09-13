@@ -2,10 +2,6 @@
 
 namespace Illuminate\Database\Schema;
 
-use Exception;
-use Illuminate\Support\Str;
-use Symfony\Component\Process\Process;
-
 class SqliteSchemaState extends SchemaState
 {
     /**

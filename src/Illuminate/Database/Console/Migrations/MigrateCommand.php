@@ -6,7 +6,6 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
 
 class MigrateCommand extends BaseCommand
