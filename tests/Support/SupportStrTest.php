@@ -369,8 +369,12 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('fooqux foobar', Str::reverse('raboof xuqoof'));
         $this->assertSame('foo/qux? foo/bar?', Str::reverse('?rab/oof ?xuq/oof'));
+        $this->assertSame('火车票', Str::reverse('票车火'));
+        $this->assertSame('日、に、本、ほん、語、ご', Str::reverse('ご、語、んほ、本、に、日'));
+        $this->assertSame('Hallöle', Str::reverse('elöllaH'));
+        $this->assertSame('Weiße Rosen sind nicht grün!', Str::reverse('!nürg thcin dnis nesoR eßieW'));
     }
-    
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));

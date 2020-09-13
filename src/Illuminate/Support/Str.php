@@ -541,7 +541,11 @@ class Str
      */
     public static function reverse($value)
     {
-        return strrev($value);
+        $r = '';
+        for ($i = mb_strlen($value); $i>=0; $i--) {
+            $r .= mb_substr($value, $i, 1);
+        }
+        return $r;
     }
     
     /**
