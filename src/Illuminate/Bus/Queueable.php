@@ -191,7 +191,7 @@ trait Queueable
     {
         if (! empty($this->chained)) {
             dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
-                if ($this->batchId && method_exists($next, 'withBatchId')) {
+                if (property_exists($this, 'batchId') && method_exists($next, 'withBatchId')) {
                     $next->withBatchId($this->batchId);
                 }
 
