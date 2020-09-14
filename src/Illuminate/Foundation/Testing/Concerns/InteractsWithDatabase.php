@@ -122,11 +122,13 @@ trait InteractsWithDatabase
     /**
      * Cast a JSON string to a database compatible type.
      *
-     * @param  string  $value
+     * @param  array|string  $value
      * @return \Illuminate\Database\Query\Expression
      */
     public function castAsJson($value)
     {
+        $value = is_array($value) ? json_encode($value) : $value;
+
         return DB::raw("CAST('$value' AS JSON)");
     }
 
