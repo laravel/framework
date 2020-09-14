@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -56,6 +57,13 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @var string
      */
     protected $path;
+
+    /**
+     * The view middleware.
+     *
+     * @var array
+     */
+    protected $middleware = [];
 
     /**
      * Create a new view instance.
@@ -119,7 +127,10 @@ class View implements ArrayAccess, Htmlable, ViewContract
 
         $this->factory->callComposer($this);
 
-        $contents = $this->getContents();
+        $contents = (new Pipeline(app()))
+            ->send($this->getContents())
+            ->through($this->middleware)
+            ->thenReturn();
 
         // Once we've finished rendering the view, we'll decrement the render count
         // so that each sections get flushed out next time a view is created and
@@ -227,6 +238,19 @@ class View implements ArrayAccess, Htmlable, ViewContract
         return $provider instanceof MessageProvider
                         ? $provider->getMessageBag()
                         : new MessageBag((array) $provider);
+    }
+
+    /**
+     * @param  \Closure|array|string  $middleware
+     * @return $this
+     */
+    public function middleware($middleware)
+    {
+        foreach ((array) $middleware as $m) {
+            $this->middleware[] = $m;
+        }
+
+        return $this;
     }
 
     /**
