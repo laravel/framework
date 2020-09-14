@@ -1088,7 +1088,7 @@ class Builder
     /**
      * Add a where between statement to the query.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Database\Query\Expression  $column
      * @param  array  $values
      * @param  string  $boolean
      * @param  bool  $not
