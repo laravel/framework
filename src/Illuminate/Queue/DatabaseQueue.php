@@ -304,6 +304,19 @@ class DatabaseQueue extends Queue implements QueueContract
     }
 
     /**
+     * Clear all jobs from the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function clear($queue)
+    {
+        return $this->database->table($this->table)
+                    ->where('queue', $this->getQueue($queue))
+                    ->delete();
+    }
+
+    /**
      * Delete a reserved job from the queue.
      *
      * @param  string  $queue
