@@ -27,10 +27,10 @@ class AuthTokenGuardTest extends TestCase
 
         $user = $guard->user();
 
-        $this->assertEquals(1, $user->id);
+        $this->assertSame(1, $user->id);
         $this->assertTrue($guard->check());
         $this->assertFalse($guard->guest());
-        $this->assertEquals(1, $guard->id());
+        $this->assertSame(1, $guard->id());
     }
 
     public function testTokenCanBeHashed()
@@ -45,10 +45,10 @@ class AuthTokenGuardTest extends TestCase
 
         $user = $guard->user();
 
-        $this->assertEquals(1, $user->id);
+        $this->assertSame(1, $user->id);
         $this->assertTrue($guard->check());
         $this->assertFalse($guard->guest());
-        $this->assertEquals(1, $guard->id());
+        $this->assertSame(1, $guard->id());
     }
 
     public function testUserCanBeRetrievedByAuthHeaders()
@@ -61,7 +61,7 @@ class AuthTokenGuardTest extends TestCase
 
         $user = $guard->user();
 
-        $this->assertEquals(1, $user->id);
+        $this->assertSame(1, $user->id);
     }
 
     public function testUserCanBeRetrievedByBearerToken()
@@ -74,7 +74,7 @@ class AuthTokenGuardTest extends TestCase
 
         $user = $guard->user();
 
-        $this->assertEquals(1, $user->id);
+        $this->assertSame(1, $user->id);
     }
 
     public function testValidateCanDetermineIfCredentialsAreValid()
@@ -124,7 +124,7 @@ class AuthTokenGuardTest extends TestCase
 
         $user = $guard->user();
 
-        $this->assertEquals(1, $user->id);
+        $this->assertSame(1, $user->id);
     }
 
     public function testUserCanBeRetrievedByBearerTokenWithCustomKey()
@@ -137,7 +137,7 @@ class AuthTokenGuardTest extends TestCase
 
         $user = $guard->user();
 
-        $this->assertEquals(1, $user->id);
+        $this->assertSame(1, $user->id);
     }
 
     public function testUserCanBeRetrievedByQueryStringVariableWithCustomKey()
@@ -152,10 +152,10 @@ class AuthTokenGuardTest extends TestCase
 
         $user = $guard->user();
 
-        $this->assertEquals(1, $user->id);
+        $this->assertSame(1, $user->id);
         $this->assertTrue($guard->check());
         $this->assertFalse($guard->guest());
-        $this->assertEquals(1, $guard->id());
+        $this->assertSame(1, $guard->id());
     }
 
     public function testUserCanBeRetrievedByAuthHeadersWithCustomField()
@@ -168,7 +168,7 @@ class AuthTokenGuardTest extends TestCase
 
         $user = $guard->user();
 
-        $this->assertEquals(1, $user->id);
+        $this->assertSame(1, $user->id);
     }
 
     public function testValidateCanDetermineIfCredentialsAreValidWithCustomKey()
