@@ -91,7 +91,6 @@ class BusBatchTest extends TestCase
         };
 
         $thirdJob = function () {
-
         };
 
         $queue->shouldReceive('connection')->once()
