@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Queue\ClearableQueue;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Support\Str;

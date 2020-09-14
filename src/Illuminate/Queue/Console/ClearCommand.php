@@ -47,7 +47,7 @@ class ClearCommand extends Command
         $queueName = $this->getQueue($connection);
         $queue = ($this->laravel['queue'])->connection($connection);
 
-        if($queue instanceof ClearableQueue) {
+        if ($queue instanceof ClearableQueue) {
             $count = $queue->clear($queueName);
 
             $this->line('<info>Cleared '.$count.' jobs from the '.$queueName.' queue</info> ');
