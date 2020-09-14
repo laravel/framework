@@ -115,6 +115,22 @@ class PendingChain
      */
     public function dispatch()
     {
+        return app(Dispatcher::class)->dispatch($this->prepareFirstJob());
+    }
+
+    /**
+     * @return CallQueuedClosure
+     */
+    public function dispatchInBatch()
+    {
+        return $this->prepareFirstJob();
+    }
+
+    /**
+     * @return CallQueuedClosure|mixed
+     */
+    public function prepareFirstJob()
+    {
         if (is_string($this->job)) {
             $firstJob = new $this->job(...func_get_args());
         } elseif ($this->job instanceof Closure) {
@@ -128,6 +144,6 @@ class PendingChain
         $firstJob->chain($this->chain);
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
-        return app(Dispatcher::class)->dispatch($firstJob);
+        return $firstJob;
     }
 }

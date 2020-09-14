@@ -164,7 +164,7 @@ class Batch implements Arrayable, JsonSerializable
         $jobs->each->withBatchId($this->id);
 
         $this->repository->transaction(function () use ($jobs) {
-            $this->repository->incrementTotalJobs($this->id, count($jobs));
+            $this->repository->incrementTotalJobs($this->id, $this->countJobs($jobs));
 
             $this->queue->connection($this->options['connection'] ?? null)->bulk(
                 $jobs->all(),
@@ -426,5 +426,17 @@ class Batch implements Arrayable, JsonSerializable
     public function jsonSerialize()
     {
         return $this->toArray();
+    }
+
+    /**
+     * @param Collection $jobs
+     *
+     * @return int
+     */
+    private function countJobs(Collection $jobs)
+    {
+        return $jobs->reduce(function (int $count, $job) {
+            return $count + count($job->chained ?? []) + 1;
+        }, 0);
     }
 }
