@@ -161,7 +161,7 @@ class Batch implements Arrayable, JsonSerializable
      */
     public function add($jobs)
     {
-        $jobs = Collection::wrap($jobs)->map(function($job){
+        $jobs = Collection::wrap($jobs)->map(function ($job) {
             if ($job instanceof Closure) {
                 $job = CallQueuedClosure::create($job);
             }
