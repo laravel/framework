@@ -4932,6 +4932,51 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('validation.string', $v->errors()->get('name')[2]);
     }
 
+    public function testCustomValidationObjectWithDotKeysIsCorrectlyPassedValue()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['foo' => ['foo.bar' => 'baz']],
+            [
+                'foo' => new class implements Rule {
+                    public function passes($attribute, $value)
+                    {
+                        return $value === ['foo.bar' => 'baz'];
+                    }
+
+                    public function message()
+                    {
+                        return ':attribute must be baz';
+                    }
+                },
+            ]
+        );
+
+        $this->assertTrue($v->passes());
+
+        // Test failed attributes contains proper entries
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['foo' => ['foo.bar' => 'baz']],
+            [
+                'foo.foo\.bar' => new class implements Rule {
+                    public function passes($attribute, $value)
+                    {
+                        return false;
+                    }
+
+                    public function message()
+                    {
+                        return ':attribute must be baz';
+                    }
+                },
+            ]
+        );
+
+        $this->assertFalse($v->passes());
+        $this->assertTrue(is_array($v->failed()['foo.foo.bar']));
+    }
+
     public function testImplicitCustomValidationObjects()
     {
         // Test passing case...
