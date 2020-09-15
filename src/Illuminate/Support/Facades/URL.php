@@ -7,6 +7,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasValidSignature(\Illuminate\Http\Request $request, bool $absolute = true)
  * @method static string action(string $action, $parameters = [], bool $absolute = true)
  * @method static string asset(string $path, bool $secure = null)
+ * @method static string secureAsset(string $path)
  * @method static string current()
  * @method static string full()
  * @method static string previous($fallback = false)
@@ -17,6 +18,7 @@ namespace Illuminate\Support\Facades;
  * @method static string to(string $path, $extra = [], bool $secure = null)
  * @method static void defaults(array $defaults)
  * @method static void forceScheme(string $scheme)
+ * @method static bool isValidUrl(string $path)
  *
  * @see \Illuminate\Routing\UrlGenerator
  */
