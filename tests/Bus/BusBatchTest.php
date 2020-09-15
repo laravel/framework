@@ -12,6 +12,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\CallQueuedClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -89,16 +90,25 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
+        $thirdJob = function () {
+        };
+
         $queue->shouldReceive('connection')->once()
                         ->with('test-connection')
                         ->andReturn($connection = m::mock(stdClass::class));
 
-        $connection->shouldReceive('bulk')->once()->with([$job, $secondJob], '', 'test-queue');
+        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($job, $secondJob) {
+            return
+                $args[0] == $job &&
+                $args[1] == $secondJob &&
+                $args[2] instanceof CallQueuedClosure
+                && is_string($args[2]->batchId);
+        }), '', 'test-queue');
 
-        $batch = $batch->add([$job, $secondJob]);
+        $batch = $batch->add([$job, $secondJob, $thirdJob]);
 
-        $this->assertEquals(2, $batch->totalJobs);
-        $this->assertEquals(2, $batch->pendingJobs);
+        $this->assertEquals(3, $batch->totalJobs);
+        $this->assertEquals(3, $batch->pendingJobs);
         $this->assertTrue(is_string($job->batchId));
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
