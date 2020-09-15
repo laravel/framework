@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.38...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.39...6.x)
+
+
+## [v6.18.39 (2020-09-08)](https://github.com/laravel/framework/compare/v6.18.38...v6.18.39)
+
+### Fixed
+- Fixed for empty fallback_locale in `Illuminate\Translation\Translator` ([#34136](https://github.com/laravel/framework/pull/34136))
 
 
 ## [v6.18.38 (2020-09-01)](https://github.com/laravel/framework/compare/v6.18.37...v6.18.38)
