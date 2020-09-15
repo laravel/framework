@@ -575,6 +575,79 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereNumberRegistration()
+    {
+        $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereNumber(['foo', 'bar']);
+        $this->router->get('/api/{bar}/{foo}')->whereNumber('bar', 'foo');
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereSlashRegistration()
+    {
+        $wheres = ['search' => '.*'];
+
+        $this->router->get('/search/{search}')->whereSlash('search');
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereAnyCharRegistration()
+    {
+        $wheres = ['foo' => '[A-Za-z]+', 'bar' => '[A-Za-z]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereAnyChar('foo', 'bar');
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereLowerCharRegistration()
+    {
+        $wheres = ['foo' => '[a-z]+', 'bar' => '[a-z]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereLowerChar('foo', 'bar');
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereUpperCharRegistration()
+    {
+        $wheres = ['foo' => '[A-Z]+', 'bar' => '[A-Z]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereUpperChar('foo', 'bar');
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereNumberAndCharRegistration()
+    {
+        $wheres = ['foo' => '[0-9]+', 'bar' => '[A-Za-z]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereNumber('foo')->whereAnyChar('bar');
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
