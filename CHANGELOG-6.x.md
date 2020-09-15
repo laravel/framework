@@ -1,6 +1,62 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.32...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.40...6.x)
+
+
+## [v6.18.40 (2020-09-09)](https://github.com/laravel/framework/compare/v6.18.39...v6.18.40)
+
+### Revert
+- Revert of ["Fixed for empty fallback_locale in `Illuminate\Translation\Translator`"](https://github.com/laravel/framework/pull/34136) ([7c54eb6](https://github.com/laravel/framework/commit/7c54eb678d58fb9ee7f532a5a5842e6f0e1fe4c9))
+
+
+## [v6.18.39 (2020-09-08)](https://github.com/laravel/framework/compare/v6.18.38...v6.18.39)
+
+### Fixed
+- Fixed for empty fallback_locale in `Illuminate\Translation\Translator` ([#34136](https://github.com/laravel/framework/pull/34136))
+
+
+## [v6.18.38 (2020-09-01)](https://github.com/laravel/framework/compare/v6.18.37...v6.18.38)
+
+### Changed
+- Changed postgres processor ([#34055](https://github.com/laravel/framework/pull/34055))
+
+
+## [v6.18.37 (2020-08-27)](https://github.com/laravel/framework/compare/v6.18.36...v6.18.37)
+
+### Fixed
+- Fixed offset error on invalid remember token ([#34020](https://github.com/laravel/framework/pull/34020))
+- Only prepend scheme to PhpRedis host when necessary ([#34017](https://github.com/laravel/framework/pull/34017))
+- Fixed `whereKey` and `whereKeyNot` in `Illuminate\Database\Eloquent\Builder` ([#34031](https://github.com/laravel/framework/pull/34031))
+
+
+## [v6.18.36 (2020-08-25)](https://github.com/laravel/framework/compare/v6.18.35...v6.18.36)
+
+### Fixed
+- Fix dimension ratio calculation in `Illuminate\Validation\Concerns\ValidatesAttributes::failsRatioCheck()` ([#34003](https://github.com/laravel/framework/pull/34003))
+
+### Changed
+- Normalize scheme in Redis connections ([#33892](https://github.com/laravel/framework/pull/33892))
+- Check no-interaction flag exists and is true for Artisan commands ([#33950](https://github.com/laravel/framework/pull/33950))
+
+
+## [v6.18.35 (2020-08-07)](https://github.com/laravel/framework/compare/v6.18.34...v6.18.35)
+
+### Changed
+- Verify column names are actual columns when using guarded ([#33777](https://github.com/laravel/framework/pull/33777))
+
+
+## [v6.18.34 (2020-08-06)](https://github.com/laravel/framework/compare/v6.18.33...v6.18.34)
+
+### Fixed
+- Fixed `Illuminate\Support\Arr::query()` ([c6f9ae2](https://github.com/laravel/framework/commit/c6f9ae2b6fdc3c1716938223de731b97f6a5a255))
+- Dont allow mass filling with table names ([9240404](https://github.com/laravel/framework/commit/9240404b22ef6f9e827577b3753e4713ddce7471), [f5fa6e3](https://github.com/laravel/framework/commit/f5fa6e3a0fbf9a93eab45b9ae73265b4dbfc3ad7))
+
+
+## [v6.18.33 (2020-08-06)](https://github.com/laravel/framework/compare/v6.18.32...v6.18.33)
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Concerns\GuardsAttributes::isGuarded()` ([1b70bef](https://github.com/laravel/framework/commit/1b70bef5fd7cc5da74abcdf79e283f830fa3b0a4), [624d873](https://github.com/laravel/framework/commit/624d873733388aa2246553a3b465e38554953180), [b70876a](https://github.com/laravel/framework/commit/b70876ac80759fbf168c91cdffd7a2b2305e27cb))
+- Fixed escaping quotes ([687df01](https://github.com/laravel/framework/commit/687df01fa19c99546c1ae1dd53c2a465459b50dc))
 
 
 ## [v6.18.32 (2020-08-04)](https://github.com/laravel/framework/compare/v6.18.31...v6.18.32)

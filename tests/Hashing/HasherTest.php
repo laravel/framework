@@ -51,6 +51,9 @@ class HasherTest extends TestCase
         $this->assertSame('argon2id', password_get_info($value)['algoName']);
     }
 
+    /**
+     * @depends testBasicBcryptHashing
+     */
     public function testBasicBcryptVerification()
     {
         $this->expectException(RuntimeException::class);
@@ -64,6 +67,9 @@ class HasherTest extends TestCase
         (new BcryptHasher(['verify' => true]))->check('password', $argonHashed);
     }
 
+    /**
+     * @depends testBasicArgon2iHashing
+     */
     public function testBasicArgon2iVerification()
     {
         $this->expectException(RuntimeException::class);
@@ -73,6 +79,9 @@ class HasherTest extends TestCase
         (new ArgonHasher(['verify' => true]))->check('password', $bcryptHashed);
     }
 
+    /**
+     * @depends testBasicArgon2idHashing
+     */
     public function testBasicArgon2idVerification()
     {
         $this->expectException(RuntimeException::class);

@@ -616,25 +616,25 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Force the scheme for URLs.
      *
-     * @param  string  $scheme
+     * @param  string|null  $scheme
      * @return void
      */
     public function forceScheme($scheme)
     {
         $this->cachedScheme = null;
 
-        $this->forceScheme = $scheme.'://';
+        $this->forceScheme = $scheme ? $scheme.'://' : null;
     }
 
     /**
      * Set the forced root URL.
      *
-     * @param  string  $root
+     * @param  string|null  $root
      * @return void
      */
     public function forceRootUrl($root)
     {
-        $this->forcedRoot = rtrim($root, '/');
+        $this->forcedRoot = $root ? rtrim($root, '/') : null;
 
         $this->cachedRoot = null;
     }

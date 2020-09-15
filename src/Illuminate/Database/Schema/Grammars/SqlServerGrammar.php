@@ -48,7 +48,7 @@ class SqlServerGrammar extends Grammar
     {
         return "select col.name from sys.columns as col
                 join sys.objects as obj on col.object_id = obj.object_id
-                where obj.type = 'U' and obj.name = '$table'";
+                where obj.type = 'U' and obj.object_id = object_id('$table')";
     }
 
     /**

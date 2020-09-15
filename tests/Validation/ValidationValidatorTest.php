@@ -2896,6 +2896,14 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => $svgFile], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
+
+        // Knowing that demo image4.png has width = 64 and height = 65
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image4.png', '', null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // Ensure validation doesn't erroneously fail when ratio doesn't matches
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
+        $this->assertFalse($v->passes());
     }
 
     /**
@@ -3953,6 +3961,15 @@ class ValidationValidatorTest extends TestCase
             'foo\.bar' => 'required|in:valid',
         ]);
         $this->assertTrue($v->fails());
+        $this->assertArrayHasKey('foo.bar', $v->errors()->getMessages());
+
+        $v = new Validator($trans, [
+            'foo.bar' => 'valid',
+        ], [
+            'foo\.bar' => 'required|in:valid',
+        ]);
+        $this->assertTrue($v->passes());
+        $this->assertArrayHasKey('foo.bar', $v->validated());
     }
 
     public function testCoveringEmptyKeys()
@@ -4913,6 +4930,51 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('name must be taylor', $v->errors()->get('name')[0]);
         $this->assertSame('name must be a first name', $v->errors()->get('name')[1]);
         $this->assertSame('validation.string', $v->errors()->get('name')[2]);
+    }
+
+    public function testCustomValidationObjectWithDotKeysIsCorrectlyPassedValue()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['foo' => ['foo.bar' => 'baz']],
+            [
+                'foo' => new class implements Rule {
+                    public function passes($attribute, $value)
+                    {
+                        return $value === ['foo.bar' => 'baz'];
+                    }
+
+                    public function message()
+                    {
+                        return ':attribute must be baz';
+                    }
+                },
+            ]
+        );
+
+        $this->assertTrue($v->passes());
+
+        // Test failed attributes contains proper entries
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['foo' => ['foo.bar' => 'baz']],
+            [
+                'foo.foo\.bar' => new class implements Rule {
+                    public function passes($attribute, $value)
+                    {
+                        return false;
+                    }
+
+                    public function message()
+                    {
+                        return ':attribute must be baz';
+                    }
+                },
+            ]
+        );
+
+        $this->assertFalse($v->passes());
+        $this->assertTrue(is_array($v->failed()['foo.foo.bar']));
     }
 
     public function testImplicitCustomValidationObjects()

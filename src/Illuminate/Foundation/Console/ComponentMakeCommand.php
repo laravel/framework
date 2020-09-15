@@ -53,9 +53,9 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function writeView()
     {
-        $view = $this->getView();
-
-        $path = resource_path('views').'/'.str_replace('.', '/', 'components.'.$view);
+        $path = $this->viewPath(
+            str_replace('.', '/', 'components.'.$this->getView())
+        );
 
         if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);

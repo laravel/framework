@@ -193,6 +193,10 @@ class Builder
             return $this;
         }
 
+        if ($id !== null && $this->model->getKeyType() === 'string') {
+            $id = (string) $id;
+        }
+
         return $this->where($this->model->getQualifiedKeyName(), '=', $id);
     }
 
@@ -208,6 +212,10 @@ class Builder
             $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
+        }
+
+        if ($id !== null && $this->model->getKeyType() === 'string') {
+            $id = (string) $id;
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '!=', $id);

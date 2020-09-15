@@ -180,6 +180,15 @@ class RouteRegistrar
             $action = ['uses' => $action];
         }
 
+        if (is_array($action) &&
+            is_callable($action) &&
+            ! Arr::isAssoc($action)) {
+            $action = [
+                'uses' => $action[0].'@'.$action[1],
+                'controller' => $action[0].'@'.$action[1],
+            ];
+        }
+
         return array_merge($this->attributes, $action);
     }
 

@@ -18,6 +18,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
 
 class SupportCollectionTest extends TestCase
 {
@@ -478,7 +479,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testCountableByWithoutPredicate($collection)
+    public function testCountByStandalone($collection)
     {
         $c = new $collection(['foo', 'foo', 'foo', 'bar', 'bar', 'foobar']);
         $this->assertEquals(['foo' => 3, 'bar' => 2, 'foobar' => 1], $c->countBy()->all());
@@ -493,7 +494,19 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testCountableByWithPredicate($collection)
+    public function testCountByWithKey($collection)
+    {
+        $c = new $collection([
+            ['key' => 'a'], ['key' => 'a'], ['key' => 'a'], ['key' => 'a'],
+            ['key' => 'b'], ['key' => 'b'], ['key' => 'b'],
+        ]);
+        $this->assertEquals(['a' => 4, 'b' => 3], $c->countBy('key')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testCountableByWithCallback($collection)
     {
         $c = new $collection(['alice', 'aaron', 'bob', 'carla']);
         $this->assertEquals(['a' => 2, 'b' => 1, 'c' => 1], $c->countBy(function ($name) {
@@ -3405,6 +3418,24 @@ class SupportCollectionTest extends TestCase
         $actual = $firstCollection->concat($thirdCollection)->toArray();
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testDump($collection)
+    {
+        $log = new Collection();
+
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        (new $collection([1, 2, 3]))->dump('one', 'two');
+
+        $this->assertSame(['one', 'two', [1, 2, 3]], $log->all());
+
+        VarDumper::setHandler(null);
     }
 
     /**

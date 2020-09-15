@@ -139,6 +139,7 @@
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
         "phpunit/phpunit": "Required to use assertions and run tests (^8.4|^9.0).",
+        "predis/predis": "Required to use the predis connector (^1.1.2).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^5.0).",

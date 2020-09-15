@@ -31,7 +31,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindMethod()
     {
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
-        $builder->setModel($this->getMockModel());
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn('baz');
 
@@ -76,6 +78,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindOrNewMethodModelFound()
     {
         $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $model->shouldReceive('findOrNew')->once()->andReturn('baz');
 
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
@@ -91,6 +94,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindOrNewMethodModelNotFound()
     {
         $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $model->shouldReceive('findOrNew')->once()->andReturn(m::mock(Model::class));
 
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
@@ -109,7 +113,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->expectException(ModelNotFoundException::class);
 
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
-        $builder->setModel($this->getMockModel());
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->setModel($model);
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
         $builder->findOrFail('bar', ['column']);
@@ -1038,9 +1044,36 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $int = 1;
 
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', $int);
 
         $builder->whereKey($int);
+    }
+
+    public function testWhereKeyMethodWithStringZero()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 0;
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', (string) $int);
+
+        $builder->whereKey($int);
+    }
+
+    public function testWhereKeyMethodWithStringNull()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', m::on(function ($argument) {
+            return $argument === null;
+        }));
+
+        $builder->whereKey(null);
     }
 
     public function testWhereKeyMethodWithArray()
@@ -1069,6 +1102,32 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey($collection);
     }
 
+    public function testWhereKeyNotMethodWithStringZero()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 0;
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', (string) $int);
+
+        $builder->whereKeyNot($int);
+    }
+
+    public function testWhereKeyNotMethodWithStringNull()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', m::on(function ($argument) {
+            return $argument === null;
+        }));
+
+        $builder->whereKeyNot(null);
+    }
+
     public function testWhereKeyNotMethodWithInt()
     {
         $model = $this->getMockModel();
@@ -1077,6 +1136,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $int = 1;
 
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', $int);
 
         $builder->whereKeyNot($int);
@@ -1444,4 +1504,13 @@ class EloquentBuilderTestStubWithoutTimestamp extends Model
     const UPDATED_AT = null;
 
     protected $table = 'table';
+}
+
+class EloquentBuilderTestStubStringPrimaryKey extends Model
+{
+    public $incrementing = false;
+
+    protected $table = 'foo_table';
+
+    protected $keyType = 'string';
 }

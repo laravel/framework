@@ -339,6 +339,42 @@ class Stringable
     }
 
     /**
+     * Pad both sides of the string with another.
+     *
+     * @param  int  $length
+     * @param  string  $pad
+     * @return static
+     */
+    public function padBoth($length, $pad = ' ')
+    {
+        return new static(Str::padBoth($this->value, $length, $pad));
+    }
+
+    /**
+     * Pad the left side of the string with another.
+     *
+     * @param  int  $length
+     * @param  string  $pad
+     * @return static
+     */
+    public function padLeft($length, $pad = ' ')
+    {
+        return new static(Str::padLeft($this->value, $length, $pad));
+    }
+
+    /**
+     * Pad the right side of the string with another.
+     *
+     * @param  int  $length
+     * @param  string  $pad
+     * @return static
+     */
+    public function padRight($length, $pad = ' ')
+    {
+        return new static(Str::padRight($this->value, $length, $pad));
+    }
+
+    /**
      * Parse a Class@method style callback into class and method.
      *
      * @param  string|null  $default

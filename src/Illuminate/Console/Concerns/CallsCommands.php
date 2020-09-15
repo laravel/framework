@@ -66,7 +66,7 @@ trait CallsCommands
     protected function createInputFromArguments(array $arguments)
     {
         return tap(new ArrayInput(array_merge($this->context(), $arguments)), function ($input) {
-            if ($input->hasParameterOption(['--no-interaction'], true)) {
+            if ($input->getParameterOption('--no-interaction')) {
                 $input->setInteractive(false);
             }
         });
