@@ -40,7 +40,7 @@ class QueueListenerTest extends TestCase
     {
         $listener = new Listener(__DIR__);
         $options = new ListenerOptions;
-        $options->delay = 1;
+        $options->backoff = 1;
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
@@ -49,14 +49,14 @@ class QueueListenerTest extends TestCase
         $this->assertInstanceOf(Process::class, $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--queue=queue{$escape} {$escape}--delay=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape}", $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--name=default{$escape} {$escape}--queue=queue{$escape} {$escape}--backoff=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape}", $process->getCommandLine());
     }
 
     public function testMakeProcessCorrectlyFormatsCommandLineWithAnEnvironmentSpecified()
     {
         $listener = new Listener(__DIR__);
-        $options = new ListenerOptions('test');
-        $options->delay = 1;
+        $options = new ListenerOptions('default', 'test');
+        $options->backoff = 1;
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
@@ -65,14 +65,14 @@ class QueueListenerTest extends TestCase
         $this->assertInstanceOf(Process::class, $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--queue=queue{$escape} {$escape}--delay=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--name=default{$escape} {$escape}--queue=queue{$escape} {$escape}--backoff=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
     }
 
     public function testMakeProcessCorrectlyFormatsCommandLineWhenTheConnectionIsNotSpecified()
     {
         $listener = new Listener(__DIR__);
-        $options = new ListenerOptions('test');
-        $options->delay = 1;
+        $options = new ListenerOptions('default', 'test');
+        $options->backoff = 1;
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess(null, 'queue', $options);
@@ -81,6 +81,6 @@ class QueueListenerTest extends TestCase
         $this->assertInstanceOf(Process::class, $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}--once{$escape} {$escape}--queue=queue{$escape} {$escape}--delay=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}--once{$escape} {$escape}--name=default{$escape} {$escape}--queue=queue{$escape} {$escape}--backoff=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
     }
 }

@@ -613,6 +613,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertInstanceOf(Closure::class, $eagers['orders']);
         $this->assertNull($eagers['orders']());
         $this->assertSame('foo', $eagers['orders.lines']());
+
+        $builder = $this->getBuilder();
+        $builder->with('orders.lines', function () {
+            return 'foo';
+        });
+        $eagers = $builder->getEagerLoads();
+
+        $this->assertInstanceOf(Closure::class, $eagers['orders']);
+        $this->assertNull($eagers['orders']());
+        $this->assertSame('foo', $eagers['orders.lines']());
     }
 
     public function testQueryPassThru()
@@ -1325,6 +1335,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });
+        $connection->shouldReceive('getDatabaseName')->andReturn('database');
         $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
         $class = get_class($model);
         $class::setConnectionResolver($resolver);

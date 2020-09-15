@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Exceptions;
 
+use Closure;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -19,8 +20,10 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
@@ -37,6 +40,8 @@ use Whoops\Run as Whoops;
 
 class Handler implements ExceptionHandlerContract
 {
+    use ReflectsClosures;
+
     /**
      * The container implementation.
      *
@@ -50,6 +55,27 @@ class Handler implements ExceptionHandlerContract
      * @var array
      */
     protected $dontReport = [];
+
+    /**
+     * The callbacks that should be used during reporting.
+     *
+     * @var array
+     */
+    protected $reportCallbacks = [];
+
+    /**
+     * The callbacks that should be used during rendering.
+     *
+     * @var array
+     */
+    protected $renderCallbacks = [];
+
+    /**
+     * The registered exception mappings.
+     *
+     * @var array
+     */
+    protected $exceptionMap = [];
 
     /**
      * A list of the internal exception types that should not be reported.
@@ -86,6 +112,85 @@ class Handler implements ExceptionHandlerContract
     public function __construct(Container $container)
     {
         $this->container = $container;
+
+        $this->register();
+    }
+
+    /**
+     * Register the exception handling callbacks for the application.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
+
+    /**
+     * Register a reportable callback.
+     *
+     * @param  callable  $reportUsing
+     * @return \Illuminate\Foundation\Exceptions\ReportableHandler
+     */
+    public function reportable(callable $reportUsing)
+    {
+        return tap(new ReportableHandler($reportUsing), function ($callback) {
+            $this->reportCallbacks[] = $callback;
+        });
+    }
+
+    /**
+     * Register a renderable callback.
+     *
+     * @param  callable  $renderUsing
+     * @return $this
+     */
+    public function renderable(callable $renderUsing)
+    {
+        $this->renderCallbacks[] = $renderUsing;
+
+        return $this;
+    }
+
+    /**
+     * Register a new exception mapping.
+     *
+     * @param  \Closure|string  $from
+     * @param  \Closure|string|null  $to
+     * @return $this
+     */
+    public function map($from, $to = null)
+    {
+        if (is_string($to)) {
+            $to = function ($exception) use ($to) {
+                return new $to('', 0, $exception);
+            };
+        }
+
+        if (is_callable($from) && is_null($to)) {
+            $from = $this->firstClosureParameterType($to = $from);
+        }
+
+        if (! is_string($from) || ! $to instanceof Closure) {
+            throw new InvalidArgumentException('Invalid exception mapping.');
+        }
+
+        $this->exceptionMap[$from] = $to;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the given exception type should not be reported.
+     *
+     * @param  string  $class
+     * @return $this
+     */
+    protected function ignore(string $class)
+    {
+        $this->dontReport[] = $class;
+
+        return $this;
     }
 
     /**
@@ -98,14 +203,24 @@ class Handler implements ExceptionHandlerContract
      */
     public function report(Throwable $e)
     {
+        $e = $this->mapException($e);
+
         if ($this->shouldntReport($e)) {
             return;
         }
 
         if (is_callable($reportCallable = [$e, 'report'])) {
-            $this->container->call($reportCallable);
+            if ($this->container->call($reportCallable) !== false) {
+                return;
+            }
+        }
 
-            return;
+        foreach ($this->reportCallbacks as $reportCallback) {
+            if ($reportCallback->handles($e)) {
+                if ($reportCallback($e) === false) {
+                    return;
+                }
+            }
         }
 
         try {
@@ -195,7 +310,17 @@ class Handler implements ExceptionHandlerContract
             return $e->toResponse($request);
         }
 
-        $e = $this->prepareException($e);
+        $e = $this->prepareException($this->mapException($e));
+
+        foreach ($this->renderCallbacks as $renderCallback) {
+            if (is_a($e, $this->firstClosureParameterType($renderCallback))) {
+                $response = $renderCallback($e, $request);
+
+                if (! is_null($response)) {
+                    return $response;
+                }
+            }
+        }
 
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
@@ -208,6 +333,23 @@ class Handler implements ExceptionHandlerContract
         return $request->expectsJson()
                     ? $this->prepareJsonResponse($request, $e)
                     : $this->prepareResponse($request, $e);
+    }
+
+    /**
+     * Map the exception using a registered mapper if possible.
+     *
+     * @param  \Throwable  $e
+     * @return \Throwable
+     */
+    protected function mapException(Throwable $e)
+    {
+        foreach ($this->exceptionMap as $class => $mapper) {
+            if (is_a($e, $class)) {
+                return $mapper($e);
+            }
+        }
+
+        return $e;
     }
 
     /**
@@ -274,7 +416,7 @@ class Handler implements ExceptionHandlerContract
     {
         return redirect($exception->redirectTo ?? url()->previous())
                     ->withInput(Arr::except($request->input(), $this->dontFlash))
-                    ->withErrors($exception->errors(), $exception->errorBag);
+                    ->withErrors($exception->errors(), $request->input('_error_bag', $exception->errorBag));
     }
 
     /**
@@ -418,11 +560,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function registerErrorViewPaths()
     {
-        $paths = collect(config('view.paths'));
-
-        View::replaceNamespace('errors', $paths->map(function ($path) {
-            return "{$path}/errors";
-        })->push(__DIR__.'/views')->all());
+        (new RegisterErrorViewPaths)();
     }
 
     /**

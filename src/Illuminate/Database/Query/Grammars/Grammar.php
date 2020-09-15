@@ -181,7 +181,7 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
-    protected function compileWheres(Builder $query)
+    public function compileWheres(Builder $query)
     {
         // Each type of where clauses has its own compiler function which is responsible
         // for actually creating the where clauses SQL. This helps keep the code nice
@@ -250,7 +250,9 @@ class Grammar extends BaseGrammar
     {
         $value = $this->parameter($where['value']);
 
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+        $operator = str_replace('?', '??', $where['operator']);
+
+        return $this->wrap($where['column']).' '.$operator.' '.$value;
     }
 
     /**

@@ -95,6 +95,36 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     }
 
     /**
+     * Get the paginator links as a collection (for JSON responses).
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function linkCollection()
+    {
+        return collect($this->elements())->flatMap(function ($item) {
+            if (! is_array($item)) {
+                return [['url' => null, 'label' => '...', 'active' => false]];
+            }
+
+            return collect($item)->map(function ($url, $page) {
+                return [
+                    'url' => $url,
+                    'label' => $page,
+                    'active' => $this->currentPage() === $page,
+                ];
+            });
+        })->prepend([
+            'url' => $this->previousPageUrl(),
+            'label' => 'Previous',
+            'active' => false,
+        ])->push([
+            'url' => $this->nextPageUrl(),
+            'label' => 'Next',
+            'active' => false,
+        ]);
+    }
+
+    /**
      * Get the array of elements to pass to the view.
      *
      * @return array
@@ -168,6 +198,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
             'from' => $this->firstItem(),
             'last_page' => $this->lastPage(),
             'last_page_url' => $this->url($this->lastPage()),
+            'links' => $this->linkCollection()->toArray(),
             'next_page_url' => $this->nextPageUrl(),
             'path' => $this->path(),
             'per_page' => $this->perPage(),

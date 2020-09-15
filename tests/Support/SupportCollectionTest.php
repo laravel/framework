@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use JsonSerializable;
 use Mockery as m;
@@ -406,10 +407,31 @@ class SupportCollectionTest extends TestCase
 
     public function testArrayAccessOffsetExists()
     {
-        $c = new Collection(['foo', 'bar']);
+        $c = new Collection(['foo', 'bar', null]);
         $this->assertTrue($c->offsetExists(0));
         $this->assertTrue($c->offsetExists(1));
-        $this->assertFalse($c->offsetExists(1000));
+        $this->assertFalse($c->offsetExists(2));
+    }
+
+    public function testBehavesLikeAnArrayWithArrayAccess()
+    {
+        // indexed array
+        $input = ['foo', null];
+        $c = new Collection($input);
+        $this->assertEquals(isset($input[0]), isset($c[0])); // existing value
+        $this->assertEquals(isset($input[1]), isset($c[1])); // existing but null value
+        $this->assertEquals(isset($input[1000]), isset($c[1000])); // non-existing value
+        $this->assertEquals($input[0], $c[0]);
+        $this->assertEquals($input[1], $c[1]);
+
+        // associative array
+        $input = ['k1' => 'foo', 'k2' => null];
+        $c = new Collection($input);
+        $this->assertEquals(isset($input['k1']), isset($c['k1'])); // existing value
+        $this->assertEquals(isset($input['k2']), isset($c['k2'])); // existing but null value
+        $this->assertEquals(isset($input['k3']), isset($c['k3'])); // non-existing value
+        $this->assertEquals($input['k1'], $c['k1']);
+        $this->assertEquals($input['k2'], $c['k2']);
     }
 
     public function testArrayAccessOffsetGet()
@@ -1626,6 +1648,42 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testChunkWhileOnEqualElements($collection)
+    {
+        $data = (new $collection(['A', 'A', 'B', 'B', 'C', 'C', 'C']))
+            ->chunkWhile(function ($current, $key, $chunk) {
+                return $chunk->last() === $current;
+            });
+
+        $this->assertInstanceOf($collection, $data);
+        $this->assertInstanceOf($collection, $data->first());
+        $this->assertEquals([0 => 'A', 1 => 'A'], $data->first()->toArray());
+        $this->assertEquals([2 => 'B', 3 => 'B'], $data->get(1)->toArray());
+        $this->assertEquals([4 => 'C', 5 => 'C', 6 => 'C'], $data->last()->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testChunkWhileOnContiguouslyIncreasingIntegers($collection)
+    {
+        $data = (new $collection([1, 4, 9, 10, 11, 12, 15, 16, 19, 20, 21]))
+            ->chunkWhile(function ($current, $key, $chunk) {
+                return $chunk->last() + 1 == $current;
+            });
+
+        $this->assertInstanceOf($collection, $data);
+        $this->assertInstanceOf($collection, $data->first());
+        $this->assertEquals([0 => 1], $data->first()->toArray());
+        $this->assertEquals([1 => 4], $data->get(1)->toArray());
+        $this->assertEquals([2 => 9, 3 => 10, 4 => 11, 5 => 12], $data->get(2)->toArray());
+        $this->assertEquals([6 => 15, 7 => 16], $data->get(3)->toArray());
+        $this->assertEquals([8 => 19, 9 => 20, 10 => 21], $data->last()->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testEvery($collection)
     {
         $c = new $collection([]);
@@ -1725,6 +1783,17 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo,bar', $data->implode('email', ','));
 
         $data = new $collection(['taylor', 'dayle']);
+        $this->assertSame('taylordayle', $data->implode(''));
+        $this->assertSame('taylor,dayle', $data->implode(','));
+
+        $data = new $collection([
+            ['name' => Str::of('taylor'), 'email' => Str::of('foo')],
+            ['name' => Str::of('dayle'), 'email' => Str::of('bar')],
+        ]);
+        $this->assertSame('foobar', $data->implode('email'));
+        $this->assertSame('foo,bar', $data->implode('email', ','));
+
+        $data = new $collection([Str::of('taylor'), Str::of('dayle')]);
         $this->assertSame('taylordayle', $data->implode(''));
         $this->assertSame('taylor,dayle', $data->implode(','));
     }
@@ -2109,6 +2178,16 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testEmptyMethod($collection)
+    {
+        $collection = $collection::empty();
+
+        $this->assertCount(0, $collection->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testTimesMethod($collection)
     {
         $two = $collection::times(2, function ($number) {
@@ -2129,6 +2208,42 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($zero->isEmpty());
         $this->assertTrue($negative->isEmpty());
         $this->assertEquals(range(1, 5), $range->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testRangeMethod($collection)
+    {
+        $this->assertSame(
+            [1, 2, 3, 4, 5],
+            $collection::range(1, 5)->all()
+        );
+
+        $this->assertSame(
+            [-2, -1, 0, 1, 2],
+            $collection::range(-2, 2)->all()
+        );
+
+        $this->assertSame(
+            [-4, -3, -2],
+            $collection::range(-4, -2)->all()
+        );
+
+        $this->assertSame(
+            [5, 4, 3, 2, 1],
+            $collection::range(5, 1)->all()
+        );
+
+        $this->assertSame(
+            [2, 1, 0, -1, -2],
+            $collection::range(2, -2)->all()
+        );
+
+        $this->assertSame(
+            [-2, -3, -4],
+            $collection::range(-2, -4)->all()
+        );
     }
 
     /**
@@ -3100,10 +3215,22 @@ class SupportCollectionTest extends TestCase
     public function testPrepend()
     {
         $c = new Collection(['one', 'two', 'three', 'four']);
-        $this->assertEquals(['zero', 'one', 'two', 'three', 'four'], $c->prepend('zero')->all());
+        $this->assertEquals(
+            ['zero', 'one', 'two', 'three', 'four'],
+            $c->prepend('zero')->all()
+        );
 
         $c = new Collection(['one' => 1, 'two' => 2]);
-        $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $c->prepend(0, 'zero')->all());
+        $this->assertEquals(
+            ['zero' => 0, 'one' => 1, 'two' => 2],
+            $c->prepend(0, 'zero')->all()
+        );
+
+        $c = new Collection(['one' => 1, 'two' => 2]);
+        $this->assertEquals(
+            [null => 0, 'one' => 1, 'two' => 2],
+            $c->prepend(0, null)->all()
+        );
     }
 
     public function testPushWithOneItem()

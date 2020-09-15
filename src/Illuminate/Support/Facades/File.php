@@ -40,6 +40,7 @@ namespace Illuminate\Support\Facades;
  * @method static string|false mimeType(string $path)
  * @method static void ensureDirectoryExists(string $path, int $mode = 0755, bool $recursive = true)
  * @method static void link(string $target, string $link)
+ * @method static void relativeLink(string $target, string $link)
  * @method static void replace(string $path, string $content)
  *
  * @see \Illuminate\Filesystem\Filesystem

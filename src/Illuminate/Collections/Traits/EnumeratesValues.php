@@ -110,6 +110,34 @@ trait EnumeratesValues
     }
 
     /**
+     * Create a new instance with no items.
+     *
+     * @return static
+     */
+    public static function empty()
+    {
+        return new static([]);
+    }
+
+    /**
+     * Create a new collection by invoking the callback a given amount of times.
+     *
+     * @param  int  $number
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public static function times($number, callable $callback = null)
+    {
+        if ($number < 1) {
+            return new static;
+        }
+
+        return static::range(1, $number)
+            ->when($callback)
+            ->map($callback);
+    }
+
+    /**
      * Alias for the "avg" method.
      *
      * @param  callable|string|null  $callback
@@ -519,7 +547,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Filter items where the given key is not null.
+     * Filter items where the value for the given key is null.
      *
      * @param  string|null  $key
      * @return static
@@ -530,7 +558,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Filter items where the given key is null.
+     * Filter items where the value for the given key is not null.
      *
      * @param  string|null  $key
      * @return static
@@ -721,21 +749,6 @@ trait EnumeratesValues
     public function uniqueStrict($key = null)
     {
         return $this->unique($key, true);
-    }
-
-    /**
-     * Take items in the collection until the given condition is met.
-     *
-     * This is an alias to the "takeUntil" method.
-     *
-     * @param  mixed  $value
-     * @return static
-     *
-     * @deprecated Use the "takeUntil" method directly.
-     */
-    public function until($value)
-    {
-        return $this->takeUntil($value);
     }
 
     /**

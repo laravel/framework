@@ -16,7 +16,7 @@ class SQLiteGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = ['Nullable', 'Default', 'Increment'];
+    protected $modifiers = ['VirtualAs', 'StoredAs', 'Nullable', 'Default', 'Increment'];
 
     /**
      * The columns available as serials.
@@ -137,7 +137,9 @@ class SQLiteGrammar extends Grammar
     {
         $columns = $this->prefixArray('add column', $this->getColumns($blueprint));
 
-        return collect($columns)->map(function ($column) use ($blueprint) {
+        return collect($columns)->reject(function ($column) {
+            return preg_match('/as \(.*\) stored/', $column) > 0;
+        })->map(function ($column) use ($blueprint) {
             return 'alter table '.$this->wrapTable($blueprint).' '.$column;
         })->all();
     }
@@ -823,6 +825,47 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a generated, computed column type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function typeComputed(Fluent $column)
+    {
+        throw new RuntimeException('This database driver requires a type, see the virtualAs / storedAs modifiers.');
+    }
+
+    /**
+     * Get the SQL for a generated virtual column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->virtualAs)) {
+            return " as ({$column->virtualAs})";
+        }
+    }
+
+    /**
+     * Get the SQL for a generated stored column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->storedAs)) {
+            return " as ({$column->storedAs}) stored";
+        }
+    }
+
+    /**
      * Get the SQL for a nullable column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -831,7 +874,13 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
-        return $column->nullable ? ' null' : ' not null';
+        if (is_null($column->virtualAs) && is_null($column->storedAs)) {
+            return $column->nullable ? ' null' : ' not null';
+        }
+
+        if ($column->nullable === false) {
+            return ' not null';
+        }
     }
 
     /**
@@ -843,7 +892,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
+        if (! is_null($column->default) && is_null($column->virtualAs) && is_null($column->storedAs)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }

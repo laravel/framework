@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\PostgresBuilder;
+use Illuminate\Database\Schema\PostgresSchemaState;
 use PDO;
 
 class PostgresConnection extends Connection
@@ -69,6 +70,18 @@ class PostgresConnection extends Connection
     protected function getDefaultSchemaGrammar()
     {
         return $this->withTablePrefix(new SchemaGrammar);
+    }
+
+    /**
+     * Get the schema state for the connection.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem|null  $files
+     * @param  callable|null  $processFactory
+     * @return \Illuminate\Database\Schema\PostgresSchemaState
+     */
+    public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
+    {
+        return new PostgresSchemaState($this, $files, $processFactory);
     }
 
     /**

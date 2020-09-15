@@ -4,6 +4,7 @@ namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 use RuntimeException;
 
@@ -36,6 +37,13 @@ trait Queueable
      * @var string|null
      */
     public $chainQueue;
+
+    /**
+     * The callbacks to be executed on chain failure.
+     *
+     * @var array|null
+     */
+    public $chainCatchCallbacks;
 
     /**
      * The number of seconds before the job should be made available.
@@ -190,7 +198,21 @@ trait Queueable
 
                 $next->chainConnection = $this->chainConnection;
                 $next->chainQueue = $this->chainQueue;
+                $next->chainCatchCallbacks = $this->chainCatchCallbacks;
             }));
         }
+    }
+
+    /**
+     * Invoke all of the chain's failed job callbacks.
+     *
+     * @param  \Throwable  $e
+     * @return void
+     */
+    public function invokeChainCatchCallbacks($e)
+    {
+        collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
+            $callback instanceof SerializableClosure ? $callback->__invoke($e) : call_user_func($callback, $e);
+        });
     }
 }

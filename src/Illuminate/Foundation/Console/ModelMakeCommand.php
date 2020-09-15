@@ -72,7 +72,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createFactory()
     {
-        $factory = Str::studly(class_basename($this->argument('name')));
+        $factory = Str::studly($this->argument('name'));
 
         $this->call('make:factory', [
             'name' => "{$factory}Factory",
@@ -154,6 +154,17 @@ class ModelMakeCommand extends GeneratorCommand
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
                         ? $customPath
                         : __DIR__.$stub;
+    }
+
+    /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
+    {
+        return is_dir(app_path('Models')) ? $rootNamespace.'\\Models' : $rootNamespace;
     }
 
     /**

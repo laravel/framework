@@ -911,7 +911,7 @@ class User extends Model
 {
     public $table = 'users';
     public $timestamps = true;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected static function boot()
     {
@@ -934,7 +934,7 @@ class Post extends Model
 {
     public $table = 'posts';
     public $timestamps = true;
-    protected $guarded = ['id'];
+    protected $guarded = [];
     protected $touches = ['touchingTags'];
 
     protected static function boot()
@@ -1008,7 +1008,7 @@ class Tag extends Model
 {
     public $table = 'tags';
     public $timestamps = true;
-    protected $guarded = ['id'];
+    protected $fillable = ['name'];
 
     public function posts()
     {
@@ -1020,7 +1020,7 @@ class TouchingTag extends Model
 {
     public $table = 'tags';
     public $timestamps = true;
-    protected $guarded = ['id'];
+    protected $guarded = [];
     protected $touches = ['posts'];
 
     public function posts()
@@ -1033,7 +1033,7 @@ class TagWithCustomPivot extends Model
 {
     public $table = 'tags';
     public $timestamps = true;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function posts()
     {
@@ -1056,7 +1056,7 @@ class TagWithGlobalScope extends Model
 {
     public $table = 'tags';
     public $timestamps = true;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public static function boot()
     {

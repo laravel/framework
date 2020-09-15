@@ -438,7 +438,7 @@ class Builder
      * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function firstOrCreate(array $attributes, array $values = [])
+    public function firstOrCreate(array $attributes = [], array $values = [])
     {
         if (! is_null($instance = $this->where($attributes)->first())) {
             return $instance;
@@ -1083,12 +1083,17 @@ class Builder
     /**
      * Set the relationships that should be eager loaded.
      *
-     * @param  mixed  $relations
+     * @param  string|array  $relations
+     * @param  string|\Closure|null  $callback
      * @return $this
      */
-    public function with($relations)
+    public function with($relations, $callback = null)
     {
-        $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+        if ($callback instanceof Closure) {
+            $eagerLoad = $this->parseWithRelations([$relations => $callback]);
+        } else {
+            $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+        }
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
 

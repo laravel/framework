@@ -441,6 +441,19 @@ class MailManager implements FactoryContract
     }
 
     /**
+     * Disconnect the given mailer and remove from local cache.
+     *
+     * @param  string|null  $name
+     * @return void
+     */
+    public function purge($name = null)
+    {
+        $name = $name ?: $this->getDefaultDriver();
+
+        unset($this->mailers[$name]);
+    }
+
+    /**
      * Register a custom transport creator Closure.
      *
      * @param  string  $driver

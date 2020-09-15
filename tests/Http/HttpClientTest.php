@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Http;
 
+use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
@@ -43,6 +46,9 @@ class HttpClientTest extends TestCase
         $this->assertSame('{"result":{"foo":"bar"}}', (string) $response);
         $this->assertIsArray($response->json());
         $this->assertSame(['foo' => 'bar'], $response->json()['result']);
+        $this->assertSame(['foo' => 'bar'], $response->json('result'));
+        $this->assertSame('bar', $response->json('result.foo'));
+        $this->assertSame('default', $response->json('missing_key', 'default'));
         $this->assertSame(['foo' => 'bar'], $response['result']);
         $this->assertIsObject($response->object());
         $this->assertSame('bar', $response->object()->result->foo);
@@ -426,6 +432,48 @@ class HttpClientTest extends TestCase
             return $request->url() === 'http://foo.com/json' &&
                    $request->hasHeaders('X-Test-Header');
         });
+    }
+
+    public function testRequestExceptionSummary()
+    {
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed"}}');
+
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+
+        throw new RequestException(new Response($response));
+    }
+
+    public function testRequestExceptionTruncatedSummary()
+    {
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our sup (truncated...)');
+
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+
+        throw new RequestException(new Response($response));
+    }
+
+    public function testRequestExceptionEmptyBody()
+    {
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessageMatches('/HTTP request returned status code 403$/');
+
+        $response = new Psr7Response(403);
+
+        throw new RequestException(new Response($response));
     }
 
     public function testSinkToFile()

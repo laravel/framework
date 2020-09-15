@@ -9,7 +9,7 @@ class DummyClass extends Exception
     /**
      * Report the exception.
      *
-     * @return void
+     * @return bool|void
      */
     public function report()
     {

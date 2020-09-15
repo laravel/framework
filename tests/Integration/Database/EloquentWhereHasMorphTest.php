@@ -226,7 +226,7 @@ class Comment extends Model
 
     public $timestamps = false;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function commentable()
     {
@@ -250,7 +250,7 @@ class Post extends Model
 
     public $timestamps = false;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function scopeSomeSharedModelScope($query)
     {
@@ -262,7 +262,7 @@ class Video extends Model
 {
     public $timestamps = false;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function scopeSomeSharedModelScope($query)
     {
