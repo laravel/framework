@@ -66,7 +66,7 @@ class CallQueuedClosure implements ShouldQueue
      */
     public function handle(Container $container)
     {
-        $container->call($this->closure->getClosure());
+        $container->call($this->closure->getClosure(), ['job' => $this]);
     }
 
     /**
