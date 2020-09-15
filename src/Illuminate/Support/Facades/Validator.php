@@ -7,6 +7,7 @@ namespace Illuminate\Support\Facades;
  * @method static void extend(string $rule, \Closure|string $extension, string $message = null)
  * @method static void extendImplicit(string $rule, \Closure|string $extension, string $message = null)
  * @method static void replacer(string $rule, \Closure|string $replacer)
+ * @method static array validate(array $data, array $rules, array $messages = [], array $customAttributes = [])
  *
  * @see \Illuminate\Validation\Factory
  */
