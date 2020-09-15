@@ -1,6 +1,18 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.27.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.28.0...7.x)
+
+
+## [v7.28.0 (2020-09-08)](https://github.com/laravel/framework/compare/v7.27.0...v7.28.0)
+
+### Added
+- Added expectsTable console assertion ([74e1fca](https://github.com/laravel/framework/commit/74e1fca5fa333e32e24a7aa24049d5303a1bf281), [c6cf381](https://github.com/laravel/framework/commit/c6cf38139d2524a7c3accb606e3fb1b035c98d6a))
+
+### Fixed
+- Use `getTouchedRelations` when touching owners ([#34100](https://github.com/laravel/framework/pull/34100))
+- Fixed for empty fallback_locale in `Illuminate\Translation\Translator` ([#34136](https://github.com/laravel/framework/pull/34136))
+- Fixed `Illuminate\Database\Schema\Grammars\SqlServerGrammar::compileColumnListing()` for tables with schema ([#34076](https://github.com/laravel/framework/pull/34076))
+- Fixed Significant performance issue in Eloquent Collection loadCount() method ([#34177](https://github.com/laravel/framework/pull/34177))
 
 
 ## [v7.27.0 (2020-09-01)](https://github.com/laravel/framework/compare/v7.26.1...v7.27.0)
