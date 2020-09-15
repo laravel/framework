@@ -1,6 +1,12 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.28.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.28.1...7.x)
+
+
+## [v7.28.1 (2020-09-09)](https://github.com/laravel/framework/compare/v7.28.0...v7.28.1)
+
+### Revert
+- Revert of ["Fixed for empty fallback_locale in `Illuminate\Translation\Translator`"](https://github.com/laravel/framework/pull/34136) ([7c54eb6](https://github.com/laravel/framework/commit/7c54eb678d58fb9ee7f532a5a5842e6f0e1fe4c9))
 
 
 ## [v7.28.0 (2020-09-08)](https://github.com/laravel/framework/compare/v7.27.0...v7.28.0)
