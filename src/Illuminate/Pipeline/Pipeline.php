@@ -219,6 +219,19 @@ class Pipeline implements PipelineContract
     }
 
     /**
+     * Set the container instance.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return $this
+     */
+    public function setContainer(Container $container)
+    {
+        $this->container = $container;
+
+        return $this;
+    }
+
+    /**
      * Handle the value returned from each pipe before passing it to the next.
      *
      * @param  mixed  $carry
