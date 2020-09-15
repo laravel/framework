@@ -1484,10 +1484,28 @@ trait HasAttributes
      * @return $this
      */
     public function append($attributes)
-    {
-        $this->appends = array_unique(
-            array_merge($this->appends, is_string($attributes) ? func_get_args() : $attributes)
-        );
+    {                
+        $attributes = is_string($attributes) ? func_get_args() : $attributes;
+
+        foreach ($attributes as $attribute) {
+            $dotPosition = strpos($attribute, '.');
+
+            if ($dotPosition === false) {
+                $this->appends = array_unique(array_merge($this->appends, [$attribute]));
+                continue;
+            }
+
+            $innerAttributeName = substr($attribute, 0, $dotPosition);
+            $innerAttributeAppend = substr($attribute, $dotPosition + 1);
+            $innerAttribute = $this->getAttribute($innerAttributeName);
+
+            if ( ! method_exists($innerAttribute, 'append')) {
+                throw RelationNotFoundException::make(null, $innerAttributeName);
+            }
+
+            $innerAttribute->append($innerAttributeAppend);
+        }
+
 
         return $this;
     }
