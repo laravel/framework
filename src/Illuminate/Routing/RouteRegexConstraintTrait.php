@@ -75,7 +75,7 @@ trait RouteRegexConstraintTrait
     /**
      * Set slash character as regular expression requirement on the route.
      *
-     * @param  string|array $parameter
+     * @param  string $parameter
      * @return $this
      */
     public function whereSlash(string $name)
