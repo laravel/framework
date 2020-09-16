@@ -31,6 +31,7 @@
                     <div class="ml-4 text-lg text-gray-500 uppercase tracking-wider">
                         @yield('message')
                     </div>
+                </div>
             </div>
         </div>
     </body>
