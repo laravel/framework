@@ -1,6 +1,20 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.0.4...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.1.0...8.x)
+
+
+## [v8.1.0 (2020-09-11)](https://github.com/laravel/framework/compare/v8.0.4...v8.1.0)
+
+### Added
+- Added `Illuminate\Database\Eloquent\Factories\Factory::raw()` ([#34278](https://github.com/laravel/framework/pull/34278))
+- Added `Illuminate\Database\Eloquent\Factories\Factory::createMany()` ([#34285](https://github.com/laravel/framework/pull/34285), [69072c7](https://github.com/laravel/framework/commit/69072c7d3efd2784d195cb95e45e4dcb8ef5907f))
+- Added the `Countable` interface to `AssertableJsonString` ([#34284](https://github.com/laravel/framework/pull/34284))
+
+### Fixed
+- Fixed the new maintenance mode ([#34264](https://github.com/laravel/framework/pull/34264))
+
+### Changed
+- Optimize command can also cache view ([#34287](https://github.com/laravel/framework/pull/34287))
 
 
 ## [v8.0.4 (2020-09-11)](https://github.com/laravel/framework/compare/v8.0.3...v8.0.4)
