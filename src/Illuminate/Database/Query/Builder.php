@@ -2770,7 +2770,7 @@ class Builder
     }
 
     /**
-     * Insert a new record into the database.
+     * Insert new records into the database.
      *
      * @param  array  $values
      * @return bool
@@ -2809,7 +2809,7 @@ class Builder
     }
 
     /**
-     * Insert a new record into the database while ignoring errors.
+     * Insert new records into the database while ignoring errors.
      *
      * @param  array  $values
      * @return int
@@ -2869,7 +2869,7 @@ class Builder
     }
 
     /**
-     * Update a record in the database.
+     * Update records in the database.
      *
      * @param  array  $values
      * @return int
@@ -2950,7 +2950,7 @@ class Builder
     }
 
     /**
-     * Delete a record from the database.
+     * Delete records from the database.
      *
      * @param  mixed  $id
      * @return int
