@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Illuminate\View\AnonymousComponent;
+use Illuminate\View\DynamicComponent;
 use Illuminate\View\ViewFinderInterface;
 use InvalidArgumentException;
 use ReflectionClass;
@@ -228,8 +229,10 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
+        $escapeAttributes = $class !== DynamicComponent::class;
+
         return " @component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
-<?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
+<?php $component->withAttributes(['.$this->attributesToString($attributes->all(), $escapeAttributes).']); ?>';
     }
 
     /**
