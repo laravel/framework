@@ -54,7 +54,7 @@ class ComponentMakeCommand extends GeneratorCommand
     protected function writeView()
     {
         $path = $this->viewPath(
-            str_replace('.', '/', 'components.'.$this->getView())
+            str_replace('.', '/', 'components.'.$this->getView()).'.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
@@ -67,7 +67,7 @@ class ComponentMakeCommand extends GeneratorCommand
         }
 
         file_put_contents(
-            $path.'.blade.php',
+            $path,
             '<div>
     <!-- '.Inspiring::quote().' -->
 </div>'
