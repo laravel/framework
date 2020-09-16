@@ -5,7 +5,7 @@ namespace Illuminate\Contracts\Queue;
 interface ClearableQueue
 {
     /**
-     * Clear all jobs from the queue.
+     * Delete all of the jobs from the queue.
      *
      * @param  string  $queue
      * @return int

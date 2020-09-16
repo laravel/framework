@@ -258,21 +258,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Clear all jobs from the queue.
-     *
-     * @param  string  $queue
-     * @return int
-     */
-    public function clear($queue)
-    {
-        $queue = $this->getQueue($queue);
-
-        return $this->getConnection()->eval(
-            LuaScripts::clear(), 3, $queue, $queue.':delayed', $queue.':reserved'
-        );
-    }
-
-    /**
      * Delete a reserved job from the queue.
      *
      * @param  string  $queue
@@ -299,6 +284,21 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $this->getConnection()->eval(
             LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved',
             $job->getReservedJob(), $this->availableAt($delay)
+        );
+    }
+
+    /**
+     * Delete all of the jobs from the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function clear($queue)
+    {
+        $queue = $this->getQueue($queue);
+
+        return $this->getConnection()->eval(
+            LuaScripts::clear(), 3, $queue, $queue.':delayed', $queue.':reserved'
         );
     }
 

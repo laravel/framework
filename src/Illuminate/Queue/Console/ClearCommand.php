@@ -25,7 +25,7 @@ class ClearCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Clear the queue';
+    protected $description = 'Delete all of the jobs from the specified queue';
 
     /**
      * Execute the console command.
@@ -45,14 +45,15 @@ class ClearCommand extends Command
         // configuration file for the application. We will pull it based on the set
         // connection being run for the queue operation currently being executed.
         $queueName = $this->getQueue($connection);
+
         $queue = ($this->laravel['queue'])->connection($connection);
 
         if ($queue instanceof ClearableQueue) {
             $count = $queue->clear($queueName);
 
-            $this->line('<info>Cleared '.$count.' jobs from the '.$queueName.' queue</info> ');
+            $this->line('<info>Cleared '.$count.' jobs from the ['.$queueName.'] queue</info> ');
         } else {
-            $this->line('<error>Clearing queues is not supported on '.(new ReflectionClass($queue))->getShortName().'</error> ');
+            $this->line('<error>Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']</error> ');
         }
 
         return 0;
