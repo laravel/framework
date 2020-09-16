@@ -61,6 +61,11 @@ class ComponentMakeCommand extends GeneratorCommand
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
 
+        if ($this->files->exists($path) && ! $this->option('force')) {
+            $this->warn('View already exists');
+            return;
+        }
+
         file_put_contents(
             $path.'.blade.php',
             '<div>
