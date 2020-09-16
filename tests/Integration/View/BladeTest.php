@@ -30,7 +30,7 @@ class BladeTest extends TestCase
     {
         $view = View::make('uses-panel-dynamically', ['name' => 'Taylor'])->render();
 
-        $this->assertEquals('<div class="ml-2" wire:model="foo">
+        $this->assertEquals('<div class="ml-2" wire:model="foo" wire:model.lazy="bar">
     Hello Taylor
 </div>', trim($view));
     }
