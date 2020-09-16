@@ -98,7 +98,7 @@ abstract class ServiceProvider
     public function callBootingCallbacks()
     {
         foreach ($this->bootingCallbacks as $callback) {
-            $callback();
+            $this->app->call($callback);
         }
     }
 
@@ -110,7 +110,7 @@ abstract class ServiceProvider
     public function callBootedCallbacks()
     {
         foreach ($this->bootedCallbacks as $callback) {
-            $callback();
+            $this->app->call($callback);
         }
     }
 
