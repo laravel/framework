@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
@@ -127,7 +128,11 @@ trait InteractsWithDatabase
      */
     public function castAsJson($value)
     {
-        $value = is_array($value) ? json_encode($value) : $value;
+        if ($value instanceof Jsonable) {
+            $value = $value->toJson();
+        } elseif (is_array($value)) {
+            $value = json_encode($value);
+        }
 
         return DB::raw("CAST('$value' AS JSON)");
     }
