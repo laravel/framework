@@ -1186,6 +1186,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
         $this->assertSame('save_stub.morph_type', $relation->getQualifiedMorphType());
         $this->assertEquals(EloquentModelStub::class, $relation->getMorphClass());
+        $this->assertEquals(EloquentModelStub::class, Relation::getMorphedAlias(EloquentModelStub::class));
     }
 
     public function testCorrectMorphClassIsReturned()
@@ -1195,6 +1196,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         try {
             $this->assertEquals(EloquentModelStub::class, $model->getMorphClass());
+            $this->assertEquals(EloquentModelStub::class, Relation::getMorphedAlias(EloquentModelStub::class));
         } finally {
             Relation::morphMap([], false);
         }
@@ -1224,6 +1226,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
         $this->assertSame('save_stub.morph_type', $relation->getQualifiedMorphType());
         $this->assertEquals(EloquentModelStub::class, $relation->getMorphClass());
+        $this->assertEquals(EloquentModelStub::class, Relation::getMorphedAlias(EloquentModelStub::class));
     }
 
     public function testBelongsToCreatesProperRelation()

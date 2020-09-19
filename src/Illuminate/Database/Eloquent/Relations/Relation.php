@@ -370,6 +370,21 @@ abstract class Relation
     }
 
     /**
+     * Get the alias associated with a custom polymorphic model.
+     *
+     * @param  string  $model
+     * @return string
+     */
+    public static function getMorphedAlias($model)
+    {
+        if (! empty(static::$morphMap) && in_array($model, static::$morphMap)) {
+            return array_search($model, static::$morphMap, true);
+        }
+
+        return $model;
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method

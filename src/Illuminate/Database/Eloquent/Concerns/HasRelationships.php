@@ -725,13 +725,7 @@ trait HasRelationships
      */
     public function getMorphClass()
     {
-        $morphMap = Relation::morphMap();
-
-        if (! empty($morphMap) && in_array(static::class, $morphMap)) {
-            return array_search(static::class, $morphMap, true);
-        }
-
-        return static::class;
+        return Relation::getMorphedAlias(static::class);
     }
 
     /**
