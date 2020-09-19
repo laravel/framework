@@ -26,9 +26,9 @@ class CallbackEventTest extends TestCase
 
         $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
 
-        }))->onSuccess(function () use ( &$success ) {
+        }))->onSuccess(function () use (&$success) {
             $success = true;
-        })->onFailure(function () use ( &$success ) {
+        })->onFailure(function () use (&$success) {
             $success = false;
         });
 
@@ -43,9 +43,9 @@ class CallbackEventTest extends TestCase
 
         $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
             return false;
-        }))->onSuccess(function () use ( &$success ) {
+        }))->onSuccess(function () use (&$success) {
             $success = true;
-        })->onFailure(function () use ( &$success ) {
+        })->onFailure(function () use (&$success) {
             $success = false;
         });
 
@@ -60,9 +60,9 @@ class CallbackEventTest extends TestCase
 
         $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
             throw new \Exception;
-        }))->onSuccess(function () use ( &$success ) {
+        }))->onSuccess(function () use (&$success) {
             $success = true;
-        })->onFailure(function () use ( &$success ) {
+        })->onFailure(function () use (&$success) {
             $success = false;
         });
 
