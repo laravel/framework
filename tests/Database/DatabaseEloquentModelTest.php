@@ -1196,6 +1196,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         try {
             $this->assertEquals(EloquentModelStub::class, $model->getMorphClass());
+            $this->assertEquals('alias', Relation::getMorphedAlias('AnotherModel'));
             $this->assertEquals(EloquentModelStub::class, Relation::getMorphedAlias(EloquentModelStub::class));
         } finally {
             Relation::morphMap([], false);
