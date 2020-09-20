@@ -519,4 +519,18 @@ trait ReplacesAttributes
     {
         return $this->replaceRequiredIf($message, $attribute, $rule, $parameters);
     }
+
+    /**
+     * Replace all place-holders for the unfilled_with rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceUnfilledWith($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceRequiredWith($message, $attribute, $rule, $parameters);
+    }
 }

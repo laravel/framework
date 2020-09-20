@@ -1727,7 +1727,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate the given attribute is unfilled if another field is present.
+     * Validate that an attribute is unfilled when another attribute has a given value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -1740,8 +1740,27 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->prepareValuesAndOther($parameters);
 
-        if (! is_null($other)) {
-            return false;
+        if (in_array($other, $values)) {
+            return ! $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is unfilled when any other attribute exists.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateUnfilledWith($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'unfilled_with');
+
+        if (! $this->allFailingRequired($parameters)) {
+            return ! $this->validateRequired($attribute, $value);
         }
 
         return true;
