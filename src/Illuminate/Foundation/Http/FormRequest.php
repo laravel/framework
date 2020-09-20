@@ -196,9 +196,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function validatedFilled()
     {
         $validated = $this->validated();
-
+        
         return array_filter($validated, function ($value) {
-            return !empty($value);
+            return ! empty($value);
         });
     }
 
