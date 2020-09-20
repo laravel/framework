@@ -41,7 +41,10 @@ if (isset($data['redirect']) && $_SERVER['REQUEST_URI'] !== $data['redirect']) {
 
 // Output the prerendered template...
 http_response_code($data['status'] ?? 503);
-header('Retry-After: '.$data['retry']);
+
+if (isset($data['retry'])) {
+    header('Retry-After: '.$data['retry']);
+}
 
 echo $data['template'];
 
