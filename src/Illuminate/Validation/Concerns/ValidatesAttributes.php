@@ -1719,6 +1719,27 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the given attribute is unfilled if another field is present.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateUnfilledIf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'unfilled_if');
+
+        [$values, $other] = $this->prepareValuesAndOther($parameters);
+
+        if (!is_null($other)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Validate that an attribute is a valid URL.
      *
      * @param  string  $attribute
