@@ -37,6 +37,17 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'specified'], $request->validated());
     }
 
+    public function testValidatedMethodReturnsTheFilledValidatedData()
+    {
+        $payload = ['name' => 'Gregori', 'last' => null];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestNullableStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['name' => 'Gregori'], $request->validatedFilled());
+    }
+
     public function testValidatedMethodReturnsTheValidatedDataNestedRules()
     {
         $payload = ['nested' => ['foo' => 'bar', 'baz' => ''], 'array' => [1, 2]];
@@ -223,6 +234,19 @@ class FoundationTestFormRequestStub extends FormRequest
     public function rules()
     {
         return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestNullableStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required', 'last' => 'sometimes|nullable'];
     }
 
     public function authorize()
