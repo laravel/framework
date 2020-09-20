@@ -506,7 +506,6 @@ trait ReplacesAttributes
         return str_replace(':values', implode(', ', $parameters), $message);
     }
 
-
     /**
      * Replace all place-holders for the unfilled_if rule.
      *

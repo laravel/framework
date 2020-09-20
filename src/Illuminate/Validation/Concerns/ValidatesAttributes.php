@@ -1740,7 +1740,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->prepareValuesAndOther($parameters);
 
-        if (!is_null($other)) {
+        if (! is_null($other)) {
             return false;
         }
 
