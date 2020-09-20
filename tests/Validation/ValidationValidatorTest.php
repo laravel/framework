@@ -5571,6 +5571,24 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['data.1.date' => ['validation.date'], 'data.*.date' => ['validation.date']], $validator->messages()->toArray());
     }
 
+    public function testValidateUnfilledIf()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), [], ['name' => 'unfilled_if:first_name', 'first_name' => 'sometimes']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['name' => 'Ricky Bobby'], ['name' => 'unfilled_if:first_name', 'first_name' => 'sometimes']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['first_name' => 'Richard', 'last_name' => 'Robert'], ['name' => 'unfilled_if:first_name', 'first_name' => 'sometimes', 'last_name' => 'sometimes']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['name' => 'Ricky Bobby', 'first_name' => 'Richard', 'last_name' => 'Robert'], ['name' => 'unfilled_if:first_name', 'first_name' => 'sometimes']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['name' => 'Ricky Bobby', 'first_name' => 'Richard', 'last_name' => 'Robert'], ['name' => 'sometimes', 'first_name' => 'unfilled_if:name', 'last_name' => 'unfilled_if:name']);
+        $this->assertTrue($v->fails());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

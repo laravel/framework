@@ -221,6 +221,7 @@ class Validator implements ValidatorContract
         'RequiredWithout',
         'RequiredWithoutAll',
         'Same',
+        'UnfilledIf',
         'Unique',
     ];
 

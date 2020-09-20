@@ -505,4 +505,19 @@ trait ReplacesAttributes
 
         return str_replace(':values', implode(', ', $parameters), $message);
     }
+
+
+    /**
+     * Replace all place-holders for the unfilled_if rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceUnfilledIf($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceRequiredIf($message, $attribute, $rule, $parameters);
+    }
 }
