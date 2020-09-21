@@ -229,10 +229,8 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        $escapeAttributes = $class !== DynamicComponent::class;
-
         return " @component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
-<?php $component->withAttributes(['.$this->attributesToString($attributes->all(), $escapeAttributes).']); ?>';
+<?php $component->withAttributes(['.$this->attributesToString($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class).']); ?>';
     }
 
     /**
