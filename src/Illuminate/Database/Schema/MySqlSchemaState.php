@@ -82,6 +82,7 @@ class MySqlSchemaState extends SchemaState
     protected function baseDumpCommand()
     {
         $columnStatistics = $this->connection->isMaria() ? '' : '--column-statistics=0';
+
         $gtidPurged = $this->connection->isMaria() ? '' : '--set-gtid-purged=OFF';
 
         return 'mysqldump '.$gtidPurged.' '.$columnStatistics.' --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" "${:LARAVEL_LOAD_DATABASE}"';
