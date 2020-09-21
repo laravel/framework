@@ -291,7 +291,7 @@ if (! function_exists('config_path')) {
 
 if (! function_exists('console_dir')) {
     /**
-     * print out to the browsers console dir
+     * print out to the browsers console
      *
      * @param mixed $data
      * @return void
@@ -301,16 +301,17 @@ if (! function_exists('console_dir')) {
         $string = json_encode($data, JSON_FORCE_OBJECT);
 
         echo <<<HTML
-            <script>
-                console.dir($string)
-            </script>
+        <script>
+        console.dir($string)
+        </script>
+
         HTML;
     }
 }
 
 if (! function_exists('console_log')) {
     /**
-     * print out to the browsers console log
+     * print out to the browsers console
      *
      * @param mixed $data
      * @return void
@@ -320,16 +321,17 @@ if (! function_exists('console_log')) {
         $string = json_encode($data, JSON_FORCE_OBJECT);
 
         echo <<<HTML
-            <script>
-                console.log($string)
-            </script>
+        <script>
+        console.log($string)
+        </script>
+
         HTML;
     }
 }
 
 if (! function_exists('console_table')) {
     /**
-     * print out to the browsers console table
+     * print out to the browsers console
      *
      * @param mixed $data
      * @return void
@@ -339,9 +341,10 @@ if (! function_exists('console_table')) {
         $string = json_encode($data, JSON_FORCE_OBJECT);
 
         echo <<<HTML
-            <script>
-                console.table($string)
-            </script>
+        <script>
+        console.table($string)
+        </script>
+        
         HTML;
     }
 }
