@@ -4,7 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayIterator;
 use Closure;
-use DateTime;
+use DateTimeInterface;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
@@ -1217,10 +1217,10 @@ class LazyCollection implements Enumerable
     /**
      * Take items in the collection until it reaches the given time.
      *
-     * @param  \DateTime  $timeout
+     * @param  \DateTimeInterface  $timeout
      * @return static
      */
-    public function takeUntilTimeout(DateTime $timeout)
+    public function takeUntilTimeout(DateTimeInterface $timeout)
     {
         $timeout = $timeout->getTimestamp();
 
