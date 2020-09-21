@@ -289,6 +289,63 @@ if (! function_exists('config_path')) {
     }
 }
 
+if (! function_exists('console_dir')) {
+    /**
+     * print out to the browsers console dir
+     *
+     * @param mixed $data
+     * @return void
+     */
+    function console_dir($data)
+    {
+        $string = json_encode($data, JSON_FORCE_OBJECT);
+
+        echo <<<HTML
+            <script>
+                console.dir($string)
+            </script>
+        HTML;
+    }
+}
+
+if (! function_exists('console_log')) {
+    /**
+     * print out to the browsers console log
+     *
+     * @param mixed $data
+     * @return void
+     */
+    function console_log($data)
+    {
+        $string = json_encode($data, JSON_FORCE_OBJECT);
+
+        echo <<<HTML
+            <script>
+                console.log($string)
+            </script>
+        HTML;
+    }
+}
+
+if (! function_exists('console_table')) {
+    /**
+     * print out to the browsers console table
+     *
+     * @param mixed $data
+     * @return void
+     */
+    function console_table($data)
+    {
+        $string = json_encode($data, JSON_FORCE_OBJECT);
+
+        echo <<<HTML
+            <script>
+                console.table($string)
+            </script>
+        HTML;
+    }
+}
+
 if (! function_exists('cookie')) {
     /**
      * Create a new cookie instance.
