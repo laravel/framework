@@ -88,7 +88,7 @@ trait GuardHelpers
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return $this
      */
-    public function setUser(AuthenticatableContract $user)
+    public function setUser(?AuthenticatableContract $user)
     {
         $this->user = $user;
 
