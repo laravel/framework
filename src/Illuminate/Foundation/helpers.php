@@ -291,7 +291,7 @@ if (! function_exists('config_path')) {
 
 if (! function_exists('console_dir')) {
     /**
-     * print out to the browsers console
+     * print out to the browsers console dir.
      *
      * @param mixed $data
      * @return void
@@ -311,7 +311,7 @@ if (! function_exists('console_dir')) {
 
 if (! function_exists('console_log')) {
     /**
-     * print out to the browsers console
+     * print out to the browsers console log.
      *
      * @param mixed $data
      * @return void
@@ -331,7 +331,7 @@ if (! function_exists('console_log')) {
 
 if (! function_exists('console_table')) {
     /**
-     * print out to the browsers console
+     * print out to the browsers console table.
      *
      * @param mixed $data
      * @return void
