@@ -76,7 +76,7 @@ class BusFake implements QueueingDispatcher
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
 
-        if (is_numeric($callback)) {
+        if (is_int($callback)) {
             return $this->assertDispatchedTimes($command, $callback);
         }
 
@@ -138,7 +138,7 @@ class BusFake implements QueueingDispatcher
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
 
-        if (is_numeric($callback)) {
+        if (is_int($callback)) {
             return $this->assertDispatchedAfterResponseTimes($command, $callback);
         }
 
