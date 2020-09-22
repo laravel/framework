@@ -1,6 +1,19 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.28.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.28.3...7.x)
+
+
+## [v7.28.3 (2020-09-17)](https://github.com/laravel/framework/compare/v7.28.2...v7.28.3)
+
+### Fixed
+- Fixed problems with dots in validator ([#34355](https://github.com/laravel/framework/pull/34355))
+
+
+## [v7.28.2 (2020-09-15)](https://github.com/laravel/framework/compare/v7.28.1...v7.28.2)
+
+### Fixed
+- Do not used `now` helper in `Illuminate/Cache/DatabaseLock::expiresAt()` ([#34262](https://github.com/laravel/framework/pull/34262))
+- Fixed `Illuminate\View\ComponentAttributeBag::whereDoesntStartWith()` ([#34329](https://github.com/laravel/framework/pull/34329))
 
 
 ## [v7.28.1 (2020-09-09)](https://github.com/laravel/framework/compare/v7.28.0...v7.28.1)
