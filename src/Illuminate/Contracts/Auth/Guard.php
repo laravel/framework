@@ -19,6 +19,13 @@ interface Guard
     public function guest();
 
     /**
+     * Forget the current user.
+     *
+     * @return $this
+     */
+    public function forget();
+
+    /**
      * Get the currently authenticated user.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
