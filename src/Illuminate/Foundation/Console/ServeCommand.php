@@ -82,6 +82,8 @@ class ServeCommand extends Command
             return $this->handle();
         }
 
+        $this->openBrowser();
+
         return $status;
     }
 
@@ -103,6 +105,26 @@ class ServeCommand extends Command
         });
 
         return $process;
+    }
+
+    /**
+     * Open the default browser after the Laravel development server has started.
+     *
+     * @return void
+     */
+    protected function openBrowser()
+    {
+        foreach (['xdg-open', 'sensible-browser', 'start'] as $command) {
+            try {
+                $process = new Process([$command, "http://{$this->host()}:{$this->port()}"]);
+                $process->run();
+
+                if ($process->isSuccessful()) {
+                    break;
+                }
+            } catch (\Throwable $exception) {
+            }
+        }
     }
 
     /**
