@@ -68,6 +68,31 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhenNullPassedToFirstMethod($collection)
+    {
+        $data = new $collection([]);
+        $res = $data->first(null);
+        $this->assertNull($res);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhenNullPassedToThirdParamInFirstMethod($collection)
+    {
+        $data = new $collection;
+        $res = $data->first(null, function (){
+            return 'default';
+        });
+        $this->assertSame($res, 'default');
+
+        $res = $data->first(null, ['key' => ['value']]);
+        $this->assertArrayHasKey('key', $res);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testFirstWhere($collection)
     {
         $data = new $collection([
