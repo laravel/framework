@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class SupportLazyCollectionTest extends TestCase
@@ -152,6 +154,36 @@ class SupportLazyCollectionTest extends TestCase
         })->values()->all();
 
         $this->assertSame([['key', 1], ['key', 2]], $results);
+    }
+
+    public function testTakeUntilTimeout()
+    {
+        $timeout = Carbon::now();
+
+        $mock = m::mock(LazyCollection::class.'[now]');
+
+        $results = $mock
+            ->times(10)
+            ->pipe(function ($collection) use ($mock, $timeout) {
+                tap($collection)
+                    ->mockery_init($mock->mockery_getContainer())
+                    ->shouldAllowMockingProtectedMethods()
+                    ->shouldReceive('now')
+                    ->times(3)
+                    ->andReturn(
+                        (clone $timeout)->sub(2, 'minute')->getTimestamp(),
+                        (clone $timeout)->sub(1, 'minute')->getTimestamp(),
+                        $timeout->getTimestamp()
+                    );
+
+                return $collection;
+            })
+            ->takeUntilTimeout($timeout)
+            ->all();
+
+        $this->assertSame([1, 2], $results);
+
+        m::close();
     }
 
     public function testTapEach()
