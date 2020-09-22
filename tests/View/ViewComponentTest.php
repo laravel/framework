@@ -4,13 +4,14 @@ namespace Illuminate\Tests\View;
 
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
+use Illuminate\View\Concerns\AutowiresProperties;
 use PHPUnit\Framework\TestCase;
 
 class ViewComponentTest extends TestCase
 {
     public function testDataExposure()
     {
-        $component = new TestViewComponent;
+        $component = new TestViewComponent();
 
         $variables = $component->data();
 
@@ -21,7 +22,7 @@ class ViewComponentTest extends TestCase
 
     public function testAttributeParentInheritance()
     {
-        $component = new TestViewComponent;
+        $component = new TestViewComponent();
 
         $component->withAttributes(['class' => 'foo', 'attributes' => new ComponentAttributeBag(['class' => 'bar', 'type' => 'button'])]);
 
@@ -30,7 +31,7 @@ class ViewComponentTest extends TestCase
 
     public function testPublicMethodsWithNoArgsAreConvertedToStringableCallablesInvokedAndNotCached()
     {
-        $component = new TestSampleViewComponent;
+        $component = new TestSampleViewComponent();
 
         $this->assertEquals(0, $component->counter);
         $this->assertEquals(0, TestSampleViewComponent::$publicStaticCounter);
@@ -83,6 +84,22 @@ class ViewComponentTest extends TestCase
         // protected methods do not override public properties.
         $this->assertArrayHasKey('world', $variables);
         $this->assertSame('world property', $variables['world']);
+    }
+
+    public function testPropertiesCanBeAutowired()
+    {
+        $component = new TestAutowiringPropertiesViewComponent();
+
+        $this->assertEquals('', $component->foo);
+        $this->assertSame(false, isset($component->abc));
+
+        $component->withAttributes(['foo' => 'bar', 'abc' => 'xyz']);
+        $component->autowireProperties();
+
+        $this->assertSame(false, isset($component->attributes['foo']));
+        $this->assertSame(true, isset($component->attributes['abc']));
+        $this->assertEquals('bar', $component->foo);
+        $this->assertSame(false, isset($component->abc));
     }
 }
 
@@ -195,5 +212,17 @@ class TestDefaultAttributesComponent extends Component
     public function render()
     {
         return $this->attributes->get('id');
+    }
+}
+
+class TestAutowiringPropertiesViewComponent extends Component
+{
+    use AutowiresProperties;
+
+    public $foo = '';
+
+    public function render()
+    {
+        return '';
     }
 }

@@ -164,4 +164,15 @@ trait ManagesComponents
     {
         return count($this->componentStack) - 1;
     }
+
+    /**
+     * Set the data passed to the current component's view.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    public function setData(array $data = [])
+    {
+        $this->componentData[$this->currentComponent()] = $data;
+    }
 }

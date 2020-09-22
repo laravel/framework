@@ -229,7 +229,8 @@ class ComponentTagCompiler
         }
 
         return " @component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
-<?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
+<?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>
+<?php $__env->setData($component->autowireProperties()); ?>';
     }
 
     /**

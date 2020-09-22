@@ -236,6 +236,8 @@ abstract class Component
         return array_merge([
             'data',
             'render',
+            'mount',
+            'autowireProperties',
             'resolveView',
             'shouldRender',
             'view',
@@ -280,5 +282,10 @@ abstract class Component
     public function shouldRender()
     {
         return true;
+    }
+
+    public function autowireProperties()
+    {
+        return $this->data();
     }
 }
