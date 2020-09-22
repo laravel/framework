@@ -1215,7 +1215,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Take items in the collection until it reaches the given time.
+     * Take items in the collection until a given point in time.
      *
      * @param  \DateTimeInterface  $timeout
      * @return static
