@@ -197,7 +197,7 @@ class Logger implements LoggerInterface
      * Fires a log event.
      *
      * @param  string  $level
-     * @param  mixed  $message
+     * @param  string  $message
      * @param  array  $context
      * @return void
      */
