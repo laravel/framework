@@ -1,6 +1,22 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.3.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.4.0...8.x)
+
+
+## [v8.4.0 (2020-09-16)](https://github.com/laravel/framework/compare/v8.3.0...v8.4.0)
+
+### Added
+- Added SQLite schema dump support ([#34323](https://github.com/laravel/framework/pull/34323))
+- Added `queue:clear` command ([#34330](https://github.com/laravel/framework/pull/34330), [06b378c](https://github.com/laravel/framework/commit/06b378c07b2ea989aa3e947ca003e96ea277153c))
+
+### Fixed
+- Fixed `minimal.blade.php` ([#34379](https://github.com/laravel/framework/pull/34379))
+- Dont double escape on ComponentTagCompiler.php ([ec75487](https://github.com/laravel/framework/commit/ec75487062506963dd27a4302fe3680c0e3681a3))
+- Fixed dots in attribute names in `DynamicComponent` ([2d1d962](https://github.com/laravel/framework/commit/2d1d96272a94bce123676ed742af2d80ba628ba4))
+
+### Changed
+- Show warning when view exists when using artisan `make:component` ([#34376](https://github.com/laravel/framework/pull/34376), [0ce75e0](https://github.com/laravel/framework/commit/0ce75e01a66ba4b13bbe4cbed85564f1dc76bb05))
+- Call the booting/booted callbacks from the container ([#34370](https://github.com/laravel/framework/pull/34370))
 
 
 ## [v8.3.0 (2020-09-15)](https://github.com/laravel/framework/compare/v8.2.0...v8.3.0)
