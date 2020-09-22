@@ -2114,6 +2114,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => ['bar' => ['id' => 'qux'], 'baz' => ['id' => 'QUX']]], ['foo.*.id' => 'distinct:ignore_case']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => ['bar' => ['id' => 'qux'], 'baz' => ['id' => 'QUX']]], ['foo.*.id' => 'distinct:ignore_case,level=1']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => ['bar' => ['id' => 1], 'baz' => ['id' => 2]]], ['foo.*.id' => 'distinct']);
         $this->assertTrue($v->passes());
 
@@ -2132,7 +2135,16 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['cat' => [['prod' => [['id' => 1]]], ['prod' => [['id' => 1]]]]], ['cat.*.prod.*.id' => 'distinct']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['cat' => [['prod' => [['id' => 1]]], ['prod' => [['id' => 1]]]]], ['cat.*.prod.*.id' => 'distinct:level=1']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['cat' => [['prod' => [['id' => 1]]], ['prod' => [['id' => 2]]]]], ['cat.*.prod.*.id' => 'distinct']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['cat' => [['prod' => [1, 2, 3]], ['prod' => [1, 2, 3]]]], ['cat.*.prod.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['cat' => [['prod' => [1, 2, 3]], ['prod' => [1, 2, 3]]]], ['cat.*.prod.*' => 'distinct:level=1']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['cat' => ['sub' => [['prod' => [['id' => 1]]], ['prod' => [['id' => 2]]]]]], ['cat.sub.*.prod.*.id' => 'distinct']);
@@ -2140,6 +2152,19 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['cat' => ['sub' => [['prod' => [['id' => 2]]], ['prod' => [['id' => 2]]]]]], ['cat.sub.*.prod.*.id' => 'distinct']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['cat' => ['sub' => [['prod' => [['id' => 2]]], ['prod' => [['id' => 2]]]]]], ['cat.sub.*.prod.*.id' => 'distinct:level=1']);
+        $this->assertTrue($v->passes());
+
+        $prod = [['id' => 1], ['id' => 2]];
+        $v = new Validator($trans, ['cat' => [['sub' => [['prod' => $prod], ['prod' => $prod]]], ['sub' => [['prod' => $prod], ['prod' => $prod]]]]], ['cat.*.sub.*.prod.*.id' => 'distinct']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['cat' => [['sub' => [['prod' => $prod], ['prod' => $prod]]], ['sub' => [['prod' => $prod], ['prod' => $prod]]]]], ['cat.*.sub.*.prod.*.id' => 'distinct:level=1']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['cat' => [['sub' => [['prod' => $prod], ['prod' => $prod]]], ['sub' => [['prod' => $prod], ['prod' => $prod]]]]], ['cat.*.sub.*.prod.*.id' => 'distinct:level=2']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => ['foo', 'foo'], 'bar' => ['bar', 'baz']], ['foo.*' => 'distinct', 'bar.*' => 'distinct']);
         $this->assertFalse($v->passes());
@@ -2174,6 +2199,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, [['foo' => [['id' => 1]]], ['foo' => [['id' => 1]]]], ['*' => 'array', '*.foo' => 'array', '*.foo.*.id' => 'distinct']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, [['foo' => [['id' => 1]]], ['foo' => [['id' => 1]]]], ['*' => 'array', '*.foo' => 'array', '*.foo.*.id' => 'distinct:level=1']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo', 'foo'], ['*' => 'distinct'], ['*.distinct' => 'There is a duplication!']);
         $this->assertFalse($v->passes());

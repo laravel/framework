@@ -550,9 +550,11 @@ trait ValidatesAttributes
      */
     public function validateDistinct($attribute, $value, $parameters)
     {
-        $data = Arr::except($this->getDistinctValues($attribute), $attribute);
+        $parameters = $this->parseNamedParameters($parameters) ?: [];
+        $level = Arr::get($parameters, 'level', null);
+        $data = Arr::except($this->getDistinctValuesInLevel($attribute, $level), $attribute);
 
-        if (in_array('ignore_case', $parameters)) {
+        if (array_key_exists('ignore_case', $parameters)) {
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
@@ -562,12 +564,17 @@ trait ValidatesAttributes
     /**
      * Get the values to distinct between.
      *
-     * @param  string  $attribute
+     * @param  string   $attribute
+     * @param  null|int  $level
      * @return array
      */
-    protected function getDistinctValues($attribute)
+    protected function getDistinctValuesInLevel($attribute, $level)
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
+        if ($level !== null) {
+            $level = (int) $level;
+            $attributeName = $this->getAttributeNameOnLevel($attribute, $attributeName, $level);
+        }
 
         if (! property_exists($this, 'distinctValues')) {
             return $this->extractDistinctValues($attributeName);
@@ -578,6 +585,47 @@ trait ValidatesAttributes
         }
 
         return $this->distinctValues[$attributeName];
+    }
+
+    /**
+     * Get attribute name for specific name.
+     *
+     * For example: ['foo.bar.ids.0', 'foo.*.ids.*', 1] => 'foo.bar.ids.*'
+     *
+     * @param  string  $attribute
+     * @param  string  $attributeName
+     * @param  int  $level
+     * @return string
+     */
+    protected function getAttributeNameOnLevel($attribute, $attributeName, $level)
+    {
+        if ($level <= 0) {
+            return $attributeName;
+        }
+
+        $wildCardCount = substr_count($attributeName, '*');
+        if ($wildCardCount === 0) {
+            return $attributeName;
+        }
+
+        $numberOfReplacement = min($level, $wildCardCount);
+        $matches = [];
+        $pattern = str_replace('\*', '([^\.]*)', preg_quote($attributeName));
+        preg_match('/'.$pattern.'/', $attribute, $matches);
+
+        foreach ($matches as $key => $match) {
+            if ($key === 0) {
+                continue;
+            }
+
+            if ($key > $numberOfReplacement) {
+                break;
+            }
+
+            $attributeName = preg_replace('/\*/', $match, $attributeName, 1);
+        }
+
+        return $attributeName;
     }
 
     /**
