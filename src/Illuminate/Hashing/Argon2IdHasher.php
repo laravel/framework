@@ -11,12 +11,11 @@ class Argon2IdHasher extends ArgonHasher
      *
      * @param  string  $value
      * @param  string  $hashedValue
-     * @param  array  $options
      * @return bool
      *
      * @throws \RuntimeException
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check($value, $hashedValue)
     {
         if ($this->verifyAlgorithm && $this->info($hashedValue)['algoName'] !== 'argon2id') {
             throw new RuntimeException('This password does not use the Argon2id algorithm.');

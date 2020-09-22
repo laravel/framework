@@ -88,18 +88,17 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      *
      * @param  string  $value
      * @param  string  $hashedValue
-     * @param  array  $options
      * @return bool
      *
      * @throws \RuntimeException
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check($value, $hashedValue)
     {
         if ($this->verifyAlgorithm && $this->info($hashedValue)['algoName'] !== 'argon2i') {
             throw new RuntimeException('This password does not use the Argon2i algorithm.');
         }
 
-        return parent::check($value, $hashedValue, $options);
+        return parent::check($value, $hashedValue);
     }
 
     /**
