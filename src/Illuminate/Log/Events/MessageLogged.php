@@ -29,7 +29,7 @@ class MessageLogged
      * Create a new event instance.
      *
      * @param  string  $level
-     * @param  string  $message
+     * @param  mixed  $message
      * @param  array  $context
      * @return void
      */
