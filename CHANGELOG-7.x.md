@@ -1,6 +1,12 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.28.2...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.28.3...7.x)
+
+
+## [v7.28.3 (2020-09-17)](https://github.com/laravel/framework/compare/v7.28.2...v7.28.3)
+
+### Fixed
+- Fixed problems with dots in validator ([#34355](https://github.com/laravel/framework/pull/34355))
 
 
 ## [v7.28.2 (2020-09-15)](https://github.com/laravel/framework/compare/v7.28.1...v7.28.2)
