@@ -287,9 +287,9 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
      */
     protected function resetDefault()
     {
-        $this->schema()->drop('users_default');
-        $this->schema()->drop('contracts_default');
-        $this->schema()->drop('positions_default');
+        $this->schema()->drop('default_users');
+        $this->schema()->drop('default_contracts');
+        $this->schema()->drop('default_positions');
     }
 
     /**
@@ -297,22 +297,22 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
      */
     protected function migrateDefault()
     {
-        $this->schema()->create('users_default', function ($table) {
+        $this->schema()->create('default_users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
-            $table->unsignedInteger('has_one_through_default_test_position_id')->unique()->nullable();
+            $table->unsignedInteger('default_position_id')->unique()->nullable();
             $table->timestamps();
         });
 
-        $this->schema()->create('contracts_default', function ($table) {
+        $this->schema()->create('default_contracts', function ($table) {
             $table->increments('id');
-            $table->integer('has_one_through_default_test_user_id')->unique();
+            $table->integer('default_user_id')->unique();
             $table->string('title');
             $table->text('body');
             $table->timestamps();
         });
 
-        $this->schema()->create('positions_default', function ($table) {
+        $this->schema()->create('default_positions', function ($table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
@@ -350,7 +350,7 @@ class HasOneThroughTestUser extends Eloquent
 
     public function contract()
     {
-        return $this->hasOne(HasOneThroughTestContract::class, 'user_id');
+        return $this->hasOne(HasOneThroughTestContract::class);
     }
 }
 
@@ -364,7 +364,7 @@ class HasOneThroughTestContract extends Eloquent
 
     public function owner()
     {
-        return $this->belongsTo(HasOneThroughTestUser::class, 'user_id');
+        return $this->belongsTo(HasOneThroughTestUser::class);
     }
 }
 
@@ -375,12 +375,12 @@ class HasOneThroughTestPosition extends Eloquent
 
     public function contract()
     {
-        return $this->hasOneThrough(HasOneThroughTestContract::class, HasOneThroughTestUser::class, 'position_id', 'user_id');
+        return $this->hasOneThrough(HasOneThroughTestContract::class, HasOneThroughTestUser::class);
     }
 
     public function user()
     {
-        return $this->hasOne(HasOneThroughTestUser::class, 'position_id');
+        return $this->hasOne(HasOneThroughTestUser::class);
     }
 }
 
@@ -389,7 +389,7 @@ class HasOneThroughTestPosition extends Eloquent
  */
 class HasOneThroughDefaultTestUser extends Eloquent
 {
-    protected $table = 'users_default';
+    protected $table = 'default_users';
     protected $guarded = [];
 
     public function contract()
@@ -403,7 +403,7 @@ class HasOneThroughDefaultTestUser extends Eloquent
  */
 class HasOneThroughDefaultTestContract extends Eloquent
 {
-    protected $table = 'contracts_default';
+    protected $table = 'default_contracts';
     protected $guarded = [];
 
     public function owner()
@@ -414,7 +414,7 @@ class HasOneThroughDefaultTestContract extends Eloquent
 
 class HasOneThroughDefaultTestPosition extends Eloquent
 {
-    protected $table = 'positions_default';
+    protected $table = 'default_positions';
     protected $guarded = [];
 
     public function contract()
@@ -440,7 +440,7 @@ class HasOneThroughIntermediateTestPosition extends Eloquent
 
     public function user()
     {
-        return $this->hasOne(HasOneThroughTestUser::class, 'position_id');
+        return $this->hasOne(HasOneThroughTestUser::class);
     }
 }
 
@@ -453,7 +453,7 @@ class HasOneThroughSoftDeletesTestUser extends Eloquent
 
     public function contract()
     {
-        return $this->hasOne(HasOneThroughSoftDeletesTestContract::class, 'user_id');
+        return $this->hasOne(HasOneThroughSoftDeletesTestContract::class);
     }
 }
 
@@ -467,7 +467,7 @@ class HasOneThroughSoftDeletesTestContract extends Eloquent
 
     public function owner()
     {
-        return $this->belongsTo(HasOneThroughSoftDeletesTestUser::class, 'user_id');
+        return $this->belongsTo(HasOneThroughSoftDeletesTestUser::class);
     }
 }
 
@@ -478,11 +478,11 @@ class HasOneThroughSoftDeletesTestPosition extends Eloquent
 
     public function contract()
     {
-        return $this->hasOneThrough(HasOneThroughSoftDeletesTestContract::class, HasOneThroughTestUser::class, 'position_id', 'user_id');
+        return $this->hasOneThrough(HasOneThroughSoftDeletesTestContract::class, HasOneThroughTestUser::class);
     }
 
     public function user()
     {
-        return $this->hasOne(HasOneThroughSoftDeletesTestUser::class, 'position_id');
+        return $this->hasOne(HasOneThroughSoftDeletesTestUser::class);
     }
 }

@@ -393,9 +393,9 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
      */
     protected function resetDefault()
     {
-        $this->schema()->drop('users_default');
-        $this->schema()->drop('posts_default');
-        $this->schema()->drop('countries_default');
+        $this->schema()->drop('default_users');
+        $this->schema()->drop('default_posts');
+        $this->schema()->drop('default_countries');
     }
 
     /**
@@ -403,22 +403,22 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
      */
     protected function migrateDefault()
     {
-        $this->schema()->create('users_default', function ($table) {
+        $this->schema()->create('default_users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
-            $table->unsignedInteger('has_many_through_default_test_country_id');
+            $table->unsignedInteger('default_country_id');
             $table->timestamps();
         });
 
-        $this->schema()->create('posts_default', function ($table) {
+        $this->schema()->create('default_posts', function ($table) {
             $table->increments('id');
-            $table->integer('has_many_through_default_test_user_id');
+            $table->integer('default_user_id');
             $table->string('title');
             $table->text('body');
             $table->timestamps();
         });
 
-        $this->schema()->create('countries_default', function ($table) {
+        $this->schema()->create('default_countries', function ($table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
@@ -456,7 +456,7 @@ class HasManyThroughTestUser extends Eloquent
 
     public function posts()
     {
-        return $this->hasMany(HasManyThroughTestPost::class, 'user_id');
+        return $this->hasMany(HasManyThroughTestPost::class);
     }
 }
 
@@ -470,7 +470,7 @@ class HasManyThroughTestPost extends Eloquent
 
     public function owner()
     {
-        return $this->belongsTo(HasManyThroughTestUser::class, 'user_id');
+        return $this->belongsTo(HasManyThroughTestUser::class);
     }
 }
 
@@ -481,12 +481,12 @@ class HasManyThroughTestCountry extends Eloquent
 
     public function posts()
     {
-        return $this->hasManyThrough(HasManyThroughTestPost::class, HasManyThroughTestUser::class, 'country_id', 'user_id');
+        return $this->hasManyThrough(HasManyThroughTestPost::class, HasManyThroughTestUser::class);
     }
 
     public function users()
     {
-        return $this->hasMany(HasManyThroughTestUser::class, 'country_id');
+        return $this->hasMany(HasManyThroughTestUser::class);
     }
 }
 
@@ -495,7 +495,7 @@ class HasManyThroughTestCountry extends Eloquent
  */
 class HasManyThroughDefaultTestUser extends Eloquent
 {
-    protected $table = 'users_default';
+    protected $table = 'default_users';
     protected $guarded = [];
 
     public function posts()
@@ -509,7 +509,7 @@ class HasManyThroughDefaultTestUser extends Eloquent
  */
 class HasManyThroughDefaultTestPost extends Eloquent
 {
-    protected $table = 'posts_default';
+    protected $table = 'default_posts';
     protected $guarded = [];
 
     public function owner()
@@ -520,7 +520,7 @@ class HasManyThroughDefaultTestPost extends Eloquent
 
 class HasManyThroughDefaultTestCountry extends Eloquent
 {
-    protected $table = 'countries_default';
+    protected $table = 'default_countries';
     protected $guarded = [];
 
     public function posts()
@@ -546,7 +546,7 @@ class HasManyThroughIntermediateTestCountry extends Eloquent
 
     public function users()
     {
-        return $this->hasMany(HasManyThroughTestUser::class, 'country_id');
+        return $this->hasMany(HasManyThroughTestUser::class);
     }
 }
 
@@ -559,7 +559,7 @@ class HasManyThroughSoftDeletesTestUser extends Eloquent
 
     public function posts()
     {
-        return $this->hasMany(HasManyThroughSoftDeletesTestPost::class, 'user_id');
+        return $this->hasMany(HasManyThroughSoftDeletesTestPost::class);
     }
 }
 
@@ -573,7 +573,7 @@ class HasManyThroughSoftDeletesTestPost extends Eloquent
 
     public function owner()
     {
-        return $this->belongsTo(HasManyThroughSoftDeletesTestUser::class, 'user_id');
+        return $this->belongsTo(HasManyThroughSoftDeletesTestUser::class);
     }
 }
 
@@ -584,11 +584,11 @@ class HasManyThroughSoftDeletesTestCountry extends Eloquent
 
     public function posts()
     {
-        return $this->hasManyThrough(HasManyThroughSoftDeletesTestPost::class, HasManyThroughTestUser::class, 'country_id', 'user_id');
+        return $this->hasManyThrough(HasManyThroughSoftDeletesTestPost::class, HasManyThroughTestUser::class);
     }
 
     public function users()
     {
-        return $this->hasMany(HasManyThroughSoftDeletesTestUser::class, 'country_id');
+        return $this->hasMany(HasManyThroughSoftDeletesTestUser::class);
     }
 }

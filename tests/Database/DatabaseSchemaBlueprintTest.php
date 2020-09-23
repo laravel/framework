@@ -288,7 +288,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
+            'alter table `posts` add `model_id` char(36) not null',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 }
