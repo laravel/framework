@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Carbon\CarbonInterface;
-use Carbon\Exceptions\InvalidFormatException;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
