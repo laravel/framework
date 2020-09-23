@@ -35,6 +35,19 @@ class BladeTest extends TestCase
 </div>', trim($view));
     }
 
+    public function test_rendering_the_same_dynamic_component_with_different_attributes()
+    {
+        $view = View::make('varied-dynamic-calls')->render();
+
+        $this->assertEquals('<span class="text-medium">
+    Hello Taylor
+</span>
+  
+ <span >
+    Hello Samuel
+</span>', trim($view));
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);
