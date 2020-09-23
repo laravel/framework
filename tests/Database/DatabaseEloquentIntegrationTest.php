@@ -1413,6 +1413,34 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse(Date::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
     }
 
+    public function testSpecialFormats()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('!Y-d-m \\Y');
+        $model->setRawAttributes([
+            'updated_at' => '2017-05-11 Y',
+        ]);
+
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2017-11-05 00:00:00.000000', $date->format('Y-m-d H:i:s.u'), 'the date should respect the whole format');
+
+        $model->setDateFormat('Y d m|');
+        $model->setRawAttributes([
+            'updated_at' => '2020 11 09',
+        ]);
+
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2020-09-11 00:00:00.000000', $date->format('Y-m-d H:i:s.u'), 'the date should respect the whole format');
+
+        $model->setDateFormat('Y d m|*');
+        $model->setRawAttributes([
+            'updated_at' => '2020 11 09 foo',
+        ]);
+
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2020-09-11 00:00:00.000000', $date->format('Y-m-d H:i:s.u'), 'the date should respect the whole format');
+    }
+
     public function testUpdatingChildModelTouchesParent()
     {
         $before = Carbon::now();
