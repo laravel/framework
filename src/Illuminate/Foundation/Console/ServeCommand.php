@@ -92,11 +92,7 @@ class ServeCommand extends Command
      */
     protected function startProcess()
     {
-        $process = new Process($this->serverCommand(), null, collect($_ENV)->mapWithKeys(function ($value, $key) {
-            return $key === 'APP_ENV'
-                    ? [$key => $value]
-                    : [$key => false];
-        })->all());
+        $process = new Process($this->serverCommand());
 
         $process->start(function ($type, $buffer) {
             $this->output->write($buffer);
