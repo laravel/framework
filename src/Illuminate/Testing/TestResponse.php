@@ -1075,6 +1075,22 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Dump the content from the response when the given truth test passes.
+     *
+     * @param \Closure $closure
+     *
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function dumpIf(Closure $closure)
+    {
+        if ($closure($this)) {
+            $this->dump();
+        }
+
+        return $this;
+    }
+
+    /**
      * Dump the headers from the response.
      *
      * @return $this
