@@ -30,13 +30,6 @@ class DynamicComponent extends Component
     protected static $componentClasses = [];
 
     /**
-     * The cached binding keys for component classes.
-     *
-     * @var array
-     */
-    protected static $bindings = [];
-
-    /**
      * Create a new component instance.
      *
      * @return void
@@ -153,13 +146,9 @@ EOF;
      */
     protected function bindings(string $class)
     {
-        if (! isset(static::$bindings[$class])) {
-            [$data, $attributes] = $this->compiler()->partitionDataAndAttributes($class, $this->attributes->getAttributes());
+        [$data, $attributes] = $this->compiler()->partitionDataAndAttributes($class, $this->attributes->getAttributes());
 
-            static::$bindings[$class] = array_keys($data->all());
-        }
-
-        return static::$bindings[$class];
+        return array_keys($data->all());
     }
 
     /**
