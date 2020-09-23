@@ -1082,7 +1082,7 @@ class TestResponse implements ArrayAccess
      */
     public function dumpIf(callable $callback)
     {
-        if ($closure($this)) {
+        if ($callback($this)) {
             $this->dump();
         }
 
