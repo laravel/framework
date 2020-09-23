@@ -1070,7 +1070,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists
-     * @param  string|null  $using
+     * @param  \Illuminate\Database\Eloquent\Relations\Pivot|null  $using
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
     public function newPivot(self $parent, array $attributes, $table, $exists, $using = null)
