@@ -17,6 +17,8 @@ class ConfigurationUrlParser
         'postgres' => 'pgsql',
         'postgresql' => 'pgsql',
         'sqlite3' => 'sqlite',
+        'redis' => 'tcp',
+        'rediss' => 'tls',
     ];
 
     /**
@@ -39,12 +41,16 @@ class ConfigurationUrlParser
             return $config;
         }
 
-        $parsedUrl = $this->parseUrl($url);
+        $rawComponents = $this->parseUrl($url);
+
+        $decodedComponents = $this->parseStringsToNativeTypes(
+            array_map('rawurldecode', $rawComponents)
+        );
 
         return array_merge(
             $config,
-            $this->getPrimaryOptions($parsedUrl),
-            $this->getQueryOptions($parsedUrl)
+            $this->getPrimaryOptions($decodedComponents),
+            $this->getQueryOptions($rawComponents)
         );
     }
 
@@ -95,7 +101,7 @@ class ConfigurationUrlParser
     {
         $path = $url['path'] ?? null;
 
-        return $path ? substr($path, 1) : null;
+        return $path && $path !== '/' ? substr($path, 1) : null;
     }
 
     /**
@@ -137,9 +143,7 @@ class ConfigurationUrlParser
             throw new InvalidArgumentException('The database configuration URL is malformed.');
         }
 
-        return $this->parseStringsToNativeTypes(
-            array_map('rawurldecode', $parsedUrl)
-        );
+        return $parsedUrl;
     }
 
     /**

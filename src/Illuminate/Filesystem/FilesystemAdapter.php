@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use League\Flysystem\Adapter\Ftp;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
@@ -131,7 +132,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->read($path);
         } catch (FileNotFoundException $e) {
-            throw new ContractFileNotFoundException($path, $e->getCode(), $e);
+            throw new ContractFileNotFoundException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -228,12 +229,14 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Store the uploaded file on the disk.
      *
      * @param  string  $path
-     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile  $file
-     * @param  array  $options
+     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string  $file
+     * @param  mixed  $options
      * @return string|false
      */
     public function putFile($path, $file, $options = [])
     {
+        $file = is_string($file) ? new File($file) : $file;
+
         return $this->putFileAs($path, $file, $file->hashName(), $options);
     }
 
@@ -241,14 +244,14 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Store the uploaded file on the disk with a given name.
      *
      * @param  string  $path
-     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile  $file
+     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string  $file
      * @param  string  $name
-     * @param  array  $options
+     * @param  mixed  $options
      * @return string|false
      */
     public function putFileAs($path, $file, $name, $options = [])
     {
-        $stream = fopen($file->getRealPath(), 'r');
+        $stream = fopen(is_string($file) ? $file : $file->getRealPath(), 'r');
 
         // Next, we will format the path of the file and store the file using a stream since
         // they provide better performance than alternatives. Once we write the file this
@@ -429,6 +432,8 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->driver->getUrl($path);
         } elseif ($adapter instanceof AwsS3Adapter) {
             return $this->getAwsUrl($adapter, $path);
+        } elseif ($adapter instanceof Ftp) {
+            return $this->getFtpUrl($path);
         } elseif ($adapter instanceof LocalAdapter) {
             return $this->getLocalUrl($path);
         } else {
@@ -479,6 +484,21 @@ class FilesystemAdapter implements CloudFilesystemContract
         return $adapter->getClient()->getObjectUrl(
             $adapter->getBucket(), $adapter->getPathPrefix().$path
         );
+    }
+
+    /**
+     * Get the URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    protected function getFtpUrl($path)
+    {
+        $config = $this->driver->getConfig();
+
+        return $config->has('url')
+                ? $this->concatPathToUrl($config->get('url'), $path)
+                : $path;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Mail;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Foundation\Testing\Assert;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
@@ -91,7 +92,7 @@ class SendingMailWithLocaleTest extends TestCase
 
         Mail::to('test@mail.com')->locale('es')->send(new TimestampTestMail);
 
-        $this->assertRegExp('/nombre (en|dentro de) (un|1) día/',
+        Assert::assertMatchesRegularExpression('/nombre (en|dentro de) (un|1) día/',
             app('swift.transport')->messages()[0]->getBody()
         );
 

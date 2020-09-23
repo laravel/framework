@@ -26,15 +26,16 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.0-dev"
+            "dev-master": "6.x-dev"
         }
     },
     "suggest": {
-        "league/flysystem": "Required to use the Flysystem local and FTP drivers (^1.0).",
+        "ext-ftp": "Required to use the Flysystem FTP driver.",
+        "league/flysystem": "Required to use the Flysystem local and FTP drivers (^1.0.34).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^1.0).",
         "league/flysystem-cached-adapter": "Required to use the Flysystem cache (^1.0).",
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
-        "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0)"
+        "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0)."
     },
     "config": {
         "sort-packages": true

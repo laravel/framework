@@ -48,12 +48,14 @@ class LoadEnvironmentVariables
             }
         }
 
-        if (! env('APP_ENV')) {
+        $environment = Env::get('APP_ENV');
+
+        if (! $environment) {
             return;
         }
 
         $this->setEnvironmentFilePath(
-            $app, $app->environmentFile().'.'.env('APP_ENV')
+            $app, $app->environmentFile().'.'.$environment
         );
     }
 
@@ -103,6 +105,6 @@ class LoadEnvironmentVariables
         $output->writeln('The environment file is invalid!');
         $output->writeln($e->getMessage());
 
-        die(1);
+        exit(1);
     }
 }

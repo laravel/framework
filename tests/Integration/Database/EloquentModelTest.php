@@ -29,6 +29,33 @@ class EloquentModelTest extends DatabaseTestCase
         });
     }
 
+    public function testCantUpdateGuardedAttributesUsingDifferentCasing()
+    {
+        $model = new TestModel2;
+
+        $model->fill(['ID' => 123]);
+
+        $this->assertNull($model->ID);
+    }
+
+    public function testCantUpdateGuardedAttributeUsingJson()
+    {
+        $model = new TestModel2;
+
+        $model->fill(['id->foo' => 123]);
+
+        $this->assertNull($model->id);
+    }
+
+    public function testCantMassFillAttributesWithTableNamesWhenUsingGuarded()
+    {
+        $model = new TestModel2;
+
+        $model->fill(['foo.bar' => 123]);
+
+        $this->assertCount(0, $model->getAttributes());
+    }
+
     public function testUserCanUpdateNullableDate()
     {
         $user = TestModel1::create([

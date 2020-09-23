@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Notifications;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Notifications\RoutesNotifications;
+use Illuminate\Support\Facades\Notification;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -49,6 +51,15 @@ class NotificationRoutesNotificationsTest extends TestCase
         $instance = new RoutesNotificationsTestInstance;
         $this->assertSame('bar', $instance->routeNotificationFor('foo'));
         $this->assertSame('taylor@laravel.com', $instance->routeNotificationFor('mail'));
+    }
+
+    public function testOnDemandNotificationsCannotUseDatabaseChannel()
+    {
+        $this->expectExceptionObject(
+            new InvalidArgumentException('The database channel does not support on-demand notifications.')
+        );
+
+        Notification::route('database', 'foo');
     }
 }
 

@@ -172,6 +172,17 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame('foobar', $app->make('bar'));
     }
 
+    public function testDeferredServiceIsLoadedWhenAccessingImplementationThroughInterface()
+    {
+        $app = new Application;
+        $app->setDeferredServices([
+            SampleInterface::class => InterfaceToImplementationDeferredServiceProvider::class,
+            SampleImplementation::class => SampleImplementationDeferredServiceProvider::class,
+        ]);
+        $instance = $app->make(SampleInterface::class);
+        $this->assertEquals($instance->getPrimitive(), 'foo');
+    }
+
     public function testEnvironment()
     {
         $app = new Application;
@@ -348,11 +359,12 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application('/base/path');
 
-        $this->assertSame('/base/path/bootstrap/cache/services.php', $app->getCachedServicesPath());
-        $this->assertSame('/base/path/bootstrap/cache/packages.php', $app->getCachedPackagesPath());
-        $this->assertSame('/base/path/bootstrap/cache/config.php', $app->getCachedConfigPath());
-        $this->assertSame('/base/path/bootstrap/cache/routes.php', $app->getCachedRoutesPath());
-        $this->assertSame('/base/path/bootstrap/cache/events.php', $app->getCachedEventsPath());
+        $ds = DIRECTORY_SEPARATOR;
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/services.php', $app->getCachedServicesPath());
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/config.php', $app->getCachedConfigPath());
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/events.php', $app->getCachedEventsPath());
     }
 
     public function testEnvPathsAreUsedForCachePathsWhenSpecified()
@@ -364,6 +376,7 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_ROUTES_CACHE'] = '/absolute/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = '/absolute/path/events.php';
 
+        $ds = DIRECTORY_SEPARATOR;
         $this->assertSame('/absolute/path/services.php', $app->getCachedServicesPath());
         $this->assertSame('/absolute/path/packages.php', $app->getCachedPackagesPath());
         $this->assertSame('/absolute/path/config.php', $app->getCachedConfigPath());
@@ -388,11 +401,12 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
 
-        $this->assertSame('/base/path/relative/path/services.php', $app->getCachedServicesPath());
-        $this->assertSame('/base/path/relative/path/packages.php', $app->getCachedPackagesPath());
-        $this->assertSame('/base/path/relative/path/config.php', $app->getCachedConfigPath());
-        $this->assertSame('/base/path/relative/path/routes.php', $app->getCachedRoutesPath());
-        $this->assertSame('/base/path/relative/path/events.php', $app->getCachedEventsPath());
+        $ds = DIRECTORY_SEPARATOR;
+        $this->assertSame('/base/path'.$ds.'relative/path/services.php', $app->getCachedServicesPath());
+        $this->assertSame('/base/path'.$ds.'relative/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/base/path'.$ds.'relative/path/config.php', $app->getCachedConfigPath());
+        $this->assertSame('/base/path'.$ds.'relative/path/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('/base/path'.$ds.'relative/path/events.php', $app->getCachedEventsPath());
 
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
@@ -412,11 +426,12 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
 
-        $this->assertSame('/relative/path/services.php', $app->getCachedServicesPath());
-        $this->assertSame('/relative/path/packages.php', $app->getCachedPackagesPath());
-        $this->assertSame('/relative/path/config.php', $app->getCachedConfigPath());
-        $this->assertSame('/relative/path/routes.php', $app->getCachedRoutesPath());
-        $this->assertSame('/relative/path/events.php', $app->getCachedEventsPath());
+        $ds = DIRECTORY_SEPARATOR;
+        $this->assertSame($ds.'relative/path/services.php', $app->getCachedServicesPath());
+        $this->assertSame($ds.'relative/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame($ds.'relative/path/config.php', $app->getCachedConfigPath());
+        $this->assertSame($ds.'relative/path/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame($ds.'relative/path/events.php', $app->getCachedEventsPath());
 
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
@@ -470,6 +485,44 @@ class ApplicationDeferredServiceProviderStub extends ServiceProvider implements 
     {
         static::$initialized = true;
         $this->app['foo'] = 'foo';
+    }
+}
+
+interface SampleInterface
+{
+    public function getPrimitive();
+}
+
+class SampleImplementation implements SampleInterface
+{
+    private $primitive;
+
+    public function __construct($primitive)
+    {
+        $this->primitive = $primitive;
+    }
+
+    public function getPrimitive()
+    {
+        return $this->primitive;
+    }
+}
+
+class InterfaceToImplementationDeferredServiceProvider extends ServiceProvider implements DeferrableProvider
+{
+    public function register()
+    {
+        $this->app->bind(SampleInterface::class, SampleImplementation::class);
+    }
+}
+
+class SampleImplementationDeferredServiceProvider extends ServiceProvider implements DeferrableProvider
+{
+    public function register()
+    {
+        $this->app->when(SampleImplementation::class)->needs('$primitive')->give(function () {
+            return 'foo';
+        });
     }
 }
 

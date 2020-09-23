@@ -140,8 +140,6 @@ class Dispatcher implements QueueingDispatcher
      *
      * @param  mixed  $command
      * @return mixed
-     *
-     * @throws \RuntimeException
      */
     public function dispatchToQueue($command)
     {
@@ -182,6 +180,20 @@ class Dispatcher implements QueueingDispatcher
         }
 
         return $queue->push($command);
+    }
+
+    /**
+     * Dispatch a command to its appropriate handler after the current process.
+     *
+     * @param  mixed  $command
+     * @param  mixed  $handler
+     * @return void
+     */
+    public function dispatchAfterResponse($command, $handler = null)
+    {
+        $this->container->terminating(function () use ($command, $handler) {
+            $this->dispatchNow($command, $handler);
+        });
     }
 
     /**

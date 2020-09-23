@@ -629,6 +629,22 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
+    public function testFirstWhere()
+    {
+        $tag = Tag::create(['name' => 'foo']);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
+        ]);
+
+        $relationTag = $post->tags()->firstWhere('name', 'foo');
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+
+        $relationTag = $post->tags()->firstWhere('name', '=', 'foo');
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
     public function testWherePivotOnBoolean()
     {
         $tag = Tag::create(['name' => Str::random()]);

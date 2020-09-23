@@ -37,7 +37,7 @@ class PendingMailFake extends PendingMail
      */
     public function sendNow(Mailable $mailable)
     {
-        $this->mailer->send($this->fill($mailable));
+        return $this->mailer->send($this->fill($mailable));
     }
 
     /**

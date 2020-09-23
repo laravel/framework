@@ -31,14 +31,14 @@ class RenderingMailWithLocaleTest extends TestCase
     {
         $mail = new RenderedTestMail;
 
-        $this->assertStringContainsString('name'.PHP_EOL, $mail->render());
+        $this->assertStringContainsString('name', $mail->render());
     }
 
     public function testMailableRendersInSelectedLocale()
     {
         $mail = (new RenderedTestMail)->locale('es');
 
-        $this->assertStringContainsString('nombre'.PHP_EOL, $mail->render());
+        $this->assertStringContainsString('nombre', $mail->render());
     }
 
     public function testMailableRendersInAppSelectedLocale()
@@ -47,7 +47,7 @@ class RenderingMailWithLocaleTest extends TestCase
 
         $mail = new RenderedTestMail;
 
-        $this->assertStringContainsString('nombre'.PHP_EOL, $mail->render());
+        $this->assertStringContainsString('nombre', $mail->render());
     }
 }
 

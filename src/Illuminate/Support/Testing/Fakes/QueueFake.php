@@ -95,6 +95,23 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
+     * Assert if a job was pushed with an empty chain based on a truth-test callback.
+     *
+     * @param  string  $job
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertPushedWithoutChain($job, $callback = null)
+    {
+        PHPUnit::assertTrue(
+            $this->pushed($job, $callback)->isNotEmpty(),
+            "The expected [{$job}] job was not pushed."
+        );
+
+        $this->assertPushedWithChainOfClasses($job, [], $callback);
+    }
+
+    /**
      * Assert if a job was pushed with chained jobs based on a truth-test callback.
      *
      * @param  string  $job

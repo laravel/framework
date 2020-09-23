@@ -11,6 +11,8 @@ interface ExceptionHandler
      *
      * @param  \Exception  $e
      * @return void
+     *
+     * @throws \Exception
      */
     public function report(Exception $e);
 
@@ -28,6 +30,8 @@ interface ExceptionHandler
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Exception
      */
     public function render($request, Exception $e);
 

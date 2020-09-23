@@ -26,16 +26,25 @@ class FileStore implements Store
     protected $directory;
 
     /**
+     * Octal representation of the cache file permissions.
+     *
+     * @var int|null
+     */
+    protected $filePermission;
+
+    /**
      * Create a new file cache store instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $directory
+     * @param  int|null  $filePermission
      * @return void
      */
-    public function __construct(Filesystem $files, $directory)
+    public function __construct(Filesystem $files, $directory, $filePermission = null)
     {
         $this->files = $files;
         $this->directory = $directory;
+        $this->filePermission = $filePermission;
     }
 
     /**
@@ -65,7 +74,13 @@ class FileStore implements Store
             $path, $this->expiration($seconds).serialize($value), true
         );
 
-        return $result !== false && $result > 0;
+        if ($result !== false && $result > 0) {
+            $this->ensureFileHasCorrectPermissions($path);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -79,6 +94,22 @@ class FileStore implements Store
         if (! $this->files->exists(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
+    }
+
+    /**
+     * Ensure the cache file has the correct permissions.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function ensureFileHasCorrectPermissions($path)
+    {
+        if (is_null($this->filePermission) ||
+            intval($this->files->chmod($path), 8) == $this->filePermission) {
+            return;
+        }
+
+        $this->files->chmod($path, $this->filePermission);
     }
 
     /**
@@ -148,7 +179,9 @@ class FileStore implements Store
         }
 
         foreach ($this->files->directories($this->directory) as $directory) {
-            if (! $this->files->deleteDirectory($directory)) {
+            $deleted = $this->files->deleteDirectory($directory);
+
+            if (! $deleted || $this->files->exists($directory)) {
                 return false;
             }
         }

@@ -176,6 +176,25 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertCount(0, FactoryBuildableUser::find($instances->pluck('id')->toArray()));
     }
 
+    public function testCreateManyCollectionOfModels()
+    {
+        $users = factory(FactoryBuildableUser::class)->createMany([
+            [
+                'name' => 'Taylor',
+            ],
+            [
+                'name' => 'John',
+            ],
+            [
+                'name' => 'Doe',
+            ],
+        ]);
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(3, $users);
+        $this->assertCount(3, FactoryBuildableUser::find($users->pluck('id')->toArray()));
+        $this->assertEquals(['Taylor', 'John', 'Doe'], $users->pluck('name')->toArray());
+    }
+
     public function testCreatingModelsWithCallableState()
     {
         $server = factory(FactoryBuildableServer::class)->create();

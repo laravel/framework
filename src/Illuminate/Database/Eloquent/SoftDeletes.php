@@ -92,6 +92,8 @@ trait SoftDeletes
         }
 
         $query->update($columns);
+
+        $this->syncOriginalAttributes(array_keys($columns));
     }
 
     /**

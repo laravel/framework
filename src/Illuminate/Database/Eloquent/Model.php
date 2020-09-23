@@ -10,6 +10,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
@@ -374,7 +375,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     protected function removeTableFromKey($key)
     {
-        return Str::contains($key, '.') ? last(explode('.', $key)) : $key;
+        return $key;
     }
 
     /**
@@ -1150,7 +1151,10 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             static::newQueryWithoutScopes()->findOrFail($this->getKey())->attributes
         );
 
-        $this->load(collect($this->relations)->except('pivot')->keys()->toArray());
+        $this->load(collect($this->relations)->reject(function ($relation) {
+            return $relation instanceof Pivot
+                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
+        })->keys()->all());
 
         $this->syncOriginal();
 

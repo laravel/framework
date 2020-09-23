@@ -251,7 +251,7 @@ class Filesystem
     }
 
     /**
-     * Create a hard link to the target file or directory.
+     * Create a symlink to the target file or directory. On Windows, a hard link is created if the target is a file.
      *
      * @param  string  $target
      * @param  string  $link
@@ -457,6 +457,21 @@ class Filesystem
         }
 
         return $directories;
+    }
+
+    /**
+     * Ensure a directory exists.
+     *
+     * @param  string  $path
+     * @param  int  $mode
+     * @param  bool  $recursive
+     * @return void
+     */
+    public function ensureDirectoryExists($path, $mode = 0755, $recursive = true)
+    {
+        if (! $this->isDirectory($path)) {
+            $this->makeDirectory($path, $mode, $recursive);
+        }
     }
 
     /**

@@ -10,6 +10,7 @@ use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -91,6 +92,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty(['foo', 'bar']));
     }
 
+    public function testFloatAndNullComparisonWhenDirty()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->floatAttribute = null;
+        $model->syncOriginal();
+        $this->assertFalse($model->isDirty('floatAttribute'));
+        $model->forceFill(['floatAttribute' => 0.0]);
+        $this->assertTrue($model->isDirty('floatAttribute'));
+    }
+
     public function testDirtyOnCastOrDateAttributes()
     {
         $model = new EloquentModelCastingStub;
@@ -146,6 +157,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isClean('bar'));
         $this->assertFalse($model->isClean('foo', 'bar'));
         $this->assertFalse($model->isClean(['foo', 'bar']));
+    }
+
+    public function testCleanWhenFloatUpdateAttribute()
+    {
+        // test is equivalent
+        $model = new EloquentModelStub(['castedFloat' => 8 - 6.4]);
+        $model->syncOriginal();
+        $this->assertTrue($model->originalIsEquivalent('castedFloat', 1.6));
+
+        // test is not equivalent
+        $model = new EloquentModelStub(['castedFloat' => 5.6]);
+        $model->syncOriginal();
+        $this->assertFalse($model->originalIsEquivalent('castedFloat', 5.5));
     }
 
     public function testCalculatedAttributes()
@@ -320,7 +344,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->save());
     }
 
-    public function testSaveIsCancelledIfSavingEventReturnsFalse()
+    public function testSaveIsCanceledIfSavingEventReturnsFalse()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
@@ -332,7 +356,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->save());
     }
 
-    public function testUpdateIsCancelledIfUpdatingEventReturnsFalse()
+    public function testUpdateIsCanceledIfUpdatingEventReturnsFalse()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
@@ -567,7 +591,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->exists);
     }
 
-    public function testInsertIsCancelledIfCreatingEventReturnsFalse()
+    public function testInsertIsCanceledIfCreatingEventReturnsFalse()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
@@ -991,11 +1015,21 @@ class DatabaseEloquentModelTest extends TestCase
     public function testGuarded()
     {
         $model = new EloquentModelStub;
+
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+
         $model->guard(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
         $this->assertFalse(isset($model->name));
         $this->assertFalse(isset($model->age));
         $this->assertSame('bar', $model->foo);
+
+        $model = new EloquentModelStub;
+        $model->guard(['name', 'age']);
+        $model->fill(['Foo' => 'bar']);
+        $this->assertFalse(isset($model->Foo));
     }
 
     public function testFillableOverridesGuarded()
@@ -1317,8 +1351,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($clone->exists);
         $this->assertSame('taylor', $clone->first);
         $this->assertSame('otwell', $clone->last);
-        $this->assertObjectNotHasAttribute('created_at', $clone);
-        $this->assertObjectNotHasAttribute('updated_at', $clone);
+        $this->assertArrayNotHasKey('created_at', $clone->getAttributes());
+        $this->assertArrayNotHasKey('updated_at', $clone->getAttributes());
         $this->assertEquals(['bar'], $clone->foo);
     }
 
@@ -1992,6 +2026,7 @@ class EloquentModelStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = EloquentModelSaveStub::class;
+    protected $casts = ['castedFloat' => 'float'];
 
     public function getListItemsAttribute($value)
     {
@@ -2110,7 +2145,7 @@ class EloquentDateModelStub extends EloquentModelStub
 class EloquentModelSaveStub extends Model
 {
     protected $table = 'save_stub';
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function save(array $options = [])
     {

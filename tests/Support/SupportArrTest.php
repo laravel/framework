@@ -368,6 +368,28 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::has([], ['']));
     }
 
+    public function testHasAnyMethod()
+    {
+        $array = ['name' => 'Taylor', 'age' => '', 'city' => null];
+        $this->assertTrue(Arr::hasAny($array, 'name'));
+        $this->assertTrue(Arr::hasAny($array, 'age'));
+        $this->assertTrue(Arr::hasAny($array, 'city'));
+        $this->assertFalse(Arr::hasAny($array, 'foo'));
+        $this->assertTrue(Arr::hasAny($array, 'name', 'email'));
+        $this->assertTrue(Arr::hasAny($array, ['name', 'email']));
+
+        $array = ['name' => 'Taylor', 'email' => 'foo'];
+        $this->assertTrue(Arr::hasAny($array, 'name', 'email'));
+        $this->assertFalse(Arr::hasAny($array, 'surname', 'password'));
+        $this->assertFalse(Arr::hasAny($array, ['surname', 'password']));
+
+        $array = ['foo' => ['bar' => null, 'baz' => '']];
+        $this->assertTrue(Arr::hasAny($array, 'foo.bar'));
+        $this->assertTrue(Arr::hasAny($array, 'foo.baz'));
+        $this->assertFalse(Arr::hasAny($array, 'foo.bax'));
+        $this->assertTrue(Arr::hasAny($array, ['foo.bax', 'foo.baz']));
+    }
+
     public function testIsAssoc()
     {
         $this->assertTrue(Arr::isAssoc(['a' => 'a', 0 => 'b']));

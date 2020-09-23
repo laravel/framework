@@ -153,7 +153,7 @@ class CacheManager implements FactoryContract
      */
     protected function createFileDriver(array $config)
     {
-        return $this->repository(new FileStore($this->app['files'], $config['path']));
+        return $this->repository(new FileStore($this->app['files'], $config['path'], $config['permission'] ?? null));
     }
 
     /**
@@ -258,15 +258,36 @@ class CacheManager implements FactoryContract
      */
     public function repository(Store $store)
     {
-        $repository = new Repository($store);
+        return tap(new Repository($store), function ($repository) {
+            $this->setEventDispatcher($repository);
+        });
+    }
 
-        if ($this->app->bound(DispatcherContract::class)) {
-            $repository->setEventDispatcher(
-                $this->app[DispatcherContract::class]
-            );
+    /**
+     * Set the event dispatcher on the given repository instance.
+     *
+     * @param  \Illuminate\Cache\Repository  $repository
+     * @return void
+     */
+    protected function setEventDispatcher(Repository $repository)
+    {
+        if (! $this->app->bound(DispatcherContract::class)) {
+            return;
         }
 
-        return $repository;
+        $repository->setEventDispatcher(
+            $this->app[DispatcherContract::class]
+        );
+    }
+
+    /**
+     * Re-set the event dispatcher on all resolved cache repositories.
+     *
+     * @return void
+     */
+    public function refreshEventDispatcher()
+    {
+        array_map([$this, 'setEventDispatcher'], $this->stores);
     }
 
     /**

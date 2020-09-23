@@ -147,8 +147,8 @@ class Pipeline implements PipelineContract
             return function ($passable) use ($stack, $pipe) {
                 try {
                     if (is_callable($pipe)) {
-                        // If the pipe is an instance of a Closure, we will just call it directly but
-                        // otherwise we'll resolve the pipes out of the container and call it with
+                        // If the pipe is a callable, then we will call it directly, but otherwise we
+                        // will resolve the pipes out of the dependency container and call it with
                         // the appropriate method and arguments, returning the results back out.
                         return $pipe($passable, $stack);
                     } elseif (! is_object($pipe)) {
@@ -225,7 +225,7 @@ class Pipeline implements PipelineContract
     }
 
     /**
-     * Handles the value returned from each pipe before passing it to the next.
+     * Handle the value returned from each pipe before passing it to the next.
      *
      * @param  mixed  $carry
      * @return mixed

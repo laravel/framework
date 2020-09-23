@@ -170,4 +170,23 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals(['alter table `users` add `foo` varchar(255) not null'], $blueprint->toSql($connection, new MySqlGrammar));
     }
+
+    public function testMacroable()
+    {
+        Blueprint::macro('foo', function () {
+            return $this->addCommand('foo');
+        });
+
+        MySqlGrammar::macro('compileFoo', function () {
+            return 'bar';
+        });
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->foo();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $this->assertEquals(['bar'], $blueprint->toSql($connection, new MySqlGrammar));
+    }
 }

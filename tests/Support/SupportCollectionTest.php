@@ -364,10 +364,13 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['foo', 'bar']);
         $c = $c->forget(0)->all();
         $this->assertFalse(isset($c['foo']));
+        $this->assertFalse(isset($c[0]));
+        $this->assertTrue(isset($c[1]));
 
         $c = new Collection(['foo' => 'bar', 'baz' => 'qux']);
         $c = $c->forget('foo')->all();
         $this->assertFalse(isset($c['foo']));
+        $this->assertTrue(isset($c['baz']));
     }
 
     public function testForgetArrayOfKeys()
@@ -2266,6 +2269,30 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testGroupByCallable($collection)
+    {
+        $data = new $collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
+
+        $result = $data->groupBy([$this, 'sortByRating']);
+        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+
+        $result = $data->groupBy([$this, 'sortByUrl']);
+        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+    }
+
+    public function sortByRating(array $value)
+    {
+        return $value['rating'];
+    }
+
+    public function sortByUrl(array $value)
+    {
+        return $value['url'];
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testGroupByAttributePreservingKeys($collection)
     {
         $data = new $collection([10 => ['rating' => 1, 'url' => '1'],  20 => ['rating' => 1, 'url' => '1'],  30 => ['rating' => 2, 'url' => '2']]);
@@ -3906,6 +3933,76 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([1, 2, 3]);
         $this->assertNull($data->get(null));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhereNull($collection)
+    {
+        $data = new $collection([
+            ['name' => 'Taylor'],
+            ['name' => null],
+            ['name' => 'Bert'],
+            ['name' => false],
+            ['name' => ''],
+        ]);
+
+        $this->assertSame([
+            1 => ['name' => null],
+        ], $data->whereNull('name')->all());
+
+        $this->assertSame([], $data->whereNull()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhereNullWithoutKey($collection)
+    {
+        $collection = new $collection([1, null, 3, 'null', false, true]);
+        $this->assertSame([
+            1 => null,
+        ], $collection->whereNull()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhereNotNull($collection)
+    {
+        $data = new $collection($originalData = [
+            ['name' => 'Taylor'],
+            ['name' => null],
+            ['name' => 'Bert'],
+            ['name' => false],
+            ['name' => ''],
+        ]);
+
+        $this->assertSame([
+            0 => ['name' => 'Taylor'],
+            2 => ['name' => 'Bert'],
+            3 => ['name' => false],
+            4 => ['name' => ''],
+        ], $data->whereNotNull('name')->all());
+
+        $this->assertSame($originalData, $data->whereNotNull()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhereNotNullWithoutKey($collection)
+    {
+        $data = new $collection([1, null, 3, 'null', false, true]);
+
+        $this->assertSame([
+            0 => 1,
+            2 => 3,
+            3 => 'null',
+            4 => false,
+            5 => true,
+        ], $data->whereNotNull()->all());
     }
 
     /**

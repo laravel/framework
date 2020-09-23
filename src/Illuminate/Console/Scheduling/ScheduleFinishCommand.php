@@ -11,7 +11,7 @@ class ScheduleFinishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'schedule:finish {id}';
+    protected $signature = 'schedule:finish {id} {code=0}';
 
     /**
      * The console command description.
@@ -37,6 +37,6 @@ class ScheduleFinishCommand extends Command
     {
         collect($schedule->events())->filter(function ($value) {
             return $value->mutexName() == $this->argument('id');
-        })->each->callAfterCallbacks($this->laravel);
+        })->each->callAfterCallbacksWithExitCode($this->laravel, $this->argument('code'));
     }
 }

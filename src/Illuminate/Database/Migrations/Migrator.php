@@ -9,6 +9,7 @@ use Illuminate\Database\Events\MigrationEnded;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Events\MigrationStarted;
+use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -139,6 +140,8 @@ class Migrator
         // aren't, we will just make a note of it to the developer so they're aware
         // that all of the migrations have been run against this database system.
         if (count($migrations) === 0) {
+            $this->fireMigrationEvent(new NoPendingMigrations('up'));
+
             $this->note('<info>Nothing to migrate.</info>');
 
             return;
@@ -221,6 +224,8 @@ class Migrator
         $migrations = $this->getMigrationsForRollback($options);
 
         if (count($migrations) === 0) {
+            $this->fireMigrationEvent(new NoPendingMigrations('down'));
+
             $this->note('<info>Nothing to rollback.</info>');
 
             return [];

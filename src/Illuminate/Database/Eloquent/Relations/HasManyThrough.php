@@ -247,6 +247,20 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Add a basic where clause to the query, and return the first result.
+     *
+     * @param  \Closure|string|array  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->first();
+    }
+
+    /**
      * Execute the query and get the first related model.
      *
      * @param  array  $columns
@@ -373,7 +387,7 @@ class HasManyThrough extends Relation
     /**
      * Get a paginator for the "select" statement.
      *
-     * @param  int  $perPage
+     * @param  int|null  $perPage
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int  $page
@@ -389,7 +403,7 @@ class HasManyThrough extends Relation
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int  $perPage
+     * @param  int|null  $perPage
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page

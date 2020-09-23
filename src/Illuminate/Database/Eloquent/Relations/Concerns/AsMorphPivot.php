@@ -47,6 +47,10 @@ trait AsMorphPivot
      */
     public function delete()
     {
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return (int) parent::delete();
+        }
+
         if ($this->fireModelEvent('deleting') === false) {
             return 0;
         }

@@ -138,6 +138,13 @@ class SupportTestingQueueFakeTest extends TestCase
         ]);
     }
 
+    public function testAssertPushedWithoutChain()
+    {
+        $this->fake->push(new JobWithChainStub([]));
+
+        $this->fake->assertPushedWithoutChain(JobWithChainStub::class);
+    }
+
     public function testAssertPushedWithChainSameJobDifferentChains()
     {
         $this->fake->push(new JobWithChainStub([

@@ -181,4 +181,15 @@ class CacheArrayStoreTest extends TestCase
 
         $this->assertTrue($wannabeOwner->acquire());
     }
+
+    public function testReleasingLockAfterAlreadyForceReleasedByAnotherOwnerFails()
+    {
+        $store = new ArrayStore;
+        $owner = $store->lock('foo', 10);
+        $wannabeOwner = $store->lock('foo', 10);
+        $owner->acquire();
+        $wannabeOwner->forceRelease();
+
+        $this->assertFalse($wannabeOwner->release());
+    }
 }

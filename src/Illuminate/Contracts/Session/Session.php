@@ -56,7 +56,7 @@ interface Session
     public function exists($key);
 
     /**
-     * Checks if an a key is present and not null.
+     * Checks if a key is present and not null.
      *
      * @param  string|array  $key
      * @return bool

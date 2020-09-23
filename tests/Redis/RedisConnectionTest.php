@@ -9,6 +9,8 @@ use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Predis\Client;
+use Redis;
 
 class RedisConnectionTest extends TestCase
 {
@@ -547,6 +549,189 @@ class RedisConnectionTest extends TestCase
         );
     }
 
+    public function testItScansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $initialKeys = ['test:scan:1', 'test:scan:2'];
+
+            foreach ($initialKeys as $k => $key) {
+                $redis->set($key, 'test');
+                $initialKeys[$k] = $this->getPrefix($redis->client()).$key;
+            }
+
+            $iterator = null;
+
+            do {
+                [$cursor, $returnedKeys] = $redis->scan($iterator);
+
+                if (! is_array($returnedKeys)) {
+                    $returnedKeys = [$returnedKeys];
+                }
+
+                foreach ($returnedKeys as $returnedKey) {
+                    $this->assertTrue(in_array($returnedKey, $initialKeys));
+                }
+            } while ($iterator > 0);
+
+            $redis->flushAll();
+        }
+    }
+
+    public function testItZscansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $members = [100 => 'test:zscan:1', 200 => 'test:zscan:2'];
+
+            foreach ($members as $score => $member) {
+                $redis->zadd('set', $score, $member);
+            }
+
+            $iterator = null;
+            $result = [];
+
+            do {
+                [$iterator, $returnedMembers] = $redis->zscan('set', $iterator);
+
+                if (! is_array($returnedMembers)) {
+                    $returnedMembers = [$returnedMembers];
+                }
+
+                foreach ($returnedMembers as $member => $score) {
+                    $this->assertArrayHasKey((int) $score, $members);
+                    $this->assertContains($member, $members);
+                }
+
+                $result += $returnedMembers;
+            } while ($iterator > 0);
+
+            $this->assertCount(2, $result);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->zscan('set', $iterator, ['match' => 'test:unmatch:*']);
+            $this->assertEmpty($returned);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->zscan('set', $iterator, ['count' => 5]);
+            $this->assertCount(2, $returned);
+
+            $redis->flushAll();
+        }
+    }
+
+    public function testItHscansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $fields = ['name' => 'mohamed', 'hobby' => 'diving'];
+
+            foreach ($fields as $field => $value) {
+                $redis->hset('hash', $field, $value);
+            }
+
+            $iterator = null;
+            $result = [];
+
+            do {
+                [$iterator, $returnedFields] = $redis->hscan('hash', $iterator);
+
+                foreach ($returnedFields as $field => $value) {
+                    $this->assertArrayHasKey($field, $fields);
+                    $this->assertContains($value, $fields);
+                }
+
+                $result += $returnedFields;
+            } while ($iterator > 0);
+
+            $this->assertCount(2, $result);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->hscan('hash', $iterator, ['match' => 'test:unmatch:*']);
+            $this->assertEmpty($returned);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->hscan('hash', $iterator, ['count' => 5]);
+            $this->assertCount(2, $returned);
+
+            $redis->flushAll();
+        }
+    }
+
+    public function testItSscansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $members = ['test:sscan:1', 'test:sscan:2'];
+
+            foreach ($members as $member) {
+                $redis->sadd('set', $member);
+            }
+
+            $iterator = null;
+            $result = [];
+
+            do {
+                [$iterator, $returnedMembers] = $redis->sscan('set', $iterator);
+
+                foreach ($returnedMembers as $member) {
+                    $this->assertContains($member, $members);
+                    array_push($result, $member);
+                }
+            } while ($iterator > 0);
+
+            $this->assertCount(2, $result);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->sscan('set', $iterator, ['match' => 'test:unmatch:*']);
+            $this->assertEmpty($returned);
+
+            $iterator = null;
+            [$iterator, $returned] = $redis->sscan('set', $iterator, ['count' => 5]);
+            $this->assertCount(2, $returned);
+
+            $redis->flushAll();
+        }
+    }
+
+    public function testPhpRedisScanOption()
+    {
+        foreach ($this->connections() as $redis) {
+            if ($redis->client() instanceof Client) {
+                continue;
+            }
+
+            $iterator = null;
+
+            do {
+                $returned = $redis->scan($iterator);
+
+                if ($redis->client()->getOption(Redis::OPT_SCAN) === Redis::SCAN_RETRY) {
+                    $this->assertEmpty($returned);
+                }
+            } while ($iterator > 0);
+        }
+    }
+
+    private function getPrefix($client)
+    {
+        if ($client instanceof Redis) {
+            return $client->getOption(Redis::OPT_PREFIX);
+        }
+
+        return $client->getOptions()->prefix;
+    }
+
+    public function testMacroable()
+    {
+        Connection::macro('foo', function () {
+            return 'foo';
+        });
+
+        foreach ($this->connections() as $redis) {
+            $this->assertSame(
+                'foo',
+                $redis->foo()
+            );
+        }
+    }
+
     public function connections()
     {
         $connections = [
@@ -554,8 +739,8 @@ class RedisConnectionTest extends TestCase
             'phpredis' => $this->redis['phpredis']->connection(),
         ];
 
-        $host = getenv('REDIS_HOST') ?: '127.0.0.1';
-        $port = getenv('REDIS_PORT') ?: 6379;
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
 
         $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
@@ -582,7 +767,31 @@ class RedisConnectionTest extends TestCase
             ],
         ]);
 
+        $serializerPhpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 7,
+                'options' => ['serializer' => Redis::SERIALIZER_JSON],
+                'timeout' => 0.5,
+            ],
+        ]);
+
+        $scanRetryPhpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 8,
+                'options' => ['scan' => Redis::SCAN_RETRY],
+                'timeout' => 0.5,
+            ],
+        ]);
+
         $connections[] = $prefixedPhpredis->connection();
+        $connections[] = $serializerPhpRedis->connection();
+        $connections[] = $scanRetryPhpRedis->connection();
         $connections['persistent'] = $persistentPhpRedis->connection();
 
         return $connections;

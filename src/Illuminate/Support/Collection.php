@@ -428,7 +428,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
-        if (is_array($groupBy)) {
+        if (! $this->useAsCallable($groupBy) && is_array($groupBy)) {
             $nextGroups = $groupBy;
 
             $groupBy = array_shift($nextGroups);

@@ -98,6 +98,16 @@ trait FormatsMessages
         // that is not attribute specific. If we find either we'll return it.
         foreach ($keys as $key) {
             foreach (array_keys($source) as $sourceKey) {
+                if (strpos($sourceKey, '*') !== false) {
+                    $pattern = str_replace('\*', '([^.]*)', preg_quote($sourceKey, '#'));
+
+                    if (preg_match('#^'.$pattern.'\z#u', $key) === 1) {
+                        return $source[$sourceKey];
+                    }
+
+                    continue;
+                }
+
                 if (Str::is($sourceKey, $key)) {
                     return $source[$sourceKey];
                 }
@@ -250,7 +260,9 @@ trait FormatsMessages
         // an implicit attribute we will display the raw attribute's name and not
         // modify it with any of these replacements before we display the name.
         if (isset($this->implicitAttributes[$primaryAttribute])) {
-            return $attribute;
+            return ($formatter = $this->implicitAttributesFormatter)
+                            ? $formatter($attribute)
+                            : $attribute;
         }
 
         return str_replace('_', ' ', Str::snake($attribute));

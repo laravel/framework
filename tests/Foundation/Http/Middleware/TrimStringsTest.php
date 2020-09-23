@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TrimStringsTest extends TestCase
 {
-    public function testTrimStringsIgnoringExceptAttribute() : void
+    public function testTrimStringsIgnoringExceptAttribute()
     {
         $middleware = new TrimStringsWithExceptAttribute();
         $symfonyRequest = new SymfonyRequest([

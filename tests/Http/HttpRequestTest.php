@@ -405,6 +405,16 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request['file']);
     }
 
+    public function testBooleanMethod()
+    {
+        $request = Request::create('/', 'GET', ['with_trashed' => 'false', 'download' => true, 'checked' => 1, 'unchecked' => '0']);
+        $this->assertTrue($request->boolean('checked'));
+        $this->assertTrue($request->boolean('download'));
+        $this->assertFalse($request->boolean('unchecked'));
+        $this->assertFalse($request->boolean('with_trashed'));
+        $this->assertFalse($request->boolean('some_undefined_key'));
+    }
+
     public function testArrayAccess()
     {
         $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);

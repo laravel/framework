@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
+use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -24,6 +25,13 @@ trait MakesHttpRequests
      * @var array
      */
     protected $defaultCookies = [];
+
+    /**
+     * Additional cookies will not be encrypted for the request.
+     *
+     * @var array
+     */
+    protected $unencryptedCookies = [];
 
     /**
      * Additional server variables for the request.
@@ -168,6 +176,33 @@ trait MakesHttpRequests
     public function withCookie(string $name, string $value)
     {
         $this->defaultCookies[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Define additional cookies will not be encrypted before sending with the request.
+     *
+     * @param  array  $cookies
+     * @return $this
+     */
+    public function withUnencryptedCookies(array $cookies)
+    {
+        $this->unencryptedCookies = array_merge($this->unencryptedCookies, $cookies);
+
+        return $this;
+    }
+
+    /**
+     * Add a cookie will not be encrypted before sending with the request.
+     *
+     * @param  string  $name
+     * @param  string  $value
+     * @return $this
+     */
+    public function withUnencryptedCookie(string $name, string $value)
+    {
+        $this->unencryptedCookies[$name] = $value;
 
         return $this;
     }
@@ -455,11 +490,7 @@ trait MakesHttpRequests
             $uri = substr($uri, 1);
         }
 
-        if (! Str::startsWith($uri, 'http')) {
-            $uri = config('app.url').'/'.$uri;
-        }
-
-        return trim($uri, '/');
+        return trim(url($uri), '/');
     }
 
     /**
@@ -527,12 +558,12 @@ trait MakesHttpRequests
     protected function prepareCookiesForRequest()
     {
         if (! $this->encryptCookies) {
-            return $this->defaultCookies;
+            return array_merge($this->defaultCookies, $this->unencryptedCookies);
         }
 
-        return collect($this->defaultCookies)->map(function ($value) {
-            return encrypt($value, false);
-        })->all();
+        return collect($this->defaultCookies)->map(function ($value, $key) {
+            return encrypt(CookieValuePrefix::create($key, app('encrypter')->getKey()).$value, false);
+        })->merge($this->unencryptedCookies)->all();
     }
 
     /**

@@ -22,6 +22,8 @@ class ViewServiceProvider extends ServiceProvider
 
         $this->registerViewFinder();
 
+        $this->registerBladeCompiler();
+
         $this->registerEngineResolver();
     }
 
@@ -75,6 +77,20 @@ class ViewServiceProvider extends ServiceProvider
     {
         $this->app->bind('view.finder', function ($app) {
             return new FileViewFinder($app['files'], $app['config']['view.paths']);
+        });
+    }
+
+    /**
+     * Register the Blade compiler implementation.
+     *
+     * @return void
+     */
+    public function registerBladeCompiler()
+    {
+        $this->app->singleton('blade.compiler', function () {
+            return new BladeCompiler(
+                $this->app['files'], $this->app['config']['view.compiled']
+            );
         });
     }
 
@@ -133,15 +149,6 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerBladeEngine($resolver)
     {
-        // The Compiler engine requires an instance of the CompilerInterface, which in
-        // this case will be the Blade compiler, so we'll first create the compiler
-        // instance to pass into the engine so it can compile the views properly.
-        $this->app->singleton('blade.compiler', function () {
-            return new BladeCompiler(
-                $this->app['files'], $this->app['config']['view.compiled']
-            );
-        });
-
         $resolver->register('blade', function () {
             return new CompilerEngine($this->app['blade.compiler']);
         });

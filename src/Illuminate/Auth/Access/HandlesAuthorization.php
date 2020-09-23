@@ -19,7 +19,7 @@ trait HandlesAuthorization
     /**
      * Throws an unauthorized exception.
      *
-     * @param  string  $message
+     * @param  string|null  $message
      * @param  mixed|null  $code
      * @return \Illuminate\Auth\Access\Response
      */

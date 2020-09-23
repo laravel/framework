@@ -66,6 +66,6 @@ class MailMarkdownTest extends TestCase
 
         $result = $markdown->parse('# Something')->toHtml();
 
-        $this->assertSame('<h1>Something</h1>', $result);
+        $this->assertSame("<h1>Something</h1>\n", $result);
     }
 }

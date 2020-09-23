@@ -192,7 +192,31 @@ class SqlServerGrammar extends Grammar
     {
         $columns = $this->wrapArray($command->columns);
 
-        return 'alter table '.$this->wrapTable($blueprint).' drop column '.implode(', ', $columns);
+        $dropExistingConstraintsSql = $this->compileDropDefaultConstraint($blueprint, $command).';';
+
+        return $dropExistingConstraintsSql.'alter table '.$this->wrapTable($blueprint).' drop column '.implode(', ', $columns);
+    }
+
+    /**
+     * Compile a drop default constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropDefaultConstraint(Blueprint $blueprint, Fluent $command)
+    {
+        $columns = "'".implode("','", $command->columns)."'";
+
+        $tableName = $this->getTablePrefix().$blueprint->getTable();
+
+        $sql = "DECLARE @sql NVARCHAR(MAX) = '';";
+        $sql .= "SELECT @sql += 'ALTER TABLE [dbo].[{$tableName}] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
+        $sql .= 'FROM SYS.COLUMNS ';
+        $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$tableName}]') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
+        $sql .= 'EXEC(@sql)';
+
+        return $sql;
     }
 
     /**

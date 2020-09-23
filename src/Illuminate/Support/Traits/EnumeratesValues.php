@@ -145,7 +145,7 @@ trait EnumeratesValues
     {
         call_user_func_array([$this, 'dump'], $args);
 
-        die(1);
+        exit(1);
     }
 
     /**
@@ -493,6 +493,28 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter items where the given key is not null.
+     *
+     * @param  string|null  $key
+     * @return static
+     */
+    public function whereNull($key = null)
+    {
+        return $this->whereStrict($key, null);
+    }
+
+    /**
+     * Filter items where the given key is null.
+     *
+     * @param  string|null  $key
+     * @return static
+     */
+    public function whereNotNull($key = null)
+    {
+        return $this->where($key, '!==', null);
+    }
+
+    /**
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
@@ -825,7 +847,7 @@ trait EnumeratesValues
      * Get an operator checker callback.
      *
      * @param  string  $key
-     * @param  string  $operator
+     * @param  string|null  $operator
      * @param  mixed  $value
      * @return \Closure
      */

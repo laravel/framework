@@ -115,6 +115,7 @@ abstract class Manager
                 return $this->$method();
             }
         }
+
         throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
 

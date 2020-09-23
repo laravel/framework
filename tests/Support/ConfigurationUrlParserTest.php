@@ -23,6 +23,8 @@ class ConfigurationUrlParserTest extends TestCase
             'postgres' => 'pgsql',
             'postgresql' => 'pgsql',
             'sqlite3' => 'sqlite',
+            'redis' => 'tcp',
+            'rediss' => 'tls',
         ], ConfigurationUrlParser::getDriverAliases());
 
         ConfigurationUrlParser::addDriverAlias('some-particular-alias', 'mysql');
@@ -33,6 +35,8 @@ class ConfigurationUrlParserTest extends TestCase
             'postgres' => 'pgsql',
             'postgresql' => 'pgsql',
             'sqlite3' => 'sqlite',
+            'redis' => 'tcp',
+            'rediss' => 'tls',
             'some-particular-alias' => 'mysql',
         ], ConfigurationUrlParser::getDriverAliases());
 
@@ -172,6 +176,17 @@ class ConfigurationUrlParserTest extends TestCase
                     'host' => 'localhost',
                     'database' => 'baz',
                     'driver' => 'mysql',
+                ],
+            ],
+            'simple URL with percent encoding in query' => [
+                'mysql://foo:bar%25bar@localhost/baz?timezone=%2B00%3A00',
+                [
+                    'username' => 'foo',
+                    'password' => 'bar%bar',
+                    'host' => 'localhost',
+                    'database' => 'baz',
+                    'driver' => 'mysql',
+                    'timezone' => '+00:00',
                 ],
             ],
             'URL with mssql alias driver' => [
@@ -344,7 +359,58 @@ class ConfigurationUrlParserTest extends TestCase
                     'database' => 0,
                 ],
                 [
-                    'driver' => 'redis',
+                    'driver' => 'tcp',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 0,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
+                ],
+            ],
+            'Redis example where URL ends with "/" and database is not present'  => [
+                [
+                    'url' => 'redis://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111/',
+                    'host' => '127.0.0.1',
+                    'password' => null,
+                    'port' => 6379,
+                    'database' => 2,
+                ],
+                [
+                    'driver' => 'tcp',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 2,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
+                ],
+            ],
+            'Redis Example with tls scheme' => [
+                [
+                    'url' => 'tls://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
+                    'host' => '127.0.0.1',
+                    'password' =>  null,
+                    'port' =>  6379,
+                    'database' => 0,
+                ],
+                [
+                    'driver' => 'tls',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 0,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
+                ],
+            ],
+            'Redis Example with rediss scheme' => [
+                [
+                    'url' => 'rediss://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
+                    'host' => '127.0.0.1',
+                    'password' =>  null,
+                    'port' =>  6379,
+                    'database' => 0,
+                ],
+                [
+                    'driver' => 'tls',
                     'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
                     'port' => 111,
                     'database' => 0,

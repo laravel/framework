@@ -149,7 +149,7 @@ class DatabaseManager implements ConnectionResolverInterface
         $connections = $this->app['config']['database.connections'];
 
         if (is_null($config = Arr::get($connections, $name))) {
-            throw new InvalidArgumentException("Database [{$name}] not configured.");
+            throw new InvalidArgumentException("Database connection [{$name}] not configured.");
         }
 
         return (new ConfigurationUrlParser)
@@ -256,8 +256,8 @@ class DatabaseManager implements ConnectionResolverInterface
         $fresh = $this->makeConnection($name);
 
         return $this->connections[$name]
-                                ->setPdo($fresh->getPdo())
-                                ->setReadPdo($fresh->getReadPdo());
+                                ->setPdo($fresh->getRawPdo())
+                                ->setReadPdo($fresh->getRawReadPdo());
     }
 
     /**
