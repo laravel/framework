@@ -150,7 +150,9 @@ class MorphTo extends BelongsTo
     protected function gatherKeysByType($type, $keyType)
     {
         if ( $keyType === 'string' ) {
-            return array_map(function($modelId) { return (string) $modelId; }, array_keys($this->dictionary[$type]));
+            return array_map(function ($modelId) {
+                return (string) $modelId;
+            }, array_keys($this->dictionary[$type]));
         }
 
         return array_keys($this->dictionary[$type]);
