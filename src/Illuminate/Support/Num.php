@@ -62,6 +62,16 @@ class Num
     }
 
     /**
+     * Check the current value
+     *
+     * @return void
+     */
+    public function dd()
+    {
+        dd($this->value);
+    }
+
+    /**
      * Divide current value by passed value
      *
      * @param int|float|string $value
