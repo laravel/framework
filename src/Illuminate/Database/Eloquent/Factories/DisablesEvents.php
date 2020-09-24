@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 trait DisablesEvents
 {
-    protected bool $disableEvents;
+    protected $disableEvents;
 
     /**
      * Disables events during creation.
