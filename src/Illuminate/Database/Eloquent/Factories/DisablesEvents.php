@@ -6,6 +6,11 @@ use Illuminate\Support\Collection;
 
 trait DisablesEvents
 {
+    /**
+     * Tracks if events should be disabled in this factory instance.
+     *
+     * @var mixed
+     */
     protected $disableEvents;
 
     /**
@@ -34,6 +39,8 @@ trait DisablesEvents
 
     /**
      * Checks if events should be disabled for creation.
+     *
+     * @return bool
      */
     protected function shouldDisableEvents(): bool
     {
@@ -48,7 +55,6 @@ trait DisablesEvents
      * Set the connection name on the results and store them.
      *
      * @param  \Illuminate\Support\Collection  $results
-     *
      * @return void
      */
     protected function store(Collection $results)
@@ -62,10 +68,10 @@ trait DisablesEvents
 
     /**
      * Create a new instance of the factory builder with the given mutated properties.
+     *
      * This propagates the event disabler across states.
      *
      * @param  array  $arguments
-     *
      * @return static
      */
     protected function newInstance(array $arguments = [])
