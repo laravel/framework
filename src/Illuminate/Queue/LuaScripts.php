@@ -128,6 +128,41 @@ LUA;
     }
 
     /**
+     * Get the Lua script for deleting a pending job.
+     *
+     * KEYS[1] - The name of the primary queue
+     * ARGV[1] - The ID of the job to delete
+     *
+     * @return string
+     */
+    public static function deletePending()
+    {
+        return <<<'LUA'
+local jobs = {}
+local cursor = 0
+
+-- Iterate over the list in chunks of 100
+repeat
+    jobs = redis.call('lrange', KEYS[1], cursor, cursor + 99)
+
+    for i = 1, #jobs do
+        local job = cjson.decode(jobs[i])
+        
+        -- If the job ID matches, remove it from the list and return
+        if(job['id'] == ARGV[1]) then
+            redis.call('lrem', KEYS[1], 1, jobs[i])
+            return true
+        end
+    end
+
+    cursor = cursor + 100
+until #jobs < 100
+
+return false
+LUA;
+    }
+
+    /**
      * Get the Lua script for removing all jobs from the queue.
      *
      * KEYS[1] - The name of the primary queue

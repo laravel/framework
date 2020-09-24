@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\ClearableQueue;
+use Illuminate\Contracts\Queue\DeletableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
@@ -10,7 +11,7 @@ use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Carbon;
 use PDO;
 
-class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
+class DatabaseQueue extends Queue implements QueueContract, ClearableQueue, DeletableQueue
 {
     /**
      * The database connection instance.
@@ -302,6 +303,27 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
         ]);
 
         return $job;
+    }
+
+    /**
+     * Delete a pending job from the queue.
+     *
+     * @param  string|null  $queue
+     * @param  mixed  $id
+     * @return bool
+     */
+    public function deletePending($queue, $id)
+    {
+        return $this->database->transaction(function () use ($queue, $id) {
+            if ($this->database->table($this->table)
+                    ->where('queue', $this->getQueue($queue))
+                    ->whereNull('reserved_at')
+                    ->lockForUpdate()->find($id)) {
+                $this->database->table($this->table)->where('id', $id)->delete();
+                return true;
+            }
+            return false;
+        });
     }
 
     /**

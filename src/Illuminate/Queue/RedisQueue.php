@@ -3,12 +3,13 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\ClearableQueue;
+use Illuminate\Contracts\Queue\DeletableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Support\Str;
 
-class RedisQueue extends Queue implements QueueContract, ClearableQueue
+class RedisQueue extends Queue implements QueueContract, ClearableQueue, DeletableQueue
 {
     /**
      * The Redis factory implementation.
@@ -255,6 +256,20 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         }
 
         return [$job, $reserved];
+    }
+
+    /**
+     * Delete a pending job from the queue.
+     *
+     * @param  string|null  $queue
+     * @param  mixed  $id
+     * @return bool
+     */
+    public function deletePending($queue, $id)
+    {
+        return $this->getConnection()->eval(
+            LuaScripts::deletePending(), 1, $this->getQueue($queue), $id
+        );
     }
 
     /**

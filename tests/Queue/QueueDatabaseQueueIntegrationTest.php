@@ -148,6 +148,37 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     }
 
     /**
+     * Test that the pending jobs can be deleted.
+     */
+    public function testThatPendingJobsCanBeDeleted()
+    {
+        $this->connection()
+            ->table('jobs')
+            ->insert([[
+                'id' => 1,
+                'queue' => $mock_queue_name = 'mock_queue_name',
+                'payload' => 'mock_payload',
+                'attempts' => 0,
+                'reserved_at' => Carbon::now()->addDay()->getTimestamp(),
+                'available_at' => Carbon::now()->subDay()->getTimestamp(),
+                'created_at' => Carbon::now()->getTimestamp(),
+            ], [
+                'id' => 2,
+                'queue' => $mock_queue_name,
+                'payload' => 'mock_payload 2',
+                'attempts' => 0,
+                'reserved_at' => null,
+                'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
+                'created_at' => Carbon::now()->getTimestamp(),
+            ]]);
+
+        $this->assertTrue($this->queue->deletePending($mock_queue_name, 2));
+        $this->assertEquals(1, $this->queue->size($mock_queue_name));
+        $this->assertFalse($this->queue->deletePending($mock_queue_name, 1));
+        $this->assertEquals(1, $this->queue->size($mock_queue_name));
+    }
+
+    /**
      * Test that the queue can be cleared.
      */
     public function testThatQueueCanBeCleared()
@@ -173,7 +204,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
             ]]);
 
         $this->assertEquals(2, $this->queue->clear($mock_queue_name));
-        $this->assertEquals(0, $this->queue->size());
+        $this->assertEquals(0, $this->queue->size($mock_queue_name));
     }
 
     /**
