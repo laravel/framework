@@ -267,7 +267,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue, Deletab
      */
     public function deletePending($queue, $id)
     {
-        return $this->getConnection()->eval(
+        return (bool) $this->getConnection()->eval(
             LuaScripts::deletePending(), 1, $this->getQueue($queue), $id
         );
     }

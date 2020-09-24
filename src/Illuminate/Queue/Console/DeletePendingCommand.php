@@ -17,8 +17,8 @@ class DeletePendingCommand extends Command
      * @var string
      */
     protected $signature = 'queue:delete {id : The ID of the pending job}
-                            {--connection= : The name of the queue connection to clear}
-                            {--queue= : The name of the queue to clear}';
+                            {--connection= : The name of the queue connection}
+                            {--queue= : The name of the queue}';
 
     /**
      * The console command description.
@@ -49,20 +49,20 @@ class DeletePendingCommand extends Command
         $queue = ($this->laravel['queue'])->connection($connection);
 
         if ($queue instanceof DeletableQueue) {
-            if($queue->deletePending($queueName, $this->argument('id'))) {
+            if ($queue->deletePending($queueName, $this->argument('id'))) {
                 $this->info('Pending job deleted successfully!');
             } else {
                 $this->error('No pending job matches the given ID.');
             }
         } else {
-            $this->error('Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
+            $this->error('Deleting pending jobs is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
         }
 
         return 0;
     }
 
     /**
-     * Get the queue name to clear.
+     * Get the queue name.
      *
      * @param  string  $connection
      * @return string

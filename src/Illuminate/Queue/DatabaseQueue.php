@@ -320,8 +320,10 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue, Dele
                     ->whereNull('reserved_at')
                     ->lockForUpdate()->find($id)) {
                 $this->database->table($this->table)->where('id', $id)->delete();
+
                 return true;
             }
+
             return false;
         });
     }
