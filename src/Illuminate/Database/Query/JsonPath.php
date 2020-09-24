@@ -28,6 +28,8 @@ class JsonPath extends Expression implements \ArrayAccess
     protected $path = [];
 
     /**
+     * The current scope, either a column name or null.
+     *
      * @var string|null
      */
     protected $scope;
@@ -102,17 +104,25 @@ class JsonPath extends Expression implements \ArrayAccess
      */
     public function getValue()
     {
-        return array_reduce($this->path, static function ($carry, array $item) {
+        $lastType = null;
+
+        return array_reduce($this->path, static function ($carry, array $item) use (&$lastType) {
             switch ($item['type']) {
                 case 'member':
-                    return $carry . self::SEPARATOR . '"' . $item['name'] . '"';
+                    $carry .= self::SEPARATOR . '"' . $item['name'] . '"';
+                    break;
                 case 'identifier':
-                    return $carry . self::SEPARATOR . $item['name'];
+                    $carry .= self::SEPARATOR . $item['name'];
+                    break;
                 case 'cell':
-                    return $carry . '[' . $item['name'] . ']';
+                    $carry .= '[' . $item['name'] . ']';
+                    break;
                 case 'match':
-                    return $carry . self::SEPARATOR . ($item['prefix'] ? '[' . $item['prefix'] . ']' : '') . '**' . $item['suffix'];
+                    $carry .= (in_array($lastType, ['cell', 'match']) ? '.' : '') . '**"' . $item['name'] . '"';
+                    break;
             }
+
+            $lastType = $item['type'] ?? null;
 
             return $carry;
         }, $this->scope);
@@ -133,22 +143,18 @@ class JsonPath extends Expression implements \ArrayAccess
     }
 
     /**
-     * Add a match path leg for a suffix and optional prefix.
+     * Add a match path leg for a suffix.
      *
      * Generates paths using the `**` token. Paths generated are like
-     * `$.foo[0].[prefix]**suffix` and `$.foo[0].**suffix`.
+     * `$.foo**suffix` and `$.foo[0].**suffix`.
      *
-     * @param string      $suffix
-     * @param string|null $prefix
+     * @param string $suffix
      *
      * @return $this
      */
-    public function matches(string $suffix, ?string $prefix = null): self
+    public function matches(string $suffix): self
     {
-        return $this->addPathLeg('match', [
-            'prefix' => $prefix,
-            'suffix' => $suffix,
-        ]);
+        return $this->addPathLeg('match', $suffix);
     }
 
     /**
@@ -171,7 +177,13 @@ class JsonPath extends Expression implements \ArrayAccess
         // If the member contains a double asterisk it's a match path leg
         // so we're going to want to pass that where appropriate.
         if (Str::contains($name, '**')) {
-            return $this->matches(...array_reverse(explode('**', $name)));
+            [$prefix, $suffix] = explode('**', $name);
+
+            if (! empty($prefix)) {
+                return $this->member($prefix)->matches($suffix);
+            }
+
+            return $this->matches($suffix);
         }
 
         return $this->addPathLeg('member', $name);
@@ -216,22 +228,17 @@ class JsonPath extends Expression implements \ArrayAccess
     /**
      * Adds a leg to the Json path.
      *
-     * @param string       $type
-     * @param string|array $details
+     * @param string $type
+     * @param string $name
      *
      * @return static
      */
-    protected function addPathLeg(string $type, $details): self
+    protected function addPathLeg(string $type, string $name): self
     {
-        $path = compact('type');
-
-        if (is_array($details)) {
-            $path = array_merge($path, $details);
-        } else {
-            $path['name'] = $details;
-        }
-
-        $this->path[] = $path;
+        $this->path[] = [
+            'type' => $type,
+            'name' => $name,
+        ];
 
         return $this;
     }
