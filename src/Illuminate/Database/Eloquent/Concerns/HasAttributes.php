@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use LogicException;
 
 trait HasAttributes
@@ -915,11 +916,13 @@ trait HasAttributes
         // Finally, we will just assume this date is in the format used by default on
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
-        if (Date::hasFormat($value, $format)) {
-            return Date::createFromFormat($format, $value);
+        try {
+            $date = Date::createFromFormat($format, $value);
+        } catch (InvalidArgumentException $e) {
+            $date = false;
         }
 
-        return Date::parse($value);
+        return $date ?: Date::parse($value);
     }
 
     /**
