@@ -85,7 +85,7 @@ class ThrottleRequests
         $limiterResponse = call_user_func($limiter, $request);
 
         if ($limiterResponse instanceof Response) {
-            return $limit;
+            return $limiterResponse;
         } elseif ($limiterResponse instanceof Unlimited) {
             return $next($request);
         }

@@ -30,9 +30,22 @@ class BladeTest extends TestCase
     {
         $view = View::make('uses-panel-dynamically', ['name' => 'Taylor'])->render();
 
-        $this->assertEquals('<div class="ml-2" wire:model="foo">
+        $this->assertEquals('<div class="ml-2" wire:model="foo" wire:model.lazy="bar">
     Hello Taylor
 </div>', trim($view));
+    }
+
+    public function test_rendering_the_same_dynamic_component_with_different_attributes()
+    {
+        $view = View::make('varied-dynamic-calls')->render();
+
+        $this->assertEquals('<span class="text-medium">
+    Hello Taylor
+</span>
+  
+ <span >
+    Hello Samuel
+</span>', trim($view));
     }
 
     protected function getEnvironmentSetUp($app)

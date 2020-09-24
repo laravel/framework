@@ -1502,6 +1502,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "tableB" cross join "tableA" on "tableA"."column1" = "tableB"."column2"', $builder->toSql());
     }
 
+    public function testCrossJoinSubs()
+    {
+        $builder = $this->getBuilder();
+        $builder->selectRaw('(sale / overall.sales) * 100 AS percent_of_total')->from('sales')->crossJoinSub($this->getBuilder()->selectRaw('SUM(sale) AS sales')->from('sales'), 'overall');
+        $this->assertSame('select (sale / overall.sales) * 100 AS percent_of_total from "sales" cross join (select SUM(sale) AS sales from "sales") as "overall"', $builder->toSql());
+    }
+
     public function testComplexJoin()
     {
         $builder = $this->getBuilder();

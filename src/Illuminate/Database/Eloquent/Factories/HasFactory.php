@@ -13,8 +13,20 @@ trait HasFactory
      */
     public static function factory($count = null, $state = [])
     {
-        return Factory::factoryForModel(get_called_class())
+        $factory = static::newFactory() ?: Factory::factoryForModel(get_called_class());
+
+        return $factory
                     ->count(is_numeric($count) ? $count : null)
                     ->state(is_callable($count) || is_array($count) ? $count : $state);
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        //
     }
 }

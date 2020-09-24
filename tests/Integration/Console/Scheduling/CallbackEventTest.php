@@ -22,29 +22,47 @@ class CallbackEventTest extends TestCase
 
     public function testDefaultResultIsSuccess()
     {
-        $event = new CallbackEvent(m::mock(EventMutex::class), function () {
+        $success = null;
+
+        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        }))->onSuccess(function () use (&$success) {
+            $success = true;
+        })->onFailure(function () use (&$success) {
+            $success = false;
         });
 
         $event->run($this->app);
 
-        $this->assertSame(0, $event->exitCode);
+        $this->assertTrue($success);
     }
 
     public function testFalseResponseIsFailure()
     {
-        $event = new CallbackEvent(m::mock(EventMutex::class), function () {
+        $success = null;
+
+        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
             return false;
+        }))->onSuccess(function () use (&$success) {
+            $success = true;
+        })->onFailure(function () use (&$success) {
+            $success = false;
         });
 
         $event->run($this->app);
 
-        $this->assertSame(1, $event->exitCode);
+        $this->assertFalse($success);
     }
 
     public function testExceptionIsFailure()
     {
-        $event = new CallbackEvent(m::mock(EventMutex::class), function () {
+        $success = null;
+
+        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
             throw new \Exception;
+        }))->onSuccess(function () use (&$success) {
+            $success = true;
+        })->onFailure(function () use (&$success) {
+            $success = false;
         });
 
         try {
@@ -52,7 +70,7 @@ class CallbackEventTest extends TestCase
         } catch (Exception $e) {
         }
 
-        $this->assertSame(1, $event->exitCode);
+        $this->assertFalse($success);
     }
 
     public function testExceptionBubbles()

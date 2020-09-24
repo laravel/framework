@@ -31,6 +31,9 @@
             "dev-master": "9.x-dev"
         }
     },
+    "suggest": {
+        "symfony/var-dumper": "Required to use the dump method (^5.1)."
+    },
     "config": {
         "sort-packages": true
     },

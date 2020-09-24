@@ -62,11 +62,18 @@ class FactoryMakeCommand extends GeneratorCommand
     {
         $namespaceModel = $this->option('model')
                         ? $this->qualifyModel($this->option('model'))
-                        : $this->qualifyModel('Model');
+                        : $this->qualifyModel($this->guessModelName($name));
 
         $model = class_basename($namespaceModel);
 
+        if (Str::startsWith($namespaceModel, 'App\\Models')) {
+            $namespace = Str::beforeLast('Database\\Factories\\'.Str::after($namespaceModel, 'App\\Models\\'), '\\');
+        } else {
+            $namespace = 'Database\\Factories';
+        }
+
         $replace = [
+            '{{ factoryNamespace }}' => $namespace,
             'NamespacedDummyModel' => $namespaceModel,
             '{{ namespacedModel }}' => $namespaceModel,
             '{{namespacedModel}}' => $namespaceModel,
@@ -88,13 +95,36 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        $name = str_replace(
-            ['\\', '/'], '', $this->argument('name')
-        );
+        $name = Str::replaceFirst('App\\', '', $name);
 
-        $name = Str::finish($name, 'Factory');
+        $name = Str::finish($this->argument('name'), 'Factory');
 
-        return $this->laravel->databasePath()."/factories/{$name}.php";
+        return $this->laravel->databasePath().'/factories/'.str_replace('\\', '/', $name).'.php';
+    }
+
+    /**
+     * Guess the model name from the Factory name or return a default model name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function guessModelName($name)
+    {
+        if (Str::endsWith($name, 'Factory')) {
+            $name = substr($name, 0, -7);
+        }
+
+        $modelName = $this->qualifyModel(class_basename($name));
+
+        if (class_exists($modelName)) {
+            return $modelName;
+        }
+
+        if (is_dir(app_path('Models/'))) {
+            return 'App\Models\Model';
+        }
+
+        return 'App\Model';
     }
 
     /**

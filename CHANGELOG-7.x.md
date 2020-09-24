@@ -1,6 +1,37 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.27.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.28.3...7.x)
+
+
+## [v7.28.3 (2020-09-17)](https://github.com/laravel/framework/compare/v7.28.2...v7.28.3)
+
+### Fixed
+- Fixed problems with dots in validator ([#34355](https://github.com/laravel/framework/pull/34355))
+
+
+## [v7.28.2 (2020-09-15)](https://github.com/laravel/framework/compare/v7.28.1...v7.28.2)
+
+### Fixed
+- Do not used `now` helper in `Illuminate/Cache/DatabaseLock::expiresAt()` ([#34262](https://github.com/laravel/framework/pull/34262))
+- Fixed `Illuminate\View\ComponentAttributeBag::whereDoesntStartWith()` ([#34329](https://github.com/laravel/framework/pull/34329))
+
+
+## [v7.28.1 (2020-09-09)](https://github.com/laravel/framework/compare/v7.28.0...v7.28.1)
+
+### Revert
+- Revert of ["Fixed for empty fallback_locale in `Illuminate\Translation\Translator`"](https://github.com/laravel/framework/pull/34136) ([7c54eb6](https://github.com/laravel/framework/commit/7c54eb678d58fb9ee7f532a5a5842e6f0e1fe4c9))
+
+
+## [v7.28.0 (2020-09-08)](https://github.com/laravel/framework/compare/v7.27.0...v7.28.0)
+
+### Added
+- Added expectsTable console assertion ([74e1fca](https://github.com/laravel/framework/commit/74e1fca5fa333e32e24a7aa24049d5303a1bf281), [c6cf381](https://github.com/laravel/framework/commit/c6cf38139d2524a7c3accb606e3fb1b035c98d6a))
+
+### Fixed
+- Use `getTouchedRelations` when touching owners ([#34100](https://github.com/laravel/framework/pull/34100))
+- Fixed for empty fallback_locale in `Illuminate\Translation\Translator` ([#34136](https://github.com/laravel/framework/pull/34136))
+- Fixed `Illuminate\Database\Schema\Grammars\SqlServerGrammar::compileColumnListing()` for tables with schema ([#34076](https://github.com/laravel/framework/pull/34076))
+- Fixed Significant performance issue in Eloquent Collection loadCount() method ([#34177](https://github.com/laravel/framework/pull/34177))
 
 
 ## [v7.27.0 (2020-09-01)](https://github.com/laravel/framework/compare/v7.26.1...v7.27.0)

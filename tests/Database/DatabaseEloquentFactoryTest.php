@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
@@ -95,6 +96,13 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $user);
         $this->assertEquals('Taylor Otwell', $user->name);
 
+        $users = FactoryTestUserFactory::new()->createMany([
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Jeffrey Way'],
+        ]);
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(2, $users);
+
         $users = FactoryTestUserFactory::times(10)->create();
         $this->assertCount(10, $users);
     }
@@ -123,6 +131,27 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $user);
         $this->assertEquals('Taylor Otwell', $user->name);
         $this->assertCount(0, FactoryTestUser::all());
+    }
+
+    public function test_basic_model_attributes_can_be_created()
+    {
+        $user = FactoryTestUserFactory::new()->raw();
+        $this->assertIsArray($user);
+
+        $user = FactoryTestUserFactory::new()->raw(['name' => 'Taylor Otwell']);
+        $this->assertIsArray($user);
+        $this->assertEquals('Taylor Otwell', $user['name']);
+    }
+
+    public function test_expanded_model_attributes_can_be_created()
+    {
+        $post = FactoryTestPostFactory::new()->raw();
+        $this->assertIsArray($post);
+
+        $post = FactoryTestPostFactory::new()->raw(['title' => 'Test Title']);
+        $this->assertIsArray($post);
+        $this->assertIsInt($post['user_id']);
+        $this->assertEquals('Test Title', $post['title']);
     }
 
     public function test_after_creating_and_making_callbacks_are_called()

@@ -2,9 +2,11 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Constraints\CountInDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
@@ -116,6 +118,23 @@ trait InteractsWithDatabase
     {
         return $model instanceof Model
             && in_array(SoftDeletes::class, class_uses_recursive($model));
+    }
+
+    /**
+     * Cast a JSON string to a database compatible type.
+     *
+     * @param  array|string  $value
+     * @return \Illuminate\Database\Query\Expression
+     */
+    public function castAsJson($value)
+    {
+        if ($value instanceof Jsonable) {
+            $value = $value->toJson();
+        } elseif (is_array($value)) {
+            $value = json_encode($value);
+        }
+
+        return DB::raw("CAST('$value' AS JSON)");
     }
 
     /**

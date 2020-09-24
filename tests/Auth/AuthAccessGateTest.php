@@ -328,7 +328,7 @@ class AuthAccessGateTest extends TestCase
         $gate = $this->getBasicGate();
 
         $gate->define('foo', function ($user) {
-            $this->assertEquals(1, $user->id);
+            $this->assertSame(1, $user->id);
 
             return true;
         });
@@ -519,7 +519,7 @@ class AuthAccessGateTest extends TestCase
 
         // Assert that the callback receives the new user with ID of 2 instead of ID of 1...
         $gate->define('foo', function ($user) {
-            $this->assertEquals(2, $user->id);
+            $this->assertSame(2, $user->id);
 
             return true;
         });
@@ -541,16 +541,16 @@ class AuthAccessGateTest extends TestCase
         };
         $gate->guessPolicyNamesUsing($guesserCallback);
         $gate->getPolicyFor('fooClass');
-        $this->assertEquals(1, $counter);
+        $this->assertSame(1, $counter);
 
         // now the guesser callback should be present on the new gate as well
         $newGate = $gate->forUser((object) ['id' => 1]);
 
         $newGate->getPolicyFor('fooClass');
-        $this->assertEquals(2, $counter);
+        $this->assertSame(2, $counter);
 
         $newGate->getPolicyFor('fooClass');
-        $this->assertEquals(3, $counter);
+        $this->assertSame(3, $counter);
     }
 
     /**

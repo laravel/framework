@@ -30,13 +30,6 @@ class DynamicComponent extends Component
     protected static $componentClasses = [];
 
     /**
-     * The cached binding keys for component classes.
-     *
-     * @var array
-     */
-    protected static $bindings = [];
-
-    /**
      * Create a new component instance.
      *
      * @return void
@@ -54,7 +47,7 @@ class DynamicComponent extends Component
     public function render()
     {
         $template = <<<'EOF'
-<?php extract(collect($attributes->getAttributes())->mapWithKeys(function ($value, $key) { return [Illuminate\Support\Str::camel(str_replace(':', ' ', $key)) => $value]; })->all(), EXTR_SKIP); ?>
+<?php extract(collect($attributes->getAttributes())->mapWithKeys(function ($value, $key) { return [Illuminate\Support\Str::camel(str_replace([':', '.'], ' ', $key)) => $value]; })->all(), EXTR_SKIP); ?>
 {{ props }}
 <x-{{ component }} {{ bindings }} {{ attributes }}>
 {{ slots }}
@@ -113,7 +106,7 @@ EOF;
     protected function compileBindings(array $bindings)
     {
         return collect($bindings)->map(function ($key) {
-            return ':'.$key.'="$'.Str::camel(str_replace(':', ' ', $key)).'"';
+            return ':'.$key.'="$'.Str::camel(str_replace([':', '.'], ' ', $key)).'"';
         })->implode(' ');
     }
 
@@ -153,13 +146,9 @@ EOF;
      */
     protected function bindings(string $class)
     {
-        if (! isset(static::$bindings[$class])) {
-            [$data, $attributes] = $this->compiler()->partitionDataAndAttributes($class, $this->attributes->getAttributes());
+        [$data, $attributes] = $this->compiler()->partitionDataAndAttributes($class, $this->attributes->getAttributes());
 
-            static::$bindings[$class] = array_keys($data->all());
-        }
-
-        return static::$bindings[$class];
+        return array_keys($data->all());
     }
 
     /**

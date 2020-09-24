@@ -126,4 +126,22 @@ end
 return val
 LUA;
     }
+
+    /**
+     * Get the Lua script for removing all jobs from the queue.
+     *
+     * KEYS[1] - The name of the primary queue
+     * KEYS[2] - The name of the "delayed" queue
+     * KEYS[3] - The name of the "reserved" queue
+     *
+     * @return string
+     */
+    public static function clear()
+    {
+        return <<<'LUA'
+local size = redis.call('llen', KEYS[1]) + redis.call('zcard', KEYS[2]) + redis.call('zcard', KEYS[3])
+redis.call('del', KEYS[1], KEYS[2], KEYS[3])
+return size
+LUA;
+    }
 }
