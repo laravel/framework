@@ -705,11 +705,13 @@ abstract class Factory
 
         $relationship = Str::camel(Str::substr($method, 3));
 
-        $relationshipClass = get_class($this->newModel()->{$relationship}()->getRelated());
+        $relatedModel = get_class($this->newModel()->{$relationship}()->getRelated());
 
-        $factory = method_exists($relationshipClass, 'newFactory') && $relationshipClass::newFactory()
-            ? $relationshipClass::newFactory()
-            : static::factoryForModel($relationshipClass);
+        if (method_exists($relatedModel, 'newFactory')) {
+            $factory = $relatedModel::newFactory() ?: static::factoryForModel($relatedModel);
+        } else {
+            $factory = static::factoryForModel($relatedModel);
+        }
 
         if (Str::startsWith($method, 'for')) {
             return $this->for($factory->state($parameters[0] ?? []), $relationship);
