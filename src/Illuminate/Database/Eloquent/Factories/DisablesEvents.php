@@ -21,7 +21,7 @@ trait DisablesEvents
     }
 
     /**
-     * Enables events during creation
+     * Enables events during creation.
      *
      * @return self
      */

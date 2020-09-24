@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Illuminate\Database\Eloquent\Factories\DisablesEvents;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentFactoryDisablesEventsTest extends TestCase
 {
@@ -63,15 +63,15 @@ class DatabaseEloquentFactoryDisablesEventsTest extends TestCase
     public function test_factory_creates_without_events()
     {
         $dispatcher = Mockery::spy(Dispatcher::class);
-        FactoryTestUser::setEventDispatcher($dispatcher);
+        FactoryEventTestUser::setEventDispatcher($dispatcher);
 
-        $user = FactoryTestUserFactory::new()->withoutEvents()->create();
+        $user = FactoryEventTestUserFactory::new()->withoutEvents()->create();
 
         foreach (self::ALL_MODEL_EVENTS as $event => $method) {
             $dispatcher->shouldNotHaveReceived(
                 $method,
                 [
-                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestUser",
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryEventTestUser",
                     Mockery::on(function ($arg) use ($user) {
                         return $arg->is($user);
                     }),
@@ -79,43 +79,43 @@ class DatabaseEloquentFactoryDisablesEventsTest extends TestCase
             );
         }
 
-        $this->assertInstanceOf(FactoryTestUser::class, $user);
+        $this->assertInstanceOf(FactoryEventTestUser::class, $user);
     }
 
     public function test_factory_creates_with_events()
     {
         $dispatcher = Mockery::spy(Dispatcher::class);
-        FactoryTestUser::setEventDispatcher($dispatcher);
+        FactoryEventTestUser::setEventDispatcher($dispatcher);
 
-        $user = FactoryTestUserFactory::new()->create();
+        $user = FactoryEventTestUserFactory::new()->create();
 
         foreach (self::CREATE_MODEL_EVENTS as $event => $method) {
             $dispatcher->shouldHaveReceived($method)
                 ->with(
-                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestUser",
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryEventTestUser",
                     Mockery::on(function ($arg) use ($user) {
                         return $arg->is($user);
                     }),
                 );
         }
 
-        $this->assertInstanceOf(FactoryTestUser::class, $user);
+        $this->assertInstanceOf(FactoryEventTestUser::class, $user);
     }
 
     public function test_factory_creates_without_events_and_relationship()
     {
         $dispatcher = Mockery::spy(Dispatcher::class);
-        FactoryTestPost::setEventDispatcher($dispatcher);
-        FactoryTestUser::setEventDispatcher($dispatcher);
+        FactoryEventTestPost::setEventDispatcher($dispatcher);
+        FactoryEventTestUser::setEventDispatcher($dispatcher);
 
-        $post = FactoryTestPostFactory::new()->withoutEvents()->create();
+        $post = FactoryEventTestPostFactory::new()->withoutEvents()->create();
 
         foreach (self::ALL_MODEL_EVENTS as $event => $method) {
             $dispatcher->shouldNotHaveReceived(
                 $method,
                 [
-                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestPost",
-                    Mockery::type(FactoryTestPost::class),
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryEventTestPost",
+                    Mockery::type(FactoryEventTestPost::class),
                 ]
             );
         }
@@ -123,38 +123,38 @@ class DatabaseEloquentFactoryDisablesEventsTest extends TestCase
         foreach (self::CREATE_MODEL_EVENTS as $event => $method) {
             $dispatcher->shouldHaveReceived($method)
                 ->with(
-                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestUser",
-                    Mockery::type(FactoryTestUser::class)
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryEventTestUser",
+                    Mockery::type(FactoryEventTestUser::class)
                 );
         }
 
-        $this->assertInstanceOf(FactoryTestPost::class, $post);
-        $this->assertInstanceOf(FactoryTestUser::class, $post->user);
+        $this->assertInstanceOf(FactoryEventTestPost::class, $post);
+        $this->assertInstanceOf(FactoryEventTestUser::class, $post->user);
     }
 
     public function test_factory_creates_with_events_and_relationship()
     {
         $dispatcher = Mockery::spy(Dispatcher::class);
-        FactoryTestPost::setEventDispatcher($dispatcher);
-        FactoryTestUser::setEventDispatcher($dispatcher);
+        FactoryEventTestPost::setEventDispatcher($dispatcher);
+        FactoryEventTestUser::setEventDispatcher($dispatcher);
 
-        $post = FactoryTestPostFactory::new()->withEvents()->create();
+        $post = FactoryEventTestPostFactory::new()->withEvents()->create();
 
         foreach (self::CREATE_MODEL_EVENTS as $event => $method) {
             $dispatcher->shouldHaveReceived($method)
                 ->with(
-                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestPost",
-                    Mockery::type(FactoryTestPost::class)
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryEventTestPost",
+                    Mockery::type(FactoryEventTestPost::class)
                 );
             $dispatcher->shouldHaveReceived($method)
                 ->with(
-                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestUser",
-                    Mockery::type(FactoryTestUser::class)
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryEventTestUser",
+                    Mockery::type(FactoryEventTestUser::class)
                 );
         }
 
-        $this->assertInstanceOf(FactoryTestPost::class, $post);
-        $this->assertInstanceOf(FactoryTestUser::class, $post->user);
+        $this->assertInstanceOf(FactoryEventTestPost::class, $post);
+        $this->assertInstanceOf(FactoryEventTestUser::class, $post->user);
     }
 
     protected function setUp(): void
@@ -207,11 +207,11 @@ class DatabaseEloquentFactoryDisablesEventsTest extends TestCase
     }
 }
 
-class FactoryTestUserFactory extends Factory
+class FactoryEventTestUserFactory extends Factory
 {
     use DisablesEvents;
 
-    protected $model = FactoryTestUser::class;
+    protected $model = FactoryEventTestUser::class;
 
     public function definition()
     {
@@ -222,7 +222,7 @@ class FactoryTestUserFactory extends Factory
     }
 }
 
-class FactoryTestUser extends Eloquent
+class FactoryEventTestUser extends Eloquent
 {
     use HasFactory;
 
@@ -230,36 +230,36 @@ class FactoryTestUser extends Eloquent
 
     public function posts()
     {
-        return $this->hasMany(FactoryTestPost::class, 'user_id');
+        return $this->hasMany(FactoryEventTestPost::class, 'user_id');
     }
 }
 
-class FactoryTestPostFactory extends Factory
+class FactoryEventTestPostFactory extends Factory
 {
     use DisablesEvents;
 
-    protected $model = FactoryTestPost::class;
+    protected $model = FactoryEventTestPost::class;
 
     public function definition()
     {
         return [
-            'user_id' => FactoryTestUserFactory::new(),
+            'user_id' => FactoryEventTestUserFactory::new(),
             'title' => $this->faker->name,
         ];
     }
 }
 
-class FactoryTestPost extends Eloquent
+class FactoryEventTestPost extends Eloquent
 {
     protected $table = 'posts';
 
     public function user()
     {
-        return $this->belongsTo(FactoryTestUser::class, 'user_id');
+        return $this->belongsTo(FactoryEventTestUser::class, 'user_id');
     }
 
     public function author()
     {
-        return $this->belongsTo(FactoryTestUser::class, 'user_id');
+        return $this->belongsTo(FactoryEventTestUser::class, 'user_id');
     }
 }
