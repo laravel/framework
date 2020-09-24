@@ -10,9 +10,35 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Illuminate\Contracts\Events\Dispatcher;
 
 class DatabaseEloquentFactoryTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
+    private const ALL_MODEL_EVENTS = [
+        'retrieved' => 'dispatch',
+        'creating' => 'until',
+        'created' => 'dispatch',
+        'updating' => 'until',
+        'updated' => 'dispatch',
+        'saving' => 'until',
+        'saved' => 'dispatch',
+        'deleting' => 'until',
+        'deleted' => 'dispatch',
+        'restoring' => 'until',
+        'restored' => 'dispatch',
+    ];
+
+    private const CREATE_MODEL_EVENTS = [
+        'creating' => 'until',
+        'created' => 'dispatch',
+        'saving' => 'until',
+        'saved' => 'dispatch',
+    ];
+
     protected function setUp(): void
     {
         Container::getInstance()->singleton(\Faker\Generator::class, function ($app, $parameters) {
@@ -331,6 +357,103 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(FactoryTestUser::class, $post->author);
         $this->assertEquals('Taylor Otwell', $post->author->name);
         $this->assertCount(2, $post->comments);
+    }
+
+    public function test_factory_creates_without_events()
+    {
+        $dispatcher = Mockery::spy(Dispatcher::class);
+        FactoryTestUser::setEventDispatcher($dispatcher);
+
+        $user = FactoryTestUserFactory::new()->withoutEvents()->create();
+
+        foreach (self::ALL_MODEL_EVENTS as $event => $method) {
+            $dispatcher->shouldNotHaveReceived(
+                $method,
+                [
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestUser",
+                    Mockery::on(function ($arg) use ($user) {
+                        return $arg->is($user);
+                    }),
+                ]
+            );
+        }
+
+        $this->assertInstanceOf(FactoryTestUser::class, $user);
+    }
+
+    public function test_factory_creates_with_events()
+    {
+        $dispatcher = Mockery::spy(Dispatcher::class);
+        FactoryTestUser::setEventDispatcher($dispatcher);
+
+        $user = FactoryTestUserFactory::new()->create();
+
+        foreach (self::CREATE_MODEL_EVENTS as $event => $method) {
+            $dispatcher->shouldHaveReceived($method)
+                ->with(
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestUser",
+                    Mockery::on(function ($arg) use ($user) {
+                        return $arg->is($user);
+                    }),
+                );
+        }
+
+        $this->assertInstanceOf(FactoryTestUser::class, $user);
+    }
+
+    public function test_factory_creates_without_events_and_relationship()
+    {
+        $dispatcher = Mockery::spy(Dispatcher::class);
+        FactoryTestPost::setEventDispatcher($dispatcher);
+        FactoryTestUser::setEventDispatcher($dispatcher);
+
+        $post = FactoryTestPostFactory::new()->withoutEvents()->create();
+
+        foreach (self::ALL_MODEL_EVENTS as $event => $method) {
+            $dispatcher->shouldNotHaveReceived(
+                $method,
+                [
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestPost",
+                    Mockery::type(FactoryTestPost::class),
+                ]
+            );
+        }
+
+        foreach (self::CREATE_MODEL_EVENTS as $event => $method) {
+            $dispatcher->shouldHaveReceived($method)
+                ->with(
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestUser",
+                    Mockery::type(FactoryTestUser::class)
+                );
+        }
+
+        $this->assertInstanceOf(FactoryTestPost::class, $post);
+        $this->assertInstanceOf(FactoryTestUser::class, $post->user);
+    }
+
+    public function test_factory_creates_with_events_and_relationship()
+    {
+        $dispatcher = Mockery::spy(Dispatcher::class);
+        FactoryTestPost::setEventDispatcher($dispatcher);
+        FactoryTestUser::setEventDispatcher($dispatcher);
+
+        $post = FactoryTestPostFactory::new()->withEvents()->create();
+
+        foreach (self::CREATE_MODEL_EVENTS as $event => $method) {
+            $dispatcher->shouldHaveReceived($method)
+                ->with(
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestPost",
+                    Mockery::type(FactoryTestPost::class)
+                );
+            $dispatcher->shouldHaveReceived($method)
+                ->with(
+                    "eloquent.${event}: Illuminate\Tests\Database\FactoryTestUser",
+                    Mockery::type(FactoryTestUser::class)
+                );
+        }
+
+        $this->assertInstanceOf(FactoryTestPost::class, $post);
+        $this->assertInstanceOf(FactoryTestUser::class, $post->user);
     }
 
     /**

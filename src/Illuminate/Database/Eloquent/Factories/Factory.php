@@ -100,6 +100,13 @@ abstract class Factory
     protected static $factoryNameResolver;
 
     /**
+     * Tracks if events should be disabled in this factory instance.
+     *
+     * @var bool
+     */
+    protected $disableEvents = false;
+
+    /**
      * Create a new factory instance.
      *
      * @param  int|null  $count
@@ -242,12 +249,13 @@ abstract class Factory
      */
     protected function store(Collection $results)
     {
-        $results->each(function ($model) {
+        $shouldDisableEvents = $this->shouldDisableEvents();
+        $results->each(function ($model) use ($shouldDisableEvents) {
             if (! isset($this->connection)) {
                 $model->setConnection($model->newQueryWithoutScopes()->getConnection()->getName());
             }
 
-            $model->save();
+            $shouldDisableEvents ? $model->saveQuietly() : $model->save();
 
             $this->createChildren($model);
         });
@@ -573,7 +581,7 @@ abstract class Factory
      */
     protected function newInstance(array $arguments = [])
     {
-        return new static(...array_values(array_merge([
+        $newInstance = new static(...array_values(array_merge([
             'count' => $this->count,
             'states' => $this->states,
             'has' => $this->has,
@@ -582,6 +590,10 @@ abstract class Factory
             'afterCreating' => $this->afterCreating,
             'connection' => $this->connection,
         ], $arguments)));
+
+        return $this->shouldDisableEvents()
+            ? $newInstance->withoutEvents()
+            : $newInstance->withEvents();
     }
 
     /**
@@ -688,6 +700,44 @@ abstract class Factory
         };
 
         return $resolver($modelName);
+    }
+
+    /**
+     * Disables events during creation.
+     *
+     * @return self
+     */
+    public function withoutEvents()
+    {
+        $this->disableEvents = true;
+
+        return $this;
+    }
+
+    /**
+     * Enables events during creation.
+     *
+     * @return self
+     */
+    public function withEvents()
+    {
+        $this->disableEvents = false;
+
+        return $this;
+    }
+
+    /**
+     * Checks if events should be disabled for creation.
+     *
+     * @return bool
+     */
+    protected function shouldDisableEvents(): bool
+    {
+        if (isset($this->disableEvents) && ! is_null($this->disableEvents)) {
+            return $this->disableEvents;
+        }
+
+        return false;
     }
 
     /**
