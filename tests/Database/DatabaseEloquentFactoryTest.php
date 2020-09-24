@@ -399,8 +399,6 @@ class FactoryTestPostFactory extends Factory
 
 class FactoryTestPost extends Eloquent
 {
-    use HasFactory;
-
     protected $table = 'posts';
 
     public function user()
@@ -435,8 +433,6 @@ class FactoryTestCommentFactory extends Factory
 
 class FactoryTestComment extends Eloquent
 {
-    use HasFactory;
-
     protected $table = 'comments';
 
     public function commentable()
@@ -459,8 +455,6 @@ class FactoryTestRoleFactory extends Factory
 
 class FactoryTestRole extends Eloquent
 {
-    use HasFactory;
-
     protected $table = 'roles';
 
     public function users()

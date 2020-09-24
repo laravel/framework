@@ -707,7 +707,9 @@ abstract class Factory
 
         $relationshipClass = get_class($this->newModel()->{$relationship}()->getRelated());
 
-        $factory = $relationshipClass::newFactory() ?: static::factoryForModel($relationshipClass);
+        $factory = method_exists($relationshipClass, 'newFactory') && $relationshipClass::newFactory()
+            ? $relationshipClass::newFactory()
+            : static::factoryForModel($relationshipClass);
 
         if (Str::startsWith($method, 'for')) {
             return $this->for($factory->state($parameters[0] ?? []), $relationship);
