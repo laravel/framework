@@ -196,6 +196,37 @@ trait InteractsWithInput
     }
 
     /**
+     * Apply the callback if the request contains a non-empty value equals to the expected input key.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @return $this|mixed
+     */
+    public function whenEquals($key, $value, callable $callback)
+    {
+        if ($this->filled($key) && $this->isEquals($key, $value)) {
+            return $callback(data_get($this->all(), $key)) ?: $this;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Determine if a given input value matches a given pattern.
+     *
+     * @param  string $key
+     * @param  string $value
+     * @return boolean
+     */
+    public function isEquals($key, $value)
+    {
+        $pattern = $this->input($key);
+
+        return Str::is($pattern, $value);
+    }
+
+    /**
      * Determine if the request is missing a given input item key.
      *
      * @param  string|array  $key

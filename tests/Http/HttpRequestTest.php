@@ -356,6 +356,36 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($foo);
     }
 
+    public function testWhenEqualsMethod()
+    {
+        $parameters = ['name' => 'Taylor', 'age' => '', 'city' => null, 'foo' => 0];
+
+        $request = Request::create('/', 'GET', $parameters);
+
+        [$name, $age, $city, $foo] = array_values($parameters);
+
+        $request->whenEquals('name', 'Taylor', function ($value) use (&$name) {
+            $name = $value . ' ' . 'Otwell';
+        });
+
+        $request->whenEquals('age', '', function ($value) use (&$age) {
+            $age = 'test';
+        });
+
+        $request->whenEquals('city', null, function ($value) use (&$city) {
+            $city = 'test';
+        });
+
+        $request->whenEquals('foo', 0, function () use (&$foo) {
+            $foo = 10;
+        });
+
+        $this->assertSame('Taylor Otwell', $name);
+        $this->assertEmpty($age);
+        $this->assertNull($city);
+        $this->assertSame(10, $foo);
+    }
+
     public function testMissingMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
