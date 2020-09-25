@@ -70,6 +70,6 @@ class ViewComponentAttributeBagTest extends TestCase
     {
         ComponentAttributeBag::implodedAttributes(['data-id', 'data-test' => '*']);
         $bag = new ComponentAttributeBag(['class' => 'p-1', 'data-id' => 'test', 'data-test' => 'example']);
-        $this->assertSame('class="mb-4 p-1" data-id="id test" data-test="test*example"', (string) $bag->merge(['class' => 'mb-4','data-id' => 'id', 'data-test' => 'test']));
+        $this->assertSame('class="mb-4 p-1" data-id="id test" data-test="test*example"', (string) $bag->merge(['class' => 'mb-4', 'data-id' => 'id', 'data-test' => 'test']));
     }
 }

@@ -23,7 +23,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     protected $attributes = [];
 
     /**
-     * Array of attributes that should be imploded. 'class' is still hard coded
+     * Array of attributes that should be imploded. 'class' is still hard coded.
      *
      * @var array
      */
@@ -41,9 +41,10 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
-     * Set our list of imploded attributes
+     * Set our list of imploded attributes.
      *
-     * @param  array $attrs
+     * @param  array  $attrs
+     * @return void
      */
     public static function implodedAttributes($attrs)
     {
@@ -214,9 +215,9 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
-     * Determine where or not to implode a merged attribute instead of overwriting it
+     * Determine where or not to implode a merged attribute instead of overwriting it.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return bool
      */
     protected function attributeShouldBeImploded($key)
@@ -225,9 +226,9 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
-     * Determine which character to use when imploding a merged attribute
+     * Determine which character to use when imploding a merged attribute.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return string
      */
     protected function getAttributeImplodeGlueCharacter($key)
