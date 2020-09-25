@@ -58,7 +58,7 @@ use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 use Illuminate\Queue\Console\BatchesTableCommand;
 use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
-use Illuminate\Queue\Console\DeletePendingCommand as QueueDeletePendingCommand;
+use Illuminate\Queue\Console\DeleteCommand as QueueDeleteCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
@@ -99,7 +99,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'OptimizeClear' => 'command.optimize.clear',
         'PackageDiscover' => 'command.package.discover',
         'QueueClear' => 'command.queue.clear',
-        'QueueDeletePending' => 'command.queue.delete-pending',
+        'QueueDelete' => 'command.queue.delete',
         'QueueFailed' => 'command.queue.failed',
         'QueueFlush' => 'command.queue.flush',
         'QueueForget' => 'command.queue.forget',
@@ -733,10 +733,10 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerQueueDeletePendingCommand()
+    protected function registerQueueDeleteCommand()
     {
-        $this->app->singleton('command.queue.delete-pending', function () {
-            return new QueueDeletePendingCommand;
+        $this->app->singleton('command.queue.delete', function () {
+            return new QueueDeleteCommand;
         });
     }
 

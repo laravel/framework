@@ -442,6 +442,29 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param  string  $driver
      */
+    public function testDeleteDelayed($driver)
+    {
+        $this->setQueue($driver);
+
+        $job1 = new RedisQueueIntegrationTestJob(30);
+        $job2 = new RedisQueueIntegrationTestJob(40);
+        $job3 = new RedisQueueIntegrationTestJob(50);
+
+        $id1 = $this->queue->push($job1);
+        $id2 = $this->queue->later(60, $job2);
+        $id3 = $this->queue->push($job3);
+
+        $this->assertTrue($this->queue->deleteDelayed(null, $id2));
+        $this->assertEquals(2, $this->queue->size());
+        $this->assertEquals($id1, $this->queue->pop()->getJobId());
+        $this->assertEquals($id3, $this->queue->pop()->getJobId());
+    }
+
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param  string  $driver
+     */
     public function testClear($driver)
     {
         $this->setQueue($driver);

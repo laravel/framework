@@ -273,6 +273,20 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue, Deletab
     }
 
     /**
+     * Delete a delayed job from the queue.
+     *
+     * @param  string|null  $queue
+     * @param  mixed  $id
+     * @return bool
+     */
+    public function deleteDelayed($queue, $id)
+    {
+        return (bool) $this->getConnection()->eval(
+            LuaScripts::deleteDelayed(), 1, $this->getQueue($queue).':delayed', $id
+        );
+    }
+
+    /**
      * Delete a reserved job from the queue.
      *
      * @param  string  $queue

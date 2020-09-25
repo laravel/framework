@@ -7,7 +7,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Queue\DeletableQueue;
 use ReflectionClass;
 
-class DeletePendingCommand extends Command
+class DeleteCommand extends Command
 {
     use ConfirmableTrait;
 
@@ -16,7 +16,7 @@ class DeletePendingCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:delete {id : The ID of the pending job}
+    protected $signature = 'queue:delete {id : The ID of the pending or delayed job}
                             {--connection= : The name of the queue connection}
                             {--queue= : The name of the queue}';
 
@@ -25,7 +25,7 @@ class DeletePendingCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Delete a pending job from the queue';
+    protected $description = 'Delete a pending or delayed job from the queue';
 
     /**
      * Execute the console command.
@@ -49,13 +49,14 @@ class DeletePendingCommand extends Command
         $queue = ($this->laravel['queue'])->connection($connection);
 
         if ($queue instanceof DeletableQueue) {
-            if ($queue->deletePending($queueName, $this->argument('id'))) {
-                $this->info('Pending job deleted successfully!');
+            if ($queue->deletePending($queueName, $this->argument('id')) ||
+                $queue->deleteDelayed($queueName, $this->argument('id'))) {
+                $this->info('Pending/delayed job deleted successfully!');
             } else {
-                $this->error('No pending job matches the given ID.');
+                $this->error('No pending/delayed job matches the given ID.');
             }
         } else {
-            $this->error('Deleting pending jobs is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
+            $this->error('Deleting pending/delayed jobs is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
         }
 
         return 0;

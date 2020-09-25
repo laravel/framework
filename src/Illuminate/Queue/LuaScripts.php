@@ -163,6 +163,39 @@ LUA;
     }
 
     /**
+     * Get the Lua script for deleting a delayed job.
+     *
+     * KEYS[1] - The name of the delayed queue
+     * ARGV[1] - The ID of the job to delete
+     *
+     * @return string
+     */
+    public static function deleteDelayed()
+    {
+        return <<<'LUA'
+local cursor = 0
+
+repeat
+    -- Iterate over the delayed jobs sorted set
+    local scanner = redis.call('zscan', KEYS[1], cursor)
+    cursor = scanner[1]
+
+    for i = 1, #scanner[2], 2 do
+        local job = cjson.decode(scanner[2][i])
+
+        -- If the job ID matches, remove it from the sorted set and return
+        if(job['id'] == ARGV[1]) then
+            redis.call('zrem', KEYS[1], scanner[2][i])
+            return true
+        end
+    end
+until cursor == '0'
+
+return false
+LUA;
+    }
+
+    /**
      * Get the Lua script for removing all jobs from the queue.
      *
      * KEYS[1] - The name of the primary queue

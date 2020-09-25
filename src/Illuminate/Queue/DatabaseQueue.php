@@ -259,6 +259,20 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue, Dele
     }
 
     /**
+     * Modify the query to check for delayed jobs.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return void
+     */
+    protected function isDelayed($query)
+    {
+        $query->where(function ($query) {
+            $query->whereNull('reserved_at')
+                  ->where('available_at', '>', $this->currentTime());
+        });
+    }
+
+    /**
      * Modify the query to check for jobs that are reserved but have expired.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -317,8 +331,33 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue, Dele
         return $this->database->transaction(function () use ($queue, $id) {
             if ($this->database->table($this->table)
                     ->where('queue', $this->getQueue($queue))
-                    ->whereNull('reserved_at')
-                    ->lockForUpdate()->find($id)) {
+                    ->where(function ($query) {
+                        $this->isAvailable($query);
+                    })->lockForUpdate()->find($id)) {
+                $this->database->table($this->table)->where('id', $id)->delete();
+
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Delete a delayed job from the queue.
+     *
+     * @param  string|null  $queue
+     * @param  mixed  $id
+     * @return bool
+     */
+    public function deleteDelayed($queue, $id)
+    {
+        return $this->database->transaction(function () use ($queue, $id) {
+            if ($this->database->table($this->table)
+                    ->where('queue', $this->getQueue($queue))
+                    ->where(function ($query) {
+                        $this->isDelayed($query);
+                    })->lockForUpdate()->find($id)) {
                 $this->database->table($this->table)->where('id', $id)->delete();
 
                 return true;
