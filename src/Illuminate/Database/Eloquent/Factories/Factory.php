@@ -7,6 +7,7 @@ use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -491,6 +492,26 @@ abstract class Factory
     }
 
     /**
+     * Define a parent model for the model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string|null  $relationship
+     * @return static
+     */
+    public function of(Model $model, $relationship = null)
+    {
+        $relationship = $relationship ?: Str::camel(class_basename($model));
+        $relationship = $this->newModel()->{$relationship}();
+
+        return $this->state($relationship instanceof MorphTo ? [
+            $relationship->getMorphType() => $model->getMorphClass(),
+            $relationship->getForeignKeyName() => $model->getKey(),
+        ] : [
+            $relationship->getForeignKeyName() => $model->getKey(),
+        ]);
+    }
+
+    /**
      * Add a new "after making" callback to the model definition.
      *
      * @param  \Closure  $callback
@@ -699,6 +720,12 @@ abstract class Factory
      */
     public function __call($method, $parameters)
     {
+        if (Str::startsWith($method, 'of')) {
+            $relationship = Str::camel(Str::substr($method, 2));
+
+            return $this->of($parameters[0], $relationship);
+        }
+
         if (! Str::startsWith($method, ['for', 'has'])) {
             static::throwBadMethodCallException($method);
         }

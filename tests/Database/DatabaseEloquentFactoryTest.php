@@ -232,6 +232,32 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestComment::all());
     }
 
+    public function test_of_belongs_to_relationship()
+    {
+        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
+        $posts = FactoryTestPostFactory::times(3)
+            ->of($user, 'user')
+            ->create();
+
+        $this->assertCount(3, $user->posts);
+
+        $this->assertCount(1, FactoryTestUser::all());
+        $this->assertCount(3, FactoryTestPost::all());
+    }
+
+    public function test_of_morph_to_relationship()
+    {
+        $post = FactoryTestPostFactory::new(['title' => 'Test Title'])->create();
+        $comments = FactoryTestCommentFactory::times(3)
+            ->of($post, 'commentable')
+            ->create();
+
+        $this->assertCount(3, $post->comments);
+
+        $this->assertCount(1, FactoryTestPost::all());
+        $this->assertCount(3, FactoryTestComment::all());
+    }
+
     public function test_belongs_to_many_relationship()
     {
         $users = FactoryTestUserFactory::times(3)
@@ -331,6 +357,23 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(FactoryTestUser::class, $post->author);
         $this->assertEquals('Taylor Otwell', $post->author->name);
         $this->assertCount(2, $post->comments);
+    }
+
+    public function test_dynamic_of_method()
+    {
+        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
+        $posts = FactoryTestPostFactory::times(3)
+            ->ofAuthor($user)
+            ->create();
+
+        $this->assertCount(3, $user->posts);
+
+        $post = FactoryTestPostFactory::new(['title' => 'Test Title'])->create();
+        $comments = FactoryTestCommentFactory::times(3)
+            ->ofCommentable($post)
+            ->create();
+
+        $this->assertCount(3, $post->comments);
     }
 
     /**
