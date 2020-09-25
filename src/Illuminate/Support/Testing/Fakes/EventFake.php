@@ -193,7 +193,7 @@ class EventFake implements Dispatcher
      */
     public function flush($event)
     {
-        //
+        unset($this->events[$event]);
     }
 
     /**

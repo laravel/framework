@@ -118,9 +118,38 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->assertDispatched('Bar');
         $fake->assertNotDispatched('Baz');
     }
+
+    public function testFlushFakes()
+    {
+        $this->fake->dispatch(new EventStub);
+        $this->fake->dispatch(new Event2Stub);
+
+        $this->fake->assertDispatched(function (EventStub $event) {
+            return true;
+        });
+
+        $this->fake->assertDispatched(function (Event2Stub $event) {
+            return true;
+        });
+
+        $this->fake->flush(EventStub::class);
+
+        $this->fake->assertNotDispatched(function (EventStub $event) {
+            return true;
+        });
+
+        $this->fake->assertDispatched(function (Event2Stub $event) {
+            return true;
+        });
+    }
 }
 
 class EventStub
+{
+    //
+}
+
+class Event2Stub
 {
     //
 }
