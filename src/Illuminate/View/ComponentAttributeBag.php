@@ -23,6 +23,13 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     protected $attributes = [];
 
     /**
+     * Array of attributes that should be imploded. 'class' is still hard coded
+     *
+     * @var array
+     */
+    public static $implodedAttributes = [];
+
+    /**
      * Create a new component attribute bag instance.
      *
      * @param  array  $attributes
@@ -31,6 +38,16 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     public function __construct(array $attributes = [])
     {
         $this->attributes = $attributes;
+    }
+
+    /**
+     * Set our list of imploded attributes
+     *
+     * @param  array $attrs
+     */
+    public static function implodedAttributes($attrs)
+    {
+        static::$implodedAttributes = $attrs;
     }
 
     /**
@@ -182,18 +199,44 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         }, $attributeDefaults);
 
         foreach ($this->attributes as $key => $value) {
-            if ($key !== 'class') {
-                $attributes[$key] = $value;
+            if ($this->attributeShouldBeImploded($key)) {
+                $attributes[$key] = implode($this->getAttributeImplodeGlueCharacter($key), array_unique(
+                    array_filter([$attributeDefaults[$key] ?? '', $value])
+                ));
 
                 continue;
             }
 
-            $attributes[$key] = implode(' ', array_unique(
-                array_filter([$attributeDefaults[$key] ?? '', $value])
-            ));
+            $attributes[$key] = $value;
         }
 
         return new static(array_merge($attributeDefaults, $attributes));
+    }
+
+    /**
+     * Determine where or not to implode a merged attribute instead of overwriting it
+     *
+     * @param  string $key
+     * @return bool
+     */
+    protected function attributeShouldBeImploded($key)
+    {
+        return $key === 'class' || in_array($key, static::$implodedAttributes) || isset(static::$implodedAttributes[$key]);
+    }
+
+    /**
+     * Determine which character to use when imploding a merged attribute
+     *
+     * @param  string $key
+     * @return string
+     */
+    protected function getAttributeImplodeGlueCharacter($key)
+    {
+        if ($key === 'class' || in_array($key, static::$implodedAttributes)) {
+            return ' ';
+        }
+
+        return static::$implodedAttributes[$key] ?? ' ';
     }
 
     /**
