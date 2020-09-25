@@ -241,6 +241,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is absent.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAbsent($attribute, $value)
+    {
+        return ! Arr::has($this->data, $attribute);
+    }
+
+    /**
      * Validate that an attribute contains only alphabetic characters.
      *
      * @param  string  $attribute

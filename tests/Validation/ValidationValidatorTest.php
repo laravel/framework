@@ -688,6 +688,20 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->hasRule('bar', 'Required'));
     }
 
+    public function testValidateAbsent()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [], ['name' => 'absent']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'Taylor'], ['name' => 'absent']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => false], ['name' => 'absent']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateArray()
     {
         $trans = $this->getIlluminateArrayTranslator();
