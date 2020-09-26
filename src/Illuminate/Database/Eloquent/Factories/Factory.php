@@ -607,9 +607,12 @@ abstract class Factory
         $resolver = static::$modelNameResolver ?: function (self $factory) {
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
 
-            return class_exists('App\\Models\\'.$factoryBasename)
-                        ? 'App\\Models\\'.$factoryBasename
-                        : 'App\\'.$factoryBasename;
+            $rootNamespace = self::rootNamespace();
+            $modelsNamespace = $rootNamespace.'Models\\';
+
+            return class_exists($modelsNamespace.$factoryBasename)
+                        ? $modelsNamespace.$factoryBasename
+                        : $rootNamespace.'\\'.$factoryBasename;
         };
 
         return $this->model ?: $resolver($this);
@@ -662,6 +665,17 @@ abstract class Factory
     }
 
     /**
+     * Get the root namespace for the class.
+     *
+     * @return string
+     */
+    protected static function rootNamespace()
+    {
+        return Container::getInstance()
+            ->getNamespace();
+    }
+
+    /**
      * Get a new Faker instance.
      *
      * @return \Faker\Generator
@@ -680,9 +694,12 @@ abstract class Factory
     public static function resolveFactoryName(string $modelName)
     {
         $resolver = static::$factoryNameResolver ?: function (string $modelName) {
-            $modelName = Str::startsWith($modelName, 'App\\Models\\')
-                ? Str::after($modelName, 'App\\Models\\')
-                : Str::after($modelName, 'App\\');
+            $rootNamespace = self::rootNamespace();
+            $modelsNamespace = $rootNamespace.'Models';
+
+            $modelName = Str::startsWith($modelName, $modelsNamespace)
+                ? Str::after($modelName, $modelsNamespace.'\\')
+                : Str::after($modelName, $rootNamespace);
 
             return static::$namespace.$modelName.'Factory';
         };

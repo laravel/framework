@@ -290,6 +290,12 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_nested_model_factories()
     {
+        $container = \Mockery::mock(Container::class)->makePartial();
+
+        $container->shouldReceive('getNamespace')->andReturn('App\\');
+
+        Container::setInstance($container);
+
         Factory::useNamespace('Factories\\');
 
         $resolves = [
