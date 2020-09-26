@@ -65,9 +65,10 @@ class FactoryMakeCommand extends GeneratorCommand
                         : $this->qualifyModel($this->guessModelName($name));
 
         $model = class_basename($namespaceModel);
+        $modelsNamespace = $this->rootNamespace()."Models";
 
-        if (Str::startsWith($namespaceModel, 'App\\Models')) {
-            $namespace = Str::beforeLast('Database\\Factories\\'.Str::after($namespaceModel, 'App\\Models\\'), '\\');
+        if (Str::startsWith($namespaceModel, $modelsNamespace)) {
+            $namespace = Str::beforeLast('Database\\Factories\\'.Str::after($namespaceModel, $modelsNamespace.'\\'), '\\');
         } else {
             $namespace = 'Database\\Factories';
         }

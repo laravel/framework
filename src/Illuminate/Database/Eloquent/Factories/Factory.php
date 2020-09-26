@@ -660,6 +660,16 @@ abstract class Factory
     {
         static::$factoryNameResolver = $callback;
     }
+    /**
+     * Get the root namespace for the class.
+     *
+     * @return string
+     */
+    protected static function rootNamespace()
+    {
+        return Container::getInstance()
+            ->getNamespace();
+    }
 
     /**
      * Get a new Faker instance.
@@ -680,9 +690,12 @@ abstract class Factory
     public static function resolveFactoryName(string $modelName)
     {
         $resolver = static::$factoryNameResolver ?: function (string $modelName) {
-            $modelName = Str::startsWith($modelName, 'App\\Models\\')
-                ? Str::after($modelName, 'App\\Models\\')
-                : Str::after($modelName, 'App\\');
+            $rootNamespace = self::rootNamespace();
+            $modelsNamespace = $rootNamespace."Models";
+
+            $modelName = Str::startsWith($modelName, $modelsNamespace)
+                ? Str::after($modelName, $modelsNamespace.'\\')
+                : Str::after($modelName, $rootNamespace);
 
             return static::$namespace.$modelName.'Factory';
         };
