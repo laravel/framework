@@ -640,7 +640,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Route
      */
-    protected function findRoute($request)
+    protected function findRoute(Request $request)
     {
         $this->current = $route = $this->routes->match($request);
 
