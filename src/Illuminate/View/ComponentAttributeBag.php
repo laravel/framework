@@ -181,7 +181,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     public function merge(array $attributeDefaults = [], $escape = true)
     {
         $attributes = [];
-        
+
         $attributeDefaults = $this->getDefaultAttributeValueArray($attributeDefaults, $escape);
 
         foreach ($this->attributes as $key => $value) {
