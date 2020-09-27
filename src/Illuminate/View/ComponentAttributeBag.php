@@ -23,14 +23,23 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     protected $attributes = [];
 
     /**
+     * The array of attributes that will be concatenated.
+     *
+     * @var array
+     */
+    protected $concatenatedAttributes = [];
+
+    /**
      * Create a new component attribute bag instance.
      *
      * @param  array  $attributes
+     * @param  array  $concatenatedAttributes
      * @return void
      */
-    public function __construct(array $attributes = [])
+    public function __construct(array $attributes = [], array $concatenatedAttributes = [])
     {
         $this->attributes = $attributes;
+        $this->concatenatedAttributes = $concatenatedAttributes;
     }
 
     /**
@@ -166,20 +175,15 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      * Merge additional attributes / values into the attribute bag.
      *
      * @param  array  $attributeDefaults
-     * @param  bool  $escape
+     * @param  bool   $escape
      * @return static
      */
     public function merge(array $attributeDefaults = [], $escape = true)
     {
         $attributes = [];
 
-        $attributeDefaults = array_map(function ($value) use ($escape) {
-            if (! $escape || is_object($value) || is_null($value) || is_bool($value)) {
-                return $value;
-            }
 
-            return e($value);
-        }, $attributeDefaults);
+        $attributeDefaults = $this->getDefaultAttributeValueArray($attributeDefaults, $escape);
 
         foreach ($this->attributes as $key => $value) {
             if ($key !== 'class') {
@@ -193,7 +197,47 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             ));
         }
 
-        return new static(array_merge($attributeDefaults, $attributes));
+        return new static(array_merge($attributeDefaults, $attributes), $this->concatenatedAttributes);
+    }
+
+    /**
+     * @param  array  $attributeDefaults
+     * @param  bool   $escape
+     * @return static
+     */
+    public function concat(array $attributeDefaults = [], $escape = true)
+    {
+        $concatAttributes = [];
+
+        $attributeDefaults = $this->getDefaultAttributeValueArray($attributeDefaults, $escape);
+
+        foreach ($this->attributes as $key => $value) {
+            if(array_key_exists($key, $attributeDefaults)) {
+                $concatAttributes[$key] = implode(' ', array_unique(
+                    array_filter([$attributeDefaults[$key] ?? '', $value])
+                ));
+            }
+        }
+
+        return new static($this->attributes, array_merge($this->concatenatedAttributes, $concatAttributes));
+    }
+
+    /**
+     * Given array of attributes return the appropriate key value pair.
+     *
+     * @param  array  $attributes
+     * @param  bool   $escape
+     * @return array
+     */
+    public function getDefaultAttributeValueArray($attributes, $escape = true)
+    {
+        return array_map(function ($value) use ($escape) {
+            if (! $escape || is_object($value) || is_null($value) || is_bool($value)) {
+                return $value;
+            }
+
+            return e($value);
+        }, $attributes);
     }
 
     /**
@@ -311,7 +355,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         $string = '';
 
-        foreach ($this->attributes as $key => $value) {
+        foreach (array_merge($this->attributes, $this->concatenatedAttributes) as $key => $value) {
             if ($value === false || is_null($value)) {
                 continue;
             }

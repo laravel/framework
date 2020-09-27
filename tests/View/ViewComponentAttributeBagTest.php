@@ -65,4 +65,31 @@ class ViewComponentAttributeBagTest extends TestCase
 
         $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
     }
+
+    public function testAttributeConcatenationWithMerge()
+    {
+        $bag = new ComponentAttributeBag(['class' => 'p-2', 'data-controller' => 'autocomplete', 'data-id' => 'merged']);
+
+        $bag = $bag->concat(['class' => 'mb-3', 'data-controller' => 'item-select'])->merge(['data-id' => 'default']);
+
+        $this->assertSame('data-id="merged" class="mb-3 p-2" data-controller="item-select autocomplete"', (string) $bag);
+    }
+
+    public function testAttributeMergeWithConcatenation()
+    {
+        $bag = new ComponentAttributeBag(['class' => 'p-2', 'data-controller' => 'autocomplete', 'data-id' => 'merged']);
+
+        $bag = $bag->merge(['data-id' => 'default'])->concat(['class' => 'mb-3', 'data-controller' => 'item-select']);
+
+        $this->assertSame('data-id="merged" class="mb-3 p-2" data-controller="item-select autocomplete"', (string) $bag);
+    }
+
+    public function testAttributeMergeWithClassStillConcatenates()
+    {
+        $bag = new ComponentAttributeBag(['class' => 'p-2']);
+
+        $bag = $bag->merge(['class' => 'mb-4']);
+
+        $this->assertSame('class="mb-4 p-2"', (string) $bag);
+    }
 }
