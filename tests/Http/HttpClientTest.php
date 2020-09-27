@@ -476,6 +476,42 @@ class HttpClientTest extends TestCase
         throw new RequestException(new Response($response));
     }
 
+    public function testThrowWithCallsClosureOnError()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 401),
+        ]);
+        $response = $client->get('laravel.com');
+
+        try {
+            $response->throwWith(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+        } catch (RequestException $e) {
+            //
+        }
+
+        $this->assertSame(401, $status);
+        $this->assertSame(401, $response->status());
+    }
+
+    public function testThrowWithDoesntCallClosureOnSuccess()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 201),
+        ]);
+        $response = $client->get('laravel.com');
+
+        $response->throwWith(function ($response) use (&$status) {
+            $status = $response->status();
+        });
+
+        $this->assertSame(0, $status);
+        $this->assertSame(201, $response->status());
+    }
+
     public function testSinkToFile()
     {
         $this->factory->fakeSequence()->push('abc123');

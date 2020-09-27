@@ -209,7 +209,24 @@ class Response implements ArrayAccess
      */
     public function throw()
     {
+        return $this->throwWith(function () {
+            //
+        });
+    }
+
+    /**
+     * Execute the callback and throw an exception if a server of client error occurred.
+     *
+     * @param \Closure $callback
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwWith($callback)
+    {
         if ($this->serverError() || $this->clientError()) {
+            $callback($this);
+
             throw new RequestException($this);
         }
 
