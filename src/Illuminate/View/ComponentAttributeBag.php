@@ -201,6 +201,8 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
+     * Concatenate additional attributes/values into the attribute bag.
+     *
      * @param  array  $attributeDefaults
      * @param  bool   $escape
      * @return static
@@ -212,7 +214,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         $attributeDefaults = $this->getDefaultAttributeValueArray($attributeDefaults, $escape);
 
         foreach ($this->attributes as $key => $value) {
-            if(array_key_exists($key, $attributeDefaults)) {
+            if (array_key_exists($key, $attributeDefaults)) {
                 $concatAttributes[$key] = implode(' ', array_unique(
                     array_filter([$attributeDefaults[$key] ?? '', $value])
                 ));
