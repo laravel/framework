@@ -33,9 +33,9 @@ class ModelNotFoundException extends RuntimeException
         $this->model = $model;
         $this->ids = Arr::wrap($ids);
 
-        $this->message = "No query results for model [{$model}]";
+        $this->message = app()->environment('production') ? "This record could not be found" : 'No query results for model [{$model}]';
 
-        if (count($this->ids) > 0) {
+        if (count($this->ids) > 0 && app()->environment('production')) {
             $this->message .= ' '.implode(', ', $this->ids);
         } else {
             $this->message .= '.';
