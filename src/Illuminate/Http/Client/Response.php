@@ -209,9 +209,11 @@ class Response implements ArrayAccess
      */
     public function throw()
     {
-        return $this->throwWith(function () {
-            //
-        });
+        if ($this->serverError() || $this->clientError()) {
+            throw new RequestException($this);
+        }
+
+        return $this;
     }
 
     /**
@@ -219,15 +221,11 @@ class Response implements ArrayAccess
      *
      * @param \Closure $callback
      * @return $this
-     *
-     * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throwWith($callback)
+    public function onError($callback)
     {
         if ($this->serverError() || $this->clientError()) {
             $callback($this);
-
-            throw new RequestException($this);
         }
 
         return $this;

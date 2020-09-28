@@ -476,40 +476,84 @@ class HttpClientTest extends TestCase
         throw new RequestException(new Response($response));
     }
 
-    public function testThrowWithCallsClosureOnError()
+    public function testOnErrorDoesntCallClosureOnInformational()
     {
         $status = 0;
         $client = $this->factory->fake([
-            'laravel.com' => $this->factory::response('', 401),
+            'laravel.com' => $this->factory::response('', 101),
         ]);
-        $response = $client->get('laravel.com');
 
-        try {
-            $response->throwWith(function ($response) use (&$status) {
+        $response = $client->get('laravel.com')
+            ->onError(function ($response) use (&$status) {
                 $status = $response->status();
             });
-        } catch (RequestException $e) {
-            //
-        }
 
-        $this->assertSame(401, $status);
-        $this->assertSame(401, $response->status());
+        $this->assertSame(0, $status);
+        $this->assertSame(101, $response->status());
     }
 
-    public function testThrowWithDoesntCallClosureOnSuccess()
+    public function testOnErrorDoesntCallClosureOnSuccess()
     {
         $status = 0;
         $client = $this->factory->fake([
             'laravel.com' => $this->factory::response('', 201),
         ]);
-        $response = $client->get('laravel.com');
 
-        $response->throwWith(function ($response) use (&$status) {
-            $status = $response->status();
-        });
+        $response = $client->get('laravel.com')
+            ->onError(function ($response) use (&$status) {
+                $status = $response->status();
+            });
 
         $this->assertSame(0, $status);
         $this->assertSame(201, $response->status());
+    }
+
+    public function testOnErrorDoesntCallClosureOnRedirection()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 301),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onError(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(0, $status);
+        $this->assertSame(301, $response->status());
+    }
+
+    public function testOnErrorCallsClosureOnClientError()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 401),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onError(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(401, $status);
+        $this->assertSame(401, $response->status());
+    }
+
+    public function testOnErrorCallsClosureOnServerError()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 501),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onError(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(501, $status);
+        $this->assertSame(501, $response->status());
     }
 
     public function testSinkToFile()
