@@ -620,9 +620,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return false;
         }
 
-        return tap($query->where(
-            $this->getKeyName(), $this->getKey()
-        )->{$method}($column, $amount, $extra), function () use ($column) {
+        return tap($this->setKeysForSaveQuery($query)->{$method}($column, $amount, $extra), function () use ($column) {
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
@@ -813,7 +811,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function setKeysForSaveQuery(Builder $query)
+    protected function setKeysForSaveQuery($query)
     {
         $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
 
