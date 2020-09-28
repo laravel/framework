@@ -31,7 +31,7 @@ class PostgresSchemaState extends SchemaState
     {
         with($process = $this->makeProcess(
             $this->baseDumpCommand().' --table=migrations --data-only --inserts'
-        ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+        ))->setTimeout(null)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
 
