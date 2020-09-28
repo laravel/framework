@@ -181,6 +181,21 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Execute the given callback if there was a server or client error.
+     *
+     * @param  \Closure|callable $callback
+     * @return $this
+     */
+    public function onError(callable $callback)
+    {
+        if ($this->serverError() || $this->clientError()) {
+            $callback($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the response cookies.
      *
      * @return \GuzzleHttp\Cookie\CookieJar
@@ -203,14 +218,21 @@ class Response implements ArrayAccess
     /**
      * Throw an exception if a server or client error occurred.
      *
+     * @param  \Closure|null  $callback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
     public function throw()
     {
+        $callback = func_get_arg(0);
+
         if ($this->serverError() || $this->clientError()) {
-            throw new RequestException($this);
+            if ($callback && is_callable($callback)) {
+                $callback($this, $exception = new RequestException($this));
+            }
+
+            throw $exception;
         }
 
         return $this;
