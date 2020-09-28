@@ -66,9 +66,6 @@ class MailSesTransportTest extends TestCase
         $transport->send($message);
 
         $this->assertEquals($messageId, $message->getHeaders()->get('X-Message-ID')->getFieldBody());
-        /**
-         * @deprecated Switch to using "X-Message-ID" header
-         */
         $this->assertEquals($messageId, $message->getHeaders()->get('X-SES-Message-ID')->getFieldBody());
     }
 }
