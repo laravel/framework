@@ -76,8 +76,8 @@ class MailgunTransport extends Transport
         $message->getHeaders()->addTextHeader('X-Message-ID', $messageId);
 
         /**
-        * @deprecated Use the "X-Message-ID" header
-        */
+         * @deprecated Use the "X-Message-ID" header
+         */
         $message->getHeaders()->addTextHeader('X-Mailgun-Message-ID', $messageId);
 
         $message->setBcc($bcc);
