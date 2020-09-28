@@ -53,13 +53,12 @@ class SesTransport extends Transport
         );
 
         $messageId = $result->get('MessageId');
-        $message->getHeaders()->addTextHeader(
-            'X-Message-ID', $messageId,
-            /**
-             * @deprecated Use the "X-Message-ID" header
-             */
-            'X-SES-Message-ID', $messageId
-        );
+        $message->getHeaders()->addTextHeader('X-Message-ID', $messageId);
+
+        /**
+        * @deprecated Use the "X-Message-ID" header
+        */
+        $message->getHeaders()->addTextHeader('X-SES-Message-ID', $messageId);
 
         $this->sendPerformed($message);
 
