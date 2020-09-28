@@ -52,7 +52,7 @@ class MailSesTransportTest extends TestCase
         $transport = new SesTransport($client);
 
         // Generate a messageId for our mock to return to ensure that the post-sent message
-        // has X-SES-Message-ID in its headers
+        // has X-Message-ID in its headers
         $messageId = Str::random(32);
         $sendRawEmailMock = new sendRawEmailMock($messageId);
         $client->expects($this->once())
