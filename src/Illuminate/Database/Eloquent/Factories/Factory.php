@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Factories;
 use Closure;
 use Faker\Generator;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -680,9 +681,13 @@ abstract class Factory
     public static function resolveFactoryName(string $modelName)
     {
         $resolver = static::$factoryNameResolver ?: function (string $modelName) {
-            $modelName = Str::startsWith($modelName, 'App\\Models\\')
-                ? Str::after($modelName, 'App\\Models\\')
-                : Str::after($modelName, 'App\\');
+            $namespace = Container::getInstance()
+                        ->make(Application::class)
+                        ->getNamespace();
+
+            $modelName = Str::startsWith($modelName, $namespace.'Models\\')
+                ? Str::after($modelName, $namespace.'Models\\')
+                : Str::after($modelName, $namespace);
 
             return static::$namespace.$modelName.'Factory';
         };

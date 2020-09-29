@@ -3,13 +3,16 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Foundation\Application;
 use PHPUnit\Framework\TestCase;
+use Mockery as m;
 
 class DatabaseEloquentFactoryTest extends TestCase
 {
@@ -17,6 +20,14 @@ class DatabaseEloquentFactoryTest extends TestCase
     {
         Container::getInstance()->singleton(\Faker\Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
+        });
+
+        Container::getInstance()->singleton(ApplicationContract::class, function ($app, $parameters) {
+            $application = m::mock(ApplicationContract::class);
+
+            $application->shouldReceive('getNamespace')->andReturn('App\\');
+
+            return $application;
         });
 
         $db = new DB;
@@ -82,6 +93,8 @@ class DatabaseEloquentFactoryTest extends TestCase
     protected function tearDown(): void
     {
         $this->schema()->drop('users');
+
+        m::close();
     }
 
     public function test_basic_model_can_be_created()
