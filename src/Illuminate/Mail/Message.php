@@ -314,6 +314,15 @@ class Message
     {
         return $this->swift;
     }
+    
+    /**
+     * @return \Swift_Mime_Header|null
+     */
+    public function messageId()
+    {
+        $headers = $this->swift->getHeaders();
+        return $headers->get('X-Message-ID');
+    }
 
     /**
      * Dynamically pass missing methods to the Swift instance.
