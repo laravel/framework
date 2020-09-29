@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Arr;
 use stdClass;
 
 class Collection implements ArrayAccess, Enumerable
