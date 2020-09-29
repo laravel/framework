@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use InvalidArgumentException;
+use Illuminate\Support\Arr;
 
 class ConfigurationUrlParser
 {
