@@ -111,6 +111,10 @@ class HasInDatabase extends Constraint
      */
     public function toString($options = 0): string
     {
-        return json_encode($this->data, $options);
+        foreach ($this->data as $key => $data) {
+            $output[$key] = $data instanceof Expression ? (string) $data : $data;
+        }
+
+        return json_encode($output ?? [], $options);
     }
 }
