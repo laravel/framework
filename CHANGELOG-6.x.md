@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.40...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.41...6.x)
+
+
+## [v6.18.41 (2020-09-29)](https://github.com/laravel/framework/compare/v6.18.40...v6.18.41)
+
+### Fixed
+- Added support for stream reads in FileManager for S3 driver ([#34480](https://github.com/laravel/framework/pull/34480))
 
 
 ## [v6.18.40 (2020-09-09)](https://github.com/laravel/framework/compare/v6.18.39...v6.18.40)
