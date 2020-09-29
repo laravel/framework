@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\URL;
 class VerifyEmail extends Notification
 {
     /**
-     * The callback that should be used to create the reset password URL.
+     * The callback that should be used to create the verify email URL.
      *
      * @var \Closure|null
      */
@@ -67,20 +67,20 @@ class VerifyEmail extends Notification
     {
         if (static::$createUrlCallback) {
             return call_user_func(static::$createUrlCallback, $notifiable);
-        } else {
-            return URL::temporarySignedRoute(
-                'verification.verify',
-                Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
-                [
-                    'id' => $notifiable->getKey(),
-                    'hash' => sha1($notifiable->getEmailForVerification()),
-                ]
-            );
         }
+
+        return URL::temporarySignedRoute(
+            'verification.verify',
+            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+            [
+                'id' => $notifiable->getKey(),
+                'hash' => sha1($notifiable->getEmailForVerification()),
+            ]
+        );
     }
 
     /**
-     * Set a callback that should be used when creating the reset password button URL.
+     * Set a callback that should be used when creating the verify email button URL.
      *
      * @param  \Closure  $callback
      * @return void
