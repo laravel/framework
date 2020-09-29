@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\App;
 use PHPUnit\Framework\TestCase;
 use Mockery as m;
 
@@ -22,8 +22,8 @@ class DatabaseEloquentFactoryTest extends TestCase
             return \Faker\Factory::create('en_US');
         });
 
-        Container::getInstance()->singleton(ApplicationContract::class, function ($app, $parameters) {
-            $application = m::mock(ApplicationContract::class);
+        Container::getInstance()->singleton(Application::class, function ($app, $parameters) {
+            $application = m::mock(Application::class);
 
             $application->shouldReceive('getNamespace')->andReturn('App\\');
 
