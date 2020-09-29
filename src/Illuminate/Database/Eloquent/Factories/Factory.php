@@ -647,7 +647,7 @@ abstract class Factory
     {
         $factory = static::resolveFactoryName($modelName);
 
-        return $factory::new();
+        return new $factory($modelName);
     }
 
     /**
