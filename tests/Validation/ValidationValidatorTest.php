@@ -61,7 +61,7 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('post name is required', $v->errors()->all()[0]);
+        $this->assertSame('post name is required', $v->errors()->all()[0]);
     }
 
     public function testSometimesWorksOnNestedArrays()

@@ -14,7 +14,7 @@ class BladeTest extends TestCase
     {
         $view = View::make('hello', ['name' => 'Taylor'])->render();
 
-        $this->assertEquals('Hello Taylor', trim($view));
+        $this->assertSame('Hello Taylor', trim($view));
     }
 
     public function test_rendering_a_component()
@@ -30,7 +30,7 @@ class BladeTest extends TestCase
     {
         $view = View::make('uses-panel-dynamically', ['name' => 'Taylor'])->render();
 
-        $this->assertEquals('<div class="ml-2" wire:model="foo" wire:model.lazy="bar">
+        $this->assertSame('<div class="ml-2" wire:model="foo" wire:model.lazy="bar">
     Hello Taylor
 </div>', trim($view));
     }

@@ -198,7 +198,7 @@ class BusBatchTest extends TestCase
         $this->assertTrue($batch->cancelled());
         $this->assertEquals(1, $_SERVER['__finally.count']);
         $this->assertEquals(1, $_SERVER['__catch.count']);
-        $this->assertEquals('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
+        $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
     public function test_failed_jobs_can_be_recorded_while_allowing_failures()
@@ -236,7 +236,7 @@ class BusBatchTest extends TestCase
         $this->assertFalse($batch->finished());
         $this->assertFalse($batch->cancelled());
         $this->assertEquals(1, $_SERVER['__catch.count']);
-        $this->assertEquals('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
+        $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
     public function test_batch_can_be_cancelled()

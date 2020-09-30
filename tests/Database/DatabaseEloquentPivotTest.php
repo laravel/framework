@@ -161,13 +161,13 @@ class DatabaseEloquentPivotTest extends TestCase
         $original->pivotParent = 'foo';
         $original->setRelation('bar', 'baz');
 
-        $this->assertEquals('baz', $original->getRelation('bar'));
+        $this->assertSame('baz', $original->getRelation('bar'));
 
         $pivot = $original->withoutRelations();
 
         $this->assertInstanceOf(Pivot::class, $pivot);
         $this->assertNotSame($pivot, $original);
-        $this->assertEquals('foo', $original->pivotParent);
+        $this->assertSame('foo', $original->pivotParent);
         $this->assertNull($pivot->pivotParent);
         $this->assertTrue($original->relationLoaded('bar'));
         $this->assertFalse($pivot->relationLoaded('bar'));

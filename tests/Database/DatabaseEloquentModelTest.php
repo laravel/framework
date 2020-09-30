@@ -67,7 +67,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->list_items = ['name' => 'taylor'];
         $this->assertEquals(['name' => 'taylor'], $model->list_items);
         $attributes = $model->getAttributes();
-        $this->assertEquals(json_encode(['name' => 'taylor']), $attributes['list_items']);
+        $this->assertSame(json_encode(['name' => 'taylor']), $attributes['list_items']);
     }
 
     public function testSetAttributeWithNumericKey()
