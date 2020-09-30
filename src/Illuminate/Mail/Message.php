@@ -316,7 +316,7 @@ class Message
     }
     
     /**
-     * @return \Swift_Mime_Header|null
+     * @return string|int|null
      */
     public function messageId()
     {
