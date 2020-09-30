@@ -692,7 +692,7 @@ trait EnumeratesValues
      * Pass the collection into a new class.
      *
      * @param  string  $class
-     * @return static
+     * @return mixed
      */
     public function pipeInto($class)
     {
