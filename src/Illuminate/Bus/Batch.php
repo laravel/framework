@@ -81,21 +81,21 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * The date indicating when the batch was created.
      *
-     * @var \Illuminate\Support\CarbonImmutable
+     * @var \Carbon\CarbonImmutable
      */
     public $createdAt;
 
     /**
      * The date indicating when the batch was cancelled.
      *
-     * @var \Illuminate\Support\CarbonImmutable|null
+     * @var \Carbon\CarbonImmutable|null
      */
     public $cancelledAt;
 
     /**
      * The date indicating when the batch was finished.
      *
-     * @var \Illuminate\Support\CarbonImmutable|null
+     * @var \Carbon\CarbonImmutable|null
      */
     public $finishedAt;
 
@@ -111,9 +111,9 @@ class Batch implements Arrayable, JsonSerializable
      * @param  int  $failedJobs
      * @param  array  $failedJobIds
      * @param  array  $options
-     * @param  \Illuminate\Support\CarbonImmutable  $createdAt
-     * @param  \Illuminate\Support\CarbonImmutable|null  $cancelledAt
-     * @param  \Illuminate\Support\CarbonImmutable|null  $finishedAt
+     * @param  \Carbon\CarbonImmutable  $createdAt
+     * @param  \Carbon\CarbonImmutable|null  $cancelledAt
+     * @param  \Carbon\CarbonImmutable|null  $finishedAt
      * @return void
      */
     public function __construct(QueueFactory $queue,
@@ -239,7 +239,7 @@ class Batch implements Arrayable, JsonSerializable
      * Decrement the pending jobs for the batch.
      *
      * @param  string  $jobId
-     * @return int
+     * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function decrementPendingJobs(string $jobId)
     {
@@ -322,7 +322,7 @@ class Batch implements Arrayable, JsonSerializable
      * Increment the failed jobs for the batch.
      *
      * @param  string  $jobId
-     * @return int
+     * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function incrementFailedJobs(string $jobId)
     {
@@ -393,7 +393,7 @@ class Batch implements Arrayable, JsonSerializable
      * Invoke a batch callback handler.
      *
      * @param  \Illuminate\Queue\SerializableClosure|callable  $handler
-     * @param  \Illuminate\Bus  $batch
+     * @param  \Illuminate\Bus\Batch  $batch
      * @param  \Throwable|null  $e
      * @return void
      */
