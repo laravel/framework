@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\URL;
 class VerifyEmail extends Notification
 {
     /**
+     * The callback that should be used to create the verify email URL.
+     *
+     * @var \Closure|null
+     */
+    public static $createUrlCallback;
+
+    /**
      * The callback that should be used to build the mail message.
      *
      * @var \Closure|null
@@ -58,6 +65,10 @@ class VerifyEmail extends Notification
      */
     protected function verificationUrl($notifiable)
     {
+        if (static::$createUrlCallback) {
+            return call_user_func(static::$createUrlCallback, $notifiable);
+        }
+
         return URL::temporarySignedRoute(
             'verification.verify',
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
@@ -66,6 +77,17 @@ class VerifyEmail extends Notification
                 'hash' => sha1($notifiable->getEmailForVerification()),
             ]
         );
+    }
+
+    /**
+     * Set a callback that should be used when creating the email verification URL.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function createUrlUsing($callback)
+    {
+        static::$createUrlCallback = $callback;
     }
 
     /**
