@@ -469,6 +469,12 @@ class Blueprint
      */
     public function rename($to)
     {
+        if (count(func_get_args()) > 1) {
+            throw new BadMethodCallException(
+                "It only accept one argument! You should use 'renameColumn' method if you want to rename the column name!"
+            );
+        }
+
         return $this->addCommand('rename', compact('to'));
     }
 
