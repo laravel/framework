@@ -188,7 +188,7 @@ class Response implements ArrayAccess
      */
     public function onError(callable $callback)
     {
-        if ($this->serverError() || $this->clientError()) {
+        if ($this->failed()) {
             $callback($this);
         }
 
@@ -227,7 +227,7 @@ class Response implements ArrayAccess
     {
         $callback = func_get_args()[0] ?? null;
 
-        if ($this->serverError() || $this->clientError()) {
+        if ($this->failed()) {
             throw tap(new RequestException($this), function ($exception) use ($callback) {
                 if ($callback && is_callable($callback)) {
                     $callback($this, $exception);
