@@ -22,7 +22,7 @@ class BusBatchableTest extends TestCase
         };
 
         $this->assertSame($class, $class->withBatchId('test-batch-id'));
-        $this->assertEquals('test-batch-id', $class->batchId);
+        $this->assertSame('test-batch-id', $class->batchId);
 
         Container::setInstance($container = new Container);
 
@@ -30,7 +30,7 @@ class BusBatchableTest extends TestCase
         $repository->shouldReceive('find')->once()->with('test-batch-id')->andReturn('test-batch');
         $container->instance(BatchRepository::class, $repository);
 
-        $this->assertEquals('test-batch', $class->batch());
+        $this->assertSame('test-batch', $class->batch());
 
         Container::setInstance(null);
     }

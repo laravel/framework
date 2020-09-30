@@ -25,7 +25,7 @@ class ViewComponentTest extends TestCase
 
         $component->withAttributes(['class' => 'foo', 'attributes' => new ComponentAttributeBag(['class' => 'bar', 'type' => 'button'])]);
 
-        $this->assertEquals('class="foo bar" type="button"', (string) $component->attributes);
+        $this->assertSame('class="foo bar" type="button"', (string) $component->attributes);
     }
 
     public function testPublicMethodsWithNoArgsAreConvertedToStringableCallablesInvokedAndNotCached()

@@ -31,7 +31,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->syncOriginal();
         $model->uppercase = 'dries';
-        $this->assertEquals('TAYLOR', $model->getOriginal('uppercase'));
+        $this->assertSame('TAYLOR', $model->getOriginal('uppercase'));
 
         $model = new TestEloquentModelWithCustomCast;
         $model->uppercase = 'taylor';
@@ -39,7 +39,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model->uppercase = 'dries';
         $model->getOriginal();
 
-        $this->assertEquals('DRIES', $model->uppercase);
+        $this->assertSame('DRIES', $model->uppercase);
 
         $model = new TestEloquentModelWithCustomCast;
 
@@ -82,7 +82,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals(['foo' => 'bar'], $model->options);
         $this->assertEquals(['foo' => 'bar'], $model->options);
 
-        $this->assertEquals(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
+        $this->assertSame(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
 
         $model = new TestEloquentModelWithCustomCast(['options' => []]);
         $model->syncOriginal();
@@ -104,9 +104,9 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->address = new Address('117 Spencer St.', 'Another house.');
 
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
-        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal('address')->lineOne);
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('110 Kingsbrook St.', $model->getOriginal('address')->lineOne);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
 
         $model = new TestEloquentModelWithCustomCast([
             'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
@@ -116,10 +116,10 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->address = new Address('117 Spencer St.', 'Another house.');
 
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
-        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
-        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
 
         $model = new TestEloquentModelWithCustomCast([
             'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
@@ -187,7 +187,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
             'value_object_caster_with_argument' => null,
         ]);
 
-        $this->assertEquals('argument', $model->value_object_caster_with_argument);
+        $this->assertSame('argument', $model->value_object_caster_with_argument);
 
         $model->setRawAttributes([
             'value_object_caster_with_caster_instance' => serialize(new ValueObject('hello')),

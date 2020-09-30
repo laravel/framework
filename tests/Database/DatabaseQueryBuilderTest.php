@@ -3077,12 +3077,12 @@ SQL;
             $query->from('two')->select('baz')->where('subkey', '=', 'subval');
         }, 'sub');
 
-        $this->assertEquals('select (select "baz" from "two" where "subkey" = ?) as "sub" from "one"', $builder->toSql());
+        $this->assertSame('select (select "baz" from "two" where "subkey" = ?) as "sub" from "one"', $builder->toSql());
         $this->assertEquals(['subval'], $builder->getBindings());
 
         $builder->select('*');
 
-        $this->assertEquals('select * from "one"', $builder->toSql());
+        $this->assertSame('select * from "one"', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
     }
 
