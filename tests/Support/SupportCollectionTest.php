@@ -3602,6 +3602,20 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testPipeInto($collection)
+    {
+        $data = new $collection([
+            'first', 'second',
+        ]);
+
+        $instance = $data->pipeInto(TestCollectionMapIntoObject::class);
+
+        $this->assertSame($data, $instance->value);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testMedianValueWithArrayCollection($collection)
     {
         $data = new $collection([1, 2, 2, 4]);
