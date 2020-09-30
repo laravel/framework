@@ -237,6 +237,18 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testItCanSendUserAgent()
+    {
+        $this->factory->fake();
+
+        $this->factory->withUserAgent('Laravel')->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                $request->hasHeader('User-Agent', 'Laravel');
+        });
+    }
+
     public function testSequenceBuilder()
     {
         $this->factory->fake([
