@@ -673,7 +673,7 @@ if (! function_exists('response')) {
     /**
      * Return a new response from the application.
      *
-     * @param  \Illuminate\View\View|string|array|null  $content
+     * @param  \Illuminate\Contracts\View\View|string|array|null  $content
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\Response|\Illuminate\Contracts\Routing\ResponseFactory
@@ -884,7 +884,7 @@ if (! function_exists('view')) {
      * @param  string|null  $view
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @param  array  $mergeData
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
     function view($view = null, $data = [], $mergeData = [])
     {
