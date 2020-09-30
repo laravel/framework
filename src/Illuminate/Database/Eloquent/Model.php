@@ -1547,7 +1547,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function offsetExists($offset)
     {
-        return array_key_exists($offset, $this->attributes) || array_key_exists($offset, $this->relations);
+        return ! is_null($this->getAttribute($offset)) // necessary for backward compatibility
+            || array_key_exists($offset, $this->attributes) || array_key_exists($offset, $this->relations);
     }
 
     /**
