@@ -321,6 +321,7 @@ class Message
     public function messageId()
     {
         $headers = $this->swift->getHeaders();
+
         return $headers->get('X-Message-ID');
     }
 
