@@ -314,6 +314,17 @@ class PendingRequest
     }
 
     /**
+     * Specify the user agent for the request.
+     *
+     * @param  string  $userAgent
+     * @return $this
+     */
+    public function withUserAgent($userAgent)
+    {
+        return $this->withHeaders(['User-Agent' => $userAgent]);
+    }
+
+    /**
      * Specify the cookies that should be included with the request.
      *
      * @param  array  $cookies
@@ -339,17 +350,6 @@ class PendingRequest
         return tap($this, function ($request) {
             return $this->options['allow_redirects'] = false;
         });
-    }
-
-    /**
-     * Specify the user agent for the request.
-     *
-     * @param  string  $userAgent
-     * @return $this
-     */
-    public function withUserAgent($userAgent)
-    {
-        return $this->withHeaders(['User-Agent' => $userAgent]);
     }
 
     /**
