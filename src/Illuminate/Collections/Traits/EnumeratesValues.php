@@ -689,6 +689,17 @@ trait EnumeratesValues
     }
 
     /**
+     * Pass the collection into a new class.
+     *
+     * @param  string  $class
+     * @return mixed
+     */
+    public function pipeInto($class)
+    {
+        return new $class($this);
+    }
+
+    /**
      * Pass the collection to the given callback and then return it.
      *
      * @param  callable  $callback
