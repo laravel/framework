@@ -188,7 +188,7 @@ class Response implements ArrayAccess
      */
     public function onError(callable $callback)
     {
-        if ($this->serverError() || $this->clientError()) {
+        if ($this->failed()) {
             $callback($this);
         }
 
