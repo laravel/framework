@@ -314,7 +314,7 @@ class Message
     {
         return $this->swift;
     }
-    
+
     /**
      * @return string|int|null
      */
