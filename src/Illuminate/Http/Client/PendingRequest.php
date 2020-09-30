@@ -342,6 +342,17 @@ class PendingRequest
     }
 
     /**
+     * Specify the user agent for the request.
+     *
+     * @param  string  $userAgent
+     * @return $this
+     */
+    public function withUserAgent($userAgent)
+    {
+        return $this->withHeaders(['User-Agent' => $userAgent]);
+    }
+
+    /**
      * Indicate that TLS certificates should not be verified.
      *
      * @return $this
