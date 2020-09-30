@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -175,6 +176,8 @@ class Blueprint
      */
     protected function addImpliedCommands(Grammar $grammar)
     {
+        $prioritizedCommands = $this->filterPrioritizedCommands();
+
         if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
@@ -183,9 +186,34 @@ class Blueprint
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
+        $this->commands = array_merge($prioritizedCommands, $this->commands);
+
         $this->addFluentIndexes();
 
         $this->addFluentCommands($grammar);
+    }
+
+    /**
+     * Filters out (and returns those filtered) commands that should be prioritized.
+     *
+     * @return array
+     */
+    protected function filterPrioritizedCommands()
+    {
+        $prioritizedCommands = ['dropForeign'];
+        $commands = [];
+
+        $this->commands = array_filter($this->commands, function ($command) use (&$commands, $prioritizedCommands) {
+            if (in_array($command->name, $prioritizedCommands)) {
+                $commands[$command->name][] = $command;
+
+                return false;
+            }
+
+            return true;
+        });
+
+        return Arr::collapse($commands);
     }
 
     /**
