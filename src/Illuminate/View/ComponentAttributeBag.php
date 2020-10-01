@@ -219,7 +219,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      * @param  mixed  $value
      * @return \Illuminate\View\AppendableAttributeValue
      */
-    public function appends($value)
+    public function prepends($value)
     {
         return new AppendableAttributeValue($value);
     }
