@@ -48,6 +48,15 @@ class BladeTest extends TestCase
 </span>', trim($view));
     }
 
+    public function test_appendable_attributes()
+    {
+        $view = View::make('uses-appendable-panel', ['name' => 'Taylor'])->render();
+
+        $this->assertEquals('<div class="mt-4 bg-gray-100" data-controller="inside-controller outside-controller" foo="bar">
+    Hello Taylor
+</div>', trim($view));
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);
