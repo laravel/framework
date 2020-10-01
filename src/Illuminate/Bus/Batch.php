@@ -169,9 +169,13 @@ class Batch implements Arrayable, JsonSerializable
 
             if (is_array($job)) {
                 $jobChain = $job;
-                foreach ($jobChain as $j) {
-                    $j->withBatchId($this->id);
-                }
+                $batchId = $this->id;
+                array_walk($jobChain, function (&$job) use ($batchId) {
+                    if ($job instanceof Closure) {
+                        $job = CallQueuedClosure::create($job);
+                    }
+                    $job->withBatchId($batchId);
+                });
 
                 $jobTotal += count($jobChain);
 
