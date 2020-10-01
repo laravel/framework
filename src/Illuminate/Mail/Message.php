@@ -316,6 +316,8 @@ class Message
     }
 
     /**
+     * Get the message id set by the Transporter after sending.
+     *
      * @return string|int|null
      */
     public function messageId()
