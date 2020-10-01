@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
 class ScheduleWorkCommand extends Command
@@ -30,7 +31,7 @@ class ScheduleWorkCommand extends Command
         $this->info('Schedule worker started successfully.');
 
         while (true) {
-            if (now()->second === 0) {
+            if (Carbon::now()->second === 0) {
                 $this->call('schedule:run');
             }
 
