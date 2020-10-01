@@ -1004,7 +1004,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Get a single property from the first element in the collection.
      *
      * @param  string  $key
-     * @return  mixed
+     * @return mixed
      */
     public function value($key);
 
