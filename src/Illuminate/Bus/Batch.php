@@ -180,6 +180,7 @@ class Batch implements Arrayable, JsonSerializable
                 $jobTotal += count($jobChain);
 
                 $chainHead = array_shift($jobChain);
+
                 return $chainHead->chain($jobChain);
             } else {
                 $job->withBatchId($this->id);

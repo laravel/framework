@@ -335,7 +335,7 @@ class BusBatchTest extends TestCase
         }), '', 'test-queue');
 
         $batch = $batch->add([
-            [$chainHeadJob, $secondJob, $thirdJob]
+            [$chainHeadJob, $secondJob, $thirdJob],
         ]);
 
         $this->assertEquals(3, $batch->totalJobs);
