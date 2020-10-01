@@ -161,18 +161,32 @@ class Batch implements Arrayable, JsonSerializable
      */
     public function add($jobs)
     {
-        $jobs = Collection::wrap($jobs)->map(function ($job) {
+        $jobTotal = 0;
+        $jobs = Collection::wrap($jobs)->map(function ($job) use (&$jobTotal) {
             if ($job instanceof Closure) {
                 $job = CallQueuedClosure::create($job);
             }
 
-            $job->withBatchId($this->id);
+            if (is_array($job)) {
+                $jobChain = $job;
+                foreach ($jobChain as $j) {
+                    $j->withBatchId($this->id);
+                }
+
+                $jobTotal += count($jobChain);
+
+                $chainHead = array_shift($jobChain);
+                return $chainHead->chain($jobChain);
+            } else {
+                $job->withBatchId($this->id);
+                $jobTotal++;
+            }
 
             return $job;
         });
 
-        $this->repository->transaction(function () use ($jobs) {
-            $this->repository->incrementTotalJobs($this->id, count($jobs));
+        $this->repository->transaction(function () use ($jobs, $jobTotal) {
+            $this->repository->incrementTotalJobs($this->id, $jobTotal);
 
             $this->queue->connection($this->options['connection'] ?? null)->bulk(
                 $jobs->all(),
