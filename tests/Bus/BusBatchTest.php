@@ -16,8 +16,6 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
