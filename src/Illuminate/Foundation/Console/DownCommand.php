@@ -18,6 +18,7 @@ class DownCommand extends Command
                                  {--render= : The view that should be prerendered for display during maintenance mode}
                                  {--retry= : The number of seconds after which the request may be retried}
                                  {--secret= : The secret phrase that may be used to bypass maintenance mode}
+                                 {--secret-time=12 : The expiration time of bypass cookie (hours)}
                                  {--status=503 : The status code that should be used when returning the maintenance mode response}';
 
     /**
@@ -72,6 +73,7 @@ class DownCommand extends Command
             'redirect' => $this->redirectPath(),
             'retry' => $this->getRetryTime(),
             'secret' => $this->option('secret'),
+            'secret-time' => (int) $this->option('secret-time'),
             'status' => (int) $this->option('status', 503),
             'template' => $this->option('render') ? $this->prerenderView() : null,
         ];

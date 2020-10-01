@@ -11,11 +11,15 @@ class MaintenanceModeBypassCookie
      * Create a new maintenance mode bypass cookie.
      *
      * @param  string  $key
+     * @param  int  $time
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public static function create(string $key)
+    public static function create(string $key, int $time = 12)
     {
-        $expiresAt = Carbon::now()->addHours(12);
+        if ($time < 1) {
+            $time = 1;
+        }
+        $expiresAt = Carbon::now()->addHours($time);
 
         return new Cookie('laravel_maintenance', base64_encode(json_encode([
             'expires_at' => $expiresAt->getTimestamp(),

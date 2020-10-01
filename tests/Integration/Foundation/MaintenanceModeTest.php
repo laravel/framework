@@ -129,6 +129,52 @@ class MaintenanceModeTest extends TestCase
         $response->assertStatus(503);
     }
 
+    public function testMaintenanceModeCanRedirectWithBypassCookieAndCustomExpirationTime()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+            'secret' => 'foo',
+            'secret-time' => 24,
+            'template' => 'Rendered Content',
+        ]));
+
+        Route::get('/foo', function () {
+            return 'Hello World';
+        })->middleware(PreventRequestsDuringMaintenance::class);
+
+        Carbon::setTestNow(now()->addHours(23));
+        $response = $this->get('/foo');
+
+        $response->assertStatus(302);
+        $response->assertCookie('laravel_maintenance');
+
+        Carbon::setTestNow(null);
+    }
+
+    public function testMaintenanceModeCanBeBypassedWithValidCookieAndCustomExpirationTime()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+            'secret' => 'foo',
+        ]));
+
+        $cookie = MaintenanceModeBypassCookie::create('foo', 24);
+
+        Route::get('/test', function () {
+            return 'Hello World';
+        })->middleware(PreventRequestsDuringMaintenance::class);
+
+        Carbon::setTestNow(now()->addHours(23));
+        $response = $this->withUnencryptedCookies([
+            'laravel_maintenance' => $cookie->getValue(),
+        ])->get('/test');
+
+        $response->assertStatus(200);
+        $this->assertSame('Hello World', $response->original);
+
+        Carbon::setTestNow(null);
+    }
+
     public function testCanCreateBypassCookies()
     {
         $cookie = MaintenanceModeBypassCookie::create('test-key');

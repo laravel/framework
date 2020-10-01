@@ -50,7 +50,7 @@ class PreventRequestsDuringMaintenance
             $data = json_decode(file_get_contents($this->app->storagePath().'/framework/down'), true);
 
             if (isset($data['secret']) && $request->path() === $data['secret']) {
-                return $this->bypassResponse($data['secret']);
+                return $this->bypassResponse($data['secret'], $data['secret-time'] ?? 12);
             }
 
             if ($this->hasValidBypassCookie($request, $data) ||
@@ -129,12 +129,13 @@ class PreventRequestsDuringMaintenance
      * Redirect the user back to the root of the application with a maintenance mode bypass cookie.
      *
      * @param  string  $secret
+     * @param  int  $time
      * @return \Illuminate\Http\RedirectResponse
      */
-    protected function bypassResponse(string $secret)
+    protected function bypassResponse(string $secret, int $time)
     {
         return redirect('/')->withCookie(
-            MaintenanceModeBypassCookie::create($secret)
+            MaintenanceModeBypassCookie::create($secret, $time)
         );
     }
 }
