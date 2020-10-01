@@ -8,11 +8,16 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchFactory;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\PendingBatch;
+use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Factory;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -298,6 +303,47 @@ class BusBatchTest extends TestCase
         $this->assertTrue($batch->cancelled());
 
         $this->assertTrue(is_string(json_encode($batch)));
+    }
+
+    public function test_chain_can_be_added_to_batch()
+    {
+        $queue = m::mock(Factory::class);
+
+        $batch = $this->createTestBatch($queue);
+
+        $chainHeadJob = new class implements ShouldQueue {
+            use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
+        };
+
+        $secondJob = new class implements ShouldQueue {
+            use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
+        };
+
+        $thirdJob = new class implements ShouldQueue {
+            use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
+        };
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
+            return
+                $args[0] == $chainHeadJob
+                && serialize($secondJob) == $args[0]->chained[0]
+                && serialize($thirdJob) == $args[0]->chained[1];
+        }), '', 'test-queue');
+
+        $batch = $batch->add([
+            [$chainHeadJob, $secondJob, $thirdJob]
+        ]);
+
+        $this->assertEquals(3, $batch->totalJobs);
+        $this->assertEquals(3, $batch->pendingJobs);
+        $this->assertTrue(is_string($chainHeadJob->batchId));
+        $this->assertTrue(is_string($secondJob->batchId));
+        $this->assertTrue(is_string($thirdJob->batchId));
+        $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
 
     protected function createTestBatch($queue, $allowFailures = false)
