@@ -773,6 +773,17 @@ trait EnumeratesValues
     }
 
     /**
+     * Get a single property from the first element in the collection.
+     *
+     * @param  string  $key
+     * @return  mixed
+     */
+    public function value($key)
+    {
+        return data_get($this->first(), $key);
+    }
+
+    /**
      * Get the collection of items as a plain array.
      *
      * @return array
