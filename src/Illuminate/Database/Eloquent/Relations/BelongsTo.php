@@ -229,6 +229,16 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Alias of "dissociate" method.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function disassociate()
+    {
+        return $this->dissociate();
+    }
+
+    /**
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
