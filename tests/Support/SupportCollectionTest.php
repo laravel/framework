@@ -4459,6 +4459,24 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testValue($collection)
+    {
+        $object1 = new stdClass();
+        $object1->prop = 1;
+        $object2 = new stdClass();
+        $object2->prop = 2;
+
+        $data = $collection::make([
+            $object1,
+            $object2,
+        ])->collect();
+
+        $this->assertEquals(1, $data->value('prop'));
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array
