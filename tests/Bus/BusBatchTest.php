@@ -311,17 +311,11 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue);
 
-        $chainHeadJob = new class implements ShouldQueue {
-            use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
-        };
+        $chainHeadJob = new ChainHeadJob();
 
-        $secondJob = new class implements ShouldQueue {
-            use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
-        };
+        $secondJob = new SecondTestJob();
 
-        $thirdJob = new class implements ShouldQueue {
-            use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
-        };
+        $thirdJob = new ThirdTestJob();
 
         $queue->shouldReceive('connection')->once()
             ->with('test-connection')
@@ -390,4 +384,19 @@ class BusBatchTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
+}
+
+class ChainHeadJob implements ShouldQueue
+{
+    use Dispatchable, Queueable, Batchable;
+}
+
+class SecondTestJob implements ShouldQueue
+{
+    use Dispatchable, Queueable, Batchable;
+}
+
+class ThirdTestJob implements ShouldQueue
+{
+    use Dispatchable, Queueable, Batchable;
 }
