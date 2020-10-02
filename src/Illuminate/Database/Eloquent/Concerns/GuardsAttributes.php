@@ -203,6 +203,10 @@ trait GuardsAttributes
             return false;
         }
 
+        if (strpos($key, '->') !== false) {
+            $key = Str::before($key, '->');
+        }
+
         return $this->getGuarded() == ['*'] ||
                ! empty(preg_grep('/^'.preg_quote($key).'$/i', $this->getGuarded())) ||
                ! $this->isGuardableColumn($key);
