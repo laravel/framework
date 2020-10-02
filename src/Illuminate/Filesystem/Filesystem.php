@@ -724,8 +724,8 @@ class Filesystem
     /**
      * Fetch contents of file and return as array
      *
-     * @param $path
-     * @param bool $lock
+     * @param  string $path
+     * @param  bool  $lock
      * @return mixed
      * @throws FileNotFoundException
      */
