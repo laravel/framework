@@ -42,6 +42,7 @@ namespace Illuminate\Support\Facades;
  * @method static void link(string $target, string $link)
  * @method static void relativeLink(string $target, string $link)
  * @method static void replace(string $path, string $content)
+ * @method static string getAsArray(string $path, bool $lock = false)
  *
  * @see \Illuminate\Filesystem\Filesystem
  */

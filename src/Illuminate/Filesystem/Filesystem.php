@@ -719,4 +719,19 @@ class Filesystem
     {
         return $this->deleteDirectory($directory, true);
     }
+
+
+    /**
+     * Fetch contents of file and return as array
+     *
+     * @param $path
+     * @param bool $lock
+     * @return mixed
+     * @throws FileNotFoundException
+     */
+    public function getAsArray($path, $lock = false)
+    {
+        $contents = $this->get($path, $lock = false);
+        return json_decode($contents, true);
+    }
 }
