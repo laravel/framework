@@ -198,6 +198,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     {
         if ($this->container->bound(Guard::class)) {
             $payload['user_id'] = $this->userId();
+            $payload['user_type'] = $this->userModel();
         }
 
         return $this;
@@ -211,6 +212,18 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     protected function userId()
     {
         return $this->container->make(Guard::class)->id();
+    }
+
+    /**
+     * Get the currently authenticated user's Model.
+     *
+     * @return mixed
+     */
+    protected function userModel()
+    {
+        $user = $this->container->make(Guard::class)->user();
+
+        return is_null($user) ? null : $user->getMorphClass();
     }
 
     /**
