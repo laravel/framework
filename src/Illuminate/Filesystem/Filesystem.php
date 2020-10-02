@@ -720,9 +720,8 @@ class Filesystem
         return $this->deleteDirectory($directory, true);
     }
 
-
     /**
-     * Fetch contents of file and return as array
+     * Fetch contents of file and return as array.
      *
      * @param  string $path
      * @param  bool  $lock
