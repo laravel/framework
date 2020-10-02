@@ -28,6 +28,25 @@ trait ManagesFrequencies
      */
     public function between($startTime, $endTime)
     {
+        // Cron often supports hourly ranges so include `between` hours, even
+        // if their minutes cannot not be expressed.
+        $oldHours = explode(' ', $this->expression)[1] ?? null;
+        if ($oldHours[0] === '*') {
+            // Preserve existing 'every' like "*/5".
+            $oldHoursEvery = ($slash = strpos($oldHours, '/'))
+                ? substr($oldHours, $slash)
+                : '';
+            $startHour = Carbon::parse($startTime, $this->timezone)->hour;
+            $endHour = Carbon::parse($endTime, $this->timezone)->hour;
+            // Don't bother unless range is more than the same hour.
+            if ($endHour > $startHour) {
+                $this->spliceIntoPosition(
+                    2,
+                    "$startHour-$endHour$oldHoursEvery"
+                );
+            }
+        }
+
         return $this->when($this->inTimeInterval($startTime, $endTime));
     }
 
