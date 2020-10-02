@@ -107,7 +107,11 @@ class Str
      */
     public static function before($subject, $search)
     {
-        return $search === '' ? $subject : explode($search, $subject)[0];
+        if ($search !== '' && ($result = strstr($subject, (string) $search, true)) !== false) {
+            return $result;
+        } else {
+            return $subject;
+        }
     }
 
     /**
