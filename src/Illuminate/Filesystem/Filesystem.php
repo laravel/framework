@@ -504,29 +504,31 @@ class Filesystem
     /**
      * Get an array of all files in a directory.
      *
-     * @param  string  $directory
-     * @param  bool  $hidden
+     * @param string $directory
+     * @param bool $hidden
+     * @param array $exclude
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
-    public function files($directory, $hidden = false)
+    public function files($directory, $hidden = false, $exclude = [])
     {
         return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->sortByName(),
-            false
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->exclude($exclude)->in($directory)->depth(0)
+                ->sortByName(), false
         );
     }
 
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param  string  $directory
-     * @param  bool  $hidden
+     * @param string $directory
+     * @param bool $hidden
+     * @param array $exclude
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
-    public function allFiles($directory, $hidden = false)
+    public function allFiles($directory, $hidden = false, $exclude = [])
     {
         return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->exclude($exclude)->in($directory)->sortByName(),
             false
         );
     }
@@ -534,14 +536,15 @@ class Filesystem
     /**
      * Get all of the directories within a given directory.
      *
-     * @param  string  $directory
+     * @param string $directory
+     * @param array $exclude
      * @return array
      */
-    public function directories($directory)
+    public function directories($directory, $exclude = [])
     {
         $directories = [];
 
-        foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
+        foreach (Finder::create()->in($directory)->directories()->depth(0)->exclude($exclude)->sortByName() as $dir) {
             $directories[] = $dir->getPathname();
         }
 
