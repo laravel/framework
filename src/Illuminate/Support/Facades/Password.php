@@ -41,6 +41,13 @@ class Password extends Facade
     const INVALID_TOKEN = PasswordBroker::INVALID_TOKEN;
 
     /**
+     * Constant representing a throttled reset attempt.
+     *
+     * @var string
+     */
+    const RESET_THROTTLED = PasswordBroker::RESET_THROTTLED;
+
+    /**
      * Get the registered name of the component.
      *
      * @return string
