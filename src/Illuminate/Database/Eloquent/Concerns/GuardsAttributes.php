@@ -189,7 +189,7 @@ trait GuardsAttributes
      * Determines if the given column is in the guarded property,
      * or any level of a JSON column nested key is guarded.
      *
-     * @param $key
+     * @param  string  $key
      * @return bool
      */
     protected function isInGuarded($key)
