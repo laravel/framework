@@ -731,6 +731,7 @@ class Filesystem
     public function getAsArray($path, $lock = false)
     {
         $contents = $this->get($path, $lock = false);
+
         return json_decode($contents, true);
     }
 }
