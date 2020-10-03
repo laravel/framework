@@ -4571,10 +4571,13 @@ class ValidationValidatorTest extends TestCase
                 '*.name' => 'required',
             ]);
 
-        $this->assertEquals($v->invalid(), [
-            1 => ['name' => null],
-            2 => ['name' => ''],
-        ]);
+        $this->assertEquals(
+            [
+                1 => ['name' => null],
+                2 => ['name' => ''],
+            ],
+            $v->invalid()
+        );
 
         $v = new Validator($trans,
             [
@@ -4584,9 +4587,12 @@ class ValidationValidatorTest extends TestCase
                 'name' => 'required',
             ]);
 
-        $this->assertEquals($v->invalid(), [
-            'name' => '',
-        ]);
+        $this->assertEquals(
+            [
+                'name' => '',
+            ],
+            $v->invalid()
+        );
     }
 
     public function testValidMethod()
@@ -4604,10 +4610,13 @@ class ValidationValidatorTest extends TestCase
                 '*.name' => 'required',
             ]);
 
-        $this->assertEquals($v->valid(), [
-            0 => ['name' => 'John'],
-            3 => ['name' => 'Doe'],
-        ]);
+        $this->assertEquals(
+            [
+                0 => ['name' => 'John'],
+                3 => ['name' => 'Doe'],
+            ],
+            $v->valid()
+        );
 
         $v = new Validator($trans,
             [
@@ -4621,10 +4630,13 @@ class ValidationValidatorTest extends TestCase
                 'age' => 'required|int',
             ]);
 
-        $this->assertEquals($v->valid(), [
-            'name' => 'Carlos',
-            'gender' => 'male',
-        ]);
+        $this->assertEquals(
+            [
+                'name' => 'Carlos',
+                'gender' => 'male',
+            ],
+            $v->valid()
+        );
     }
 
     public function testNestedInvalidMethod()
@@ -4647,12 +4659,15 @@ class ValidationValidatorTest extends TestCase
                 'regex:/[A-F]{3}[0-9]{3}/',
             ],
         ]);
-        $this->assertEquals($v->invalid(), [
-            'testinvalid' => '',
-            'records' => [
-                3 => 'ADCD23',
+        $this->assertEquals(
+            [
+                'testinvalid' => '',
+                'records' => [
+                    3 => 'ADCD23',
+                ],
             ],
-        ]);
+            $v->invalid()
+        );
     }
 
     public function testMultipleFileUploads()
