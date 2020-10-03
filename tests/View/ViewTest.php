@@ -225,11 +225,6 @@ class ViewTest extends TestCase
         $this->assertSame($view, $view->withErrors(new MessageBag($data)));
         $foo = $view->errors->get('foo');
         $this->assertEquals('baz', $foo[0]);
-        $foo = $view->errors->getBag('default')->get('foo');
-        $this->assertEquals('baz', $foo[0]);
-        $this->assertSame($view, $view->withErrors(new MessageBag($data), 'login'));
-        $foo = $view->errors->getBag('login')->get('foo');
-        $this->assertEquals('baz', $foo[0]);
     }
 
     protected function getView($data = [])

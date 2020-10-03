@@ -41,7 +41,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['tokens']->shouldReceive('recentlyCreated')->once()->with($user)->andReturn(true);
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
-        $this->assertEquals(PasswordBrokerContract::RESEND_TIMEOUT, $broker->sendResetLink(['foo']));
+        $this->assertEquals(PasswordBrokerContract::RESET_THROTTLED, $broker->sendResetLink(['foo']));
     }
 
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
