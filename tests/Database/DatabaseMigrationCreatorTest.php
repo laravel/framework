@@ -92,6 +92,6 @@ class DatabaseMigrationCreatorTest extends TestCase
     {
         $files = m::mock(Filesystem::class);
 
-        return $this->getMockBuilder(MigrationCreator::class)->setMethods(['getDatePrefix'])->setConstructorArgs([$files])->getMock();
+        return $this->getMockBuilder(MigrationCreator::class)->onlyMethods(['getDatePrefix'])->setConstructorArgs([$files])->getMock();
     }
 }

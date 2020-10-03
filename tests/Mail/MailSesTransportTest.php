@@ -46,7 +46,7 @@ class MailSesTransportTest extends TestCase
         $message->setBcc('you@example.com');
 
         $client = $this->getMockBuilder(SesClient::class)
-            ->setMethods(['sendRawEmail'])
+            ->addMethods(['sendRawEmail'])
             ->disableOriginalConstructor()
             ->getMock();
         $transport = new SesTransport($client);

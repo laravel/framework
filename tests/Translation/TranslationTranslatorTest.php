@@ -18,19 +18,19 @@ class TranslationTranslatorTest extends TestCase
 
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
     {
-        $t = $this->getMockBuilder(Translator::class)->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->willReturn('foo');
         $this->assertFalse($t->has('foo', 'bar'));
 
-        $t = $this->getMockBuilder(Translator::class)->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en', 'sp'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en', 'sp'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->willReturn('bar');
         $this->assertTrue($t->has('foo', 'bar'));
 
-        $t = $this->getMockBuilder(Translator::class)->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->willReturn('bar');
         $this->assertTrue($t->hasForLocale('foo', 'bar'));
 
-        $t = $this->getMockBuilder(Translator::class)->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->willReturn('foo');
         $this->assertFalse($t->hasForLocale('foo', 'bar'));
 
@@ -76,7 +76,7 @@ class TranslationTranslatorTest extends TestCase
 
     public function testGetMethodProperlyLoadsAndRetrievesItemWithCapitalization()
     {
-        $t = $this->getMockBuilder(Translator::class)->setMethods(null)->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods([])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :Foo :BAR']);
         $this->assertSame('breeze Bar FOO', $t->get('foo::bar.baz', ['foo' => 'bar', 'bar' => 'foo'], 'en'));
@@ -114,7 +114,7 @@ class TranslationTranslatorTest extends TestCase
 
     public function testChoiceMethodProperlyLoadsAndRetrievesItem()
     {
-        $t = $this->getMockBuilder(Translator::class)->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
@@ -124,7 +124,7 @@ class TranslationTranslatorTest extends TestCase
 
     public function testChoiceMethodProperlyCountsCollectionsAndLoadsAndRetrievesItem()
     {
-        $t = $this->getMockBuilder(Translator::class)->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->exactly(2))->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->twice()->with('line', 3, 'en')->andReturn('choiced');

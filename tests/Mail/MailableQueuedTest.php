@@ -29,7 +29,7 @@ class MailableQueuedTest extends TestCase
         $queueFake = new QueueFake(new Application);
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
-            ->setMethods(['createMessage', 'to'])
+            ->onlyMethods(['createMessage', 'to'])
             ->getMock();
         $mailer->setQueue($queueFake);
         $mailable = new MailableQueableStub;
@@ -43,7 +43,7 @@ class MailableQueuedTest extends TestCase
         $queueFake = new QueueFake(new Application);
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
-            ->setMethods(['createMessage'])
+            ->onlyMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
         $mailable = new MailableQueableStub;
@@ -72,7 +72,7 @@ class MailableQueuedTest extends TestCase
         $queueFake = new QueueFake($app);
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
-            ->setMethods(['createMessage'])
+            ->onlyMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
         $mailable = new MailableQueableStub;

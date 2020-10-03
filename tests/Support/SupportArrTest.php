@@ -110,7 +110,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo.bar' => []], $array);
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
-        $this->assertEquals($array, ['name' => 'taylor', 'languages.php' => true]);
+        $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
     }
 
     public function testExcept()

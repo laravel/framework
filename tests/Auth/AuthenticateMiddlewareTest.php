@@ -58,7 +58,7 @@ class AuthenticateMiddlewareTest extends TestCase
             return;
         }
 
-        return $this->fail();
+        $this->fail();
     }
 
     public function testDefaultAuthenticatedKeepsDefaultDriver()
@@ -109,7 +109,7 @@ class AuthenticateMiddlewareTest extends TestCase
             return;
         }
 
-        return $this->fail();
+        $this->fail();
     }
 
     public function testMultipleDriversAuthenticatedUpdatesDefault()
