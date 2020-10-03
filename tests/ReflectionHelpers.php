@@ -39,7 +39,6 @@ trait ReflectionHelpers
     }
 
     /**
-     * For setting private or protected property of an object
      * @param mixed $object
      * @param mixed $property
      * @param $value
