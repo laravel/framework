@@ -644,11 +644,11 @@ class PendingRequest
         return tap(HandlerStack::create(), function ($stack) {
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());
-            $stack->push($this->buildStubHandler());
-
             $this->middleware->each(function ($middleware) use ($stack) {
                 $stack->push($middleware);
             });
+
+            $stack->push($this->buildStubHandler());
         });
     }
 
