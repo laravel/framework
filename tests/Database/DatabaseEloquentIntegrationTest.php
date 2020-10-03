@@ -352,7 +352,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         );
 
         $this->assertSame('Mohamed Said', $user3->name);
-        $this->assertEquals(EloquentTestUser::count(), 2);
+        $this->assertEquals(2, EloquentTestUser::count());
     }
 
     public function testUpdateOrCreateOnDifferentConnection()

@@ -19,15 +19,21 @@ class FoundationHelpersTest extends TestCase
             throw new Exception;
         }, 'rescued!'), 'rescued!');
 
-        $this->assertEquals(rescue(function () {
-            throw new Exception;
-        }, function () {
-            return 'rescued!';
-        }), 'rescued!');
+        $this->assertEquals(
+            'rescued!',
+            rescue(function () {
+                throw new Exception;
+            }, function () {
+                return 'rescued!';
+            })
+        );
 
-        $this->assertEquals(rescue(function () {
-            return 'no need to rescue';
-        }, 'rescued!'), 'no need to rescue');
+        $this->assertEquals(
+            'no need to rescue',
+            rescue(function () {
+                return 'no need to rescue';
+            }, 'rescued!')
+        );
 
         $testClass = new class {
             public function test(int $a)
@@ -36,9 +42,12 @@ class FoundationHelpersTest extends TestCase
             }
         };
 
-        $this->assertEquals(rescue(function () use ($testClass) {
-            $testClass->test([]);
-        }, 'rescued!'), 'rescued!');
+        $this->assertEquals(
+            'rescued!',
+            rescue(function () use ($testClass) {
+                $testClass->test([]);
+            }, 'rescued!')
+        );
     }
 
     public function testMixReportsExceptionWhenAssetIsMissingFromManifest()

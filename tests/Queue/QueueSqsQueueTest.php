@@ -127,7 +127,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('getQueueAttributes')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateNumberOfMessages']])->andReturn($this->mockedQueueAttributesResponseModel);
         $size = $queue->size($this->queueName);
-        $this->assertEquals($size, 1);
+        $this->assertEquals(1, $size);
     }
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()
