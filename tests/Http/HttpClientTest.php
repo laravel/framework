@@ -43,6 +43,7 @@ class HttpClientTest extends TestCase
         $middleware = function ($handler) use (&$middlewareWasCalled) {
             return function ($request, $options) use ($handler, &$middlewareWasCalled) {
                 $middlewareWasCalled = true;
+
                 return $handler($request, $options);
             };
         };
