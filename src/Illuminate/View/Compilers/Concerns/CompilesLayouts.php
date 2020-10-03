@@ -29,6 +29,23 @@ trait CompilesLayouts
 
         return '';
     }
+    
+    /**
+     * Compile the extends-first statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileExtendsFirst($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        $echo = "<?php echo \$__env->first({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
+
+        $this->footer[] = $echo;
+
+        return '';
+    }
 
     /**
      * Compile the section statements into valid PHP.
