@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Bus;
+namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Contracts\Bus\Dispatcher;
