@@ -298,7 +298,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $queue = $this->getQueue($queue);
 
         return $this->getConnection()->eval(
-            LuaScripts::clear(), 4, $queue, $queue.':delayed', 
+            LuaScripts::clear(), 4, $queue, $queue.':delayed',
             $queue.':reserved', $queue.':notify'
         );
     }
