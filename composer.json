@@ -34,7 +34,7 @@
         "symfony/console": "^5.1",
         "symfony/error-handler": "^5.1",
         "symfony/finder": "^5.1",
-        "symfony/http-foundation": "^5.1",
+        "symfony/http-foundation": "^5.1,<5.2.0",
         "symfony/http-kernel": "^5.1",
         "symfony/mime": "^5.1",
         "symfony/process": "^5.1",
