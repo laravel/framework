@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
-use Illuminate\Foundation\Bus\PendingChain;
+use Illuminate\Bus\PendingChain;
 use Illuminate\Support\Testing\Fakes\BusFake;
 
 /**
@@ -11,7 +11,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static \Illuminate\Bus\PendingBatch batch(array $jobs)
  * @method static \Illuminate\Contracts\Bus\Dispatcher map(array $map)
  * @method static \Illuminate\Contracts\Bus\Dispatcher pipeThrough(array $pipes)
- * @method static \Illuminate\Foundation\Bus\PendingChain chain(array $jobs)
+ * @method static \Illuminate\Bus\PendingChain chain(array $jobs)
  * @method static bool hasCommandHandler($command)
  * @method static bool|mixed getCommandHandler($command)
  * @method static mixed dispatch($command)

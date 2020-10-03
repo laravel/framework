@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Illuminate\Bus\PendingChain;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Fluent;
 
@@ -79,7 +80,7 @@ trait Dispatchable
      * Set the jobs that should run if this job is successful.
      *
      * @param  array  $chain
-     * @return \Illuminate\Foundation\Bus\PendingChain
+     * @return \Illuminate\Bus\PendingChain
      */
     public static function withChain($chain)
     {
