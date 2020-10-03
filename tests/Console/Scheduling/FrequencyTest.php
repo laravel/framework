@@ -61,6 +61,14 @@ class FrequencyTest extends TestCase
         $this->assertSame('0 */6 * * *', $this->event->everySixHours()->getExpression());
     }
 
+    public function testBetweenHours()
+    {
+        $this->assertSame('* 1-13 * * *', $this->event->between('1am', '1pm')->getExpression());
+        $this->assertSame('*/10 2-12 * * *', $this->event->everyTenMinutes()->between('02:00', '12:00')->getExpression());
+        $this->assertSame('0 3-13/2 * * *', (clone $this->event)->everyTwoHours()->between('03:00', '13:00')->getExpression());
+        $this->assertSame('0 4-14/3 * * *', (clone $this->event)->everyThreeHours()->between('00:00', '01:00')->between('04:00', '14:00')->getExpression());
+    }
+
     public function testMonthlyOn()
     {
         $this->assertSame('0 15 4 * *', $this->event->monthlyOn(4, '15:00')->getExpression());
