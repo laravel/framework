@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Bus\PendingChain;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Support\Testing\Fakes\BusFake;
 
 /**
