@@ -73,7 +73,7 @@ class ValidationFactoryTest extends TestCase
             ['foo' => 'required']
         );
 
-        $this->assertEquals($validated, ['foo' => 'bar']);
+        $this->assertEquals(['foo' => 'bar'], $validated);
     }
 
     public function testCustomResolverIsCalled()

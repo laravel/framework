@@ -240,7 +240,7 @@ class CacheRepositoryTest extends TestCase
         $repo::macro(__CLASS__, function () {
             return 'Taylor';
         });
-        $this->assertEquals($repo->{__CLASS__}(), 'Taylor');
+        $this->assertEquals('Taylor', $repo->{__CLASS__}());
     }
 
     public function testForgettingCacheKey()

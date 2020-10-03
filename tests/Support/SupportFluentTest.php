@@ -64,7 +64,7 @@ class SupportFluentTest extends TestCase
         $fluent = new Fluent(['attributes' => '1']);
 
         $this->assertTrue(isset($fluent['attributes']));
-        $this->assertEquals($fluent['attributes'], 1);
+        $this->assertEquals(1, $fluent['attributes']);
 
         $fluent->attributes();
 
