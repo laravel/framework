@@ -7,7 +7,6 @@ use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Support\Arr;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
