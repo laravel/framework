@@ -174,23 +174,19 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_has_many_relationship()
     {
-        $users = FactoryTestUserFactory::times(10)
-                        ->has(
-                            FactoryTestPostFactory::times(3)
-                                    ->state(function ($attributes, $user) {
-                                        // Test parent is passed to child state mutations...
-                                        $_SERVER['__test.post.state-user'] = $user;
+        $postFactory = FactoryTestPostFactory::times(3)
+            ->state(function ($attributes, $user) {
+                // Test parent is passed to child state mutations...
+                $_SERVER['__test.post.state-user'] = $user;
 
-                                        return [];
-                                    })
-                                    // Test parents passed to callback...
-                                    ->afterCreating(function ($post, $user) {
-                                        $_SERVER['__test.post.creating-post'] = $post;
-                                        $_SERVER['__test.post.creating-user'] = $user;
-                                    }),
-                            'posts'
-                        )
-                        ->create();
+                return [];
+            })
+            // Test parents passed to callback...
+            ->afterCreating(function ($post, $user) {
+                $_SERVER['__test.post.creating-post'] = $post;
+                $_SERVER['__test.post.creating-user'] = $user;
+            });
+        FactoryTestUserFactory::times(10)->has($postFactory, 'posts')->create();
 
         $this->assertCount(10, FactoryTestUser::all());
         $this->assertCount(30, FactoryTestPost::all());
@@ -221,9 +217,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_morph_to_relationship()
     {
-        $posts = FactoryTestCommentFactory::times(3)
-                        ->for(FactoryTestPostFactory::new(['title' => 'Test Title']), 'commentable')
-                        ->create();
+        FactoryTestCommentFactory::times(3)
+            ->for(FactoryTestPostFactory::new(['title' => 'Test Title']), 'commentable')
+            ->create();
 
         $this->assertEquals('Test Title', FactoryTestPost::first()->title);
         $this->assertCount(3, FactoryTestPost::first()->comments);
@@ -234,16 +230,11 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_belongs_to_many_relationship()
     {
-        $users = FactoryTestUserFactory::times(3)
-                        ->hasAttached(
-                            FactoryTestRoleFactory::times(3)->afterCreating(function ($role, $user) {
-                                $_SERVER['__test.role.creating-role'] = $role;
-                                $_SERVER['__test.role.creating-user'] = $user;
-                            }),
-                            ['admin' => 'Y'],
-                            'roles'
-                        )
-                        ->create();
+        $roleFactory = FactoryTestRoleFactory::times(3)->afterCreating(function ($role, $user) {
+            $_SERVER['__test.role.creating-role'] = $role;
+            $_SERVER['__test.role.creating-user'] = $user;
+        });
+        FactoryTestUserFactory::times(3)->hasAttached($roleFactory, ['admin' => 'Y'], 'roles')->create();
 
         $this->assertCount(9, FactoryTestRole::all());
 

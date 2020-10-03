@@ -145,7 +145,7 @@ class FoundationApplicationTest extends TestCase
         $app->setDeferredServices(['foo' => ApplicationDeferredServiceProviderStub::class]);
         $app->instance('foo', 'bar');
         $instance = $app->make('foo');
-        $this->assertEquals($instance, 'bar');
+        $this->assertEquals('bar', $instance);
     }
 
     public function testDeferredServicesAreLazilyInitialized()
@@ -192,7 +192,7 @@ class FoundationApplicationTest extends TestCase
             SampleImplementation::class => SampleImplementationDeferredServiceProvider::class,
         ]);
         $instance = $app->make(SampleInterface::class);
-        $this->assertEquals($instance->getPrimitive(), 'foo');
+        $this->assertEquals('foo', $instance->getPrimitive());
     }
 
     public function testEnvironment()

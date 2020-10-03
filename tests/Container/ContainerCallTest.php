@@ -193,7 +193,7 @@ class ContainerCallTest extends TestCase
         $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerCallTest');
 
         $container = new Container;
-        $foo = $container->call(function ($foo, $bar = 'default') {
+        $container->call(function ($foo, $bar = 'default') {
             return $foo;
         });
     }

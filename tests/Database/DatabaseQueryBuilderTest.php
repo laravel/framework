@@ -198,13 +198,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhenCallbackWithDefault()
     {
         $callback = function ($query, $condition) {
-            $this->assertEquals($condition, 'truthy');
+            $this->assertEquals('truthy', $condition);
 
             $query->where('id', '=', 1);
         };
 
         $default = function ($query, $condition) {
-            $this->assertEquals($condition, 0);
+            $this->assertEquals(0, $condition);
 
             $query->where('id', '=', 2);
         };
@@ -257,13 +257,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUnlessCallbackWithDefault()
     {
         $callback = function ($query, $condition) {
-            $this->assertEquals($condition, 0);
+            $this->assertEquals(0, $condition);
 
             $query->where('id', '=', 1);
         };
 
         $default = function ($query, $condition) {
-            $this->assertEquals($condition, 'truthy');
+            $this->assertEquals('truthy', $condition);
 
             $query->where('id', '=', 2);
         };

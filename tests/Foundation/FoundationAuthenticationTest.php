@@ -16,7 +16,7 @@ class FoundationAuthenticationTest extends TestCase
     use InteractsWithAuthentication;
 
     /**
-     * @var \Mockery
+     * @var m
      */
     protected $app;
 
@@ -29,7 +29,7 @@ class FoundationAuthenticationTest extends TestCase
     ];
 
     /**
-     * @var \Mockery
+     * @return Guard|m\LegacyMockInterface|m\MockInterface
      */
     protected function mockGuard()
     {

@@ -31,7 +31,7 @@ class CacheDatabaseStoreTest extends TestCase
 
     public function testNullIsReturnedAndItemDeletedWhenItemIsExpired()
     {
-        $store = $this->getMockBuilder(DatabaseStore::class)->setMethods(['forget'])->setConstructorArgs($this->getMocks())->getMock();
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['forget'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
@@ -65,7 +65,7 @@ class CacheDatabaseStoreTest extends TestCase
 
     public function testValueIsInsertedWhenNoExceptionsAreThrown()
     {
-        $store = $this->getMockBuilder(DatabaseStore::class)->setMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
@@ -77,7 +77,7 @@ class CacheDatabaseStoreTest extends TestCase
 
     public function testValueIsUpdatedWhenInsertThrowsException()
     {
-        $store = $this->getMockBuilder(DatabaseStore::class)->setMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
@@ -93,7 +93,7 @@ class CacheDatabaseStoreTest extends TestCase
 
     public function testValueIsInsertedOnPostgres()
     {
-        $store = $this->getMockBuilder(DatabaseStore::class)->setMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
@@ -105,7 +105,7 @@ class CacheDatabaseStoreTest extends TestCase
 
     public function testForeverCallsStoreItemWithReallyLongTime()
     {
-        $store = $this->getMockBuilder(DatabaseStore::class)->setMethods(['put'])->setConstructorArgs($this->getMocks())->getMock();
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['put'])->setConstructorArgs($this->getMocks())->getMock();
         $store->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(315360000))->willReturn(true);
         $result = $store->forever('foo', 'bar');
         $this->assertTrue($result);
