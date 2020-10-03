@@ -34,6 +34,25 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->ok());
     }
 
+    public function testMiddlewareGetsCalled()
+    {
+        $this->factory->fake();
+
+        $middlewareWasCalled = false;
+
+        $middleware = function ($handler) use (&$middlewareWasCalled) {
+            return function ($request, $options) use ($handler, &$middlewareWasCalled) {
+                $middlewareWasCalled = true;
+                return $handler($request, $options);
+            };
+        };
+
+        $response = $this->factory->withMiddleware($middleware)->post('http://laravel.com/test-missing-page');
+
+        $this->assertTrue($response->ok());
+        $this->assertTrue($middlewareWasCalled);
+    }
+
     public function testResponseBodyCasting()
     {
         $this->factory->fake([
