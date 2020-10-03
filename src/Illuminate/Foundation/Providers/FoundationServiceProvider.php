@@ -36,6 +36,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * Register the service provider.
      *
      * @return void
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function register()
     {
