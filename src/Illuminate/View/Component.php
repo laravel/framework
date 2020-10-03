@@ -5,7 +5,6 @@ namespace Illuminate\View;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
@@ -64,7 +63,7 @@ abstract class Component
     {
         $view = $this->render();
 
-        if ($view instanceof ViewContract) {
+        if ($view instanceof View) {
             return $view;
         }
 
