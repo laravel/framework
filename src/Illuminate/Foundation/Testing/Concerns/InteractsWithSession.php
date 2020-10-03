@@ -19,13 +19,18 @@ trait InteractsWithSession
 
     /**
      * Set the session to the given array.
+     * Get the value from given key.
      *
-     * @param  array  $data
-     * @return $this
+     * @param  mixed  $data
+     * @return mixed
      */
-    public function session(array $data)
+    public function session($data)
     {
         $this->startSession();
+
+        if (! is_array($data)) {
+            return $this->app['session']->get($data);
+        }
 
         foreach ($data as $key => $value) {
             $this->app['session']->put($key, $value);
