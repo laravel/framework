@@ -375,7 +375,7 @@ class Stringable
     }
 
     /**
-     * Parse a Class@method style callback into class and method.
+     * Parse a Class method style callback into class and method.
      *
      * @param  string|null  $default
      * @return array
