@@ -83,6 +83,6 @@ trait Dispatchable
      */
     public static function withChain($chain)
     {
-        return app(Dispatcher::class)->chain([static::class, ...$chain]);
+        return app(Dispatcher::class)->chain(array_merge([static::class], $chain));
     }
 }
