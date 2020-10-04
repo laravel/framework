@@ -45,14 +45,23 @@ class PendingChain
     public $catchCallbacks = [];
 
     /**
+     * The IoC container instance.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
      * Create a new PendingChain instance.
      *
+     * @param  \Illuminate\Contracts\Container\Container $container
      * @param  mixed  $job
      * @param  array  $chain
      * @return void
      */
-    public function __construct($job, $chain)
+    public function __construct($container, $job, $chain)
     {
+        $this->container = $container;
         $this->job = $job;
         $this->chain = $chain;
     }
@@ -128,6 +137,6 @@ class PendingChain
         $firstJob->chain($this->chain);
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
-        return app(Dispatcher::class)->dispatch($firstJob);
+        return $this->container->make(Dispatcher::class)->dispatch($firstJob);
     }
 }

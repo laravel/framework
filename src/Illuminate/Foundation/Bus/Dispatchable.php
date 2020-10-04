@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Bus;
 
-use Illuminate\Bus\PendingChain;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Fluent;
 
@@ -84,6 +83,6 @@ trait Dispatchable
      */
     public static function withChain($chain)
     {
-        return new PendingChain(static::class, $chain);
+        return app(Dispatcher::class)->chain([static::class, ...$chain]);
     }
 }

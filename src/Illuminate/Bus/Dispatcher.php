@@ -163,7 +163,7 @@ class Dispatcher implements QueueingDispatcher
     {
         $jobs = Collection::wrap($jobs);
 
-        return new PendingChain($jobs->shift(), $jobs->toArray());
+        return new PendingChain($this->container, $jobs->shift(), $jobs->toArray());
     }
 
     /**

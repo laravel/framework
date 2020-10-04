@@ -62,21 +62,10 @@ class JobChainingTest extends TestCase
 
     public function testJobsCanBeChainedOnSuccessUsingBusFacade()
     {
-        Bus::dispatchChain([
+        Bus::chain([
             new JobChainingTestFirstJob(),
             new JobChainingTestSecondJob(),
-        ]);
-
-        $this->assertTrue(JobChainingTestFirstJob::$ran);
-        $this->assertTrue(JobChainingTestSecondJob::$ran);
-    }
-
-    public function testJobsCanBeChainedOnSuccessUsingBusFacadeAsArguments()
-    {
-        Bus::dispatchChain(
-            new JobChainingTestFirstJob(),
-            new JobChainingTestSecondJob()
-        );
+        ])->dispatch();
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
