@@ -144,7 +144,7 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('Taylor', $data->shift());
         $this->assertSame('Otwell', $data->first());
         $this->assertSame('Otwell', $data->shift());
-        $this->assertEquals(null, $data->first());
+        $this->assertNull($data->first());
     }
 
     /**
