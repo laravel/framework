@@ -39,10 +39,10 @@ class BladeTest extends TestCase
     {
         $view = View::make('varied-dynamic-calls')->render();
 
-        $this->assertEquals('<span class="text-medium">
+        $this->assertSame('<span class="text-medium">
     Hello Taylor
 </span>
-
+  
  <span >
     Hello Samuel
 </span>', trim($view));
