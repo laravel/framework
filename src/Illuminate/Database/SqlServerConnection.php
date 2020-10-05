@@ -3,7 +3,7 @@
 namespace Illuminate\Database;
 
 use Closure;
-use Doctrine\DBAL\Driver\PDOSqlsrv\Driver as DoctrineDriver;
+use Doctrine\DBAL\Driver\PDO\SQLSrv\Driver;
 use Doctrine\DBAL\Version;
 use Exception;
 use Illuminate\Database\PDO\SqlServerDriver;
@@ -22,7 +22,7 @@ class SqlServerConnection extends Connection
      * @param  int  $attempts
      * @return mixed
      *
-     * @throws \Exception|\Throwable
+     * @throws \Throwable
      */
     public function transaction(Closure $callback, $attempts = 1)
     {
@@ -110,6 +110,6 @@ class SqlServerConnection extends Connection
      */
     protected function getDoctrineDriver()
     {
-        return class_exists(Version::class) ? new DoctrineDriver : new SqlServerDriver;
+        return new Driver;
     }
 }

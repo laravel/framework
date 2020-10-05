@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database;
 
-use Doctrine\DBAL\Driver\PDOMySql\Driver as DoctrineDriver;
+use Doctrine\DBAL\Driver\PDO\MySQL\Driver;
 use Doctrine\DBAL\Version;
 use Illuminate\Database\PDO\MySqlDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
@@ -59,10 +59,10 @@ class MySqlConnection extends Connection
     /**
      * Get the Doctrine DBAL driver.
      *
-     * @return \Doctrine\DBAL\Driver\PDOMySql\Driver|\Illuminate\Database\PDO\MySqlDriver
+     * @return \Doctrine\DBAL\Driver\PDO\MySQL\Driver
      */
     protected function getDoctrineDriver()
     {
-        return class_exists(Version::class) ? new DoctrineDriver : new MySqlDriver;
+        return new Driver;
     }
 }
