@@ -346,7 +346,7 @@ abstract class AbstractPaginator implements Htmlable
         $this->items->transform($callback);
 
         return $this;
-    }    
+    }
 
     /**
      * Get the number of items shown per page.
