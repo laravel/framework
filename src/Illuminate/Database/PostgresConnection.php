@@ -3,8 +3,6 @@
 namespace Illuminate\Database;
 
 use Doctrine\DBAL\Driver\PDO\PgSQL\Driver;
-use Doctrine\DBAL\Version;
-use Illuminate\Database\PDO\PostgresDriver;
 use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar as SchemaGrammar;

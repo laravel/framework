@@ -4,9 +4,7 @@ namespace Illuminate\Database;
 
 use Closure;
 use Doctrine\DBAL\Driver\PDO\SQLSrv\Driver;
-use Doctrine\DBAL\Version;
 use Exception;
-use Illuminate\Database\PDO\SqlServerDriver;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;

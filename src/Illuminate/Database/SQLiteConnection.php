@@ -3,8 +3,6 @@
 namespace Illuminate\Database;
 
 use Doctrine\DBAL\Driver\PDO\SQLite\Driver;
-use Doctrine\DBAL\Version;
-use Illuminate\Database\PDO\SQLiteDriver;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar as SchemaGrammar;

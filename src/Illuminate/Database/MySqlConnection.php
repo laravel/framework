@@ -3,8 +3,6 @@
 namespace Illuminate\Database;
 
 use Doctrine\DBAL\Driver\PDO\MySQL\Driver;
-use Doctrine\DBAL\Version;
-use Illuminate\Database\PDO\MySqlDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
