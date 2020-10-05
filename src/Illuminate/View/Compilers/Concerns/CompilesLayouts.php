@@ -29,7 +29,7 @@ trait CompilesLayouts
 
         return '';
     }
-    
+
     /**
      * Compile the extends-first statements into valid PHP.
      *
