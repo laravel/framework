@@ -196,6 +196,106 @@ class DatabaseEloquentHasOneTest extends TestCase
         $relation->getRelationExistenceCountQuery($builder, $builder);
     }
 
+    public function testIsNotNull()
+    {
+        $relation = $this->getRelation();
+
+        $this->related->shouldReceive('getTable')->never();
+        $this->related->shouldReceive('getConnectionName')->never();
+
+        $this->assertFalse($relation->is(null));
+    }
+
+    public function testIsModel()
+    {
+        $relation = $this->getRelation();
+
+        $this->related->shouldReceive('getTable')->once()->andReturn('table');
+        $this->related->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(1);
+        $model->shouldReceive('getTable')->once()->andReturn('table');
+        $model->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $this->assertTrue($relation->is($model));
+    }
+
+    public function testIsModelWithStringRelatedKey()
+    {
+        $relation = $this->getRelation();
+
+        $this->related->shouldReceive('getTable')->once()->andReturn('table');
+        $this->related->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('1');
+        $model->shouldReceive('getTable')->once()->andReturn('table');
+        $model->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $this->assertTrue($relation->is($model));
+    }
+
+    public function testIsNotModelWithNullRelatedKey()
+    {
+        $relation = $this->getRelation();
+
+        $this->related->shouldReceive('getTable')->never();
+        $this->related->shouldReceive('getConnectionName')->never();
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(null);
+        $model->shouldReceive('getTable')->never();
+        $model->shouldReceive('getConnectionName')->never();
+
+        $this->assertFalse($relation->is($model));
+    }
+
+    public function testIsNotModelWithAnotherRelatedKey()
+    {
+        $relation = $this->getRelation();
+
+        $this->related->shouldReceive('getTable')->never();
+        $this->related->shouldReceive('getConnectionName')->never();
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(2);
+        $model->shouldReceive('getTable')->never();
+        $model->shouldReceive('getConnectionName')->never();
+
+        $this->assertFalse($relation->is($model));
+    }
+
+    public function testIsNotModelWithAnotherTable()
+    {
+        $relation = $this->getRelation();
+
+        $this->related->shouldReceive('getTable')->once()->andReturn('table');
+        $this->related->shouldReceive('getConnectionName')->never();
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(1);
+        $model->shouldReceive('getTable')->once()->andReturn('table.two');
+        $model->shouldReceive('getConnectionName')->never();
+
+        $this->assertFalse($relation->is($model));
+    }
+
+    public function testIsNotModelWithAnotherConnection()
+    {
+        $relation = $this->getRelation();
+
+        $this->related->shouldReceive('getTable')->once()->andReturn('table');
+        $this->related->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(1);
+        $model->shouldReceive('getTable')->once()->andReturn('table');
+        $model->shouldReceive('getConnectionName')->once()->andReturn('connection.two');
+
+        $this->assertFalse($relation->is($model));
+    }
+
     protected function getRelation()
     {
         $this->builder = m::mock(Builder::class);
