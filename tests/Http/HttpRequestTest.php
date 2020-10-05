@@ -1022,12 +1022,12 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['foo' => 'bar', 'empty' => '']);
 
         // Parameter 'foo' is 'bar', then it ISSET and is NOT EMPTY.
-        $this->assertEquals('bar', $request->foo);
+        $this->assertSame('bar', $request->foo);
         $this->assertTrue(isset($request->foo));
         $this->assertFalse(empty($request->foo));
 
         // Parameter 'empty' is '', then it ISSET and is EMPTY.
-        $this->assertEquals('', $request->empty);
+        $this->assertSame('', $request->empty);
         $this->assertTrue(isset($request->empty));
         $this->assertEmpty($request->empty);
 
@@ -1058,7 +1058,7 @@ class HttpRequestTest extends TestCase
 
         // Special case: router parameter 'xyz' is 'overwritten' by QueryString, then it ISSET and is NOT EMPTY.
         // Basically, QueryStrings have priority over router parameters.
-        $this->assertEquals('overwritten', $request->xyz);
+        $this->assertSame('overwritten', $request->xyz);
         $this->assertTrue(isset($request->foo));
         $this->assertFalse(empty($request->foo));
 
