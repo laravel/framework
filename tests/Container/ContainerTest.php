@@ -398,7 +398,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->alias('ConcreteStub', 'foo');
-        $this->assertEquals('ConcreteStub', $container->getAlias('foo'));
+        $this->assertSame('ConcreteStub', $container->getAlias('foo'));
     }
 
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()

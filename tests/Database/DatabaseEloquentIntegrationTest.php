@@ -1220,8 +1220,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $defaultConnectionPost = EloquentTestPhoto::with('imageable')->first()->imageable;
         $secondConnectionPost = EloquentTestPhoto::on('second_connection')->with('imageable')->first()->imageable;
 
-        $this->assertEquals('Default Connection Post', $defaultConnectionPost->name);
-        $this->assertEquals('Second Connection Post', $secondConnectionPost->name);
+        $this->assertSame('Default Connection Post', $defaultConnectionPost->name);
+        $this->assertSame('Second Connection Post', $secondConnectionPost->name);
     }
 
     public function testBelongsToManyCustomPivot()

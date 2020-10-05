@@ -53,6 +53,6 @@ class DatabaseSchemaBuilderTest extends TestCase
         $column->shouldReceive('getType')->once()->andReturn($type);
         $type->shouldReceive('getName')->once()->andReturn('integer');
 
-        $this->assertEquals('integer', $builder->getColumnType('users', 'id'));
+        $this->assertSame('integer', $builder->getColumnType('users', 'id'));
     }
 }
