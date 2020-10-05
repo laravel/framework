@@ -502,6 +502,7 @@ class Str
     public static function replaceFirst($search, $replace, $subject)
     {
         $search = (string) $search;
+
         if ($search === '') {
             return $subject;
         }
