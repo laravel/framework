@@ -520,6 +520,6 @@ class AuthGuardTest extends TestCase
 
     protected function getCookieJar()
     {
-        return new CookieJar();
+        return new CookieJar(Request::create('/foo', 'GET'), m::mock(Encrypter::class), ['domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false]);
     }
 }

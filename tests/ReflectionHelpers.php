@@ -9,10 +9,13 @@ use ReflectionObject;
 trait ReflectionHelpers
 {
     /**
+     * Try to call private and protected methods in given object.
+     *
      * @param $obj
      * @param $name
      * @param array $args
      * @return mixed
+     *
      * @throws ReflectionException
      */
     protected static function privateCall($obj, $name, array $args = [])
@@ -25,9 +28,12 @@ trait ReflectionHelpers
     }
 
     /**
+     * Get private and protected property from given object.
+     *
      * @param $obj
      * @param $name
      * @return mixed
+     *
      * @throws ReflectionException
      */
     protected static function getPrivateProperty($obj, $name)
@@ -37,19 +43,5 @@ trait ReflectionHelpers
         $property->setAccessible(true);
 
         return $property->getValue($obj);
-    }
-
-    /**
-     * @param mixed $object
-     * @param mixed $property
-     * @param $value
-     * @throws ReflectionException
-     */
-    protected function setPrivateProperty($object, $property, $value)
-    {
-        $reflection = new ReflectionClass($object);
-        $reflectionProperty = $reflection->getProperty($property);
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($object, $value);
     }
 }
