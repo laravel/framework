@@ -78,7 +78,7 @@ class Factory
     protected $responseSequences = [];
 
     /**
-     * PendingRequest object with user defined default options
+     * PendingRequest object with user defined default options.
      *
      * @var \Illuminate\Http\Client\PendingRequest
      */
@@ -95,7 +95,7 @@ class Factory
     }
 
     /**
-     * Set de default options that the client will user for all requests
+     * Set de default options that the client will user for all requests.
      *
      * @param array $options
      * @return $this

@@ -616,11 +616,11 @@ class HttpClientTest extends TestCase
         $this->factory->defaultOptions([
             'headers' => [
                 'X-Test-Header' => 'testing/1.0',
-            ]
+            ],
         ]);
 
         $this->factory->fake([
-            'foo.com/*'
+            'foo.com/*',
         ]);
 
         $this->factory->get('http://foo.com/test');
