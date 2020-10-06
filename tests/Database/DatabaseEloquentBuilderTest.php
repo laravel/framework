@@ -1329,7 +1329,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $query->shouldReceive('upsert')->once()
             ->with([
-                ['email' => 'foo', 'name' => 'bar', 'foo_table.updated_at' => $now], 
+                ['email' => 'foo', 'name' => 'bar', 'foo_table.updated_at' => $now],
                 ['name' => 'bar2', 'email' => 'foo2', 'foo_table.updated_at' => $now], ], 'email')->andReturn(2);
 
         $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
