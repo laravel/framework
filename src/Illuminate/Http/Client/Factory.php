@@ -10,6 +10,7 @@ use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
+ * @method \Illuminate\Http\Client\Factory defaultOptions(array $options)
  * @method \Illuminate\Http\Client\PendingRequest accept(string $contentType)
  * @method \Illuminate\Http\Client\PendingRequest acceptJson()
  * @method \Illuminate\Http\Client\PendingRequest asForm()
@@ -77,6 +78,13 @@ class Factory
     protected $responseSequences = [];
 
     /**
+     * PendingRequest object with user defined default options
+     *
+     * @var \Illuminate\Http\Client\PendingRequest
+     */
+    protected $pendingRequest = null;
+
+    /**
      * Create a new factory instance.
      *
      * @return void
@@ -84,6 +92,19 @@ class Factory
     public function __construct()
     {
         $this->stubCallbacks = collect();
+    }
+
+    /**
+     * Set de default options that the client will user for all requests
+     *
+     * @param array $options
+     * @return $this
+     */
+    public function defaultOptions(array $options)
+    {
+        $this->pendingRequest = tap(new PendingRequest($this))->withOptions($options);
+
+        return $this;
     }
 
     /**
@@ -311,7 +332,7 @@ class Factory
             return $this->macroCall($method, $parameters);
         }
 
-        return tap(new PendingRequest($this), function ($request) {
+        return tap($this->pendingRequest ?? new PendingRequest($this), function ($request) {
             $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
     }

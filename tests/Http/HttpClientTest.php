@@ -610,4 +610,23 @@ class HttpClientTest extends TestCase
 
         $this->assertSame(json_encode(['page' => 'foo']), stream_get_contents($resource));
     }
+
+    public function testSettingDefaultOptions()
+    {
+        $this->factory->defaultOptions([
+            'headers' => [
+                'X-Test-Header' => 'testing/1.0',
+            ]
+        ]);
+
+        $this->factory->fake([
+            'foo.com/*'
+        ]);
+
+        $this->factory->get('http://foo.com/test');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeaders('X-Test-Header');
+        });
+    }
 }
