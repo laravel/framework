@@ -2188,6 +2188,29 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpsertMethod()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `email` = values(`email`), `name` = values(`name`)', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
+        $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
+        $this->assertEquals(2, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") values (?, ?), (?, ?) on conflict ("email") do update set "email" = "excluded"."email", "name" = "excluded"."name"', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
+        $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
+        $this->assertEquals(2, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") values (?, ?), (?, ?) on conflict ("email") do update set "email" = "excluded"."email", "name" = "excluded"."name"', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
+        $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
+        $this->assertEquals(2, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('merge [users] using (values (?, ?), (?, ?)) [laravel_source] ([email], [name]) on [laravel_source].[email] = [users].[email] when not matched then insert ([email], [name]) values ([email], [name])', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
+        $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
+        $this->assertEquals(2, $result);
+    }
+
     public function testUpdateMethodWithJoins()
     {
         $builder = $this->getBuilder();

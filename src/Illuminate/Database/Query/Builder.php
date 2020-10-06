@@ -2924,6 +2924,35 @@ class Builder
     }
 
     /**
+     * Insert new records or update the existing ones.
+     *
+     * @param  array  $values
+     * @param  array|string  $uniqueBy
+     * @return int
+     */
+    public function upsert(array $values, $uniqueBy)
+    {
+        if (empty($values)) {
+            return 0;
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+
+                $values[$key] = $value;
+            }
+        }
+
+        return $this->connection->affectingStatement(
+            $this->grammar->compileUpsert($this, $values, (array) $uniqueBy),
+            $this->cleanBindings(Arr::flatten($values, 1))
+        );
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
