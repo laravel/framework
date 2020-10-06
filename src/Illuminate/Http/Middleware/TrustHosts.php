@@ -70,4 +70,18 @@ abstract class TrustHosts
             return '^(.+\.)?'.preg_quote($host).'$';
         }
     }
+
+    /**
+     * Get a regular expression matching the private IP address of the server.
+     *
+     * @return string|null
+     */
+    protected function privateIpAddressOfServer()
+    {
+        $server = $this->app['request']->server;
+
+        if ($ipAddress = $server->get('SERVER_ADDR') ?: $server->get('LOCAL_ADDR')) {
+            return '^'.preg_quote($ipAddress).'$';
+        }
+    }
 }
