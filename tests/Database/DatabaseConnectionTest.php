@@ -16,7 +16,6 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Builder;
-use Illuminate\Tests\ReflectionHelpers;
 use Mockery as m;
 use PDO;
 use PDOException;
@@ -27,8 +26,6 @@ use stdClass;
 
 class DatabaseConnectionTest extends TestCase
 {
-    use ReflectionHelpers;
-
     protected function tearDown(): void
     {
         m::close();
@@ -159,32 +156,6 @@ class DatabaseConnectionTest extends TestCase
         $connection->expects($this->once())->method('fireConnectionEvent')->with('beganTransaction');
         $connection->beginTransaction();
         $this->assertEquals(1, $connection->transactionLevel());
-    }
-
-    public function testCreateTransactionMethodRetriesOnFailure()
-    {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
-        $exception = new ErrorException('server has gone away');
-        $pdo->expects($this->once())
-            ->method('beginTransaction')
-            ->will($this->throwException($exception));
-        $requiredMethods = ['reconnectIfMissingConnection', 'handleBeginTransactionException'];
-        $connection = $this->getMockConnection($requiredMethods, $pdo);
-        $connection->expects($this->once())->method('reconnectIfMissingConnection');
-        $connection->expects($this->once())->method('handleBeginTransactionException')->with($exception);
-        $this->privateCall($connection, 'createTransaction');
-    }
-
-    public function testHandleBeginTransactionExceptionRetries()
-    {
-        $exception = new ErrorException('server has gone away');
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
-        $requiredMethods = ['causedByLostConnection', 'reconnect'];
-        $connection = $this->getMockConnection($requiredMethods, $pdo);
-        $connection->expects($this->once())->method('causedByLostConnection')->with($exception)->willReturn(true);
-        $connection->expects($this->once())->method('reconnect');
-        $pdo->expects($this->once())->method('beginTransaction');
-        $this->privateCall($connection, 'handleBeginTransactionException', [$exception]);
     }
 
     public function testBeginTransactionMethodReconnectsMissingConnection()

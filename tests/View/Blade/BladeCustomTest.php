@@ -2,13 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Illuminate\Tests\ReflectionHelpers;
 use InvalidArgumentException;
 
 class BladeCustomTest extends AbstractBladeTestCase
 {
-    use ReflectionHelpers;
-
     public function testCustomPhpCodeIsCorrectlyHandled()
     {
         $this->assertSame('<?php if($test): ?> <?php @show(\'test\'); ?> <?php endif; ?>', $this->compiler->compileString("@if(\$test) <?php @show('test'); ?> @endif"));
@@ -55,18 +52,20 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    /**
-     * @dataProvider customNamesDataProvider
-     * @param string $name
-     * 
-     * @throws \ReflectionException
-     */
-    public function testValidCustomNames(string $name)
+    public function testValidCustomNames()
     {
-        $this->compiler->directive($name, function () {
+        $this->assertNull($this->compiler->directive('custom', function () {
             //
-        });
-        $this->assertArrayHasKey($name, $this->getPrivateProperty($this->compiler, 'customDirectives'));
+        }));
+        $this->assertNull($this->compiler->directive('custom_custom', function () {
+            //
+        }));
+        $this->assertNull($this->compiler->directive('customCustom', function () {
+            //
+        }));
+        $this->assertNull($this->compiler->directive('custom::custom', function () {
+            //
+        }));
     }
 
     public function testInvalidCustomNames()
@@ -223,15 +222,5 @@ class BladeCustomTest extends AbstractBladeTestCase
         $string = '@foreach';
         $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
-    }
-
-    public function customNamesDataProvider()
-    {
-        return [
-            ['custom'],
-            ['custom_custom'],
-            ['customCustom'],
-            ['custom::custom'],
-        ];
     }
 }
