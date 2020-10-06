@@ -1107,7 +1107,6 @@ trait HasAttributes
         throw new InvalidCastException($this->getModel(), $key, $castType);
     }
 
-
     /**
      * Determine if the key is serializable using a custom class.
      *
