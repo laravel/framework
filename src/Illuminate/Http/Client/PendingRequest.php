@@ -181,14 +181,22 @@ class PendingRequest
     /**
      * Attach a file to the request.
      *
-     * @param  string  $name
+     * @param  string|array  $name
      * @param  string  $contents
      * @param  string|null  $filename
      * @param  array  $headers
      * @return $this
      */
-    public function attach($name, $contents, $filename = null, array $headers = [])
+    public function attach($name, $contents = '', $filename = null, array $headers = [])
     {
+        if (is_array($name)) {
+            foreach ($name as $file) {
+                $this->attach(...$file);
+            }
+
+            return $this;
+        }
+
         $this->asMultipart();
 
         $this->pendingFiles[] = array_filter([
@@ -197,21 +205,6 @@ class PendingRequest
             'headers' => $headers,
             'filename' => $filename,
         ]);
-
-        return $this;
-    }
-    
-    /**
-     * Attach multiple files to the request.
-     *
-     * @param  array  $files
-     * @return $this
-     */
-    public function attachMany(array $files)
-    {
-        foreach ($files as $file) {
-            $this->attach(...$file);
-        }
 
         return $this;
     }
