@@ -109,7 +109,7 @@ class PendingChain
     }
 
     /**
-     * Prepare a job chain for dispatch with the given arguments
+     * Prepare a job chain for dispatch with the given arguments.
      *
      * @return CallQueuedClosure|mixed
      */

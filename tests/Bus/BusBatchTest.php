@@ -317,14 +317,14 @@ class BusBatchTest extends TestCase
 
         $thirdJob = new ThirdTestJob();
 
-        $fourthJob = function (){
+        $fourthJob = function () {
         };
 
         $queue->shouldReceive('connection')->once()
             ->with('test-connection')
             ->andReturn($connection = m::mock(stdClass::class));
 
-        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($firstJob, $secondJob, $thirdJob, $fourthJob) {
+        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($firstJob, $secondJob, $thirdJob) {
             return
                 $args[0] == $firstJob
                 && $args[1] == $secondJob
