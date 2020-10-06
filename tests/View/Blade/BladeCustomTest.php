@@ -58,6 +58,7 @@ class BladeCustomTest extends AbstractBladeTestCase
     /**
      * @dataProvider customNamesDataProvider
      * @param string $name
+     * 
      * @throws \ReflectionException
      */
     public function testValidCustomNames(string $name)
