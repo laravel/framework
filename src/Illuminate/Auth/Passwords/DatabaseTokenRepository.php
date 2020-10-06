@@ -117,7 +117,9 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function getPayload($email, $token)
     {
-        return ['email' => $email, 'token' => $this->hasher->make($token), 'created_at' => new Carbon];
+        $token = str_replace('/', '.', $this->hasher->make($token));
+
+        return ['email' => $email, 'token' => $token, 'created_at' => new Carbon];
     }
 
     /**
