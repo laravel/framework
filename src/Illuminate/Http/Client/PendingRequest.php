@@ -202,7 +202,7 @@ class PendingRequest
     }
     
     /**
-     * Attach multiple files to the request. Accepts an array containing arrays of files
+     * Attach multiple files to the request.
      *
      * @param  array  $files
      * @return $this
