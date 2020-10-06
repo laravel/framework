@@ -1112,7 +1112,8 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return bool
-     * @throws InvalidCastException
+     *
+     * @throws \Illuminate\Database\Eloquent\InvalidCastException
      */
     protected function isClassSerializable($key)
     {
