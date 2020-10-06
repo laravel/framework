@@ -814,7 +814,7 @@ class Builder
             return 0;
         }
 
-        if (!is_array(reset($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -867,7 +867,7 @@ class Builder
      */
     protected function addTimestampsToValues(array $values)
     {
-        if (!$this->model->usesTimestamps()) {
+        if (! $this->model->usesTimestamps()) {
             return $values;
         }
 
@@ -892,13 +892,13 @@ class Builder
      */
     protected function addUpdatedAtToColumns(array $update)
     {
-        if (!$this->model->usesTimestamps()) {
+        if (! $this->model->usesTimestamps()) {
             return $update;
         }
 
         $column = $this->model->getUpdatedAtColumn();
 
-        if (!is_null($column) && !array_key_exists($column, $update) && !in_array($column, $update)) {
+        if (! is_null($column) && ! array_key_exists($column, $update) && ! in_array($column, $update)) {
             $update[] = $column;
         }
 
