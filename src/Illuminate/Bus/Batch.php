@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
@@ -167,21 +168,23 @@ class Batch implements Arrayable, JsonSerializable
                 $job = CallQueuedClosure::create($job);
             }
 
-            if (is_array($job)) {
-                $jobChain = $job;
+            if ($job instanceof PendingChain) {
                 $batchId = $this->id;
-                array_walk($jobChain, function (&$job) use ($batchId) {
+
+                $job->job->withBatchId($batchId);
+
+                $jobTotal++;
+
+                array_walk($job->chain, function (&$job) use ($batchId) {
                     if ($job instanceof Closure) {
                         $job = CallQueuedClosure::create($job);
                     }
                     $job->withBatchId($batchId);
                 });
 
-                $jobTotal += count($jobChain);
+                $jobTotal += count($job->chain);
 
-                $chainHead = array_shift($jobChain);
-
-                return $chainHead->chain($jobChain);
+                return $job->prepare();
             } else {
                 $job->withBatchId($this->id);
                 $jobTotal++;

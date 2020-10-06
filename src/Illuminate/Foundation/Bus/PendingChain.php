@@ -109,11 +109,11 @@ class PendingChain
     }
 
     /**
-     * Dispatch the job with the given arguments.
+     * Prepare a job chain for dispatch with the given arguments
      *
-     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     * @return CallQueuedClosure|mixed
      */
-    public function dispatch()
+    public function prepare()
     {
         if (is_string($this->job)) {
             $firstJob = new $this->job(...func_get_args());
@@ -128,6 +128,18 @@ class PendingChain
         $firstJob->chain($this->chain);
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
-        return app(Dispatcher::class)->dispatch($firstJob);
+        return $firstJob;
+    }
+
+    /**
+     * Dispatch the job with the given arguments.
+     *
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     */
+    public function dispatch()
+    {
+        $preparedJob = $this->prepare();
+
+        return app(Dispatcher::class)->dispatch($preparedJob);
     }
 }
