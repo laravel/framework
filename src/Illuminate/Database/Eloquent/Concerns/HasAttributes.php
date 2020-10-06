@@ -617,8 +617,9 @@ trait HasAttributes
      */
     protected function serializeClassCastableAttribute($key, $value)
     {
-        return $this->resolveCasterClass($key)
-                    ->serialize($this, $key, $value, $this->attributes);
+        return $this->resolveCasterClass($key)->serialize(
+            $this, $key, $value, $this->attributes
+        );
     }
 
     /**
@@ -1117,13 +1118,8 @@ trait HasAttributes
      */
     protected function isClassSerializable($key)
     {
-        if (! $this->isClassCastable($key)) {
-            return false;
-        }
-
-        $castType = $this->parseCasterClass($this->getCasts()[$key]);
-
-        return method_exists($castType, 'serialize');
+        return $this->isClassCastable($key) &&
+               method_exists($this->parseCasterClass($this->getCasts()[$key]), 'serialize');
     }
 
     /**
