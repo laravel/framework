@@ -51,11 +51,13 @@ class PostgresSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $args = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD pg_restore --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE $LARAVEL_LOAD_PATH';
-        if(preg_match('/\.sql$/', $path) !== false) {
-            $args = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD psql --file=$LARAVEL_LOAD_PATH --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE';
+        $command = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD pg_restore --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE $LARAVEL_LOAD_PATH';
+
+        if (preg_match('/\.sql$/', $path) !== false) {
+            $command = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD psql --file=$LARAVEL_LOAD_PATH --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE';
         }
-        $process = $this->makeProcess($args);
+
+        $process = $this->makeProcess($command);
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
