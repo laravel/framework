@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
+use ErrorException;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
@@ -147,12 +148,14 @@ class DatabaseConnectionTest extends TestCase
         }
     }
 
-    public function testBeginTransactionMethodUsesCreateTransactionMethod()
+    public function testBeginTransactionMethodRetriesOnFailure()
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
-        $connection = $this->getMockConnection(['createTransaction', 'fireConnectionEvent'], $pdo);
-        $connection->expects($this->once())->method('createTransaction');
-        $connection->expects($this->once())->method('fireConnectionEvent')->with('beganTransaction');
+        $pdo->expects($this->at(0))
+            ->method('beginTransaction')
+            ->will($this->throwException(new ErrorException('server has gone away')));
+        $connection = $this->getMockConnection(['reconnect'], $pdo);
+        $connection->expects($this->once())->method('reconnect');
         $connection->beginTransaction();
         $this->assertEquals(1, $connection->transactionLevel());
     }
