@@ -398,7 +398,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->alias('ConcreteStub', 'foo');
-        $this->assertEquals($container->getAlias('foo'), 'ConcreteStub');
+        $this->assertSame('ConcreteStub', $container->getAlias('foo'));
     }
 
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
@@ -424,7 +424,7 @@ class ContainerTest extends TestCase
     public function testMakeWithMethodIsAnAliasForMakeMethod()
     {
         $mock = $this->getMockBuilder(Container::class)
-                     ->setMethods(['make'])
+                     ->onlyMethods(['make'])
                      ->getMock();
 
         $mock->expects($this->once())

@@ -608,7 +608,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the values of a given key.
      *
-     * @param  string|array  $value
+     * @param  string|array|int|null  $value
      * @param  string|null  $key
      * @return static
      */

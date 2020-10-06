@@ -409,7 +409,7 @@ class Arr
      * Pluck an array of values from an array.
      *
      * @param  iterable  $array
-     * @param  string|array  $value
+     * @param  string|array|int|null  $value
      * @param  string|array|null  $key
      * @return array
      */

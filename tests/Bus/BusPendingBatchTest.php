@@ -40,8 +40,8 @@ class BusPendingBatchTest extends TestCase
             //
         })->allowFailures()->onConnection('test-connection')->onQueue('test-queue');
 
-        $this->assertEquals('test-connection', $pendingBatch->connection());
-        $this->assertEquals('test-queue', $pendingBatch->queue());
+        $this->assertSame('test-connection', $pendingBatch->connection());
+        $this->assertSame('test-queue', $pendingBatch->queue());
         $this->assertCount(1, $pendingBatch->thenCallbacks());
         $this->assertCount(1, $pendingBatch->catchCallbacks());
 

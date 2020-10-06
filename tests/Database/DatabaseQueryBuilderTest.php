@@ -7,6 +7,7 @@ use DateTime;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
+
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
@@ -198,13 +199,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhenCallbackWithDefault()
     {
         $callback = function ($query, $condition) {
-            $this->assertEquals($condition, 'truthy');
+            $this->assertEquals('truthy', $condition);
 
             $query->where('id', '=', 1);
         };
 
         $default = function ($query, $condition) {
-            $this->assertEquals($condition, 0);
+            $this->assertEquals(0, $condition);
 
             $query->where('id', '=', 2);
         };
@@ -257,13 +258,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUnlessCallbackWithDefault()
     {
         $callback = function ($query, $condition) {
-            $this->assertEquals($condition, 0);
+            $this->assertEquals(0, $condition);
 
             $query->where('id', '=', 1);
         };
 
         $default = function ($query, $condition) {
-            $this->assertEquals($condition, 'truthy');
+            $this->assertEquals('truthy', $condition);
 
             $query->where('id', '=', 2);
         };
@@ -3100,12 +3101,12 @@ SQL;
             $query->from('two')->select('baz')->where('subkey', '=', 'subval');
         }, 'sub');
 
-        $this->assertEquals('select (select "baz" from "two" where "subkey" = ?) as "sub" from "one"', $builder->toSql());
+        $this->assertSame('select (select "baz" from "two" where "subkey" = ?) as "sub" from "one"', $builder->toSql());
         $this->assertEquals(['subval'], $builder->getBindings());
 
         $builder->select('*');
 
-        $this->assertEquals('select * from "one"', $builder->toSql());
+        $this->assertSame('select * from "one"', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
     }
 

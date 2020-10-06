@@ -352,7 +352,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         );
 
         $this->assertSame('Mohamed Said', $user3->name);
-        $this->assertEquals(EloquentTestUser::count(), 2);
+        $this->assertEquals(2, EloquentTestUser::count());
     }
 
     public function testUpdateOrCreateOnDifferentConnection()
@@ -369,8 +369,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
             ['name' => 'Mohamed Said']
         );
 
-        $this->assertEquals(EloquentTestUser::count(), 1);
-        $this->assertEquals(EloquentTestUser::on('second_connection')->count(), 2);
+        $this->assertEquals(1, EloquentTestUser::count());
+        $this->assertEquals(2, EloquentTestUser::on('second_connection')->count());
     }
 
     public function testCheckAndCreateMethodsOnMultiConnections()
@@ -1220,8 +1220,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $defaultConnectionPost = EloquentTestPhoto::with('imageable')->first()->imageable;
         $secondConnectionPost = EloquentTestPhoto::on('second_connection')->with('imageable')->first()->imageable;
 
-        $this->assertEquals($defaultConnectionPost->name, 'Default Connection Post');
-        $this->assertEquals($secondConnectionPost->name, 'Second Connection Post');
+        $this->assertSame('Default Connection Post', $defaultConnectionPost->name);
+        $this->assertSame('Second Connection Post', $secondConnectionPost->name);
     }
 
     public function testBelongsToManyCustomPivot()
@@ -1411,6 +1411,34 @@ class DatabaseEloquentIntegrationTest extends TestCase
         // but Date::hasFormat() can be used instead to check date formatting:
         $this->assertTrue(Date::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
         $this->assertFalse(Date::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
+    }
+
+    public function testSpecialFormats()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('!Y-d-m \\Y');
+        $model->setRawAttributes([
+            'updated_at' => '2017-05-11 Y',
+        ]);
+
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2017-11-05 00:00:00.000000', $date->format('Y-m-d H:i:s.u'), 'the date should respect the whole format');
+
+        $model->setDateFormat('Y d m|');
+        $model->setRawAttributes([
+            'updated_at' => '2020 11 09',
+        ]);
+
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2020-09-11 00:00:00.000000', $date->format('Y-m-d H:i:s.u'), 'the date should respect the whole format');
+
+        $model->setDateFormat('Y d m|*');
+        $model->setRawAttributes([
+            'updated_at' => '2020 11 09 foo',
+        ]);
+
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2020-09-11 00:00:00.000000', $date->format('Y-m-d H:i:s.u'), 'the date should respect the whole format');
     }
 
     public function testUpdatingChildModelTouchesParent()

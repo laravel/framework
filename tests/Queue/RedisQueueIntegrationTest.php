@@ -431,6 +431,7 @@ class RedisQueueIntegrationTest extends TestCase
 
         $this->assertEquals(2, $this->queue->clear(null));
         $this->assertEquals(0, $this->queue->size());
+        $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default:notify'));
     }
 
     /**

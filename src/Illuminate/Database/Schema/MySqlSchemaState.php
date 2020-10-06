@@ -116,7 +116,7 @@ class MySqlSchemaState extends SchemaState
     protected function executeDumpProcess(Process $process, $output, array $variables)
     {
         try {
-            $process->mustRun($output, $variables);
+            $process->setTimeout(null)->mustRun($output, $variables);
         } catch (Exception $e) {
             if (Str::contains($e->getMessage(), ['column-statistics', 'column_statistics'])) {
                 return $this->executeDumpProcess(Process::fromShellCommandLine(

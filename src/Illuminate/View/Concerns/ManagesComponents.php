@@ -42,7 +42,7 @@ trait ManagesComponents
     /**
      * Start a component rendering process.
      *
-     * @param  \Illuminate\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
+     * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
      * @param  array  $data
      * @return void
      */

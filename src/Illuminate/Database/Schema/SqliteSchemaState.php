@@ -15,7 +15,7 @@ class SqliteSchemaState extends SchemaState
     {
         with($process = $this->makeProcess(
             $this->baseCommand().' .schema'
-        ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+        ))->setTimeout(null)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
 

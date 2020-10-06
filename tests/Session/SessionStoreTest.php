@@ -433,7 +433,7 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $this->assertEquals($session->getName(), $this->getSessionName());
         $session->setName('foo');
-        $this->assertEquals($session->getName(), 'foo');
+        $this->assertSame('foo', $session->getName());
     }
 
     public function testKeyExists()

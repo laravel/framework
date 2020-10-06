@@ -181,14 +181,22 @@ class PendingRequest
     /**
      * Attach a file to the request.
      *
-     * @param  string  $name
+     * @param  string|array  $name
      * @param  string  $contents
      * @param  string|null  $filename
      * @param  array  $headers
      * @return $this
      */
-    public function attach($name, $contents, $filename = null, array $headers = [])
+    public function attach($name, $contents = '', $filename = null, array $headers = [])
     {
+        if (is_array($name)) {
+            foreach ($name as $file) {
+                $this->attach(...$file);
+            }
+
+            return $this;
+        }
+
         $this->asMultipart();
 
         $this->pendingFiles[] = array_filter([
@@ -311,6 +319,17 @@ class PendingRequest
         return tap($this, function ($request) use ($token, $type) {
             return $this->options['headers']['Authorization'] = trim($type.' '.$token);
         });
+    }
+
+    /**
+     * Specify the user agent for the request.
+     *
+     * @param  string  $userAgent
+     * @return $this
+     */
+    public function withUserAgent($userAgent)
+    {
+        return $this->withHeaders(['User-Agent' => $userAgent]);
     }
 
     /**

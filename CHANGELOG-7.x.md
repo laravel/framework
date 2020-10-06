@@ -44,7 +44,7 @@
 - RefreshDatabase migration commands parameters moved to methods ([#34007](https://github.com/laravel/framework/pull/34007), [8b35c8e](https://github.com/laravel/framework/commit/8b35c8e6ba5879e71fd81fd03b5687ee2b46c55a), [256f71c](https://github.com/laravel/framework/commit/256f71c1f81da2d4bb3e327b18389ac43fa97a72))
 
 ### Changed
-- allow to reset forced scheme and root-url in UrlGenerator ([#34039](https://github.com/laravel/framework/pull/34039))
+- Allow to reset forced scheme and root-url in UrlGenerator ([#34039](https://github.com/laravel/framework/pull/34039))
 - Updating the make commands to use a custom views path ([#34060](https://github.com/laravel/framework/pull/34060), [b593c62](https://github.com/laravel/framework/commit/b593c6242942623fcc12638d0390da7c58dbbb11))
 - Using "public static property" in View Component causes an error ([#34058](https://github.com/laravel/framework/pull/34058))
 - Changed postgres processor ([#34055](https://github.com/laravel/framework/pull/34055))
@@ -121,7 +121,7 @@
 
 ### Fixed
 - Fixed `Illuminate\Support\Arr::query()` ([c6f9ae2](https://github.com/laravel/framework/commit/c6f9ae2b6fdc3c1716938223de731b97f6a5a255))
-- Dont allow mass filling with table names ([9240404](https://github.com/laravel/framework/commit/9240404b22ef6f9e827577b3753e4713ddce7471), [f5fa6e3](https://github.com/laravel/framework/commit/f5fa6e3a0fbf9a93eab45b9ae73265b4dbfc3ad7))
+- Don't allow mass filling with table names ([9240404](https://github.com/laravel/framework/commit/9240404b22ef6f9e827577b3753e4713ddce7471), [f5fa6e3](https://github.com/laravel/framework/commit/f5fa6e3a0fbf9a93eab45b9ae73265b4dbfc3ad7))
 
 
 ## [v7.23.1 (2020-08-06)](https://github.com/laravel/framework/compare/v7.23.0...v7.23.1)
@@ -179,7 +179,7 @@
 
 ### Fixed
 - Prevent usage of get*AtColumn() when model has no timestamps ([#33634](https://github.com/laravel/framework/pull/33634))
-- Dont decrement transaction below 0 in `Illuminate\Database\Concerns\ManagesTransactions::handleCommitTransactionException()` ([7681795](https://github.com/laravel/framework/commit/768179578e5492b5f80c391bd43b233938e16e27))
+- Don't decrement transaction below 0 in `Illuminate\Database\Concerns\ManagesTransactions::handleCommitTransactionException()` ([7681795](https://github.com/laravel/framework/commit/768179578e5492b5f80c391bd43b233938e16e27))
 - Fixed transaction problems on closure transaction ([c4cdfc7](https://github.com/laravel/framework/commit/c4cdfc7c54127b772ef10f37cfc9ef8e9d6b3227))
 - Prevent to serialize uninitialized properties ([#33644](https://github.com/laravel/framework/pull/33644))
 - Fixed missing statement preventing deletion in `Illuminate\Database\Eloquent\Relations\MorphPivot::delete()` ([#33648](https://github.com/laravel/framework/pull/33648))
@@ -394,7 +394,7 @@
 - Fixed `Illuminate\Cache\ArrayStore::increment()` bug that changes expiration to forever ([#32875](https://github.com/laravel/framework/pull/32875))
 
 ### Changed
-- Dont cache non objects in `Illuminate/Database/Eloquent/Concerns/HasAttributes::getClassCastableAttributeValue()` ([894fe22](https://github.com/laravel/framework/commit/894fe22c6c111b224de5bada24dcbba4c93f0305))
+- Don't cache non objects in `Illuminate/Database/Eloquent/Concerns/HasAttributes::getClassCastableAttributeValue()` ([894fe22](https://github.com/laravel/framework/commit/894fe22c6c111b224de5bada24dcbba4c93f0305))
 - Added explicit `symfony/polyfill-php73` dependency ([5796b1e](https://github.com/laravel/framework/commit/5796b1e43dfe14914050a7e5dd24ddf803ec99b8))
 - Set `Cache\FileStore` file permissions only once ([#32845](https://github.com/laravel/framework/pull/32845), [11c533b](https://github.com/laravel/framework/commit/11c533b9aa062f4cba1dd0fe3673bf33d275480f))
 - Added alias as key of package's view components ([#32863](https://github.com/laravel/framework/pull/32863))
@@ -885,7 +885,7 @@
 - Fixed `trim` of the prefix in the `CompiledRouteCollection::newRoute()` ([ce0355c](https://github.com/laravel/framework/commit/ce0355c72bf4defb93ae80c7bf7812bd6532031a), [b842c65](https://github.com/laravel/framework/commit/b842c65ecfe1ea7839d61a46b177b6b5887fd4d2))
 
 ### Changed
-- remove comments before compiling components in the `BladeCompiler` ([2964d2d](https://github.com/laravel/framework/commit/2964d2dfd3cc50f7a709effee0af671c86587915))
+- Remove comments before compiling components in the `BladeCompiler` ([2964d2d](https://github.com/laravel/framework/commit/2964d2dfd3cc50f7a709effee0af671c86587915))
 
 
 ## [v7.0.1 (2020-03-03)](https://github.com/laravel/framework/compare/v7.0.0...v7.0.1)

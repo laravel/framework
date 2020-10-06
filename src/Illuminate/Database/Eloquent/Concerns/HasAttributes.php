@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use LogicException;
 
 trait HasAttributes
@@ -237,6 +238,10 @@ trait HasAttributes
             if ($attributes[$key] && $attributes[$key] instanceof DateTimeInterface &&
                 $this->isClassCastable($key)) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
+            }
+
+            if ($attributes[$key] && $this->isClassSerializable($key)) {
+                $attributes[$key] = $this->serializeClassCastableAttribute($key, $attributes[$key]);
             }
 
             if ($attributes[$key] instanceof Arrayable) {
@@ -604,6 +609,20 @@ trait HasAttributes
     }
 
     /**
+     * Serialize the given attribute using the custom cast class.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function serializeClassCastableAttribute($key, $value)
+    {
+        return $this->resolveCasterClass($key)->serialize(
+            $this, $key, $value, $this->attributes
+        );
+    }
+
+    /**
      * Determine if the cast type is a custom date time cast.
      *
      * @param  string  $cast
@@ -915,11 +934,13 @@ trait HasAttributes
         // Finally, we will just assume this date is in the format used by default on
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
-        if (Date::hasFormat($value, $format)) {
-            return Date::createFromFormat($format, $value);
+        try {
+            $date = Date::createFromFormat($format, $value);
+        } catch (InvalidArgumentException $e) {
+            $date = false;
         }
 
-        return Date::parse($value);
+        return $date ?: Date::parse($value);
     }
 
     /**
@@ -1085,6 +1106,20 @@ trait HasAttributes
         }
 
         throw new InvalidCastException($this->getModel(), $key, $castType);
+    }
+
+    /**
+     * Determine if the key is serializable using a custom class.
+     *
+     * @param  string  $key
+     * @return bool
+     *
+     * @throws \Illuminate\Database\Eloquent\InvalidCastException
+     */
+    protected function isClassSerializable($key)
+    {
+        return $this->isClassCastable($key) &&
+               method_exists($this->parseCasterClass($this->getCasts()[$key]), 'serialize');
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -31,7 +32,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->syncOriginal();
         $model->uppercase = 'dries';
-        $this->assertEquals('TAYLOR', $model->getOriginal('uppercase'));
+        $this->assertSame('TAYLOR', $model->getOriginal('uppercase'));
 
         $model = new TestEloquentModelWithCustomCast;
         $model->uppercase = 'taylor';
@@ -39,7 +40,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model->uppercase = 'dries';
         $model->getOriginal();
 
-        $this->assertEquals('DRIES', $model->uppercase);
+        $this->assertSame('DRIES', $model->uppercase);
 
         $model = new TestEloquentModelWithCustomCast;
 
@@ -82,7 +83,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals(['foo' => 'bar'], $model->options);
         $this->assertEquals(['foo' => 'bar'], $model->options);
 
-        $this->assertEquals(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
+        $this->assertSame(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
 
         $model = new TestEloquentModelWithCustomCast(['options' => []]);
         $model->syncOriginal();
@@ -104,9 +105,9 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->address = new Address('117 Spencer St.', 'Another house.');
 
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
-        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal('address')->lineOne);
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('110 Kingsbrook St.', $model->getOriginal('address')->lineOne);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
 
         $model = new TestEloquentModelWithCustomCast([
             'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
@@ -116,10 +117,10 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->address = new Address('117 Spencer St.', 'Another house.');
 
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
-        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
-        $this->assertEquals('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('110 Kingsbrook St.', $model->getOriginal()['address_line_one']);
 
         $model = new TestEloquentModelWithCustomCast([
             'address' => new Address('110 Kingsbrook St.', 'My Childhood House'),
@@ -132,6 +133,24 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertNull($model->address);
         $this->assertInstanceOf(Address::class, $model->getOriginal('address'));
         $this->assertNull($model->address);
+    }
+
+    public function testSerializableCasts()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+        $model->price = '123.456';
+
+        $expectedValue = (new Decimal('123.456'))->getValue();
+
+        $this->assertSame($expectedValue, $model->price->getValue());
+        $this->assertSame('123.456', $model->getAttributes()['price']);
+        $this->assertSame('123.456', $model->toArray()['price']);
+
+        $unserializedModel = unserialize(serialize($model));
+
+        $this->assertSame($expectedValue, $unserializedModel->price->getValue());
+        $this->assertSame('123.456', $unserializedModel->getAttributes()['price']);
+        $this->assertSame('123.456', $unserializedModel->toArray()['price']);
     }
 
     public function testOneWayCasting()
@@ -187,7 +206,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
             'value_object_caster_with_argument' => null,
         ]);
 
-        $this->assertEquals('argument', $model->value_object_caster_with_argument);
+        $this->assertSame('argument', $model->value_object_caster_with_argument);
 
         $model->setRawAttributes([
             'value_object_caster_with_caster_instance' => serialize(new ValueObject('hello')),
@@ -231,6 +250,7 @@ class TestEloquentModelWithCustomCast extends Model
      */
     protected $casts = [
         'address' => AddressCaster::class,
+        'price' => DecimalCaster::class,
         'password' => HashCaster::class,
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
@@ -303,6 +323,24 @@ class JsonCaster implements CastsAttributes
     public function set($model, $key, $value, $attributes)
     {
         return json_encode($value);
+    }
+}
+
+class DecimalCaster implements CastsAttributes, SerializesCastableAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        return new Decimal($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return (string) $value;
+    }
+
+    public function serialize($model, $key, $value, $attributes)
+    {
+        return (string) $value;
     }
 }
 
@@ -383,6 +421,30 @@ class Address
     {
         $this->lineOne = $lineOne;
         $this->lineTwo = $lineTwo;
+    }
+}
+
+final class Decimal
+{
+    private $value;
+    private $scale;
+
+    public function __construct($value)
+    {
+        $parts = explode('.', (string) $value);
+
+        $this->scale = strlen($parts[1]);
+        $this->value = (int) str_replace('.', '', $value);
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function __toString()
+    {
+        return substr_replace($this->value, '.', -$this->scale, 0);
     }
 }
 
