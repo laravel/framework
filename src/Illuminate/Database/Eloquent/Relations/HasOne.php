@@ -4,12 +4,12 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Concerns\ComparesWithModels;
+use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class HasOne extends HasOneOrMany
 {
-    use ComparesWithModels, SupportsDefaultModels;
+    use ComparesRelatedModels, SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.

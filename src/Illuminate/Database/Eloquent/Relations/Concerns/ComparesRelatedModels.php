@@ -4,7 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 
-trait ComparesWithModels
+trait ComparesRelatedModels
 {
     /**
      * Determine if the model is the related instance of the relationship.
