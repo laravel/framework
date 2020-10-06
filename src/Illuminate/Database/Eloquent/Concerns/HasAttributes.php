@@ -1117,7 +1117,7 @@ trait HasAttributes
      */
     protected function isClassSerializable($key)
     {
-        if (!$this->isClassCastable($key)) {
+        if (! $this->isClassCastable($key)) {
             return false;
         }
 
