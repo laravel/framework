@@ -154,6 +154,25 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile an "upsert" statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  array $values
+     * @param  array $uniqueBy
+     * @return  string
+     */
+    public function compileUpsert(Builder $query, array $values, array $uniqueBy)
+    {
+        $sql = $this->compileInsert($query, $values).' on duplicate key update ';
+
+        $columns = collect(array_keys(reset($values)))->map(function ($value, $key) {
+            return $this->wrap($value).' = values('.$this->wrap($value).')';
+        })->implode(', ');
+
+        return $sql.$columns;
+    }
+
+    /**
      * Prepare a JSON column being updated using the JSON_SET function.
      *
      * @param  string  $key

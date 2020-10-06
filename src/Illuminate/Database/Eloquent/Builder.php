@@ -801,6 +801,20 @@ class Builder
     }
 
     /**
+     * Insert new records or update the existing ones.
+     *
+     * @param  array  $values
+     * @param  array|string  $uniqueBy
+     * @return int
+     */
+    public function upsert(array $values, $uniqueBy)
+    {
+        return $this->toBase()->upsert(collect($values)->map(function ($value, $key) {
+            return $this->addUpdatedAtColumn($value);
+        })->toArray(), $uniqueBy);
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column

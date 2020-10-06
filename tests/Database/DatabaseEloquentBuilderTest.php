@@ -1315,6 +1315,29 @@ class DatabaseEloquentBuilderTest extends TestCase
         Carbon::setTestNow(null);
     }
 
+    public function testUpsert()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table')->andReturn('foo_table');
+        $query->from = 'foo_table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder->setModel($model);
+
+        $query->shouldReceive('upsert')->once()
+            ->with([
+                ['email' => 'foo', 'name' => 'bar', 'foo_table.updated_at' => $now],
+                ['name' => 'bar2', 'email' => 'foo2', 'foo_table.updated_at' => $now], ], 'email')->andReturn(2);
+
+        $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
+        $this->assertEquals(2, $result);
+
+        Carbon::setTestNow(null);
+    }
+
     public function testWithCastsMethod()
     {
         $builder = new Builder($this->getMockQueryBuilder());
