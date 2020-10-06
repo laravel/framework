@@ -465,7 +465,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
 
         $this->assertTrue(Builder::hasGlobalMacro('foo'));
-        $this->assertEquals($builder->foo('bar'), 'bar');
+        $this->assertEquals('bar', $builder->foo('bar'));
         $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
@@ -489,7 +489,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('hydrate')->once()->with($records)->andReturn(new Collection(['hydrated']));
         $models = $builder->getModels(['foo']);
 
-        $this->assertEquals($models, ['hydrated']);
+        $this->assertEquals(['hydrated'], $models);
     }
 
     public function testEagerLoadRelationsLoadTopLevelRelationships()

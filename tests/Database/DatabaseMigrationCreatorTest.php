@@ -102,7 +102,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $customStubs = 'stubs';
 
         return $this->getMockBuilder(MigrationCreator::class)
-            ->setMethods(['getDatePrefix'])
+            ->onlyMethods(['getDatePrefix'])
             ->setConstructorArgs([$files, $customStubs])
             ->getMock();
     }
