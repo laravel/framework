@@ -15,7 +15,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Facades\Bus;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -309,30 +311,43 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue);
 
-        $chainHeadJob = new ChainHeadJob();
+        $firstJob = new FirstTestJob();
 
         $secondJob = new SecondTestJob();
 
         $thirdJob = new ThirdTestJob();
 
+        $fourthJob = function (){
+        };
+
         $queue->shouldReceive('connection')->once()
             ->with('test-connection')
             ->andReturn($connection = m::mock(stdClass::class));
 
-        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
+        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($firstJob, $secondJob, $thirdJob, $fourthJob) {
             return
-                $args[0] == $chainHeadJob
-                && serialize($secondJob) == $args[0]->chained[0]
-                && serialize($thirdJob) == $args[0]->chained[1];
+                $args[0] == $firstJob
+                && $args[1] == $secondJob
+                && unserialize($args[1]->chained[0]) == $thirdJob
+                && unserialize($args[1]->chained[1]) instanceof CallQueuedClosure
+                && is_string(unserialize($args[1]->chained[1])->batchId);
         }), '', 'test-queue');
 
+        // Without "RuntimeException: A facade root has not been set" is thrown
+        Bus::partialMock()->shouldReceive('chain')->andReturn(new PendingChain($secondJob, [$thirdJob, $fourthJob]));
+
         $batch = $batch->add([
-            [$chainHeadJob, $secondJob, $thirdJob],
+            $firstJob,
+            Bus::chain([
+                $secondJob,
+                $thirdJob,
+                $fourthJob,
+            ]),
         ]);
 
-        $this->assertEquals(3, $batch->totalJobs);
-        $this->assertEquals(3, $batch->pendingJobs);
-        $this->assertTrue(is_string($chainHeadJob->batchId));
+        $this->assertEquals(4, $batch->totalJobs);
+        $this->assertEquals(4, $batch->pendingJobs);
+        $this->assertTrue(is_string($firstJob->batchId));
         $this->assertTrue(is_string($secondJob->batchId));
         $this->assertTrue(is_string($thirdJob->batchId));
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
@@ -384,7 +399,7 @@ class BusBatchTest extends TestCase
     }
 }
 
-class ChainHeadJob implements ShouldQueue
+class FirstTestJob implements ShouldQueue
 {
     use Dispatchable, Queueable, Batchable;
 }
