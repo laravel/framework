@@ -21,7 +21,7 @@ class BladeTest extends TestCase
     {
         $view = View::make('uses-panel', ['name' => 'Taylor'])->render();
 
-        $this->assertEquals('<div class="ml-2">
+        $this->assertSame('<div class="ml-2">
     Hello Taylor
 </div>', trim($view));
     }
@@ -39,7 +39,7 @@ class BladeTest extends TestCase
     {
         $view = View::make('varied-dynamic-calls')->render();
 
-        $this->assertEquals('<span class="text-medium">
+        $this->assertSame('<span class="text-medium">
     Hello Taylor
 </span>
   
@@ -52,7 +52,7 @@ class BladeTest extends TestCase
     {
         $view = View::make('uses-appendable-panel', ['name' => 'Taylor'])->render();
 
-        $this->assertEquals('<div class="mt-4 bg-gray-100" data-controller="inside-controller outside-controller" foo="bar">
+        $this->assertSame('<div class="mt-4 bg-gray-100" data-controller="inside-controller outside-controller" foo="bar">
     Hello Taylor
 </div>', trim($view));
     }
