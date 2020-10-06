@@ -805,13 +805,28 @@ class Builder
      *
      * @param  array  $values
      * @param  array|string  $uniqueBy
+     * @param  array|null  $update
      * @return int
      */
-    public function upsert(array $values, $uniqueBy)
+    public function upsert(array $values, $uniqueBy, $update = null)
     {
-        return $this->toBase()->upsert(collect($values)->map(function ($value, $key) {
-            return $this->addUpdatedAtColumn($value);
-        })->toArray(), $uniqueBy);
+        if (empty($values)) {
+            return 0;
+        }
+
+        if (!is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        if (is_null($update)) {
+            $update = array_keys(reset($values));
+        }
+
+        $values = $this->addTimestampsToValues($values);
+
+        $update = $this->addUpdatedAtToColumns($update);
+
+        return $this->toBase()->upsert($values, $uniqueBy, $update);
     }
 
     /**
@@ -842,6 +857,52 @@ class Builder
         return $this->toBase()->decrement(
             $column, $amount, $this->addUpdatedAtColumn($extra)
         );
+    }
+
+    /**
+     * Add timestamps to the inserted values.
+     *
+     * @param array $values
+     * @return array
+     */
+    protected function addTimestampsToValues(array $values)
+    {
+        if (!$this->model->usesTimestamps()) {
+            return $values;
+        }
+
+        $timestamp = $this->model->freshTimestampString();
+
+        $columns = array_filter([$this->model->getCreatedAtColumn(), $this->model->getUpdatedAtColumn()]);
+
+        foreach ($columns as $column) {
+            foreach ($values as &$row) {
+                $row = array_merge([$column => $timestamp], $row);
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Add the "updated at" column to the updated columns.
+     *
+     * @param array $update
+     * @return array
+     */
+    protected function addUpdatedAtToColumns(array $update)
+    {
+        if (!$this->model->usesTimestamps()) {
+            return $update;
+        }
+
+        $column = $this->model->getUpdatedAtColumn();
+
+        if (!is_null($column) && !array_key_exists($column, $update) && !in_array($column, $update)) {
+            $update[] = $column;
+        }
+
+        return $update;
     }
 
     /**

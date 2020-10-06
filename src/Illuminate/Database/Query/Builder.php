@@ -2928,12 +2928,17 @@ class Builder
      *
      * @param  array  $values
      * @param  array|string  $uniqueBy
+     * @param  array|null  $update
      * @return int
      */
-    public function upsert(array $values, $uniqueBy)
+    public function upsert(array $values, $uniqueBy, $update = null)
     {
         if (empty($values)) {
             return 0;
+        }
+
+        if ($update === []) {
+            return (int) $this->insert($values);
         }
 
         if (! is_array(reset($values))) {
@@ -2946,9 +2951,20 @@ class Builder
             }
         }
 
+        if (is_null($update)) {
+            $update = array_keys(reset($values));
+        }
+
+        $bindings = $this->cleanBindings(array_merge(
+            Arr::flatten($values, 1),
+            collect($update)->reject(function ($value, $key) {
+                return is_int($key);
+            })->all()
+        ));
+
         return $this->connection->affectingStatement(
-            $this->grammar->compileUpsert($this, $values, (array) $uniqueBy),
-            $this->cleanBindings(Arr::flatten($values, 1))
+            $this->grammar->compileUpsert($this, $values, (array) $uniqueBy, $update),
+            $bindings
         );
     }
 

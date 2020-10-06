@@ -347,9 +347,10 @@ class SqlServerGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder $query
      * @param  array $values
      * @param  array $uniqueBy
+     * @param  array $update
      * @return  string
      */
-    public function compileUpsert(Builder $query, array $values, array $uniqueBy)
+    public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
     {
         $columns = $this->columnize(array_keys(reset($values)));
 
@@ -366,6 +367,16 @@ class SqlServerGrammar extends Grammar
         })->implode(' and ');
 
         $sql .= 'on '.$on.' ';
+
+        if ($update) {
+            $update = collect($update)->map(function ($value, $key) {
+                return is_numeric($key)
+                    ? $this->wrap($value).' = '.$this->wrap('laravel_source.'.$value)
+                    : $this->wrap($key).' = '.$this->parameter($value);
+            })->implode(', ');
+
+            $sql .= 'when matched then update set '.$update.' ';
+        }
 
         $sql .= 'when not matched then insert ('.$columns.') values ('.$columns.')';
 
