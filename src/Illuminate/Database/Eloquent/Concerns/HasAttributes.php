@@ -240,6 +240,10 @@ trait HasAttributes
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
+            if ($attributes[$key] && $this->isClassSerializable($key)) {
+                $attributes[$key] = $this->serializeClassCastableAttribute($key, $attributes[$key]);
+            }
+
             if ($attributes[$key] instanceof Arrayable) {
                 $attributes[$key] = $attributes[$key]->toArray();
             }
@@ -602,6 +606,19 @@ trait HasAttributes
         }
 
         return trim(strtolower($this->getCasts()[$key]));
+    }
+
+    /**
+     * Serialize the given attribute using the custom cast class.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function serializeClassCastableAttribute($key, $value)
+    {
+        return $this->resolveCasterClass($key)
+                    ->serialize($this, $key, $value, $this->attributes);
     }
 
     /**
@@ -1088,6 +1105,25 @@ trait HasAttributes
         }
 
         throw new InvalidCastException($this->getModel(), $key, $castType);
+    }
+
+
+    /**
+     * Determine if the key is serializable using a custom class.
+     *
+     * @param  string  $key
+     * @return bool
+     * @throws InvalidCastException
+     */
+    protected function isClassSerializable($key)
+    {
+        if (!$this->isClassCastable($key)) {
+            return false;
+        }
+
+        $castType = $this->parseCasterClass($this->getCasts()[$key]);
+
+        return method_exists($castType, 'serialize');
     }
 
     /**

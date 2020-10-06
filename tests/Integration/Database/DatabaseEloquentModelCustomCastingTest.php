@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -134,6 +135,24 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertNull($model->address);
     }
 
+    public function testSerializableCasts()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+        $model->price = '123.456';
+
+        $expectedValue = (new Decimal('123.456'))->getValue();
+
+        $this->assertSame($expectedValue, $model->price->getValue());
+        $this->assertSame('123.456', $model->getAttributes()['price']);
+        $this->assertSame('123.456', $model->toArray()['price']);
+
+        $unserializedModel = unserialize(serialize($model));
+
+        $this->assertSame($expectedValue, $unserializedModel->price->getValue());
+        $this->assertSame('123.456', $unserializedModel->getAttributes()['price']);
+        $this->assertSame('123.456', $unserializedModel->toArray()['price']);
+    }
+
     public function testOneWayCasting()
     {
         // CastsInboundAttributes is used for casting that is unidirectional... only use case I can think of is one-way hashing...
@@ -231,6 +250,7 @@ class TestEloquentModelWithCustomCast extends Model
      */
     protected $casts = [
         'address' => AddressCaster::class,
+        'price' => DecimalCaster::class,
         'password' => HashCaster::class,
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
@@ -303,6 +323,24 @@ class JsonCaster implements CastsAttributes
     public function set($model, $key, $value, $attributes)
     {
         return json_encode($value);
+    }
+}
+
+class DecimalCaster implements CastsAttributes, SerializesCastableAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        return new Decimal($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return (string) $value;
+    }
+
+    public function serialize($model, $key, $value, $attributes)
+    {
+        return (string) $value;
     }
 }
 
@@ -383,6 +421,30 @@ class Address
     {
         $this->lineOne = $lineOne;
         $this->lineTwo = $lineTwo;
+    }
+}
+
+final class Decimal
+{
+    private $value;
+    private $scale;
+
+    public function __construct($value)
+    {
+        $parts = explode('.', (string) $value);
+
+        $this->scale = strlen($parts[1]);
+        $this->value = (int) str_replace('.', '', $value);
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function __toString()
+    {
+        return substr_replace($this->value, '.', -$this->scale, 0);
     }
 }
 
