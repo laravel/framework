@@ -200,6 +200,21 @@ class PendingRequest
 
         return $this;
     }
+    
+    /**
+     * Attach multiple files to the request. Accepts an array containing arrays of files
+     *
+     * @param  array  $files
+     * @return $this
+     */
+    public function attachMany(array $files)
+    {
+        foreach ($files as $file) {
+            $this->attach(...$file);
+        }
+
+        return $this;
+    }
 
     /**
      * Indicate the request is a multi-part form request.
