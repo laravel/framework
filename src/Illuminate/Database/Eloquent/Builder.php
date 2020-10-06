@@ -809,7 +809,7 @@ class Builder
      */
     public function upsert(array $values, $uniqueBy)
     {
-        return $this->toBase()->upsert(collect($values)->map(function($value, $key) {
+        return $this->toBase()->upsert(collect($values)->map(function ($value, $key) {
             return $this->addUpdatedAtColumn($value);
         })->toArray(), $uniqueBy);
     }
