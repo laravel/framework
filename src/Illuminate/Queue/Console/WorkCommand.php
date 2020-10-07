@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
-use Illuminate\Queue\Events\JobRestarted;
+use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
@@ -158,8 +158,8 @@ class WorkCommand extends Command
             $this->writeOutput($event->job, 'success');
         });
 
-        $this->laravel['events']->listen(JobRestarted::class, function ($event) {
-            $this->writeOutput($event->job, 'restarting');
+        $this->laravel['events']->listen(JobReleased::class, function ($event) {
+            $this->writeOutput($event->job, 'releasing');
         });
 
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
