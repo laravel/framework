@@ -415,7 +415,7 @@ class Builder
      */
     public function dropColumns($table, $columns)
     {
-        $this->table($table, function (Blueprint $blueprint) use ($table, $columns) {
+        $this->table($table, function (Blueprint $blueprint) use ($columns) {
             $blueprint->dropColumn($columns);
         });
     }
