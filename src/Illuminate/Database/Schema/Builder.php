@@ -227,6 +227,20 @@ class Builder
     }
 
     /**
+     * Drop columns from a table schema.
+     *
+     * @param  string  $table
+     * @param  string|array  $columns
+     * @return void
+     */
+    public function dropColumns($table, $columns)
+    {
+        $this->table($table, function (Blueprint $blueprint) use ($columns) {
+            $blueprint->dropColumn($columns);
+        });
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return void
