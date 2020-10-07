@@ -470,7 +470,7 @@ trait ManagesFrequencies
     }
 
     /**
-     * Schedule the event to run yearly on a given month, day and time.
+     * Schedule the event to run yearly on a given month, day, and time.
      *
      * @param  int  $month
      * @param  int  $day
