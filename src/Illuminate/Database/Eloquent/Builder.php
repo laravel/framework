@@ -906,7 +906,7 @@ class Builder
 
         $columns = array_filter([
             $this->model->getCreatedAtColumn(),
-            $this->model->getUpdatedAtColumn()
+            $this->model->getUpdatedAtColumn(),
         ]);
 
         foreach ($columns as $column) {
