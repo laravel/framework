@@ -1001,11 +1001,12 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder $query
      * @param  array $values
      * @param  array $uniqueBy
+     * @param  array $update
      * @return  string
      *
      * @throws \RuntimeException
      */
-    public function compileUpsert(Builder $query, array $values, array $uniqueBy)
+    public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
     {
         throw new RuntimeException('This database engine does not support upserts.');
     }
