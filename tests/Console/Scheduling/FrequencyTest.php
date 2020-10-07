@@ -34,6 +34,9 @@ class FrequencyTest extends TestCase
         $this->assertSame('*/3 * * * *', $this->event->everyThreeMinutes()->getExpression());
         $this->assertSame('*/4 * * * *', $this->event->everyFourMinutes()->getExpression());
         $this->assertSame('*/5 * * * *', $this->event->everyFiveMinutes()->getExpression());
+        $this->assertSame('*/10 * * * *', $this->event->everyTenMinutes()->getExpression());
+        $this->assertSame('*/15 * * * *', $this->event->everyFifteenMinutes()->getExpression());
+        $this->assertSame('0,30 * * * *', $this->event->everyThirtyMinutes()->getExpression());
     }
 
     public function testDaily()
@@ -41,9 +44,24 @@ class FrequencyTest extends TestCase
         $this->assertSame('0 0 * * *', $this->event->daily()->getExpression());
     }
 
+    public function testDailyAt()
+    {
+        $this->assertSame('8 13 * * *', $this->event->dailyAt('13:08')->getExpression());
+    }
+
     public function testTwiceDaily()
     {
         $this->assertSame('0 3,15 * * *', $this->event->twiceDaily(3, 15)->getExpression());
+    }
+
+    public function testWeekly()
+    {
+        $this->assertSame('0 0 * * 0', $this->event->weekly()->getExpression());
+    }
+
+    public function testWeeklyOn()
+    {
+        $this->assertSame('0 8 * * 1', $this->event->weeklyOn(1, '8:00')->getExpression());
     }
 
     public function testOverrideWithHourly()
@@ -61,9 +79,19 @@ class FrequencyTest extends TestCase
         $this->assertSame('0 */6 * * *', $this->event->everySixHours()->getExpression());
     }
 
+    public function testMonthly()
+    {
+        $this->assertSame('0 0 1 * *', $this->event->monthly()->getExpression());
+    }
+
     public function testMonthlyOn()
     {
         $this->assertSame('0 15 4 * *', $this->event->monthlyOn(4, '15:00')->getExpression());
+    }
+
+    public function testLastDayOfMonth()
+    {
+        $this->assertSame('0 0 31 * *', $this->event->lastDayOfMonth()->getExpression());
     }
 
     public function testTwiceMonthly()
@@ -129,6 +157,11 @@ class FrequencyTest extends TestCase
     public function testQuarterly()
     {
         $this->assertSame('0 0 1 1-12/3 *', $this->event->quarterly()->getExpression());
+    }
+
+    public function testYearly()
+    {
+        $this->assertSame('0 0 1 1 *', $this->event->yearly()->getExpression());
     }
 
     public function testFrequencyMacro()
