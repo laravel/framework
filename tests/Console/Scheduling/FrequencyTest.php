@@ -164,6 +164,16 @@ class FrequencyTest extends TestCase
         $this->assertSame('0 0 1 1 *', $this->event->yearly()->getExpression());
     }
 
+    public function testYearlyOn()
+    {
+        $this->assertSame('8 15 5 4 *', $this->event->yearlyOn(4, 5, '15:08')->getExpression());
+    }
+
+    public function testYearlyOnTuesdays()
+    {
+        $this->assertSame('1 9 20 7 2', $this->event->tuesdays()->yearlyOn(7, 20, '09:01')->getExpression());
+    }
+
     public function testFrequencyMacro()
     {
         Event::macro('everyXMinutes', function ($x) {

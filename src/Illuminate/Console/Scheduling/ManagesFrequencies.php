@@ -470,6 +470,22 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run yearly on a given month, day, and time.
+     *
+     * @param  int  $month
+     * @param  int  $day
+     * @param  string  $time
+     * @return $this
+     */
+    public function yearlyOn($month = 1, $day = 1, $time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, $day)
+                    ->spliceIntoPosition(4, $month);
+    }
+
+    /**
      * Set the days of the week the command should run on.
      *
      * @param  array|mixed  $days
