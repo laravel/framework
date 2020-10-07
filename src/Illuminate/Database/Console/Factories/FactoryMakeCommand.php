@@ -79,7 +79,7 @@ class FactoryMakeCommand extends GeneratorCommand
             '{{namespacedModel}}' => $namespaceModel,
             'DummyModel' => $model,
             '{{ model }}' => $model,
-            '{{model}}' => $model,
+            '{{ name }}' => $name,
         ];
 
         return str_replace(
