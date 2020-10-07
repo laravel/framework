@@ -405,4 +405,18 @@ class Builder
     {
         $this->resolver = $resolver;
     }
+
+    /**
+     * Drop columns from a table schema.
+     *
+     * @param  string  $table
+     * @param  string|array  $columns
+     * @return void
+     */
+    public function dropColumns($table, $columns)
+    {
+        $this->table($table, function (Blueprint $blueprint) use ($table, $columns) {
+            $blueprint->dropColumn($columns);
+        });
+    }
 }
