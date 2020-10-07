@@ -161,18 +161,28 @@ class Batch implements Arrayable, JsonSerializable
      */
     public function add($jobs)
     {
-        $jobs = Collection::wrap($jobs)->map(function ($job) {
-            if ($job instanceof Closure) {
-                $job = CallQueuedClosure::create($job);
-            }
+        $count = 0;
 
-            $job->withBatchId($this->id);
+        $jobs = Collection::wrap($jobs)->map(function ($job) use (&$count) {
+            $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
+
+            if (is_array($job)) {
+                $count += count($job);
+
+                return with($this->prepareBatchedChain($job), function ($chain) {
+                    return $chain->first()->chain($chain->slice(1)->values()->all());
+                });
+            } else {
+                $job->withBatchId($this->id);
+
+                $count++;
+            }
 
             return $job;
         });
 
-        $this->repository->transaction(function () use ($jobs) {
-            $this->repository->incrementTotalJobs($this->id, count($jobs));
+        $this->repository->transaction(function () use ($jobs, $count) {
+            $this->repository->incrementTotalJobs($this->id, $count);
 
             $this->queue->connection($this->options['connection'] ?? null)->bulk(
                 $jobs->all(),
@@ -182,6 +192,21 @@ class Batch implements Arrayable, JsonSerializable
         });
 
         return $this->fresh();
+    }
+
+    /**
+     * Prepare a chain that exists within the jobs being added.
+     *
+     * @param  array  $chain
+     * @return \Illuminate\Support\Collection
+     */
+    protected function prepareBatchedChain(array $chain)
+    {
+        return collect($chain)->map(function ($job) {
+            $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
+
+            return $job->withBatchId($this->id);
+        });
     }
 
     /**
