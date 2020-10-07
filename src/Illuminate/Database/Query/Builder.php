@@ -2935,9 +2935,7 @@ class Builder
     {
         if (empty($values)) {
             return 0;
-        }
-
-        if ($update === []) {
+        } elseif ($update === []) {
             return (int) $this->insert($values);
         }
 

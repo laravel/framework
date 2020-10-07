@@ -822,11 +822,11 @@ class Builder
             $update = array_keys(reset($values));
         }
 
-        $values = $this->addTimestampsToValues($values);
-
-        $update = $this->addUpdatedAtToColumns($update);
-
-        return $this->toBase()->upsert($values, $uniqueBy, $update);
+        return $this->toBase()->upsert(
+            $this->addTimestampsToUpsertValues($values),
+            $uniqueBy,
+            $this->addUpdatedAtToUpsertColumns($update)
+        );
     }
 
     /**
@@ -860,52 +860,6 @@ class Builder
     }
 
     /**
-     * Add timestamps to the inserted values.
-     *
-     * @param array $values
-     * @return array
-     */
-    protected function addTimestampsToValues(array $values)
-    {
-        if (! $this->model->usesTimestamps()) {
-            return $values;
-        }
-
-        $timestamp = $this->model->freshTimestampString();
-
-        $columns = array_filter([$this->model->getCreatedAtColumn(), $this->model->getUpdatedAtColumn()]);
-
-        foreach ($columns as $column) {
-            foreach ($values as &$row) {
-                $row = array_merge([$column => $timestamp], $row);
-            }
-        }
-
-        return $values;
-    }
-
-    /**
-     * Add the "updated at" column to the updated columns.
-     *
-     * @param array $update
-     * @return array
-     */
-    protected function addUpdatedAtToColumns(array $update)
-    {
-        if (! $this->model->usesTimestamps()) {
-            return $update;
-        }
-
-        $column = $this->model->getUpdatedAtColumn();
-
-        if (! is_null($column) && ! array_key_exists($column, $update) && ! in_array($column, $update)) {
-            $update[] = $column;
-        }
-
-        return $update;
-    }
-
-    /**
      * Add the "updated at" column to an array of values.
      *
      * @param  array  $values
@@ -934,6 +888,57 @@ class Builder
         unset($values[$column]);
 
         return $values;
+    }
+
+    /**
+     * Add timestamps to the inserted values.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    protected function addTimestampsToUpsertValues(array $values)
+    {
+        if (! $this->model->usesTimestamps()) {
+            return $values;
+        }
+
+        $timestamp = $this->model->freshTimestampString();
+
+        $columns = array_filter([
+            $this->model->getCreatedAtColumn(),
+            $this->model->getUpdatedAtColumn()
+        ]);
+
+        foreach ($columns as $column) {
+            foreach ($values as &$row) {
+                $row = array_merge([$column => $timestamp], $row);
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Add the "updated at" column to the updated columns.
+     *
+     * @param  array  $update
+     * @return array
+     */
+    protected function addUpdatedAtToUpsertColumns(array $update)
+    {
+        if (! $this->model->usesTimestamps()) {
+            return $update;
+        }
+
+        $column = $this->model->getUpdatedAtColumn();
+
+        if (! is_null($column) &&
+            ! array_key_exists($column, $update) &&
+            ! in_array($column, $update)) {
+            $update[] = $column;
+        }
+
+        return $update;
     }
 
     /**
