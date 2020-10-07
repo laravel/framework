@@ -161,37 +161,28 @@ class Batch implements Arrayable, JsonSerializable
      */
     public function add($jobs)
     {
-        $jobTotal = 0;
-        $jobs = Collection::wrap($jobs)->map(function ($job) use (&$jobTotal) {
-            if ($job instanceof Closure) {
-                $job = CallQueuedClosure::create($job);
-            }
+        $count = 0;
+
+        $jobs = Collection::wrap($jobs)->map(function ($job) use (&$count) {
+            $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
 
             if (is_array($job)) {
-                $jobChain = $job;
-                $batchId = $this->id;
-                array_walk($jobChain, function (&$job) use ($batchId) {
-                    if ($job instanceof Closure) {
-                        $job = CallQueuedClosure::create($job);
-                    }
-                    $job->withBatchId($batchId);
+                $count += count($job);
+
+                return with($this->prepareBatchedChain($job), function ($chain) {
+                    return $chain->first()->chain($chain->slice(1)->values()->all());
                 });
-
-                $jobTotal += count($jobChain);
-
-                $chainHead = array_shift($jobChain);
-
-                return $chainHead->chain($jobChain);
             } else {
                 $job->withBatchId($this->id);
-                $jobTotal++;
+
+                $count++;
             }
 
             return $job;
         });
 
-        $this->repository->transaction(function () use ($jobs, $jobTotal) {
-            $this->repository->incrementTotalJobs($this->id, $jobTotal);
+        $this->repository->transaction(function () use ($jobs, $count) {
+            $this->repository->incrementTotalJobs($this->id, $count);
 
             $this->queue->connection($this->options['connection'] ?? null)->bulk(
                 $jobs->all(),
@@ -201,6 +192,21 @@ class Batch implements Arrayable, JsonSerializable
         });
 
         return $this->fresh();
+    }
+
+    /**
+     * Prepare a chain that exists within the jobs being added.
+     *
+     * @param  array  $chain
+     * @return \Illuminate\Support\Collection
+     */
+    protected function prepareBatchedChain(array $chain)
+    {
+        return collect($chain)->map(function ($job) {
+            $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
+
+            return $job->withBatchId($this->id);
+        });
     }
 
     /**
