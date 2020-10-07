@@ -276,7 +276,7 @@ trait ManagesFrequencies
      */
     public function weekdays()
     {
-        return $this->spliceIntoPosition(5, '1-5');
+        return $this->days('1-5');
     }
 
     /**
@@ -286,7 +286,7 @@ trait ManagesFrequencies
      */
     public function weekends()
     {
-        return $this->spliceIntoPosition(5, '0,6');
+        return $this->days('0,6');
     }
 
     /**
@@ -382,7 +382,7 @@ trait ManagesFrequencies
     {
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(5, $day);
+        return $this->days($day);
     }
 
     /**
