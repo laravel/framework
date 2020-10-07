@@ -10,6 +10,7 @@ use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobRestarted;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
@@ -446,6 +447,11 @@ class Worker
             // so it is not lost entirely. This'll let the job be retried at a later time by
             // another listener (or this same one). We will re-throw this exception after.
             if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
+
+                $this->raiseRestartingJobEvent(
+                    $connectionName, $job
+                );
+
                 $job->release($this->calculateBackoff($job, $options));
             }
         }
@@ -603,6 +609,20 @@ class Worker
     {
         $this->events->dispatch(new JobExceptionOccurred(
             $connectionName, $job, $e
+        ));
+    }
+
+    /**
+     * Raise the restarting queue job event.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     */
+    protected function raiseRestartingJobEvent($connectionName, $job)
+    {
+        $this->events->dispatch(new JobRestarted(
+            $connectionName, $job
         ));
     }
 
