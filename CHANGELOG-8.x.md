@@ -1,6 +1,27 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.8.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.9.0...8.x)
+
+
+## [v8.9.0 (2020-10-06)](https://github.com/laravel/framework/compare/v8.8.0...v8.9.0)
+
+### Added
+- Added support `times()` with `raw()` from `Illuminate\Database\Eloquent\Factories\Factory` ([#34667](https://github.com/laravel/framework/pull/34667))
+- Added `Illuminate\Pagination\AbstractPaginator::through()` ([#34657](https://github.com/laravel/framework/pull/34657))
+- Added `extendsFirst` method similar to `includesFirst` to view ([#34648](https://github.com/laravel/framework/pull/34648))
+- Allowed `Illuminate\Http\Client\PendingRequest::attach()` method to accept many files ([#34697](https://github.com/laravel/framework/pull/34697), [1bb7ad6](https://github.com/laravel/framework/commit/1bb7ad664a3607f719af2d91c3f95cf71662dcd2))
+- Allowed serializing custom casts when converting a model to an array ([#34702](https://github.com/laravel/framework/pull/34702))
+
+### Fixed
+- Added missed RESET_THROTTLED constant to Password Facade ([#34641](https://github.com/laravel/framework/pull/34641))
+- Fixed queue clearing when blocking ([#34659](https://github.com/laravel/framework/pull/34659))
+- Fixed missing import in TestView.php ([#34677](https://github.com/laravel/framework/pull/34677))
+- Use `getRealPath` to ensure console command class names are generated correctly in `Illuminate\Foundation\Console\Kernel` ([#34653](https://github.com/laravel/framework/pull/34653))
+- Added pg_dump --no-owner and --no-acl to avoid owner/permission issues in `Illuminate\Database\Schema\PostgresSchemaState::baseDumpCommand()` ([#34689](https://github.com/laravel/framework/pull/34689))
+- Fixed `queue:failed` command when Class not exists ([#34696](https://github.com/laravel/framework/pull/34696))
+
+### Performance
+- Increase performance of `Str::before()` by over 60% ([#34642](https://github.com/laravel/framework/pull/34642))
 
 
 ## [v8.8.0 (2020-10-02)](https://github.com/laravel/framework/compare/v8.7.1...v8.8.0)
