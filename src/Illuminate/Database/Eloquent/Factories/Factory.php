@@ -686,9 +686,11 @@ abstract class Factory
     public static function resolveFactoryName(string $modelName)
     {
         $resolver = static::$factoryNameResolver ?: function (string $modelName) {
-            $modelName = Str::startsWith($modelName, 'App\\Models\\')
-                ? Str::after($modelName, 'App\\Models\\')
-                : Str::after($modelName, 'App\\');
+            $rootNamespace = Container::getInstance()->getNamespace();
+
+            $modelName = Str::startsWith($modelName, $rootNamespace.'Models\\')
+                ? Str::after($modelName, $rootNamespace.'Models\\')
+                : Str::after($modelName, $rootNamespace);
 
             return static::$namespace.$modelName.'Factory';
         };
