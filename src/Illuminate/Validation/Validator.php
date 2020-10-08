@@ -489,7 +489,7 @@ class Validator implements ValidatorContract
 
         $results = [];
 
-        $missingValue = Str::random(10);
+        $missingValue = new \stdClass();
 
         foreach (array_keys($this->getRules()) as $key) {
             $value = data_get($this->getData(), $key, $missingValue);
