@@ -336,7 +336,7 @@ trait InteractsWithIO
     }
 
     /**
-     * Write newline(s).
+     * Write a blank line.
      *
      * @param  int  $count
      * @return void
