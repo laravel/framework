@@ -4,6 +4,8 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
 
 class ScheduleWorkCommand extends Command
 {
@@ -30,12 +32,38 @@ class ScheduleWorkCommand extends Command
     {
         $this->info('Schedule worker started successfully.');
 
+        [$lastExecutionStartedAt, $keyOfLastExecutionWithOutput, $executions] = [null, null, []];
+
         while (true) {
-            if (Carbon::now()->second === 0) {
-                $this->call('schedule:run');
+            usleep(100 * 1000);
+
+            if (Carbon::now()->second === 0 &&
+                ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
+                $executions[] = $execution = new Process([PHP_BINARY, 'artisan', 'schedule:run']);
+
+                $execution->start();
+
+                $lastExecutionStartedAt = Carbon::now()->startOfMinute();
             }
 
-            sleep(1);
+            foreach ($executions as $key => $execution) {
+                $output = trim($execution->getIncrementalOutput()).
+                          trim($execution->getIncrementalErrorOutput());
+
+                if (! empty($output)) {
+                    if ($key !== $keyOfLastExecutionWithOutput) {
+                        $this->info(PHP_EOL.'Execution #'.($key + 1).' output:');
+
+                        $keyOfLastExecutionWithOutput = $key;
+                    }
+
+                    $this->output->writeln($output);
+                }
+
+                if (! $execution->isRunning()) {
+                    unset($executions[$key]);
+                }
+            }
         }
     }
 }
