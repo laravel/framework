@@ -29,8 +29,10 @@ class PostgresSchemaState extends SchemaState
      */
     protected function appendMigrationData(string $path)
     {
+        $migrationsTable = config('database.migrations', 'migrations');
+
         with($process = $this->makeProcess(
-            $this->baseDumpCommand().' --table=migrations --data-only --inserts'
+            $this->baseDumpCommand().' --table='.$migrationsTable.' --data-only --inserts'
         ))->setTimeout(null)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
