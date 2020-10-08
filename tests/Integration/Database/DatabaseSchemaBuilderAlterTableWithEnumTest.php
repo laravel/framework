@@ -25,6 +25,26 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
         $this->assertSame('integer', Schema::getColumnType('users', 'age'));
     }
 
+    public function testGetAllTablesAndColumnListing()
+    {
+        $tables = Schema::getAllTables();
+
+        $this->assertCount(1, $tables);
+        $this->assertEquals('stdClass', get_class($tables[0]));
+
+        $tableProperties = array_values((array) $tables[0]);
+        $this->assertEquals(['users', 'BASE TABLE'], $tableProperties);
+        $this->assertEquals(['id', 'name', 'age', 'color'], Schema::getColumnListing('users'));
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->integer('id');
+            $table->string('title');
+        });
+        $tables = Schema::getAllTables();
+        $this->assertCount(2, $tables);
+        Schema::drop('posts');
+    }
+
     protected function setUp(): void
     {
         parent::setUp();

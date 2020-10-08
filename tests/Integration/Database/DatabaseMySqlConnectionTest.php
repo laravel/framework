@@ -31,7 +31,7 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
 
     protected function tearDown(): void
     {
-        DB::table(self::TABLE)->truncate();
+        Schema::drop(self::TABLE);
 
         parent::tearDown();
     }
