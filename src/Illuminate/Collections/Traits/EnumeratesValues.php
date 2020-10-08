@@ -692,10 +692,12 @@ trait EnumeratesValues
             throw new Exception('Property "term" must be an instance of string.');
         }
 
+        $term = Str::lower($term);
+
         return $this->filter(function ($item) use ($key, $term) {
             $value = Str::lower(data_get($item, $key));
 
-            return Str::contains($value, Str::lower($term));
+            return Str::contains($value, $term);
         });
     }
 
