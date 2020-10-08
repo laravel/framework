@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Countable;
 use Illuminate\Support\Traits\Macroable;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
@@ -431,11 +432,15 @@ class Str
      * Get the plural form of an English word.
      *
      * @param  string  $value
-     * @param  int  $count
+     * @param  Countable|int|array  $count
      * @return string
      */
     public static function plural($value, $count = 2)
     {
+        if (is_array($count) || $count instanceof Countable) {
+            $count = count($count);
+        }
+
         return Pluralizer::plural($value, $count);
     }
 
@@ -443,11 +448,15 @@ class Str
      * Pluralize the last word of an English, studly caps case string.
      *
      * @param  string  $value
-     * @param  int  $count
+     * @param  Countable|int|array  $count
      * @return string
      */
     public static function pluralStudly($value, $count = 2)
     {
+        if (is_array($count) || $count instanceof Countable) {
+            $count = count($count);
+        }
+
         $parts = preg_split('/(.)(?=[A-Z])/u', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         $lastWord = array_pop($parts);
