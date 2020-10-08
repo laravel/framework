@@ -66,7 +66,6 @@ class ScheduleWorkCommand extends Command
                         $keyOfLastExecutionWithOutput = $key;
                     }
 
-
                     $this->error(trim($incrementalErrorOutput));
                 }
 
