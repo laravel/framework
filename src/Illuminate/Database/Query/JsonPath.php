@@ -15,7 +15,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @return static
      */
-    public static function make(?string $scope = null): self
+    public static function make(?string $scope = null)
     {
         return new static($scope);
     }
@@ -50,7 +50,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @return static
      */
-    public function __get(string $name): self
+    public function __get(string $name)
     {
         return $this->member($name);
     }
@@ -64,7 +64,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @return static
      */
-    public function allCells(): self
+    public function allCells()
     {
         return $this->cell('*');
     }
@@ -77,7 +77,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @return static
      */
-    public function allMembers(): self
+    public function allMembers()
     {
         return $this->identifier('*');
     }
@@ -92,7 +92,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @return static
      */
-    public function cell($index): self
+    public function cell($index)
     {
         return $this->addPathLeg('cell', $index);
     }
@@ -137,7 +137,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @link http://www.ecma-international.org/ecma-262/5.1/#sec-7.6
      */
-    public function identifier(string $name): self
+    public function identifier(string $name)
     {
         return $this->addPathLeg('identifier', $name);
     }
@@ -152,7 +152,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @return $this
      */
-    public function matches(string $suffix): self
+    public function matches(string $suffix)
     {
         return $this->addPathLeg('match', $suffix);
     }
@@ -167,7 +167,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @return static
      */
-    public function member(string $name): self
+    public function member(string $name)
     {
         // If the member is an asterisk we want to select all members.
         if ($name === '*') {
@@ -197,7 +197,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists($offset)
     {
         return false;
     }
@@ -215,12 +215,23 @@ class JsonPath extends Expression implements \ArrayAccess
         return $this->cell($offset);
     }
 
-    public function offsetSet($offset, $value): void
+    /**
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($offset, $value)
     {
         // This method is intentionally empty
     }
 
-    public function offsetUnset($offset): void
+    /**
+     *
+     * @param mixed $offset
+     * @return void
+     */
+    public function offsetUnset($offset)
     {
         // This method is intentionally empty
     }
@@ -233,7 +244,7 @@ class JsonPath extends Expression implements \ArrayAccess
      *
      * @return static
      */
-    protected function addPathLeg(string $type, string $name): self
+    protected function addPathLeg(string $type, string $name)
     {
         $this->path[] = [
             'type' => $type,
