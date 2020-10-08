@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -71,5 +72,39 @@ class SupportPluralizerTest extends TestCase
     private function assertPluralStudly($expected, $value, $count = 2)
     {
         $this->assertSame($expected, Str::pluralStudly($value, $count));
+    }
+
+    public function testPluralWithArray()
+    {
+        $this->assertSame('tests', Str::plural('test', []));
+        $this->assertSame('test', Str::plural('test', ['item1']));
+        $this->assertSame('tests', Str::plural('test', ['item1', 'item2']));
+    }
+
+    public function testPluralWithCountables()
+    {
+        $this->assertSame('tests', Str::plural('test', collect([])));
+        $this->assertSame('test', Str::plural('test', collect(['item1'])));
+        $this->assertSame('tests', Str::plural('test', collect(['item1', 'item2'])));
+
+        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 30, 10);
+        $this->assertSame('tests', Str::plural('test', $paginator));
+    }
+
+    public function testPluralStudyWithArray()
+    {
+        $this->assertPluralStudly('RealHumans', 'RealHuman', []);
+        $this->assertPluralStudly('RealHuman', 'RealHuman', ['item1']);
+        $this->assertPluralStudly('RealHumans', 'RealHuman', ['item1', 'item2']);
+    }
+
+    public function testPluralStudyWithCountables()
+    {
+        $this->assertPluralStudly('RealHumans', 'RealHuman', collect([]));
+        $this->assertPluralStudly('RealHuman', 'RealHuman', collect(['item1']));
+        $this->assertPluralStudly('RealHumans', 'RealHuman', collect(['item1', 'item2']));
+
+        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 30, 10);
+        $this->assertPluralStudly('RealHumans', 'RealHuman', $paginator);
     }
 }
