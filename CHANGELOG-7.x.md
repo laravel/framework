@@ -1,6 +1,12 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.28.3...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.28.4...7.x)
+
+
+## [v7.28.4 (2020-10-06)](https://github.com/laravel/framework/compare/v7.28.3...v7.28.4)
+
+### Fixed
+- Added missed RESET_THROTTLED constant to Password Facade ([#34641](https://github.com/laravel/framework/pull/34641))
 
 
 ## [v7.28.3 (2020-09-17)](https://github.com/laravel/framework/compare/v7.28.2...v7.28.3)
