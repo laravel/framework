@@ -688,8 +688,8 @@ trait EnumeratesValues
      */
     public function whereLike($key, $term)
     {
-        if (!is_string($term)) {
-            throw new Exception("Property \"term\" must be an instance of string.");
+        if (! is_string($term)) {
+            throw new Exception('Property "term" must be an instance of string.');
         }
 
         return $this->filter(function ($item) use ($key, $term) {
