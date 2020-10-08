@@ -332,7 +332,18 @@ trait InteractsWithIO
         $this->comment('*     '.$string.'     *');
         $this->comment(str_repeat('*', $length));
 
-        $this->output->newLine();
+        $this->newLine();
+    }
+
+    /**
+     * Write newline(s).
+     *
+     * @param  int  $count
+     * @return void
+     */
+    public function newLine($count = 1)
+    {
+        $this->output->newLine($count);
     }
 
     /**
