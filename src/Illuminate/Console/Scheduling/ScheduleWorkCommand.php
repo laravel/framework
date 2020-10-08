@@ -32,41 +32,32 @@ class ScheduleWorkCommand extends Command
     {
         $this->info('Schedule worker started successfully.');
 
-        $lastExecutionStartedAt = null;
-
-        $keyOfLastExecutionWithOutput = null;
-
-        $executions = [];
+        [$lastExecutionStartedAt, $keyOfLastExecutionWithOutput, $executions] = [null, null, []];
 
         while (true) {
-            if (Carbon::now()->second === 0 && ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
-                $execution = new Process([PHP_BINARY, 'artisan', 'schedule:run']);
+            usleep(100 * 1000);
+
+            if (Carbon::now()->second === 0 &&
+                ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
+                $executions[] = $execution = new Process([PHP_BINARY, 'artisan', 'schedule:run']);
+
                 $execution->start();
-                $executions[] = $execution;
+
                 $lastExecutionStartedAt = Carbon::now()->startOfMinute();
             }
 
             foreach ($executions as $key => $execution) {
-                $incrementalOutput = trim($execution->getIncrementalOutput());
+                $output = trim($execution->getIncrementalOutput()).
+                          trim($execution->getIncrementalErrorOutput());
 
-                if (Str::length($incrementalOutput) > 0) {
+                if (! empty($output)) {
                     if ($key !== $keyOfLastExecutionWithOutput) {
                         $this->info(PHP_EOL.'Execution #'.($key + 1).' output:');
+
                         $keyOfLastExecutionWithOutput = $key;
                     }
 
-                    $this->warn($incrementalOutput);
-                }
-
-                $incrementalErrorOutput = trim($execution->getIncrementalErrorOutput());
-
-                if (Str::length($incrementalErrorOutput) > 0) {
-                    if ($key !== $keyOfLastExecutionWithOutput) {
-                        $this->info(PHP_EOL.'Execution #'.($key + 1).' output:');
-                        $keyOfLastExecutionWithOutput = $key;
-                    }
-
-                    $this->error(trim($incrementalErrorOutput));
+                    $this->output->writeln($output);
                 }
 
                 if (! $execution->isRunning()) {
