@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -86,9 +86,7 @@ class SupportPluralizerTest extends TestCase
         $this->assertSame('tests', Str::plural('test', collect([])));
         $this->assertSame('test', Str::plural('test', collect(['item1'])));
         $this->assertSame('tests', Str::plural('test', collect(['item1', 'item2'])));
-
-        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 30, 10);
-        $this->assertSame('tests', Str::plural('test', $paginator));
+        $this->assertSame('tests', Str::plural('test', new MessageBag(['msg1', 'msg2'])));
     }
 
     public function testPluralStudyWithArray()
@@ -103,8 +101,6 @@ class SupportPluralizerTest extends TestCase
         $this->assertPluralStudly('RealHumans', 'RealHuman', collect([]));
         $this->assertPluralStudly('RealHuman', 'RealHuman', collect(['item1']));
         $this->assertPluralStudly('RealHumans', 'RealHuman', collect(['item1', 'item2']));
-
-        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 30, 10);
-        $this->assertPluralStudly('RealHumans', 'RealHuman', $paginator);
+        $this->assertPluralStudly('RealHumans', 'RealHuman', new MessageBag(['msg1', 'msg2']));
     }
 }
