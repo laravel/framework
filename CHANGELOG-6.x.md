@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.41...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.42...6.x)
+
+
+## [v6.18.42 (2020-10-06)](https://github.com/laravel/framework/compare/v6.18.41...v6.18.42)
+
+### Fixed
+- Added missed RESET_THROTTLED constant to Password Facade ([#34641](https://github.com/laravel/framework/pull/34641))
 
 
 ## [v6.18.41 (2020-09-29)](https://github.com/laravel/framework/compare/v6.18.40...v6.18.41)
