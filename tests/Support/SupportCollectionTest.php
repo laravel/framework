@@ -205,6 +205,19 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testCollectionShuffleWithOutSeed($collection)
+    {
+        $data = new $collection(range(0, 100, 10));
+
+        $firstRandom = json_encode($data->shuffle());
+        $secondRandom = json_encode($data->shuffle());
+
+        $this->assertNotEquals($firstRandom, $secondRandom);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSkipMethod($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6]);
