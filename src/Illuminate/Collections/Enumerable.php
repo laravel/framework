@@ -423,6 +423,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function whereInstanceOf($type);
 
     /**
+     * Filter any string items which match the given search term.
+     *
+     * @param  string  $key
+     * @param  string  $term
+     * @throws Exception
+     * @return static
+     */
+    public function whereLike($key, $term);
+
+    /**
      * Get the first item from the enumerable passing the given truth test.
      *
      * @param  callable|null  $callback

@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
@@ -674,6 +675,27 @@ trait EnumeratesValues
     {
         return $this->filter(function ($value) use ($type) {
             return $value instanceof $type;
+        });
+    }
+
+    /**
+     * Filter any string items which match the given search term.
+     *
+     * @param  string  $key
+     * @param  string  $term
+     * @throws Exception
+     * @return static
+     */
+    public function whereLike($key, $term)
+    {
+        if (!is_string($term)) {
+            throw new Exception("Property \"term\" must be an instance of string.");
+        }
+
+        return $this->filter(function ($item) use ($key, $term) {
+            $value = Str::lower(data_get($item, $key));
+
+            return Str::contains($value, Str::lower($term));
         });
     }
 
