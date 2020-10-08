@@ -4,7 +4,6 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 class ScheduleWorkCommand extends Command
