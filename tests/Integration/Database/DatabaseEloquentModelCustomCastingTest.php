@@ -323,14 +323,6 @@ class UppercaseCaster implements CastsAttributes
     }
 }
 
-class UppercaseCasterComparable extends UppercaseCaster implements ComparesCastableAttributes
-{
-    public function compare($value, $originalValue)
-    {
-        return strtoupper($value) === strtoupper($originalValue);
-    }
-}
-
 class AddressCaster implements CastsAttributes
 {
     public function get($model, $key, $value, $attributes)
