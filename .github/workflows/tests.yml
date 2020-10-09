@@ -75,7 +75,7 @@ jobs:
         if: "matrix.php >= 8"
 
       - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit --verbose --group PDOFailure
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root

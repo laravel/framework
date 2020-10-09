@@ -55,6 +55,7 @@ class DatabaseConnectionTest extends TestCase
         $this->assertSame('foo', $connection->selectOne('foo', ['bar' => 'baz']));
     }
 
+    /** @group PDOFailure */
     public function testSelectProperlyCallsPDO()
     {
         $readPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->setMethods(['prepare'])->getMock();
