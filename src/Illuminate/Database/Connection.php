@@ -168,7 +168,7 @@ class Connection implements ConnectionInterface
     {
         $this->pdo = $pdo;
         $this->readPdo = $readPdo;
-dump($readPdo);
+        dump($readPdo);
         // First we will setup the default properties. We keep track of the DB
         // name we are connected to since it is needed when some reflective
         // type commands are run such as checking whether a table exists.
@@ -964,7 +964,8 @@ dump($readPdo);
         if ($this->readPdo instanceof Closure) {
             return $this->readPdo = call_user_func($this->readPdo);
         }
-dd($this->readPdo);
+        dd($this->readPdo);
+
         return $this->readPdo ?: $this->getPdo();
     }
 
