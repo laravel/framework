@@ -1123,6 +1123,20 @@ trait HasAttributes
     }
 
     /**
+     * Determine if an attribute can be checked for being dirty using a custom class.
+     *
+     * @param  string  $key
+     * @return bool
+     *
+     * @throws \Illuminate\Database\Eloquent\InvalidCastException
+     */
+    protected function isClassComparable($key)
+    {
+        return $this->isClassCastable($key) &&
+            method_exists($this->parseCasterClass($this->getCasts()[$key]), 'compare');
+    }
+
+    /**
      * Resolve the custom caster class for a given key.
      *
      * @param  string  $key
@@ -1472,6 +1486,8 @@ trait HasAttributes
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                    $this->castAttribute($key, $original);
+        } elseif ($this->isClassComparable($key)) {
+            return $this->resolveCasterClass($key)->compare($attribute, $original);
         }
 
         return is_numeric($attribute) && is_numeric($original)
