@@ -6,10 +6,11 @@ interface ComparesCastableAttributes
 {
     /**
      * Compare current and original attribute values.
+     * Returns true if values are equal and false otherwise.
      *
      * @param  mixed  $value
      * @param  mixed  $originalValue
-     * @return mixed
+     * @return bool
      */
     public function compare($value, $originalValue);
 }
