@@ -20,4 +20,14 @@ class SupportHtmlStringTest extends TestCase
         $html = new HtmlString('<h1>foo</h1>');
         $this->assertEquals($str, (string) $html);
     }
+
+    public function testIsEmpty()
+    {
+        $this->assertTrue((new HtmlString(''))->isEmpty());
+    }
+
+    public function testIsNotEmpty()
+    {
+        $this->assertTrue((new HtmlString('foo'))->isNotEmpty());
+    }
 }
