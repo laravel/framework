@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Contracts\Database\Eloquent\ComparesCastableAttributes;
 use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\Model;
@@ -153,6 +154,37 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertSame('123.456', $unserializedModel->toArray()['price']);
     }
 
+    public function testComparableCasts()
+    {
+        $model = new TestEloquentModelWithCustomCast();
+        $model->setRawAttributes(
+            [
+                'decimal' => '123.456',
+                'decimal_comparable' => '234.567',
+            ],
+            true
+        );
+
+        $this->assertEmpty($model->getDirty());
+
+        //we know how to compare decimal attribute so it's not assumed as dirty
+        $decimalComparableAttribute = $model->decimal_comparable;
+        $this->assertInstanceOf(Decimal::class, $decimalComparableAttribute);
+        $this->assertEquals('234.56700000', (string) $decimalComparableAttribute);
+        $this->assertEmpty($model->getDirty());
+
+        //we don't know how to compare decimal attribute so it's assumed as dirty
+        $decimalAttribute = $model->decimal;
+        $this->assertInstanceOf(Decimal::class, $decimalAttribute);
+        $this->assertEquals('123.45600000', (string) $decimalAttribute);
+        $this->assertEquals(
+            [
+                'decimal' => '123.45600000',
+            ],
+            $model->getDirty()
+        );
+    }
+
     public function testOneWayCasting()
     {
         // CastsInboundAttributes is used for casting that is unidirectional... only use case I can think of is one-way hashing...
@@ -254,6 +286,8 @@ class TestEloquentModelWithCustomCast extends Model
         'password' => HashCaster::class,
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
+        'decimal' => DecimalPrecisionCaster::class,
+        'decimal_comparable' => DecimalPrecisionCasterComparable::class,
         'options' => JsonCaster::class,
         'value_object_with_caster' => ValueObject::class,
         'value_object_caster_with_argument' => ValueObject::class.':argument',
@@ -286,6 +320,14 @@ class UppercaseCaster implements CastsAttributes
     public function set($model, $key, $value, $attributes)
     {
         return [$key => strtoupper($value)];
+    }
+}
+
+class UppercaseCasterComparable extends UppercaseCaster implements ComparesCastableAttributes
+{
+    public function compare($value, $originalValue)
+    {
+        return strtoupper($value) === strtoupper($originalValue);
     }
 }
 
@@ -465,5 +507,37 @@ class DateObjectCaster implements CastsAttributes
     public function set($model, $key, $value, $attributes)
     {
         return $value->format('Y-m-d');
+    }
+}
+
+class DecimalPrecisionCaster implements CastsAttributes
+{
+    protected $precision;
+
+    public function __construct($precision = 8)
+    {
+        $this->precision = $precision;
+    }
+
+    public function get($model, string $key, $value, array $attributes)
+    {
+        return new Decimal(number_format((float) $value, $this->precision));
+    }
+
+    public function set($model, string $key, $value, array $attributes)
+    {
+        return (string) $value;
+    }
+}
+
+class DecimalPrecisionCasterComparable extends DecimalPrecisionCaster implements ComparesCastableAttributes
+{
+    public function compare($value, $originalValue)
+    {
+        $value = (string) $value;
+        $originalValue = (string) $value;
+
+        return number_format((float) $value, $this->precision)
+            === number_format((float) $originalValue, $this->precision);
     }
 }
