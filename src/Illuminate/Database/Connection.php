@@ -384,7 +384,7 @@ class Connection implements ConnectionInterface
      * @param  \PDOStatement  $statement
      * @return \PDOStatement
      */
-    protected function prepared(PDOStatement $statement)
+    protected function prepared( $statement)
     {
         $statement->setFetchMode($this->fetchMode);
 
