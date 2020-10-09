@@ -20,7 +20,6 @@ use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
 use LogicException;
 use PDO;
-use PDOStatement;
 
 class Connection implements ConnectionInterface
 {
@@ -384,7 +383,7 @@ class Connection implements ConnectionInterface
      * @param  \PDOStatement  $statement
      * @return \PDOStatement
      */
-    protected function prepared( $statement)
+    protected function prepared($statement)
     {
         $statement->setFetchMode($this->fetchMode);
 
