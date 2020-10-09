@@ -17,6 +17,7 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\DB;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -850,10 +851,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestModelParentStub;
 
         $builder = $model->withCount(['foo'=>function($query){
-            $query->sum('num1');
+            $query->select(DB::raw('sum(num1)'));
         }]);
 
-        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select sum(num1) as aggregate from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select sum(num1) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithCountSumRename()
@@ -861,10 +862,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestModelParentStub;
 
         $builder = $model->withCount(['foo as foo_sum'=>function($query){
-            $query->sum('num1');
+            $query->select(DB::raw('sum(num1)'));
         }]);
 
-        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select sum(num1) as aggregate from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select sum(num1) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithCountAvg()
@@ -872,10 +873,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestModelParentStub;
 
         $builder = $model->withCount(['foo'=>function($query){
-            $query->avg('num1');
+            $query->select(DB::raw('avg(num1)'));
         }]);
 
-        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select avg(num1) as aggregate from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select avg(num1) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithCountAvgRename()
@@ -883,10 +884,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestModelParentStub;
 
         $builder = $model->withCount(['foo as foo_avg'=>function($query){
-            $query->avg('num1');
+             $query->select(DB::raw('avg(num1)'));
         }]);
 
-        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select avg(num1) as aggregate from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select avg(num1) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testHasWithConstraintsAndHavingInSubquery()
