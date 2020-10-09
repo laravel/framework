@@ -589,6 +589,8 @@ class Arr
      */
     public static function shuffle($array, $seed = null)
     {
+        $array = $array instanceof Collection ? $array->all() : $array;
+
         if (is_null($seed)) {
             shuffle($array);
         } else {
