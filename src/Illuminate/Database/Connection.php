@@ -168,7 +168,7 @@ class Connection implements ConnectionInterface
     {
         $this->pdo = $pdo;
         $this->readPdo = $readPdo;
-        dump(get_class($readPdo));
+
         // First we will setup the default properties. We keep track of the DB
         // name we are connected to since it is needed when some reflective
         // type commands are run such as checking whether a table exists.
@@ -329,7 +329,7 @@ class Connection implements ConnectionInterface
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
-            $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
+            $statement = $this->prepared(dd(get_class($this->getPdoForSelect($useReadPdo)))
                               ->prepare($query));
 
             $this->bindValues($statement, $this->prepareBindings($bindings));
@@ -964,7 +964,6 @@ class Connection implements ConnectionInterface
         if ($this->readPdo instanceof Closure) {
             return $this->readPdo = call_user_func($this->readPdo);
         }
-        dd($this->readPdo);
 
         return $this->readPdo ?: $this->getPdo();
     }
