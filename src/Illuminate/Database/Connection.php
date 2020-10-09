@@ -383,7 +383,8 @@ class Connection implements ConnectionInterface
      * @return \PDOStatement
      */
     protected function prepared(PDOStatement $statement)
-    {dump('test', $statement);
+    {
+        dump('test', $statement);
         $statement->setFetchMode($this->fetchMode);
 
         $this->event(new StatementPrepared(
