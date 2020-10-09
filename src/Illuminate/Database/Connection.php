@@ -953,19 +953,25 @@ class Connection implements ConnectionInterface
      */
     public function getReadPdo()
     {
-        if ($this->transactions > 0) {
+        if ($this->transactions > 0) {dump('Transactions are present');
             return $this->getPdo();
         }
 
-        if ($this->recordsModified && $this->getConfig('sticky')) {
+        if ($this->recordsModified && $this->getConfig('sticky')) {dump('Modified record and sticky config.');
             return $this->getPdo();
         }
 
-        if ($this->readPdo instanceof Closure) {
+        if ($this->readPdo instanceof Closure) {dump('Closure');
             return $this->readPdo = call_user_func($this->readPdo);
         }
 
-        return $this->readPdo ?: $this->getPdo();
+        if ($this->readPdo) {dump('read pdo returned');
+            return $this->readPdo;
+        }
+
+        dump('write pdo');
+
+        return $this->getPdo();
     }
 
     /**
