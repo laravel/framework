@@ -168,7 +168,7 @@ class Connection implements ConnectionInterface
     {
         $this->pdo = $pdo;
         $this->readPdo = $readPdo;
-        dump($readPdo);
+        dump(get_class($readPdo));
         // First we will setup the default properties. We keep track of the DB
         // name we are connected to since it is needed when some reflective
         // type commands are run such as checking whether a table exists.
