@@ -57,16 +57,15 @@ class DatabaseConnectionTest extends TestCase
 
     public function testSelectProperlyCallsPDO()
     {
-        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->setMethods(['prepare'])->getMock();
+        $readPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->setMethods(['prepare'])->getMock();
         $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->setMethods(['prepare'])->getMock();
         $writePdo->expects($this->never())->method('prepare');
         $statement = $this->getMockBuilder('PDOStatement')->setMethods(['execute', 'fetchAll', 'bindValue'])->getMock();
         $statement->expects($this->once())->method('bindValue')->with('foo', 'bar', 2);
         $statement->expects($this->once())->method('execute');
         $statement->expects($this->once())->method('fetchAll')->willReturn(['boom']);
-        $pdo->expects($this->once())->method('prepare')->with('foo')->willReturn($statement);
-        $mock = $this->getMockConnection(['prepareBindings'], $writePdo);
-        $mock->setReadPdo($pdo);
+        $readPdo->expects($this->once())->method('prepare')->with('foo')->willReturn($statement);
+        $mock = $this->getMockConnection(['prepareBindings'], $writePdo, $readPdo);
         $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['foo' => 'bar']))->willReturn(['foo' => 'bar']);
         $results = $mock->select('foo', ['foo' => 'bar']);
         $this->assertEquals(['boom'], $results);
@@ -421,11 +420,14 @@ class DatabaseConnectionTest extends TestCase
         $this->assertSame($connection, $schema->getConnection());
     }
 
-    protected function getMockConnection($methods = [], $pdo = null)
+    protected function getMockConnection($methods = [], $pdo = null, $readPdo = null)
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
         $defaults = ['getDefaultQueryGrammar', 'getDefaultPostProcessor', 'getDefaultSchemaGrammar'];
-        $connection = $this->getMockBuilder(Connection::class)->setMethods(array_merge($defaults, $methods))->setConstructorArgs([$pdo])->getMock();
+        $connection = $this->getMockBuilder(Connection::class)
+            ->setMethods(array_merge($defaults, $methods))
+            ->setConstructorArgs([$pdo, '', '', [], $readPdo])
+            ->getMock();
         $connection->enableQueryLog();
 
         return $connection;

@@ -19,11 +19,12 @@ class SQLiteConnection extends Connection
      * @param  string  $database
      * @param  string  $tablePrefix
      * @param  array  $config
+     * @param  \PDO|\Closure|null  $readPdo
      * @return void
      */
-    public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
+    public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [], $readPdo = null)
     {
-        parent::__construct($pdo, $database, $tablePrefix, $config);
+        parent::__construct($pdo, $database, $tablePrefix, $config, $readPdo);
 
         $enableForeignKeyConstraints = $this->getForeignKeyConstraintsConfigurationValue();
 

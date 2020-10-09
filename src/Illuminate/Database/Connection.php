@@ -161,11 +161,13 @@ class Connection implements ConnectionInterface
      * @param  string  $database
      * @param  string  $tablePrefix
      * @param  array  $config
+     * @param  \PDO|\Closure|null  $readPdo
      * @return void
      */
-    public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
+    public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [], $readPdo = null)
     {
         $this->pdo = $pdo;
+        $this->readPdo = $readPdo;
 
         // First we will setup the default properties. We keep track of the DB
         // name we are connected to since it is needed when some reflective
