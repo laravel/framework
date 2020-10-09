@@ -28,7 +28,7 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.0]
-        stability: [prefer-lowest, prefer-stable]
+        stability: [prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
