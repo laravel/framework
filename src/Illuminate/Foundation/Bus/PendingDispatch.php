@@ -126,11 +126,13 @@ class PendingDispatch
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return void
+     * @return $this
      */
     public function __call($method, $parameters)
     {
         $this->job->{$method}(...$parameters);
+
+        return $this;
     }
 
     /**
