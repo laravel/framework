@@ -10,7 +10,7 @@ trait ParsesLogConfiguration
     /**
      * The Log levels.
      *
-     * @var array
+     * @var int[]
      */
     protected $levels = [
         'debug' => Monolog::DEBUG,

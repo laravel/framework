@@ -10,7 +10,7 @@ class MySqlGrammar extends Grammar
     /**
      * The grammar specific operators.
      *
-     * @var array
+     * @var string[]
      */
     protected $operators = ['sounds like'];
 

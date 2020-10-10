@@ -182,7 +182,7 @@ class Builder
     /**
      * All of the available clause operators.
      *
-     * @var array
+     * @var string[]
      */
     public $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',

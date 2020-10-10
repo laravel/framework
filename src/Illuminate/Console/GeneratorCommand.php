@@ -25,7 +25,7 @@ abstract class GeneratorCommand extends Command
     /**
      * Reserved names that cannot be used for generation.
      *
-     * @var array
+     * @var string[]
      */
     protected $reservedNames = [
         '__halt_compiler',

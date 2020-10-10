@@ -115,7 +115,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * All of the verbs supported by the router.
      *
-     * @var array
+     * @var string[]
      */
     public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 

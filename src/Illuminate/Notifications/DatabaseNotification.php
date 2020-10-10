@@ -37,7 +37,7 @@ class DatabaseNotification extends Model
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @var string[]
      */
     protected $casts = [
         'data' => 'array',

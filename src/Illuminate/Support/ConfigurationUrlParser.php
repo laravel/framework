@@ -9,7 +9,7 @@ class ConfigurationUrlParser
     /**
      * The drivers aliases map.
      *
-     * @var array
+     * @var string[]
      */
     protected static $driverAliases = [
         'mssql' => 'sqlsrv',

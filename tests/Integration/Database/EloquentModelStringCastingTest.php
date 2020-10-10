@@ -127,12 +127,12 @@ class StringCasts extends Eloquent
     protected $table = 'casting_table';
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $guarded = [];
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $casts = [
         'array_attributes' => 'array',
