@@ -850,7 +850,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->withCount(['foo' => function($query){
+        $builder = $model->withCount(['foo' => function ($query) {
             $query->select(DB::raw('sum(num1)'));
         }]);
 
@@ -861,7 +861,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->withCount(['foo as foo_sum' => function($query){
+        $builder = $model->withCount(['foo as foo_sum' => function ($query) {
             $query->select(DB::raw('sum(num1)'));
         }]);
 
@@ -872,7 +872,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->withCount(['foo' => function($query){
+        $builder = $model->withCount(['foo' => function ($query) {
             $query->select(DB::raw('avg(num1)'));
         }]);
 
@@ -883,7 +883,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->withCount(['foo as foo_avg' => function($query){
+        $builder = $model->withCount(['foo as foo_avg' => function ($query) {
              $query->select(DB::raw('avg(num1)'));
         }]);
 
