@@ -122,6 +122,18 @@ class PendingDispatch
     }
 
     /**
+     * Call methods within the job.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return void
+     */
+    public function __call($method, $parameters)
+    {
+        $this->job->{$method}(...$parameters);
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
