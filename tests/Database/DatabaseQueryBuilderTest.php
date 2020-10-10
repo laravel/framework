@@ -3749,6 +3749,17 @@ SQL;
         $this->assertSame('select * from "users" where "roles" ??& ?', $builder->toSql());
     }
 
+    public function testClone()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users');
+        $clone = $builder->clone()->where('email', 'foo');
+
+        $this->assertNotSame($builder, $clone);
+        $this->assertSame('select * from "users"', $builder->toSql());
+        $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
+    }
+
     public function testCloneWithout()
     {
         $builder = $this->getBuilder();
