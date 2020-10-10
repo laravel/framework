@@ -38,7 +38,7 @@ trait InteractsWithIO
     /**
      * The mapping between human readable verbosity levels and Symfony's OutputInterface.
      *
-     * @var int[]
+     * @var array
      */
     protected $verbosityMap = [
         'v' => OutputInterface::VERBOSITY_VERBOSE,

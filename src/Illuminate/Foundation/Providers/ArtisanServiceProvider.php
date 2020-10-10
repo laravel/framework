@@ -79,7 +79,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     /**
      * The commands to be registered.
      *
-     * @var string[]
+     * @var array
      */
     protected $commands = [
         'CacheClear' => 'command.cache.clear',
@@ -124,7 +124,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     /**
      * The commands to be registered.
      *
-     * @var string[]
+     * @var array
      */
     protected $devCommands = [
         'CacheTable' => 'command.cache.table',

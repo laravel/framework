@@ -246,7 +246,7 @@ class TestEloquentModelWithCustomCast extends Model
     /**
      * The attributes that should be cast to native types.
      *
-     * @var string[]
+     * @var array
      */
     protected $casts = [
         'address' => AddressCaster::class,

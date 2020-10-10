@@ -44,7 +44,7 @@ class ResourceRegistrar
     /**
      * The verbs used in the resource URIs.
      *
-     * @var string[]
+     * @var array
      */
     protected static $verbs = [
         'create' => 'create',

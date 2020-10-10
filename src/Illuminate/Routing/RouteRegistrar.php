@@ -60,7 +60,7 @@ class RouteRegistrar
     /**
      * The attributes that are aliased.
      *
-     * @var string[]
+     * @var array
      */
     protected $aliases = [
         'name' => 'as',

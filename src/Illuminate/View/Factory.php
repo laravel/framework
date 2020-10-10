@@ -60,7 +60,7 @@ class Factory implements FactoryContract
     /**
      * The extension to engine bindings.
      *
-     * @var string[]
+     * @var array
      */
     protected $extensions = [
         'blade.php' => 'blade',

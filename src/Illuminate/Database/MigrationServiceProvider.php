@@ -22,7 +22,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     /**
      * The commands to be registered.
      *
-     * @var string[]
+     * @var array
      */
     protected $commands = [
         'Migrate' => 'command.migrate',
