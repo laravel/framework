@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
