@@ -4,9 +4,17 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Mockery as m;
 
 class DatabaseEloquentWithCountTest extends DatabaseTestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        
+        m::close();
+    }
+
     public function testWithCountSum()
     {
         $model = new EloquentBuilderTestModelParentStub;
