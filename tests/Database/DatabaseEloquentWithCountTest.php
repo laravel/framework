@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Mockery as m;
@@ -11,8 +12,10 @@ class DatabaseEloquentWithCountTest extends DatabaseTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         m::close();
+
+        AliasLoader::setInstance([]);
     }
 
     public function testWithCountSum()
