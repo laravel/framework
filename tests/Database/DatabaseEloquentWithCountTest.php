@@ -15,7 +15,7 @@ class DatabaseEloquentWithCountTest extends DatabaseTestCase
 
         m::close();
 
-        AliasLoader::setInstance([]);
+        AliasLoader::getInstance([])->setInstance([]);
     }
 
     public function testWithCountSum()
