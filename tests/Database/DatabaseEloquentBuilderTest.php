@@ -18,11 +18,12 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class DatabaseEloquentBuilderTest extends TestCase
+class DatabaseEloquentBuilderTest extends DatabaseTestCase
 {
     protected function tearDown(): void
     {
