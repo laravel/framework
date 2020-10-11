@@ -169,7 +169,12 @@ class FrequencyTest extends TestCase
         $this->assertSame('8 15 5 4 *', $this->event->yearlyOn(4, 5, '15:08')->getExpression());
     }
 
-    public function testYearlyOnTuesdays()
+    public function testYearlyOnMondaysOnly()
+    {
+        $this->assertSame('1 9 * 7 1', $this->event->mondays()->yearlyOn(7, '*', '09:01')->getExpression());
+    }
+
+    public function testYearlyOnTuesdaysAndDayOfMonth20()
     {
         $this->assertSame('1 9 20 7 2', $this->event->tuesdays()->yearlyOn(7, 20, '09:01')->getExpression());
     }
