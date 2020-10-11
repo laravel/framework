@@ -43,7 +43,7 @@ class PreventOverlappingJobsTest extends TestCase
         $lockKey = (new PreventOverlappingJobs)->getLockKey($command);
 
         $this->assertTrue(OverlappingTestJob::$handled);
-        $this->assertNull($this->app->get(Cache::class)->get($lockKey));
+        $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->acquire());
     }
 
     public function testOverlappingJobsAreNotExecuted()
