@@ -78,8 +78,14 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $guard = $this->option('guard') ?: $config->get('auth.defaults.guard');
 
+        $guardProvider = $config->get('auth.guards.'.$guard.'.provider');
+        
+        if (is_null($guardProvider)) {
+            throw new \LogicException('The provided guard `'.$guard.'` does not exist in auth.guards.');
+        }
+
         return $config->get(
-            'auth.providers.'.$config->get('auth.guards.'.$guard.'.provider').'.model'
+            'auth.providers.'.$guardProvider.'.model'
         );
     }
 
