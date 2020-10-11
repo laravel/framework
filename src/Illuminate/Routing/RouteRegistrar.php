@@ -183,6 +183,10 @@ class RouteRegistrar
         if (is_array($action) &&
             is_callable($action) &&
             ! Arr::isAssoc($action)) {
+            // Start with a backslash, if it is not already starting with.
+            if (strncmp($action[0], '\\', 1)) {
+                $action[0] = '\\'.$action[0];
+            }
             $action = [
                 'uses' => $action[0].'@'.$action[1],
                 'controller' => $action[0].'@'.$action[1],
