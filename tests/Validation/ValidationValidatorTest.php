@@ -1847,6 +1847,82 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    /**
+     * @param mixed $input
+     * @param mixed $allowed
+     * @param bool $passes
+     *
+     * @dataProvider multipleOfDataProvider
+     */
+    public function testValidateMutlpleOf($input, $allowed, $passes)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => $input], ['foo' => "multiple_of:{$allowed}"]);
+        $this->assertSame($passes, $v->passes());
+    }
+
+    public function multipleOfDataProvider()
+    {
+        return [
+            [0, 0, false], // zero (same)
+            [0, 10, true], // zero + integer
+            [10, 0, false],
+            [0, 10.1, true], // zero + float
+            [10.1, 0, false],
+            [0, -10, true], // zero + -integer
+            [-10, 0, false],
+            [0, -10.1, true], // zero + -float
+            [-10.1, 0, false],
+            [10, 10, true], // integer (same)
+            [10, 5, true], // integer + integer
+            [10, 4, false],
+            [20, 10, true],
+            [5, 10, false],
+            [10, -5, true], // integer + -integer
+            [10, -4, false],
+            [-20, 10, true],
+            [-5, 10, false],
+            [-10, -10, true], // -integer (same)
+            [-10, -5, true], // -integer + -integer
+            [-10, -4, false],
+            [-20, -10, true],
+            [-5, -10, false],
+            [10, 10.0, true], // integer + float (same)
+            [10, 5.0, true], // integer + float
+            [10, 4.0, false],
+            [20.0, 10, true],
+            [5.0, 10, false],
+            [10.0, -10.0, true], // integer + -float (same)
+            [10, -5.0, true], // integer + -float
+            [10, -4.0, false],
+            [-20.0, 10, true],
+            [-5.0, 10, false],
+            [10.0, -10.0, true], // -integer + float (same)
+            [-10, 5.0, true], // -integer + float
+            [-10, 4.0, false],
+            [20.0, -10, true],
+            [5.0, -10, false],
+            [10.5, 10.5, true], // float (same)
+            [10.5, 0.5, true], // float + float
+            [10.5, 0.3, false],
+            [31.5, 10.5, true],
+            [31.6, 10.5, false],
+            [10.5, -0.5, true], // float + -float
+            [10.5, -0.3, false],
+            [-31.5, 10.5, true],
+            [-31.6, 10.5, false],
+            [-10.5, -10.5, true], // -float (same)
+            [-10.5, -0.5, true], // -float + -float
+            [-10.5, -0.3, false],
+            [-31.5, -10.5, true],
+            [-31.6, -10.5, false],
+            ['foo', 1, false], // invalid values
+            [1, 'foo', false],
+            ['foo', 'foo', false],
+        ];
+    }
+
     public function testProperMessagesAreReturnedForSizes()
     {
         $trans = $this->getIlluminateArrayTranslator();
