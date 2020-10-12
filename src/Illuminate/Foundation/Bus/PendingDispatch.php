@@ -122,7 +122,7 @@ class PendingDispatch
     }
 
     /**
-     * Call methods within the job.
+     * Dynamically proxy methods to the underlying job.
      *
      * @param  string  $method
      * @param  array  $parameters
