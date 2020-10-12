@@ -336,6 +336,19 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Transform each item in the slice of items using a callback.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function through(callable $callback)
+    {
+        $this->items->transform($callback);
+
+        return $this;
+    }
+
+    /**
      * Get the number of items shown per page.
      *
      * @return int

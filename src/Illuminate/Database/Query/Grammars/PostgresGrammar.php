@@ -219,6 +219,30 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile an "upsert" statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  array $values
+     * @param  array $uniqueBy
+     * @param  array $update
+     * @return  string
+     */
+    public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
+    {
+        $sql = $this->compileInsert($query, $values);
+
+        $sql .= ' on conflict ('.$this->columnize($uniqueBy).') do update set ';
+
+        $columns = collect($update)->map(function ($value, $key) {
+            return is_numeric($key)
+                ? $this->wrap($value).' = '.$this->wrapValue('excluded').'.'.$this->wrap($value)
+                : $this->wrap($key).' = '.$this->parameter($value);
+        })->implode(', ');
+
+        return $sql.$columns;
+    }
+
+    /**
      * Prepares a JSON column being updated using the JSONB_SET function.
      *
      * @param  string  $key

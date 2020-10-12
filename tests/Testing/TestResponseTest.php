@@ -1028,7 +1028,7 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
             ],
             'barfoo' => [
                 ['bar' => ['bar' => 'foo 0']],
-                ['bar' => ['bar' => 'foo 0', 'bar' => 'foo 0']],
+                ['bar' => ['bar' => 'foo 0', 'foo' => 'foo 0']],
                 ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
             ],
             'numeric_keys' => [

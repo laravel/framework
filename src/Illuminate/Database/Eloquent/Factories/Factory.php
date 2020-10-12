@@ -177,7 +177,13 @@ abstract class Factory
      */
     public function raw($attributes = [], ?Model $parent = null)
     {
-        return $this->state($attributes)->getExpandedAttributes($parent);
+        if ($this->count === null) {
+            return $this->state($attributes)->getExpandedAttributes($parent);
+        }
+
+        return array_map(function () use ($attributes, $parent) {
+            return $this->state($attributes)->getExpandedAttributes($parent);
+        }, range(1, $this->count));
     }
 
     /**

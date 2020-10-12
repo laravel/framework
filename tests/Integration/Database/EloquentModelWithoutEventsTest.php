@@ -31,7 +31,7 @@ class EloquentModelWithoutEventsTest extends DatabaseTestCase
 
         $model->save();
 
-        $this->assertEquals('Laravel', $model->project);
+        $this->assertSame('Laravel', $model->project);
     }
 }
 
