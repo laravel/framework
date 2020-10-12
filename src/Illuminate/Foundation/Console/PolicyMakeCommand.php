@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use LogicException;
 use Symfony\Component\Console\Input\InputOption;
 
 class PolicyMakeCommand extends GeneratorCommand
@@ -81,7 +82,7 @@ class PolicyMakeCommand extends GeneratorCommand
         $guardProvider = $config->get('auth.guards.'.$guard.'.provider');
 
         if (is_null($guardProvider)) {
-            throw new \LogicException('The provided guard `'.$guard.'` does not exist in auth.guards.');
+            throw new LogicException('The ['.$guard.'] guard is not defined in your "auth" configuration file.');
         }
 
         return $config->get(
