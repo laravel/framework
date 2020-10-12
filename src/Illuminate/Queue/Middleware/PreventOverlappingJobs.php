@@ -33,7 +33,6 @@ class PreventOverlappingJobs
      * @param  string  $key
      * @param  string  $prefix
      * @param  int  $expiresAt
-     * @param  string  $prefix
      *
      * @return void
      */
