@@ -3,29 +3,32 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
+use Illuminate\Validation\Factory as ValidationFactory;
+use Illuminate\Validation\ValidationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\Redirector;
-use Illuminate\Container\Container;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Validation\Factory as ValidationFactory;
-use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 
 class FoundationFormRequestTest extends TestCase
 {
     protected $mocks = [];
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
 
         $this->mocks = [];
     }
 
-    public function test_validated_method_returns_the_validated_data()
+    public function testValidatedMethodReturnsTheValidatedData()
     {
         $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
 
@@ -34,11 +37,55 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'specified'], $request->validated());
     }
 
-    /**
-     * @expectedException \Illuminate\Validation\ValidationException
-     */
-    public function test_validate_throws_when_validation_fails()
+    public function testValidatedMethodReturnsTheValidatedDataNestedRules()
     {
+        $payload = ['nested' => ['foo' => 'bar', 'baz' => ''], 'array' => [1, 2]];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestNestedStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $request->validated());
+    }
+
+    public function testValidatedMethodReturnsTheValidatedDataNestedChildRules()
+    {
+        $payload = ['nested' => ['foo' => 'bar', 'with' => 'extras']];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestNestedChildStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['nested' => ['foo' => 'bar']], $request->validated());
+    }
+
+    public function testValidatedMethodReturnsTheValidatedDataNestedArrayRules()
+    {
+        $payload = ['nested' => [['bar' => 'baz', 'with' => 'extras'], ['bar' => 'baz2', 'with' => 'extras']]];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestNestedArrayStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $request->validated());
+    }
+
+    public function testValidatedMethodNotValidateTwice()
+    {
+        $payload = ['name' => 'specified', 'with' => 'extras'];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestTwiceStub::class);
+
+        $request->validateResolved();
+        $request->validated();
+
+        $this->assertEquals(1, FoundationTestFormRequestTwiceStub::$count);
+    }
+
+    public function testValidateThrowsWhenValidationFails()
+    {
+        $this->expectException(ValidationException::class);
+
         $request = $this->createRequest(['no' => 'name']);
 
         $this->mocks['redirect']->shouldReceive('withInput->withErrors');
@@ -46,18 +93,26 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage This action is unauthorized.
-     */
-    public function test_validate_method_throws_when_authorization_fails()
+    public function testValidateMethodThrowsWhenAuthorizationFails()
     {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
     }
 
-    public function test_prepare_for_validation_runs_before_validation()
+    public function testPrepareForValidationRunsBeforeValidation()
     {
         $this->createRequest([], FoundationTestFormRequestHooks::class)->validateResolved();
+    }
+
+    public function test_after_validation_runs_after_validation()
+    {
+        $request = $this->createRequest([], FoundationTestFormRequestHooks::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['name' => 'Adam'], $request->all());
     }
 
     /**
@@ -66,6 +121,8 @@ class FoundationFormRequestTest extends TestCase
      * @param  string  $class
      * @param  \Closure  $excecutor
      * @return \Exception
+     *
+     * @throws \Exception
      */
     protected function catchException($class, $excecutor)
     {
@@ -79,7 +136,7 @@ class FoundationFormRequestTest extends TestCase
             throw $e;
         }
 
-        throw new Exception("No exception thrown. Expected exception {$class}");
+        throw new Exception("No exception thrown. Expected exception {$class}.");
     }
 
     /**
@@ -112,7 +169,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createValidationFactory($container)
     {
-        $translator = m::mock(Translator::class)->shouldReceive('trans')
+        $translator = m::mock(Translator::class)->shouldReceive('get')
                        ->zeroOrMoreTimes()->andReturn('error')->getMock();
 
         return new ValidationFactory($translator, $container);
@@ -174,6 +231,67 @@ class FoundationTestFormRequestStub extends FormRequest
     }
 }
 
+class FoundationTestFormRequestNestedStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['nested.foo' => 'required', 'array.*' => 'integer'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestNestedChildStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['nested.foo' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestNestedArrayStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['nested.*.bar' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestTwiceStub extends FormRequest
+{
+    public static $count = 0;
+
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function withValidator(Validator $validator)
+    {
+        $validator->after(function ($validator) {
+            self::$count++;
+        });
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
 class FoundationTestFormRequestForbiddenStub extends FormRequest
 {
     public function authorize()
@@ -181,6 +299,7 @@ class FoundationTestFormRequestForbiddenStub extends FormRequest
         return false;
     }
 }
+
 class FoundationTestFormRequestHooks extends FormRequest
 {
     public function rules()
@@ -196,5 +315,10 @@ class FoundationTestFormRequestHooks extends FormRequest
     public function prepareForValidation()
     {
         $this->replace(['name' => 'Taylor']);
+    }
+
+    public function passedValidation()
+    {
+        $this->replace(['name' => 'Adam']);
     }
 }

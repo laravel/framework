@@ -2,15 +2,16 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class SqlServerGrammar extends Grammar
 {
     /**
      * All of the available clause operators.
      *
-     * @var array
+     * @var string[]
      */
     protected $operators = [
         '=', '<', '>', '<=', '>=', '!<', '!>', '<>', '!=',
@@ -104,6 +105,20 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "where time" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereTime(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        return 'cast('.$this->wrap($where['column']).' as time) '.$where['operator'].' '.$value;
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column
@@ -112,11 +127,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileJsonContains($column, $value)
     {
-        $parts = explode('->', $column, 2);
-
-        $field = $this->wrap($parts[0]);
-
-        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return $value.' in (select [value] from openjson('.$field.$path.'))';
     }
@@ -130,6 +141,21 @@ class SqlServerGrammar extends Grammar
     public function prepareBindingForJsonContains($binding)
     {
         return is_bool($binding) ? json_encode($binding) : $binding;
+    }
+
+    /**
+     * Compile a "JSON length" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileJsonLength($column, $operator, $value)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+
+        return '(select count(*) from openjson('.$field.$path.')) '.$operator.' '.$value;
     }
 
     /**
@@ -185,7 +211,7 @@ class SqlServerGrammar extends Grammar
     {
         $constraint = $this->compileRowConstraint($query);
 
-        return "select * from ({$sql}) as temp_table where row_num {$constraint}";
+        return "select * from ({$sql}) as temp_table where row_num {$constraint} order by row_num";
     }
 
     /**
@@ -205,6 +231,23 @@ class SqlServerGrammar extends Grammar
         }
 
         return ">= {$start}";
+    }
+
+    /**
+     * Compile a delete statement without joins into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @param  string  $where
+     * @return string
+     */
+    protected function compileDeleteWithoutJoins(Builder $query, $table, $where)
+    {
+        $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
+
+        return ! is_null($query->limit) && $query->limit > 0 && $query->offset <= 0
+                        ? Str::replaceFirst('delete', 'delete top ('.$query->limit.')', $sql)
+                        : $sql;
     }
 
     /**
@@ -255,6 +298,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Wrap a union subquery in parentheses.
+     *
+     * @param  string  $sql
+     * @return string
+     */
+    protected function wrapUnion($sql)
+    {
+        return 'select * from ('.$sql.') as '.$this->wrapTable('temp_table');
+    }
+
+    /**
      * Compile an exists statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -270,105 +324,63 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a delete statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    public function compileDelete(Builder $query)
-    {
-        $table = $this->wrapTable($query->from);
-
-        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        return isset($query->joins)
-                    ? $this->compileDeleteWithJoins($query, $table, $where)
-                    : trim("delete from {$table} {$where}");
-    }
-
-    /**
-     * Compile a delete statement with joins into SQL.
+     * Compile an update statement with joins into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
+     * @param  string  $columns
      * @param  string  $where
      * @return string
      */
-    protected function compileDeleteWithJoins(Builder $query, $table, $where)
+    protected function compileUpdateWithJoins(Builder $query, $table, $columns, $where)
     {
-        $joins = ' '.$this->compileJoins($query, $query->joins);
+        $alias = last(explode(' as ', $table));
 
-        $alias = stripos($table, ' as ') !== false
-                ? explode(' as ', $table)[1] : $table;
+        $joins = $this->compileJoins($query, $query->joins);
 
-        return trim("delete {$alias} from {$table}{$joins} {$where}");
+        return "update {$alias} set {$columns} from {$table} {$joins} {$where}";
     }
 
     /**
-     * Compile a truncate table statement into SQL.
+     * Compile an "upsert" statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return array
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  array $values
+     * @param  array $uniqueBy
+     * @param  array $update
+     * @return  string
      */
-    public function compileTruncate(Builder $query)
+    public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
     {
-        return ['truncate table '.$this->wrapTable($query->from) => []];
-    }
+        $columns = $this->columnize(array_keys(reset($values)));
 
-    /**
-     * Compile an update statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
-     * @return string
-     */
-    public function compileUpdate(Builder $query, $values)
-    {
-        list($table, $alias) = $this->parseUpdateTable($query->from);
+        $sql = 'merge '.$this->wrapTable($query->from).' ';
 
-        // Each one of the columns in the update statements needs to be wrapped in the
-        // keyword identifiers, also a place-holder needs to be created for each of
-        // the values in the list of bindings so we can make the sets statements.
-        $columns = collect($values)->map(function ($value, $key) {
-            return $this->wrap($key).' = '.$this->parameter($value);
+        $parameters = collect($values)->map(function ($record) {
+            return '('.$this->parameterize($record).')';
         })->implode(', ');
 
-        // If the query has any "join" clauses, we will setup the joins on the builder
-        // and compile them so we can attach them to this update, as update queries
-        // can get join statements to attach to other tables when they're needed.
-        $joins = '';
+        $sql .= 'using (values '.$parameters.') '.$this->wrapTable('laravel_source').' ('.$columns.') ';
 
-        if (isset($query->joins)) {
-            $joins = ' '.$this->compileJoins($query, $query->joins);
+        $on = collect($uniqueBy)->map(function ($column) use ($query) {
+            return $this->wrap('laravel_source.'.$column).' = '.$this->wrap($query->from.'.'.$column);
+        })->implode(' and ');
+
+        $sql .= 'on '.$on.' ';
+
+        if ($update) {
+            $update = collect($update)->map(function ($value, $key) {
+                return is_numeric($key)
+                    ? $this->wrap($value).' = '.$this->wrap('laravel_source.'.$value)
+                    : $this->wrap($key).' = '.$this->parameter($value);
+            })->implode(', ');
+
+            $sql .= 'when matched then update set '.$update.' ';
         }
 
-        // Of course, update queries may also be constrained by where clauses so we'll
-        // need to compile the where clauses and attach it to the query so only the
-        // intended records are updated by the SQL statements we generate to run.
-        $where = $this->compileWheres($query);
+        $sql .= 'when not matched then insert ('.$columns.') values ('.$columns.')';
 
-        if (! empty($joins)) {
-            return trim("update {$alias} set {$columns} from {$table}{$joins} {$where}");
-        }
-
-        return trim("update {$table}{$joins} set $columns $where");
-    }
-
-    /**
-     * Get the table and alias for the given table.
-     *
-     * @param  string  $table
-     * @return array
-     */
-    protected function parseUpdateTable($table)
-    {
-        $table = $alias = $this->wrapTable($table);
-
-        if (stripos($table, '] as [') !== false) {
-            $alias = '['.explode('] as [', $table)[1];
-        }
-
-        return [$table, $alias];
+        return $sql;
     }
 
     /**
@@ -380,24 +392,11 @@ class SqlServerGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        // Update statements with joins in SQL Servers utilize an unique syntax. We need to
-        // take all of the bindings and put them on the end of this array since they are
-        // added to the end of the "where" clause statements as typical where clauses.
-        $bindingsWithoutJoin = Arr::except($bindings, 'join');
+        $cleanBindings = Arr::except($bindings, 'select');
 
         return array_values(
-            array_merge($values, $bindings['join'], Arr::flatten($bindingsWithoutJoin))
+            array_merge($values, Arr::flatten($cleanBindings))
         );
-    }
-
-    /**
-     * Determine if the grammar supports savepoints.
-     *
-     * @return bool
-     */
-    public function supportsSavepoints()
-    {
-        return true;
     }
 
     /**
@@ -451,22 +450,20 @@ class SqlServerGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $parts = explode('->', $value, 2);
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
-        $field = $this->wrapSegments(explode('.', array_shift($parts)));
-
-        return 'json_value('.$field.', '.$this->wrapJsonPath($parts[0]).')';
+        return 'json_value('.$field.$path.')';
     }
 
     /**
-     * Wrap the given JSON path.
+     * Wrap the given JSON boolean value.
      *
      * @param  string  $value
      * @return string
      */
-    protected function wrapJsonPath($value)
+    protected function wrapJsonBooleanValue($value)
     {
-        return '\'$."'.str_replace('->', '"."', $value).'"\'';
+        return "'".$value."'";
     }
 
     /**
@@ -477,7 +474,11 @@ class SqlServerGrammar extends Grammar
      */
     public function wrapTable($table)
     {
-        return $this->wrapTableValuedFunction(parent::wrapTable($table));
+        if (! $this->isExpression($table)) {
+            return $this->wrapTableValuedFunction(parent::wrapTable($table));
+        }
+
+        return $this->getValue($table);
     }
 
     /**

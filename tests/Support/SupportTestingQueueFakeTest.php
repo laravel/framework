@@ -2,16 +2,27 @@
 
 namespace Illuminate\Tests\Support;
 
+use BadMethodCallException;
 use Illuminate\Bus\Queueable;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingQueueFakeTest extends TestCase
 {
-    protected function setUp()
+    /**
+     * @var \Illuminate\Support\Testing\Fakes\QueueFake
+     */
+    private $fake;
+
+    /**
+     * @var \Illuminate\Tests\Support\JobStub
+     */
+    private $job;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new QueueFake(new Application);
@@ -32,6 +43,15 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class);
     }
 
+    public function testAssertPushedWithClosure()
+    {
+        $this->fake->push($this->job);
+
+        $this->fake->assertPushed(function (JobStub $job) {
+            return true;
+        });
+    }
+
     public function testQueueSize()
     {
         $this->assertEquals(0, $this->fake->size());
@@ -43,12 +63,26 @@ class SupportTestingQueueFakeTest extends TestCase
 
     public function testAssertNotPushed()
     {
+        $this->fake->push($this->job);
+
+        try {
+            $this->fake->assertNotPushed(JobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.'));
+        }
+    }
+
+    public function testAssertNotPushedWithClosure()
+    {
         $this->fake->assertNotPushed(JobStub::class);
 
         $this->fake->push($this->job);
 
         try {
-            $this->fake->assertNotPushed(JobStub::class);
+            $this->fake->assertNotPushed(function (JobStub $job) {
+                return true;
+            });
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.'));
@@ -67,6 +101,24 @@ class SupportTestingQueueFakeTest extends TestCase
         }
 
         $this->fake->assertPushedOn('foo', JobStub::class);
+    }
+
+    public function testAssertPushedOnWithClosure()
+    {
+        $this->fake->push($this->job, '', 'foo');
+
+        try {
+            $this->fake->assertPushedOn('bar', function (JobStub $job) {
+                return true;
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+        }
+
+        $this->fake->assertPushedOn('foo', function (JobStub $job) {
+            return true;
+        });
     }
 
     public function testAssertPushedTimes()
@@ -105,7 +157,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $queue = 'my-test-queue';
         $this->fake->bulk([
             $this->job,
-            new JobStub(),
+            new JobStub,
         ], null, $queue);
 
         $this->fake->assertPushedOn($queue, JobStub::class);
@@ -125,6 +177,13 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushedWithChain(JobWithChainStub::class, [
             new JobStub,
         ]);
+    }
+
+    public function testAssertPushedWithoutChain()
+    {
+        $this->fake->push(new JobWithChainStub([]));
+
+        $this->fake->assertPushedWithoutChain(JobWithChainStub::class);
     }
 
     public function testAssertPushedWithChainSameJobDifferentChains()
@@ -215,6 +274,17 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+        }
+    }
+
+    public function testCallUndefinedMethodErrorHandling()
+    {
+        try {
+            $this->fake->undefinedMethod();
+        } catch (BadMethodCallException $e) {
+            $this->assertThat($e, new ExceptionMessage(sprintf(
+                'Call to undefined method %s::%s()', get_class($this->fake), 'undefinedMethod'
+            )));
         }
     }
 }

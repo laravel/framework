@@ -52,12 +52,22 @@ trait ManagesFrequencies
      */
     private function inTimeInterval($startTime, $endTime)
     {
-        return function () use ($startTime, $endTime) {
-            return Carbon::now($this->timezone)->between(
-                Carbon::parse($startTime, $this->timezone),
-                Carbon::parse($endTime, $this->timezone),
-                true
-            );
+        [$now, $startTime, $endTime] = [
+            Carbon::now($this->timezone),
+            Carbon::parse($startTime, $this->timezone),
+            Carbon::parse($endTime, $this->timezone),
+        ];
+
+        if ($endTime->lessThan($startTime)) {
+            if ($startTime->greaterThan($now)) {
+                $startTime->subDay(1);
+            } else {
+                $endTime->addDay(1);
+            }
+        }
+
+        return function () use ($now, $startTime, $endTime) {
+            return $now->between($startTime, $endTime);
         };
     }
 
@@ -69,6 +79,36 @@ trait ManagesFrequencies
     public function everyMinute()
     {
         return $this->spliceIntoPosition(1, '*');
+    }
+
+    /**
+     * Schedule the event to run every two minutes.
+     *
+     * @return $this
+     */
+    public function everyTwoMinutes()
+    {
+        return $this->spliceIntoPosition(1, '*/2');
+    }
+
+    /**
+     * Schedule the event to run every three minutes.
+     *
+     * @return $this
+     */
+    public function everyThreeMinutes()
+    {
+        return $this->spliceIntoPosition(1, '*/3');
+    }
+
+    /**
+     * Schedule the event to run every four minutes.
+     *
+     * @return $this
+     */
+    public function everyFourMinutes()
+    {
+        return $this->spliceIntoPosition(1, '*/4');
     }
 
     /**
@@ -124,12 +164,58 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run hourly at a given offset in the hour.
      *
-     * @param  int  $offset
+     * @param  array|int  $offset
      * @return $this
      */
     public function hourlyAt($offset)
     {
+        $offset = is_array($offset) ? implode(',', $offset) : $offset;
+
         return $this->spliceIntoPosition(1, $offset);
+    }
+
+    /**
+     * Schedule the event to run every two hours.
+     *
+     * @return $this
+     */
+    public function everyTwoHours()
+    {
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, '*/2');
+    }
+
+    /**
+     * Schedule the event to run every three hours.
+     *
+     * @return $this
+     */
+    public function everyThreeHours()
+    {
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, '*/3');
+    }
+
+    /**
+     * Schedule the event to run every four hours.
+     *
+     * @return $this
+     */
+    public function everyFourHours()
+    {
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, '*/4');
+    }
+
+    /**
+     * Schedule the event to run every six hours.
+     *
+     * @return $this
+     */
+    public function everySixHours()
+    {
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, '*/6');
     }
 
     /**
@@ -165,7 +251,7 @@ trait ManagesFrequencies
         $segments = explode(':', $time);
 
         return $this->spliceIntoPosition(2, (int) $segments[0])
-                    ->spliceIntoPosition(1, count($segments) == 2 ? (int) $segments[1] : '0');
+                    ->spliceIntoPosition(1, count($segments) === 2 ? (int) $segments[1] : '0');
     }
 
     /**
@@ -190,7 +276,7 @@ trait ManagesFrequencies
      */
     public function weekdays()
     {
-        return $this->spliceIntoPosition(5, '1-5');
+        return $this->days('1-5');
     }
 
     /**
@@ -200,7 +286,7 @@ trait ManagesFrequencies
      */
     public function weekends()
     {
-        return $this->spliceIntoPosition(5, '0,6');
+        return $this->days('0,6');
     }
 
     /**
@@ -288,15 +374,15 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run weekly on a given day and time.
      *
-     * @param  int  $day
+     * @param  int  $dayOfWeek
      * @param  string  $time
      * @return $this
      */
-    public function weeklyOn($day, $time = '0:0')
+    public function weeklyOn($dayOfWeek, $time = '0:0')
     {
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(5, $day);
+        return $this->days($dayOfWeek);
     }
 
     /**
@@ -314,31 +400,47 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run monthly on a given day and time.
      *
-     * @param  int  $day
+     * @param  int  $dayOfMonth
      * @param  string  $time
      * @return $this
      */
-    public function monthlyOn($day = 1, $time = '0:0')
+    public function monthlyOn($dayOfMonth = 1, $time = '0:0')
     {
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(3, $day);
+        return $this->spliceIntoPosition(3, $dayOfMonth);
     }
 
     /**
-     * Schedule the event to run twice monthly.
+     * Schedule the event to run twice monthly at a given time.
      *
      * @param  int  $first
      * @param  int  $second
+     * @param  string  $time
      * @return $this
      */
-    public function twiceMonthly($first = 1, $second = 16)
+    public function twiceMonthly($first = 1, $second = 16, $time = '0:0')
     {
-        $days = $first.','.$second;
+        $daysOfMonth = $first.','.$second;
+
+        $this->dailyAt($time);
 
         return $this->spliceIntoPosition(1, 0)
             ->spliceIntoPosition(2, 0)
-            ->spliceIntoPosition(3, $days);
+            ->spliceIntoPosition(3, $daysOfMonth);
+    }
+
+    /**
+     * Schedule the event to run on the last day of the month.
+     *
+     * @param  string  $time
+     * @return $this
+     */
+    public function lastDayOfMonth($time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, Carbon::now()->endOfMonth()->day);
     }
 
     /**
@@ -365,6 +467,22 @@ trait ManagesFrequencies
                     ->spliceIntoPosition(2, 0)
                     ->spliceIntoPosition(3, 1)
                     ->spliceIntoPosition(4, 1);
+    }
+
+    /**
+     * Schedule the event to run yearly on a given month, day, and time.
+     *
+     * @param  int  $month
+     * @param  int|string  $dayOfMonth
+     * @param  string  $time
+     * @return $this
+     */
+    public function yearlyOn($month = 1, $dayOfMonth = 1, $time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, $dayOfMonth)
+                    ->spliceIntoPosition(4, $month);
     }
 
     /**

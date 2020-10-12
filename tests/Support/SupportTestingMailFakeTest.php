@@ -2,16 +2,28 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Mail\Mailable;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Testing\Fakes\MailFake;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingMailFakeTest extends TestCase
 {
-    protected function setUp()
+    /**
+     * @var \Illuminate\Support\Testing\Fakes\MailFake
+     */
+    private $fake;
+
+    /**
+     * @var \Illuminate\Tests\Support\MailableStub
+     */
+    private $mailable;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new MailFake;
@@ -30,6 +42,17 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
         $this->fake->assertSent(MailableStub::class);
+    }
+
+    public function testAssertSentWhenRecipientHasPreferredLocale()
+    {
+        $user = new LocalizedRecipientStub;
+
+        $this->fake->to($user)->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, function ($mail) use ($user) {
+            return $mail->hasTo($user) && $mail->locale === 'au';
+        });
     }
 
     public function testAssertNotSent()
@@ -114,16 +137,48 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertNothingSent();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('Mailables were sent unexpectedly.'));
+            $this->assertThat($e, new ExceptionMessage('The following mailables were sent unexpectedly: Illuminate\Tests\Support\MailableStub'));
         }
+    }
+
+    public function testAssertNothingQueued()
+    {
+        $this->fake->assertNothingQueued();
+
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        try {
+            $this->fake->assertNothingQueued();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The following mailables were queued unexpectedly: Illuminate\Tests\Support\MailableStub'));
+        }
+    }
+
+    public function testAssertQueuedWithClosure()
+    {
+        $this->fake->to($user = new LocalizedRecipientStub)->queue($this->mailable);
+
+        $this->fake->assertQueued(function (MailableStub $mail) use ($user) {
+            return $mail->hasTo($user);
+        });
+    }
+
+    public function testAssertSentWithClosure()
+    {
+        $this->fake->to($user = new LocalizedRecipientStub)->send($this->mailable);
+
+        $this->fake->assertSent(function (MailableStub $mail) use ($user) {
+            return $mail->hasTo($user);
+        });
     }
 }
 
-class MailableStub extends Mailable
+class MailableStub extends Mailable implements MailableContract
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.6';
+    protected $version = '6.0';
 
     /**
      * Build the message.
@@ -141,7 +196,7 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.6';
+    protected $version = '6.0';
 
     /**
      * Build the message.
@@ -152,5 +207,15 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
     {
         $this->with('first_name', 'Taylor')
              ->withLastName('Otwell');
+    }
+}
+
+class LocalizedRecipientStub implements HasLocalePreference
+{
+    public $email = 'taylor@laravel.com';
+
+    public function preferredLocale()
+    {
+        return 'au';
     }
 }

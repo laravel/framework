@@ -2,16 +2,18 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use InvalidArgumentException;
+
 class BladeCustomTest extends AbstractBladeTestCase
 {
     public function testCustomPhpCodeIsCorrectlyHandled()
     {
-        $this->assertEquals('<?php if($test): ?> <?php @show(\'test\'); ?> <?php endif; ?>', $this->compiler->compileString("@if(\$test) <?php @show('test'); ?> @endif"));
+        $this->assertSame('<?php if($test): ?> <?php @show(\'test\'); ?> <?php endif; ?>', $this->compiler->compileString("@if(\$test) <?php @show('test'); ?> @endif"));
     }
 
     public function testMixingYieldAndEcho()
     {
-        $this->assertEquals('<?php echo $__env->yieldContent(\'title\'); ?> - <?php echo e(Config::get(\'site.title\')); ?>', $this->compiler->compileString("@yield('title') - {{Config::get('site.title')}}"));
+        $this->assertSame('<?php echo $__env->yieldContent(\'title\'); ?> - <?php echo e(Config::get(\'site.title\')); ?>', $this->compiler->compileString("@yield('title') - {{Config::get('site.title')}}"));
     }
 
     public function testCustomExtensionsAreCompiled()
@@ -19,7 +21,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->extend(function ($value) {
             return str_replace('foo', 'bar', $value);
         });
-        $this->assertEquals('bar', $this->compiler->compileString('foo'));
+        $this->assertSame('bar', $this->compiler->compileString('foo'));
     }
 
     public function testCustomStatements()
@@ -48,6 +50,40 @@ class BladeCustomTest extends AbstractBladeTestCase
         $string = '@customControl';
         $expected = '<?php echo custom_control(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testValidCustomNames()
+    {
+        $this->assertNull($this->compiler->directive('custom', function () {
+            //
+        }));
+        $this->assertNull($this->compiler->directive('custom_custom', function () {
+            //
+        }));
+        $this->assertNull($this->compiler->directive('customCustom', function () {
+            //
+        }));
+        $this->assertNull($this->compiler->directive('custom::custom', function () {
+            //
+        }));
+    }
+
+    public function testInvalidCustomNames()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The directive name [custom-custom] is not valid.');
+        $this->compiler->directive('custom-custom', function () {
+            //
+        });
+    }
+
+    public function testInvalidCustomNames2()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The directive name [custom:custom] is not valid.');
+        $this->compiler->directive('custom:custom', function () {
+            //
+        });
     }
 
     public function testCustomExtensionOverwritesCore()
@@ -91,6 +127,19 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testCustomUnlessConditions()
+    {
+        $this->compiler->if('custom', function ($anything) {
+            return true;
+        });
+
+        $string = '@unlesscustom($user)
+@endcustom';
+        $expected = '<?php if (! \Illuminate\Support\Facades\Blade::check(\'custom\', $user)): ?>
+<?php endif; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testCustomConditionsAccepts0AsArgument()
     {
         $this->compiler->if('custom', function ($number) {
@@ -108,7 +157,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomComponents()
     {
-        $this->compiler->component('app.components.alert', 'alert');
+        $this->compiler->aliasComponent('app.components.alert', 'alert');
 
         $string = '@alert
 @endalert';
@@ -119,7 +168,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomComponentsWithSlots()
     {
-        $this->compiler->component('app.components.alert', 'alert');
+        $this->compiler->aliasComponent('app.components.alert', 'alert');
 
         $string = '@alert([\'type\' => \'danger\'])
 @endalert';
@@ -128,20 +177,9 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testCustomComponentsDefaultAlias()
-    {
-        $this->compiler->component('app.components.alert');
-
-        $string = '@alert
-@endalert';
-        $expected = '<?php $__env->startComponent(\'app.components.alert\'); ?>
-<?php echo $__env->renderComponent(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
-    }
-
     public function testCustomComponentsWithExistingDirective()
     {
-        $this->compiler->component('app.components.foreach');
+        $this->compiler->aliasComponent('app.components.foreach', 'foreach');
 
         $string = '@foreach
 @endforeach';
@@ -155,7 +193,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.input', 'input');
 
         $string = '@input';
-        $expected = '<?php echo $__env->make(\'app.includes.input\', [], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -164,7 +202,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.input', 'input');
 
         $string = '@input([\'type\' => \'email\'])';
-        $expected = '<?php echo $__env->make(\'app.includes.input\', [\'type\' => \'email\'], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [\'type\' => \'email\'], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -173,7 +211,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.input');
 
         $string = '@input';
-        $expected = '<?php echo $__env->make(\'app.includes.input\', [], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -182,7 +220,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.foreach');
 
         $string = '@foreach';
-        $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

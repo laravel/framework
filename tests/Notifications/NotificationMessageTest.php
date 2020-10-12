@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Messages\SimpleMessage as Message;
+use PHPUnit\Framework\TestCase;
 
 class NotificationMessageTest extends TestCase
 {
     public function testLevelCanBeRetrieved()
     {
         $message = new Message;
-        $this->assertEquals('info', $message->level);
+        $this->assertSame('info', $message->level);
 
         $message = new Message;
         $message->level('error');
-        $this->assertEquals('error', $message->level);
+        $this->assertSame('error', $message->level);
     }
 
     public function testMessageFormatsMultiLineText()
@@ -25,7 +25,7 @@ class NotificationMessageTest extends TestCase
             single line of text.
         ');
 
-        $this->assertEquals('This is a single line of text.', $message->introLines[0]);
+        $this->assertSame('This is a single line of text.', $message->introLines[0]);
 
         $message = new Message;
         $message->with([
@@ -33,6 +33,6 @@ class NotificationMessageTest extends TestCase
             'single line of text.',
         ]);
 
-        $this->assertEquals('This is a single line of text.', $message->introLines[0]);
+        $this->assertSame('This is a single line of text.', $message->introLines[0]);
     }
 }

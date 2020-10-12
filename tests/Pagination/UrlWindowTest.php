@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Pagination\UrlWindow;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\UrlWindow;
+use PHPUnit\Framework\TestCase;
 
 class UrlWindowTest extends TestCase
 {
@@ -25,28 +25,50 @@ class UrlWindowTest extends TestCase
     public function testPresenterCanGetAUrlRangeForAWindowOfLinks()
     {
         $array = [];
-        for ($i = 1; $i <= 13; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $array[$i] = 'item'.$i;
         }
-        $p = new LengthAwarePaginator($array, count($array), 1, 7);
+        $p = new LengthAwarePaginator($array, count($array), 1, 12);
         $window = new UrlWindow($p);
         $slider = [];
-        for ($i = 4; $i <= 10; $i++) {
+        for ($i = 9; $i <= 15; $i++) {
             $slider[$i] = '/?page='.$i;
         }
 
-        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
+        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [19 => '/?page=19', 20 => '/?page=20']], $window->get());
 
         /*
          * Test Being Near The End Of The List
          */
-        $p = new LengthAwarePaginator($array, count($array), 1, 8);
+        $array = [];
+        for ($i = 1; $i <= 20; $i++) {
+            $array[$i] = 'item'.$i;
+        }
+        $p = new LengthAwarePaginator($array, count($array), 1, 17);
         $window = new UrlWindow($p);
         $last = [];
-        for ($i = 5; $i <= 13; $i++) {
+        for ($i = 11; $i <= 20; $i++) {
             $last[$i] = '/?page='.$i;
         }
-
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
+    }
+
+    public function testCustomUrlRangeForAWindowOfLinks()
+    {
+        $array = [];
+        for ($i = 1; $i <= 20; $i++) {
+            $array[$i] = 'item'.$i;
+        }
+
+        $p = new LengthAwarePaginator($array, count($array), 1, 8);
+        $p->onEachSide(1);
+        $window = new UrlWindow($p);
+
+        $slider = [];
+        for ($i = 7; $i <= 9; $i++) {
+            $slider[$i] = '/?page='.$i;
+        }
+
+        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [19 => '/?page=19', 20 => '/?page=20']], $window->get());
     }
 }

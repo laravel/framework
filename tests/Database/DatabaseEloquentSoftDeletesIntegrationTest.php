@@ -2,18 +2,19 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use BadMethodCallException;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -84,7 +85,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         Carbon::setTestNow(null);
 
@@ -248,11 +249,11 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->createUsers();
 
         $result = SoftDeletesTestUser::withTrashed()->firstOrCreate(['email' => 'taylorotwell@gmail.com']);
-        $this->assertEquals('taylorotwell@gmail.com', $result->email);
+        $this->assertSame('taylorotwell@gmail.com', $result->email);
         $this->assertCount(1, SoftDeletesTestUser::all());
 
         $result = SoftDeletesTestUser::firstOrCreate(['email' => 'foo@bar.com']);
-        $this->assertEquals('foo@bar.com', $result->email);
+        $this->assertSame('foo@bar.com', $result->email);
         $this->assertCount(2, SoftDeletesTestUser::all());
         $this->assertCount(3, SoftDeletesTestUser::withTrashed()->get());
     }
@@ -265,7 +266,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $now = Carbon::now();
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::find(2);
         $userModel->delete();
         $this->assertEquals($now->toDateTimeString(), $userModel->getOriginal('deleted_at'));
@@ -280,7 +281,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::find(2);
         $userModel->delete();
         $userModel->restore();
@@ -295,7 +296,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         $this->createUsers();
 
-        /** @var SoftDeletesTestUser $userModel */
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::withTrashed()->find(1);
         $userModel->restore();
         $this->assertEquals($userModel->deleted_at, SoftDeletesTestUser::find(1)->deleted_at);
@@ -306,16 +307,30 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals($userModel->getOriginal('deleted_at'), SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
     }
 
+    public function testModifyingBeforeSoftDeletingAndRestoring()
+    {
+        $this->createUsers();
+
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
+        $userModel = SoftDeletesTestUser::find(2);
+        $userModel->email = 'foo@bar.com';
+        $userModel->delete();
+        $userModel->restore();
+
+        $this->assertEquals($userModel->id, SoftDeletesTestUser::find(2)->id);
+        $this->assertSame('foo@bar.com', SoftDeletesTestUser::find(2)->email);
+    }
+
     public function testUpdateOrCreate()
     {
         $this->createUsers();
 
         $result = SoftDeletesTestUser::updateOrCreate(['email' => 'foo@bar.com'], ['email' => 'bar@baz.com']);
-        $this->assertEquals('bar@baz.com', $result->email);
+        $this->assertSame('bar@baz.com', $result->email);
         $this->assertCount(2, SoftDeletesTestUser::all());
 
         $result = SoftDeletesTestUser::withTrashed()->updateOrCreate(['email' => 'taylorotwell@gmail.com'], ['email' => 'foo@bar.com']);
-        $this->assertEquals('foo@bar.com', $result->email);
+        $this->assertSame('foo@bar.com', $result->email);
         $this->assertCount(2, SoftDeletesTestUser::all());
         $this->assertCount(3, SoftDeletesTestUser::withTrashed()->get());
     }
@@ -333,14 +348,14 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = $abigail->fresh();
 
         $this->assertNull($abigail->address);
-        $this->assertEquals('Laravel avenue 43', $abigail->address()->withTrashed()->first()->address);
+        $this->assertSame('Laravel avenue 43', $abigail->address()->withTrashed()->first()->address);
 
         // restore
         $abigail->address()->withTrashed()->restore();
 
         $abigail = $abigail->fresh();
 
-        $this->assertEquals('Laravel avenue 43', $abigail->address->address);
+        $this->assertSame('Laravel avenue 43', $abigail->address->address);
 
         // delete on model
         $abigail->address->delete();
@@ -348,7 +363,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = $abigail->fresh();
 
         $this->assertNull($abigail->address);
-        $this->assertEquals('Laravel avenue 43', $abigail->address()->withTrashed()->first()->address);
+        $this->assertSame('Laravel avenue 43', $abigail->address()->withTrashed()->first()->address);
 
         // force delete
         $abigail->address()->withTrashed()->forceDelete();
@@ -373,14 +388,14 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = $abigail->fresh();
 
         $this->assertNull($abigail->group);
-        $this->assertEquals('admin', $abigail->group()->withTrashed()->first()->name);
+        $this->assertSame('admin', $abigail->group()->withTrashed()->first()->name);
 
         // restore
         $abigail->group()->withTrashed()->restore();
 
         $abigail = $abigail->fresh();
 
-        $this->assertEquals('admin', $abigail->group->name);
+        $this->assertSame('admin', $abigail->group->name);
 
         // delete on model
         $abigail->group->delete();
@@ -388,7 +403,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = $abigail->fresh();
 
         $this->assertNull($abigail->group);
-        $this->assertEquals('admin', $abigail->group()->withTrashed()->first()->name);
+        $this->assertSame('admin', $abigail->group()->withTrashed()->first()->name);
 
         // force delete
         $abigail->group()->withTrashed()->forceDelete();
@@ -412,7 +427,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = $abigail->fresh();
 
         $this->assertCount(1, $abigail->posts);
-        $this->assertEquals('First Title', $abigail->posts->first()->title);
+        $this->assertSame('First Title', $abigail->posts->first()->title);
         $this->assertCount(2, $abigail->posts()->withTrashed()->get());
 
         // restore
@@ -523,6 +538,14 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, $users);
     }
 
+    public function testWhereDoesntHaveWithNestedDeletedRelationship()
+    {
+        $this->createUsers();
+
+        $users = SoftDeletesTestUser::doesntHave('posts.comments')->get();
+        $this->assertCount(1, $users);
+    }
+
     public function testWhereHasWithNestedDeletedRelationshipAndWithTrashedCondition()
     {
         $this->createUsers();
@@ -542,8 +565,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
         $post1->delete();
-        $post2 = $abigail->posts()->create(['title' => 'Second Title']);
-        $post3 = $abigail->posts()->create(['title' => 'Third Title']);
+        $abigail->posts()->create(['title' => 'Second Title']);
+        $abigail->posts()->create(['title' => 'Third Title']);
 
         $user = SoftDeletesTestUser::withCount('posts')->orderBy('postsCount', 'desc')->first();
         $this->assertEquals(2, $user->posts_count);
@@ -610,11 +633,10 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals($abigail->email, $comment->owner->email);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testMorphToWithBadMethodCall()
     {
+        $this->expectException(BadMethodCallException::class);
+
         $this->createUsers();
 
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
@@ -656,7 +678,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
-        $comment1 = $post1->comments()->create([
+        $post1->comments()->create([
             'body' => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
             'owner_id' => $abigail->id,
@@ -698,7 +720,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     protected function createUsers()
     {
         $taylor = SoftDeletesTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        $abigail = SoftDeletesTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        SoftDeletesTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $taylor->delete();
     }
@@ -745,7 +767,6 @@ class SoftDeletesTestUser extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'users';
     protected $guarded = [];
 
@@ -769,7 +790,6 @@ class SoftDeletesTestUserWithTrashedPosts extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'users';
     protected $guarded = [];
 
@@ -786,7 +806,6 @@ class SoftDeletesTestPost extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'posts';
     protected $guarded = [];
 
@@ -817,7 +836,6 @@ class SoftDeletesTestComment extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'comments';
     protected $guarded = [];
 
@@ -831,7 +849,6 @@ class SoftDeletesTestCommentWithTrashed extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'comments';
     protected $guarded = [];
 
@@ -848,7 +865,6 @@ class SoftDeletesTestAddress extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'addresses';
     protected $guarded = [];
 }
@@ -860,7 +876,6 @@ class SoftDeletesTestGroup extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'groups';
     protected $guarded = [];
 

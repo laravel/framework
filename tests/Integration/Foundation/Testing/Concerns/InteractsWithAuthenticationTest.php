@@ -2,12 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Testing\Concerns;
 
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Orchestra\Testbench\TestCase;
 
 class InteractsWithAuthenticationTest extends TestCase
 {
@@ -23,11 +24,11 @@ class InteractsWithAuthenticationTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->string('username');
@@ -44,7 +45,7 @@ class InteractsWithAuthenticationTest extends TestCase
         ]);
     }
 
-    public function test_acting_as_is_properly_handled_for_session_auth()
+    public function testActingAsIsProperlyHandledForSessionAuth()
     {
         Route::get('me', function (Request $request) {
             return 'Hello '.$request->user()->username;
@@ -58,7 +59,7 @@ class InteractsWithAuthenticationTest extends TestCase
             ->assertSeeText('Hello taylorotwell');
     }
 
-    public function test_acting_as_is_properly_handled_for_auth_via_request()
+    public function testActingAsIsProperlyHandledForAuthViaRequest()
     {
         Route::get('me', function (Request $request) {
             return 'Hello '.$request->user()->username;
@@ -85,14 +86,14 @@ class AuthenticationTestUser extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var string[]
      */
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var string[]
      */
     protected $hidden = [
         'password', 'remember_token',

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Messages\MailMessage;
+use PHPUnit\Framework\TestCase;
 
 class NotificationMailMessageTest extends TestCase
 {
@@ -11,11 +11,57 @@ class NotificationMailMessageTest extends TestCase
     {
         $message = new MailMessage;
 
-        $this->assertEquals('notifications::email', $message->markdown);
+        $this->assertSame('notifications::email', $message->markdown);
 
         $message->template('notifications::foo');
 
-        $this->assertEquals('notifications::foo', $message->markdown);
+        $this->assertSame('notifications::foo', $message->markdown);
+    }
+
+    public function testHtmlAndPlainView()
+    {
+        $message = new MailMessage;
+
+        $this->assertNull($message->view);
+        $this->assertSame([], $message->viewData);
+
+        $message->view(['notifications::foo', 'notifications::bar'], [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('notifications::foo', $message->view[0]);
+        $this->assertSame('notifications::bar', $message->view[1]);
+        $this->assertSame(['foo' => 'bar'], $message->viewData);
+    }
+
+    public function testHtmlView()
+    {
+        $message = new MailMessage;
+
+        $this->assertNull($message->view);
+        $this->assertSame([], $message->viewData);
+
+        $message->view('notifications::foo', [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('notifications::foo', $message->view);
+        $this->assertSame(['foo' => 'bar'], $message->viewData);
+    }
+
+    public function testPlainView()
+    {
+        $message = new MailMessage;
+
+        $this->assertNull($message->view);
+        $this->assertSame([], $message->viewData);
+
+        $message->view([null, 'notifications::foo'], [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('notifications::foo', $message->view[1]);
+        $this->assertSame(['foo' => 'bar'], $message->viewData);
     }
 
     public function testCcIsSetCorrectly()
@@ -28,6 +74,11 @@ class NotificationMailMessageTest extends TestCase
         $message = new MailMessage;
         $message->cc('test@example.com')
                 ->cc('test@example.com', 'Test');
+
+        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->cc);
+
+        $message = new MailMessage;
+        $message->cc(['test@example.com', 'Test' => 'test@example.com']);
 
         $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->cc);
     }
@@ -44,6 +95,11 @@ class NotificationMailMessageTest extends TestCase
                 ->bcc('test@example.com', 'Test');
 
         $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->bcc);
+
+        $message = new MailMessage;
+        $message->bcc(['test@example.com', 'Test' => 'test@example.com']);
+
+        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->bcc);
     }
 
     public function testReplyToIsSetCorrectly()
@@ -58,5 +114,22 @@ class NotificationMailMessageTest extends TestCase
                 ->replyTo('test@example.com', 'Test');
 
         $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
+
+        $message = new MailMessage;
+        $message->replyTo(['test@example.com', 'Test' => 'test@example.com']);
+
+        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
+    }
+
+    public function testCallbackIsSetCorrectly()
+    {
+        $callback = function () {
+            //
+        };
+
+        $message = new MailMessage;
+        $message->withSwiftMessage($callback);
+
+        $this->assertSame([$callback], $message->callbacks);
     }
 }

@@ -2,13 +2,15 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\View\Compilers\CompilerInterface;
+use Illuminate\View\Engines\CompilerEngine;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\View\Engines\CompilerEngine;
 
 class ViewCompilerEngineTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -21,7 +23,7 @@ class ViewCompilerEngineTest extends TestCase
         $engine->getCompiler()->shouldReceive('compile')->once()->with(__DIR__.'/fixtures/foo.php');
         $results = $engine->get(__DIR__.'/fixtures/foo.php');
 
-        $this->assertEquals('Hello World
+        $this->assertSame('Hello World
 ', $results);
     }
 
@@ -33,12 +35,12 @@ class ViewCompilerEngineTest extends TestCase
         $engine->getCompiler()->shouldReceive('compile')->never();
         $results = $engine->get(__DIR__.'/fixtures/foo.php');
 
-        $this->assertEquals('Hello World
+        $this->assertSame('Hello World
 ', $results);
     }
 
     protected function getEngine()
     {
-        return new CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
+        return new CompilerEngine(m::mock(CompilerInterface::class), new Filesystem);
     }
 }

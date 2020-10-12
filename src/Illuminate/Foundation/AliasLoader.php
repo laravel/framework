@@ -100,7 +100,7 @@ class AliasLoader
      */
     protected function ensureFacadeExists($alias)
     {
-        if (file_exists($path = storage_path('framework/cache/facade-'.sha1($alias).'.php'))) {
+        if (is_file($path = storage_path('framework/cache/facade-'.sha1($alias).'.php'))) {
             return $path;
         }
 
@@ -134,13 +134,13 @@ class AliasLoader
     /**
      * Add an alias to the loader.
      *
-     * @param  string  $class
      * @param  string  $alias
+     * @param  string  $class
      * @return void
      */
-    public function alias($class, $alias)
+    public function alias($alias, $class)
     {
-        $this->aliases[$class] = $alias;
+        $this->aliases[$alias] = $class;
     }
 
     /**

@@ -47,7 +47,7 @@ class ValidationException extends Exception
      * Create a new exception instance.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
+     * @param  \Symfony\Component\HttpFoundation\Response|null  $response
      * @param  string  $errorBag
      * @return void
      */

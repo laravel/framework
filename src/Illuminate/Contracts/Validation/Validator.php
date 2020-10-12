@@ -7,6 +7,24 @@ use Illuminate\Contracts\Support\MessageProvider;
 interface Validator extends MessageProvider
 {
     /**
+     * Run the validator's rules against its data.
+     *
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validate();
+
+    /**
+     * Get the attributes and values that were validated.
+     *
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validated();
+
+    /**
      * Determine if the data fails the validation rules.
      *
      * @return bool
@@ -23,7 +41,7 @@ interface Validator extends MessageProvider
     /**
      * Add conditions to a given field based on a Closure.
      *
-     * @param  string  $attribute
+     * @param  string|array  $attribute
      * @param  string|array  $rules
      * @param  callable  $callback
      * @return $this
@@ -31,7 +49,7 @@ interface Validator extends MessageProvider
     public function sometimes($attribute, $rules, callable $callback);
 
     /**
-     * After an after validation callback.
+     * Add an after validation callback.
      *
      * @param  callable|string  $callback
      * @return $this

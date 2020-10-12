@@ -2,38 +2,53 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
 class FluentRoutingTest extends TestCase
 {
-    public function test_middleware_run_when_registered_as_array_or_params()
-    {
-        Route::middleware(Middleware::class, Middleware2::class)
-            ->get('one', function () {
-                return 'Hello World';
-            });
+    public static $value = '';
 
-        Route::get('two', function () {
+    public function testMiddlewareRunWhenRegisteredAsArrayOrParams()
+    {
+        $controller = function () {
             return 'Hello World';
-        })->middleware(Middleware::class, Middleware2::class);
+        };
+
+        Route::middleware(Middleware::class, Middleware2::class)
+            ->get('before', $controller);
+
+        Route::get('after', $controller)
+            ->middleware(Middleware::class, Middleware2::class);
 
         Route::middleware([Middleware::class, Middleware2::class])
-            ->get('three', function () {
-                return 'Hello World';
-            });
+            ->get('before_array', $controller);
 
-        Route::get('four', function () {
-            return 'Hello World';
-        })->middleware([Middleware::class, Middleware2::class]);
+        Route::get('after_array', $controller)
+            ->middleware([Middleware::class, Middleware2::class]);
 
-        $this->assertEquals('middleware output', $this->get('one')->content());
-        $this->assertEquals('middleware output', $this->get('two')->content());
-        $this->assertEquals('middleware output', $this->get('three')->content());
-        $this->assertEquals('middleware output', $this->get('four')->content());
+        Route::middleware(Middleware::class)
+            ->get('before_after', $controller)
+            ->middleware([Middleware2::class]);
+
+        Route::middleware(Middleware::class)
+            ->middleware(Middleware2::class)
+            ->get('both_before', $controller);
+
+        Route::get('both_after', $controller)
+            ->middleware(Middleware::class)
+            ->middleware(Middleware2::class);
+
+        $this->assertSame('1_2', $this->get('before')->content());
+        $this->assertSame('1_2', $this->get('after')->content());
+        $this->assertSame('1_2', $this->get('before_array')->content());
+        $this->assertSame('1_2', $this->get('after_array')->content());
+        $this->assertSame('1_2', $this->get('before_after')->content());
+        $this->assertSame('1_2', $this->get('both_before')->content());
+        $this->assertSame('1_2', $this->get('both_after')->content());
     }
 }
 
@@ -41,6 +56,8 @@ class Middleware
 {
     public function handle($request, $next)
     {
+        FluentRoutingTest::$value = '1';
+
         return $next($request);
     }
 }
@@ -49,6 +66,6 @@ class Middleware2
 {
     public function handle()
     {
-        return 'middleware output';
+        return FluentRoutingTest::$value.'_2';
     }
 }

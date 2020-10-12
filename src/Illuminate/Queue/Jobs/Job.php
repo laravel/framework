@@ -2,6 +2,9 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\ManuallyFailedException;
 use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
@@ -45,6 +48,8 @@ abstract class Job
 
     /**
      * The name of the connection the job belongs to.
+     *
+     * @var string
      */
     protected $connectionName;
 
@@ -70,6 +75,16 @@ abstract class Job
     abstract public function getRawBody();
 
     /**
+     * Get the UUID of the job.
+     *
+     * @return string|null
+     */
+    public function uuid()
+    {
+        return $this->payload()['uuid'] ?? null;
+    }
+
+    /**
      * Fire the job.
      *
      * @return void
@@ -78,7 +93,7 @@ abstract class Job
     {
         $payload = $this->payload();
 
-        list($class, $method) = JobName::parse($payload['job']);
+        [$class, $method] = JobName::parse($payload['job']);
 
         ($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
     }
@@ -106,7 +121,7 @@ abstract class Job
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param  int  $delay
      * @return void
      */
     public function release($delay = 0)
@@ -155,21 +170,47 @@ abstract class Job
     }
 
     /**
-     * Process an exception that caused the job to fail.
+     * Delete the job, call the "failed" method, and raise the failed job event.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable|null  $e
      * @return void
      */
-    public function failed($e)
+    public function fail($e = null)
     {
         $this->markAsFailed();
 
+        if ($this->isDeleted()) {
+            return;
+        }
+
+        try {
+            // If the job has failed, we will delete it, call the "failed" method and then call
+            // an event indicating the job has failed so it can be logged if needed. This is
+            // to allow every developer to better keep monitor of their failed queue jobs.
+            $this->delete();
+
+            $this->failed($e);
+        } finally {
+            $this->resolve(Dispatcher::class)->dispatch(new JobFailed(
+                $this->connectionName, $this, $e ?: new ManuallyFailedException
+            ));
+        }
+    }
+
+    /**
+     * Process an exception that caused the job to fail.
+     *
+     * @param  \Throwable|null  $e
+     * @return void
+     */
+    protected function failed($e)
+    {
         $payload = $this->payload();
 
-        list($class, $method) = JobName::parse($payload['job']);
+        [$class, $method] = JobName::parse($payload['job']);
 
         if (method_exists($this->instance = $this->resolve($class), 'failed')) {
-            $this->instance->failed($payload['data'], $e);
+            $this->instance->failed($payload['data'], $e, $payload['uuid']);
         }
     }
 
@@ -182,6 +223,16 @@ abstract class Job
     protected function resolve($class)
     {
         return $this->container->make($class);
+    }
+
+    /**
+     * Get the resolved job handler instance.
+     *
+     * @return mixed
+     */
+    public function getResolvedJob()
+    {
+        return $this->instance;
     }
 
     /**
@@ -205,6 +256,26 @@ abstract class Job
     }
 
     /**
+     * Get the number of times to attempt a job after an exception.
+     *
+     * @return int|null
+     */
+    public function maxExceptions()
+    {
+        return $this->payload()['maxExceptions'] ?? null;
+    }
+
+    /**
+     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
+     *
+     * @return int|null
+     */
+    public function backoff()
+    {
+        return $this->payload()['backoff'] ?? $this->payload()['delay'] ?? null;
+    }
+
+    /**
      * Get the number of seconds the job can run.
      *
      * @return int|null
@@ -219,9 +290,9 @@ abstract class Job
      *
      * @return int|null
      */
-    public function timeoutAt()
+    public function retryUntil()
     {
-        return $this->payload()['timeoutAt'] ?? null;
+        return $this->payload()['retryUntil'] ?? $this->payload()['timeoutAt'] ?? null;
     }
 
     /**

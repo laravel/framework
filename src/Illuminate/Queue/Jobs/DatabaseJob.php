@@ -3,8 +3,8 @@
 namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Container\Container;
-use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Contracts\Queue\Job as JobContract;
+use Illuminate\Queue\DatabaseQueue;
 
 class DatabaseJob extends Job implements JobContract
 {
@@ -45,15 +45,13 @@ class DatabaseJob extends Job implements JobContract
      * Release the job back into the queue.
      *
      * @param  int  $delay
-     * @return mixed
+     * @return void
      */
     public function release($delay = 0)
     {
         parent::release($delay);
 
-        $this->delete();
-
-        return $this->database->release($this->queue, $this->job, $delay);
+        $this->database->deleteAndRelease($this->queue, $this, $delay);
     }
 
     /**
@@ -96,5 +94,15 @@ class DatabaseJob extends Job implements JobContract
     public function getRawBody()
     {
         return $this->job->payload;
+    }
+
+    /**
+     * Get the database job record.
+     *
+     * @return \Illuminate\Queue\Jobs\DatabaseJobRecord
+     */
+    public function getJobRecord()
+    {
+        return $this->job;
     }
 }

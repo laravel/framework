@@ -27,7 +27,7 @@ class SqsJob extends Job implements JobContract
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  \Aws\Sqs\SqsClient  $sqs
-     * @param  array   $job
+     * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
      * @return void
@@ -44,7 +44,7 @@ class SqsJob extends Job implements JobContract
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param  int  $delay
      * @return void
      */
     public function release($delay = 0)

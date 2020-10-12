@@ -2,8 +2,9 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Support\InteractsWithTime;
+use Closure;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Support\InteractsWithTime;
 
 class RateLimiter
 {
@@ -17,6 +18,13 @@ class RateLimiter
     protected $cache;
 
     /**
+     * The configured limit object resolvers.
+     *
+     * @var array
+     */
+    protected $limiters = [];
+
+    /**
      * Create a new rate limiter instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
@@ -25,6 +33,31 @@ class RateLimiter
     public function __construct(Cache $cache)
     {
         $this->cache = $cache;
+    }
+
+    /**
+     * Register a named limiter configuration.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function for(string $name, Closure $callback)
+    {
+        $this->limiters[$name] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Get the given named rate limiter.
+     *
+     * @param  string  $name
+     * @return \Closure
+     */
+    public function limiter(string $name)
+    {
+        return $this->limiters[$name] ?? null;
     }
 
     /**
@@ -51,21 +84,21 @@ class RateLimiter
      * Increment the counter for a given key for a given decay time.
      *
      * @param  string  $key
-     * @param  float|int  $decayMinutes
+     * @param  int  $decaySeconds
      * @return int
      */
-    public function hit($key, $decayMinutes = 1)
+    public function hit($key, $decaySeconds = 60)
     {
         $this->cache->add(
-            $key.':timer', $this->availableAt($decayMinutes * 60), $decayMinutes
+            $key.':timer', $this->availableAt($decaySeconds), $decaySeconds
         );
 
-        $added = $this->cache->add($key, 0, $decayMinutes);
+        $added = $this->cache->add($key, 0, $decaySeconds);
 
         $hits = (int) $this->cache->increment($key);
 
         if (! $added && $hits == 1) {
-            $this->cache->put($key, 1, $decayMinutes);
+            $this->cache->put($key, 1, $decaySeconds);
         }
 
         return $hits;

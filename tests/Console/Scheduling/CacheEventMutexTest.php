@@ -2,20 +2,22 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
+use Illuminate\Console\Scheduling\CacheEventMutex;
+use Illuminate\Console\Scheduling\Event;
+use Illuminate\Contracts\Cache\Factory;
+use Illuminate\Contracts\Cache\Repository;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Console\Scheduling\Event;
-use Illuminate\Console\Scheduling\CacheEventMutex;
 
 class CacheEventMutexTest extends TestCase
 {
     /**
-     * @var CacheEventMutex
+     * @var \Illuminate\Console\Scheduling\CacheEventMutex
      */
     protected $cacheMutex;
 
     /**
-     * @var Event
+     * @var \Illuminate\Console\Scheduling\Event
      */
     protected $event;
 
@@ -29,12 +31,12 @@ class CacheEventMutexTest extends TestCase
      */
     protected $cacheRepository;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->cacheFactory = m::mock('Illuminate\Contracts\Cache\Factory');
-        $this->cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->cacheFactory = m::mock(Factory::class);
+        $this->cacheRepository = m::mock(Repository::class);
         $this->cacheFactory->shouldReceive('store')->andReturn($this->cacheRepository);
         $this->cacheMutex = new CacheEventMutex($this->cacheFactory);
         $this->event = new Event($this->cacheMutex, 'command');

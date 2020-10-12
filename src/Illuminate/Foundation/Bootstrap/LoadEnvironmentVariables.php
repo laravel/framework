@@ -4,9 +4,10 @@ namespace Illuminate\Foundation\Bootstrap;
 
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidFileException;
-use Dotenv\Exception\InvalidPathException;
-use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Env;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class LoadEnvironmentVariables
 {
@@ -25,11 +26,9 @@ class LoadEnvironmentVariables
         $this->checkForSpecificEnvironmentFile($app);
 
         try {
-            (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
-        } catch (InvalidPathException $e) {
-            //
+            $this->createDotenv($app)->safeLoad();
         } catch (InvalidFileException $e) {
-            die('The environment file is invalid: '.$e->getMessage());
+            $this->writeErrorAndDie($e);
         }
     }
 
@@ -49,12 +48,14 @@ class LoadEnvironmentVariables
             }
         }
 
-        if (! env('APP_ENV')) {
+        $environment = Env::get('APP_ENV');
+
+        if (! $environment) {
             return;
         }
 
         $this->setEnvironmentFilePath(
-            $app, $app->environmentFile().'.'.env('APP_ENV')
+            $app, $app->environmentFile().'.'.$environment
         );
     }
 
@@ -67,12 +68,43 @@ class LoadEnvironmentVariables
      */
     protected function setEnvironmentFilePath($app, $file)
     {
-        if (file_exists($app->environmentPath().'/'.$file)) {
+        if (is_file($app->environmentPath().'/'.$file)) {
             $app->loadEnvironmentFrom($file);
 
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Create a Dotenv instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return \Dotenv\Dotenv
+     */
+    protected function createDotenv($app)
+    {
+        return Dotenv::create(
+            Env::getRepository(),
+            $app->environmentPath(),
+            $app->environmentFile()
+        );
+    }
+
+    /**
+     * Write the error information to the screen and exit.
+     *
+     * @param  \Dotenv\Exception\InvalidFileException  $e
+     * @return void
+     */
+    protected function writeErrorAndDie(InvalidFileException $e)
+    {
+        $output = (new ConsoleOutput)->getErrorOutput();
+
+        $output->writeln('The environment file is invalid!');
+        $output->writeln($e->getMessage());
+
+        exit(1);
     }
 }

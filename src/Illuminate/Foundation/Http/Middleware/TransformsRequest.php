@@ -8,24 +8,14 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class TransformsRequest
 {
     /**
-     * The additional attributes passed to the middleware.
-     *
-     * @var array
-     */
-    protected $attributes = [];
-
-    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  array  ...$attributes
      * @return mixed
      */
-    public function handle($request, Closure $next, ...$attributes)
+    public function handle($request, Closure $next)
     {
-        $this->attributes = $attributes;
-
         $this->clean($request);
 
         return $next($request);
@@ -43,7 +33,7 @@ class TransformsRequest
 
         if ($request->isJson()) {
             $this->cleanParameterBag($request->json());
-        } else {
+        } elseif ($request->request !== $request->query) {
             $this->cleanParameterBag($request->request);
         }
     }
@@ -63,12 +53,13 @@ class TransformsRequest
      * Clean the data in the given array.
      *
      * @param  array  $data
+     * @param  string  $keyPrefix
      * @return array
      */
-    protected function cleanArray(array $data)
+    protected function cleanArray(array $data, $keyPrefix = '')
     {
-        return collect($data)->map(function ($value, $key) {
-            return $this->cleanValue($key, $value);
+        return collect($data)->map(function ($value, $key) use ($keyPrefix) {
+            return $this->cleanValue($keyPrefix.$key, $value);
         })->all();
     }
 
@@ -82,7 +73,7 @@ class TransformsRequest
     protected function cleanValue($key, $value)
     {
         if (is_array($value)) {
-            return $this->cleanArray($value);
+            return $this->cleanArray($value, $key.'.');
         }
 
         return $this->transform($key, $value);

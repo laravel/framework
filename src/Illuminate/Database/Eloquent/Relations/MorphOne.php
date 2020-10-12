@@ -2,13 +2,14 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class MorphOne extends MorphOneOrMany
 {
-    use SupportsDefaultModels;
+    use ComparesRelatedModels, SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.
@@ -17,13 +18,17 @@ class MorphOne extends MorphOneOrMany
      */
     public function getResults()
     {
+        if (is_null($this->getParentKey())) {
+            return $this->getDefaultFor($this->parent);
+        }
+
         return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  string  $relation
      * @return array
      */
@@ -39,7 +44,7 @@ class MorphOne extends MorphOneOrMany
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @param  string  $relation
      * @return array
@@ -60,5 +65,16 @@ class MorphOne extends MorphOneOrMany
         return $this->related->newInstance()
                     ->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey})
                     ->setAttribute($this->getMorphType(), $this->morphClass);
+    }
+
+    /**
+     * Get the value of the model's foreign key.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return mixed
+     */
+    protected function getRelatedKeyFrom(Model $model)
+    {
+        return $model->getAttribute($this->getForeignKeyName());
     }
 }

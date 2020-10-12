@@ -2,7 +2,9 @@
 
 namespace Illuminate\Redis\Limiters;
 
+use Exception;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
+use Illuminate\Support\Str;
 
 class ConcurrencyLimiter
 {
@@ -57,13 +59,17 @@ class ConcurrencyLimiter
      * @param  int  $timeout
      * @param  callable|null  $callback
      * @return bool
+     *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
+     * @throws \Exception
      */
     public function block($timeout, $callback = null)
     {
         $starting = time();
 
-        while (! $slot = $this->acquire()) {
+        $id = Str::random(20);
+
+        while (! $slot = $this->acquire($id)) {
             if (time() - $timeout >= $starting) {
                 throw new LimiterTimeoutException;
             }
@@ -72,9 +78,15 @@ class ConcurrencyLimiter
         }
 
         if (is_callable($callback)) {
-            return tap($callback(), function () use ($slot) {
-                $this->release($slot);
-            });
+            try {
+                return tap($callback(), function () use ($slot, $id) {
+                    $this->release($slot, $id);
+                });
+            } catch (Exception $exception) {
+                $this->release($slot, $id);
+
+                throw $exception;
+            }
         }
 
         return true;
@@ -83,17 +95,19 @@ class ConcurrencyLimiter
     /**
      * Attempt to acquire the lock.
      *
+     * @param  string  $id  A unique identifier for this lock
      * @return mixed
      */
-    protected function acquire()
+    protected function acquire($id)
     {
         $slots = array_map(function ($i) {
             return $this->name.$i;
         }, range(1, $this->maxLocks));
 
-        return $this->redis->eval($this->luaScript(), count($slots),
-            ...array_merge($slots, [$this->name, $this->releaseAfter])
-        );
+        return $this->redis->eval(...array_merge(
+            [$this->lockScript(), count($slots)],
+            array_merge($slots, [$this->name, $this->releaseAfter, $id])
+        ));
     }
 
     /**
@@ -102,15 +116,16 @@ class ConcurrencyLimiter
      * KEYS    - The keys that represent available slots
      * ARGV[1] - The limiter name
      * ARGV[2] - The number of seconds the slot should be reserved
+     * ARGV[3] - The unique identifier for this lock
      *
      * @return string
      */
-    protected function luaScript()
+    protected function lockScript()
     {
         return <<<'LUA'
 for index, value in pairs(redis.call('mget', unpack(KEYS))) do
     if not value then
-        redis.call('set', ARGV[1]..index, "1", "EX", ARGV[2])
+        redis.call('set', KEYS[index], ARGV[3], "EX", ARGV[2])
         return ARGV[1]..index
     end
 end
@@ -121,10 +136,31 @@ LUA;
      * Release the lock.
      *
      * @param  string  $key
+     * @param  string  $id
      * @return void
      */
-    protected function release($key)
+    protected function release($key, $id)
     {
-        $this->redis->del($key);
+        $this->redis->eval($this->releaseScript(), 1, $key, $id);
+    }
+
+    /**
+     * Get the Lua script to atomically release a lock.
+     *
+     * KEYS[1] - The name of the lock
+     * ARGV[1] - The unique identifier for this lock
+     *
+     * @return string
+     */
+    protected function releaseScript()
+    {
+        return <<<'LUA'
+if redis.call('get', KEYS[1]) == ARGV[1]
+then
+    return redis.call('del', KEYS[1])
+else
+    return 0
+end
+LUA;
     }
 }

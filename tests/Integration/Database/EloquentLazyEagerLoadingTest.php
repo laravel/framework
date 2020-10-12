@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentLazyEagerLoadingTest;
 
-use Illuminate\Support\Facades\Schema;
+use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -11,29 +13,26 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentLazyEagerLoadingTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('one', function ($table) {
+        Schema::create('one', function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('two', function ($table) {
+        Schema::create('two', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
         });
 
-        Schema::create('three', function ($table) {
+        Schema::create('three', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
         });
     }
 
-    /**
-     * @test
-     */
-    public function it_basic()
+    public function testItBasic()
     {
         $one = Model1::create();
         $one->twos()->create();
@@ -44,11 +43,11 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($model->relationLoaded('twos'));
         $this->assertFalse($model->relationLoaded('threes'));
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $model->load('threes');
 
-        $this->assertCount(1, \DB::getQueryLog());
+        $this->assertCount(1, DB::getQueryLog());
 
         $this->assertTrue($model->relationLoaded('threes'));
     }
@@ -58,7 +57,7 @@ class Model1 extends Model
 {
     public $table = 'one';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
     protected $with = ['twos'];
 
     public function twos()
@@ -76,7 +75,7 @@ class Model2 extends Model
 {
     public $table = 'two';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function one()
     {
@@ -88,7 +87,7 @@ class Model3 extends Model
 {
     public $table = 'three';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function one()
     {

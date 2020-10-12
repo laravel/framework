@@ -2,14 +2,16 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
-use Pusher\Pusher;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Broadcasting\BroadcastException;
+use Pusher\Pusher;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class PusherBroadcaster extends Broadcaster
 {
+    use UsePusherChannelConventions;
+
     /**
      * The Pusher SDK instance.
      *
@@ -33,18 +35,17 @@ class PusherBroadcaster extends Broadcaster
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     public function auth($request)
     {
-        if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
-            ! $request->user()) {
+        $channelName = $this->normalizeChannelName($request->channel_name);
+
+        if ($this->isGuardedChannel($request->channel_name) &&
+            ! $this->retrieveUser($request, $channelName)) {
             throw new AccessDeniedHttpException;
         }
-
-        $channelName = Str::startsWith($request->channel_name, 'private-')
-                            ? Str::replaceFirst('private-', '', $request->channel_name)
-                            : Str::replaceFirst('presence-', '', $request->channel_name);
 
         return parent::verifyUserCanAccessChannel(
             $request, $channelName
@@ -66,11 +67,13 @@ class PusherBroadcaster extends Broadcaster
             );
         }
 
+        $channelName = $this->normalizeChannelName($request->channel_name);
+
         return $this->decodePusherResponse(
             $request,
             $this->pusher->presence_auth(
                 $request->channel_name, $request->socket_id,
-                $request->user()->getAuthIdentifier(), $result
+                $this->retrieveUser($request, $channelName)->getAuthIdentifier(), $result
             )
         );
     }
@@ -99,6 +102,8 @@ class PusherBroadcaster extends Broadcaster
      * @param  string  $event
      * @param  array  $payload
      * @return void
+     *
+     * @throws \Illuminate\Broadcasting\BroadcastException
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
@@ -114,7 +119,9 @@ class PusherBroadcaster extends Broadcaster
         }
 
         throw new BroadcastException(
-            is_bool($response) ? 'Failed to connect to Pusher.' : $response['body']
+            ! empty($response['body'])
+                ? sprintf('Pusher error: %s.', $response['status'])
+                : 'Failed to connect to Pusher.'
         );
     }
 

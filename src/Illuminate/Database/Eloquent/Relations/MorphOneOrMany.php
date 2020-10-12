@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 abstract class MorphOneOrMany extends HasOneOrMany
 {
@@ -68,19 +68,6 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /**
-     * Attach a model instance to the parent model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function save(Model $model)
-    {
-        $model->setAttribute($this->getMorphType(), $this->morphClass);
-
-        return parent::save($model);
-    }
-
-    /**
      * Set the foreign ID and type for creating a related model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
@@ -104,7 +91,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
-            $this->morphType, $this->morphClass
+            $query->qualifyColumn($this->getMorphType()), $this->morphClass
         );
     }
 

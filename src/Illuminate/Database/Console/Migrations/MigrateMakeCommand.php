@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Composer;
 use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Support\Composer;
+use Illuminate\Support\Str;
 
 class MigrateMakeCommand extends BaseCommand
 {
@@ -13,11 +13,12 @@ class MigrateMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'make:migration {name : The name of the migration.}
-        {--create= : The table to be created.}
-        {--table= : The table to migrate.}
-        {--path= : The location where the migration file should be created.}
-        {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths.}';
+    protected $signature = 'make:migration {name : The name of the migration}
+        {--create= : The table to be created}
+        {--table= : The table to migrate}
+        {--path= : The location where the migration file should be created}
+        {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
+        {--fullpath : Output the full path of the migration}';
 
     /**
      * The console command description.
@@ -100,14 +101,18 @@ class MigrateMakeCommand extends BaseCommand
      *
      * @param  string  $name
      * @param  string  $table
-     * @param  bool    $create
+     * @param  bool  $create
      * @return string
      */
     protected function writeMigration($name, $table, $create)
     {
-        $file = pathinfo($this->creator->create(
+        $file = $this->creator->create(
             $name, $this->getMigrationPath(), $table, $create
-        ), PATHINFO_FILENAME);
+        );
+
+        if (! $this->option('fullpath')) {
+            $file = pathinfo($file, PATHINFO_FILENAME);
+        }
 
         $this->line("<info>Created Migration:</info> {$file}");
     }

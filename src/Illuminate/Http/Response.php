@@ -3,17 +3,37 @@
 namespace Illuminate\Http;
 
 use ArrayObject;
-use JsonSerializable;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
+use Illuminate\Support\Traits\Macroable;
+use JsonSerializable;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-class Response extends BaseResponse
+class Response extends SymfonyResponse
 {
     use ResponseTrait, Macroable {
         Macroable::__call as macroCall;
+    }
+
+    /**
+     * Create a new HTTP response.
+     *
+     * @param  mixed  $content
+     * @param  int  $status
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct($content = '', $status = 200, array $headers = [])
+    {
+        $this->headers = new ResponseHeaderBag($headers);
+
+        $this->setContent($content);
+        $this->setStatusCode($status);
+        $this->setProtocolVersion('1.0');
     }
 
     /**
@@ -65,7 +85,7 @@ class Response extends BaseResponse
     /**
      * Morph the given content into JSON.
      *
-     * @param  mixed   $content
+     * @param  mixed  $content
      * @return string
      */
     protected function morphToJson($content)

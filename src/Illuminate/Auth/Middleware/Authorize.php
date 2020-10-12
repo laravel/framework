@@ -3,19 +3,11 @@
 namespace Illuminate\Auth\Middleware;
 
 use Closure;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Auth\Factory as Auth;
+use Illuminate\Database\Eloquent\Model;
 
 class Authorize
 {
-    /**
-     * The authentication factory instance.
-     *
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $auth;
-
     /**
      * The gate instance.
      *
@@ -26,13 +18,11 @@ class Authorize
     /**
      * Create a new middleware instance.
      *
-     * @param  \Illuminate\Contracts\Auth\Factory  $auth
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @return void
      */
-    public function __construct(Auth $auth, Gate $gate)
+    public function __construct(Gate $gate)
     {
-        $this->auth = $auth;
         $this->gate = $gate;
     }
 
@@ -50,8 +40,6 @@ class Authorize
      */
     public function handle($request, Closure $next, $ability, ...$models)
     {
-        $this->auth->authenticate();
-
         $this->gate->authorize($ability, $this->getGateArguments($request, $models));
 
         return $next($request);
@@ -62,7 +50,7 @@ class Authorize
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  array|null  $models
-     * @return array|string|\Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|array|string
      */
     protected function getGateArguments($request, $models)
     {
@@ -84,7 +72,12 @@ class Authorize
      */
     protected function getModel($request, $model)
     {
-        return $this->isClassName($model) ? $model : $request->route($model);
+        if ($this->isClassName($model)) {
+            return trim($model);
+        } else {
+            return $request->route($model, null) ?:
+                ((preg_match("/^['\"](.*)['\"]$/", trim($model), $matches)) ? $matches[1] : null);
+        }
     }
 
     /**

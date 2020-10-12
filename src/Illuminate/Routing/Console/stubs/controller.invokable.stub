@@ -1,16 +1,16 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
+use {{ rootNamespace }}Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use DummyRootNamespaceHttp\Controllers\Controller;
 
-class DummyClass extends Controller
+class {{ class }} extends Controller
 {
     /**
      * Handle the incoming request.
      *
-     * @param  \Illuminate\Http\Request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function __invoke(Request $request)

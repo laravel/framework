@@ -2,24 +2,33 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\View\Compilers\BladeCompiler;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
 
 abstract class AbstractBladeTestCase extends TestCase
 {
+    /**
+     * @var \Illuminate\View\Compilers\BladeCompiler
+     */
     protected $compiler;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->compiler = new BladeCompiler(m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
+        $this->compiler = new BladeCompiler($this->getFiles(), __DIR__);
         parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
 
         parent::tearDown();
+    }
+
+    protected function getFiles()
+    {
+        return m::mock(Filesystem::class);
     }
 }

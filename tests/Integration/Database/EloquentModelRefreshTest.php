@@ -2,10 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelRefreshTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -13,7 +14,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentModelRefreshTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -25,20 +26,14 @@ class EloquentModelRefreshTest extends DatabaseTestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function it_refreshes_model_excluded_by_global_scope()
+    public function testItRefreshesModelExcludedByGlobalScope()
     {
         $post = Post::create(['title' => 'mohamed']);
 
         $post->refresh();
     }
 
-    /**
-     * @test
-     */
-    public function it_refreshes_a_soft_deleted_model()
+    public function testItRefreshesASoftDeletedModel()
     {
         $post = Post::create(['title' => 'said']);
 
@@ -51,10 +46,7 @@ class EloquentModelRefreshTest extends DatabaseTestCase
         $this->assertTrue($post->trashed());
     }
 
-    /**
-     * @test
-     */
-    public function it_syncs_original_on_refresh()
+    public function testItSyncsOriginalOnRefresh()
     {
         $post = Post::create(['title' => 'pat']);
 
@@ -64,7 +56,24 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $this->assertEmpty($post->getDirty());
 
-        $this->assertEquals('patrick', $post->getOriginal('title'));
+        $this->assertSame('patrick', $post->getOriginal('title'));
+    }
+
+    public function testAsPivot()
+    {
+        Schema::create('post_posts', function (Blueprint $table) {
+            $table->bigInteger('foreign_id');
+            $table->bigInteger('related_id');
+        });
+
+        $post = AsPivotPost::create(['title' => 'parent']);
+        $child = AsPivotPost::create(['title' => 'child']);
+
+        $post->children()->attach($child->getKey());
+
+        $this->assertEquals(1, $post->children->count());
+
+        $post->children->first()->refresh();
     }
 }
 
@@ -72,7 +81,7 @@ class Post extends Model
 {
     public $table = 'posts';
     public $timestamps = true;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     use SoftDeletes;
 
@@ -84,4 +93,21 @@ class Post extends Model
             $query->where('title', '!=', 'mohamed');
         });
     }
+}
+
+class AsPivotPost extends Post
+{
+    public function children()
+    {
+        return $this
+            ->belongsToMany(static::class, (new AsPivotPostPivot())->getTable(), 'foreign_id', 'related_id')
+            ->using(AsPivotPostPivot::class);
+    }
+}
+
+class AsPivotPostPivot extends Model
+{
+    use AsPivot;
+
+    protected $table = 'post_posts';
 }

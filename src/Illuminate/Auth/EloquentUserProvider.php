@@ -2,11 +2,11 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Support\Str;
-use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
 
 class EloquentUserProvider implements UserProvider
 {
@@ -47,9 +47,9 @@ class EloquentUserProvider implements UserProvider
     {
         $model = $this->createModel();
 
-        return $model->newQuery()
-            ->where($model->getAuthIdentifierName(), $identifier)
-            ->first();
+        return $this->newModelQuery($model)
+                    ->where($model->getAuthIdentifierName(), $identifier)
+                    ->first();
     }
 
     /**
@@ -63,21 +63,24 @@ class EloquentUserProvider implements UserProvider
     {
         $model = $this->createModel();
 
-        $model = $model->where($model->getAuthIdentifierName(), $identifier)->first();
+        $retrievedModel = $this->newModelQuery($model)->where(
+            $model->getAuthIdentifierName(), $identifier
+        )->first();
 
-        if (! $model) {
-            return null;
+        if (! $retrievedModel) {
+            return;
         }
 
-        $rememberToken = $model->getRememberToken();
+        $rememberToken = $retrievedModel->getRememberToken();
 
-        return $rememberToken && hash_equals($rememberToken, $token) ? $model : null;
+        return $rememberToken && hash_equals($rememberToken, $token)
+                        ? $retrievedModel : null;
     }
 
     /**
      * Update the "remember me" token for the given user in storage.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|\Illuminate\Database\Eloquent\Model  $user
      * @param  string  $token
      * @return void
      */
@@ -104,14 +107,14 @@ class EloquentUserProvider implements UserProvider
     {
         if (empty($credentials) ||
            (count($credentials) === 1 &&
-            array_key_exists('password', $credentials))) {
+            Str::contains($this->firstCredentialKey($credentials), 'password'))) {
             return;
         }
 
         // First we will add each credential element to the query as a where clause.
         // Then we can execute the query and, if we found a user, return it in a
         // Eloquent User "model" that will be utilized by the Guard instances.
-        $query = $this->createModel()->newQuery();
+        $query = $this->newModelQuery();
 
         foreach ($credentials as $key => $value) {
             if (Str::contains($key, 'password')) {
@@ -129,6 +132,19 @@ class EloquentUserProvider implements UserProvider
     }
 
     /**
+     * Get the first key from the credential array.
+     *
+     * @param  array  $credentials
+     * @return string|null
+     */
+    protected function firstCredentialKey(array $credentials)
+    {
+        foreach ($credentials as $key => $value) {
+            return $key;
+        }
+    }
+
+    /**
      * Validate a user against the given credentials.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
@@ -140,6 +156,19 @@ class EloquentUserProvider implements UserProvider
         $plain = $credentials['password'];
 
         return $this->hasher->check($plain, $user->getAuthPassword());
+    }
+
+    /**
+     * Get a new query builder for the model instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function newModelQuery($model = null)
+    {
+        return is_null($model)
+                ? $this->createModel()->newQuery()
+                : $model->newQuery();
     }
 
     /**

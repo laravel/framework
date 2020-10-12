@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
-use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 
 class RouteCacheCommand extends Command
 {
@@ -85,7 +85,7 @@ class RouteCacheCommand extends Command
     /**
      * Get a fresh application instance.
      *
-     * @return \Illuminate\Foundation\Application
+     * @return \Illuminate\Contracts\Foundation\Application
      */
     protected function getFreshApplication()
     {
@@ -104,6 +104,6 @@ class RouteCacheCommand extends Command
     {
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-        return str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
+        return str_replace('{{routes}}', var_export($routes->compile(), true), $stub);
     }
 }

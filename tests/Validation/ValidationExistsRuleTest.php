@@ -2,12 +2,14 @@
 
 namespace Illuminate\Tests\Validation;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Validation\Validator;
-use Illuminate\Validation\Rules\Exists;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Validator;
+use PHPUnit\Framework\TestCase;
 
 class ValidationExistsRuleTest extends TestCase
 {
@@ -16,7 +18,7 @@ class ValidationExistsRuleTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -35,11 +37,35 @@ class ValidationExistsRuleTest extends TestCase
     {
         $rule = new Exists('table');
         $rule->where('foo', 'bar');
-        $this->assertEquals('exists:table,NULL,foo,bar', (string) $rule);
+        $this->assertSame('exists:table,NULL,foo,"bar"', (string) $rule);
+
+        $rule = new Exists(User::class);
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:users,NULL,foo,"bar"', (string) $rule);
 
         $rule = new Exists('table', 'column');
         $rule->where('foo', 'bar');
-        $this->assertEquals('exists:table,column,foo,bar', (string) $rule);
+        $this->assertSame('exists:table,column,foo,"bar"', (string) $rule);
+
+        $rule = new Exists(User::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:users,column,foo,"bar"', (string) $rule);
+
+        $rule = new Exists(UserWithConnection::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:mysql.users,column,foo,"bar"', (string) $rule);
+
+        $rule = new Exists('Illuminate\Tests\Validation\User', 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:users,column,foo,"bar"', (string) $rule);
+
+        $rule = new Exists(NoTableNameModel::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:no_table_name_models,column,foo,"bar"', (string) $rule);
+
+        $rule = new Exists(ClassWithRequiredConstructorParameters::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:'.ClassWithRequiredConstructorParameters::class.',column,foo,"bar"', (string) $rule);
     }
 
     public function testItChoosesValidRecordsUsingWhereInRule()
@@ -47,10 +73,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule = new Exists('users', 'id');
         $rule->whereIn('type', ['foo', 'bar']);
 
-        EloquentTestUser::create(['id' => '1', 'type' => 'foo']);
-        EloquentTestUser::create(['id' => '2', 'type' => 'bar']);
-        EloquentTestUser::create(['id' => '3', 'type' => 'baz']);
-        EloquentTestUser::create(['id' => '4', 'type' => 'other']);
+        User::create(['id' => '1', 'type' => 'foo']);
+        User::create(['id' => '2', 'type' => 'bar']);
+        User::create(['id' => '3', 'type' => 'baz']);
+        User::create(['id' => '4', 'type' => 'other']);
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [], ['id' => $rule]);
@@ -71,10 +97,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule = new Exists('users', 'id');
         $rule->whereNotIn('type', ['foo', 'bar']);
 
-        EloquentTestUser::create(['id' => '1', 'type' => 'foo']);
-        EloquentTestUser::create(['id' => '2', 'type' => 'bar']);
-        EloquentTestUser::create(['id' => '3', 'type' => 'baz']);
-        EloquentTestUser::create(['id' => '4', 'type' => 'other']);
+        User::create(['id' => '1', 'type' => 'foo']);
+        User::create(['id' => '2', 'type' => 'bar']);
+        User::create(['id' => '3', 'type' => 'baz']);
+        User::create(['id' => '4', 'type' => 'other']);
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [], ['id' => $rule]);
@@ -95,10 +121,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule = new Exists('users', 'id');
         $rule->whereIn('type', ['foo', 'bar', 'baz'])->whereNotIn('type', ['foo', 'bar']);
 
-        EloquentTestUser::create(['id' => '1', 'type' => 'foo']);
-        EloquentTestUser::create(['id' => '2', 'type' => 'bar']);
-        EloquentTestUser::create(['id' => '3', 'type' => 'baz']);
-        EloquentTestUser::create(['id' => '4', 'type' => 'other']);
+        User::create(['id' => '1', 'type' => 'foo']);
+        User::create(['id' => '2', 'type' => 'bar']);
+        User::create(['id' => '3', 'type' => 'baz']);
+        User::create(['id' => '4', 'type' => 'other']);
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [], ['id' => $rule]);
@@ -157,15 +183,15 @@ class ValidationExistsRuleTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->schema('default')->drop('users');
     }
 
     public function getIlluminateArrayTranslator()
     {
-        return new \Illuminate\Translation\Translator(
-            new \Illuminate\Translation\ArrayLoader, 'en'
+        return new Translator(
+            new ArrayLoader, 'en'
         );
     }
 }
@@ -173,9 +199,32 @@ class ValidationExistsRuleTest extends TestCase
 /**
  * Eloquent Models.
  */
-class EloquentTestUser extends Eloquent
+class User extends Eloquent
 {
     protected $table = 'users';
     protected $guarded = [];
     public $timestamps = false;
+}
+
+class UserWithConnection extends User
+{
+    protected $connection = 'mysql';
+}
+
+class NoTableNameModel extends Eloquent
+{
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class ClassWithRequiredConstructorParameters
+{
+    private $bar;
+    private $baz;
+
+    public function __construct($bar, $baz)
+    {
+        $this->bar = $bar;
+        $this->baz = $baz;
+    }
 }

@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use PHPUnit\Framework\ExpectationFailedException;
+use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingEventFakeTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new EventFake(m::mock(Dispatcher::class));
@@ -29,6 +29,15 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->dispatch(EventStub::class);
 
         $this->fake->assertDispatched(EventStub::class);
+    }
+
+    public function testAssertDispatchedWithClosure()
+    {
+        $this->fake->dispatch(new EventStub);
+
+        $this->fake->assertDispatched(function (EventStub $event) {
+            return true;
+        });
     }
 
     public function testAssertDispatchedWithCallbackInt()
@@ -75,10 +84,24 @@ class SupportTestingEventFakeTest extends TestCase
         }
     }
 
+    public function testAssertNotDispatchedWithClosure()
+    {
+        $this->fake->dispatch(new EventStub);
+
+        try {
+            $this->fake->assertNotDispatched(function (EventStub $event) {
+                return true;
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\EventStub] event was dispatched.'));
+        }
+    }
+
     public function testAssertDispatchedWithIgnore()
     {
         $dispatcher = m::mock(Dispatcher::class);
-        $dispatcher->shouldReceive('dispatch')->twice();
+        $dispatcher->shouldReceive('dispatch')->once();
 
         $fake = new EventFake($dispatcher, [
             'Foo',
@@ -91,12 +114,13 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->dispatch('Bar', ['id' => 1]);
         $fake->dispatch('Baz');
 
-        $fake->assertNotDispatched('Foo');
-        $fake->assertNotDispatched('Bar');
-        $fake->assertDispatched('Baz');
+        $fake->assertDispatched('Foo');
+        $fake->assertDispatched('Bar');
+        $fake->assertNotDispatched('Baz');
     }
 }
 
 class EventStub
 {
+    //
 }

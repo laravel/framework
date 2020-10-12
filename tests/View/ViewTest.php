@@ -2,13 +2,22 @@
 
 namespace Illuminate\Tests\View;
 
-use Mockery as m;
+use ArrayAccess;
+use BadMethodCallException;
+use Closure;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\View\Engine;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
+use Illuminate\View\Factory;
 use Illuminate\View\View;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class ViewTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -37,10 +46,10 @@ class ViewTest extends TestCase
 
         $callback = function (View $rendered, $contents) use ($view) {
             $this->assertEquals($view, $rendered);
-            $this->assertEquals('contents', $contents);
+            $this->assertSame('contents', $contents);
         };
 
-        $this->assertEquals('contents', $view->render($callback));
+        $this->assertSame('contents', $view->render($callback));
     }
 
     public function testRenderHandlingCallbackReturnValues()
@@ -53,7 +62,7 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('decrementRender');
         $view->getFactory()->shouldReceive('flushStateIfDoneRendering');
 
-        $this->assertEquals('new contents', $view->render(function () {
+        $this->assertSame('new contents', $view->render(function () {
             return 'new contents';
         }));
 
@@ -61,22 +70,22 @@ class ViewTest extends TestCase
             return '';
         }));
 
-        $this->assertEquals('contents', $view->render(function () {
+        $this->assertSame('contents', $view->render(function () {
             //
         }));
     }
 
     public function testRenderSectionsReturnsEnvironmentSections()
     {
-        $view = m::mock('Illuminate\View\View[render]', [
-            m::mock('Illuminate\View\Factory'),
-            m::mock(\Illuminate\Contracts\View\Engine::class),
+        $view = m::mock(View::class.'[render]', [
+            m::mock(Factory::class),
+            m::mock(Engine::class),
             'view',
             'path',
             [],
         ]);
 
-        $view->shouldReceive('render')->with(m::type('Closure'))->once()->andReturn($sections = ['foo' => 'bar']);
+        $view->shouldReceive('render')->with(m::type(Closure::class))->once()->andReturn($sections = ['foo' => 'bar']);
 
         $this->assertEquals($sections, $view->renderSections());
     }
@@ -91,8 +100,8 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('decrementRender')->twice();
         $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->twice();
 
-        $this->assertEquals('contents', $view->render());
-        $this->assertEquals('contents', (string) $view);
+        $this->assertSame('contents', $view->render());
+        $this->assertSame('contents', (string) $view);
     }
 
     public function testViewNestBindsASubView()
@@ -101,39 +110,39 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('make')->once()->with('foo', ['data']);
         $result = $view->nest('key', 'foo', ['data']);
 
-        $this->assertInstanceOf('Illuminate\View\View', $result);
+        $this->assertInstanceOf(View::class, $result);
     }
 
     public function testViewAcceptsArrayableImplementations()
     {
-        $arrayable = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $arrayable = m::mock(Arrayable::class);
         $arrayable->shouldReceive('toArray')->once()->andReturn(['foo' => 'bar', 'baz' => ['qux', 'corge']]);
 
         $view = $this->getView($arrayable);
 
-        $this->assertEquals('bar', $view->foo);
+        $this->assertSame('bar', $view->foo);
         $this->assertEquals(['qux', 'corge'], $view->baz);
     }
 
     public function testViewGettersSetters()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $this->assertEquals($view->getName(), 'view');
-        $this->assertEquals($view->getPath(), 'path');
+        $this->assertEquals('view', $view->name());
+        $this->assertEquals('path', $view->getPath());
         $data = $view->getData();
-        $this->assertEquals($data['foo'], 'bar');
+        $this->assertEquals('bar', $data['foo']);
         $view->setPath('newPath');
-        $this->assertEquals($view->getPath(), 'newPath');
+        $this->assertEquals('newPath', $view->getPath());
     }
 
     public function testViewArrayAccess()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $this->assertInstanceOf('ArrayAccess', $view);
+        $this->assertInstanceOf(ArrayAccess::class, $view);
         $this->assertTrue($view->offsetExists('foo'));
-        $this->assertEquals($view->offsetGet('foo'), 'bar');
+        $this->assertEquals('bar', $view->offsetGet('foo'));
         $view->offsetSet('foo', 'baz');
-        $this->assertEquals($view->offsetGet('foo'), 'baz');
+        $this->assertEquals('baz', $view->offsetGet('foo'));
         $view->offsetUnset('foo');
         $this->assertFalse($view->offsetExists('foo'));
     }
@@ -141,11 +150,11 @@ class ViewTest extends TestCase
     public function testViewConstructedWithObjectData()
     {
         $view = $this->getView(new DataObjectStub);
-        $this->assertInstanceOf('ArrayAccess', $view);
+        $this->assertInstanceOf(ArrayAccess::class, $view);
         $this->assertTrue($view->offsetExists('foo'));
-        $this->assertEquals($view->offsetGet('foo'), 'bar');
+        $this->assertEquals('bar', $view->offsetGet('foo'));
         $view->offsetSet('foo', 'baz');
-        $this->assertEquals($view->offsetGet('foo'), 'baz');
+        $this->assertEquals('baz', $view->offsetGet('foo'));
         $view->offsetUnset('foo');
         $this->assertFalse($view->offsetExists('foo'));
     }
@@ -154,21 +163,20 @@ class ViewTest extends TestCase
     {
         $view = $this->getView(['foo' => 'bar']);
         $this->assertTrue(isset($view->foo));
-        $this->assertEquals($view->foo, 'bar');
+        $this->assertEquals('bar', $view->foo);
         $view->foo = 'baz';
-        $this->assertEquals($view->foo, 'baz');
+        $this->assertEquals('baz', $view->foo);
         $this->assertEquals($view['foo'], $view->foo);
         unset($view->foo);
         $this->assertFalse(isset($view->foo));
         $this->assertFalse($view->offsetExists('foo'));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method Illuminate\View\View::badMethodCall does not exist.
-     */
     public function testViewBadMethod()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Illuminate\View\View::badMethodCall does not exist.');
+
         $view = $this->getView();
         $view->badMethodCall();
     }
@@ -183,9 +191,9 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
         $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
 
-        $view->renderable = m::mock('Illuminate\Contracts\Support\Renderable');
+        $view->renderable = m::mock(Renderable::class);
         $view->renderable->shouldReceive('render')->once()->andReturn('text');
-        $this->assertEquals('contents', $view->render());
+        $this->assertSame('contents', $view->render());
     }
 
     public function testViewRenderSections()
@@ -200,8 +208,8 @@ class ViewTest extends TestCase
 
         $view->getFactory()->shouldReceive('getSections')->once()->andReturn(['foo', 'bar']);
         $sections = $view->renderSections();
-        $this->assertEquals($sections[0], 'foo');
-        $this->assertEquals($sections[1], 'bar');
+        $this->assertEquals('foo', $sections[0]);
+        $this->assertEquals('bar', $sections[1]);
     }
 
     public function testWithErrors()
@@ -209,22 +217,27 @@ class ViewTest extends TestCase
         $view = $this->getView();
         $errors = ['foo' => 'bar', 'qu' => 'ux'];
         $this->assertSame($view, $view->withErrors($errors));
-        $this->assertInstanceOf('Illuminate\Support\MessageBag', $view->errors);
+        $this->assertInstanceOf(ViewErrorBag::class, $view->errors);
         $foo = $view->errors->get('foo');
-        $this->assertEquals($foo[0], 'bar');
+        $this->assertEquals('bar', $foo[0]);
         $qu = $view->errors->get('qu');
-        $this->assertEquals($qu[0], 'ux');
+        $this->assertEquals('ux', $qu[0]);
         $data = ['foo' => 'baz'];
-        $this->assertSame($view, $view->withErrors(new \Illuminate\Support\MessageBag($data)));
+        $this->assertSame($view, $view->withErrors(new MessageBag($data)));
         $foo = $view->errors->get('foo');
-        $this->assertEquals($foo[0], 'baz');
+        $this->assertEquals('baz', $foo[0]);
+        $foo = $view->errors->getBag('default')->get('foo');
+        $this->assertEquals('baz', $foo[0]);
+        $this->assertSame($view, $view->withErrors(new MessageBag($data), 'login'));
+        $foo = $view->errors->getBag('login')->get('foo');
+        $this->assertEquals('baz', $foo[0]);
     }
 
     protected function getView($data = [])
     {
         return new View(
-            m::mock('Illuminate\View\Factory'),
-            m::mock(\Illuminate\Contracts\View\Engine::class),
+            m::mock(Factory::class),
+            m::mock(Engine::class),
             'view',
             'path',
             $data

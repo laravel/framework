@@ -2,12 +2,13 @@
 
 namespace Illuminate\Redis\Connectors;
 
-use Predis\Client;
-use Illuminate\Support\Arr;
-use Illuminate\Redis\Connections\PredisConnection;
+use Illuminate\Contracts\Redis\Connector;
 use Illuminate\Redis\Connections\PredisClusterConnection;
+use Illuminate\Redis\Connections\PredisConnection;
+use Illuminate\Support\Arr;
+use Predis\Client;
 
-class PredisConnector
+class PredisConnector implements Connector
 {
     /**
      * Create a new clustered Predis connection.

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Auth\Passwords;
 
+use Illuminate\Contracts\Auth\PasswordBrokerFactory as FactoryContract;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Contracts\Auth\PasswordBrokerFactory as FactoryContract;
 
 /**
  * @mixin \Illuminate\Contracts\Auth\PasswordBroker
@@ -14,7 +14,7 @@ class PasswordBrokerManager implements FactoryContract
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -28,7 +28,7 @@ class PasswordBrokerManager implements FactoryContract
     /**
      * Create a new PasswordBroker manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function __construct($app)
@@ -46,9 +46,7 @@ class PasswordBrokerManager implements FactoryContract
     {
         $name = $name ?: $this->getDefaultDriver();
 
-        return isset($this->brokers[$name])
-                    ? $this->brokers[$name]
-                    : $this->brokers[$name] = $this->resolve($name);
+        return $this->brokers[$name] ?? ($this->brokers[$name] = $this->resolve($name));
     }
 
     /**
@@ -97,7 +95,8 @@ class PasswordBrokerManager implements FactoryContract
             $this->app['hash'],
             $config['table'],
             $key,
-            $config['expire']
+            $config['expire'],
+            $config['throttle'] ?? 0
         );
     }
 
@@ -137,7 +136,7 @@ class PasswordBrokerManager implements FactoryContract
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

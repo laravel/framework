@@ -3,8 +3,8 @@
 namespace Illuminate\View\Middleware;
 
 use Closure;
-use Illuminate\Support\ViewErrorBag;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Support\ViewErrorBag;
 
 class ShareErrorsFromSession
 {

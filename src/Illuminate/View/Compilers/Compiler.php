@@ -2,8 +2,8 @@
 
 namespace Illuminate\View\Compilers;
 
-use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;
+use InvalidArgumentException;
 
 abstract class Compiler
 {

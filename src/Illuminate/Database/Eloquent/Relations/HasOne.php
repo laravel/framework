@@ -2,13 +2,14 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class HasOne extends HasOneOrMany
 {
-    use SupportsDefaultModels;
+    use ComparesRelatedModels, SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.
@@ -17,13 +18,17 @@ class HasOne extends HasOneOrMany
      */
     public function getResults()
     {
+        if (is_null($this->getParentKey())) {
+            return $this->getDefaultFor($this->parent);
+        }
+
         return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  string  $relation
      * @return array
      */
@@ -60,5 +65,16 @@ class HasOne extends HasOneOrMany
         return $this->related->newInstance()->setAttribute(
             $this->getForeignKeyName(), $parent->{$this->localKey}
         );
+    }
+
+    /**
+     * Get the value of the model's foreign key.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return mixed
+     */
+    protected function getRelatedKeyFrom(Model $model)
+    {
+        return $model->getAttribute($this->getForeignKeyName());
     }
 }

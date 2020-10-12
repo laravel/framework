@@ -19,7 +19,7 @@ class HtmlString implements Htmlable
      * @param  string  $html
      * @return void
      */
-    public function __construct($html)
+    public function __construct($html = '')
     {
         $this->html = $html;
     }
@@ -32,6 +32,26 @@ class HtmlString implements Htmlable
     public function toHtml()
     {
         return $this->html;
+    }
+
+    /**
+     * Determine if the given HTML string is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return $this->html === '';
+    }
+
+    /**
+     * Determine if the given HTML string is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return $this->html !== '';
     }
 
     /**

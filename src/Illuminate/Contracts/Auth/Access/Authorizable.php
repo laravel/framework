@@ -7,9 +7,9 @@ interface Authorizable
     /**
      * Determine if the entity has a given ability.
      *
-     * @param  string  $ability
+     * @param  iterable|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
-    public function can($ability, $arguments = []);
+    public function can($abilities, $arguments = []);
 }

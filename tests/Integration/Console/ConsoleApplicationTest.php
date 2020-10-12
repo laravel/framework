@@ -3,43 +3,68 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Command;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel;
+use Orchestra\Testbench\TestCase;
 
 class ConsoleApplicationTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->app[Kernel::class]->registerCommand(new FooCommandStub);
     }
 
-    public function test_artisan_call_using_command_name()
+    public function testArtisanCallUsingCommandName()
+    {
+        $this->artisan('foo:bar', [
+            'id' => 1,
+        ])->assertExitCode(0);
+    }
+
+    public function testArtisanCallUsingCommandClass()
+    {
+        $this->artisan(FooCommandStub::class, [
+            'id' => 1,
+        ])->assertExitCode(0);
+    }
+
+    public function testArtisanCallNow()
     {
         $exitCode = $this->artisan('foo:bar', [
             'id' => 1,
-        ]);
+        ])->run();
 
-        $this->assertEquals($exitCode, 0);
+        $this->assertSame(0, $exitCode);
     }
 
-    public function test_artisan_call_using_command_class()
+    public function testArtisanWithMockCallAfterCallNow()
     {
-        $exitCode = $this->artisan(FooCommandStub::class, [
+        $exitCode = $this->artisan('foo:bar', [
+            'id' => 1,
+        ])->run();
+
+        $mock = $this->artisan('foo:bar', [
             'id' => 1,
         ]);
 
-        $this->assertEquals($exitCode, 0);
+        $this->assertSame(0, $exitCode);
+        $mock->assertExitCode(0);
     }
 
-    /*
-     * @expectedException \Symfony\Component\Console\Exception\CommandNotFoundException
-     */
-    // public function test_artisan_call_invalid_command_name()
-    // {
-    //     $this->artisan('foo:bars');
-    // }
+    public function testArtisanInstantiateScheduleWhenNeed()
+    {
+        $this->assertFalse($this->app->resolved(Schedule::class));
+
+        $this->app[Kernel::class]->registerCommand(new ScheduleCommandStub);
+
+        $this->assertFalse($this->app->resolved(Schedule::class));
+
+        $this->artisan('foo:schedule');
+
+        $this->assertTrue($this->app->resolved(Schedule::class));
+    }
 }
 
 class FooCommandStub extends Command
@@ -47,6 +72,16 @@ class FooCommandStub extends Command
     protected $signature = 'foo:bar {id}';
 
     public function handle()
+    {
+        //
+    }
+}
+
+class ScheduleCommandStub extends Command
+{
+    protected $signature = 'foo:schedule';
+
+    public function handle(Schedule $schedule)
     {
         //
     }

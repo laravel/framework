@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
+use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -20,15 +20,15 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         $app['config']->set('app.debug', 'true');
     }
 
-    public function test_mail_is_sent()
+    public function testMailIsSent()
     {
-        $notifiable = (new AnonymousNotifiable())
+        $notifiable = (new AnonymousNotifiable)
             ->route('testchannel', 'enzo')
             ->route('anothertestchannel', 'enzo@deepblue.com');
 
         NotificationFacade::send(
             $notifiable,
-            new TestMailNotificationForAnonymousNotifiable()
+            new TestMailNotificationForAnonymousNotifiable
         );
 
         $this->assertEquals([
@@ -36,24 +36,26 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         ], $_SERVER['__notifiable.route']);
     }
 
-    public function test_faking()
+    public function testFaking()
     {
         $fake = NotificationFacade::fake();
 
         $this->assertInstanceOf(NotificationFake::class, $fake);
 
-        $notifiable = (new AnonymousNotifiable())
+        $notifiable = (new AnonymousNotifiable)
             ->route('testchannel', 'enzo')
             ->route('anothertestchannel', 'enzo@deepblue.com');
 
-        NotificationFacade::send(
+        NotificationFacade::locale('it')->send(
             $notifiable,
-            new TestMailNotificationForAnonymousNotifiable()
+            new TestMailNotificationForAnonymousNotifiable
         );
 
-        NotificationFacade::assertSentTo(new AnonymousNotifiable(), TestMailNotificationForAnonymousNotifiable::class,
-            function ($notification, $channels, $notifiable) {
-                return $notifiable->routes['testchannel'] == 'enzo' && $notifiable->routes['anothertestchannel'] == 'enzo@deepblue.com';
+        NotificationFacade::assertSentTo(new AnonymousNotifiable, TestMailNotificationForAnonymousNotifiable::class,
+            function ($notification, $channels, $notifiable, $locale) {
+                return $notifiable->routes['testchannel'] === 'enzo' &&
+                    $notifiable->routes['anothertestchannel'] === 'enzo@deepblue.com' &&
+                    $locale === 'it';
             }
         );
     }

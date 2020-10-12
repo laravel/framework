@@ -2,14 +2,19 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\Console\CacheTableCommand;
+use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Composer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Cache\Console\CacheTableCommand;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class CacheTableCommandTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -17,10 +22,10 @@ class CacheTableCommandTest extends TestCase
     public function testCreateMakesMigration()
     {
         $command = new CacheTableCommandTestStub(
-            $files = m::mock('Illuminate\Filesystem\Filesystem'),
-            $composer = m::mock('Illuminate\Support\Composer')
+            $files = m::mock(Filesystem::class),
+            $composer = m::mock(Composer::class)
         );
-        $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
+        $creator = m::mock(MigrationCreator::class)->shouldIgnoreMissing();
 
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -37,7 +42,7 @@ class CacheTableCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new ArrayInput($input), new NullOutput);
     }
 }
 
@@ -45,6 +50,6 @@ class CacheTableCommandTestStub extends CacheTableCommand
 {
     public function call($command, array $arguments = [])
     {
-        //
+        return 0;
     }
 }

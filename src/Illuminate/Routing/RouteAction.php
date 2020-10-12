@@ -2,9 +2,9 @@
 
 namespace Illuminate\Routing;
 
-use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LogicException;
 use UnexpectedValueException;
 
 class RouteAction
@@ -28,7 +28,7 @@ class RouteAction
         // If the action is already a Closure instance, we will just set that instance
         // as the "uses" property, because there is nothing else we need to do when
         // it is available. Otherwise we will need to find it in the action list.
-        if (is_callable($action)) {
+        if (is_callable($action, true)) {
             return ! is_array($action) ? ['uses' => $action] : [
                 'uses' => $action[0].'@'.$action[1],
                 'controller' => $action[0].'@'.$action[1],
@@ -54,6 +54,8 @@ class RouteAction
      *
      * @param  string  $uri
      * @return array
+     *
+     * @throws \LogicException
      */
     protected static function missingAction($uri)
     {
@@ -78,7 +80,7 @@ class RouteAction
     /**
      * Make an action for an invokable controller.
      *
-     * @param  string $action
+     * @param  string  $action
      * @return string
      *
      * @throws \UnexpectedValueException

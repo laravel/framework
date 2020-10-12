@@ -1,9 +1,28 @@
 <?php
 
-use Faker\Generator as Faker;
+namespace {{ factoryNamespace }};
 
-$factory->define(DummyModel::class, function (Faker $faker) {
-    return [
-        //
-    ];
-});
+use Illuminate\Database\Eloquent\Factories\Factory;
+use {{ namespacedModel }};
+
+class {{ model }}Factory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = {{ model }}::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            //
+        ];
+    }
+}

@@ -2,14 +2,15 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Queue\Worker;
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Worker;
+use Illuminate\Queue\WorkerOptions;
+use Illuminate\Support\Carbon;
 
 class WorkCommand extends Command
 {
@@ -20,15 +21,20 @@ class WorkCommand extends Command
      */
     protected $signature = 'queue:work
                             {connection? : The name of the queue connection to work}
+                            {--name=default : The name of the worker}
                             {--queue= : The names of the queues to work}
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
-                            {--delay=0 : The number of seconds to delay failed jobs}
+                            {--stop-when-empty : Stop when the queue is empty}
+                            {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
+                            {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
+                            {--max-jobs=0 : The number of jobs to process before stopping}
+                            {--max-time=0 : The maximum number of seconds the worker should run}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
                             {--sleep=3 : Number of seconds to sleep when no job is available}
                             {--timeout=60 : The number of seconds a child process can run}
-                            {--tries=0 : Number of times to attempt a job before logging it failed}';
+                            {--tries=1 : Number of times to attempt a job before logging it failed}';
 
     /**
      * The console command description.
@@ -45,22 +51,31 @@ class WorkCommand extends Command
     protected $worker;
 
     /**
+     * The cache store implementation.
+     *
+     * @var \Illuminate\Contracts\Cache\Repository
+     */
+    protected $cache;
+
+    /**
      * Create a new queue work command.
      *
      * @param  \Illuminate\Queue\Worker  $worker
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return void
      */
-    public function __construct(Worker $worker)
+    public function __construct(Worker $worker, Cache $cache)
     {
         parent::__construct();
 
+        $this->cache = $cache;
         $this->worker = $worker;
     }
 
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int|null
      */
     public function handle()
     {
@@ -81,7 +96,7 @@ class WorkCommand extends Command
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
-        $this->runWorker(
+        return $this->runWorker(
             $connection, $queue
         );
     }
@@ -91,13 +106,13 @@ class WorkCommand extends Command
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @return array
+     * @return int|null
      */
     protected function runWorker($connection, $queue)
     {
-        $this->worker->setCache($this->laravel['cache']->driver());
-
-        return $this->worker->{$this->option('once') ? 'runNextJob' : 'daemon'}(
+        return $this->worker->setName($this->option('name'))
+                     ->setCache($this->cache)
+                     ->{$this->option('once') ? 'runNextJob' : 'daemon'}(
             $connection, $queue, $this->gatherWorkerOptions()
         );
     }
@@ -109,10 +124,21 @@ class WorkCommand extends Command
      */
     protected function gatherWorkerOptions()
     {
+        $backoff = $this->hasOption('backoff')
+                    ? $this->option('backoff')
+                    : $this->option('delay');
+
         return new WorkerOptions(
-            $this->option('delay'), $this->option('memory'),
-            $this->option('timeout'), $this->option('sleep'),
-            $this->option('tries'), $this->option('force')
+            $this->option('name'),
+            $backoff,
+            $this->option('memory'),
+            $this->option('timeout'),
+            $this->option('sleep'),
+            $this->option('tries'),
+            $this->option('force'),
+            $this->option('stop-when-empty'),
+            $this->option('max-jobs'),
+            $this->option('max-time')
         );
     }
 
@@ -142,7 +168,7 @@ class WorkCommand extends Command
      * Write the status output for the queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  string $status
+     * @param  string  $status
      * @return void
      */
     protected function writeOutput(Job $job, $status)
@@ -184,8 +210,10 @@ class WorkCommand extends Command
     protected function logFailedJob(JobFailed $event)
     {
         $this->laravel['queue.failer']->log(
-            $event->connectionName, $event->job->getQueue(),
-            $event->job->getRawBody(), $event->exception
+            $event->connectionName,
+            $event->job->getQueue(),
+            $event->job->getRawBody(),
+            $event->exception
         );
     }
 

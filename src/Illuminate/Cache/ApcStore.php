@@ -2,9 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\Store;
-
-class ApcStore extends TaggableStore implements Store
+class ApcStore extends TaggableStore
 {
     use RetrievesMultipleKeys;
 
@@ -51,23 +49,23 @@ class ApcStore extends TaggableStore implements Store
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed   $value
-     * @param  float|int  $minutes
-     * @return void
+     * @param  mixed  $value
+     * @param  int  $seconds
+     * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
-        $this->apc->put($this->prefix.$key, $value, (int) ($minutes * 60));
+        return $this->apc->put($this->prefix.$key, $value, $seconds);
     }
 
     /**
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
@@ -79,7 +77,7 @@ class ApcStore extends TaggableStore implements Store
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
@@ -91,12 +89,12 @@ class ApcStore extends TaggableStore implements Store
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed   $value
-     * @return void
+     * @param  mixed  $value
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 0);
+        return $this->put($key, $value, 0);
     }
 
     /**

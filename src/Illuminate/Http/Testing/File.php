@@ -28,6 +28,13 @@ class File extends UploadedFile
     public $sizeToReport;
 
     /**
+     * The MIME type to report.
+     *
+     * @var string|null
+     */
+    public $mimeTypeToReport;
+
+    /**
      * Create a new file instance.
      *
      * @param  string  $name
@@ -41,7 +48,7 @@ class File extends UploadedFile
 
         parent::__construct(
             $this->tempFilePath(), $name, $this->getMimeType(),
-            filesize($this->tempFilePath()), null, true
+            null, true
         );
     }
 
@@ -49,12 +56,24 @@ class File extends UploadedFile
      * Create a new fake file.
      *
      * @param  string  $name
-     * @param  int  $kilobytes
+     * @param  string|int  $kilobytes
      * @return \Illuminate\Http\Testing\File
      */
     public static function create($name, $kilobytes = 0)
     {
         return (new FileFactory)->create($name, $kilobytes);
+    }
+
+    /**
+     * Create a new fake file with content.
+     *
+     * @param  string  $name
+     * @param  string  $content
+     * @return \Illuminate\Http\Testing\File
+     */
+    public static function createWithContent($name, $content)
+    {
+        return (new FileFactory)->createWithContent($name, $content);
     }
 
     /**
@@ -94,13 +113,26 @@ class File extends UploadedFile
     }
 
     /**
-     * Get the MIME type for the file.
+     * Set the "MIME type" for the file.
+     *
+     * @param  string  $mimeType
+     * @return $this
+     */
+    public function mimeType($mimeType)
+    {
+        $this->mimeTypeToReport = $mimeType;
+
+        return $this;
+    }
+
+    /**
+     * Get the MIME type of the file.
      *
      * @return string
      */
     public function getMimeType()
     {
-        return MimeType::from($this->name);
+        return $this->mimeTypeToReport ?: MimeType::from($this->name);
     }
 
     /**

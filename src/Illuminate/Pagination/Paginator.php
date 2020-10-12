@@ -2,17 +2,16 @@
 
 namespace Illuminate\Pagination;
 
-use Countable;
 use ArrayAccess;
-use JsonSerializable;
-use IteratorAggregate;
-use Illuminate\Support\Collection;
-use Illuminate\Support\HtmlString;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
+use Countable;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Collection;
+use IteratorAggregate;
+use JsonSerializable;
 
-class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Jsonable, PaginatorContract
+class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, PaginatorContract
 {
     /**
      * Determine if there are more items in the data source.
@@ -32,6 +31,8 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      */
     public function __construct($items, $perPage, $currentPage = null, array $options = [])
     {
+        $this->options = $options;
+
         foreach ($options as $key => $value) {
             $this->{$key} = $value;
         }
@@ -100,15 +101,13 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return string
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
     public function render($view = null, $data = [])
     {
-        return new HtmlString(
-            static::viewFactory()->make($view ?: static::$defaultSimpleView, array_merge($data, [
-                'paginator' => $this,
-            ]))->render()
-        );
+        return static::viewFactory()->make($view ?: static::$defaultSimpleView, array_merge($data, [
+            'paginator' => $this,
+        ]));
     }
 
     /**
@@ -147,7 +146,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
             'first_page_url' => $this->url(1),
             'from' => $this->firstItem(),
             'next_page_url' => $this->nextPageUrl(),
-            'path' => $this->path,
+            'path' => $this->path(),
             'per_page' => $this->perPage(),
             'prev_page_url' => $this->previousPageUrl(),
             'to' => $this->lastItem(),

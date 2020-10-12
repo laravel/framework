@@ -9,10 +9,11 @@ interface ConnectionInterface
     /**
      * Begin a fluent query against a database table.
      *
-     * @param  string  $table
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
+     * @param  string|null  $as
      * @return \Illuminate\Database\Query\Builder
      */
-    public function table($table);
+    public function table($table, $as = null);
 
     /**
      * Get a new raw query expression.
@@ -26,25 +27,37 @@ interface ConnectionInterface
      * Run a select statement and return a single result.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
      * @return mixed
      */
-    public function selectOne($query, $bindings = []);
+    public function selectOne($query, $bindings = [], $useReadPdo = true);
 
     /**
      * Run a select statement against the database.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
      * @return array
      */
-    public function select($query, $bindings = []);
+    public function select($query, $bindings = [], $useReadPdo = true);
+
+    /**
+     * Run a select statement against the database and returns a generator.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
+     * @return \Generator
+     */
+    public function cursor($query, $bindings = [], $useReadPdo = true);
 
     /**
      * Run an insert statement against the database.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return bool
      */
     public function insert($query, $bindings = []);
@@ -53,7 +66,7 @@ interface ConnectionInterface
      * Run an update statement against the database.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return int
      */
     public function update($query, $bindings = []);
@@ -62,7 +75,7 @@ interface ConnectionInterface
      * Run a delete statement against the database.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return int
      */
     public function delete($query, $bindings = []);
@@ -71,7 +84,7 @@ interface ConnectionInterface
      * Execute an SQL statement and return the boolean result.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return bool
      */
     public function statement($query, $bindings = []);
@@ -80,7 +93,7 @@ interface ConnectionInterface
      * Run an SQL statement and get the number of rows affected.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return int
      */
     public function affectingStatement($query, $bindings = []);
@@ -147,4 +160,11 @@ interface ConnectionInterface
      * @return array
      */
     public function pretend(Closure $callback);
+
+    /**
+     * Get the name of the connected database.
+     *
+     * @return string
+     */
+    public function getDatabaseName();
 }

@@ -2,28 +2,23 @@
 
 namespace Illuminate\Tests\Auth;
 
-use stdClass;
-use Mockery as m;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Auth\RequestGuard;
-use Illuminate\Container\Container;
-use Illuminate\Auth\EloquentUserProvider;
-use Illuminate\Config\Repository as Config;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\RequestGuard;
+use Illuminate\Config\Repository as Config;
+use Illuminate\Container\Container;
+use Illuminate\Http\Request;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class AuthenticateMiddlewareTest extends TestCase
 {
     protected $auth;
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
-    public function setUp()
+    protected function setUp(): void
     {
         $container = Container::setInstance(new Container);
 
@@ -34,12 +29,18 @@ class AuthenticateMiddlewareTest extends TestCase
         });
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\AuthenticationException
-     * @expectedExceptionMessage Unauthenticated.
-     */
+    protected function tearDown(): void
+    {
+        m::close();
+
+        Container::setInstance(null);
+    }
+
     public function testDefaultUnauthenticatedThrows()
     {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Unauthenticated.');
+
         $this->registerAuthDriver('default', false);
 
         $this->authenticate();
@@ -57,7 +58,7 @@ class AuthenticateMiddlewareTest extends TestCase
             return;
         }
 
-        return $this->fail();
+        $this->fail();
     }
 
     public function testDefaultAuthenticatedKeepsDefaultDriver()
@@ -80,12 +81,11 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($secondary, $this->auth->guard());
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\AuthenticationException
-     * @expectedExceptionMessage Unauthenticated.
-     */
     public function testMultipleDriversUnauthenticatedThrows()
     {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Unauthenticated.');
+
         $this->registerAuthDriver('default', false);
 
         $this->registerAuthDriver('secondary', false);
@@ -109,7 +109,7 @@ class AuthenticateMiddlewareTest extends TestCase
             return;
         }
 
-        return $this->fail();
+        $this->fail();
     }
 
     public function testMultipleDriversAuthenticatedUpdatesDefault()
@@ -178,7 +178,7 @@ class AuthenticateMiddlewareTest extends TestCase
      * @param  string  ...$guards
      * @return void
      *
-     * @throws AuthenticationException
+     * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function authenticate(...$guards)
     {
