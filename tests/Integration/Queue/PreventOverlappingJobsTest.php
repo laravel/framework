@@ -59,14 +59,16 @@ class PreventOverlappingJobsTest extends TestCase
 
         $this->expectException(\Exception::class);
 
-        $instance->call($job, [
-            'command' => serialize($command = new FailedOverlappingTestJob),
-        ]);
+        try {
+            $instance->call($job, [
+                'command' => serialize($command = new FailedOverlappingTestJob),
+            ]);
+        } finally {
+            $lockKey = (new PreventOverlappingJobs)->getLockKey($command);
 
-        $lockKey = (new PreventOverlappingJobs)->getLockKey($command);
-
-        $this->assertTrue(FailedOverlappingTestJob::$handled);
-        $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->acquire());
+            $this->assertTrue(FailedOverlappingTestJob::$handled);
+            $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->acquire());
+        }
     }
 
     public function testOverlappingJobsAreNotExecuted()
