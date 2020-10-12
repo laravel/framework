@@ -3749,6 +3749,40 @@ SQL;
         $this->assertSame('select * from "users" where "roles" ??& ?', $builder->toSql());
     }
 
+    public function testClone()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users');
+        $clone = $builder->clone()->where('email', 'foo');
+
+        $this->assertNotSame($builder, $clone);
+        $this->assertSame('select * from "users"', $builder->toSql());
+        $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
+    }
+
+    public function testCloneWithout()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('email', 'foo')->orderBy('email');
+        $clone = $builder->cloneWithout(['orders']);
+
+        $this->assertSame('select * from "users" where "email" = ? order by "email" asc', $builder->toSql());
+        $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
+    }
+
+    public function testCloneWithoutBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('email', 'foo')->orderBy('email');
+        $clone = $builder->cloneWithout(['wheres'])->cloneWithoutBindings(['where']);
+
+        $this->assertSame('select * from "users" where "email" = ? order by "email" asc', $builder->toSql());
+        $this->assertEquals([0 => 'foo'], $builder->getBindings());
+
+        $this->assertSame('select * from "users" order by "email" asc', $clone->toSql());
+        $this->assertEquals([], $clone->getBindings());
+    }
+
     protected function getConnection()
     {
         $connection = m::mock(ConnectionInterface::class);
