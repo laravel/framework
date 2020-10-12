@@ -7,6 +7,13 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 class PreventOverlappingJobs
 {
     /**
+     * The amount of time (in seconds) to expire the lock.
+     *
+     * @var int
+     */
+    public $expiresAt;
+
+    /**
      * The key of the job.
      *
      * @var string
@@ -24,15 +31,17 @@ class PreventOverlappingJobs
      * Create a new overlapping jobs middleware instance.
      *
      * @param  string  $key
+     * @param  string  $prefix
      * @param  int  $expiresAt
      * @param  string  $prefix
      *
      * @return void
      */
-    public function __construct($key = '', $prefix = 'overlap:')
+    public function __construct($key = '', $prefix = 'overlap:', $expiresAt = 0)
     {
         $this->key = $key;
         $this->prefix = $prefix;
+        $this->expiresAt = $expiresAt;
     }
 
     /**
@@ -44,7 +53,7 @@ class PreventOverlappingJobs
      */
     public function handle($job, $next)
     {
-        $lock = app(Cache::class)->lock($this->getLockKey($job));
+        $lock = app(Cache::class)->lock($this->getLockKey($job), $this->expiresAt);
 
         if ($lock->get()) {
             try {
@@ -53,6 +62,19 @@ class PreventOverlappingJobs
                 $lock->release();
             }
         }
+    }
+
+    /**
+     * Set the expiry (in seconds) of the lock key.
+     *
+     * @param  int  $expiresAt
+     * @return $this
+     */
+    public function expireAt($expiresAt)
+    {
+        $this->expiresAt = $expiresAt;
+
+        return $this;
     }
 
     /**
