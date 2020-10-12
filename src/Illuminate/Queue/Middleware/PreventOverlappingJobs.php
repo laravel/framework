@@ -47,9 +47,11 @@ class PreventOverlappingJobs
         $lock = app(Cache::class)->lock($this->getLockKey($job));
 
         if ($lock->get()) {
-            $next($job);
-
-            $lock->release();
+            try {
+                $next($job);
+            } finally {
+                $lock->release();
+            }
         }
     }
 

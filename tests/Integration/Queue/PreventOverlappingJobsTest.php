@@ -46,6 +46,29 @@ class PreventOverlappingJobsTest extends TestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->acquire());
     }
 
+    public function testLockIsReleasedOnJobExceptions()
+    {
+        FailedOverlappingTestJob::$handled = false;
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+
+        $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+
+        $this->expectException(\Exception::class);
+
+        $instance->call($job, [
+            'command' => serialize($command = new FailedOverlappingTestJob),
+        ]);
+
+        $lockKey = (new PreventOverlappingJobs)->getLockKey($command);
+
+        $this->assertTrue(FailedOverlappingTestJob::$handled);
+        $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->acquire());
+    }
+
     public function testOverlappingJobsAreNotExecuted()
     {
         OverlappingTestJob::$handled = false;
@@ -83,5 +106,15 @@ class OverlappingTestJob
     public function middleware()
     {
         return [new PreventOverlappingJobs];
+    }
+}
+
+class FailedOverlappingTestJob extends OverlappingTestJob
+{
+    public function handle()
+    {
+        static::$handled = true;
+
+        throw new \Exception;
     }
 }
