@@ -25,21 +25,28 @@ class PreventOverlappingJobs
      *
      * @var string
      */
-    public $prefix;
+    public $prefix = 'overlap:';
+
+    /**
+     * The delay (in seconds) to release the job back to the queue.
+     *
+     * @var int|null
+     */
+    public $releaseAfter;
 
     /**
      * Create a new overlapping jobs middleware instance.
      *
      * @param  string  $key
-     * @param  string  $prefix
+     * @param  int|null  $releaseAfter
      * @param  int  $expiresAt
      *
      * @return void
      */
-    public function __construct($key = '', $prefix = 'overlap:', $expiresAt = 0)
+    public function __construct($key = '', $releaseAfter = 0, $expiresAt = 0)
     {
         $this->key = $key;
-        $this->prefix = $prefix;
+        $this->releaseAfter = $releaseAfter;
         $this->expiresAt = $expiresAt;
     }
 
@@ -60,7 +67,21 @@ class PreventOverlappingJobs
             } finally {
                 $lock->release();
             }
+        } elseif (!is_null($this->releaseAfter)) {
+            $job->release($this->releaseAfter);
         }
+    }
+
+    /**
+     * Do not release the job back to the queue.
+     *
+     * @return $this
+     */
+    public function dontRelease()
+    {
+        $this->releaseAfter = null;
+
+        return $this;
     }
 
     /**
@@ -72,6 +93,19 @@ class PreventOverlappingJobs
     public function expireAt($expiresAt)
     {
         $this->expiresAt = $expiresAt;
+
+        return $this;
+    }
+
+    /**
+     * Set the delay (in seconds) to release the job back to the queue.
+     *
+     * @param  int  $releaseAfter
+     * @return $this
+     */
+    public function releaseAfter($releaseAfter)
+    {
+        $this->releaseAfter = $releaseAfter;
 
         return $this;
     }
