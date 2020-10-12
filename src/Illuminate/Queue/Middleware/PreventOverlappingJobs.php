@@ -67,7 +67,7 @@ class PreventOverlappingJobs
             } finally {
                 $lock->release();
             }
-        } elseif (!is_null($this->releaseAfter)) {
+        } elseif (! is_null($this->releaseAfter)) {
             $job->release($this->releaseAfter);
         }
     }
