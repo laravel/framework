@@ -91,7 +91,7 @@ class UploadedFile extends SymfonyUploadedFile
     /**
      * Get the contents of the uploaded file.
      *
-     * @return bool|string
+     * @return false|string
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
