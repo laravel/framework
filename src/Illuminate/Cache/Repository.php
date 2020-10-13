@@ -477,7 +477,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function tags($names)
     {
-        if (! method_exists($this->store, 'tags')) {
+        if (! $this->supportsTags()) {
             throw new BadMethodCallException('This cache store does not support tagging.');
         }
 
@@ -499,6 +499,33 @@ class Repository implements ArrayAccess, CacheContract
     protected function itemKey($key)
     {
         return $key;
+    }
+
+    /**
+     * Calculate the number of seconds for the given TTL.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int  $ttl
+     * @return int
+     */
+    protected function getSeconds($ttl)
+    {
+        $duration = $this->parseDateInterval($ttl);
+
+        if ($duration instanceof DateTimeInterface) {
+            $duration = Carbon::now()->diffInRealSeconds($duration, false);
+        }
+
+        return (int) $duration > 0 ? $duration : 0;
+    }
+
+    /**
+     * Determine if the current store supports tags.
+     *
+     * @return bool
+     */
+    public function supportsTags()
+    {
+        return method_exists($this->store, 'tags');
     }
 
     /**
@@ -611,23 +638,6 @@ class Repository implements ArrayAccess, CacheContract
     public function offsetUnset($key)
     {
         $this->forget($key);
-    }
-
-    /**
-     * Calculate the number of seconds for the given TTL.
-     *
-     * @param  \DateTimeInterface|\DateInterval|int  $ttl
-     * @return int
-     */
-    protected function getSeconds($ttl)
-    {
-        $duration = $this->parseDateInterval($ttl);
-
-        if ($duration instanceof DateTimeInterface) {
-            $duration = Carbon::now()->diffInRealSeconds($duration, false);
-        }
-
-        return (int) $duration > 0 ? $duration : 0;
     }
 
     /**
