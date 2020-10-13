@@ -502,6 +502,33 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Calculate the number of seconds for the given TTL.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int  $ttl
+     * @return int
+     */
+    protected function getSeconds($ttl)
+    {
+        $duration = $this->parseDateInterval($ttl);
+
+        if ($duration instanceof DateTimeInterface) {
+            $duration = Carbon::now()->diffInRealSeconds($duration, false);
+        }
+
+        return (int) $duration > 0 ? $duration : 0;
+    }
+
+    /**
+     * Determine if the current store supports tags.
+     *
+     * @return bool
+     */
+    public function supportsTags()
+    {
+        return method_exists($this->store, 'tags');
+    }
+
+    /**
      * Get the default cache time.
      *
      * @return int|null
@@ -611,33 +638,6 @@ class Repository implements ArrayAccess, CacheContract
     public function offsetUnset($key)
     {
         $this->forget($key);
-    }
-
-    /**
-     * Calculate the number of seconds for the given TTL.
-     *
-     * @param  \DateTimeInterface|\DateInterval|int  $ttl
-     * @return int
-     */
-    protected function getSeconds($ttl)
-    {
-        $duration = $this->parseDateInterval($ttl);
-
-        if ($duration instanceof DateTimeInterface) {
-            $duration = Carbon::now()->diffInRealSeconds($duration, false);
-        }
-
-        return (int) $duration > 0 ? $duration : 0;
-    }
-
-    /**
-     * Check if the current storage supports tags.
-     *
-     * @return bool
-     */
-    public function supportsTags()
-    {
-        return method_exists($this->store, 'tags');
     }
 
     /**
