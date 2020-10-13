@@ -175,7 +175,8 @@ trait GuardsAttributes
         // If the key is in the "fillable" array, we can of course assume that it's
         // a fillable attribute. Otherwise, we will check the guarded array when
         // we need to determine if the attribute is black-listed on the model.
-        if (in_array($key, $this->getFillable())) {
+        $allFillableKeys = $this->getAllFillableKeys($key);
+        if (array_intersect($allFillableKeys, $this->getFillable())) {
             return true;
         }
 
@@ -244,9 +245,38 @@ trait GuardsAttributes
     protected function fillableFromArray(array $attributes)
     {
         if (count($this->getFillable()) > 0 && ! static::$unguarded) {
-            return array_intersect_key($attributes, array_flip($this->getFillable()));
+            $fillables = [];
+
+            foreach ($attributes as $key => $value) {
+                $allFillableKeys = $this->getAllFillableKeys($key);
+                if(array_intersect($allFillableKeys, $this->getFillable())) {
+                    $fillables[$key] = $value;
+                }
+            }
+
+            return $fillables;
         }
 
         return $attributes;
+    }
+
+    /**
+     * Get the all fillable keys with JSON
+     * E.g. 'foo->bar->baz' will return ['foo->*', 'foo->bar->*']
+     * @param       $key
+     */
+    private function getAllFillableKeys($key)
+    {
+        $jsonKeys = [$key];
+        if (strpos($key, '->')) {
+            $tempKey = $key;
+
+            do {
+                $attr = Str::beforeLast($tempKey, '->');
+                $jsonKeys[] = $attr . '->*';
+                $tempKey = $attr;
+            } while (strpos($tempKey, '->') != false);
+        }
+        return $jsonKeys;
     }
 }

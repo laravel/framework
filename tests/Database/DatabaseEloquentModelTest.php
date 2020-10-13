@@ -1072,6 +1072,55 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
+
+    public function testFillingJSONAttributesAllowWildcard()
+    {
+        // test nested JSON cannot be filled when fillable is not empty
+        $model = new EloquentModelStub;
+        $model->fillable(['baz']);
+        $model->fill(['meta->name' => 'foo']);
+        $this->assertEquals(
+            [],
+            $model->toArray()
+        );
+
+        // test wildcard fillsables can be used for single level
+        $model = new EloquentModelStub;
+        $model->fillable(['meta->*']);
+        $model->fill(['meta->name' => 'foo']);
+        $this->assertEquals(
+            ['meta' => json_encode(['name' => 'foo'])],
+            $model->toArray()
+        );
+
+        // test wildcard fillables can be used for multilevel
+        $model = new EloquentModelStub;
+        $model->fillable(['meta->*']);
+        $model->fill(['meta->name->foo' => 'bar']);
+        $this->assertEquals(
+            ['meta' => json_encode(['name' => ['foo' => 'bar']])],
+            $model->toArray()
+        );
+
+        // test attribute will not be filled if the key is not correct
+        $model = new EloquentModelStub;
+        $model->fillable(['meta->age']);
+        $model->fill(['meta->name->foo' => 'bar']);
+        $this->assertEquals(
+            [],
+            $model->toArray()
+        );
+
+        // test multilevel wildcard fillables can be used for multilevel
+        $model = new EloquentModelStub;
+        $model->fillable(['meta->age->*']);
+        $model->fill(['meta->age->foo->bar' => 'baz']);
+        $this->assertEquals(
+            ['meta' => json_encode(['age' => ['foo' => ['bar' => 'baz']]])],
+            $model->toArray()
+        );
+    }
+
     public function testUnguardAllowsAnythingToBeSet()
     {
         $model = new EloquentModelStub;
