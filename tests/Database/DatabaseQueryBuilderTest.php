@@ -930,6 +930,16 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testUnionWithWhere()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users');
+        $builder->union($this->getBuilder()->select('*')->from('dogs'));
+        $builder->where('name', 'test');
+        $this->assertSame('(select * from "users") union (select * from "dogs") where "name" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
     public function testMySqlUnionOrderBys()
     {
         $builder = $this->getMySqlBuilder();
