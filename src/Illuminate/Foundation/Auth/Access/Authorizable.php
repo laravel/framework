@@ -25,7 +25,7 @@ trait Authorizable
      * @param  array|mixed  $arguments
      * @return bool
      */
-    public function canany($abilities, $arguments = [])
+    public function canAny($abilities, $arguments = [])
     {
         return app(Gate::class)->forUser($this)->any($abilities, $arguments);
     }
