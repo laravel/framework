@@ -24,7 +24,7 @@ class ListFailedCommand extends Command
     /**
      * The table headers for the command.
      *
-     * @var array
+     * @var string[]
      */
     protected $headers = ['ID', 'Connection', 'Queue', 'Class', 'Failed At'];
 

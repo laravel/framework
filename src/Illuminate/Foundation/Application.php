@@ -150,7 +150,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * The prefixes of absolute cache paths for use during normalization.
      *
-     * @var array
+     * @var string[]
      */
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 

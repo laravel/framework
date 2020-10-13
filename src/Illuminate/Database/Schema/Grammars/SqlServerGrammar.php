@@ -17,14 +17,14 @@ class SqlServerGrammar extends Grammar
     /**
      * The possible column modifiers.
      *
-     * @var array
+     * @var string[]
      */
     protected $modifiers = ['Increment', 'Collate', 'Nullable', 'Default', 'Persisted'];
 
     /**
      * The columns available as serials.
      *
-     * @var array
+     * @var string[]
      */
     protected $serials = ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'];
 

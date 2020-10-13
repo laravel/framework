@@ -182,7 +182,7 @@ class Builder
     /**
      * All of the available clause operators.
      *
-     * @var array
+     * @var string[]
      */
     public $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
@@ -3234,6 +3234,16 @@ class Builder
     }
 
     /**
+     * Clone the query.
+     *
+     * @return static
+     */
+    public function clone()
+    {
+        return clone $this;
+    }
+
+    /**
      * Clone the query without the given properties.
      *
      * @param  array  $properties
@@ -3241,7 +3251,7 @@ class Builder
      */
     public function cloneWithout(array $properties)
     {
-        return tap(clone $this, function ($clone) use ($properties) {
+        return tap($this->clone(), function ($clone) use ($properties) {
             foreach ($properties as $property) {
                 $clone->{$property} = null;
             }
@@ -3256,7 +3266,7 @@ class Builder
      */
     public function cloneWithoutBindings(array $except)
     {
-        return tap(clone $this, function ($clone) use ($except) {
+        return tap($this->clone(), function ($clone) use ($except) {
             foreach ($except as $type) {
                 $clone->bindings[$type] = [];
             }

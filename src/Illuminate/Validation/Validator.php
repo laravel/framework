@@ -163,7 +163,7 @@ class Validator implements ValidatorContract
     /**
      * The validation rules that may be applied to files.
      *
-     * @var array
+     * @var string[]
      */
     protected $fileRules = [
         'Between',
@@ -180,7 +180,7 @@ class Validator implements ValidatorContract
     /**
      * The validation rules that imply the field is required.
      *
-     * @var array
+     * @var string[]
      */
     protected $implicitRules = [
         'Accepted',
@@ -198,7 +198,7 @@ class Validator implements ValidatorContract
     /**
      * The validation rules which depend on other fields as parameters.
      *
-     * @var array
+     * @var string[]
      */
     protected $dependentRules = [
         'After',
@@ -227,21 +227,21 @@ class Validator implements ValidatorContract
     /**
      * The validation rules that can exclude an attribute.
      *
-     * @var array
+     * @var string[]
      */
     protected $excludeRules = ['ExcludeIf', 'ExcludeUnless', 'ExcludeWithout'];
 
     /**
      * The size related validation rules.
      *
-     * @var array
+     * @var string[]
      */
     protected $sizeRules = ['Size', 'Between', 'Min', 'Max', 'Gt', 'Lt', 'Gte', 'Lte'];
 
     /**
      * The numeric related validation rules.
      *
-     * @var array
+     * @var string[]
      */
     protected $numericRules = ['Numeric', 'Integer'];
 
