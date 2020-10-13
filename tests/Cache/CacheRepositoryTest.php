@@ -324,10 +324,10 @@ class CacheRepositoryTest extends TestCase
 
     public function testNonTaggableRepositoryDoesNotSupportTags()
     {
-        $taggable = m::mock(FileStore::class);
-        $taggableRepo = new Repository($taggable);
+        $nonTaggable = m::mock(FileStore::class);
+        $nonTaggableRepo = new Repository($nonTaggable);
 
-        $this->assertFalse($taggableRepo->supportsTags());
+        $this->assertFalse($nonTaggableRepo->supportsTags());
     }
 
     protected function getRepository()
