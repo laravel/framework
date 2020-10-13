@@ -477,7 +477,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function tags($names)
     {
-        if (! method_exists($this->store, 'tags')) {
+        if (! $this->supportsTags()) {
             throw new BadMethodCallException('This cache store does not support tagging.');
         }
 
@@ -628,6 +628,16 @@ class Repository implements ArrayAccess, CacheContract
         }
 
         return (int) $duration > 0 ? $duration : 0;
+    }
+
+    /**
+     * Check if the current storage supports tags.
+     *
+     * @return bool
+     */
+    public function supportsTags()
+    {
+        return method_exists($this->store, 'tags');
     }
 
     /**
