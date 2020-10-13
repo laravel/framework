@@ -1072,7 +1072,6 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
-
     public function testFillingJSONAttributesAllowWildcard()
     {
         // test nested JSON cannot be filled when fillable is not empty

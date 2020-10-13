@@ -249,7 +249,7 @@ trait GuardsAttributes
 
             foreach ($attributes as $key => $value) {
                 $allFillableKeys = $this->getAllFillableKeys($key);
-                if(array_intersect($allFillableKeys, $this->getFillable())) {
+                if (array_intersect($allFillableKeys, $this->getFillable())) {
                     $fillables[$key] = $value;
                 }
             }
@@ -262,7 +262,7 @@ trait GuardsAttributes
 
     /**
      * Get the all fillable keys with JSON
-     * E.g. 'foo->bar->baz' will return ['foo->*', 'foo->bar->*']
+     * E.g. 'foo->bar->baz' will return ['foo->*', 'foo->bar->*'].
      * @param       $key
      */
     private function getAllFillableKeys($key)
@@ -273,10 +273,11 @@ trait GuardsAttributes
 
             do {
                 $attr = Str::beforeLast($tempKey, '->');
-                $jsonKeys[] = $attr . '->*';
+                $jsonKeys[] = $attr.'->*';
                 $tempKey = $attr;
             } while (strpos($tempKey, '->') != false);
         }
+
         return $jsonKeys;
     }
 }
