@@ -144,7 +144,8 @@ class RateLimitedTestJob
 
     public static $handled = false;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->key = Str::random(10);
     }
 
