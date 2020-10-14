@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
@@ -843,6 +844,51 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $model->withCount(['foo as foo_bar', 'foo']);
 
         $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountSum()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount(['foo' => function ($query) {
+            // when without test case  ,  "DB::raw('sum(num1)')"  replace  "new Expression('sum(num1)')"
+            $query->select(new Expression('sum(num1)'));
+        }]);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select sum(num1) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountSumRename()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount(['foo as foo_sum' => function ($query) {
+            $query->select(new Expression('sum(num1)'));
+        }]);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select sum(num1) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAvg()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount(['foo' => function ($query) {
+            $query->select(new Expression('avg(num1)'));
+        }]);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select avg(num1) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAvgRename()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount(['foo as foo_avg' => function ($query) {
+            $query->select(new Expression('avg(num1)'));
+        }]);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select avg(num1) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testHasWithConstraintsAndHavingInSubquery()
