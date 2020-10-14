@@ -490,6 +490,20 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Specify caller class and function  to front of log message.
+     * @param  string  $message
+     * @return string
+     */
+    public function addPrefixToMessage($message)
+    {
+        if (! $this->app['config']['logging.prefix']) return $message;
+
+        [$one, $two, $three, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
+
+        return "{$caller['class']}::{$caller['function']}() >>> {$message}";
+    }
+
+    /**
      * System is unusable.
      *
      * @param  string  $message
@@ -499,6 +513,8 @@ class LogManager implements LoggerInterface
      */
     public function emergency($message, array $context = [])
     {
+        $message = $this->addPrefixToMessage($message);
+
         $this->driver()->emergency($message, $context);
     }
 
@@ -515,6 +531,8 @@ class LogManager implements LoggerInterface
      */
     public function alert($message, array $context = [])
     {
+        $message = $this->addPrefixToMessage($message);
+
         $this->driver()->alert($message, $context);
     }
 
@@ -530,6 +548,8 @@ class LogManager implements LoggerInterface
      */
     public function critical($message, array $context = [])
     {
+        $message = $this->addPrefixToMessage($message);
+
         $this->driver()->critical($message, $context);
     }
 
@@ -544,6 +564,8 @@ class LogManager implements LoggerInterface
      */
     public function error($message, array $context = [])
     {
+        $message = $this->addPrefixToMessage($message);
+
         $this->driver()->error($message, $context);
     }
 
@@ -560,6 +582,8 @@ class LogManager implements LoggerInterface
      */
     public function warning($message, array $context = [])
     {
+        $message = $this->addPrefixToMessage($message);
+
         $this->driver()->warning($message, $context);
     }
 
@@ -573,6 +597,8 @@ class LogManager implements LoggerInterface
      */
     public function notice($message, array $context = [])
     {
+        $message = $this->addPrefixToMessage($message);
+
         $this->driver()->notice($message, $context);
     }
 
@@ -588,6 +614,8 @@ class LogManager implements LoggerInterface
      */
     public function info($message, array $context = [])
     {
+        $message = $this->addPrefixToMessage($message);
+
         $this->driver()->info($message, $context);
     }
 
@@ -601,6 +629,8 @@ class LogManager implements LoggerInterface
      */
     public function debug($message, array $context = [])
     {
+        $message = $this->addPrefixToMessage($message);
+
         $this->driver()->debug($message, $context);
     }
 
@@ -615,6 +645,8 @@ class LogManager implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
+        $message = $this->addPrefixToMessage($message);
+
         $this->driver()->log($level, $message, $context);
     }
 
