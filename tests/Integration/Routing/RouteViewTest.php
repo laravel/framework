@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use Illuminate\Tests\Integration\Routing\Fixtures\DataProvider;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -19,6 +20,16 @@ class RouteViewTest extends TestCase
 
         $this->assertStringContainsString('Test bar', $this->get('/route')->getContent());
         $this->assertSame(200, $this->get('/route')->status());
+    }
+
+    public function testRouteViewDataProvider()
+    {
+        Route::view('route/{a}/{b}', 'view', [DataProvider::class, 'data']);
+
+        View::addLocation(__DIR__.'/Fixtures');
+
+        $this->assertStringContainsString('Test 123', $this->get('/route/1/23')->getContent());
+        $this->assertSame(200, $this->get('/route/1/23')->status());
     }
 
     public function testRouteViewWithParams()
