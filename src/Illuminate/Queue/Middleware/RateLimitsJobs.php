@@ -4,6 +4,7 @@ namespace Illuminate\Queue\Middleware;
 
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
+use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 
 class RateLimitsJobs
@@ -31,7 +32,7 @@ class RateLimitsJobs
      */
     public function __construct($limiterName)
     {
-        $this->limiter = app(RateLimiter::class);
+        $this->limiter = Container::getInstance()->make(RateLimiter::class);
         $this->limiterName = $limiterName;
     }
 
