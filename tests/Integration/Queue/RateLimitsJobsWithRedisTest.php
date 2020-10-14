@@ -42,7 +42,7 @@ class RateLimitsJobsWithRedisTest extends TestCase
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
 
-        $testJob = new RateLimitedTestJob;
+        $testJob = new RedisRateLimitedTestJob;
 
         $rateLimiter->for($testJob->key, function ($job) {
             return Limit::none();
@@ -56,7 +56,7 @@ class RateLimitsJobsWithRedisTest extends TestCase
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
 
-        $testJob = new RateLimitedTestJob;
+        $testJob = new RedisRateLimitedTestJob;
 
         $rateLimiter->for($testJob->key, function ($job) {
             return Limit::perMinute(1);
@@ -70,7 +70,7 @@ class RateLimitsJobsWithRedisTest extends TestCase
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
 
-        $adminJob = new AdminTestJob;
+        $adminJob = new RedisAdminTestJob;
 
         $rateLimiter->for($adminJob->key, function ($job) {
             if ($job->isAdmin()) {
@@ -83,7 +83,7 @@ class RateLimitsJobsWithRedisTest extends TestCase
         $this->assertJobRanSuccessfully($adminJob);
         $this->assertJobRanSuccessfully($adminJob);
 
-        $nonAdminJob = new NonAdminTestJob;
+        $nonAdminJob = new RedisNonAdminTestJob;
 
         $rateLimiter->for($nonAdminJob->key, function ($job) {
             if ($job->isAdmin()) {
@@ -136,7 +136,7 @@ class RateLimitsJobsWithRedisTest extends TestCase
     }
 }
 
-class RateLimitedTestJob
+class RedisRateLimitedTestJob
 {
     use InteractsWithQueue, Queueable;
 
@@ -160,7 +160,7 @@ class RateLimitedTestJob
     }
 }
 
-class AdminTestJob extends RateLimitedTestJob
+class RedisAdminTestJob extends RedisRateLimitedTestJob
 {
     public function isAdmin()
     {
@@ -168,7 +168,7 @@ class AdminTestJob extends RateLimitedTestJob
     }
 }
 
-class NonAdminTestJob extends RateLimitedTestJob
+class RedisNonAdminTestJob extends RedisRateLimitedTestJob
 {
     public function isAdmin()
     {
