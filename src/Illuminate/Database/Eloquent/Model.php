@@ -672,21 +672,21 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
         return true;
     }
-    
+
     /**
      * Save the model and all of its relationships without throwing an Exception when parent isn't instanciated (unknown foreign key id).
      *
+     * @param string $fk_child_name	The laravel compliant foreign key name
      * @param mixed $fk_id			The id of the parent
-     * @param mixed $fk_name_child	The laravel compliant foreign key name
      * @return bool
      */
-   public function pushOrCreate(?mixed $fk_id = null, ?string $fk_name_child = null)
+   public function pushOrCreate(?string $fk_child_name = null, $fk_id = null)
    {
        // Sets the parent id to the child foreign key
        // The first call to pushOrCreate() will not specify the child name
        // Only set the foreign key id if the child doesn't exists already
-       if ($fk_name_child !== null && $this->{$fk_name_child} === null) {
-           $this->{$fk_name_child} = $fk_id;
+       if ($fk_child_name !== null && $this->{$fk_child_name} === null) {
+           $this->{$fk_child_name} = $fk_id;
        }
 
        // Save() gives us access to the record id
@@ -703,8 +703,9 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
            foreach (array_filter($models) as $model) {
                // Pass the parent id and the laravel compliant foreign key name to the child
-               $fk_name_parent = explode('\\', get_class($this));
-               if (!$model->pushOrCreate($this->id, "{Str::snake(end($fk_name_parent))}_id")) {
+               $fk_parent_class = explode('\\', get_class($this));
+               $fk_parent_name = Str::snake(end($fk_parent_class));
+               if (!$model->pushOrCreate("{$fk_parent_name}_id", $this->id)) {
                    return false;
                }
            }
