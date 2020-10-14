@@ -63,7 +63,7 @@ class RateLimitsJobsTest extends TestCase
 
         $this->assertJobRanSuccessfully(AdminTestJob::class);
         $this->assertJobRanSuccessfully(AdminTestJob::class);
-        
+
         $this->assertJobRanSuccessfully(NonAdminTestJob::class);
         $this->assertJobWasReleased(NonAdminTestJob::class);
     }
