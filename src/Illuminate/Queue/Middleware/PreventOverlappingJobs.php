@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Middleware;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
 class PreventOverlappingJobs
@@ -59,7 +60,8 @@ class PreventOverlappingJobs
      */
     public function handle($job, $next)
     {
-        $lock = app(Cache::class)->lock($this->getLockKey($job), $this->expiresAt);
+        $lock = Container::getInstance()->make(Cache::class)
+            ->lock($this->getLockKey($job), $this->expiresAt);
 
         if ($lock->get()) {
             try {
