@@ -501,7 +501,7 @@ class LogManager implements LoggerInterface
 
         [$one, $two, $three, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
 
-        return "{$caller['class']}::{$caller['function']}() >>> {$message}";
+        return sprintf('%s::%s() >>> %s', $caller['class'] ?? '', $caller['function'] ?? '', $message);
     }
 
     /**
