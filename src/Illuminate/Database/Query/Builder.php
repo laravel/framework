@@ -770,6 +770,10 @@ class Builder
         return $this->whereNested(function ($query) use ($column, $method, $boolean) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
+                    $value = array_pad($value, 3, null);
+                    if (count($value) === 3) {
+                        $value[] = $boolean;
+                    }
                     $query->{$method}(...array_values($value));
                 } else {
                     $query->$method($key, '=', $value, $boolean);
