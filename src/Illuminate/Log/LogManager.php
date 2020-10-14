@@ -491,6 +491,7 @@ class LogManager implements LoggerInterface
 
     /**
      * Specify caller class and function  to front of log message.
+     *
      * @param  string  $message
      * @return string
      */
