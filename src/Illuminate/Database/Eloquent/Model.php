@@ -672,6 +672,46 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
         return true;
     }
+    
+    /**
+     * Save the model and all of its relationships without throwing an Exception when parent isn't instanciated (unknown foreign key id).
+     *
+     * @param mixed $fk_id			The id of the parent
+     * @param mixed $fk_name_child	The laravel compliant foreign key name
+     * @return bool
+     */
+   public function pushOrCreate(?mixed $fk_id = null, ?string $fk_name_child = null)
+   {
+       // Sets the parent id to the child foreign key
+       // The first call to pushOrCreate() will not specify the child name
+       // Only set the foreign key id if the child doesn't exists already
+       if ($fk_name_child !== null && $this->{$fk_name_child} === null) {
+           $this->{$fk_name_child} = $fk_id;
+       }
+
+       // Save() gives us access to the record id
+       if (!$this->save()) {
+           return false;
+       }
+
+       // To sync all of the relationships to the database, we will simply spin through
+       // the relationships and save each model via this "push" method, which allows
+       // us to recurse into all of these nested relations for the model instance.
+       foreach ($this->relations as $models) {
+           $models = $models instanceof Collection
+               ? $models->all() : [$models];
+
+           foreach (array_filter($models) as $model) {
+               // Pass the parent id and the laravel compliant foreign key name to the child
+               $fk_name_parent = explode('\\', get_class($this));
+               if (!$model->pushOrCreate($this->id, "{Str::snake(end($fk_name_parent))}_id")) {
+                   return false;
+               }
+           }
+       }
+
+       return true;
+   }
 
     /**
      * Save the model to the database without raising any events.
