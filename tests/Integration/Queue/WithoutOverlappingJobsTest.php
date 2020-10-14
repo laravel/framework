@@ -8,14 +8,14 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\PreventOverlappingJobs;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
-class PreventOverlappingJobsTest extends TestCase
+class WithoutOverlappingJobsTest extends TestCase
 {
     protected function tearDown(): void
     {
@@ -40,7 +40,7 @@ class PreventOverlappingJobsTest extends TestCase
             'command' => serialize($command = new OverlappingTestJob),
         ]);
 
-        $lockKey = (new PreventOverlappingJobs)->getLockKey($command);
+        $lockKey = (new WithoutOverlapping)->getLockKey($command);
 
         $this->assertTrue(OverlappingTestJob::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->acquire());
@@ -64,7 +64,7 @@ class PreventOverlappingJobsTest extends TestCase
                 'command' => serialize($command = new FailedOverlappingTestJob),
             ]);
         } finally {
-            $lockKey = (new PreventOverlappingJobs)->getLockKey($command);
+            $lockKey = (new WithoutOverlapping)->getLockKey($command);
 
             $this->assertTrue(FailedOverlappingTestJob::$handled);
             $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->acquire());
@@ -76,7 +76,7 @@ class PreventOverlappingJobsTest extends TestCase
         OverlappingTestJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $lockKey = (new PreventOverlappingJobs)->getLockKey($command = new OverlappingTestJob);
+        $lockKey = (new WithoutOverlapping)->getLockKey($command = new OverlappingTestJob);
         $this->app->get(Cache::class)->lock($lockKey, 10)->acquire();
 
         $job = m::mock(Job::class);
@@ -98,7 +98,7 @@ class PreventOverlappingJobsTest extends TestCase
         SkipOverlappingTestJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $lockKey = (new PreventOverlappingJobs)->getLockKey($command = new SkipOverlappingTestJob);
+        $lockKey = (new WithoutOverlapping)->getLockKey($command = new SkipOverlappingTestJob);
         $this->app->get(Cache::class)->lock($lockKey, 10)->acquire();
 
         $job = m::mock(Job::class);
@@ -129,7 +129,7 @@ class OverlappingTestJob
 
     public function middleware()
     {
-        return [new PreventOverlappingJobs];
+        return [new WithoutOverlapping];
     }
 }
 
@@ -137,7 +137,7 @@ class SkipOverlappingTestJob extends OverlappingTestJob
 {
     public function middleware()
     {
-        return [(new PreventOverlappingJobs)->dontRelease()];
+        return [(new WithoutOverlapping)->dontRelease()];
     }
 }
 
