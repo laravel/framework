@@ -176,7 +176,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
-    public function testdropConstrainedForeignId()
+    public function testDropConstrainedForeignId()
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropConstrainedForeignId('foo');
