@@ -674,19 +674,19 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
-     * Save the model and all of its relationships without throwing an Exception when parent isn't instanciated (unknown foreign key id).
+     * Save the model and all of its relationships without throwing an Exception when parent isn't instanciated (undefined parent primary key).
      *
-     * @param string $fk_child_name	The laravel compliant foreign key name
-     * @param mixed $fk_id			The id of the parent
+     * @param string $fkChildName	The laravel compliant foreign key name
+     * @param mixed $fkId			The id of the parent
      * @return bool
      */
-   public function pushOrCreate(?string $fk_child_name = null, $fk_id = null)
+   public function pushOrCreate(?string $fkChildName = null, $fkId = null)
    {
        // Sets the parent id to the child foreign key
        // The first call to pushOrCreate() will not specify the child name
        // Only set the foreign key id if the child doesn't exists already
-       if ($fk_child_name !== null && $this->{$fk_child_name} === null) {
-           $this->{$fk_child_name} = $fk_id;
+       if ($fkChildName !== null && $this->{$fkChildName} === null) {
+           $this->{$fkChildName} = $fkId;
        }
 
        // Save() gives us access to the record id
@@ -703,9 +703,9 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
            foreach (array_filter($models) as $model) {
                // Pass the parent id and the laravel compliant foreign key name to the child
-               $fk_parent_class = explode('\\', get_class($this));
-               $fk_parent_name = Str::snake(end($fk_parent_class));
-               if (!$model->pushOrCreate("{$fk_parent_name}_id", $this->id)) {
+               $fkParentClass = explode('\\', get_class($this));
+               $fkParentName = Str::snake(end($fkParentClass));
+               if (!$model->pushOrCreate("{$fkParentName}_id", $this->id)) {
                    return false;
                }
            }
