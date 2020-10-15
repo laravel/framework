@@ -58,7 +58,7 @@ trait HasAttributes
     /**
      * The built-in, primitive cast types supported by Eloquent.
      *
-     * @var array
+     * @var string[]
      */
     protected static $primitiveCastTypes = [
         'array',

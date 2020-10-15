@@ -38,6 +38,13 @@ class PendingChain
     public $queue;
 
     /**
+     * The number of seconds before the chain should be made available.
+     *
+     * @var \DateTimeInterface|\DateInterval|int|null
+     */
+    public $delay;
+
+    /**
      * The callbacks to be executed on failure.
      *
      * @var array
@@ -79,6 +86,19 @@ class PendingChain
     public function onQueue($queue)
     {
         $this->queue = $queue;
+
+        return $this;
+    }
+
+    /**
+     * Set the desired delay for the chain.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @return $this
+     */
+    public function delay($delay)
+    {
+        $this->delay = $delay;
 
         return $this;
     }
@@ -126,6 +146,7 @@ class PendingChain
         $firstJob->allOnConnection($this->connection);
         $firstJob->allOnQueue($this->queue);
         $firstJob->chain($this->chain);
+        $firstJob->delay($this->delay);
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
         return app(Dispatcher::class)->dispatch($firstJob);

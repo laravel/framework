@@ -361,6 +361,19 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
+     * Create a new chain of queueable jobs.
+     *
+     * @param  \Illuminate\Support\Collection|array  $jobs
+     * @return \Illuminate\Foundation\Bus\PendingChain
+     */
+    public function chain($jobs)
+    {
+        $jobs = Collection::wrap($jobs);
+
+        return new PendingChainFake($this, $jobs->shift(), $jobs->toArray());
+    }
+
+    /**
      * Attempt to find the batch with the given ID.
      *
      * @param  string  $batchId

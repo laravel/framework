@@ -384,6 +384,19 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given column and foreign key should be dropped.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropConstrainedForeignId($column)
+    {
+        $this->dropForeign([$column]);
+
+        return $this->dropColumn($column);
+    }
+
+    /**
      * Indicate that the given indexes should be renamed.
      *
      * @param  string  $from

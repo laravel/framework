@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.42...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.18.43...6.x)
+
+
+## [v6.18.43 (2020-10-13)](https://github.com/laravel/framework/compare/v6.18.42...v6.18.43)
+
+### Fixed
+- Matched `symfony/debug` version with other symfony reqs ([6ce02a2](https://github.com/laravel/framework/commit/6ce02a21cf736f28beda2529d1e28849e86b0944))
 
 
 ## [v6.18.42 (2020-10-06)](https://github.com/laravel/framework/compare/v6.18.41...v6.18.42)

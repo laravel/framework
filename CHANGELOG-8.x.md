@@ -1,6 +1,39 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.9.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.10.0...8.x)
+
+
+## [v8.10.0 (2020-10-13)](https://github.com/laravel/framework/compare/v8.9.0...v8.10.0)
+
+### Added
+- Allow for chains to be added to batches ([#34612](https://github.com/laravel/framework/pull/34612), [7b4a9ec](https://github.com/laravel/framework/commit/7b4a9ec6c58906eb73957015e4c78f73e780e944))
+- Added `is()` method to 1-1 relations for model comparison ([#34693](https://github.com/laravel/framework/pull/34693), [7ba2577](https://github.com/laravel/framework/commit/7ba257732d2342175a6ffe7db7a4ca847ca1d353))
+- Added `upsert` to Eloquent and Base Query Builders ([#34698](https://github.com/laravel/framework/pull/34698), [#34712](https://github.com/laravel/framework/pull/34712), [58a0e1b](https://github.com/laravel/framework/commit/58a0e1b7e2bb6df3923883c4fc8cf13b1bce7322))
+- Support psql and pg_restore commands in schema load ([#34711](https://github.com/laravel/framework/pull/34711))
+- Added `Illuminate\Database\Schema\Builder::dropColumns()` method on the schema class ([#34720](https://github.com/laravel/framework/pull/34720))
+- Added yearlyOn() method to scheduler ([#34728](https://github.com/laravel/framework/pull/34728))
+- Added restrictOnDelete method to ForeignKeyDefinition class ([#34752](https://github.com/laravel/framework/pull/34752))
+- Added `newLine()` method to `InteractsWithIO` trait ([#34754](https://github.com/laravel/framework/pull/34754))
+- Added isNotEmpty method to HtmlString ([#34774](https://github.com/laravel/framework/pull/34774))
+- Added delay() to PendingChain ([#34789](https://github.com/laravel/framework/pull/34789))
+- Added 'multiple_of' validation rule ([#34788](https://github.com/laravel/framework/pull/34788))
+- Added custom methods proxy support for jobs ::dispatch() ([#34781](https://github.com/laravel/framework/pull/34781))
+- Added `QueryBuilder::clone()` ([#34780](https://github.com/laravel/framework/pull/34780))
+- Support bus chain on fake ([a952ac24](https://github.com/laravel/framework/commit/a952ac24f34b832270a2f80cd425c2afe4c61fc1))
+- Added missing force flag to queue:clear command ([#34809](https://github.com/laravel/framework/pull/34809))
+- Added `dropConstrainedForeignId` to `Blueprint ([#34806](https://github.com/laravel/framework/pull/34806))
+- Implement supportsTags() on the Cache Repository ([#34820](https://github.com/laravel/framework/pull/34820))
+- Added `canAny` to user model ([#34815](https://github.com/laravel/framework/pull/34815))
+- Added when() and unless() methods to MailMessage ([#34814](https://github.com/laravel/framework/pull/34814))
+
+### Fixed
+- Fixed collection wrapping in `BelongsToManyRelationship` ([9245807](https://github.com/laravel/framework/commit/9245807f8a1132a30ce669513cf0e99e9e078267))
+- Fixed LengthAwarePaginator translations issue ([#34714](https://github.com/laravel/framework/pull/34714))
+
+### Changed
+- Improve `schedule:work` command ([#34736](https://github.com/laravel/framework/pull/34736), [bbddba2](https://github.com/laravel/framework/commit/bbddba279bc781fc2868a6967430943de636614f))
+- Guard against invalid guard in make:policy ([#34792](https://github.com/laravel/framework/pull/34792))
+- Fixed router inconsistency for namespaced route groups ([#34793](https://github.com/laravel/framework/pull/34793))
 
 
 ## [v8.9.0 (2020-10-06)](https://github.com/laravel/framework/compare/v8.8.0...v8.9.0)

@@ -21,7 +21,7 @@ class Grammar extends BaseGrammar
     /**
      * The components that make up a select clause.
      *
-     * @var array
+     * @var string[]
      */
     protected $selectComponents = [
         'aggregate',
