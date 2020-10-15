@@ -7,7 +7,7 @@ use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 
-class RateLimitsJobs
+class RateLimited
 {
     /**
      * The rate limiter instance.

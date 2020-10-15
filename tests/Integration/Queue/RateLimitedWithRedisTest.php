@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\RateLimitsJobsWithRedis;
+use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -18,7 +18,7 @@ use Orchestra\Testbench\TestCase;
 /**
  * @group integration
  */
-class RateLimitsJobsWithRedisTest extends TestCase
+class RateLimitedWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
 
@@ -156,7 +156,7 @@ class RedisRateLimitedTestJob
 
     public function middleware()
     {
-        return [new RateLimitsJobsWithRedis($this->key)];
+        return [new RateLimitedWithRedis($this->key)];
     }
 }
 

@@ -7,7 +7,7 @@ use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Support\InteractsWithTime;
 
-class RateLimitsJobsWithRedis extends RateLimitsJobs
+class RateLimitedWithRedis extends RateLimited
 {
     use InteractsWithTime;
 
