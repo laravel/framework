@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Illuminate\Cache\RateLimitingServiceProvider;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 use Illuminate\Support\Carbon;
@@ -60,5 +61,10 @@ class ThrottleRequestsWithRedisTest extends TestCase
                 // $this->assertTrue(in_array($e->getHeaders()['X-RateLimit-Reset'], [$finish->getTimestamp() + 2, $finish->getTimestamp() + 3]));
             }
         });
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return [RateLimitingServiceProvider::class];
     }
 }

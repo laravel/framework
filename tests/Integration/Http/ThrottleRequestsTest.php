@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Cache\RateLimitingServiceProvider;
 use Illuminate\Cache\RateLimiting\GlobalLimit;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
@@ -97,5 +98,10 @@ class ThrottleRequestsTest extends TestCase
             $this->assertEquals(2, $e->getHeaders()['Retry-After']);
             $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return [RateLimitingServiceProvider::class];
     }
 }
