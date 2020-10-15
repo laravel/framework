@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 
