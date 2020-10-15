@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Cache\RateLimiter;
-use Illuminate\Cache\RateLimitingServiceProvider;
 use Illuminate\Cache\RateLimiting\GlobalLimit;
+use Illuminate\Cache\RateLimitingServiceProvider;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Routing\Middleware\ThrottleRequests;
