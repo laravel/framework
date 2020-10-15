@@ -262,6 +262,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Determine if the request is made by a bot / search engine.
+     *
+     * @return bool
+     */
+    public function bot()
+    {
+        return preg_match('/bot|crawl|slurp|spider|mediapartners/i', $this->userAgent());
+    }
+
+    /**
      * Determine if the request is over HTTPS.
      *
      * @return bool
