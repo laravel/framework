@@ -24,15 +24,15 @@ class RateLimitsJobs
     protected $limiterName;
 
     /**
-     * Create a new rate limiter middleware instance.
+     * Create a new middleware instance.
      *
      * @param  string  $limiterName
-     *
      * @return void
      */
     public function __construct($limiterName)
     {
         $this->limiter = Container::getInstance()->make(RateLimiter::class);
+
         $this->limiterName = $limiterName;
     }
 
@@ -45,27 +45,27 @@ class RateLimitsJobs
      */
     public function handle($job, $next)
     {
-        if (! is_null($limiter = $this->limiter->limiter($this->limiterName))) {
-            $limiterResponse = call_user_func($limiter, $job);
-
-            if ($limiterResponse instanceof Unlimited) {
-                return $next($job);
-            }
-
-            return $this->handleJob(
-                $job,
-                $next,
-                collect(Arr::wrap($limiterResponse))->map(function ($limit) {
-                    return (object) [
-                        'key' => md5($this->limiterName.$limit->key),
-                        'maxAttempts' => $limit->maxAttempts,
-                        'decayMinutes' => $limit->decayMinutes,
-                    ];
-                })->all()
-            );
-        } else {
+        if (is_null($limiter = $this->limiter->limiter($this->limiterName))) {
             return $next($job);
         }
+
+        $limiterResponse = call_user_func($limiter, $job);
+
+        if ($limiterResponse instanceof Unlimited) {
+            return $next($job);
+        }
+
+        return $this->handleJob(
+            $job,
+            $next,
+            collect(Arr::wrap($limiterResponse))->map(function ($limit) {
+                return (object) [
+                    'key' => md5($this->limiterName.$limit->key),
+                    'maxAttempts' => $limit->maxAttempts,
+                    'decayMinutes' => $limit->decayMinutes,
+                ];
+            })->all()
+        );
     }
 
     /**
@@ -90,13 +90,13 @@ class RateLimitsJobs
     }
 
     /**
-     * Get the number of seconds until the next retry.
+     * Get the number of seconds that should elapse before the job is retried.
      *
      * @param  string  $key
      * @return int
      */
     protected function getTimeUntilNextRetry($key)
     {
-        return $this->limiter->availableIn($key);
+        return $this->limiter->availableIn($key) + 3;
     }
 }

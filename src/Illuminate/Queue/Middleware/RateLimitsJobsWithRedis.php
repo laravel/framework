@@ -26,10 +26,9 @@ class RateLimitsJobsWithRedis extends RateLimitsJobs
     public $decaysAt = [];
 
     /**
-     * Create a new rate limiter middleware instance.
+     * Create a new middleware instance.
      *
      * @param  string  $limiterName
-     *
      * @return void
      */
     public function __construct($limiterName)
@@ -78,13 +77,13 @@ class RateLimitsJobsWithRedis extends RateLimitsJobs
     }
 
     /**
-     * Get the number of seconds until the lock is released.
+     * Get the number of seconds that should elapse before the job is retried.
      *
      * @param  string  $key
      * @return int
      */
     protected function getTimeUntilNextRetry($key)
     {
-        return $this->decaysAt[$key] - $this->currentTime();
+        return ($this->decaysAt[$key] - $this->currentTime()) + 3;
     }
 }
