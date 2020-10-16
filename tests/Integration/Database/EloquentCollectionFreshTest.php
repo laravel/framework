@@ -31,11 +31,11 @@ class EloquentCollectionFreshTest extends DatabaseTestCase
 
         $collection = User::all();
 
-        User::whereKey($collection->pluck('id')->toArray())->delete();
+        $collection->first()->delete();
 
         $freshCollection = $collection->fresh();
 
-        $this->assertEmpty($freshCollection->filter());
+        $this->assertCount(1, $freshCollection);
         $this->assertInstanceOf(EloquentCollection::class, $freshCollection);
     }
 }
