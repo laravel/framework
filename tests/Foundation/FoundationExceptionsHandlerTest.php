@@ -16,6 +16,7 @@ use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -28,6 +29,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     protected $config;
 
     protected $container;
@@ -60,8 +63,6 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
     }
 
@@ -69,16 +70,29 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')]);
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
 
         $this->handler->report(new RuntimeException('Exception message'));
+    }
+
+    public function testHandlerReportsExceptionWhenUnReportable()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
+
+        $this->handler->report(new UnReportableException('Exception message'));
     }
 
     public function testHandlerCallsReportMethodWithDependencies()
     {
         $reporter = m::mock(ReportingService::class);
         $this->container->instance(ReportingService::class, $reporter);
-        $reporter->shouldReceive('send')->withArgs(['Exception message']);
+        $reporter->shouldReceive('send')->withArgs(['Exception message'])->once();
+
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
 
         $this->handler->report(new ReportableException('Exception message'));
     }
@@ -97,11 +111,24 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertStringContainsString('"trace":', $response);
     }
 
-    public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
+    public function testReturnsCustomResponseFromRenderableCallback()
     {
+        $this->handler->renderable(function (CustomException $e, $request) {
+            $this->assertSame($this->request, $request);
+
+            return response()->json(['response' => 'My custom exception response']);
+        });
+
         $response = $this->handler->render($this->request, new CustomException)->getContent();
 
         $this->assertSame('{"response":"My custom exception response"}', $response);
+    }
+
+    public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
+    {
+        $response = $this->handler->render($this->request, new ResponsableException)->getContent();
+
+        $this->assertSame('{"response":"My responsable exception response"}', $response);
     }
 
     public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndExceptionMessageIsMasked()
@@ -210,11 +237,15 @@ class FoundationExceptionsHandlerTest extends TestCase
     }
 }
 
-class CustomException extends Exception implements Responsable
+class CustomException extends Exception
+{
+}
+
+class ResponsableException extends Exception implements Responsable
 {
     public function toResponse($request)
     {
-        return response()->json(['response' => 'My custom exception response']);
+        return response()->json(['response' => 'My responsable exception response']);
     }
 }
 
@@ -223,6 +254,14 @@ class ReportableException extends Exception
     public function report(ReportingService $reportingService)
     {
         $reportingService->send($this->getMessage());
+    }
+}
+
+class UnReportableException extends Exception
+{
+    public function report()
+    {
+        return false;
     }
 }
 

@@ -672,7 +672,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('Not allowed to view as it is not published.', $response->message());
         $this->assertFalse($response->allowed());
         $this->assertTrue($response->denied());
-        $this->assertEquals($response->code(), 'unpublished');
+        $this->assertSame('unpublished', $response->code());
     }
 
     public function testAuthorizeReturnsAnAllowedResponseForATruthyReturn()

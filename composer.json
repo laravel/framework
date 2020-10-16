@@ -15,34 +15,33 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": "^7.3",
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "doctrine/inflector": "^1.4|^2.0",
-        "dragonmantank/cron-expression": "^2.0",
+        "dragonmantank/cron-expression": "^3.0",
         "egulias/email-validator": "^2.1.10",
         "league/commonmark": "^1.3",
         "league/flysystem": "^1.0.34",
         "monolog/monolog": "^2.0",
         "nesbot/carbon": "^2.17",
-        "opis/closure": "^3.1",
+        "opis/closure": "^3.5.3",
         "psr/container": "^1.0",
         "psr/simple-cache": "^1.0",
-        "ramsey/uuid": "^3.7|^4.0",
+        "ramsey/uuid": "^4.0",
         "swiftmailer/swiftmailer": "^6.0",
-        "symfony/console": "^5.0",
-        "symfony/error-handler": "^5.0",
-        "symfony/finder": "^5.0",
-        "symfony/http-foundation": "^5.0",
-        "symfony/http-kernel": "^5.0",
-        "symfony/mime": "^5.0",
-        "symfony/polyfill-php73": "^1.17",
-        "symfony/process": "^5.0",
-        "symfony/routing": "^5.0",
-        "symfony/var-dumper": "^5.0",
+        "symfony/console": "^5.1",
+        "symfony/error-handler": "^5.1",
+        "symfony/finder": "^5.1",
+        "symfony/http-foundation": "^5.1",
+        "symfony/http-kernel": "^5.1",
+        "symfony/mime": "^5.1",
+        "symfony/process": "^5.1",
+        "symfony/routing": "^5.1",
+        "symfony/var-dumper": "^5.1",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2",
-        "vlucas/phpdotenv": "^4.0",
+        "vlucas/phpdotenv": "^5.2",
         "voku/portable-ascii": "^1.4.8"
     },
     "replace": {
@@ -50,6 +49,7 @@
         "illuminate/broadcasting": "self.version",
         "illuminate/bus": "self.version",
         "illuminate/cache": "self.version",
+        "illuminate/collections": "self.version",
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
         "illuminate/container": "self.version",
@@ -62,6 +62,7 @@
         "illuminate/hashing": "self.version",
         "illuminate/http": "self.version",
         "illuminate/log": "self.version",
+        "illuminate/macroable": "self.version",
         "illuminate/mail": "self.version",
         "illuminate/notifications": "self.version",
         "illuminate/pagination": "self.version",
@@ -80,15 +81,14 @@
         "aws/aws-sdk-php": "^3.0",
         "doctrine/dbal": "^2.6",
         "filp/whoops": "^2.4",
-        "guzzlehttp/guzzle": "^6.3.1|^7.0",
+        "guzzlehttp/guzzle": "^6.5.5|^7.0.1",
         "league/flysystem-cached-adapter": "^1.0",
         "mockery/mockery": "^1.3.1",
-        "moontoast/math": "^1.1",
-        "orchestra/testbench-core": "^5.0",
+        "orchestra/testbench-core": "^6.0",
         "pda/pheanstalk": "^4.0",
         "phpunit/phpunit": "^8.4|^9.0",
         "predis/predis": "^1.1.1",
-        "symfony/cache": "^5.0"
+        "symfony/cache": "^5.1"
     },
     "provide": {
         "psr/container-implementation": "1.0"
@@ -98,11 +98,14 @@
     },
     "autoload": {
         "files": [
+            "src/Illuminate/Collections/helpers.php",
+            "src/Illuminate/Events/functions.php",
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
         ],
         "psr-4": {
-            "Illuminate\\": "src/Illuminate/"
+            "Illuminate\\": "src/Illuminate/",
+            "Illuminate\\Support\\": ["src/Illuminate/Macroable/", "src/Illuminate/Collections/"]
         }
     },
     "autoload-dev": {
@@ -115,7 +118,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "8.x-dev"
         }
     },
     "suggest": {
@@ -129,21 +132,20 @@
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6).",
         "filp/whoops": "Required for friendly error pages in development (^2.4).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (^1.9.1).",
-        "guzzlehttp/guzzle": "Required to use the HTTP Client, Mailgun mail driver and the ping methods on schedules (^6.3.1|^7.0).",
+        "guzzlehttp/guzzle": "Required to use the HTTP Client, Mailgun mail driver and the ping methods on schedules (^6.5.5|^7.0.1).",
         "laravel/tinker": "Required to use the tinker console command (^2.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^1.0).",
         "league/flysystem-cached-adapter": "Required to use the Flysystem cache (^1.0).",
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
         "mockery/mockery": "Required to use mocking (^1.3.1).",
-        "moontoast/math": "Required to use ordered UUIDs (^1.1).",
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
         "phpunit/phpunit": "Required to use assertions and run tests (^8.4|^9.0).",
         "predis/predis": "Required to use the predis connector (^1.1.2).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0).",
-        "symfony/cache": "Required to PSR-6 cache bridge (^5.0).",
-        "symfony/filesystem": "Required to create relative storage directory symbolic links (^5.0).",
+        "symfony/cache": "Required to PSR-6 cache bridge (^5.1).",
+        "symfony/filesystem": "Required to enable support for relative symbolic links (^5.1).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
         "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
     },

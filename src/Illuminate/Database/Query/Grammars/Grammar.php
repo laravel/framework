@@ -21,7 +21,7 @@ class Grammar extends BaseGrammar
     /**
      * The components that make up a select clause.
      *
-     * @var array
+     * @var string[]
      */
     protected $selectComponents = [
         'aggregate',
@@ -181,7 +181,7 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
-    protected function compileWheres(Builder $query)
+    public function compileWheres(Builder $query)
     {
         // Each type of where clauses has its own compiler function which is responsible
         // for actually creating the where clauses SQL. This helps keep the code nice
@@ -250,7 +250,9 @@ class Grammar extends BaseGrammar
     {
         $value = $this->parameter($where['value']);
 
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+        $operator = str_replace('?', '??', $where['operator']);
+
+        return $this->wrap($where['column']).' '.$operator.' '.$value;
     }
 
     /**
@@ -991,6 +993,22 @@ class Grammar extends BaseGrammar
         $joins = $this->compileJoins($query, $query->joins);
 
         return "update {$table} {$joins} set {$columns} {$where}";
+    }
+
+    /**
+     * Compile an "upsert" statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  array $values
+     * @param  array $uniqueBy
+     * @param  array $update
+     * @return  string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
+    {
+        throw new RuntimeException('This database engine does not support upserts.');
     }
 
     /**

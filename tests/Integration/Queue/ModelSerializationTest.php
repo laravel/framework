@@ -232,8 +232,8 @@ class ModelSerializationTest extends TestCase
 
         $unserialized = unserialize($serialized);
 
-        $this->assertEquals($unserialized->users->first()->email, 'taylor@laravel.com');
-        $this->assertEquals($unserialized->users->last()->email, 'mohamed@laravel.com');
+        $this->assertEquals('taylor@laravel.com', $unserialized->users->first()->email);
+        $this->assertEquals('mohamed@laravel.com', $unserialized->users->last()->email);
     }
 
     public function testItCanUnserializeACollectionInCorrectOrderAndHandleDeletedModels()
@@ -252,8 +252,8 @@ class ModelSerializationTest extends TestCase
 
         $this->assertCount(2, $unserialized->users);
 
-        $this->assertEquals($unserialized->users->first()->email, '3@laravel.com');
-        $this->assertEquals($unserialized->users->last()->email, '1@laravel.com');
+        $this->assertEquals('3@laravel.com', $unserialized->users->first()->email);
+        $this->assertEquals('1@laravel.com', $unserialized->users->last()->email);
     }
 
     public function testItCanUnserializeCustomCollection()
@@ -322,7 +322,7 @@ class ModelSerializationTest extends TestCase
 class ModelSerializationTestUser extends Model
 {
     public $table = 'users';
-    public $guarded = ['id'];
+    public $guarded = [];
     public $timestamps = false;
 }
 
@@ -334,7 +334,7 @@ class ModelSerializationTestCustomUserCollection extends Collection
 class ModelSerializationTestCustomUser extends Model
 {
     public $table = 'users';
-    public $guarded = ['id'];
+    public $guarded = [];
     public $timestamps = false;
 
     public function newCollection(array $models = [])
@@ -345,7 +345,7 @@ class ModelSerializationTestCustomUser extends Model
 
 class Order extends Model
 {
-    public $guarded = ['id'];
+    public $guarded = [];
     public $timestamps = false;
 
     public function line()
@@ -366,7 +366,7 @@ class Order extends Model
 
 class Line extends Model
 {
-    public $guarded = ['id'];
+    public $guarded = [];
     public $timestamps = false;
 
     public function product()
@@ -377,13 +377,13 @@ class Line extends Model
 
 class Product extends Model
 {
-    public $guarded = ['id'];
+    public $guarded = [];
     public $timestamps = false;
 }
 
 class User extends Model
 {
-    public $guarded = ['id'];
+    public $guarded = [];
     public $timestamps = false;
 
     public function roles()
@@ -395,7 +395,7 @@ class User extends Model
 
 class Role extends Model
 {
-    public $guarded = ['id'];
+    public $guarded = [];
     public $timestamps = false;
 
     public function users()
@@ -407,7 +407,7 @@ class Role extends Model
 
 class RoleUser extends Pivot
 {
-    public $guarded = ['id'];
+    public $guarded = [];
     public $timestamps = false;
 
     public function user()

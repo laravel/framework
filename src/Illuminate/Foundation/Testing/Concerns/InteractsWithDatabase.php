@@ -2,9 +2,11 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Constraints\CountInDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
@@ -119,6 +121,23 @@ trait InteractsWithDatabase
     }
 
     /**
+     * Cast a JSON string to a database compatible type.
+     *
+     * @param  array|string  $value
+     * @return \Illuminate\Database\Query\Expression
+     */
+    public function castAsJson($value)
+    {
+        if ($value instanceof Jsonable) {
+            $value = $value->toJson();
+        } elseif (is_array($value)) {
+            $value = json_encode($value);
+        }
+
+        return DB::raw("CAST('$value' AS JSON)");
+    }
+
+    /**
      * Get the database connection.
      *
      * @param  string|null  $connection
@@ -139,7 +158,7 @@ trait InteractsWithDatabase
      * @param  array|string  $class
      * @return $this
      */
-    public function seed($class = 'DatabaseSeeder')
+    public function seed($class = 'Database\\Seeders\\DatabaseSeeder')
     {
         foreach (Arr::wrap($class) as $class) {
             $this->artisan('db:seed', ['--class' => $class, '--no-interaction' => true]);

@@ -87,7 +87,7 @@ class JsonCast extends Model
 {
     public $table = 'json_casts';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public $casts = [
         'basic_string_as_json_field' => 'json',

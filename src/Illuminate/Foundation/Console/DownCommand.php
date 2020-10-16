@@ -4,27 +4,28 @@ namespace Illuminate\Foundation\Console;
 
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\InteractsWithTime;
+use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
+use Illuminate\Support\Facades\View;
 
 class DownCommand extends Command
 {
-    use InteractsWithTime;
-
     /**
      * The console command signature.
      *
      * @var string
      */
-    protected $signature = 'down {--message= : The message for the maintenance mode}
+    protected $signature = 'down {--redirect= : The path that users should be redirected to}
+                                 {--render= : The view that should be prerendered for display during maintenance mode}
                                  {--retry= : The number of seconds after which the request may be retried}
-                                 {--allow=* : IP or networks allowed to access the application while in maintenance mode}';
+                                 {--secret= : The secret phrase that may be used to bypass maintenance mode}
+                                 {--status=503 : The status code that should be used when returning the maintenance mode response}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Put the application into maintenance mode';
+    protected $description = 'Put the application into maintenance / demo mode';
 
     /**
      * Execute the console command.
@@ -34,15 +35,21 @@ class DownCommand extends Command
     public function handle()
     {
         try {
-            if (file_exists(storage_path('framework/down'))) {
+            if (is_file(storage_path('framework/down'))) {
                 $this->comment('Application is already down.');
 
-                return true;
+                return 0;
             }
 
-            file_put_contents(storage_path('framework/down'),
-                              json_encode($this->getDownFilePayload(),
-                              JSON_PRETTY_PRINT));
+            file_put_contents(
+                storage_path('framework/down'),
+                json_encode($this->getDownFilePayload(), JSON_PRETTY_PRINT)
+            );
+
+            file_put_contents(
+                storage_path('framework/maintenance.php'),
+                file_get_contents(__DIR__.'/stubs/maintenance-mode.stub')
+            );
 
             $this->comment('Application is now in maintenance mode.');
         } catch (Exception $e) {
@@ -62,11 +69,38 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
-            'time' => $this->currentTime(),
-            'message' => $this->option('message'),
+            'redirect' => $this->redirectPath(),
             'retry' => $this->getRetryTime(),
-            'allowed' => $this->option('allow'),
+            'secret' => $this->option('secret'),
+            'status' => (int) $this->option('status', 503),
+            'template' => $this->option('render') ? $this->prerenderView() : null,
         ];
+    }
+
+    /**
+     * Get the path that users should be redirected to.
+     *
+     * @return string
+     */
+    protected function redirectPath()
+    {
+        if ($this->option('redirect') && $this->option('redirect') !== '/') {
+            return '/'.trim($this->option('redirect'), '/');
+        }
+
+        return $this->option('redirect');
+    }
+
+    /**
+     * Prerender the specified view so that it can be rendered even before loading Composer.
+     *
+     * @return string
+     */
+    protected function prerenderView()
+    {
+        (new RegisterErrorViewPaths)();
+
+        return view($this->option('render'))->render();
     }
 
     /**

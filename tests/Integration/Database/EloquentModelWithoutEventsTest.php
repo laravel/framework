@@ -31,7 +31,7 @@ class EloquentModelWithoutEventsTest extends DatabaseTestCase
 
         $model->save();
 
-        $this->assertEquals('Laravel', $model->project);
+        $this->assertSame('Laravel', $model->project);
     }
 }
 
@@ -39,7 +39,7 @@ class AutoFilledModel extends Model
 {
     public $table = 'auto_filled_models';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public static function boot()
     {

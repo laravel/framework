@@ -49,7 +49,9 @@ trait RefreshDatabase
      */
     protected function migrateUsing()
     {
-        return [];
+        return [
+            '--seed' => $this->shouldSeed(),
+        ];
     }
 
     /**
@@ -80,6 +82,7 @@ trait RefreshDatabase
         return [
             '--drop-views' => $this->shouldDropViews(),
             '--drop-types' => $this->shouldDropTypes(),
+            '--seed' => $this->shouldSeed(),
         ];
     }
 
@@ -132,8 +135,7 @@ trait RefreshDatabase
      */
     protected function shouldDropViews()
     {
-        return property_exists($this, 'dropViews')
-                            ? $this->dropViews : false;
+        return property_exists($this, 'dropViews') ? $this->dropViews : false;
     }
 
     /**
@@ -143,7 +145,16 @@ trait RefreshDatabase
      */
     protected function shouldDropTypes()
     {
-        return property_exists($this, 'dropTypes')
-                            ? $this->dropTypes : false;
+        return property_exists($this, 'dropTypes') ? $this->dropTypes : false;
+    }
+
+    /**
+     * Determine if the seed task should be run when refreshing the database.
+     *
+     * @return bool
+     */
+    protected function shouldSeed()
+    {
+        return property_exists($this, 'seed') ? $this->seed : false;
     }
 }

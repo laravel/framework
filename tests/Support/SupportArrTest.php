@@ -110,7 +110,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo.bar' => []], $array);
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
-        $this->assertEquals($array, ['name' => 'taylor', 'languages.php' => true]);
+        $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
     }
 
     public function testExcept()
@@ -564,6 +564,9 @@ class SupportArrTest extends TestCase
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, 'zero');
         $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
+
+        $array = Arr::prepend(['one' => 1, 'two' => 2], 0, null);
+        $this->assertEquals([null => 0, 'one' => 1, 'two' => 2], $array);
     }
 
     public function testPull()
@@ -630,6 +633,12 @@ class SupportArrTest extends TestCase
         $this->assertCount(2, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
         $this->assertContains($random[1], ['foo', 'bar', 'baz']);
+
+        // preserve keys
+        $random = Arr::random(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], 2, true);
+        $this->assertIsArray($random);
+        $this->assertCount(2, $random);
+        $this->assertCount(2, array_intersect_assoc(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], $random));
     }
 
     public function testRandomOnEmptyArray()

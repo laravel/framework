@@ -465,7 +465,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
 
         $this->assertTrue(Builder::hasGlobalMacro('foo'));
-        $this->assertEquals($builder->foo('bar'), 'bar');
+        $this->assertEquals('bar', $builder->foo('bar'));
         $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
@@ -489,7 +489,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('hydrate')->once()->with($records)->andReturn(new Collection(['hydrated']));
         $models = $builder->getModels(['foo']);
 
-        $this->assertEquals($models, ['hydrated']);
+        $this->assertEquals(['hydrated'], $models);
     }
 
     public function testEagerLoadRelationsLoadTopLevelRelationships()
@@ -608,6 +608,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->with(['orders.lines' => function () {
             return 'foo';
         }]);
+        $eagers = $builder->getEagerLoads();
+
+        $this->assertInstanceOf(Closure::class, $eagers['orders']);
+        $this->assertNull($eagers['orders']());
+        $this->assertSame('foo', $eagers['orders.lines']());
+
+        $builder = $this->getBuilder();
+        $builder->with('orders.lines', function () {
+            return 'foo';
+        });
         $eagers = $builder->getEagerLoads();
 
         $this->assertInstanceOf(Closure::class, $eagers['orders']);
@@ -1305,6 +1315,31 @@ class DatabaseEloquentBuilderTest extends TestCase
         Carbon::setTestNow(null);
     }
 
+    public function testUpsert()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table')->andReturn('foo_table');
+        $query->from = 'foo_table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder->setModel($model);
+
+        $query->shouldReceive('upsert')->once()
+            ->with([
+                ['email' => 'foo', 'name' => 'bar', 'updated_at' => $now, 'created_at' => $now],
+                ['name' => 'bar2', 'email' => 'foo2', 'updated_at' => $now, 'created_at' => $now],
+            ], ['email'], ['email', 'name', 'updated_at'])->andReturn(2);
+
+        $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
+
+        $this->assertEquals(2, $result);
+
+        Carbon::setTestNow(null);
+    }
+
     public function testWithCastsMethod()
     {
         $builder = new Builder($this->getMockQueryBuilder());
@@ -1325,6 +1360,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });
+        $connection->shouldReceive('getDatabaseName')->andReturn('database');
         $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
         $class = get_class($model);
         $class::setConnectionResolver($resolver);

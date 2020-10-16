@@ -14,6 +14,8 @@ namespace Illuminate\Support\Facades;
  * @method static void log($level, string $message, array $context = [])
  * @method static void notice(string $message, array $context = [])
  * @method static void warning(string $message, array $context = [])
+ * @method static void write(string $level, string $message, array $context = [])
+ * @method static void listen(\Closure $callback)
  *
  * @see \Illuminate\Log\Logger
  */

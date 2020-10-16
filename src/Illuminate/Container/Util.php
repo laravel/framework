@@ -5,6 +5,9 @@ namespace Illuminate\Container;
 use Closure;
 use ReflectionNamedType;
 
+/**
+ * @internal
+ */
 class Util
 {
     /**

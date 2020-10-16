@@ -139,7 +139,7 @@ class TestUpdateModel1 extends Model
 {
     public $table = 'test_model1';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }
 
 class TestUpdateModel2 extends Model
@@ -156,5 +156,5 @@ class TestUpdateModel3 extends Model
 
     public $table = 'test_model3';
     protected $fillable = ['counter'];
-    protected $dates = ['deleted_at'];
+    protected $casts = ['deleted_at' => 'datetime'];
 }

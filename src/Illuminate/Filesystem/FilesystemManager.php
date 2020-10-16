@@ -345,6 +345,19 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Disconnect the given disk and remove from local cache.
+     *
+     * @param  string|null  $name
+     * @return void
+     */
+    public function purge($name = null)
+    {
+        $name = $name ?? $this->getDefaultDriver();
+
+        unset($this->disks[$name]);
+    }
+
+    /**
      * Register a custom driver creator Closure.
      *
      * @param  string  $driver

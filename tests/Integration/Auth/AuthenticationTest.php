@@ -84,7 +84,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        $this->assertSame('email', $response->decodeResponseJson()['email']);
+        $this->assertSame('email', $response->json()['email']);
     }
 
     public function testBasicAuthRespectsAdditionalConditions()

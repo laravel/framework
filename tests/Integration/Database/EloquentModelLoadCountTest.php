@@ -74,7 +74,7 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
     {
         $model = BaseModel::first();
 
-        $this->assertEquals(null, $model->deletedrelated_count);
+        $this->assertNull($model->deletedrelated_count);
 
         $model->loadCount('deletedrelated');
 
@@ -84,7 +84,7 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
 
         $model = BaseModel::first();
 
-        $this->assertEquals(null, $model->deletedrelated_count);
+        $this->assertNull($model->deletedrelated_count);
 
         $model->loadCount('deletedrelated');
 
@@ -96,7 +96,7 @@ class BaseModel extends Model
 {
     public $timestamps = false;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function related1()
     {

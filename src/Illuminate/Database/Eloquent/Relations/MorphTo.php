@@ -136,7 +136,7 @@ class MorphTo extends BelongsTo
         $whereIn = $this->whereInMethod($instance, $ownerKey);
 
         return $query->{$whereIn}(
-            $instance->getTable().'.'.$ownerKey, $this->gatherKeysByType($type)
+            $instance->getTable().'.'.$ownerKey, $this->gatherKeysByType($type, $instance->getKeyType())
         )->get();
     }
 
@@ -144,11 +144,16 @@ class MorphTo extends BelongsTo
      * Gather all of the foreign keys for a given type.
      *
      * @param  string  $type
+     * @param  string  $keyType
      * @return array
      */
-    protected function gatherKeysByType($type)
+    protected function gatherKeysByType($type, $keyType)
     {
-        return array_keys($this->dictionary[$type]);
+        return $keyType !== 'string'
+                    ? array_keys($this->dictionary[$type])
+                    : array_map(function ($modelId) {
+                        return (string) $modelId;
+                    }, array_keys($this->dictionary[$type]));
     }
 
     /**
@@ -232,6 +237,16 @@ class MorphTo extends BelongsTo
         $this->parent->setAttribute($this->morphType, null);
 
         return $this->parent->setRelation($this->relationName, null);
+    }
+
+    /**
+     * Alias for the "dissociate" method.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function disassociate()
+    {
+        return $this->dissociate();
     }
 
     /**

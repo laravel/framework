@@ -37,6 +37,11 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response put(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
  * @method static \Illuminate\Http\Client\ResponseSequence fakeSequence(string $urlPattern = '*')
+ * @method static void assertSent(callable $callback)
+ * @method static void assertNotSent(callable $callback)
+ * @method static void assertNothingSent()
+ * @method static void assertSentCount(int $count)
+ * @method static void assertSequencesAreEmpty()
  *
  * @see \Illuminate\Http\Client\Factory
  */

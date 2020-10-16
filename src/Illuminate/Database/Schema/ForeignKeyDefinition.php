@@ -35,6 +35,16 @@ class ForeignKeyDefinition extends Fluent
     }
 
     /**
+     * Indicate that deletes should be restricted.
+     *
+     * @return $this
+     */
+    public function restrictOnDelete()
+    {
+        return $this->onDelete('restrict');
+    }
+
+    /**
      * Indicate that deletes should set the foreign key value to null.
      *
      * @return $this

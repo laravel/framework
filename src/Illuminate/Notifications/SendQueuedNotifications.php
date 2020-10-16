@@ -118,17 +118,17 @@ class SendQueuedNotifications implements ShouldQueue
     }
 
     /**
-     * Get the retry delay for the notification.
+     * Get number of seconds before a released notification will be available.
      *
      * @return mixed
      */
-    public function retryAfter()
+    public function backoff()
     {
-        if (! method_exists($this->notification, 'retryAfter') && ! isset($this->notification->retryAfter)) {
+        if (! method_exists($this->notification, 'backoff') && ! isset($this->notification->backoff)) {
             return;
         }
 
-        return $this->notification->retryAfter ?? $this->notification->retryAfter();
+        return $this->notification->backoff ?? $this->notification->backoff();
     }
 
     /**
@@ -138,11 +138,11 @@ class SendQueuedNotifications implements ShouldQueue
      */
     public function retryUntil()
     {
-        if (! method_exists($this->notification, 'retryUntil') && ! isset($this->notification->timeoutAt)) {
+        if (! method_exists($this->notification, 'retryUntil') && ! isset($this->notification->retryUntil)) {
             return;
         }
 
-        return $this->notification->timeoutAt ?? $this->notification->retryUntil();
+        return $this->notification->retryUntil ?? $this->notification->retryUntil();
     }
 
     /**

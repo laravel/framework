@@ -176,6 +176,17 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
+    public function testDropConstrainedForeignId()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropConstrainedForeignId('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table "users" drop constraint "users_foo_foreign"', $statements[0]);
+        $this->assertSame('DECLARE @sql NVARCHAR(MAX) = \'\';SELECT @sql += \'ALTER TABLE [dbo].[users] DROP CONSTRAINT \' + OBJECT_NAME([default_object_id]) + \';\' FROM SYS.COLUMNS WHERE [object_id] = OBJECT_ID(\'[dbo].[users]\') AND [name] in (\'foo\') AND [default_object_id] <> 0;EXEC(@sql);alter table "users" drop column "foo"', $statements[1]);
+    }
+
     public function testDropTimestamps()
     {
         $blueprint = new Blueprint('users');

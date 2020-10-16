@@ -17,6 +17,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Http\RedirectResponse to(string $path, int $status = 302, array $headers = [], bool $secure = null)
  * @method static \Illuminate\Routing\UrlGenerator getUrlGenerator()
  * @method static void setSession(\Illuminate\Session\Store $session)
+ * @method static void setIntendedUrl(string $url)
  *
  * @see \Illuminate\Routing\Redirector
  */
