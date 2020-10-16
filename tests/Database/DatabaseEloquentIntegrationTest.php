@@ -1340,10 +1340,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::find(1)->update(['name' => 'Mathieu TUDISCO']);
         EloquentTestUser::find(2)->update(['email' => 'dev@mathieutu.ovh']);
 
-        $this->assertEquals($users->map->fresh(), $users->fresh());
+        $this->assertCount(3, $users);
+        $this->assertNotEquals('Mathieu TUDISCO', $users[0]->name);
+        $this->assertNotEquals('dev@mathieutu.ovh', $users[1]->email);
 
-        $users = new Collection;
-        $this->assertEquals($users->map->fresh(), $users->fresh());
+        $refreshedUsers = $users->fresh();
+
+        $this->assertCount(2, $refreshedUsers);
+        $this->assertEquals('Mathieu TUDISCO', $refreshedUsers[0]->name);
+        $this->assertEquals('dev@mathieutu.ovh', $refreshedUsers[1]->email);
     }
 
     public function testTimestampsUsingDefaultDateFormat()
