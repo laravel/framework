@@ -714,6 +714,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull($comment->owner);
     }
 
+    public function testSoftDeletesCanUseWhereRaw()
+    {
+        $this->createUsers();
+
+        $builder = SoftDeletesTestUser::whereRaw('id = 1 OR email = "abigailotwell@gmail.com"');
+        $users = $builder->get();
+
+        $this->assertSame('select * from "users" where (id = 1 OR email = "abigailotwell@gmail.com") and "users"."deleted_at" is null', $builder->toSql());
+        $this->assertCount(1, $users);
+        $this->assertSame(2, $users->first()->id);
+        $this->assertNull(SoftDeletesTestUser::find(1));
+    }
+
     /**
      * Helpers...
      */
