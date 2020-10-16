@@ -66,7 +66,7 @@ class ThrottleRequestsTest extends TestCase
         $rateLimiter = Container::getInstance()->make(RateLimiter::class);
 
         $rateLimiter->for('test', function ($request) {
-            return new GlobalLimit(2, 1);
+            return new GlobalLimit(2, 60);
         });
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
