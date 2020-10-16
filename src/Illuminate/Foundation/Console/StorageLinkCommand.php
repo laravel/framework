@@ -33,6 +33,12 @@ class StorageLinkCommand extends Command
             if (file_exists($link)) {
                 $this->error("The [$link] link already exists.");
             } else {
+                $linkDirectoryPath = dirname($link);
+
+                if (! file_exists($linkDirectoryPath) && ! mkdir($linkDirectoryPath, 0755, true) && ! is_dir($linkDirectoryPath)) {
+                    throw new RuntimeException("Directory [{$linkDirectoryPath}] was not created");
+                }
+
                 if ($this->option('relative')) {
                     $target = $this->getRelativeTarget($link, $target);
                 }
