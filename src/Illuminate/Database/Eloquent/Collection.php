@@ -280,7 +280,7 @@ class Collection extends BaseCollection implements QueueableCollection
         }) ? $result->toBase() : $result;
     }
 
-     /**
+    /**
      *  Run a replicate over each of the items. 
      * 
      * @param  callable|null  $callback
@@ -290,10 +290,11 @@ class Collection extends BaseCollection implements QueueableCollection
     public function replicate(array $except = null)
     {
         $items = $this->map(function ($model) use ($except) {
-            return  $model->replicate($except);           
+
+            return  $model->replicate($except);     
+
         });
         return new static($items);
-        
     }
 
     /**

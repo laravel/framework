@@ -92,7 +92,8 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertFalse($c->contains(3));
     }
 
-    public function testReplicateIsReplicateEloquentCollection(){
+    public function testReplicateIsReplicateEloquentCollection()
+    {
 
         $model1 = (new TestEloquentCollectionModel)->forceFill(['id' => 1,'name'=> 'taylor']);
         $model2 = (new TestEloquentCollectionModel)->forceFill(['id' => 2,'name'=> 'adam']);
