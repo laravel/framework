@@ -281,18 +281,17 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     *  Run a replicate over each of the items.
+     *  Replicates every item in the collection .
      *
-     * @param  callable|null  $callback
      * @param  array|null  $except
      * @return static
      */
     public function replicate(array $except = null)
     {
         $items = $this->map(function ($model) use ($except) {
-            return  $model->replicate($except);
+            return $model->replicate($except);
         });
-        
+
         return new static($items);
     }
 
