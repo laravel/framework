@@ -51,13 +51,26 @@ class RollbackCommand extends BaseCommand
      */
     public function handle()
     {
+        // Calling a separate generic function to allow the
+        // handle method to be optionally extended.
+        $this->executeCommand();
+    }
+
+    /**
+     * Rollback the database.
+     *
+     * @return int
+     */
+    public function executeCommand()
+    {
         if (! $this->confirmToProceed()) {
             return 1;
         }
 
         $this->migrator->usingConnection($this->option('database'), function () {
             $this->migrator->setOutput($this->output)->rollback(
-                $this->getMigrationPaths(), [
+                $this->getMigrationPaths(),
+                [
                     'pretend' => $this->option('pretend'),
                     'step' => (int) $this->option('step'),
                 ]

@@ -51,6 +51,18 @@ class ResetCommand extends BaseCommand
      */
     public function handle()
     {
+        // Calling a separate generic function to allow the
+        // handle method to be optionally extended.
+        $this->executeCommand();
+    }
+
+    /**
+     * Reset the database.
+     *
+     * @return int
+     */
+    public function executeCommand()
+    {
         if (! $this->confirmToProceed()) {
             return 1;
         }
@@ -64,7 +76,8 @@ class ResetCommand extends BaseCommand
             }
 
             $this->migrator->setOutput($this->output)->reset(
-                $this->getMigrationPaths(), $this->option('pretend')
+                $this->getMigrationPaths(),
+                $this->option('pretend')
             );
         });
 

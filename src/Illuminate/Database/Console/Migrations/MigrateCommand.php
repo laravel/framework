@@ -69,6 +69,18 @@ class MigrateCommand extends BaseCommand
      */
     public function handle()
     {
+        // Calling a separate generic function to allow the
+        // handle method to be optionally extended.
+        $this->executeCommand();
+    }
+
+    /**
+     * Migrate the database.
+     *
+     * @return int
+     */
+    public function executeCommand()
+    {
         if (! $this->confirmToProceed()) {
             return 1;
         }
