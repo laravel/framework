@@ -90,7 +90,7 @@ class RateLimiter
      */
     public function hit($key, $decaySeconds = 60)
     {
-        if(! ($this->cache->getStore() instanceof LockProvider)) {
+        if (! ($this->cache->getStore() instanceof LockProvider)) {
             return $this->increment($key, $decaySeconds);
         }
 
