@@ -292,7 +292,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
-     * Set the Container Command Loader
+     * Set the Container Command Loader.
      *
      * @return $this
      */

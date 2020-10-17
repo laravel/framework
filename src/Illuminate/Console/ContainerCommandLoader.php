@@ -17,7 +17,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
 
     /**
      * A map of command names to classes.
-     * 
+     *
      * @var array
      */
     protected $commandMap;
@@ -42,7 +42,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
      */
     public function get(string $name)
     {
-        if (!$this->has($name)) {
+        if (! $this->has($name)) {
             throw new CommandNotFoundException(sprintf('Command "%s" does not exist.', $name));
         }
 
@@ -62,7 +62,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
 
     /**
      * Get the command names.
-     * 
+     *
      * @return string[]
      */
     public function getNames()
