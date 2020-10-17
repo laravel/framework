@@ -99,7 +99,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $model3 = (new TestEloquentCollectionModel)->forceFill(['id' => 3, 'name' => 'abdelaal']);
         $c = new Collection([$model1, $model2, $model3]);
         $replicatedCollection = $c->replicate();
-   
+    
         $this->assertInstanceOf(Collection::class, $replicatedCollection);
         $this->assertFalse($replicatedCollection->contains($model3));
         $this->assertFalse($replicatedCollection->contains($model2));
