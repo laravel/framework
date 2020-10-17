@@ -47,6 +47,13 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected static $bootstrappers = [];
 
     /**
+     * A map of command names to classes.
+     *
+     * @var array
+     */
+    protected $commandMap = [];
+
+    /**
      * The Event Dispatcher.
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
@@ -254,10 +261,16 @@ class Application extends SymfonyApplication implements ApplicationContract
      * Add a command, resolving through the application.
      *
      * @param  string  $command
-     * @return \Symfony\Component\Console\Command\Command
+     * @return \Symfony\Component\Console\Command\Command|null
      */
     public function resolve($command)
     {
+        if (class_exists($command) && ($commandName = $command::getDefaultName())) {
+            $this->commandMap[$commandName] = $command;
+
+            return null;
+        }
+
         return $this->add($this->laravel->make($command));
     }
 
@@ -274,6 +287,18 @@ class Application extends SymfonyApplication implements ApplicationContract
         foreach ($commands as $command) {
             $this->resolve($command);
         }
+
+        return $this;
+    }
+
+    /**
+     * Set the Container Command Loader
+     *
+     * @return $this
+     */
+    public function setContainerCommandLoader()
+    {
+        $this->setCommandLoader(new ContainerCommandLoader($this->laravel, $this->commandMap));
 
         return $this;
     }
