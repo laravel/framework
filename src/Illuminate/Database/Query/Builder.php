@@ -903,7 +903,7 @@ class Builder
      */
     public function whereRaw($sql, $bindings = [], $boolean = 'and')
     {
-        $sql = "(" . $sql . ")";
+        $sql = '('.$sql.')';
 
         $this->wheres[] = ['type' => 'raw', 'sql' => $sql, 'boolean' => $boolean];
 
