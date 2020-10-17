@@ -281,7 +281,7 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     *  Replicates every item in the collection .
+     * Replicates every item in the collection.
      *
      * @param  array|null  $except
      * @return static
