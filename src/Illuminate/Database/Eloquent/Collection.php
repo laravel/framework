@@ -288,11 +288,10 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function replicate(array $except = null)
     {
-        $items = $this->map(function ($model) use ($except) {
+        return $this->map(function ($model) use ($except) {
             return $model->replicate($except);
         });
-
-        return new static($items);
+             
     }
 
     /**
