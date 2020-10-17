@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Closure;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
 
@@ -81,13 +82,39 @@ class RateLimiter
     }
 
     /**
-     * Increment the counter for a given key for a given decay time.
+     * Acquire the lock and increment the counter for a given key and decay time.
      *
      * @param  string  $key
      * @param  int  $decaySeconds
      * @return int
      */
     public function hit($key, $decaySeconds = 60)
+    {
+        if(! ($this->cache->getStore() instanceof LockProvider)) {
+            return $this->increment($key, $decaySeconds);
+        }
+
+        $lock = $this->cache->getStore()
+                    ->lock('ratelimit_lock:'.$key, 10)
+                    ->betweenBlockedAttemptsSleepFor(50);
+
+        try {
+            $lock->block(10);
+
+            return $this->increment($key, $decaySeconds);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    /**
+     * Increment the counter for a given key for a given decay time.
+     *
+     * @param  string  $key
+     * @param  int  $decaySeconds
+     * @return int
+     */
+    public function increment($key, $decaySeconds = 60)
     {
         $this->cache->add(
             $key.':timer', $this->availableAt($decaySeconds), $decaySeconds

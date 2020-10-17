@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\Lock;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -28,9 +30,16 @@ class CacheRateLimiterTest extends TestCase
     public function testHitProperlyIncrementsAttemptCount()
     {
         $cache = m::mock(Cache::class);
+        $store = m::mock(RedisStore::class);
+        $lock = m::mock(Lock::class);
         $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
         $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(true);
         $cache->shouldReceive('increment')->once()->with('key')->andReturn(1);
+        $cache->shouldReceive('getStore')->twice()->andReturn($store);
+        $store->shouldReceive('lock')->once()->andReturn($lock);
+        $lock->shouldReceive('betweenBlockedAttemptsSleepFor')->once()->andReturn($lock);
+        $lock->shouldReceive('block')->once();
+        $lock->shouldReceive('release')->once();
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->hit('key', 1);
@@ -39,10 +48,17 @@ class CacheRateLimiterTest extends TestCase
     public function testHitHasNoMemoryLeak()
     {
         $cache = m::mock(Cache::class);
+        $store = m::mock(RedisStore::class);
+        $lock = m::mock(Lock::class);
         $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
         $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(false);
         $cache->shouldReceive('increment')->once()->with('key')->andReturn(1);
+        $cache->shouldReceive('getStore')->twice()->andReturn($store);
         $cache->shouldReceive('put')->once()->with('key', 1, 1);
+        $store->shouldReceive('lock')->once()->andReturn($lock);
+        $lock->shouldReceive('betweenBlockedAttemptsSleepFor')->once()->andReturn($lock);
+        $lock->shouldReceive('block')->once();
+        $lock->shouldReceive('release')->once();
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->hit('key', 1);
