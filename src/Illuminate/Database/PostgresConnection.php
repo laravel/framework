@@ -103,4 +103,14 @@ class PostgresConnection extends Connection
     {
         return new DoctrineDriver;
     }
+
+    /**
+     * Get the default schema dump path.
+     *
+     * @return string
+     */
+    public function getSchemaPath()
+    {
+        return database_path('schema/'.$this->getName().'-schema.dump');
+    }
 }
