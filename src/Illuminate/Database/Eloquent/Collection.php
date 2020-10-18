@@ -290,7 +290,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         return $this->map(function ($model) use ($except) {
             return $model->replicate($except);
-        });             
+        });           
     }
 
     /**
