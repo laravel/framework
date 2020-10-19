@@ -183,13 +183,14 @@ class LazyCollection implements Enumerable
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() === 1 && $this->useAsCallable($key)) {
-            $placeholder = new stdClass;
-
-            return $this->first($key, $placeholder) !== $placeholder;
-        }
-
         if (func_num_args() === 1) {
+
+            if ($this->useAsCallable($key)) {
+                $placeholder = new stdClass;
+
+                return $this->first($key, $placeholder) !== $placeholder;
+            }
+
             $needle = $key;
 
             foreach ($this as $value) {

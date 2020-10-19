@@ -9,6 +9,11 @@ use Symfony\Component\Process\Process;
 class ScheduleWorkCommand extends Command
 {
     /**
+     * Second in microseconds (US it symbol is μs, sometimes simplified to us when Unicode is not available.
+     */
+    const SECOND_IN_US = 1000000;
+
+    /**
      * The console command name.
      *
      * @var string
@@ -34,7 +39,7 @@ class ScheduleWorkCommand extends Command
         [$lastExecutionStartedAt, $keyOfLastExecutionWithOutput, $executions] = [null, null, []];
 
         while (true) {
-            usleep(100 * 1000);
+            usleep(0.1 * self::SECOND_IN_US);
 
             if (Carbon::now()->second === 0 &&
                 ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {

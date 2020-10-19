@@ -15,6 +15,8 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 {
     use InteractsWithTime;
 
+    const USER_AGENT_MAX_LENGTH = 500;
+
     /**
      * The database connection instance.
      *
@@ -248,7 +250,8 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      */
     protected function userAgent()
     {
-        return substr((string) $this->container->make('request')->header('User-Agent'), 0, 500);
+        $user_agent_header = (string) $this->container->make('request')->header('User-Agent');
+        return substr($user_agent_header, 0, self::USER_AGENT_MAX_LENGTH);
     }
 
     /**

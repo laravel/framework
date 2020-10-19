@@ -29,7 +29,8 @@ class ProcessUtils
             $escapedArgument = '';
             $quote = false;
 
-            foreach (preg_split('/(")/', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
+            $args = preg_split('/(")/', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+            foreach ($args as $part) {
                 if ('"' === $part) {
                     $escapedArgument .= '\\"';
                 } elseif (self::isSurroundedBy($part, '%')) {
@@ -64,6 +65,10 @@ class ProcessUtils
      */
     protected static function isSurroundedBy($arg, $char)
     {
-        return 2 < strlen($arg) && $char === $arg[0] && $char === $arg[strlen($arg) - 1];
+        if (strlen($arg) <= 2) {
+            return false;
+        }
+
+        return $char === $arg[0] && $char === $arg[strlen($arg) - 1];
     }
 }
