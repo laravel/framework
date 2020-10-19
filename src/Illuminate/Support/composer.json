@@ -21,7 +21,7 @@
         "illuminate/collections": "^8.0",
         "illuminate/contracts": "^8.0",
         "illuminate/macroable": "^8.0",
-        "nesbot/carbon": "^2.17",
+        "nesbot/carbon": "^2.31",
         "voku/portable-ascii": "^1.4.8"
     },
     "conflict": {

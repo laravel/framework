@@ -33,7 +33,7 @@
         }
     },
     "suggest": {
-        "dragonmantank/cron-expression": "Required to use scheduler (^3.0).",
+        "dragonmantank/cron-expression": "Required to use scheduler (^3.0.2).",
         "guzzlehttp/guzzle": "Required to use the ping methods on schedules (^6.5.5|^7.0.1).",
         "illuminate/bus": "Required to use the scheduled job dispatcher (^8.0).",
         "illuminate/container": "Required to use the scheduler (^8.0).",

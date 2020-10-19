@@ -24,7 +24,7 @@
         "illuminate/filesystem": "^8.0",
         "illuminate/pipeline": "^8.0",
         "illuminate/support": "^8.0",
-        "opis/closure": "^3.5.3",
+        "opis/closure": "^3.6",
         "ramsey/uuid": "^4.0",
         "symfony/process": "^5.1"
     },
