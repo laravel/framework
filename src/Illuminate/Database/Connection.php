@@ -1296,6 +1296,10 @@ class Connection implements ConnectionInterface
      */
     public function getSchemaPath()
     {
+        if (file_exists($path = database_path('schema/'.$this->getName().'-schema.dump'))) {
+            return $path;
+        }
+
         return database_path('schema/'.$this->getName().'-schema.sql');
     }
 }
