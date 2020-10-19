@@ -8,7 +8,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
 
 /**
  * @method static \Illuminate\Bus\Batch|null findBatch(string $batchId)
- * @method static \Illuminate\Bus\PendingBatch batch(array $jobs)
+ * @method static \Illuminate\Bus\PendingBatch batch(array|mixed $jobs)
  * @method static \Illuminate\Contracts\Bus\Dispatcher map(array $map)
  * @method static \Illuminate\Contracts\Bus\Dispatcher pipeThrough(array $pipes)
  * @method static \Illuminate\Foundation\Bus\PendingChain chain(array $jobs)
