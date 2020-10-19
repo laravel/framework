@@ -1288,4 +1288,18 @@ class Connection implements ConnectionInterface
     {
         return static::$resolvers[$driver] ?? null;
     }
+
+    /**
+     * Get the default schema dump path.
+     *
+     * @return string
+     */
+    public function getSchemaPath()
+    {
+        if (file_exists($path = database_path('schema/'.$this->getName().'-schema.dump'))) {
+            return $path;
+        }
+
+        return database_path('schema/'.$this->getName().'-schema.sql');
+    }
 }
