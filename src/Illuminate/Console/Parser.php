@@ -80,20 +80,46 @@ class Parser
     {
         [$token, $description] = static::extractDescription($token);
 
+        // default values
+        $default = null;
+        $name = $token;
+        $mode = InputArgument::REQUIRED;
+        $trim = '';
+
         switch (true) {
             case Str::endsWith($token, '?*'):
-                return new InputArgument(trim($token, '?*'), InputArgument::IS_ARRAY, $description);
+                $trim = '?*';
+                $mode = InputArgument::REQUIRED;
+                break;
+
             case Str::endsWith($token, '*'):
-                return new InputArgument(trim($token, '*'), InputArgument::IS_ARRAY | InputArgument::REQUIRED, $description);
+                $trim = '*';
+                $mode = InputArgument::IS_ARRAY | InputArgument::REQUIRED;
+                break;
+
             case Str::endsWith($token, '?'):
-                return new InputArgument(trim($token, '?'), InputArgument::OPTIONAL, $description);
+                $trim = '?';
+                $mode = InputArgument::OPTIONAL;
+                break;
+
             case preg_match('/(.+)\=\*(.+)/', $token, $matches):
-                return new InputArgument($matches[1], InputArgument::IS_ARRAY, $description, preg_split('/,\s?/', $matches[2]));
+                $name = $matches[1];
+                $mode = InputArgument::IS_ARRAY;
+                $default = preg_split('/,\s?/', $matches[2]);
+                break;
+
             case preg_match('/(.+)\=(.+)/', $token, $matches):
-                return new InputArgument($matches[1], InputArgument::OPTIONAL, $description, $matches[2]);
-            default:
-                return new InputArgument($token, InputArgument::REQUIRED, $description);
+                $name = $matches[1];
+                $mode = InputArgument::OPTIONAL;
+                $default = $matches[2];
+                break;
         }
+
+        if ($trim) {
+            $name = trim($name, $trim);
+        }
+
+        return new InputArgument($name, $mode, $description, $default);
     }
 
     /**
