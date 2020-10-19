@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
+/**
+ * @requires extension pdo_mysql
+ */
 class ApiAuthenticationWithEloquentTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

@@ -23,7 +23,7 @@
         "illuminate/filesystem": "^6.0",
         "illuminate/pipeline": "^6.0",
         "illuminate/support": "^6.0",
-        "opis/closure": "^3.1",
+        "opis/closure": "^3.6",
         "symfony/debug": "^4.3.4",
         "symfony/process": "^4.3.4"
     },
