@@ -19,7 +19,7 @@
         "ext-mbstring": "*",
         "doctrine/inflector": "^1.4|^2.0",
         "illuminate/contracts": "^6.0",
-        "nesbot/carbon": "^2.0"
+        "nesbot/carbon": "^2.31"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"

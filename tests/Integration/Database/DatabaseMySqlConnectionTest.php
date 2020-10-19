@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
 
+/**
+ * @requires extension pdo_mysql
+ */
 class DatabaseMySqlConnectionTest extends TestCase
 {
     const TABLE = 'player';

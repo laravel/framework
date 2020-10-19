@@ -50,7 +50,7 @@ class Pipeline extends BasePipeline
 
         $response = $handler->render($passable, $e);
 
-        if (method_exists($response, 'withException')) {
+        if (is_object($response) && method_exists($response, 'withException')) {
             $response->withException($e);
         }
 
