@@ -42,7 +42,7 @@ class CacheSchedulingMutex implements SchedulingMutex, CacheAware
     public function create(Event $event, DateTimeInterface $time)
     {
         return $this->cache->store($this->store)->add(
-            $event->mutexName().$time->format('Hi'), true, 3600
+            $this->getEventKey($event, $time), true, 3600
         );
     }
 
@@ -56,8 +56,18 @@ class CacheSchedulingMutex implements SchedulingMutex, CacheAware
     public function exists(Event $event, DateTimeInterface $time)
     {
         return $this->cache->store($this->store)->has(
-            $event->mutexName().$time->format('Hi')
+            $this->getEventKey($event, $time)
         );
+    }
+
+    /**
+     * @param \Illuminate\Console\Scheduling\Event  $event
+     * @param \DateTimeInterface  $time
+     * @return string
+     */
+    private function getEventKey(Event $event, DateTimeInterface $time)
+    {
+        return $event->mutexName().$time->format('Hi');
     }
 
     /**
