@@ -8,6 +8,7 @@ use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Compilers\BladeCompiler;
 
 abstract class ServiceProvider
@@ -136,12 +137,14 @@ abstract class ServiceProvider
      * Load the given routes file if routes are not already cached.
      *
      * @param  string  $path
+     * @param  array  $attributes
+     *
      * @return void
      */
-    protected function loadRoutesFrom($path)
+    protected function loadRoutesFrom($path, array $attributes = [])
     {
         if (! ($this->app instanceof CachesRoutes && $this->app->routesAreCached())) {
-            require $path;
+            Route::group($attributes, $path);
         }
     }
 

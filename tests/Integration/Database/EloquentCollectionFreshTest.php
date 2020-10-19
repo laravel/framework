@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
@@ -30,8 +31,11 @@ class EloquentCollectionFreshTest extends DatabaseTestCase
 
         $collection = User::all();
 
-        User::whereKey($collection->pluck('id')->toArray())->delete();
+        $collection->first()->delete();
 
-        $this->assertEmpty($collection->fresh()->filter());
+        $freshCollection = $collection->fresh();
+
+        $this->assertCount(1, $freshCollection);
+        $this->assertInstanceOf(EloquentCollection::class, $freshCollection);
     }
 }

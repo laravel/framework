@@ -90,17 +90,15 @@ class CallQueuedListener implements ShouldQueue
             $this->job, $container->make($this->class)
         );
 
-        call_user_func_array(
-            [$handler, $this->method], $this->data
-        );
+        $handler->{$this->method}(...array_values($this->data));
     }
 
     /**
      * Set the job instance of the given class if necessary.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  mixed  $instance
-     * @return mixed
+     * @param  object  $instance
+     * @return object
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
@@ -125,10 +123,10 @@ class CallQueuedListener implements ShouldQueue
 
         $handler = Container::getInstance()->make($this->class);
 
-        $parameters = array_merge($this->data, [$e]);
+        $parameters = array_merge(array_values($this->data), [$e]);
 
         if (method_exists($handler, 'failed')) {
-            call_user_func_array([$handler, 'failed'], $parameters);
+            $handler->failed(...$parameters);
         }
     }
 

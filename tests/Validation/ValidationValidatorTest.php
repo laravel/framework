@@ -1857,9 +1857,16 @@ class ValidationValidatorTest extends TestCase
     public function testValidateMutlpleOf($input, $allowed, $passes)
     {
         $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.multiple_of' => 'The :attribute must be a multiple of :value'], 'en');
 
         $v = new Validator($trans, ['foo' => $input], ['foo' => "multiple_of:{$allowed}"]);
+
         $this->assertSame($passes, $v->passes());
+        if ($v->fails()) {
+            $this->assertSame("The foo must be a multiple of {$allowed}", $v->messages()->first('foo'));
+        } else {
+            $this->assertSame('', $v->messages()->first('foo'));
+        }
     }
 
     public function multipleOfDataProvider()
@@ -1920,6 +1927,8 @@ class ValidationValidatorTest extends TestCase
             ['foo', 1, false], // invalid values
             [1, 'foo', false],
             ['foo', 'foo', false],
+            [1, '', false],
+            [1, null, false],
         ];
     }
 

@@ -300,9 +300,11 @@ class Collection extends BaseCollection implements QueueableCollection
             ->get()
             ->getDictionary();
 
-        return $this->map(function ($model) use ($freshModels) {
-            return $model->exists && isset($freshModels[$model->getKey()])
-                    ? $freshModels[$model->getKey()] : null;
+        return $this->filter(function ($model) use ($freshModels) {
+            return $model->exists && isset($freshModels[$model->getKey()]);
+        })
+        ->map(function ($model) use ($freshModels) {
+            return $freshModels[$model->getKey()];
         });
     }
 
@@ -484,7 +486,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function zip($items)
     {
-        return call_user_func_array([$this->toBase(), 'zip'], func_get_args());
+        return $this->toBase()->zip(...func_get_args());
     }
 
     /**
