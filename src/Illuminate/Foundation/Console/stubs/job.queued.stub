@@ -27,7 +27,7 @@ class {{ class }} implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function __invoke()
     {
         //
     }
