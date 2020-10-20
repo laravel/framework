@@ -7,7 +7,7 @@ use {{ namespacedModel }};
 class {{ class }}
 {
     /**
-     * Handle the DocDummyModel "created" event.
+     * Handle the {{ model }} "created" event.
      *
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
@@ -18,7 +18,7 @@ class {{ class }}
     }
 
     /**
-     * Handle the DocDummyModel "updated" event.
+     * Handle the {{ model }} "updated" event.
      *
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
@@ -29,7 +29,7 @@ class {{ class }}
     }
 
     /**
-     * Handle the DocDummyModel "deleted" event.
+     * Handle the {{ model }} "deleted" event.
      *
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
@@ -40,7 +40,7 @@ class {{ class }}
     }
 
     /**
-     * Handle the DocDummyModel "restored" event.
+     * Handle the {{ model }} "restored" event.
      *
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
@@ -51,7 +51,7 @@ class {{ class }}
     }
 
     /**
-     * Handle the DocDummyModel "force deleted" event.
+     * Handle the {{ model }} "force deleted" event.
      *
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
