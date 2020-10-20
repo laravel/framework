@@ -1,5 +1,8 @@
 * text=auto
 
+*.php diff=php
+*.md diff=markdown
+
 /.github export-ignore
 /bin export-ignore
 /tests export-ignore
