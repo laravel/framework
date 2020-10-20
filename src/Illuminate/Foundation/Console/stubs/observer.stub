@@ -1,18 +1,18 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
-use NamespacedDummyModel;
+use {{ namespacedModel }};
 
-class DummyClass
+class {{ class }}
 {
     /**
      * Handle the DocDummyModel "created" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function created(DummyModel $dummyModel)
+    public function created({{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -20,10 +20,10 @@ class DummyClass
     /**
      * Handle the DocDummyModel "updated" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function updated(DummyModel $dummyModel)
+    public function updated({{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -31,10 +31,10 @@ class DummyClass
     /**
      * Handle the DocDummyModel "deleted" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function deleted(DummyModel $dummyModel)
+    public function deleted({{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -42,10 +42,10 @@ class DummyClass
     /**
      * Handle the DocDummyModel "restored" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function restored(DummyModel $dummyModel)
+    public function restored({{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -53,10 +53,10 @@ class DummyClass
     /**
      * Handle the DocDummyModel "force deleted" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function forceDeleted(DummyModel $dummyModel)
+    public function forceDeleted({{ model }} ${{ modelVariable }})
     {
         //
     }

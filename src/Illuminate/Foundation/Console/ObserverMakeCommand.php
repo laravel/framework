@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 
 class ObserverMakeCommand extends GeneratorCommand
@@ -78,27 +78,40 @@ class ObserverMakeCommand extends GeneratorCommand
      */
     protected function replaceModel($stub, $model)
     {
-        $model = str_replace('/', '\\', $model);
+        $modelClass = $this->parseModel($model);
 
-        $namespacedModel = $this->qualifyModel($model);
+        $replace = [
+            'DummyFullModelClass' => $modelClass,
+            '{{ namespacedModel }}' => $modelClass,
+            '{{namespacedModel}}' => $modelClass,
+            'DummyModelClass' => class_basename($modelClass),
+            '{{ model }}' => class_basename($modelClass),
+            '{{model}}' => class_basename($modelClass),
+            'DummyModelVariable' => lcfirst(class_basename($modelClass)),
+            '{{ modelVariable }}' => lcfirst(class_basename($modelClass)),
+            '{{modelVariable}}' => lcfirst(class_basename($modelClass)),
+        ];
 
-        if (Str::startsWith($model, '\\')) {
-            $stub = str_replace('NamespacedDummyModel', trim($model, '\\'), $stub);
-        } else {
-            $stub = str_replace('NamespacedDummyModel', $namespacedModel, $stub);
+        return str_replace(
+            array_keys($replace), array_values($replace), $stub
+        );
+    }
+
+    /**
+     * Get the fully-qualified model class name.
+     *
+     * @param  string  $model
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function parseModel($model)
+    {
+        if (preg_match('([^A-Za-z0-9_/\\\\])', $model)) {
+            throw new InvalidArgumentException('Model name contains invalid characters.');
         }
 
-        $stub = str_replace(
-            "use {$namespacedModel};\nuse {$namespacedModel};", "use {$namespacedModel};", $stub
-        );
-
-        $model = class_basename(trim($model, '\\'));
-
-        $stub = str_replace('DocDummyModel', Str::snake($model, ' '), $stub);
-
-        $stub = str_replace('DummyModel', $model, $stub);
-
-        return str_replace('dummyModel', Str::camel($model), $stub);
+        return $this->qualifyModel($model);
     }
 
     /**
