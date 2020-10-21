@@ -14,7 +14,9 @@ class {{ class }} extends Command
     protected $signature = '{{ command }}';
 
     /**
-     * The default command name for lazy loading.
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
      *
      * @var string|null
      */
