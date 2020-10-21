@@ -18,6 +18,15 @@ class ServeCommand extends Command
     protected $name = 'serve';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'serve';
+
+    /**
      * The console command description.
      *
      * @var string
