@@ -1,62 +1,62 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
-use NamespacedDummyModel;
+use {{ namespacedModel }};
 
-class DummyClass
+class {{ class }}
 {
     /**
-     * Handle the DocDummyModel "created" event.
+     * Handle the {{ model }} "created" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function created(DummyModel $dummyModel)
+    public function created({{ model }} ${{ modelVariable }})
     {
         //
     }
 
     /**
-     * Handle the DocDummyModel "updated" event.
+     * Handle the {{ model }} "updated" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function updated(DummyModel $dummyModel)
+    public function updated({{ model }} ${{ modelVariable }})
     {
         //
     }
 
     /**
-     * Handle the DocDummyModel "deleted" event.
+     * Handle the {{ model }} "deleted" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function deleted(DummyModel $dummyModel)
+    public function deleted({{ model }} ${{ modelVariable }})
     {
         //
     }
 
     /**
-     * Handle the DocDummyModel "restored" event.
+     * Handle the {{ model }} "restored" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function restored(DummyModel $dummyModel)
+    public function restored({{ model }} ${{ modelVariable }})
     {
         //
     }
 
     /**
-     * Handle the DocDummyModel "force deleted" event.
+     * Handle the {{ model }} "force deleted" event.
      *
-     * @param  \NamespacedDummyModel  $dummyModel
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function forceDeleted(DummyModel $dummyModel)
+    public function forceDeleted({{ model }} ${{ modelVariable }})
     {
         //
     }

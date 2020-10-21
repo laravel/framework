@@ -1,6 +1,30 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.10.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.11.1...8.x)
+
+
+## [v8.11.1 (2020-10-20)](https://github.com/laravel/framework/compare/v8.11.0...v8.11.1)
+
+### Fixed
+- Fixed `bound()` method ([a7759d7](https://github.com/laravel/framework/commit/a7759d70e15b0be946569b8299ac694c08a35d7e))
+
+
+## [v8.11.0 (2020-10-20)](https://github.com/laravel/framework/compare/v8.10.0...v8.11.0)
+
+### Added
+- Added job middleware to prevent overlapping jobs ([#34794](https://github.com/laravel/framework/pull/34794), [eed05b4](https://github.com/laravel/framework/commit/eed05b41097cfe62766d4086ede8dee97c057c29))
+- Bring Rate Limiters to Jobs ([#34829](https://github.com/laravel/framework/pull/34829), [ae00294](https://github.com/laravel/framework/commit/ae00294c418e431372bad0d09ac15d15925247f7))
+- Added `multiple_of` custom replacer in validator ([#34858](https://github.com/laravel/framework/pull/34858))
+- Preserve eloquent collection type after calling ->fresh() ([#34848](https://github.com/laravel/framework/pull/34848))
+- Provisional support for PHP 8.0 for 6.x (Changed some code in 8.x) ([#34884](https://github.com/laravel/framework/pull/34884), [28bb76e](https://github.com/laravel/framework/commit/28bb76efbcfc5fee57307ffa062b67ff709240dc))
+
+### Fixed
+- Fixed `fresh()` and `refresh()` on pivots and morph pivots ([#34836](https://github.com/laravel/framework/pull/34836))
+- Fixed config `batching` typo ([#34852](https://github.com/laravel/framework/pull/34852))
+- Fixed `Illuminate\Queue\Console\RetryBatchCommand` for un-found batch id ([#34878](https://github.com/laravel/framework/pull/34878))
+
+### Changed
+- Change `loadRoutesFrom()` to accept group $attributes ([#34866](https://github.com/laravel/framework/pull/34866))
 
 
 ## [v8.10.0 (2020-10-13)](https://github.com/laravel/framework/compare/v8.9.0...v8.10.0)

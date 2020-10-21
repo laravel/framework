@@ -1,6 +1,18 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.18.43...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.19.1...6.x)
+
+
+## [v6.19.1 (2020-10-20)](https://github.com/laravel/framework/compare/v6.19.0...v6.19.1)
+
+### Fixed
+- Fixed `bound()` method ([a7759d7](https://github.com/laravel/framework/commit/a7759d70e15b0be946569b8299ac694c08a35d7e))
+
+
+## [v6.19.0 (2020-10-20)](https://github.com/laravel/framework/compare/v6.18.43...v6.19.0)
+
+### Added
+- Provisional support for PHP 8.0 ([#34884](https://github.com/laravel/framework/pull/34884), [28bb76e](https://github.com/laravel/framework/commit/28bb76efbcfc5fee57307ffa062b67ff709240dc))
 
 
 ## [v6.18.43 (2020-10-13)](https://github.com/laravel/framework/compare/v6.18.42...v6.18.43)
