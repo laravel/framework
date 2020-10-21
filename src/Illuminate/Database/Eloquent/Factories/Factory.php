@@ -241,6 +241,20 @@ abstract class Factory
     }
 
     /**
+     * Create a callback that persists a model in the database when invoked.
+     *
+     * @param  array  $attributes
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
+     * @return \Closure
+     */
+    public function lazy(array $attributes = [], ?Model $parent = null)
+    {
+        return function () use ($attributes, $parent) {
+            return $this->create($attributes, $parent);
+        };
+    }
+
+    /**
      * Set the connection name on the results and store them.
      *
      * @param  \Illuminate\Support\Collection  $results
