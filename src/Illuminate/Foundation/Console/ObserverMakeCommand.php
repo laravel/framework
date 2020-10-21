@@ -45,31 +45,6 @@ class ObserverMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the stub file for the generator.
-     *
-     * @return string
-     */
-    protected function getStub()
-    {
-        return $this->option('model')
-            ? $this->resolveStubPath('/stubs/observer.stub')
-            : $this->resolveStubPath('/stubs/observer.plain.stub');
-    }
-
-    /**
-     * Resolve the fully-qualified path to the stub.
-     *
-     * @param  string  $stub
-     * @return string
-     */
-    protected function resolveStubPath($stub)
-    {
-        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-            ? $customPath
-            : __DIR__.$stub;
-    }
-
-    /**
      * Replace the model for the given stub.
      *
      * @param  string  $stub
@@ -112,6 +87,31 @@ class ObserverMakeCommand extends GeneratorCommand
         }
 
         return $this->qualifyModel($model);
+    }
+
+    /**
+     * Get the stub file for the generator.
+     *
+     * @return string
+     */
+    protected function getStub()
+    {
+        return $this->option('model')
+            ? $this->resolveStubPath('/stubs/observer.stub')
+            : $this->resolveStubPath('/stubs/observer.plain.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
