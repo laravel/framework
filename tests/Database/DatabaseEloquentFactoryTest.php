@@ -154,6 +154,20 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('Test Title', $post['title']);
     }
 
+    public function test_lazy_model_attributes_can_be_created()
+    {
+        $userFunction = FactoryTestUserFactory::new()->lazy();
+        $this->assertIsCallable($userFunction);
+        $this->assertInstanceOf(Eloquent::class, $userFunction());
+
+        $userFunction = FactoryTestUserFactory::new()->lazy(['name' => 'Taylor Otwell']);
+        $this->assertIsCallable($userFunction);
+
+        $user = $userFunction();
+        $this->assertInstanceOf(Eloquent::class, $user);
+        $this->assertSame('Taylor Otwell', $user->name);
+    }
+
     public function test_multiple_model_attributes_can_be_created()
     {
         $posts = FactoryTestPostFactory::new()->times(10)->raw();
