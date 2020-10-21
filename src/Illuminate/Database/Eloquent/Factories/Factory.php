@@ -241,7 +241,7 @@ abstract class Factory
     }
 
     /**
-     * Create a model and persist it in the database if requested.
+     * Create a callback that persists a model in the database when invoked.
      *
      * @param  array  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
