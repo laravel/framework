@@ -23,8 +23,11 @@ class ContainerCommandLoader implements CommandLoaderInterface
     protected $commandMap;
 
     /**
-     * @param  \Psr\Container\ContainerInterface $container
+     * Create a new command loader instance.
+     *
+     * @param  \Psr\Container\ContainerInterface  $container
      * @param  array  $commandMap
+     * @return void
      */
     public function __construct(ContainerInterface $container, array $commandMap)
     {
@@ -33,7 +36,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
     }
 
     /**
-     * Loads a command.
+     * Resolve a command from the container.
      *
      * @param  string  $name
      * @return \Symfony\Component\Console\Command\Command
@@ -50,7 +53,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
     }
 
     /**
-     * Checks if a command exists.
+     * Determines if a command exists.
      *
      * @param  string  $name
      * @return bool

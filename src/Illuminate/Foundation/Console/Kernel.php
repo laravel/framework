@@ -328,9 +328,8 @@ class Kernel implements KernelContract
     {
         if (is_null($this->artisan)) {
             $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
-                            ->resolveCommands($this->commands);
-
-            return $this->artisan->setContainerCommandLoader();
+                                    ->resolveCommands($this->commands)
+                                    ->setContainerCommandLoader();
         }
 
         return $this->artisan;

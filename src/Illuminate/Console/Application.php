@@ -33,6 +33,13 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected $laravel;
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
+
+    /**
      * The output from the previous command.
      *
      * @var \Symfony\Component\Console\Output\BufferedOutput
@@ -52,13 +59,6 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @var array
      */
     protected $commandMap = [];
-
-    /**
-     * The Event Dispatcher.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $events;
 
     /**
      * Create a new Artisan console application.
@@ -292,7 +292,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
-     * Set the Container Command Loader.
+     * Set the container command loader for lazy resolution.
      *
      * @return $this
      */
