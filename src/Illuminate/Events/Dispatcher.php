@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
+use Illuminate\Contracts\Events\DeferrableSubscriber;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Arr;
@@ -54,6 +55,13 @@ class Dispatcher implements DispatcherContract
      * @var callable
      */
     protected $queueResolver;
+
+    /**
+     * A list of events with lazy subscribers.
+     *
+     * @var string[]
+     */
+    protected $waitedEvents = [];
 
     /**
      * Create a new event dispatcher instance.
@@ -116,6 +124,7 @@ class Dispatcher implements DispatcherContract
     {
         return isset($this->listeners[$eventName]) ||
                isset($this->wildcards[$eventName]) ||
+               isset($this->waitedEvents[$eventName]) ||
                $this->hasWildcardListeners($eventName);
     }
 
@@ -171,14 +180,12 @@ class Dispatcher implements DispatcherContract
     {
         $subscriber = $this->resolveSubscriber($subscriber);
 
-        $events = $subscriber->subscribe($this);
-
-        if (is_array($events)) {
-            foreach ($events as $event => $listeners) {
-                foreach ($listeners as $listener) {
-                    $this->listen($event, $listener);
-                }
+        if ($subscriber instanceof DeferrableSubscriber) {
+            foreach ($subscriber->listensTo() as $event) {
+                $this->waitedEvents[$event][] = $subscriber;
             }
+        } else {
+            $this->subscribeNow($subscriber);
         }
     }
 
@@ -225,6 +232,8 @@ class Dispatcher implements DispatcherContract
         [$event, $payload] = $this->parseEventAndPayload(
             $event, $payload
         );
+
+        $this->registerDeferrableSubscribersOf($event);
 
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
@@ -618,5 +627,36 @@ class Dispatcher implements DispatcherContract
         $this->queueResolver = $resolver;
 
         return $this;
+    }
+
+    /**
+     * Subscribes the object and setups it's listeners.
+     *
+     * @param $subscriber
+     * @return void
+     */
+    protected function subscribeNow($subscriber)
+    {
+        $events = $subscriber->subscribe($this);
+
+        if (is_array($events)) {
+            foreach ($events as $event => $listeners) {
+                foreach ($listeners as $listener) {
+                    $this->listen($event, $listener);
+                }
+            }
+        }
+    }
+
+    protected function registerDeferrableSubscribersOf($event)
+    {
+        $lazySubscribers = $this->waitedEvents[$event] ?? [];
+        unset($this->waitedEvents[$event]);
+        foreach ($lazySubscribers as $i => $subscriber) {
+            if (! ($subscriber->isTriggered ?? false)) {
+                $this->subscribeNow($subscriber);
+                $subscriber->isTriggered = true;
+            }
+        }
     }
 }
