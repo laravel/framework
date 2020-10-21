@@ -569,7 +569,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Get the queue implementation from the resolver.
      *
-     * @return \Illuminate\Contracts\Queue\Queue
+     * @return \Illuminate\Contracts\Queue\Factory
      */
     protected function resolveQueue()
     {
