@@ -44,6 +44,15 @@ class VendorPublishCommand extends Command
                     {--tag=* : One or many tags that have assets you want to publish}';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'vendor:publish';
+
+    /**
      * The console command description.
      *
      * @var string

@@ -14,6 +14,15 @@ class ProviderMakeCommand extends GeneratorCommand
     protected $name = 'make:provider';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'make:provider';
+
+    /**
      * The console command description.
      *
      * @var string

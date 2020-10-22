@@ -17,6 +17,15 @@ class FailedTableCommand extends Command
     protected $name = 'queue:failed-table';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'queue:failed-table';
+
+    /**
      * The console command description.
      *
      * @var string
