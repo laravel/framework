@@ -95,7 +95,7 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        $name = Str::finish($name, 'Factory');
+        $name = Str::finish($this->argument('name'), 'Factory');
 
         return $this->laravel->databasePath().'/factories/'.str_replace('\\', '/', $name).'.php';
     }
