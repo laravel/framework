@@ -325,6 +325,10 @@ trait FormatsMessages
         if (isset($this->customValues[$attribute][$value])) {
             return $this->customValues[$attribute][$value];
         }
+        
+        if (preg_match('/\.([0-9]+)\./', $attribute, $matches)) {
+            $attribute = str_replace($matches[0], '.*.', $attribute);
+        }
 
         $key = "validation.values.{$attribute}.{$value}";
 
