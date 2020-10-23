@@ -78,13 +78,11 @@ class Dispatcher implements DispatcherContract
         if ($events instanceof Closure) {
             return $this->listen($this->firstClosureParameterType($events), $events);
         } elseif ($events instanceof QueuedClosure) {
-            return $this->listen($this->firstClosureParameterType($events->closure), $events->resolve());
-        } elseif ($listener instanceof QueuedClosure) {
-            $listener = $listener->resolve();
+            return $this->listen($this->firstClosureParameterType($events->closure), $events);
         }
 
         foreach ((array) $events as $event) {
-            if (Str::contains($event, '*')) {
+            if (mb_strpos($event, '*') !== false) {
                 $this->setupWildcardListen($event, $listener);
             } else {
                 $this->listeners[$event][] = $listener;
@@ -375,6 +373,10 @@ class Dispatcher implements DispatcherContract
      */
     public function makeListener($listener, $wildcard = false)
     {
+        if ($listener instanceof QueuedClosure) {
+            $listener = $listener->resolve();
+        }
+
         if (is_string($listener)) {
             return $this->createClassListener($listener, $wildcard);
         }
