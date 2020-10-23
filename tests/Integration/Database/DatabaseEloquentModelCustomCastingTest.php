@@ -155,11 +155,11 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model->price = '123.456';
         $model->save();
 
-        $model->increasePrice('530.865');
+        $model->increment('price', '530.865');
 
         $this->assertSame((new Decimal('654.321'))->getValue(), $model->price->getValue());
 
-        $model->decreasePrice('333.333');
+        $model->decrement('price', '333.333');
 
         $this->assertSame((new Decimal('320.988'))->getValue(), $model->price->getValue());
     }
@@ -290,22 +290,6 @@ class TestEloquentModelWithCustomCast extends Model
         'undefined_cast_column' => UndefinedCast::class,
         'birthday_at' => DateObjectCaster::class,
     ];
-
-    /**
-     * @param  float|int  $amount
-     */
-    public function increasePrice($amount)
-    {
-        $this->increment('price', $amount);
-    }
-
-    /**
-     * @param  float|int  $amount
-     */
-    public function decreasePrice($amount)
-    {
-        $this->decrement('price', $amount);
-    }
 }
 
 class HashCaster implements CastsInboundAttributes
