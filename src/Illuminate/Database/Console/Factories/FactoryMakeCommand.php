@@ -66,6 +66,9 @@ class FactoryMakeCommand extends GeneratorCommand
 
         $model = class_basename($namespaceModel);
 
+        $namespaceFactory = Str::ucfirst(str_replace('Factory', '', $name));
+        $factory = class_basename($namespaceFactory);
+
         if (Str::startsWith($namespaceModel, 'App\\Models')) {
             $namespace = Str::beforeLast('Database\\Factories\\'.Str::after($namespaceModel, 'App\\Models\\'), '\\');
         } else {
@@ -80,6 +83,8 @@ class FactoryMakeCommand extends GeneratorCommand
             'DummyModel' => $model,
             '{{ model }}' => $model,
             '{{model}}' => $model,
+            '{{ factory }}' => $factory,
+            '{{factory}}' => $factory,
         ];
 
         return str_replace(
