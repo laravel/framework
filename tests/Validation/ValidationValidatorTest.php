@@ -5043,12 +5043,12 @@ class ValidationValidatorTest extends TestCase
 
                         public function passes($attribute, $value)
                         {
-                            $ArrayTranslator = new Translator(
+                            $arrayTranslator = new Translator(
                                 new ArrayLoader, 'en'
                             );
 
                             $this->validator = new Validator(
-                                $ArrayTranslator,
+                                $arrayTranslator,
                                 $value,
                                 ['name' => 'required', 'location' => 'required']
                             );
@@ -5084,12 +5084,12 @@ class ValidationValidatorTest extends TestCase
 
                         public function passes($attribute, $value)
                         {
-                            $ArrayTranslator = new Translator(
+                            $arrayTranslator = new Translator(
                                 new ArrayLoader, 'en'
                             );
 
                             $this->validator = new Validator(
-                                $ArrayTranslator,
+                                $arrayTranslator,
                                 $value,
                                 ['name' => 'required', 'location' => 'required']
                             );
