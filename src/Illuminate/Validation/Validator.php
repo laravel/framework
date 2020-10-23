@@ -738,6 +738,18 @@ class Validator implements ValidatorContract
 
             $messages = $rule->message();
 
+            if ($messages instanceof MessageBag) {
+                foreach ($messages->messages() as $childAttribute => $childMessages){
+                    foreach ($childMessages as $childMessage){
+                        $this->messages->add("{$attribute}.{$childAttribute}", $this->makeReplacements(
+                            $childMessage, '{$attribute}.{$childAttribute}', get_class($rule), []
+                        ));
+                    }
+                }
+
+                return;
+            }
+
             $messages = $messages ? (array) $messages : [get_class($rule)];
 
             foreach ($messages as $message) {

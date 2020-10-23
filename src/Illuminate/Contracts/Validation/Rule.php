@@ -16,7 +16,7 @@ interface Rule
     /**
      * Get the validation error message.
      *
-     * @return string|array
+     * @return string|array|\Illuminate\Contracts\Support\MessageBag
      */
     public function message();
 }

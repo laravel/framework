@@ -5030,6 +5030,85 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('name must be taylor', $v->errors()->get('name')[0]);
         $this->assertSame('name must be a first name', $v->errors()->get('name')[1]);
         $this->assertSame('validation.string', $v->errors()->get('name')[2]);
+
+        // Test messagebag return from validator
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['form' => ['name' => 'taylor']],
+            [
+                'form' => [
+                    new class implements Rule {
+                        private $validator;
+
+                        public function passes($attribute, $value)
+                        {
+                            $ArrayTranslator = new Translator(
+                                new ArrayLoader, 'en'
+                            );
+
+                            $this->validator = new Validator(
+                                $ArrayTranslator,
+                                $value,
+                                ['name' => 'required', 'location' => 'required']
+                            );
+
+                            return $this->validator->passes();
+                        }
+
+                        public function message()
+                        {
+                            return $this->validator->errors();
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+
+        $this->assertSame('validation.required', $v->errors()->get('form.location')[0]);
+
+        // Test messagebag return from validator with asterix
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                ['name' => 'taylor', 'location' => 'us'],
+                ['name' => 'adam']
+            ],
+            [
+                '*' => [
+                    new class implements Rule {
+                        private $validator;
+
+                        public function passes($attribute, $value)
+                        {
+                            $ArrayTranslator = new Translator(
+                                new ArrayLoader, 'en'
+                            );
+
+                            $this->validator = new Validator(
+                                $ArrayTranslator,
+                                $value,
+                                ['name' => 'required', 'location' => 'required']
+                            );
+
+                            return $this->validator->passes();
+                        }
+
+                        public function message()
+                        {
+                            return $this->validator->errors();
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+
+        $this->assertSame('validation.required', $v->errors()->get('1.location')[0]);
     }
 
     public function testCustomValidationObjectWithDotKeysIsCorrectlyPassedValue()
