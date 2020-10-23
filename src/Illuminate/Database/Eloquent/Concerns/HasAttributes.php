@@ -609,6 +609,21 @@ trait HasAttributes
     }
 
     /**
+     * Increment or decrement the given attribute using the custom cast class.
+     *
+     * @param  string  $method
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function deviateClassCastableAttribute($method, $key, $value)
+    {
+        return $this->resolveCasterClass($key)->{$method}(
+            $this, $key, $value, $this->attributes
+        );
+    }
+
+    /**
      * Serialize the given attribute using the custom cast class.
      *
      * @param  string  $key
@@ -1106,6 +1121,21 @@ trait HasAttributes
         }
 
         throw new InvalidCastException($this->getModel(), $key, $castType);
+    }
+
+    /**
+     * Determine if the key is deviable using a custom class.
+     *
+     * @param  string  $key
+     * @return bool
+     *
+     * @throws \Illuminate\Database\Eloquent\InvalidCastException
+     */
+    protected function isClassDeviable($key)
+    {
+        return $this->isClassCastable($key) &&
+            method_exists($castType = $this->parseCasterClass($this->getCasts()[$key]), 'increment') &&
+            method_exists($castType, 'decrement');
     }
 
     /**

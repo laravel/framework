@@ -5,16 +5,30 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Contracts\Database\Eloquent\DeviatesCastableAttributes;
 use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @group integration
  */
 class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Schema::create('test_eloquent_model_with_custom_casts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->decimal('price');
+        });
+    }
+
     public function testBasicCustomCasting()
     {
         $model = new TestEloquentModelWithCustomCast;
@@ -133,6 +147,21 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertNull($model->address);
         $this->assertInstanceOf(Address::class, $model->getOriginal('address'));
         $this->assertNull($model->address);
+    }
+
+    public function testDeviableCasts()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+        $model->price = '123.456';
+        $model->save();
+
+        $model->increasePrice('530.865');
+
+        $this->assertSame((new Decimal('654.321'))->getValue(), $model->price->getValue());
+
+        $model->decreasePrice('333.333');
+
+        $this->assertSame((new Decimal('320.988'))->getValue(), $model->price->getValue());
     }
 
     public function testSerializableCasts()
@@ -261,6 +290,22 @@ class TestEloquentModelWithCustomCast extends Model
         'undefined_cast_column' => UndefinedCast::class,
         'birthday_at' => DateObjectCaster::class,
     ];
+
+    /**
+     * @param  float|int  $amount
+     */
+    public function increasePrice($amount)
+    {
+        $this->increment('price', $amount);
+    }
+
+    /**
+     * @param  float|int  $amount
+     */
+    public function decreasePrice($amount)
+    {
+        $this->decrement('price', $amount);
+    }
 }
 
 class HashCaster implements CastsInboundAttributes
@@ -326,7 +371,7 @@ class JsonCaster implements CastsAttributes
     }
 }
 
-class DecimalCaster implements CastsAttributes, SerializesCastableAttributes
+class DecimalCaster implements CastsAttributes, DeviatesCastableAttributes, SerializesCastableAttributes
 {
     public function get($model, $key, $value, $attributes)
     {
@@ -336,6 +381,16 @@ class DecimalCaster implements CastsAttributes, SerializesCastableAttributes
     public function set($model, $key, $value, $attributes)
     {
         return (string) $value;
+    }
+
+    public function increment($model, $key, $value, $attributes)
+    {
+        return new Decimal($attributes[$key] + $value);
+    }
+
+    public function decrement($model, $key, $value, $attributes)
+    {
+        return new Decimal($attributes[$key] - $value);
     }
 
     public function serialize($model, $key, $value, $attributes)
