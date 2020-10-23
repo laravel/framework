@@ -116,7 +116,7 @@ class FactoryMakeCommand extends GeneratorCommand
             $name = substr($name, 0, -7);
         }
 
-        $modelName = $this->qualifyModel(class_basename($name));
+        $modelName = $this->qualifyModel(Str::after($name, 'App\\'));
 
         if (class_exists($modelName)) {
             return $modelName;
