@@ -72,6 +72,10 @@ trait HasAttributes
         'decimal',
         'double',
         'encrypted',
+        'encrypted:array',
+        'encrypted:collection',
+        'encrypted:json',
+        'encrypted:object',
         'float',
         'int',
         'integer',
@@ -525,6 +529,14 @@ trait HasAttributes
             return $value;
         }
 
+        // If the key is one of the encrypted castable types, we'll first decrypt
+        // the value and update the cast type so we may leverage the following
+        // logic for casting the value to any additionally specified type.
+        if ($this->isEncryptedCastable($key)) {
+            $value = $this->fromEncryptedString($value);
+            $castType = Str::after($castType, 'encrypted:');
+        }
+
         switch ($castType) {
             case 'int':
             case 'integer':
@@ -554,8 +566,6 @@ trait HasAttributes
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
-            case 'encrypted':
-                return $this->fromEncryptedString($value);
         }
 
         if ($this->isClassCastable($key)) {
@@ -1112,7 +1122,7 @@ trait HasAttributes
      */
     protected function isJsonCastable($key)
     {
-        return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
+        return $this->hasCast($key, ['array', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
     }
 
     /**
@@ -1123,7 +1133,7 @@ trait HasAttributes
      */
     protected function isEncryptedCastable($key)
     {
-        return $this->hasCast($key, ['encrypted']);
+        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
     }
 
     /**
