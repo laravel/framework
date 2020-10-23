@@ -60,14 +60,13 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
+        $factory = class_basename(Str::ucfirst(str_replace('Factory', '', $name)));
+
         $namespaceModel = $this->option('model')
                         ? $this->qualifyModel($this->option('model'))
                         : $this->qualifyModel($this->guessModelName($name));
 
         $model = class_basename($namespaceModel);
-
-        $namespaceFactory = Str::ucfirst(str_replace('Factory', '', $name));
-        $factory = class_basename($namespaceFactory);
 
         if (Str::startsWith($namespaceModel, 'App\\Models')) {
             $namespace = Str::beforeLast('Database\\Factories\\'.Str::after($namespaceModel, 'App\\Models\\'), '\\');
