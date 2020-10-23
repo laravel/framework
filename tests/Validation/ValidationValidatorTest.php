@@ -5075,7 +5075,7 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             [
                 ['name' => 'taylor', 'location' => 'us'],
-                ['name' => 'adam']
+                ['name' => 'adam'],
             ],
             [
                 '*' => [
