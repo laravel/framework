@@ -105,7 +105,7 @@ trait CompilesComponents
      */
     public static function compileClassComponentOpeningWhen(bool $condition, string $component, string $alias, string $data, string $hash)
     {
-        $data = array_merge($data, ['renderSlotOnly' => !$condition]);
+        $data = array_merge($data, ['renderSlotOnly' => ! $condition]);
 
         return self::compileClassComponentOpening($component, $alias, $data, $hash);
     }

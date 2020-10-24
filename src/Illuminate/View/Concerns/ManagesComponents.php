@@ -67,7 +67,7 @@ trait ManagesComponents
      */
     public function startComponentWhen($condition, $view, array $data = [])
     {
-        $data = array_merge($data, ['renderSlotOnly' => !$condition]);
+        $data = array_merge($data, ['renderSlotOnly' => ! $condition]);
 
         $this->startComponent($view, $data);
     }
