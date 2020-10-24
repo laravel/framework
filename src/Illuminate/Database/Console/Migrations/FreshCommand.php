@@ -4,6 +4,9 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Events\DatabaseRefreshed;
+use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
 class FreshCommand extends Command
@@ -23,6 +26,26 @@ class FreshCommand extends Command
      * @var string
      */
     protected $description = 'Drop all tables and re-run all migrations';
+
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
+     * Create a new migration command instance.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @return void
+     */
+    public function __construct(Dispatcher $dispatcher)
+    {
+        parent::__construct();
+
+        $this->dispatcher = $dispatcher;
+    }
 
     /**
      * Execute the console command.
@@ -56,6 +79,10 @@ class FreshCommand extends Command
         if ($this->needsSeeding()) {
             $this->runSeeder($database);
         }
+
+        $this->dispatcher->dispatch(
+            new DatabaseRefreshed()
+        );
 
         return 0;
     }
