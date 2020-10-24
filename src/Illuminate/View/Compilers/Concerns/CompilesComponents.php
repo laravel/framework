@@ -38,6 +38,29 @@ trait CompilesComponents
     }
 
     /**
+     * Compile the component-when statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileComponentWhen($expression)
+    {
+        [$condtion, $component, $alias, $data] = strpos($expression, ',') !== false
+                    ? array_map('trim', explode(',', trim($expression, '()'), 4)) + ['', '', '', '']
+                    : [trim($expression, '()'), '', '', ''];
+
+        $component = trim($component, '\'"');
+
+        $hash = static::newComponentHash($component);
+
+        if (Str::contains($component, ['::class', '\\'])) {
+            return static::compileClassComponentOpeningWhen($condtion, $component, $alias, $data, $hash);
+        }
+
+        return "<?php \$__env->startComponentWhen{$expression}; ?>";
+    }
+
+    /**
      * Get a new component hash for a component name.
      *
      * @param  string  $component
@@ -68,6 +91,23 @@ trait CompilesComponents
             '<?php if ($component->shouldRender()): ?>',
             '<?php $__env->startComponent($component->resolveView(), $component->data()); ?>',
         ]);
+    }
+
+    /**
+     * Compile a class component opening based on a given condition.
+     *
+     * @param  bool    $condition
+     * @param  string  $component
+     * @param  string  $alias
+     * @param  string  $data
+     * @param  string  $hash
+     * @return string
+     */
+    public static function compileClassComponentOpeningWhen(bool $condition, string $component, string $alias, string $data, string $hash)
+    {
+        $data = array_merge($data, ['renderSlotOnly' => !$condition]);
+
+        return self::compileClassComponentOpening($component, $alias, $data, $hash);
     }
 
     /**

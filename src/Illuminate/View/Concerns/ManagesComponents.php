@@ -58,6 +58,21 @@ trait ManagesComponents
     }
 
     /**
+     * Start a component rendering process based on a given condition.
+     *
+     * @param  bool  $condition
+     * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
+     * @param  array  $data
+     * @return void
+     */
+    public function startComponentWhen($condition, $view, array $data = [])
+    {
+        $data = array_merge($data, ['renderSlotOnly' => !$condition]);
+
+        $this->startComponent($view, $data);
+    }
+
+    /**
      * Get the first view that actually exists from the given list, and start a component.
      *
      * @param  array  $names
@@ -86,6 +101,10 @@ trait ManagesComponents
 
         if ($view instanceof Closure) {
             $view = $view($data);
+        }
+
+        if (isset($data['renderSlotOnly']) && $data['renderSlotOnly']) {
+            return $data['slot'];
         }
 
         if ($view instanceof View) {
