@@ -35,9 +35,9 @@
                         {!! __('results') !!}
                     @else
                         {!! __('Showing :first-item to :last-item of :total results', [
-                            'first-item' => '<span class="font-medium">' . 11 . '</span>',
-                            'last-item' => '<span class="font-medium">' . 20 . '</span>',
-                            'total' => '<span class="font-medium">' . 100 . '</span>',
+                            'first-item' => '<span class="font-medium">'.$paginator->firstItem().'</span>',
+                            'last-item' => '<span class="font-medium">'.$paginator->lastItem().'</span>',
+                            'total' => '<span class="font-medium">'.$paginator->total().'</span>',
                         ]) !!}
                     @endif
                 </p>
