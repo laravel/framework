@@ -57,6 +57,13 @@ trait HasAttributes
     protected $classCastCache = [];
 
     /**
+     * The attributes that have been cast using chain casting.
+     *
+     * @var array
+     */
+    protected $chainCastCache = [];
+
+    /**
      * The built-in, primitive cast types supported by Eloquent.
      *
      * @var string[]
@@ -221,6 +228,10 @@ trait HasAttributes
                 continue;
             }
 
+            if (isset($this->chainCastCache[$key])) {
+                $attributes[$key] = $this->chainCastCache[$key];
+            }
+
             // Here we will cast the attribute. Then, if the cast is a date or datetime cast
             // then we will serialize the date for the array. This will convert the dates
             // to strings based on the date format specified for these Eloquent models.
@@ -228,6 +239,10 @@ trait HasAttributes
                 $key,
                 $attributes[$key]
             );
+
+            if (is_iterable($value)) {
+                continue;
+            }
 
             // If the attribute cast was a date or a datetime, we will serialize the date as
             // a string. This allows the developers to customize how dates are serialized
@@ -689,6 +704,14 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
+        // First we will check if a chained cast is being used.
+        if ($this->isChainCasted($key)) {
+            $this->setChainCastAttribute($key, $value);
+
+            return $this;
+        }
+
+        // If not, then determine if a custom class is being used.
         if ($this->isClassCastable($key)) {
             $this->setClassCastableAttribute($key, $value);
 
@@ -736,6 +759,29 @@ trait HasAttributes
     protected function setMutatedAttributeValue($key, $value)
     {
         return $this->{'set'.Str::studly($key).'Attribute'}($value);
+    }
+
+    /**
+     * Iterate through the chained casts to set the attribute accordingly.
+     *
+     * @param $key
+     * @param $value
+     */
+    protected function setChainCastAttribute($key, $value)
+    {
+        $casts = $this->getCasts()[$key];
+
+        foreach ($casts as $cast) {
+            $this->casts[$key] = $cast;
+
+            $this->setAttribute($key, $value);
+
+            $value = $this->attributes[$key];
+        }
+
+        $this->casts[$key] = $casts;
+
+        return $this;
     }
 
     /**
@@ -948,11 +994,21 @@ trait HasAttributes
      */
     public function fromChain($key, $value)
     {
-        foreach ($this->getCasts()[$key] as $cast) {
+        if (isset($this->chainCastCache[$key])) {
+            $value = $this->chainCastCache[$key];
+        } else {
+            $this->chainCastCache[$key] = $value;
+        }
+
+        $casts = $this->casts[$key];
+
+        foreach (array_reverse($casts) as $cast) {
             $this->casts[$key] = $cast;
 
             $value = $this->castAttribute($key, $value);
         }
+
+        $this->casts[$key] = $casts;
 
         return $value;
     }
@@ -1198,6 +1254,21 @@ trait HasAttributes
     }
 
     /**
+     * Determine if the key is a chain cast.
+     *
+     * @param $key
+     * @return bool
+     */
+    protected function isChainCasted($key)
+    {
+        if (! array_key_exists($key, $this->getCasts())) {
+            return false;
+        }
+
+        return is_iterable($this->getCasts()[$key]);
+    }
+
+    /**
      * Determine if the key is serializable using a custom class.
      *
      * @param  string  $key
@@ -1274,6 +1345,38 @@ trait HasAttributes
     }
 
     /**
+     * Merge the chain cast attributes back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributesFromChainCasts()
+    {
+        foreach ($this->chainCastCache as $key => $value) {
+            $value = $this->castAttribute($key, $value);
+
+            $this->attributes = array_merge(
+                $this->attributes,
+                $this->normalizeCastClassResponse($key, $value)
+            );
+        }
+    }
+
+    /**
+     * Reset cached chain cast attributes back into the model.
+     *
+     * @return void
+     */
+    protected function resetChainCasts()
+    {
+        foreach ($this->chainCastCache as $key => $value) {
+            $this->attributes = array_merge(
+                $this->attributes,
+                $this->normalizeCastClassResponse($key, $value)
+            );
+        }
+    }
+
+    /**
      * Normalize the response from a custom class caster.
      *
      * @param  string  $key
@@ -1293,6 +1396,7 @@ trait HasAttributes
     public function getAttributes()
     {
         $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromChainCasts();
 
         return $this->attributes;
     }
@@ -1313,7 +1417,6 @@ trait HasAttributes
         }
 
         $this->classCastCache = [];
-        $this->chainCastCache = [];
 
         return $this;
     }

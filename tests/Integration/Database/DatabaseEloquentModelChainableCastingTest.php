@@ -9,74 +9,55 @@ use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 
 /**
  * @group integration
  */
 class DatabaseEloquentModelChainableCastingTest extends DatabaseTestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('app.key', 'base64:IUHRqAQ99pZ0A1MPjbuv1D6ff3jxv0GIvS2qIW4JNU4=');
+    }
+
     public function testBasicChainedCast()
     {
         $model = new TestEloquentModelWithChainedCast;
         $model->password = 'password';
 
-        dd($model->toArray());
-
-        $this->assertSame('TAYLOR', $model->password);
-        $this->assertSame('TAYLOR', $model->getAttributes()['uppercase']);
-        $this->assertSame('TAYLOR', $model->toArray()['uppercase']);
+        $this->assertSame('password', $model->password);
+        $this->assertSame('password', $model->getAttributes()['password']);
+        $this->assertSame('password', $model->toArray()['password']);
 
         $unserializedModel = unserialize(serialize($model));
 
-        $this->assertSame('TAYLOR', $unserializedModel->uppercase);
-        $this->assertSame('TAYLOR', $unserializedModel->getAttributes()['uppercase']);
-        $this->assertSame('TAYLOR', $unserializedModel->toArray()['uppercase']);
+        $this->assertSame('password', $unserializedModel->password);
+        $this->assertSame('password', $unserializedModel->getAttributes()['password']);
+        $this->assertSame('password', $unserializedModel->toArray()['password']);
 
         $model->syncOriginal();
-        $model->uppercase = 'dries';
-        $this->assertSame('TAYLOR', $model->getOriginal('uppercase'));
+        $model->password = 'qwerty';
+        $this->assertSame('password', $model->getOriginal('password'));
 
         $model = new TestEloquentModelWithChainedCast;
-        $model->uppercase = 'taylor';
+        $model->password = 'password';
         $model->syncOriginal();
-        $model->uppercase = 'dries';
+        $model->password = 'qwerty';
         $model->getOriginal();
 
-        $this->assertSame('DRIES', $model->uppercase);
+        $this->assertSame('qwerty', $model->password);
+
+        $model = new TestEloquentModelWithChainedCast;
+        $model->number = 12345;
+
+        $this->assertSame(12345, $model->number);
+        $this->assertSame(12345, $model->getAttributes()['number']);
+        $this->assertSame(12345, $model->toArray()['number']);
 
         $model = new TestEloquentModelWithChainedCast;
 
-        $model->address = $address = new Address('110 Kingsbrook St.', 'My Childhood House');
-        $address->lineOne = '117 Spencer St.';
-        $this->assertSame('117 Spencer St.', $model->getAttributes()['address_line_one']);
-
-        $model = new TestEloquentModelWithChainedCast;
-
-        $model->setRawAttributes([
-            'address_line_one' => '110 Kingsbrook St.',
-            'address_line_two' => 'My Childhood House',
-        ]);
-
-        $this->assertSame('110 Kingsbrook St.', $model->address->lineOne);
-        $this->assertSame('My Childhood House', $model->address->lineTwo);
-
-        $this->assertSame('110 Kingsbrook St.', $model->toArray()['address_line_one']);
-        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
-
-        $model->address->lineOne = '117 Spencer St.';
-
-        $this->assertFalse(isset($model->toArray()['address']));
-        $this->assertSame('117 Spencer St.', $model->toArray()['address_line_one']);
-        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
-
-        $this->assertSame('117 Spencer St.', json_decode($model->toJson(), true)['address_line_one']);
-        $this->assertSame('My Childhood House', json_decode($model->toJson(), true)['address_line_two']);
-
-        $model->address = null;
-
-        $this->assertNull($model->toArray()['address_line_one']);
-        $this->assertNull($model->toArray()['address_line_two']);
-
         $model->options = ['foo' => 'bar'];
         $this->assertEquals(['foo' => 'bar'], $model->options);
         $this->assertEquals(['foo' => 'bar'], $model->options);
@@ -84,8 +65,6 @@ class DatabaseEloquentModelChainableCastingTest extends DatabaseTestCase
         $model->options = ['foo' => 'bar'];
         $this->assertEquals(['foo' => 'bar'], $model->options);
         $this->assertEquals(['foo' => 'bar'], $model->options);
-
-        $this->assertSame(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
 
         $model = new TestEloquentModelWithChainedCast(['options' => []]);
         $model->syncOriginal();
@@ -95,6 +74,16 @@ class DatabaseEloquentModelChainableCastingTest extends DatabaseTestCase
         $model = new TestEloquentModelWithCustomCast;
         $model->birthday_at = now();
         $this->assertTrue(is_string($model->toArray()['birthday_at']));
+    }
+
+    public function testAdvancedChainedCast()
+    {
+        $model = new TestEloquentModelWithChainedCast;
+        $model->hash = 'This is a HASH';
+
+        $this->assertSame('hsah-a-si-siht', $model->hash);
+        $this->assertSame('hsah-a-si-siht', $model->getAttributes()['hash']);
+        $this->assertSame('hsah-a-si-siht', $model->toArray()['hash']);
     }
 }
 
@@ -114,28 +103,50 @@ class TestEloquentModelWithChainedCast extends Model
      */
     protected $casts = [
         'password' => [
-           'string',
-           EncryptedCast::class,
+            'string',
+            'encrypted',
         ],
-        'account_number' => [
+        'number' => [
             'integer',
-            EncryptedCast::class,
+            'encrypted',
         ],
-        'encrypted_array' => [
+        'options' => [
             'array',
-            EncryptedCast::class,
+            'encrypted',
         ],
-        'encrypted_object' => [
-            'object',
-            EncryptedCast::class,
-        ],
-        'encrypted_collection' => [
-            'collection',
-            EncryptedCast::class,
-        ],
-        'undefined' => [
-           'string',
-            UndefinedCast::class,
+        'hash' => [
+            ReverseCaster::class,
+            SlugifyCaster::class,
+            Base64Caster::class,
         ],
     ];
+}
+
+class ReverseCaster implements CastsInboundAttributes
+{
+    public function set($model, $key, $value, $attributes)
+    {
+        return [$key => strrev($value)];
+    }
+}
+
+class SlugifyCaster implements CastsInboundAttributes
+{
+    public function set($model, $key, $value, $attributes)
+    {
+        return [$key => Str::slug($value)];
+    }
+}
+
+class Base64Caster implements CastsAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        return base64_decode($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return [$key => base64_encode($value)];
+    }
 }

@@ -695,6 +695,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public function save(array $options = [])
     {
         $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromChainCasts();
 
         $query = $this->newModelQuery();
 
@@ -936,6 +937,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public function delete()
     {
         $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromChainCasts();
 
         if (is_null($this->getKeyName())) {
             throw new Exception('No primary key defined on model.');
@@ -1754,8 +1756,10 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public function __sleep()
     {
         $this->mergeAttributesFromClassCasts();
+        $this->resetChainCasts();
 
         $this->classCastCache = [];
+        $this->chainCastCache = [];
 
         return array_keys(get_object_vars($this));
     }
