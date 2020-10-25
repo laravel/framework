@@ -1,10 +1,10 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
-class DummyClass implements CastsAttributes
+class {{ class }} implements CastsAttributes
 {
     /**
      * Cast the given value.

@@ -26,6 +26,14 @@ class EventsDispatcherTest extends TestCase
 
         $this->assertEquals([null], $response);
         $this->assertSame('bar', $_SERVER['__event.test']);
+
+        // we can still add listeners after the event has fired
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'] .= $foo;
+        });
+
+        $d->dispatch('foo', ['bar']);
+        $this->assertSame('barbar', $_SERVER['__event.test']);
     }
 
     public function testHaltingEventExecution()
@@ -382,6 +390,26 @@ class EventsDispatcherTest extends TestCase
 
         unset($_SERVER['__event.test1']);
         unset($_SERVER['__event.test2']);
+    }
+
+    public function testNestedEvent()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+
+        $d->listen('event', function () use ($d) {
+            $d->listen('event', function () {
+                $_SERVER['__event.test'][] = 'fired 1';
+            });
+            $d->listen('event', function () {
+                $_SERVER['__event.test'][] = 'fired 2';
+            });
+        });
+
+        $d->dispatch('event');
+        $this->assertSame([], $_SERVER['__event.test']);
+        $d->dispatch('event');
+        $this->assertEquals(['fired 1', 'fired 2'], $_SERVER['__event.test']);
     }
 }
 

@@ -157,7 +157,7 @@ class PhpRedisConnector implements Connector
         }
 
         if (version_compare(phpversion('redis'), '5.3.2', '>=')) {
-            $parameters[] = Arr::get($options, 'context', []);
+            $parameters[] = Arr::get($options, 'context');
         }
 
         return tap(new RedisCluster(...$parameters), function ($client) use ($options) {
