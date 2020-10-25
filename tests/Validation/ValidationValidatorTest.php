@@ -1927,7 +1927,6 @@ class ValidationValidatorTest extends TestCase
             [2, .1, true], // fmod does this "wrong", it should be 0, but fmod(2, .1) = .1
             [.75, .05, true], // fmod does this "wrong", it should be 0, but fmod(.75, .05) = .05
             [.9, .3, true], // floating point division does not produce a proper 0 here
-            [2, .3, true], // floating point division does not produce a proper 0 here
             ['foo', 1, false], // invalid values
             [1, 'foo', false],
             ['foo', 'foo', false],
