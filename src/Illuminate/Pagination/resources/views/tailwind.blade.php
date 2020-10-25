@@ -34,7 +34,7 @@
                         <span class="font-medium">{{ $paginator->total() }}</span>
                         {!! __('results') !!}
                     @else
-                        {!! trans_choice('pagination.summary', [
+                        {!! trans_choice('pagination.summary', $paginator->total(), [
                             'first-item' => '<span class="font-medium">'.$paginator->firstItem().'</span>',
                             'last-item' => '<span class="font-medium">'.$paginator->lastItem().'</span>',
                             'total' => '<span class="font-medium">'.$paginator->total().'</span>',
