@@ -141,16 +141,14 @@ trait HasAttributes
         );
 
         $attributes = $this->addMutatedAttributesToArray(
-            $attributes,
-            $mutatedAttributes = $this->getMutatedAttributes()
+            $attributes, $mutatedAttributes = $this->getMutatedAttributes()
         );
 
         // Next we will handle any casts that have been setup for this model and cast
         // the values to their appropriate type. If the attribute has a mutator we
         // will not perform the cast on those attributes to avoid any confusion.
         $attributes = $this->addCastAttributesToArray(
-            $attributes,
-            $mutatedAttributes
+            $attributes, $mutatedAttributes
         );
 
         // Here we will grab all of the appended, calculated attributes to this model
@@ -205,8 +203,7 @@ trait HasAttributes
             // mutated attribute's actual values. After we finish mutating each of the
             // attributes we will return this final array of the mutated attributes.
             $attributes[$key] = $this->mutateAttributeForArray(
-                $key,
-                $attributes[$key]
+                $key, $attributes[$key]
             );
         }
 
