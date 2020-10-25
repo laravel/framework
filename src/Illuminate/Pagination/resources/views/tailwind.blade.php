@@ -25,7 +25,7 @@
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
                 <p class="text-sm text-gray-700 leading-5">
-                    @if (__('Showing :first-item to :last-item of :total results') === 'Showing :first-item to :last-item of :total results')
+                    @if (__('pagination.summary') === 'pagination.summary')
                         {!! __('Showing') !!}
                         <span class="font-medium">{{ $paginator->firstItem() }}</span>
                         {!! __('to') !!}
@@ -34,7 +34,7 @@
                         <span class="font-medium">{{ $paginator->total() }}</span>
                         {!! __('results') !!}
                     @else
-                        {!! __('Showing :first-item to :last-item of :total results', [
+                        {!! trans_choice('pagination.summary', [
                             'first-item' => '<span class="font-medium">'.$paginator->firstItem().'</span>',
                             'last-item' => '<span class="font-medium">'.$paginator->lastItem().'</span>',
                             'total' => '<span class="font-medium">'.$paginator->total().'</span>',
