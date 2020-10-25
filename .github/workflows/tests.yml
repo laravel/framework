@@ -50,6 +50,22 @@ jobs:
       - name: Setup problem matchers
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
+      - name: Setup Doctrine DBAL 2
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "doctrine/dbal:^2.6" --no-update --no-interaction
+        if: "matrix.php >= 7.3 && matrix.stability == 'prefer-lowest'"
+
+      - name: Setup Doctrine DBAL 3
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "doctrine/dbal:^3.0" --no-update --no-interaction
+        if: "matrix.php >= 7.3 && matrix.stability == 'prefer-stable'"
+
       - name: Install dependencies
         uses: nick-invision/retry@v1
         with:
@@ -93,6 +109,22 @@ jobs:
 
       - name: Setup problem matchers
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Setup Doctrine DBAL 2
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "doctrine/dbal:^2.6" --no-update --no-interaction
+        if: "matrix.php >= 7.3 && matrix.stability == 'prefer-lowest'"
+
+      - name: Setup Doctrine DBAL 3
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "doctrine/dbal:^3.0" --no-update --no-interaction
+        if: "matrix.php >= 7.3 && matrix.stability == 'prefer-stable'"
 
       - name: Install dependencies
         uses: nick-invision/retry@v1
