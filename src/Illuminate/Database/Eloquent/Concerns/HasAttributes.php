@@ -233,8 +233,7 @@ trait HasAttributes
             // then we will serialize the date for the array. This will convert the dates
             // to strings based on the date format specified for these Eloquent models.
             $attributes[$key] = $this->castAttribute(
-                $key,
-                $attributes[$key]
+                $key, $attributes[$key]
             );
 
             if (is_iterable($value)) {
@@ -462,16 +461,12 @@ trait HasAttributes
         if (! $relation instanceof Relation) {
             if (is_null($relation)) {
                 throw new LogicException(sprintf(
-                    '%s::%s must return a relationship instance, but "null" was returned. Was the "return" keyword used?',
-                    static::class,
-                    $method
+                    '%s::%s must return a relationship instance, but "null" was returned. Was the "return" keyword used?', static::class, $method
                 ));
             }
 
             throw new LogicException(sprintf(
-                '%s::%s must return a relationship instance.',
-                static::class,
-                $method
+                '%s::%s must return a relationship instance.', static::class, $method
             ));
         }
 
@@ -648,10 +643,7 @@ trait HasAttributes
     protected function serializeClassCastableAttribute($key, $value)
     {
         return $this->resolveCasterClass($key)->serialize(
-            $this,
-            $key,
-            $value,
-            $this->attributes
+            $this, $key, $value, $this->attributes
         );
     }
 
@@ -805,9 +797,7 @@ trait HasAttributes
         [$key, $path] = explode('->', $key, 2);
 
         $this->attributes[$key] = $this->asJson($this->getArrayAttributeWithValue(
-            $path,
-            $key,
-            $value
+            $path, $key, $value
         ));
 
         return $this;
@@ -829,20 +819,14 @@ trait HasAttributes
                 function () {
                 },
                 $this->normalizeCastClassResponse($key, $caster->set(
-                    $this,
-                    $key,
-                    $this->{$key},
-                    $this->attributes
+                    $this, $key, $this->{$key}, $this->attributes
                 ))
             ));
         } else {
             $this->attributes = array_merge(
                 $this->attributes,
                 $this->normalizeCastClassResponse($key, $caster->set(
-                    $this,
-                    $key,
-                    $value,
-                    $this->attributes
+                    $this, $key, $value, $this->attributes
                 ))
             );
         }
@@ -1444,8 +1428,7 @@ trait HasAttributes
     {
         if ($key) {
             return $this->transformModelValue(
-                $key,
-                Arr::get($this->original, $key, $default)
+                $key, Arr::get($this->original, $key, $default)
             );
         }
 
@@ -1546,8 +1529,7 @@ trait HasAttributes
     public function isDirty($attributes = null)
     {
         return $this->hasChanges(
-            $this->getDirty(),
-            is_array($attributes) ? $attributes : func_get_args()
+            $this->getDirty(), is_array($attributes) ? $attributes : func_get_args()
         );
     }
 
@@ -1571,8 +1553,7 @@ trait HasAttributes
     public function wasChanged($attributes = null)
     {
         return $this->hasChanges(
-            $this->getChanges(),
-            is_array($attributes) ? $attributes : func_get_args()
+            $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
         );
     }
 
