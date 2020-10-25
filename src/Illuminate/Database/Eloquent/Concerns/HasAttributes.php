@@ -878,9 +878,7 @@ trait HasAttributes
 
         if ($value === false) {
             throw JsonEncodingException::forAttribute(
-                $this,
-                $key,
-                json_last_error_msg()
+                $this, $key, json_last_error_msg()
             );
         }
 
@@ -1025,8 +1023,7 @@ trait HasAttributes
         // when checking the field. We will just return the DateTime right away.
         if ($value instanceof DateTimeInterface) {
             return Date::parse(
-                $value->format('Y-m-d H:i:s.u'),
-                $value->getTimezone()
+                $value->format('Y-m-d H:i:s.u'), $value->getTimezone()
             );
         }
 
@@ -1412,8 +1409,7 @@ trait HasAttributes
     public function getOriginal($key = null, $default = null)
     {
         return (new static)->setRawAttributes(
-            $this->original,
-            $sync = true
+            $this->original, $sync = true
         )->getOriginalWithoutRewindingModel($key, $default);
     }
 
