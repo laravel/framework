@@ -348,12 +348,15 @@ trait QueriesRelationships
     }
 
     /**
-     * Add subselect queries to count the relations.
+     * Add subselect queries to include the given relation's column.
+     * Also, apply the SQL function on that column if provided.
      *
-     * @param  mixed  $relations
+     * @param  mixed $relation
+     * @param  string $column
+     * @param  string $function
      * @return $this
      */
-    public function withCount($relations)
+    public function withColumn($relations, $column, $function = null)
     {
         if (empty($relations)) {
             return $this;
@@ -363,12 +366,12 @@ trait QueriesRelationships
             $this->query->select([$this->query->from.'.*']);
         }
 
-        $relations = is_array($relations) ? $relations : func_get_args();
+        $relations = is_array($relations) ? $relations : [$relations];
 
         foreach ($this->parseWithRelations($relations) as $name => $constraints) {
             // First we will determine if the name has been aliased using an "as" clause on the name
             // and if it has we will extract the actual relationship name and the desired name of
-            // the resulting column. This allows multiple counts on the same relationship name.
+            // the resulting column.
             $segments = explode(' ', $name);
 
             unset($alias);
@@ -379,12 +382,13 @@ trait QueriesRelationships
 
             $relation = $this->getRelationWithoutConstraints($name);
 
-            // Here we will get the relationship count query and prepare to add it to the main query
+            // Here we will get the relationship sub-query and prepare to add it to the main query
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
-            // count query. We will normalize the relation name then append _count as the name.
-            $query = $relation->getRelationExistenceCountQuery(
-                $relation->getRelated()->newQuery(), $this
-            );
+            // sub-query.
+            // We will normalize the relation name then append _$column as the name if the $alias was not given.
+            $query = $relation->getRelationExistenceQuery(
+                $relation->getRelated()->newQuery(), $this, new Expression($function ? "$function($column)" : $column)
+            )->setBindings([], 'select');
 
             $query->callScope($constraints);
 
@@ -400,15 +404,74 @@ trait QueriesRelationships
                 $query->bindings['select'] = [];
             }
 
-            // Finally we will add the proper result column alias to the query and run the subselect
+            // Finally we will make the proper column alias to the query and run the subselect
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
-            $column = $alias ?? Str::snake($name.'_count');
+            $alias = $alias ?? Str::snake(preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function $column"));
 
-            $this->selectSub($query, $column);
+            $this->selectSub($query->limit(1), $alias);
         }
 
         return $this;
+    }
+
+    /**
+     * Add subselect queries to count the relations.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function withCount($relations)
+    {
+        return $this->withColumn(is_array($relations) ? $relations : func_get_args(), '*', 'count');
+    }
+
+    /**
+     * Add subselect queries to include the max of the relation's column.
+     *
+     * @param  string  $relation
+     * @param  string  $column
+     * @return $this
+     */
+    public function withMax($relation, $column)
+    {
+        return $this->withColumn($relation, $column, 'max');
+    }
+
+    /**
+     * Add subselect queries to include the min of the relation's column.
+     *
+     * @param  string  $relation
+     * @param  string  $column
+     * @return $this
+     */
+    public function withMin($relation, $column)
+    {
+        return $this->withColumn($relation, $column, 'min');
+    }
+
+    /**
+     * Add subselect queries to include the sum of the relation's column.
+     *
+     * @param  string  $relation
+     * @param  string  $column
+     * @return $this
+     */
+    public function withSum($relation, $column)
+    {
+        return $this->withColumn($relation, $column, 'sum');
+    }
+
+    /**
+     * Add subselect queries to include the average of the relation's column.
+     *
+     * @param  string  $relation
+     * @param  string  $column
+     * @return $this
+     */
+    public function withAvg($relation, $column)
+    {
+        return $this->withColumn($relation, $column, 'avg');
     }
 
     /**
