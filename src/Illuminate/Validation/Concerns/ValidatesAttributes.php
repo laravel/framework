@@ -1267,7 +1267,12 @@ trait ValidatesAttributes
             return false;
         }
 
-        return fmod($value, $parameters[0]) === 0.0;
+        // We know it's not a multiple of 0 without even attempting to divide by zero.
+        if ((float) $parameters[0] === 0.0) {
+            return false;
+        }
+
+        return bcmod($value, $parameters[0], 16) === '0.0000000000000000';
     }
 
     /**
