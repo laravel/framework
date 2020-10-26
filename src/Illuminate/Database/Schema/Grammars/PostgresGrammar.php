@@ -4,9 +4,12 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Traits\Macroable;
 
 class PostgresGrammar extends Grammar
 {
+    use Macroable;
+
     /**
      * If this Grammar supports schema changes wrapped in a transaction.
      *

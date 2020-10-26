@@ -7,10 +7,13 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
 class SQLiteGrammar extends Grammar
 {
+    use Macroable;
+
     /**
      * The possible column modifiers.
      *
