@@ -827,11 +827,34 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
+     * Set the keys for a select query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function setKeysForSelectQuery($query)
+    {
+        $query->where($this->getKeyName(), '=', $this->getKeyForSelectQuery());
+
+        return $query;
+    }
+
+    /**
      * Get the primary key value for a save query.
      *
      * @return mixed
      */
     protected function getKeyForSaveQuery()
+    {
+        return $this->original[$this->getKeyName()] ?? $this->getKey();
+    }
+
+    /**
+     * Get the primary key value for a select query.
+     *
+     * @return mixed
+     */
+    protected function getKeyForSelectQuery()
     {
         return $this->original[$this->getKeyName()] ?? $this->getKey();
     }
@@ -1214,7 +1237,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return;
         }
 
-        return $this->setKeysForSaveQuery(static::newQueryWithoutScopes())
+        return $this->setKeysForSelectQuery(static::newQueryWithoutScopes())
                         ->with(is_string($with) ? func_get_args() : $with)
                         ->first();
     }
@@ -1231,7 +1254,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         }
 
         $this->setRawAttributes(
-            $this->setKeysForSaveQuery(static::newQueryWithoutScopes())->firstOrFail()->attributes
+            $this->setKeysForSelectQuery(static::newQueryWithoutScopes())->firstOrFail()->attributes
         );
 
         $this->load(collect($this->relations)->reject(function ($relation) {
