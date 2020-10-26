@@ -24,7 +24,7 @@ use RuntimeException;
 
 class Builder
 {
-    use BuildsQueries, ForwardsCalls, ExplainsQueries, Macroable {
+    use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
