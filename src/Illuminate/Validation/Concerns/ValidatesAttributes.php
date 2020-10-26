@@ -1267,7 +1267,6 @@ trait ValidatesAttributes
             return false;
         }
 
-        // We know it's not a multiple of 0 without even attempting to divide by zero.
         if ((float) $parameters[0] === 0.0) {
             return false;
         }
