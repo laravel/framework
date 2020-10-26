@@ -27,26 +27,6 @@ class FreshCommand extends Command
     protected $description = 'Drop all tables and re-run all migrations';
 
     /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * Create a new migration command instance.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return void
-     */
-    public function __construct(Dispatcher $dispatcher)
-    {
-        parent::__construct();
-
-        $this->dispatcher = $dispatcher;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return int
@@ -79,7 +59,7 @@ class FreshCommand extends Command
             $this->runSeeder($database);
         }
 
-        $this->dispatcher->dispatch(
+        $this->laravel[Dispatcher::class]->dispatch(
             new DatabaseRefreshed()
         );
 

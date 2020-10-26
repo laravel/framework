@@ -27,26 +27,6 @@ class RefreshCommand extends Command
     protected $description = 'Reset and re-run all migrations';
 
     /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * Create a new migration command instance.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return void
-     */
-    public function __construct(Dispatcher $dispatcher)
-    {
-        parent::__construct();
-
-        $this->dispatcher = $dispatcher;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return int
@@ -89,7 +69,7 @@ class RefreshCommand extends Command
             $this->runSeeder($database);
         }
 
-        $this->dispatcher->dispatch(
+        $this->laravel[Dispatcher::class]->dispatch(
             new DatabaseRefreshed()
         );
 

@@ -128,8 +128,8 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateFreshCommand()
     {
-        $this->app->singleton('command.migrate.fresh', function ($app) {
-            return new FreshCommand($app[Dispatcher::class]);
+        $this->app->singleton('command.migrate.fresh', function () {
+            return new FreshCommand;
         });
     }
 
@@ -171,8 +171,8 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateRefreshCommand()
     {
-        $this->app->singleton('command.migrate.refresh', function ($app) {
-            return new RefreshCommand($app[Dispatcher::class]);
+        $this->app->singleton('command.migrate.refresh', function () {
+            return new RefreshCommand;
         });
     }
 
