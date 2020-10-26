@@ -7,6 +7,7 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Pagination\Paginator;
@@ -23,7 +24,7 @@ use ReflectionMethod;
  */
 class Builder
 {
-    use BuildsQueries, Concerns\QueriesRelationships, ForwardsCalls;
+    use BuildsQueries, Concerns\QueriesRelationships, ExplainsQueries, ForwardsCalls;
 
     /**
      * The base query builder instance.
