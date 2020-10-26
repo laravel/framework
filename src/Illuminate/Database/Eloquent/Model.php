@@ -516,6 +516,10 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function loadMorph($relation, $relations)
     {
+        if (! $this->{$relation}) {
+            return $this;
+        }
+
         $className = get_class($this->{$relation});
 
         $this->{$relation}->load($relations[$className] ?? []);
@@ -562,6 +566,10 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function loadMorphCount($relation, $relations)
     {
+        if (! $this->{$relation}) {
+            return $this;
+        }
+
         $className = get_class($this->{$relation});
 
         $this->{$relation}->loadCount($relations[$className] ?? []);
