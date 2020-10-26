@@ -91,6 +91,13 @@ class ContainerCallTest extends TestCase
         $this->assertSame('taylor', $result[1]);
     }
 
+    public function testCallWithUnnamedParameters()
+    {
+        $container = new Container;
+        $result = $container->call([new ContainerTestCallStub, 'unresolvable'], ['foo', 'bar']);
+        $this->assertEquals(['foo', 'bar'], $result);
+    }
+
     public function testBindMethodAcceptsAnArray()
     {
         $container = new Container;
