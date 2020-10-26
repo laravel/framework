@@ -28,8 +28,14 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->db = $db = new DB;
 
         $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
+            'driver'    => 'pgsql',
+            'host'      => 'postgres',
+            'database'  => 'dblimpia',
+            'username'  => 'zataca',
+            'password'  => 'zataca',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
         ]);
 
         $db->addConnection([
@@ -82,6 +88,17 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         $this->assertTrue(Str::contains($ran[0], 'users'));
         $this->assertTrue(Str::contains($ran[1], 'password_resets'));
+    }
+
+    public function testBasicMigrationOfSingleFolderWithTableRenameInPostgres()
+    {
+        $ran = $this->migrator->run([__DIR__.'/migrations/three']);
+
+        $this->assertTrue($this->db->schema()->hasTable('test_renamed'));
+
+        $this->assertTrue(Str::contains($ran[0], 'create'));
+        $this->assertTrue(Str::contains($ran[1], 'rename'));
+        $this->assertTrue(Str::contains($ran[2], 'delete'));
     }
 
     public function testMigrationsCanBeRolledBack()
