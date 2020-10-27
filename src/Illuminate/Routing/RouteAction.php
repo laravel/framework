@@ -58,7 +58,7 @@ class RouteAction
     public static function isCallable($action)
     {
         return is_callable($action, true) ||
-            (is_array($action) && isset($action[0], $action[1]) && class_exists($action[0]) && method_exists($action[0], $action[1]));
+            (is_array($action) && isset($action[0], $action[1]) && is_string($action[0]) && is_string($action[1]) && class_exists($action[0]) && method_exists($action[0], $action[1]));
     }
 
     /**
