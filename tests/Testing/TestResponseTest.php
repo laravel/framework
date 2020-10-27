@@ -130,6 +130,50 @@ class TestResponseTest extends TestCase
         $response->assertViewMissing('foo.baz');
     }
 
+    public function testAssertSee()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSee('foo');
+        $response->assertSee(['baz', 'bar']);
+    }
+
+    public function testAssertSeeCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSee('item');
+        $response->assertSee(['not', 'found']);
+    }
+
+    public function testAssertSeeEscaped()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'laravel &amp; php &amp; friends',
+        ]);
+
+        $response->assertSee('laravel & php');
+        $response->assertSee(['php & friends', 'laravel & php']);
+    }
+
+    public function testAssertSeeEscapedCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'laravel &amp; php &amp; friends',
+        ]);
+
+        $response->assertSee('foo & bar');
+        $response->assertSee(['bar & baz', 'baz & qux']);
+    }
+
     public function testAssertSeeInOrder()
     {
         $response = $this->makeMockResponse([
@@ -166,19 +210,45 @@ class TestResponseTest extends TestCase
     public function testAssertSeeText()
     {
         $response = $this->makeMockResponse([
-            'render' => 'foo<strong>bar</strong>',
+            'render' => 'foo<strong>bar</strong>baz<strong>qux</strong>',
         ]);
 
         $response->assertSeeText('foobar');
+        $response->assertSeeText(['bazqux', 'foobar']);
+    }
+
+    public function testAssertSeeTextCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>',
+        ]);
+
+        $response->assertSeeText('bazfoo');
+        $response->assertSeeText(['bazfoo', 'barqux']);
     }
 
     public function testAssertSeeTextEscaped()
     {
         $response = $this->makeMockResponse([
-            'render' => 'laravel &amp; php',
+            'render' => 'laravel &amp; php &amp; friends',
         ]);
 
         $response->assertSeeText('laravel & php');
+        $response->assertSeeText(['php & friends', 'laravel & php']);
+    }
+
+    public function testAssertSeeTextEscapedCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'laravel &amp; php &amp; friends',
+        ]);
+
+        $response->assertSeeText('foo & bar');
+        $response->assertSeeText(['foo & bar', 'bar & baz']);
     }
 
     public function testAssertSeeTextInOrder()
@@ -221,6 +291,94 @@ class TestResponseTest extends TestCase
         ]);
 
         $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
+    }
+
+    public function testAssertDontSee()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertDontSee('laravel');
+        $response->assertDontSee(['php', 'friends']);
+    }
+
+    public function testAssertDontSeeCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertDontSee('foo');
+        $response->assertDontSee(['baz', 'bar']);
+    }
+
+    public function testAssertDontSeeEscaped()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'laravel &amp; php &amp; friends',
+        ]);
+
+        $response->assertDontSee('foo & bar');
+        $response->assertDontSee(['bar & baz', 'foo & bar']);
+    }
+
+    public function testAssertDontSeeEscapedCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'laravel &amp; php &amp; friends',
+        ]);
+
+        $response->assertDontSee('laravel & php');
+        $response->assertDontSee(['php & friends', 'laravel & php']);
+    }
+
+    public function testAssertDontSeeText()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>baz<strong>qux</strong>',
+        ]);
+
+        $response->assertDontSeeText('laravelphp');
+        $response->assertDontSeeText(['phpfriends', 'laravelphp']);
+    }
+
+    public function testAssertDontSeeTextCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>baz<strong>qux</strong>',
+        ]);
+
+        $response->assertDontSeeText('foobar');
+        $response->assertDontSeeText(['bazqux', 'foobar']);
+    }
+
+    public function testAssertDontSeeTextEscaped()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'laravel &amp; php &amp; friends',
+        ]);
+
+        $response->assertDontSeeText('foo & bar');
+        $response->assertDontSeeText(['bar & baz', 'foo & bar']);
+    }
+
+    public function testAssertDontSeeTextEscapedCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'laravel &amp; php &amp; friends',
+        ]);
+
+        $response->assertDontSeeText('laravel & php');
+        $response->assertDontSeeText(['php & friends', 'laravel & php']);
     }
 
     public function testAssertOk()
