@@ -213,11 +213,11 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $job = $this->database->table($this->table)
                     ->lockForUpdate()
-                    ->where('id', function($query) use ($queue) {
+                    ->where('id', function ($query) use ($queue) {
                         $query->select('id')
                               ->from($this->table)
                               ->where('queue', $this->getQueue($queue))
-                              ->where(function($query) {
+                              ->where(function ($query) {
                                   $this->isAvailable($query);
                                   $this->isReservedButExpired($query);
                               })
