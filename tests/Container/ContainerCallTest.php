@@ -6,7 +6,6 @@ use ArgumentCountError;
 use Closure;
 use Error;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
