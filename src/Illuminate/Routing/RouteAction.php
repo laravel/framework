@@ -85,7 +85,7 @@ class RouteAction
      */
     public static function isCallable($action)
     {
-        if (is_string($action) || !is_array($action)) {
+        if (is_string($action) || ! is_array($action)) {
             return is_callable($action);
         }
 
