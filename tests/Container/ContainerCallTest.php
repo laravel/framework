@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Container;
 use Closure;
 use Error;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -173,6 +174,26 @@ class ContainerCallTest extends TestCase
         $result = $container->call($callable);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
         $this->assertSame('jeffrey', $result[1]);
+    }
+
+    public function testCallWithoutRequiredParamsThrowsException()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
+
+        $container = new Container;
+        $container->call(ContainerTestCallStub::class.'@unresolvable');
+    }
+
+    public function testCallWithoutRequiredParamsOnClosureThrowsException()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerCallTest');
+
+        $container = new Container;
+        $foo = $container->call(function ($foo, $bar = 'default') {
+            return $foo;
+        });
     }
 }
 
