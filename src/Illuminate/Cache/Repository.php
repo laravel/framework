@@ -14,6 +14,7 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 
@@ -181,6 +182,23 @@ class Repository implements ArrayAccess, CacheContract
     {
         return tap($this->get($key, $default), function () use ($key) {
             $this->forget($key);
+        });
+    }
+
+    /**
+     * Push an item into existing cache key
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return Collection
+     */
+    public function push($key, $value, $ttl = null)
+    {
+        return tap(collect($this->get($key)), function ($collection) use ($value, $key, $ttl) {
+            $collection->push($value);
+
+            $this->put($key, $collection, $ttl);
         });
     }
 

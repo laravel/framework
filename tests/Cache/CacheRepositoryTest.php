@@ -15,6 +15,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -131,6 +132,16 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1);
         $repo->put(['foo' => 'bar', 'bar' => 'baz'], 1);
+    }
+
+    public function testPushingItemIntoExistingCacheKey()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->times(2)->with('foo')->andReturn(m::type(Collection::class));
+        $repo->getStore()->shouldReceive('forever')->times(2)->with('foo', m::type(Collection::class))->andReturn(true);
+        $repo->push('foo', 'bar');
+        $repo->push('foo', 'baz');
+        //TODO actual test that ensure the foo key have two items and instance of collection
     }
 
     public function testSettingMultipleItemsInCacheArray()
