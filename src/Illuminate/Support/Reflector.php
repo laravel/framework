@@ -3,8 +3,8 @@
 namespace Illuminate\Support;
 
 use ReflectionClass;
-use ReflectionNamedType;
 use ReflectionMethod;
+use ReflectionNamedType;
 
 class Reflector
 {
