@@ -92,13 +92,6 @@ class ContainerCallTest extends TestCase
         $this->assertSame('taylor', $result[1]);
     }
 
-    public function testCallWithUnnamedParameters()
-    {
-        $container = new Container;
-        $result = $container->call([new ContainerTestCallStub, 'unresolvable'], ['foo', 'bar']);
-        $this->assertEquals(['foo', 'bar'], $result);
-    }
-
     public function testBindMethodAcceptsAnArray()
     {
         $container = new Container;
@@ -192,6 +185,15 @@ class ContainerCallTest extends TestCase
 
         $container = new Container;
         $container->call(ContainerTestCallStub::class.'@unresolvable');
+    }
+
+    public function testCallWithUnnamedParametersThrowsException()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
+
+        $container = new Container;
+        $container->call([new ContainerTestCallStub, 'unresolvable'], ['foo', 'bar']);
     }
 
     public function testCallWithoutRequiredParamsOnClosureThrowsException()
