@@ -607,7 +607,7 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
-    public function testWhereStringRegistration()
+    public function testWhereAlphaRegistration()
     {
         $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
 
