@@ -181,7 +181,7 @@ class RouteRegistrar
         }
 
         if (is_array($action) &&
-            ! Arr::isAssoc($action) && 
+            ! Arr::isAssoc($action) &&
             RouteAction::isCallable($action)
             ) {
             $action = [
