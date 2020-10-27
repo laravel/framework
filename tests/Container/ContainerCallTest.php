@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Container;
 
+use ArgumentCountError;
 use Closure;
 use Error;
 use Illuminate\Container\Container;
