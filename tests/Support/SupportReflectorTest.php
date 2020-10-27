@@ -57,6 +57,18 @@ class SupportReflectorTest extends TestCase
 
         $this->assertNull(Reflector::getParameterClassName($method->getParameters()[0]));
     }
+
+    public function testIsCallable()
+    {
+        $this->assertTrue(Reflector::isCallable(function () {
+        }));
+        $this->assertTrue(Reflector::isCallable([B::class, 'f']));
+        $this->assertFalse(Reflector::isCallable([TestClassWithCall::class, 'f']));
+        $this->assertTrue(Reflector::isCallable([new TestClassWithCall, 'f']));
+        $this->assertTrue(Reflector::isCallable([TestClassWithCallStatic::class, 'f']));
+        $this->assertFalse(Reflector::isCallable([new TestClassWithCallStatic, 'f']));
+        $this->assertFalse(Reflector::isCallable([new TestClassWithCallStatic]));
+    }
 }
 
 class A
@@ -81,4 +93,18 @@ class C
     }
 }'
     );
+}
+
+class TestClassWithCall
+{
+    public function __call($method, $parameters)
+    {
+    }
+}
+
+class TestClassWithCallStatic
+{
+    public static function __callStatic($method, $parameters)
+    {
+    }
 }
