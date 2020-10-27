@@ -188,10 +188,8 @@ class ContainerCallTest extends TestCase
 
     public function testCallWithoutRequiredParamsThrowsException()
     {
-        $this->expectException(ArgumentCountError::class);
-        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
-
         $container = new Container;
+        $this->expectException(ArgumentCountError::class);
         $container->call(ContainerTestCallStub::class.'@unresolvable');
     }
 }
