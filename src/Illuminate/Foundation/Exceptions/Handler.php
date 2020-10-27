@@ -104,7 +104,9 @@ class Handler implements ExceptionHandlerContract
         }
 
         if (Reflector::isCallable($reportCallable = [$e, 'report'])) {
-            return $this->container->call($reportCallable);
+            $this->container->call($reportCallable);
+
+            return;
         }
 
         try {
