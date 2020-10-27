@@ -19,6 +19,7 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use Psr\Log\LoggerInterface;
@@ -102,10 +103,8 @@ class Handler implements ExceptionHandlerContract
             return;
         }
 
-        if (is_callable($reportCallable = [$e, 'report'])) {
-            $this->container->call($reportCallable);
-
-            return;
+        if (Reflector::isCallable($reportCallable = [$e, 'report'])) {
+            return $this->container->call($reportCallable);
         }
 
         try {

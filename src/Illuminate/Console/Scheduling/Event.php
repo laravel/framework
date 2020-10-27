@@ -12,6 +12,7 @@ use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -673,7 +674,7 @@ class Event
      */
     public function when($callback)
     {
-        $this->filters[] = is_callable($callback) ? $callback : function () use ($callback) {
+        $this->filters[] = Reflector::isCallable($callback) ? $callback : function () use ($callback) {
             return $callback;
         };
 
@@ -688,7 +689,7 @@ class Event
      */
     public function skip($callback)
     {
-        $this->rejects[] = is_callable($callback) ? $callback : function () use ($callback) {
+        $this->rejects[] = Reflector::isCallable($callback) ? $callback : function () use ($callback) {
             return $callback;
         };
 
