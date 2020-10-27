@@ -181,8 +181,9 @@ class RouteRegistrar
         }
 
         if (is_array($action) &&
-            is_callable($action) &&
-            ! Arr::isAssoc($action)) {
+            ! Arr::isAssoc($action) && 
+            RouteAction::isCallable($action)
+            ) {
             $action = [
                 'uses' => $action[0].'@'.$action[1],
                 'controller' => $action[0].'@'.$action[1],
