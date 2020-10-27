@@ -3,8 +3,8 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Reflector;
+use Illuminate\Support\Str;
 use LogicException;
 use UnexpectedValueException;
 
