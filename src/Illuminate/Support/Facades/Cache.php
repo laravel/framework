@@ -13,7 +13,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool forget(string $key)
  * @method static bool has(string $key)
  * @method static bool missing(string $key)
- * @method static bool push(string $key, $value, \DateTimeInterface|\DateInterval|int $ttl = null)
+ * @method static \Illuminate\Support\Collection push(string $key, $value, \DateTimeInterface|\DateInterval|int $ttl = null)
  * @method static bool put(string $key, $value, \DateTimeInterface|\DateInterval|int $ttl = null)
  * @method static int|bool decrement(string $key, $value = 1)
  * @method static int|bool increment(string $key, $value = 1)
