@@ -18,6 +18,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static bool delete(string|array $paths)
  * @method static bool deleteDirectory(string $directory)
  * @method static bool exists(string $path)
+ * @method static \Illuminate\Filesystem\FilesystemManager extend(string $driver, \Closure $callback)
  * @method static bool makeDirectory(string $path)
  * @method static bool move(string $from, string $to)
  * @method static bool prepend(string $path, string $data)

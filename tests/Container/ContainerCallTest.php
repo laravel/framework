@@ -187,6 +187,15 @@ class ContainerCallTest extends TestCase
         $container->call(ContainerTestCallStub::class.'@unresolvable');
     }
 
+    public function testCallWithUnnamedParametersThrowsException()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
+
+        $container = new Container;
+        $container->call([new ContainerTestCallStub, 'unresolvable'], ['foo', 'bar']);
+    }
+
     public function testCallWithoutRequiredParamsOnClosureThrowsException()
     {
         $this->expectException(BindingResolutionException::class);

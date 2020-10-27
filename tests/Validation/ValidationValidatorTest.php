@@ -1912,18 +1912,21 @@ class ValidationValidatorTest extends TestCase
             [5.0, -10, false],
             [10.5, 10.5, true], // float (same)
             [10.5, 0.5, true], // float + float
-            [10.5, 0.3, false],
+            [10.5, 0.3, true], // 10.5/.3 = 35, tricky for floating point division
             [31.5, 10.5, true],
             [31.6, 10.5, false],
             [10.5, -0.5, true], // float + -float
-            [10.5, -0.3, false],
+            [10.5, -0.3, true], // 10.5/.3 = 35, tricky for floating point division
             [-31.5, 10.5, true],
             [-31.6, 10.5, false],
             [-10.5, -10.5, true], // -float (same)
             [-10.5, -0.5, true], // -float + -float
-            [-10.5, -0.3, false],
+            [-10.5, -0.3, true], // 10.5/.3 = 35, tricky for floating point division
             [-31.5, -10.5, true],
             [-31.6, -10.5, false],
+            [2, .1, true], // fmod does this "wrong", it should be 0, but fmod(2, .1) = .1
+            [.75, .05, true], // fmod does this "wrong", it should be 0, but fmod(.75, .05) = .05
+            [.9, .3, true], // .9/.3 = 3, tricky for floating point division
             ['foo', 1, false], // invalid values
             [1, 'foo', false],
             ['foo', 'foo', false],
