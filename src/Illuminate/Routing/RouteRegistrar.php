@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Reflector;
 use InvalidArgumentException;
 
 /**
@@ -182,7 +183,7 @@ class RouteRegistrar
 
         if (is_array($action) &&
             ! Arr::isAssoc($action) &&
-            RouteAction::isCallable($action)) {
+            Reflector::isCallable($action)) {
             $action = [
                 'uses' => $action[0].'@'.$action[1],
                 'controller' => $action[0].'@'.$action[1],
