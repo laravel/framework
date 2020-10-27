@@ -397,15 +397,11 @@ class TestResponse implements ArrayAccess
      */
     public function assertSee($value, $escape = true)
     {
-        if (is_array($value)) {
-            $values = $escape ? array_map('e', ($value)) : $value;
+        $value = Arr::wrap($value);
 
-            foreach ($values as $value) {
-                PHPUnit::assertStringContainsString((string) $value, $this->getContent());
-            }
-        } else {
-            $value = $escape ? e($value) : $value;
+        $values = $escape ? array_map('e', ($value)) : $value;
 
+        foreach ($values as $value) {
             PHPUnit::assertStringContainsString((string) $value, $this->getContent());
         }
 
@@ -437,19 +433,15 @@ class TestResponse implements ArrayAccess
      */
     public function assertSeeText($value, $escape = true)
     {
-        if (is_array($value)) {
-            $values = $escape ? array_map('e', ($value)) : $value;
+        $value = Arr::wrap($value);
 
-            tap(strip_tags($this->getContent()), function ($content) use ($values) {
-                foreach ($values as $value) {
-                    PHPUnit::assertStringContainsString((string) $value, $content);
-                }
-            });
-        } else {
-            $value = $escape ? e($value) : $value;
+        $values = $escape ? array_map('e', ($value)) : $value;
 
-            PHPUnit::assertStringContainsString((string) $value, strip_tags($this->getContent()));
-        }
+        tap(strip_tags($this->getContent()), function ($content) use ($values) {
+            foreach ($values as $value) {
+                PHPUnit::assertStringContainsString((string) $value, $content);
+            }
+        });
 
         return $this;
     }
@@ -479,15 +471,11 @@ class TestResponse implements ArrayAccess
      */
     public function assertDontSee($value, $escape = true)
     {
-        if (is_array($value)) {
-            $values = $escape ? array_map('e', ($value)) : $value;
+        $value = Arr::wrap($value);
 
-            foreach ($values as $value) {
-                PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
-            }
-        } else {
-            $value = $escape ? e($value) : $value;
+        $values = $escape ? array_map('e', ($value)) : $value;
 
+        foreach ($values as $value) {
             PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
         }
 
@@ -503,19 +491,15 @@ class TestResponse implements ArrayAccess
      */
     public function assertDontSeeText($value, $escape = true)
     {
-        if (is_array($value)) {
-            $values = $escape ? array_map('e', ($value)) : $value;
+        $value = Arr::wrap($value);
 
-            tap(strip_tags($this->getContent()), function ($content) use ($values) {
-                foreach ($values as $value) {
-                    PHPUnit::assertStringNotContainsString((string) $value, $content);
-                }
-            });
-        } else {
-            $value = $escape ? e($value) : $value;
+        $values = $escape ? array_map('e', ($value)) : $value;
 
-            PHPUnit::assertStringNotContainsString((string) $value, strip_tags($this->getContent()));
-        }
+        tap(strip_tags($this->getContent()), function ($content) use ($values) {
+            foreach ($values as $value) {
+                PHPUnit::assertStringNotContainsString((string) $value, $content);
+            }
+        });
 
         return $this;
     }
