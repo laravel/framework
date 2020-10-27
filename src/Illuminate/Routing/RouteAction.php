@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Reflector;
 use LogicException;
 use UnexpectedValueException;
 
@@ -85,11 +86,11 @@ class RouteAction
      */
     public static function isCallable($action)
     {
-        if (is_string($action) || ! is_array($action)) {
+        if (! is_array($action)) {
             return is_callable($action);
         }
 
-        return isset($action[0], $action[1]) && is_string($action[0]) && is_string($action[1]) && class_exists($action[0]) && method_exists($action[0], $action[1]);
+        return isset($action[0], $action[1]) && is_string($action[0]) && is_string($action[1]) && Reflector::isMethodCallable($action[0], $action[1]);
     }
 
     /**
