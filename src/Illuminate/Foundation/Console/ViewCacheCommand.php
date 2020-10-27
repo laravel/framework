@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -47,10 +48,22 @@ class ViewCacheCommand extends Command
      */
     protected function compileViews(Collection $views)
     {
-        $compiler = $this->laravel['view']->getEngineResolver()->resolve('blade')->getCompiler();
+        $compiler = $this->getFreshApplication()['view']->getEngineResolver()->resolve('blade')->getCompiler();
 
         $views->map(function (SplFileInfo $file) use ($compiler) {
             $compiler->compile($file->getRealPath());
+        });
+    }
+
+    /**
+     * Get a fresh application instance.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    protected function getFreshApplication()
+    {
+        return tap(require $this->laravel->bootstrapPath().'/app.php', function ($app) {
+            $app->make(ConsoleKernelContract::class)->bootstrap();
         });
     }
 
