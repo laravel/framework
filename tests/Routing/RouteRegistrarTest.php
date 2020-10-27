@@ -129,6 +129,15 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('controller-middleware');
     }
 
+    public function testCanRegisterRouteWithControllerActionArray()
+    {
+        $this->router->middleware('controller-middleware')
+                     ->get('users', [RouteRegistrarControllerStub::class, 'index']);
+
+        $this->seeResponse('controller', Request::create('users', 'GET'));
+        $this->seeMiddleware('controller-middleware');
+    }
+
     public function testCanRegisterRouteWithArrayAndControllerAction()
     {
         $this->router->middleware('controller-middleware')->put('users', [
