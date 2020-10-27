@@ -69,9 +69,11 @@ class RefreshCommand extends Command
             $this->runSeeder($database);
         }
 
-        $this->laravel[Dispatcher::class]->dispatch(
-            new DatabaseRefreshed()
-        );
+        if ($this->laravel->bound(Dispatcher::class)) {
+            $this->laravel[Dispatcher::class]->dispatch(
+                new DatabaseRefreshed
+            );
+        }
 
         return 0;
     }
