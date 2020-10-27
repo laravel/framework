@@ -611,8 +611,8 @@ class RouteRegistrarTest extends TestCase
     {
         $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
 
-        $this->router->get('/{foo}/{bar}')->whereString(['foo', 'bar']);
-        $this->router->get('/api/{bar}/{foo}')->whereString('bar', 'foo');
+        $this->router->get('/{foo}/{bar}')->whereAlpha(['foo', 'bar']);
+        $this->router->get('/api/{bar}/{foo}')->whereAlpha('bar', 'foo');
 
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {

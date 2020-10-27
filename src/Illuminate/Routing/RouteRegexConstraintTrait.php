@@ -39,7 +39,7 @@ trait RouteRegexConstraintTrait
      * @param  string|array $parameter
      * @return $this
      */
-    public function whereString(...$parameters)
+    public function whereAlpha(...$parameters)
     {
         $this->applyRouteRegex($parameters, '[a-zA-Z]+');
 
