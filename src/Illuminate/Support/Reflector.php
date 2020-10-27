@@ -52,28 +52,4 @@ class Reflector
             ? (new ReflectionClass($paramClassName))->isSubclassOf($className)
             : false;
     }
-
-    /**
-     * Determine if the class method is callable.
-     *
-     * @param  string  $class
-     * @param  string  $method
-     * @return bool
-     */
-    public static function isMethodCallable($class, $method)
-    {
-        if (! class_exists($class)) {
-            return false;
-        }
-
-        if (method_exists($class, $method)) {
-            return (new ReflectionMethod($class, $method))->isPublic();
-        }
-
-        if (method_exists($class, '__call')) {
-            return (new ReflectionMethod($class, '__call'))->isPublic();
-        }
-
-        return false;
-    }
 }
