@@ -24,6 +24,13 @@ class RateLimited
     protected $limiterName;
 
     /**
+     * Indicates if the job should be released if the limit is exceeded.
+     *
+     * @var bool
+     */
+    public $shouldRelease = true;
+
+    /**
      * Create a new middleware instance.
      *
      * @param  string  $limiterName
@@ -69,6 +76,18 @@ class RateLimited
     }
 
     /**
+     * Do not release the job back to the queue if limit is exceeded.
+     *
+     * @return $this
+     */
+    public function dontRelease()
+    {
+        $this->shouldRelease = false;
+
+        return $this;
+    }
+
+    /**
      * Handle a rate limited job.
      *
      * @param  mixed  $job
@@ -80,7 +99,9 @@ class RateLimited
     {
         foreach ($limits as $limit) {
             if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
-                return $job->release($this->getTimeUntilNextRetry($limit->key));
+                return $this->shouldRelease
+                    ? $job->release($this->getTimeUntilNextRetry($limit->key))
+                    : false;
             }
 
             $this->limiter->hit($limit->key, $limit->decayMinutes * 60);

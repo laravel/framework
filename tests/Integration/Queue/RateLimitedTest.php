@@ -49,6 +49,18 @@ class RateLimitedTest extends TestCase
         $this->assertJobWasReleased(RateLimitedTestJob::class);
     }
 
+    public function testRateLimitedJobsCanBeSkippedOnLimitReached()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $rateLimiter->for('test', function ($job) {
+            return Limit::perHour(1);
+        });
+
+        $this->assertJobRanSuccessfully(RateLimitedDontReleaseTestJob::class);
+        $this->assertJobWasSkipped(RateLimitedDontReleaseTestJob::class);
+    }
+
     public function testJobsCanHaveConditionalRateLimits()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
@@ -105,6 +117,25 @@ class RateLimitedTest extends TestCase
 
         $this->assertFalse($class::$handled);
     }
+
+    protected function assertJobWasSkipped($class)
+    {
+        $class::$handled = false;
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+
+        $job->shouldReceive('hasFailed')->once()->andReturn(false);
+        $job->shouldReceive('isReleased')->once()->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
+        $job->shouldReceive('delete')->once();
+
+        $instance->call($job, [
+            'command' => serialize($command = new $class),
+        ]);
+
+        $this->assertFalse($class::$handled);
+    }
 }
 
 class RateLimitedTestJob
@@ -137,5 +168,13 @@ class NonAdminTestJob extends RateLimitedTestJob
     public function isAdmin()
     {
         return false;
+    }
+}
+
+class RateLimitedDontReleaseTestJob extends RateLimitedTestJob
+{
+    public function middleware()
+    {
+        return [(new RateLimited('test'))->dontRelease()];
     }
 }
