@@ -93,7 +93,7 @@ class TestMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the console command arguments.
+     * Get the console command options.
      *
      * @return array
      */
