@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.11.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.11.2...8.x)
+
+
+## [v8.11.2 (2020-10-20)](https://github.com/laravel/framework/compare/v8.11.1...v8.11.2)
+
+### Revert
+- Revert ["Change loadRoutesFrom to accept $attributes](https://github.com/laravel/framework/pull/34866)" ([#34909](https://github.com/laravel/framework/pull/34909))
 
 
 ## [v8.11.1 (2020-10-20)](https://github.com/laravel/framework/compare/v8.11.0...v8.11.1)

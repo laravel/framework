@@ -594,6 +594,32 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereNumberRegistration()
+    {
+        $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereNumber(['foo', 'bar']);
+        $this->router->get('/api/{bar}/{foo}')->whereNumber(['bar', 'foo']);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereAlphaRegistration()
+    {
+        $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereAlpha(['foo', 'bar']);
+        $this->router->get('/api/{bar}/{foo}')->whereAlpha(['bar', 'foo']);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {

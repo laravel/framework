@@ -66,6 +66,20 @@ class RateLimitedWithRedisTest extends TestCase
         $this->assertJobWasReleased($testJob);
     }
 
+    public function testRateLimitedJobsCanBeSkippedOnLimitReached()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $testJob = new RedisRateLimitedDontReleaseTestJob;
+
+        $rateLimiter->for($testJob->key, function ($job) {
+            return Limit::perMinute(1);
+        });
+
+        $this->assertJobRanSuccessfully($testJob);
+        $this->assertJobWasSkipped($testJob);
+    }
+
     public function testJobsCanHaveConditionalRateLimits()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
@@ -134,6 +148,25 @@ class RateLimitedWithRedisTest extends TestCase
 
         $this->assertFalse($testJob::$handled);
     }
+
+    protected function assertJobWasSkipped($testJob)
+    {
+        $testJob::$handled = false;
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+
+        $job->shouldReceive('hasFailed')->once()->andReturn(false);
+        $job->shouldReceive('isReleased')->once()->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
+        $job->shouldReceive('delete')->once();
+
+        $instance->call($job, [
+            'command' => serialize($testJob),
+        ]);
+
+        $this->assertFalse($testJob::$handled);
+    }
 }
 
 class RedisRateLimitedTestJob
@@ -173,5 +206,13 @@ class RedisNonAdminTestJob extends RedisRateLimitedTestJob
     public function isAdmin()
     {
         return false;
+    }
+}
+
+class RedisRateLimitedDontReleaseTestJob extends RedisRateLimitedTestJob
+{
+    public function middleware()
+    {
+        return [(new RateLimitedWithRedis($this->key))->dontRelease()];
     }
 }

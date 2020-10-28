@@ -620,7 +620,9 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return $query->{$method}($column, $amount, $extra);
         }
 
-        $this->{$column} = $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
+        $this->{$column} = $this->isClassDeviable($column)
+            ? $this->deviateClassCastableAttribute($method, $column, $amount)
+            : $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
 
         $this->forceFill($extra);
 
