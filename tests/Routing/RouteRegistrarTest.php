@@ -599,7 +599,7 @@ class RouteRegistrarTest extends TestCase
         $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
 
         $this->router->get('/{foo}/{bar}')->whereNumber(['foo', 'bar']);
-        $this->router->get('/api/{bar}/{foo}')->whereNumber('bar', 'foo');
+        $this->router->get('/api/{bar}/{foo}')->whereNumber(['bar', 'foo']);
 
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
@@ -612,7 +612,7 @@ class RouteRegistrarTest extends TestCase
         $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
 
         $this->router->get('/{foo}/{bar}')->whereAlpha(['foo', 'bar']);
-        $this->router->get('/api/{bar}/{foo}')->whereAlpha('bar', 'foo');
+        $this->router->get('/api/{bar}/{foo}')->whereAlpha(['bar', 'foo']);
 
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
