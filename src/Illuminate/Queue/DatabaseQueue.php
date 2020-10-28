@@ -212,7 +212,7 @@ class DatabaseQueue extends Queue implements QueueContract
     protected function getNextAvailableJob($queue)
     {
         $job = $this->database->table($this->table)
-                    ->lockForUpdate()
+                    ->lock($this->getLockForPopping())
                     ->where('id', function ($query) use ($queue) {
                         $query->select('id')
                               ->from($this->table)
