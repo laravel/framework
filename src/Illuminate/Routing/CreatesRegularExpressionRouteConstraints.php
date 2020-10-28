@@ -7,17 +7,6 @@ use Illuminate\Support\Arr;
 trait CreatesRegularExpressionRouteConstraints
 {
     /**
-     * Specify that the given route parameters must be numeric.
-     *
-     * @param  array|string  $parameters
-     * @return $this
-     */
-    public function whereNumber($parameters)
-    {
-        return $this->assignExpressionToParameters($parameters, '[0-9]+');
-    }
-
-    /**
      * Specify that the given route parameters must be alphabetic.
      *
      * @param  array|string  $parameters
@@ -26,6 +15,17 @@ trait CreatesRegularExpressionRouteConstraints
     public function whereAlpha($parameters)
     {
         return $this->assignExpressionToParameters($parameters, '[a-zA-Z]+');
+    }
+
+    /**
+     * Specify that the given route parameters must be numeric.
+     *
+     * @param  array|string  $parameters
+     * @return $this
+     */
+    public function whereNumber($parameters)
+    {
+        return $this->assignExpressionToParameters($parameters, '[0-9]+');
     }
 
     /**
