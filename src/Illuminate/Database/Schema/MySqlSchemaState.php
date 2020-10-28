@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Exception;
+use Illuminate\Database\Connection;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
@@ -11,10 +12,11 @@ class MySqlSchemaState extends SchemaState
     /**
      * Dump the database's schema into a file.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
      * @return void
      */
-    public function dump($path)
+    public function dump(Connection $connection, $path)
     {
         $this->executeDumpProcess($this->makeProcess(
             $this->baseDumpCommand().' --routines --result-file="${:LARAVEL_LOAD_PATH}" --no-data'
