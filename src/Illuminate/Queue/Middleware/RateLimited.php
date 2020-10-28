@@ -76,18 +76,6 @@ class RateLimited
     }
 
     /**
-     * Do not release the job back to the queue if limit is exceeded.
-     *
-     * @return $this
-     */
-    public function dontRelease()
-    {
-        $this->shouldRelease = false;
-
-        return $this;
-    }
-
-    /**
      * Handle a rate limited job.
      *
      * @param  mixed  $job
@@ -100,14 +88,26 @@ class RateLimited
         foreach ($limits as $limit) {
             if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
                 return $this->shouldRelease
-                    ? $job->release($this->getTimeUntilNextRetry($limit->key))
-                    : false;
+                        ? $job->release($this->getTimeUntilNextRetry($limit->key))
+                        : false;
             }
 
             $this->limiter->hit($limit->key, $limit->decayMinutes * 60);
         }
 
         return $next($job);
+    }
+
+    /**
+     * Do not release the job back to the queue if limit is exceeded.
+     *
+     * @return $this
+     */
+    public function dontRelease()
+    {
+        $this->shouldRelease = false;
+
+        return $this;
     }
 
     /**
