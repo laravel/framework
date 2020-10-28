@@ -37,7 +37,7 @@ class BroadcastedEventsTest extends TestCase
         $d = new Dispatcher($container = m::mock(Container::class));
         $broadcast = m::mock(BroadcastFactory::class);
         $broadcast->shouldReceive('queue')->once();
-        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+        $container->shouldReceive('get')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
 
         $d->listen(AlwaysBroadcastEvent::class, function ($payload) {
             $_SERVER['__event.test'] = $payload;

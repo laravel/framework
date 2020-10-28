@@ -7,13 +7,13 @@ use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 
 class Dispatcher implements DispatcherContract
@@ -23,7 +23,7 @@ class Dispatcher implements DispatcherContract
     /**
      * The IoC container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Psr\Container\ContainerInterface
      */
     protected $container;
 
@@ -58,10 +58,10 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a new event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
+     * @param  \Psr\Container\ContainerInterface|null  $container
      * @return void
      */
-    public function __construct(ContainerContract $container = null)
+    public function __construct(ContainerInterface $container = null)
     {
         $this->container = $container ?: new Container;
     }
@@ -191,7 +191,7 @@ class Dispatcher implements DispatcherContract
     protected function resolveSubscriber($subscriber)
     {
         if (is_string($subscriber)) {
-            return $this->container->make($subscriber);
+            return $this->container->get($subscriber);
         }
 
         return $subscriber;
@@ -304,7 +304,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function broadcastEvent($event)
     {
-        $this->container->make(BroadcastFactory::class)->queue($event);
+        $this->container->get(BroadcastFactory::class)->queue($event);
     }
 
     /**
@@ -432,7 +432,7 @@ class Dispatcher implements DispatcherContract
             return $this->createQueuedHandlerCallable($class, $method);
         }
 
-        return [$this->container->make($class), $method];
+        return [$this->container->get($class), $method];
     }
 
     /**
@@ -492,7 +492,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function handlerWantsToBeQueued($class, $arguments)
     {
-        $instance = $this->container->make($class);
+        $instance = $this->container->get($class);
 
         if (method_exists($instance, 'shouldQueue')) {
             return $instance->shouldQueue($arguments[0]);
