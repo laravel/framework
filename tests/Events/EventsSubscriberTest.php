@@ -19,7 +19,7 @@ class EventsSubscriberTest extends TestCase
         $d = new Dispatcher($container = m::mock(Container::class));
         $subs = m::mock(ExampleSubscriber::class);
         $subs->shouldReceive('subscribe')->once()->with($d);
-        $container->shouldReceive('make')->once()->with(ExampleSubscriber::class)->andReturn($subs);
+        $container->shouldReceive('get')->once()->with(ExampleSubscriber::class)->andReturn($subs);
 
         $d->subscribe(ExampleSubscriber::class);
         $this->assertTrue(true);
