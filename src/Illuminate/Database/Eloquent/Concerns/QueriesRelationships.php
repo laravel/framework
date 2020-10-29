@@ -382,7 +382,7 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             $expression = $function
-                ? sprintf('%s(%s)', $function, $this->getGrammar()->wrap($column))
+                ? sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap($column))
                 : $column;
 
             // Here, we will grab the relationship sub-query and prepare to add it to the main query
