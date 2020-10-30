@@ -128,6 +128,17 @@ class Stringable
     }
 
     /**
+     * Split the string into a collection of chunks of a specified length.
+     *
+     * @param  int  $length
+     * @return \Illuminate\Support\Collection
+     */
+    public function chunk($length)
+    {
+        return collect(mb_str_split($this->value, $length));
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string|array  $needles
