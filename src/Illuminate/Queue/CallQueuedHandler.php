@@ -5,8 +5,10 @@ namespace Illuminate\Queue;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Contracts\Queue\UniqueJob;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pipeline\Pipeline;
 use ReflectionClass;
@@ -57,7 +59,11 @@ class CallQueuedHandler
             return $this->handleModelNotFound($job, $e);
         }
 
-        $this->dispatchThroughMiddleware($job, $command);
+        try {
+            $this->dispatchThroughMiddleware($job, $command);
+        } finally {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
@@ -151,6 +157,23 @@ class CallQueuedHandler
         }
 
         $command->batch()->recordSuccessfulJob($command->job->uuid());
+    }
+
+    /**
+     * Ensure the lock for the unique job is released.
+     *
+     * @param  mixed  $command
+     * @return void
+     */
+    protected function ensureUniqueJobLockIsReleased($command)
+    {
+        if ($command instanceof UniqueJob) {
+            $uniqueBy = method_exists($command, 'uniqueBy') ? $command->uniqueBy() : '';
+
+            $this->container->make(Cache::class)
+                    ->lock('unique:'.get_class($command).$uniqueBy)
+                    ->forceRelease();
+        }
     }
 
     /**
