@@ -29,7 +29,7 @@ class EloquentMorphOneToSelectTest extends DatabaseTestCase
         Schema::create('fund_extensions', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('org_id');
-            $table->decimal('fund_size',30,5)->nullable();
+            $table->decimal('fund_size', 30, 5)->nullable();
             $table->timestamps();
         });
 
@@ -122,11 +122,9 @@ class Organization extends Model
 class FundExtension extends Model
 {
     protected $guarded = [];
-
 }
 
 class OrgExtension extends Model
 {
     protected $guarded = [];
 }
-

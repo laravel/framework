@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Collection;
 
 class MorphManyTo extends MorphOneOrManyTo
 {
-
     /**
      * Match the results for a given type to their parents.
      *

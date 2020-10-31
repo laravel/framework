@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphOneToEagerLoadingTe
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOneTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -38,7 +37,7 @@ class EloquentMorphOneToEagerLoadingTest extends DatabaseTestCase
             $table->increments('id');
             $table->unsignedInteger('org_id');
             $table->unsignedInteger('user_id');
-            $table->decimal('fund_size',30,5)->nullable();
+            $table->decimal('fund_size', 30, 5)->nullable();
             $table->timestamps();
         });
 

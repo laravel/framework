@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphManyToEagerLoadingT
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphManyTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -62,9 +61,11 @@ class EloquentMorphManyToEagerLoadingTest extends DatabaseTestCase
     public function testWithMorphLoading()
     {
         $organizations = Organization::query()
-            ->with(['deals' => function (MorphManyTo $morphManyTo) {
-                $morphManyTo->morphWith([FundDeal::class => ['user']]);
-            }])
+            ->with([
+                'deals' => function (MorphManyTo $morphManyTo) {
+                    $morphManyTo->morphWith([FundDeal::class => ['user']]);
+                }
+            ])
             ->get();
 
         $this->assertTrue($organizations[0]->relationLoaded('deals'));
@@ -75,9 +76,11 @@ class EloquentMorphManyToEagerLoadingTest extends DatabaseTestCase
     public function testWithMorphLoadingWithSingleRelation()
     {
         $organizations = Organization::query()
-            ->with(['deals' => function (MorphManyTo $morphManyTo) {
-                $morphManyTo->morphWith([FundDeal::class => 'user']);
-            }])
+            ->with([
+                'deals' => function (MorphManyTo $morphManyTo) {
+                    $morphManyTo->morphWith([FundDeal::class => 'user']);
+                }
+            ])
             ->get();
 
         $this->assertTrue($organizations[0]->relationLoaded('deals'));
@@ -89,7 +92,6 @@ class User extends Model
 {
     public $timestamps = false;
 }
-
 
 class Organization extends Model
 {

@@ -35,7 +35,7 @@ class EloquentMorphOneToLazyEagerLoadingTest extends DatabaseTestCase
             $table->increments('id');
             $table->unsignedInteger('org_id');
             $table->unsignedInteger('user_id');
-            $table->decimal('fund_size',30,5)->nullable();
+            $table->decimal('fund_size', 30, 5)->nullable();
             $table->timestamps();
         });
 
@@ -71,12 +71,10 @@ class EloquentMorphOneToLazyEagerLoadingTest extends DatabaseTestCase
     }
 }
 
-
 class User extends Model
 {
     public $timestamps = false;
 }
-
 
 class Organization extends Model
 {

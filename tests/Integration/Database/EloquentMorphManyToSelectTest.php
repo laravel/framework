@@ -112,9 +112,9 @@ class EloquentMorphManyToSelectTest extends DatabaseTestCase
     {
         $organization = Organization::first();
         $fundDeals = $organization->deals()->select('org_id')->get();
-        $this->assertInstanceOf(Collection::class,$fundDeals);
-        $this->assertInstanceOf(FundDeal::class,$fundDeals->first());
-        $this->assertEquals(['org_id' => $organization->getKey()],$fundDeals->first()->getAttributes());
+        $this->assertInstanceOf(Collection::class, $fundDeals);
+        $this->assertInstanceOf(FundDeal::class, $fundDeals->first());
+        $this->assertEquals(['org_id' => $organization->getKey()], $fundDeals->first()->getAttributes());
 
 
         $organization = Organization::query()->limit(1)->offset(1)->first();
@@ -138,7 +138,6 @@ class Organization extends Model
 class FundDeal extends Model
 {
     protected $guarded = [];
-
 }
 
 class OrgDeal extends Model

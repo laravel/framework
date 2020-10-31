@@ -73,12 +73,10 @@ class EloquentMorphManyToLazyEagerLoadingTest extends DatabaseTestCase
     }
 }
 
-
 class User extends Model
 {
     public $timestamps = false;
 }
-
 
 class Organization extends Model
 {
@@ -93,7 +91,6 @@ class Organization extends Model
 class FundDeal extends Model
 {
     protected $guarded = [];
-
     protected $with = ['user'];
 
     public function user()
@@ -106,4 +103,3 @@ class OrgDeal extends Model
 {
     protected $guarded = [];
 }
-

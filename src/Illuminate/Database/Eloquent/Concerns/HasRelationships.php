@@ -397,7 +397,6 @@ trait HasRelationships
         return new MorphManyTo($query, $parent, $localKey, $foreignKey, $type, $relation);
     }
 
-
     /**
      * Define a polymorphic, direct one-to-one relationship.
      *
