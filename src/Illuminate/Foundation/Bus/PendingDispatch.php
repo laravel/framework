@@ -127,7 +127,7 @@ class PendingDispatch
      * @param  int  $uniqueFor
      * @return $this
      */
-    public function unique($uniqueBy, $uniqueFor = 3600)
+    public function unique($uniqueBy = '', $uniqueFor = 3600)
     {
         $lock = Container::getInstance()->make(Cache::class)->lock(
             $key = 'unique:'.get_class($this->job).$uniqueBy, $uniqueFor
