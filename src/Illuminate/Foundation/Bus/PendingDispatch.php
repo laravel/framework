@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Bus;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
