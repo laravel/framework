@@ -543,6 +543,21 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
+     * Eager load relation's column aggregations on the model.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @param  string  $function
+     * @return $this
+     */
+    public function loadAggregate($relations, $column, $function = null)
+    {
+        $this->newCollection([$this])->loadAggregate($relations, $column, $function);
+
+        return $this;
+    }
+
+    /**
      * Eager load relation counts on the model.
      *
      * @param  array|string  $relations
@@ -552,7 +567,75 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         $relations = is_string($relations) ? func_get_args() : $relations;
 
-        $this->newCollection([$this])->loadCount($relations);
+        return $this->loadAggregate($relations, '*', 'count');
+    }
+
+    /**
+     * Eager load relation max column values on the model.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMax($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'max');
+    }
+
+    /**
+     * Eager load relation min column values on the model.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMin($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'min');
+    }
+
+    /**
+     * Eager load relation's column summations on the model.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadSum($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'sum');
+    }
+
+    /**
+     * Eager load relation average column values on the model.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadAvg($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'avg');
+    }
+
+    /**
+     * Eager load relationship column aggregation on the polymorphic relation of a model.
+     *
+     * @param  string  $relation
+     * @param  array  $relations
+     * @param  string  $column
+     * @param  string  $function
+     * @return $this
+     */
+    public function loadMorphAggregate($relation, $relations, $column, $function = null)
+    {
+        if (! $this->{$relation}) {
+            return $this;
+        }
+
+        $className = get_class($this->{$relation});
+
+        $this->{$relation}->loadAggregate($relations[$className] ?? [], $column, $function);
 
         return $this;
     }
@@ -566,15 +649,59 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function loadMorphCount($relation, $relations)
     {
-        if (! $this->{$relation}) {
-            return $this;
-        }
+        return $this->loadMorphAggregate($relation, $relations, '*', 'count');
+    }
 
-        $className = get_class($this->{$relation});
+    /**
+     * Eager load relationship max column values on the polymorphic relation of a model.
+     *
+     * @param  string  $relation
+     * @param  array  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMorphMax($relation, $relations, $column)
+    {
+        return $this->loadMorphAggregate($relation, $relations, $column, 'max');
+    }
 
-        $this->{$relation}->loadCount($relations[$className] ?? []);
+    /**
+     * Eager load relationship min column values on the polymorphic relation of a model.
+     *
+     * @param  string  $relation
+     * @param  array  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMorphMin($relation, $relations, $column)
+    {
+        return $this->loadMorphAggregate($relation, $relations, $column, 'min');
+    }
 
-        return $this;
+    /**
+     * Eager load relationship column summations on the polymorphic relation of a model.
+     *
+     * @param  string  $relation
+     * @param  array  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMorphSum($relation, $relations, $column)
+    {
+        return $this->loadMorphAggregate($relation, $relations, $column, 'sum');
+    }
+
+    /**
+     * Eager load relationship average column values on the polymorphic relation of a model.
+     *
+     * @param  string  $relation
+     * @param  array  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMorphAvg($relation, $relations, $column)
+    {
+        return $this->loadMorphAggregate($relation, $relations, $column, 'avg');
     }
 
     /**

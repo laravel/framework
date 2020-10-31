@@ -513,7 +513,7 @@ class Builder
     public function value($column)
     {
         if ($result = $this->first([$column])) {
-            return $result->{$column};
+            return $result->{Str::afterLast($column, '.')};
         }
     }
 
@@ -1255,6 +1255,10 @@ class Builder
     {
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
+                if (Str::contains($column, '.')) {
+                    return $column;
+                }
+
                 return $query instanceof BelongsToMany
                         ? $query->getRelated()->getTable().'.'.$column
                         : $column;

@@ -64,12 +64,14 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Load a set of relationship counts onto the collection.
+     * Load a set of aggregations over relationship's column onto the collection.
      *
      * @param  array|string  $relations
+     * @param  string  $column
+     * @param  string  $function
      * @return $this
      */
-    public function loadCount($relations)
+    public function loadAggregate($relations, $column, $function = null)
     {
         if ($this->isEmpty()) {
             return $this;
@@ -78,7 +80,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $models = $this->first()->newModelQuery()
             ->whereKey($this->modelKeys())
             ->select($this->first()->getKeyName())
-            ->withCount(...func_get_args())
+            ->withAggregate($relations, $column, $function)
             ->get()
             ->keyBy($this->first()->getKeyName());
 
@@ -94,6 +96,65 @@ class Collection extends BaseCollection implements QueueableCollection
         });
 
         return $this;
+    }
+
+    /**
+     * Load a set of relationship counts onto the collection.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadCount($relations)
+    {
+        return $this->loadAggregate($relations, '*', 'count');
+    }
+
+    /**
+     * Load a set of relationship's max column values onto the collection.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMax($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'max');
+    }
+
+    /**
+     * Load a set of relationship's min column values onto the collection.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMin($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'min');
+    }
+
+    /**
+     * Load a set of relationship's column summations onto the collection.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadSum($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'sum');
+    }
+
+    /**
+     * Load a set of relationship's average column values onto the collection.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadAvg($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'avg');
     }
 
     /**

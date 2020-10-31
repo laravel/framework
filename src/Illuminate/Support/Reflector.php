@@ -26,6 +26,12 @@ class Reflector
             return false;
         }
 
+        if ($syntaxOnly &&
+            (is_string($var[0]) || is_object($var[0])) &&
+            is_string($var[1])) {
+            return true;
+        }
+
         $class = is_object($var[0]) ? get_class($var[0]) : $var[0];
 
         $method = $var[1];
