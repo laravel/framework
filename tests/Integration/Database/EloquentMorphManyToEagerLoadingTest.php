@@ -64,7 +64,7 @@ class EloquentMorphManyToEagerLoadingTest extends DatabaseTestCase
             ->with([
                 'deals' => function (MorphManyTo $morphManyTo) {
                     $morphManyTo->morphWith([FundDeal::class => ['user']]);
-                }
+                },
             ])
             ->get();
 
@@ -79,7 +79,7 @@ class EloquentMorphManyToEagerLoadingTest extends DatabaseTestCase
             ->with([
                 'deals' => function (MorphManyTo $morphManyTo) {
                     $morphManyTo->morphWith([FundDeal::class => 'user']);
-                }
+                },
             ])
             ->get();
 
