@@ -13,7 +13,7 @@ class ReleaseUniqueJobLock
      * @param  mixed  $job
      * @param  callable  $next
      * @param  string  $key
-     * @return mixed
+     * @return void
      */
     public function handle($job, $next, $key)
     {

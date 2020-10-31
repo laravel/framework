@@ -123,8 +123,8 @@ class PendingDispatch
     /**
      * Indicate that the job should be dispatched as a unique job.
      *
-     * @param string  $uniqueBy
-     * @param int  $uniqueFor
+     * @param  string  $uniqueBy
+     * @param  int  $uniqueFor
      * @return $this
      */
     public function unique($uniqueBy, $uniqueFor = 3600)
