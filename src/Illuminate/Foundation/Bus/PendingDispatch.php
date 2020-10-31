@@ -175,7 +175,7 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        if($this->cancelDispatch) {
+        if ($this->cancelDispatch) {
             // Do nothing.
         } elseif ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
