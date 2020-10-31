@@ -2,7 +2,11 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Queue\Middleware\ReleaseUniqueJobLock;
 
 class PendingDispatch
 {
@@ -19,6 +23,13 @@ class PendingDispatch
      * @var bool
      */
     protected $afterResponse = false;
+
+    /**
+     * Indicates if the job dispatch should be cancelled.
+     *
+     * @var bool
+     */
+    protected $cancelDispatch = false;
 
     /**
      * Create a new pending job dispatch.
@@ -110,6 +121,28 @@ class PendingDispatch
     }
 
     /**
+     * Indicate that the job should be dispatched as a unique job.
+     *
+     * @param string  $uniqueBy
+     * @param int  $uniqueFor
+     * @return $this
+     */
+    public function unique($uniqueBy, $uniqueFor = 3600)
+    {
+        $lock = Container::getInstance()->make(Cache::class)->lock(
+            $key = 'unique:'.get_class($this->job).$uniqueBy, $uniqueFor
+        );
+
+        $this->cancelDispatch = $this->cancelDispatch || ! $lock->get();
+
+        if (! $this->cancelDispatch && in_array(Queueable::class, class_uses_recursive($this->job))) {
+            array_push($this->job->middleware, ReleaseUniqueJobLock::class.':'.$key);
+        }
+
+        return $this;
+    }
+
+    /**
      * Indicate that the job should be dispatched after the response is sent to the browser.
      *
      * @return $this
@@ -142,7 +175,9 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        if ($this->afterResponse) {
+        if($this->cancelDispatch) {
+            // Do nothing.
+        } elseif ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
         } else {
             app(Dispatcher::class)->dispatch($this->job);
