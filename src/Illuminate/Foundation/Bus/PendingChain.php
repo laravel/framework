@@ -143,8 +143,14 @@ class PendingChain
             $firstJob = $this->job;
         }
 
-        $firstJob->allOnConnection($this->connection);
-        $firstJob->allOnQueue($this->queue);
+        if ($this->connection) {
+            $firstJob->allOnConnection($this->connection);
+        }
+
+        if ($this->queue) {
+            $firstJob->allOnQueue($this->queue);
+        }
+
         $firstJob->chain($this->chain);
         $firstJob->delay($this->delay);
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
