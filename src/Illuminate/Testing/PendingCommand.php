@@ -323,7 +323,7 @@ class PendingCommand
             $table->render();
 
             $lines = array_filter(
-                preg_split("/\n/", $output->fetch())
+                explode("\n", $output->fetch())
             );
 
             foreach ($lines as $line) {
