@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Console\Scheduling;
 
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -16,6 +17,8 @@ class FrequencyTest extends TestCase
 
     protected function setUp(): void
     {
+        Carbon::setTestNow();
+
         $this->event = new Event(
             m::mock(EventMutex::class),
             'php foo'
@@ -91,6 +94,8 @@ class FrequencyTest extends TestCase
 
     public function testLastDayOfMonth()
     {
+        Carbon::setTestNow('2020-10-10 10:10:10');
+
         $this->assertSame('0 0 31 * *', $this->event->lastDayOfMonth()->getExpression());
     }
 
