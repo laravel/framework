@@ -532,7 +532,7 @@ class SupportStringableTest extends TestCase
 
     public function testChunk()
     {
-        $chunks = $this->stringable('foobarbaz')->chunk(3);
+        $chunks = $this->stringable('foobarbaz')->split(3);
 
         $this->assertInstanceOf(Collection::class, $chunks);
         $this->assertSame(['foo', 'bar', 'baz'], $chunks->all());
