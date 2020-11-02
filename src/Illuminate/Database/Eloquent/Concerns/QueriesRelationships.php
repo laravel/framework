@@ -382,13 +382,9 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             if ($function) {
-                $expression = sprintf(
-                    '%s(%s)',
-                    $function,
-                    $this->getQuery()->getGrammar()->wrap(
-                        $column === '*' ? $column : $relation->getRelated()->qualifyColumn($column)
-                    )
-                );
+                $expression = sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap(
+                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($column)
+                ));
             } else {
                 $expression = $column;
             }
