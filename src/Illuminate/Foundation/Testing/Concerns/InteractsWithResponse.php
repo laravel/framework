@@ -34,7 +34,7 @@ trait InteractsWithResponse
     }
 
     /**
-     * Assert that the given route URL is the current request URL..
+     * Assert that the given route URL is the current request URL.
      *
      * @param  string  $route
      * @return $this
