@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class DatabaseEloquentIntegrationTest extends TestCase
 {
@@ -785,9 +784,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testHasOnMorphToRelationship()
     {
-        $this->expectException(RuntimeException::class);
+        $post = EloquentTestPost::create(['name' => 'Morph Post', 'user_id' => 1]);
+        (new EloquentTestPhoto)->imageable()->associate($post)->fill(['name' => 'Morph Photo'])->save();
 
-        EloquentTestPhoto::has('imageable')->get();
+        $photos = EloquentTestPhoto::has('imageable')->get();
+
+        $this->assertEquals(1, $photos->count());
     }
 
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
