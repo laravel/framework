@@ -240,16 +240,6 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Alias for the "dissociate" method.
-     *
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function disassociate()
-    {
-        return $this->dissociate();
-    }
-
-    /**
      * Touch all of the related models for the relationship.
      *
      * @return void
