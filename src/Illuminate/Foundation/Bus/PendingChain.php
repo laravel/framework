@@ -151,8 +151,11 @@ class PendingChain
             $firstJob->allOnQueue($this->queue);
         }
 
+        if ($this->delay) {
+            $firstJob->delay($this->delay);
+        }
+
         $firstJob->chain($this->chain);
-        $firstJob->delay($this->delay);
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
         return app(Dispatcher::class)->dispatch($firstJob);
