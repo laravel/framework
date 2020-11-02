@@ -144,15 +144,17 @@ class PendingChain
         }
 
         if ($this->connection) {
-            $firstJob->allOnConnection($this->connection);
+            $firstJob->chainConnection = $this->connection;
+            $firstJob->connection = $firstJob->connection ?: $this->connection;
         }
 
         if ($this->queue) {
-            $firstJob->allOnQueue($this->queue);
+            $firstJob->chainQueue = $this->queue;
+            $firstJob->queue = $firstJob->queue ?: $this->queue;
         }
 
         if ($this->delay) {
-            $firstJob->delay($this->delay);
+            $firstJob->delay = ! is_null($firstJob->delay) ? $firstJob->delay : $this->delay;
         }
 
         $firstJob->chain($this->chain);
