@@ -301,7 +301,7 @@ class Factory
     /**
      * Create a new pending request instance for this factory.
      *
-     * @return PendingRequest
+     * @return \Illuminate\Http\Client\PendingRequest
      */
     protected function newPendingRequest()
     {
