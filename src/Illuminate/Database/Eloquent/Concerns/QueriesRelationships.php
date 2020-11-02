@@ -414,7 +414,10 @@ trait QueriesRelationships
                 preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function $column")
             );
 
-            $this->selectSub($query->limit(1), $alias);
+            $this->selectSub(
+                $function ? $query : $query->limit(1),
+                $alias
+            );
         }
 
         return $this;
