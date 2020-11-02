@@ -21,6 +21,7 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithConsole,
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithExceptionHandling,
+        Concerns\InteractsWithResponse,
         Concerns\InteractsWithSession,
         Concerns\InteractsWithTime,
         Concerns\InteractsWithViews,
