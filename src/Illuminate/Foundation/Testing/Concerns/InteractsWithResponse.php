@@ -2,15 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Testing\Constraints\CountInDatabase;
-use Illuminate\Testing\Constraints\HasInDatabase;
-use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
-use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
+use Illuminate\Testing\Assert as PHPUnit;
 
 trait InteractsWithResponse
 {
