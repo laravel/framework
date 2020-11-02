@@ -381,9 +381,17 @@ trait QueriesRelationships
 
             $relation = $this->getRelationWithoutConstraints($name);
 
-            $expression = $function
-                ? sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap($column))
-                : $column;
+            if ($function) {
+                $expression = sprintf(
+                    '%s(%s)',
+                    $function,
+                    $this->getQuery()->getGrammar()->wrap(
+                        $column === '*' ? $column : $relation->getRelated()->qualifyColumn($column)
+                    )
+                );
+            } else {
+                $expression = $column;
+            }
 
             // Here, we will grab the relationship sub-query and prepare to add it to the main query
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
