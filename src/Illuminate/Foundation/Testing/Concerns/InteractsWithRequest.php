@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Testing\Assert as PHPUnit;
 
-trait InteractsWithResponse
+trait InteractsWithRequest
 {
     /**
      * Assert that the given URL is the current request URL.
@@ -43,6 +43,6 @@ trait InteractsWithResponse
      */
     public function getCurrentUrl()
     {
-         return $this->app['url']->current();
+        return $this->app['url']->current();
     }
 }
