@@ -135,11 +135,13 @@ class PendingDispatch
             return true;
         }
 
-        $uniqueBy = method_exists($this->job, 'uniqueBy') ? $this->job->uniqueBy() : '';
+        $uniqueId = method_exists($this->job, 'uniqueId')
+                    ? $this->job->uniqueId()
+                    : ($this->job->uniqueId ?? '');
 
         $lock = Container::getInstance()->make(Cache::class)->lock(
-            $key = 'unique:'.get_class($this->job).$uniqueBy,
-            property_exists($this->job, 'uniqueFor') ? $this->job->uniqueFor : 0
+            $key = 'unique:'.get_class($this->job).$uniqueId,
+            $this->job->uniqueFor ?? 0
         );
 
         return (bool) $lock->get();

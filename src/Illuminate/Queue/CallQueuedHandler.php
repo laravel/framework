@@ -59,9 +59,9 @@ class CallQueuedHandler
             return $this->handleModelNotFound($job, $e);
         }
 
-        try {
-            $this->dispatchThroughMiddleware($job, $command);
-        } finally {
+        $this->dispatchThroughMiddleware($job, $command);
+
+        if (! $job->isReleased()) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
@@ -168,10 +168,12 @@ class CallQueuedHandler
     protected function ensureUniqueJobLockIsReleased($command)
     {
         if ($command instanceof UniqueJob) {
-            $uniqueBy = method_exists($command, 'uniqueBy') ? $command->uniqueBy() : '';
+            $uniqueId = method_exists($command, 'uniqueId')
+                        ? $command->uniqueId()
+                        : ($command->uniqueId ?? '');
 
             $this->container->make(Cache::class)
-                    ->lock('unique:'.get_class($command).$uniqueBy)
+                    ->lock('unique:'.get_class($command).$uniqueId)
                     ->forceRelease();
         }
     }
@@ -215,6 +217,7 @@ class CallQueuedHandler
     {
         $command = unserialize($data['command']);
 
+        $this->ensureUniqueJobLockIsReleased($command);
         $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);
         $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);
 
