@@ -9,6 +9,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
  * @method static mixed auth(\Illuminate\Http\Request $request)
  * @method static void connection($name = null);
  * @method static void routes(array $attributes = null)
+ * @method static \Illuminate\Broadcasting\BroadcastManager socket($request = null)
  *
  * @see \Illuminate\Contracts\Broadcasting\Factory
  */
