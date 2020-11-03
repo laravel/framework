@@ -71,7 +71,7 @@ class UniqueJobTest extends TestCase
     {
         UniqueTestJob::$handled = false;
         dispatch($job = new UniqueTestJob);
-        
+
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
