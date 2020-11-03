@@ -128,7 +128,7 @@ trait HasAttributes
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter
      */
-    public static $encryptor;
+    public static $encrypter;
 
     /**
      * Convert the model's attributes to an array.
@@ -897,7 +897,7 @@ trait HasAttributes
      */
     public function fromEncryptedString($value)
     {
-        return (static::$encryptor ?? Crypt::getFacadeRoot())->decrypt($value, false);
+        return (static::$encrypter ?? Crypt::getFacadeRoot())->decrypt($value, false);
     }
 
     /**
@@ -909,18 +909,18 @@ trait HasAttributes
      */
     protected function castAttributeAsEncryptedString($key, $value)
     {
-        return (static::$encryptor ?? Crypt::getFacadeRoot())->encrypt($value, false);
+        return (static::$encrypter ?? Crypt::getFacadeRoot())->encrypt($value, false);
     }
 
     /**
      * Set the encryptor instance that will be used to encrypt attributes.
      *
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encryptor
+     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      * @return void
      */
-    public static function encryptUsing($encryptor)
+    public static function encryptUsing($encrypter)
     {
-        static::$encryptor = $encryptor;
+        static::$encrypter = $encrypter;
     }
 
     /**
