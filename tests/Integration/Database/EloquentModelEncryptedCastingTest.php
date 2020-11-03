@@ -147,7 +147,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         ]);
     }
 
-    public function testCustomEncryptorCanBeSpecified()
+    public function testCustomEncrypterCanBeSpecified()
     {
         $customEncrypter = $this->mock(Encrypter::class);
 
