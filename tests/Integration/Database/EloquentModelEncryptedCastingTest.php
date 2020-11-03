@@ -151,11 +151,11 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
     {
         $customEncrypter = $this->mock(Encrypter::class);
 
-        $this->assertNull(Model::$encryptor);
+        $this->assertNull(Model::$encrypter);
 
         Model::encryptUsing($customEncrypter);
 
-        $this->assertSame($customEncrypter, Model::$encryptor);
+        $this->assertSame($customEncrypter, Model::$encrypter);
 
         $this->encrypter->expects('encrypt')
             ->never();
