@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Bus;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Queue\UniqueJob;
 
 class PendingDispatch
 {
@@ -131,7 +130,8 @@ class PendingDispatch
      */
     protected function shouldDispatch()
     {
-        if (! ($this->job instanceof UniqueJob)) {
+        if (! method_exists($this->job, 'uniqueId')
+            && ! property_exists($this->job, 'uniqueId')) {
             return true;
         }
 
