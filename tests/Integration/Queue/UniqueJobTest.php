@@ -115,6 +115,31 @@ class UniqueJobTest extends TestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testLockIsNotReleasedForJobReleases()
+    {
+        UniqueTestReleasedJob::$handled = false;
+        dispatch($job = new UniqueTestReleasedJob);
+
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+
+        $this->artisan('queue:work', [
+            'connection' => 'database',
+            '--once' => true,
+        ]);
+
+        $this->assertTrue($job::$handled);
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+
+        UniqueTestReleasedJob::$handled = false;
+        $this->artisan('queue:work', [
+            'connection' => 'database',
+            '--once' => true,
+        ]);
+
+        $this->assertFalse($job::$handled);
+        $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+    }
+
     protected function getLockKey($job)
     {
         return 'unique:'.(is_string($job) ? $job : get_class($job));
@@ -135,9 +160,9 @@ class UniqueTestJob implements ShouldQueue, UniqueJob
 
 class UniqueTestFailJob implements ShouldQueue, UniqueJob
 {
-    public $tries = 1;
-
     use InteractsWithQueue, Queueable, Dispatchable;
+
+    public $tries = 1;
 
     public static $handled = false;
 
@@ -146,6 +171,20 @@ class UniqueTestFailJob implements ShouldQueue, UniqueJob
         static::$handled = true;
 
         throw new \Exception;
+    }
+}
+
+class UniqueTestReleasedJob extends UniqueTestFailJob
+{
+    public $tries = 1;
+
+    public $connection = 'database';
+
+    public function handle()
+    {
+        static::$handled = true;
+
+        $this->release();
     }
 }
 
