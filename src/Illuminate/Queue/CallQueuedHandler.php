@@ -8,6 +8,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Contracts\Queue\UniqueJob;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pipeline\Pipeline;
 use ReflectionClass;
@@ -166,8 +167,7 @@ class CallQueuedHandler
      */
     protected function ensureUniqueJobLockIsReleased($command)
     {
-        if (method_exists($command, 'uniqueId')
-            || property_exists($command, 'uniqueId')) {
+        if ($command instanceof UniqueJob) {
             $uniqueId = method_exists($command, 'uniqueId')
                         ? $command->uniqueId()
                         : ($command->uniqueId ?? '');

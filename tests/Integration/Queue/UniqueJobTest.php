@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\UniqueJob;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -145,13 +146,11 @@ class UniqueJobTest extends TestCase
     }
 }
 
-class UniqueTestJob implements ShouldQueue
+class UniqueTestJob implements ShouldQueue, UniqueJob
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 
     public static $handled = false;
-
-    public $uniqueId = '';
 
     public function handle()
     {
@@ -159,13 +158,11 @@ class UniqueTestJob implements ShouldQueue
     }
 }
 
-class UniqueTestFailJob implements ShouldQueue
+class UniqueTestFailJob implements ShouldQueue, UniqueJob
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 
     public $tries = 1;
-
-    public $uniqueId = '';
 
     public static $handled = false;
 
