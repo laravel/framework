@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
@@ -863,6 +864,157 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $model->withCount(['foo as foo_bar', 'foo']);
 
         $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAndColon()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount('foo:completed_at');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count("eloquent_builder_test_model_close_related_stubs"."completed_at") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count_completed_at" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAndColonAndRename()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount('foo:completed_at as foos_completed');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count("eloquent_builder_test_model_close_related_stubs"."completed_at") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foos_completed" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithMinAndColon()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withMin('foo:price');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select min("eloquent_builder_test_model_close_related_stubs"."price") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min_price" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithMinAndColonAndConstraints()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withMin([
+            'foo:bar as big_bars' => function ($query) {
+                $query->where('bar', '>', 10);
+            },
+        ])
+        ->where('foo', 20);
+
+        $this->assertSame(
+            'select "eloquent_builder_test_model_parent_stubs".*'
+            .', (select min("eloquent_builder_test_model_close_related_stubs"."bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bar" > ?) as "big_bars"'
+            .' from "eloquent_builder_test_model_parent_stubs"'
+            .' where "foo" = ?',
+            $builder->toSql()
+        );
+        $this->assertEquals([10, 20], $builder->getBindings());
+    }
+
+    public function testWithMinVariants()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $sqls = collect([
+            $model->withAggregate('foo', 'price', 'min'),
+            $model->withMin('foo', 'price'),
+            $model->withMin('foo:price'),
+            $model->withMin(['foo:price']),
+            $model->withMin(['foo:price' => function () {
+                //
+            }]),
+            $model->withMin(['foo:price as foo_min_price']),
+        ])
+        ->map(function ($query) {
+            return $query->toSql();
+        });
+
+        $this->assertCount(1, $sqls->unique()->all());
+        $this->assertSame(
+            'select "eloquent_builder_test_model_parent_stubs".*'
+            .', (select min("eloquent_builder_test_model_close_related_stubs"."price") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min_price"'
+            .' from "eloquent_builder_test_model_parent_stubs"',
+            $sqls[0]
+        );
+    }
+
+    public function testWithMinAndMixedRelations()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withMin(['foo:foo', 'address:bar', 'activeFoo:baz']);
+
+        $this->assertSame(
+            'select "eloquent_builder_test_model_parent_stubs".*'
+            .', (select min("eloquent_builder_test_model_close_related_stubs"."foo") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min_foo"'
+            .', (select min("eloquent_builder_test_model_close_related_stubs"."bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "address_min_bar"'
+            .', (select min("eloquent_builder_test_model_close_related_stubs"."baz") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "active" = ?) as "active_foo_min_baz"'
+            .' from "eloquent_builder_test_model_parent_stubs"',
+            $builder->toSql()
+        );
+    }
+
+    public function testWithAggregateMixedVariants()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->select('id')->withAggregate([
+            'foo' => 'count',
+            'foo:* as aliased' => 'count',
+            'foo:price' => 'sum',
+            'foo:created_at' => 'min',
+            'foo as complex_sum' => function ($query) {
+                $query->select(new Expression('SUM(price*quantity)'));
+            },
+        ]);
+
+        $this->assertSame(
+            'select "id"'
+            .', (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count"'
+            .', (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "aliased"'
+            .', (select sum("eloquent_builder_test_model_close_related_stubs"."price") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum_price"'
+            .', (select min("eloquent_builder_test_model_close_related_stubs"."created_at") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min_created_at"'
+            .', (select SUM(price*quantity) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" limit 1) as "complex_sum"'
+            .' from "eloquent_builder_test_model_parent_stubs"',
+            $builder->toSql()
+        );
+    }
+
+    public function testWithSumAndGlobalScope()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withXCountX', function ($query) {
+            return $query->addSelect('id')->where('is_published', true);
+        });
+
+        $builder = $model->select('id')->withSum([
+            'foo:weight',
+            'foo:price',
+            'foo:bar as aliased' => function ($query) {
+                $query->where('bar', 'baz');
+            },
+            'foo as complex_sum' => function ($query) {
+                $query->select(new Expression('SUM(price*quantity)'));
+            },
+        ]);
+
+        // Remove the global scope so it doesn't interfere with any other tests
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withXCountX', function ($query) {
+            //
+        });
+
+        $this->assertSame(
+            'select "id"'
+            .', (select sum("eloquent_builder_test_model_close_related_stubs"."weight") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "is_published" = ?) as "foo_sum_weight"'
+            .', (select sum("eloquent_builder_test_model_close_related_stubs"."price") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "is_published" = ?) as "foo_sum_price"'
+            .', (select sum("eloquent_builder_test_model_close_related_stubs"."bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bar" = ? and "is_published" = ?) as "aliased"'
+            .', (select SUM(price*quantity) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "is_published" = ?) as "complex_sum"'
+            .' from "eloquent_builder_test_model_parent_stubs"',
+            $builder->toSql()
+        );
     }
 
     public function testHasWithConstraintsAndHavingInSubquery()

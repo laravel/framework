@@ -349,14 +349,14 @@ trait QueriesRelationships
     }
 
     /**
-     * Add subselect queries to include an aggregate value for a relationship.
+     * Add subselect queries to include aggregate values for relationships.
      *
      * @param  mixed  $relations
      * @param  string  $column
      * @param  string  $function
      * @return $this
      */
-    public function withAggregate($relations, $column, $function = null)
+    public function withAggregate($relations, $column = null, $function = null)
     {
         if (empty($relations)) {
             return $this;
@@ -368,62 +368,99 @@ trait QueriesRelationships
 
         $relations = is_array($relations) ? $relations : [$relations];
 
-        foreach ($this->parseWithRelations($relations) as $name => $constraints) {
-            // First we will determine if the name has been aliased using an "as" clause on the name
-            // and if it has we will extract the actual relationship name and the desired name of
-            // the resulting column. This allows multiple aggregates on the same relationships.
-            $segments = explode(' ', $name);
-
-            unset($alias);
-
-            if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
-                [$name, $alias] = [$segments[0], $segments[2]];
-            }
-
-            $relation = $this->getRelationWithoutConstraints($name);
-
-            if ($function) {
-                $expression = sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap(
-                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($column)
-                ));
-            } else {
-                $expression = $column;
-            }
-
-            // Here, we will grab the relationship sub-query and prepare to add it to the main query
-            // as a sub-select. First, we'll get the "has" query and use that to get the relation
-            // sub-query. We'll format this relationship name and append this column if needed.
-            $query = $relation->getRelationExistenceQuery(
-                $relation->getRelated()->newQuery(), $this, new Expression($expression)
-            )->setBindings([], 'select');
-
-            $query->callScope($constraints);
-
-            $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
-
-            // If the query contains certain elements like orderings / more than one column selected
-            // then we will remove those elements from the query so that it will execute properly
-            // when given to the database. Otherwise, we may receive SQL errors or poor syntax.
-            $query->orders = null;
-            $query->setBindings([], 'order');
-
-            if (count($query->columns) > 1) {
-                $query->columns = [$query->columns[0]];
-                $query->bindings['select'] = [];
-            }
-
-            // Finally, we will make the proper column alias to the query and run this sub-select on
-            // the query builder. Then, we will return the builder instance back to the developer
-            // for further constraint chaining that needs to take place on the query as needed.
-            $alias = $alias ?? Str::snake(
-                preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function $column")
-            );
-
-            $this->selectSub(
-                $function ? $query : $query->limit(1),
-                $alias
-            );
+        foreach ($relations as $name => $constraints) {
+            $this->applyAggregateSubSelect($name, $constraints, $column, $function);
         }
+
+        return $this;
+    }
+
+    /**
+     * Add a specific subselect query for a withAggregate for a relation.
+     *
+     * @param int|string $name
+     * @param string|callable $constraints
+     * @param string|null $column
+     * @param string|null $function
+     * @return $this
+     */
+    protected function applyAggregateSubSelect($name, $constraints, $column = null, $function = null)
+    {
+        if (is_numeric($name)) {
+            $name = $constraints;
+            $constraints = $function ?? static function () {
+                //
+            };
+        }
+
+        if (is_string($constraints)) {
+            $function = $constraints;
+            $constraints = static function () {
+                //
+            };
+        }
+
+        // First we will determine if the name has been aliased using an "as" clause on the name
+        // and if it has we will extract the actual relationship name and the desired name of
+        // the resulting column. This allows multiple aggregates on the same relationships.
+        $segments = explode(' ', $name);
+
+        if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
+            [$name, $alias] = [$segments[0], $segments[2]];
+        }
+
+        // Next we will check if a column has been specified using a colon and if it has we will
+        // use it instead of the $column parameter of this method. This allows aggregating or
+        // counting on a specific column of a relationship using a convenient array syntax.
+        if (Str::contains($name, ':')) {
+            [$name, $column] = explode(':', $name, 2);
+        } else {
+            $column = $column ?: '*';
+        }
+
+        $relation = $this->getRelationWithoutConstraints($name);
+
+        if ($function) {
+            $expression = sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap(
+                $column === '*' ? $column : $relation->getRelated()->qualifyColumn($column)
+            ));
+        } else {
+            $expression = $column;
+        }
+
+        // Here, we will grab the relationship sub-query and prepare to add it to the main query
+        // as a sub-select. First, we'll get the "has" query and use that to get the relation
+        // sub-query. We'll format this relationship name and append this column if needed.
+        $query = $relation->getRelationExistenceQuery(
+            $relation->getRelated()->newQuery(), $this, new Expression($expression)
+        )->setBindings([], 'select');
+
+        $query->callScope($constraints);
+
+        $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
+
+        // If the query contains certain elements like orderings / more than one column selected
+        // then we will remove those elements from the query so that it will execute properly
+        // when given to the database. Otherwise, we may receive SQL errors or poor syntax.
+        $query->orders = null;
+        $query->setBindings([], 'order');
+
+        if (count($query->columns) > 1) {
+            $query->columns = [$query->columns[0]];
+            $query->bindings['select'] = [];
+        }
+
+        // Finally, we will make the proper column alias to the query and run this sub-select on
+        // the query builder. Then, we will return the builder instance back to the developer
+        // for further constraint chaining that needs to take place on the query as needed.
+        $alias = $alias ?? Str::snake(
+            preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function $column")
+        );
+
+        $this->selectSub(
+            $function ? $query : $query->limit(1),
+            $alias
+        );
 
         return $this;
     }
@@ -442,49 +479,49 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the max of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relations
      * @param  string  $column
      * @return $this
      */
-    public function withMax($relation, $column)
+    public function withMax($relations, $column = null)
     {
-        return $this->withAggregate($relation, $column, 'max');
+        return $this->withAggregate($relations, $column, 'max');
     }
 
     /**
      * Add subselect queries to include the min of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relations
      * @param  string  $column
      * @return $this
      */
-    public function withMin($relation, $column)
+    public function withMin($relations, $column = null)
     {
-        return $this->withAggregate($relation, $column, 'min');
+        return $this->withAggregate($relations, $column, 'min');
     }
 
     /**
      * Add subselect queries to include the sum of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relations
      * @param  string  $column
      * @return $this
      */
-    public function withSum($relation, $column)
+    public function withSum($relations, $column = null)
     {
-        return $this->withAggregate($relation, $column, 'sum');
+        return $this->withAggregate($relations, $column, 'sum');
     }
 
     /**
      * Add subselect queries to include the average of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relations
      * @param  string  $column
      * @return $this
      */
-    public function withAvg($relation, $column)
+    public function withAvg($relations, $column = null)
     {
-        return $this->withAggregate($relation, $column, 'avg');
+        return $this->withAggregate($relations, $column, 'avg');
     }
 
     /**
