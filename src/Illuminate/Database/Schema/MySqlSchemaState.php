@@ -83,7 +83,13 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        return 'mysqldump '.$this->connectionString().' --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc "${:LARAVEL_LOAD_DATABASE}"';
+        $cmd = 'mysqldump '.$this->connectionString().' --skip-add-locks --skip-comments --skip-set-charset --tz-utc';
+
+        if ($this->connection->isMaria()) {
+            $cmd .= ' --column-statistics=0 --set-gtid-purged=OFF';
+        }
+
+        return $cmd.' "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
