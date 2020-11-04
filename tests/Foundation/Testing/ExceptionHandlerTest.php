@@ -7,10 +7,10 @@ use RuntimeException;
 
 class ExceptionHandlerTest extends Handler
 {
-public function register()
-{
-    $this->ignore(RuntimeException::class, function (RuntimeException $exception) {
-        return $exception->getCode() === 429;
-    });
-}
+    public function register()
+    {
+        $this->ignore(RuntimeException::class, function (RuntimeException $exception) {
+            return $exception->getCode() === 429;
+        });
+    }
 }
