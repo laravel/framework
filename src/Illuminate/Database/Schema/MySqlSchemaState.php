@@ -138,7 +138,7 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
-     * Generate a common connection string (--socket, --host, --port, --user, --password)
+     * Generate a common connection string (--socket, --host, --port, --user, --password).
      *
      * @return string
      */
