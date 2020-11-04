@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.1...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.2...6.x)
+
+
+## [v6.20.2 (2020-10-29)](https://github.com/laravel/framework/compare/v6.20.1...v6.20.2)
+
+### Fixed
+- [Add some fixes](https://github.com/laravel/framework/compare/v6.20.1...v6.20.2) 
 
 
 ## [v6.20.1 (2020-10-29)](https://github.com/laravel/framework/compare/v6.20.0...v6.20.1)
