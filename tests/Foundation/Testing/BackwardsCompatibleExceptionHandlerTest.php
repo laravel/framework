@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Foundation\Testing;
 
 use Illuminate\Foundation\Exceptions\Handler;
-use RuntimeException;
 use LogicException;
+use RuntimeException;
 
 class BackwardsCompatibleExceptionHandlerTest extends Handler
 {

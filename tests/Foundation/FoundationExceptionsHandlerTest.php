@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
-use LogicException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
@@ -15,9 +14,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
+use Illuminate\Tests\Foundation\Testing\BackwardsCompatibleExceptionHandlerTest;
 use Illuminate\Tests\Foundation\Testing\ExceptionHandlerTest;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use LogicException;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +29,6 @@ use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Tests\Foundation\Testing\BackwardsCompatibleExceptionHandlerTest;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
