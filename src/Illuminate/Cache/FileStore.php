@@ -194,6 +194,8 @@ class FileStore implements Store
      *
      * @param  string  $key
      * @return array
+     *
+     * @throws \Exception
      */
     protected function getPayload($key)
     {

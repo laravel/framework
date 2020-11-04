@@ -53,6 +53,8 @@ class DatabaseLock extends Lock
      * Attempt to acquire the lock.
      *
      * @return bool
+     *
+     * @throws QueryException
      */
     public function acquire()
     {
