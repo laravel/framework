@@ -72,16 +72,16 @@ class ResetPassword extends Notification
             ], false));
         }
 
-        return $this->getMailMessage($url);
+        return $this->buildMailMessage($url);
     }
 
     /**
-     * Get the actual contents for the notification.
+     * Get the reset password notification mail message for the given URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    protected function getMailMessage($url)
+    protected function buildMailMessage($url)
     {
         return (new MailMessage)
             ->subject(Lang::get('Reset Password Notification'))
