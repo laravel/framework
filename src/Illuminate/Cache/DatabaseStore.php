@@ -114,6 +114,8 @@ class DatabaseStore implements LockProvider, Store
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
+     *
+     * @throws \Exception
      */
     public function put($key, $value, $seconds)
     {
@@ -137,6 +139,8 @@ class DatabaseStore implements LockProvider, Store
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
+     *
+     * @throws QueryException
      */
     public function add($key, $value, $seconds)
     {
