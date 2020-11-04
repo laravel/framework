@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
+use Illuminate\Tests\Foundation\Testing\ExceptionHandlerTest;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -26,7 +27,6 @@ use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Tests\Foundation\Testing\ExceptionHandlerTest;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
