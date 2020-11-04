@@ -69,9 +69,9 @@ class MySqlSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $cmd = 'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
+        $command = 'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
 
-        $this->makeProcess($cmd)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+        $this->makeProcess($command)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
     }
@@ -83,13 +83,13 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        $cmd = 'mysqldump '.$this->connectionString().' --skip-add-locks --skip-comments --skip-set-charset --tz-utc';
+        $command = 'mysqldump '.$this->connectionString().' --skip-add-locks --skip-comments --skip-set-charset --tz-utc';
 
         if ($this->connection->isMaria()) {
-            $cmd .= ' --column-statistics=0 --set-gtid-purged=OFF';
+            $command .= ' --column-statistics=0 --set-gtid-purged=OFF';
         }
 
-        return $cmd.' "${:LARAVEL_LOAD_DATABASE}"';
+        return $command.' "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
@@ -138,20 +138,18 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
-     * Generate a common connection string (--socket, --host, --port, --user, --password).
+     * Generate a basic connection string (--socket, --host, --port, --user, --password) for the database.
      *
      * @return string
      */
     protected function connectionString()
     {
-        $cmd = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
+        $value = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
 
-        if ($this->connection->getConfig()['unix_socket'] ?? false) {
-            $cmd .= ' --socket="${:LARAVEL_LOAD_SOCKET}"';
-        } else {
-            $cmd .= ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
-        }
+        $value .= $this->connection->getConfig()['unix_socket'] ?? false
+                        ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
+                        : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
 
-        return $cmd;
+        return $value;
     }
 }
