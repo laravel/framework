@@ -185,11 +185,12 @@ class Handler implements ExceptionHandlerContract
      * Indicate that the given exception type should not be reported.
      *
      * @param  string  $class
+     * @param  \Closure|null  $closure
      * @return $this
      */
-    protected function ignore(string $class)
+    protected function ignore(string $class, Closure $closure = null)
     {
-        $this->dontReport[] = $class;
+        $this->dontReport[$class] = $closure ?? true;
 
         return $this;
     }
@@ -259,10 +260,17 @@ class Handler implements ExceptionHandlerContract
      */
     protected function shouldntReport(Throwable $e)
     {
-        $dontReport = array_merge($this->dontReport, $this->internalDontReport);
+        $dontReport = collect($this->internalDontReport)
+            ->mapWithKeys(function ($type) {
+                return [$type => true];
+            })
+            ->merge($this->dontReport);
 
-        return ! is_null(Arr::first($dontReport, function ($type) use ($e) {
-            return $e instanceof $type;
+        return ! is_null($dontReport->first(function ($closure, $type) use ($e) {
+            return $e instanceof $type && (
+                $closure instanceof Closure
+                    ? $closure($e) : $closure
+            );
         }));
     }
 

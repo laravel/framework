@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Tests\Foundation\Testing\ExceptionHandlerTest;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
@@ -64,6 +65,28 @@ class FoundationExceptionsHandlerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
+    }
+
+    public function testHandlerDoesntReportExceptionWithTruthyClosure()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $handler = new ExceptionHandlerTest($this->container);
+
+        $handler->report(new RuntimeException('Exception message', 429));
+    }
+
+    public function testHandlerDoesReportExceptionWithFalseyClosure()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error');
+
+        $handler = new ExceptionHandlerTest($this->container);
+
+        $handler->report(new RuntimeException('Exception message', 400));
     }
 
     public function testHandlerReportsExceptionAsContext()
