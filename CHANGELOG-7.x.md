@@ -1,6 +1,13 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.29.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.29.1...7.x)
+
+
+## [v7.29.1 (2020-10-29)](https://github.com/laravel/framework/compare/v7.29.0...v7.29.1)
+
+### Fixed
+- Fixed alias usage in `Eloquent` ([6091048](https://github.com/laravel/framework/commit/609104806b8b639710268c75c22f43034c2b72db))
+- Fixed `Illuminate\Support\Reflector::isCallable()` ([a90f344](https://github.com/laravel/framework/commit/a90f344c66f0a5bb1d718f8bbd20c257d4de9e02))
 
 
 ## [v7.29.0 (2020-10-29)](https://github.com/laravel/framework/compare/v7.28.4...v7.29.0)
