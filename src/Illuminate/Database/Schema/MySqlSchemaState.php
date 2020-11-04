@@ -93,6 +93,22 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
+     * Generate a basic connection string (--socket, --host, --port, --user, --password) for the database.
+     *
+     * @return string
+     */
+    protected function connectionString()
+    {
+        $value = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
+
+        $value .= $this->connection->getConfig()['unix_socket'] ?? false
+                        ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
+                        : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
+
+        return $value;
+    }
+
+    /**
      * Get the base variables for a dump / load command.
      *
      * @param  array  $config
@@ -135,21 +151,5 @@ class MySqlSchemaState extends SchemaState
         }
 
         return $process;
-    }
-
-    /**
-     * Generate a basic connection string (--socket, --host, --port, --user, --password) for the database.
-     *
-     * @return string
-     */
-    protected function connectionString()
-    {
-        $value = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
-
-        $value .= $this->connection->getConfig()['unix_socket'] ?? false
-                        ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
-                        : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
-
-        return $value;
     }
 }
