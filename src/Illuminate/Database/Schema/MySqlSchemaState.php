@@ -69,17 +69,9 @@ class MySqlSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $config = $this->connection->getConfig();
+        $cmd = 'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
 
-        if ($config['unix_socket']) {
-            $cmd = 'mysql --socket="${:LARAVEL_LOAD_SOCKET}"';
-        } else {
-            $cmd = 'mysql --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
-        }
-
-        $cmd .= ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
-
-        $this->makeProcess($cmd)->mustRun(null, array_merge($this->baseVariables($config), [
+        $this->makeProcess($cmd)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
     }
@@ -91,18 +83,7 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        $columnStatistics = $this->connection->isMaria() ? '' : '--column-statistics=0';
-        $gtidPurged = $this->connection->isMaria() ? '' : '--set-gtid-purged=OFF';
-
-        $cmd = 'mysqldump '.$gtidPurged.' '.$columnStatistics.' --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc';
-
-        if ($this->connection->getConfig()['unix_socket']) {
-            $cmd .= ' --socket="${:LARAVEL_LOAD_SOCKET}"';
-        } else {
-            $cmd .= ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
-        }
-
-        return $cmd.' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" "${:LARAVEL_LOAD_DATABASE}"';
+        return 'mysqldump '.$this->connectionString().' --skip-add-drop-table --skip-add-locks --skip-comments --skip-set-charset --tz-utc "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
@@ -113,10 +94,12 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseVariables(array $config)
     {
+        $config['host'] = $config['host'] ?? '';
+
         return [
-            'LARAVEL_LOAD_SOCKET' => $config['unix_socket'],
+            'LARAVEL_LOAD_SOCKET' => $config['unix_socket'] ?? '',
             'LARAVEL_LOAD_HOST' => is_array($config['host']) ? $config['host'][0] : $config['host'],
-            'LARAVEL_LOAD_PORT' => $config['port'],
+            'LARAVEL_LOAD_PORT' => $config['port'] ?? '',
             'LARAVEL_LOAD_USER' => $config['username'],
             'LARAVEL_LOAD_PASSWORD' => $config['password'],
             'LARAVEL_LOAD_DATABASE' => $config['database'],
@@ -146,5 +129,23 @@ class MySqlSchemaState extends SchemaState
         }
 
         return $process;
+    }
+
+    /**
+     * Generate a common connection string (--socket, --host, --port, --user, --password)
+     *
+     * @return string
+     */
+    protected function connectionString()
+    {
+        $cmd = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
+
+        if ($this->connection->getConfig()['unix_socket'] ?? false) {
+            $cmd .= ' --socket="${:LARAVEL_LOAD_SOCKET}"';
+        } else {
+            $cmd .= ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
+        }
+
+        return $cmd;
     }
 }
