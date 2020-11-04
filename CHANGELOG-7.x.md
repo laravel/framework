@@ -1,7 +1,20 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.28.4...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.29.0...7.x)
 
+
+## [v7.29.0 (2020-10-29)](https://github.com/laravel/framework/compare/v7.28.4...v7.29.0)
+
+### Added
+- Full PHP 8.0 Support ([#34884](https://github.com/laravel/framework/pull/34884), [28bb76e](https://github.com/laravel/framework/commit/28bb76efbcfc5fee57307ffa062b67ff709240dc), [#33388](https://github.com/laravel/framework/pull/33388))
+- Added `Illuminate\Support\Reflector::isCallable()` ([#34994](https://github.com/laravel/framework/pull/34994), [8c16891](https://github.com/laravel/framework/commit/8c16891c6e7a4738d63788f4447614056ab5136e), [31917ab](https://github.com/laravel/framework/commit/31917abcfa0db6ec6221bb07fc91b6e768ff5ec8), [11cfa4d](https://github.com/laravel/framework/commit/11cfa4d4c92bf2f023544d58d51b35c5d31dece0), [#34999](https://github.com/laravel/framework/pull/34999))
+
+### Changed
+- Bump minimum PHP version to v7.2.5 ([#34928](https://github.com/laravel/framework/pull/34928))
+
+### Fixed
+- Fixed ambigious column on many to many with select load ([5007986](https://github.com/laravel/framework/commit/500798623d100a9746b2931ae6191cb756521f05))
+ 
 
 ## [v7.28.4 (2020-10-06)](https://github.com/laravel/framework/compare/v7.28.3...v7.28.4)
 
