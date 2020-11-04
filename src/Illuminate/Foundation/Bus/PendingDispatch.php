@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Bus;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Queue\UniqueJob;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class PendingDispatch
 {
@@ -131,7 +131,7 @@ class PendingDispatch
      */
     protected function shouldDispatch()
     {
-        if (! ($this->job instanceof UniqueJob)) {
+        if (! $this->job instanceof ShouldBeUnique) {
             return true;
         }
 
@@ -139,12 +139,14 @@ class PendingDispatch
                     ? $this->job->uniqueId()
                     : ($this->job->uniqueId ?? '');
 
-        $lock = Container::getInstance()->make(Cache::class)->lock(
-            $key = 'unique:'.get_class($this->job).$uniqueId,
-            $this->job->uniqueFor ?? 0
-        );
+        $cache = method_exists($this->job, 'uniqueVia')
+                    ? $this->job->uniqueVia()
+                    : Container::getInstance()->make(Cache::class);
 
-        return (bool) $lock->get();
+        return (bool) $cache->lock(
+            $key = 'laravel_unique_job:'.get_class($this->job).$uniqueId,
+            $this->job->uniqueFor ?? 0
+        )->get();
     }
 
     /**
@@ -169,7 +171,7 @@ class PendingDispatch
     public function __destruct()
     {
         if (! $this->shouldDispatch()) {
-            // Do nothing.
+            return;
         } elseif ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
         } else {
