@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use LogicException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
@@ -27,6 +28,7 @@ use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Tests\Foundation\Testing\BackwardsCompatibleExceptionHandlerTest;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
@@ -87,6 +89,28 @@ class FoundationExceptionsHandlerTest extends TestCase
         $handler = new ExceptionHandlerTest($this->container);
 
         $handler->report(new RuntimeException('Exception message', 400));
+    }
+
+    public function testHandlerDoesntReportExceptionWithNonAssociativeDontReportsProperty()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $handler = new BackwardsCompatibleExceptionHandlerTest($this->container);
+
+        $handler->report(new RuntimeException('Exception message'));
+    }
+
+    public function testHandlerDoesReportExceptionWithNonAssociativeDontReportsProperty()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error');
+
+        $handler = new BackwardsCompatibleExceptionHandlerTest($this->container);
+
+        $handler->report(new LogicException('Exception message'));
     }
 
     public function testHandlerReportsExceptionAsContext()

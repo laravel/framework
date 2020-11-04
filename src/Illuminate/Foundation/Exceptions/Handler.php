@@ -260,11 +260,19 @@ class Handler implements ExceptionHandlerContract
      */
     protected function shouldntReport(Throwable $e)
     {
-        $dontReport = collect($this->internalDontReport)
-            ->mapWithKeys(function ($type) {
-                return [$type => true];
-            })
-            ->merge($this->dontReport);
+        $dontReport = collect($this->dontReport)
+            ->mapWithKeys(function ($value, $key) {
+                return is_numeric($key)
+                    ? [$value => true]
+                    : [$key => $value];
+            });
+
+        $dontReport = $dontReport->merge(
+            collect($this->internalDontReport)
+                ->mapWithKeys(function ($type) {
+                    return [$type => true];
+                })
+        );
 
         return ! is_null($dontReport->first(function ($closure, $type) use ($e) {
             return $e instanceof $type && (
