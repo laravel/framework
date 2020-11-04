@@ -12,7 +12,7 @@ class NullDispatcher implements DispatcherContract
     /**
      * The underlying event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Bus\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $dispatcher;
 
