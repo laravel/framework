@@ -1,6 +1,12 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.29.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.29.2...7.x)
+
+
+## [v7.29.2 (2020-10-29)](https://github.com/laravel/framework/compare/v7.29.1...v7.29.2)
+
+### Fixed
+- [Add some fixes](https://github.com/laravel/framework/compare/v7.29.1...v7.29.2) 
 
 
 ## [v7.29.1 (2020-10-29)](https://github.com/laravel/framework/compare/v7.29.0...v7.29.1)
