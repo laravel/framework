@@ -321,7 +321,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function path($path = '')
     {
-        return ($this->appPath ?: $this->basePath.DIRECTORY_SEPARATOR.'app').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->appPath.($path ? DIRECTORY_SEPARATOR.$path : $path)
+            ?: $this->basePath.DIRECTORY_SEPARATOR.'app'.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
