@@ -88,7 +88,7 @@ class RateLimitedTest extends TestCase
         $job = m::mock(Job::class);
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('isReleased')->once()->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
         $job->shouldReceive('delete')->once();
 
@@ -108,7 +108,7 @@ class RateLimitedTest extends TestCase
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('release')->once();
-        $job->shouldReceive('isReleased')->once()->andReturn(true);
+        $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
 
         $instance->call($job, [
@@ -126,7 +126,7 @@ class RateLimitedTest extends TestCase
         $job = m::mock(Job::class);
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('isReleased')->once()->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
         $job->shouldReceive('delete')->once();
 
