@@ -1,7 +1,33 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.19.1...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.2...6.x)
 
+
+## [v6.20.2 (2020-10-29)](https://github.com/laravel/framework/compare/v6.20.1...v6.20.2)
+
+### Fixed
+- [Add some fixes](https://github.com/laravel/framework/compare/v6.20.1...v6.20.2) 
+
+
+## [v6.20.1 (2020-10-29)](https://github.com/laravel/framework/compare/v6.20.0...v6.20.1)
+
+### Fixed
+- Fixed alias usage in `Eloquent` ([6091048](https://github.com/laravel/framework/commit/609104806b8b639710268c75c22f43034c2b72db))
+- Fixed `Illuminate\Support\Reflector::isCallable()` ([a90f344](https://github.com/laravel/framework/commit/a90f344c66f0a5bb1d718f8bbd20c257d4de9e02))
+
+
+## [v6.20.0 (2020-10-28)](https://github.com/laravel/framework/compare/v6.19.1...v6.20.0)
+
+### Added
+- Full PHP 8.0 Support ([#33388](https://github.com/laravel/framework/pull/33388))
+- Added `Illuminate\Support\Reflector::isCallable()` ([#34994](https://github.com/laravel/framework/pull/34994), [8c16891](https://github.com/laravel/framework/commit/8c16891c6e7a4738d63788f4447614056ab5136e), [31917ab](https://github.com/laravel/framework/commit/31917abcfa0db6ec6221bb07fc91b6e768ff5ec8), [11cfa4d](https://github.com/laravel/framework/commit/11cfa4d4c92bf2f023544d58d51b35c5d31dece0), [#34999](https://github.com/laravel/framework/pull/34999))
+
+### Changed
+- Bump minimum PHP version to v7.2.5 ([#34928](https://github.com/laravel/framework/pull/34928))
+
+### Fixed
+- Fixed ambigious column on many to many with select load ([5007986](https://github.com/laravel/framework/commit/500798623d100a9746b2931ae6191cb756521f05))
+  
 
 ## [v6.19.1 (2020-10-20)](https://github.com/laravel/framework/compare/v6.19.0...v6.19.1)
 
