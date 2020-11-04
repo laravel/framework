@@ -50,6 +50,17 @@ class VerifyEmail extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $verificationUrl);
         }
 
+        return $this->getMailMessage($verificationUrl);
+    }
+
+    /**
+     * Get the actual contents for the notification.
+     *
+     * @param string $verificationUrl
+     * @return \Illuminate\Notifications\Messages\MailMessage
+     */
+    protected function getMailMessage($verificationUrl)
+    {
         return (new MailMessage)
             ->subject(Lang::get('Verify Email Address'))
             ->line(Lang::get('Please click the button below to verify your email address.'))
