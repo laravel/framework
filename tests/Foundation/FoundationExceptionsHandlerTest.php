@@ -14,8 +14,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
+use Illuminate\Tests\Foundation\Testing\BackwardsCompatibleExceptionHandlerTest;
+use Illuminate\Tests\Foundation\Testing\ExceptionHandlerTest;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use LogicException;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -64,6 +67,50 @@ class FoundationExceptionsHandlerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
+    }
+
+    public function testHandlerDoesntReportExceptionWithTruthyClosure()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $handler = new ExceptionHandlerTest($this->container);
+
+        $handler->report(new RuntimeException('Exception message', 429));
+    }
+
+    public function testHandlerDoesReportExceptionWithFalseyClosure()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error');
+
+        $handler = new ExceptionHandlerTest($this->container);
+
+        $handler->report(new RuntimeException('Exception message', 400));
+    }
+
+    public function testHandlerDoesntReportExceptionWithNonAssociativeDontReportsProperty()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $handler = new BackwardsCompatibleExceptionHandlerTest($this->container);
+
+        $handler->report(new RuntimeException('Exception message'));
+    }
+
+    public function testHandlerDoesReportExceptionWithNonAssociativeDontReportsProperty()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error');
+
+        $handler = new BackwardsCompatibleExceptionHandlerTest($this->container);
+
+        $handler->report(new LogicException('Exception message'));
     }
 
     public function testHandlerReportsExceptionAsContext()
