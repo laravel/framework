@@ -51,7 +51,7 @@ class RateLimitedWithRedis extends RateLimited
         foreach ($limits as $limit) {
             if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decayMinutes)) {
                 return $this->shouldRelease
-                    ?: $job->release($this->getTimeUntilNextRetry($limit->key));
+                    ? $job->release($this->getTimeUntilNextRetry($limit->key));
             }
         }
 
