@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
@@ -67,6 +68,17 @@ class FoundationExceptionsHandlerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
+    }
+
+    public function testHandlerDoesntReportExceptionWithTruthyCallable()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $handler = new ExceptionHandlerTest($this->container);
+
+        $handler->report(new AuthorizationException('Exception message'));
     }
 
     public function testHandlerDoesntReportExceptionWithTruthyClosure()

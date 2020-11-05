@@ -185,10 +185,10 @@ class Handler implements ExceptionHandlerContract
      * Indicate that the given exception type should not be reported.
      *
      * @param  string  $class
-     * @param  \Closure|null  $callback
+     * @param  callable|null  $callback
      * @return $this
      */
-    protected function ignore(string $class, Closure $callback = null)
+    protected function ignore(string $class, callable $callback = null)
     {
         $this->dontReport[$class] = $callback ?? true;
 
@@ -274,10 +274,10 @@ class Handler implements ExceptionHandlerContract
                 })
         );
 
-        return ! is_null($dontReport->first(function ($closure, $type) use ($e) {
+        return ! is_null($dontReport->first(function ($callback, $type) use ($e) {
             return $e instanceof $type && (
-                $closure instanceof Closure
-                    ? $closure($e) : $closure
+                is_callable($callback)
+                    ? $callback($e) : $callback
             );
         }));
     }
