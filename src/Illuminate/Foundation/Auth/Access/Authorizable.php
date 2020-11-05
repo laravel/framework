@@ -51,6 +51,6 @@ trait Authorizable
      */
     public function cannot($abilities, $arguments = [])
     {
-        return $this->cant($abilities, $arguments);
+        return ! $this->cant($abilities, $arguments);
     }
 }
