@@ -23,6 +23,11 @@ class EncryptCookiesTest extends TestCase
      */
     protected $router;
 
+    /**
+     * @var \Illuminate\Contracts\Encryption\Encrypter
+     */
+    protected $encrypter;
+
     protected $setCookiePath = 'cookie/set';
     protected $queueCookiePath = 'cookie/queue';
 
@@ -30,9 +35,11 @@ class EncryptCookiesTest extends TestCase
     {
         parent::setUp();
 
+        $this->encrypter = new Encrypter(str_repeat('a', 16));
+
         $container = new Container;
         $container->singleton(EncrypterContract::class, function () {
-            return new Encrypter(str_repeat('a', 16));
+            return $this->encrypter;
         });
 
         $this->router = new Router(new Dispatcher, $container);
@@ -71,6 +78,21 @@ class EncryptCookiesTest extends TestCase
         $this->assertSame('unencrypted_cookie', $cookies[1]->getName());
         $this->assertSame('value', $cookies[1]->getValue());
     }
+
+    public function testHandle(): void
+    {
+        $encryptCookiesMiddleware = new EncryptCookies($this->encrypter);
+        $next = function (Request $request) {
+            return new Response();
+        };
+
+        $request = new Request();
+        $request->cookies->set('array_cookie', ['test' => $this->encrypter->encrypt('value')]);
+
+        $response = $encryptCookiesMiddleware->handle($request, $next);
+
+        $this->assertInstanceOf(Response::class, $response);
+    }
 }
 
 class EncryptCookiesTestController extends Controller
@@ -85,6 +107,11 @@ class EncryptCookiesTestController extends Controller
     }
 
     public function queueCookies()
+    {
+        return new Response;
+    }
+
+    public function decryptCookies()
     {
         return new Response;
     }
