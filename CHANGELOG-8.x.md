@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.12.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.12.3...8.x)
+
+
+## [v8.12.3 (2020-10-30)](https://github.com/laravel/framework/compare/v8.12.2...v8.12.3)
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withAggregate()` ([20b0c6e](https://github.com/laravel/framework/commit/20b0c6e19b635466f776502b3f1260c7c51b04ae))
 
 
 ## [v8.12.2 (2020-10-29)](https://github.com/laravel/framework/compare/v8.12.1...v8.12.2)
