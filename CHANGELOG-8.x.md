@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.12.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.12.2...8.x)
+
+
+## [v8.12.2 (2020-10-29)](https://github.com/laravel/framework/compare/v8.12.1...v8.12.2)
+
+### Fixed
+- [Add some fixes](https://github.com/laravel/framework/compare/v8.12.1...v8.12.2) 
 
 
 ## [v8.12.1 (2020-10-29)](https://github.com/laravel/framework/compare/v8.12.0...v8.12.1)
