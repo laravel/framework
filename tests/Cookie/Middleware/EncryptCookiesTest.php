@@ -110,11 +110,6 @@ class EncryptCookiesTestController extends Controller
     {
         return new Response;
     }
-
-    public function decryptCookies()
-    {
-        return new Response;
-    }
 }
 
 class EncryptCookiesTestMiddleware extends EncryptCookies
