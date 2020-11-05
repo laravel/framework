@@ -1,6 +1,12 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.29.2...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.29.3...7.x)
+
+
+## [v7.29.3 (2020-11-03)](https://github.com/laravel/framework/compare/v7.29.2...v7.29.3)
+
+### Fixed
+- Added php 8 support for Illuminate Testing 7.x ([#35045](https://github.com/laravel/framework/pull/35045))
 
 
 ## [v7.29.2 (2020-10-29)](https://github.com/laravel/framework/compare/v7.29.1...v7.29.2)
