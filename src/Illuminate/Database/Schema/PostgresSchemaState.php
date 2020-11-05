@@ -19,7 +19,7 @@ class PostgresSchemaState extends SchemaState
         $excludedTables = collect($connection->getSchemaBuilder()->getAllTables())
                         ->map->tablename
                         ->reject(function ($table) {
-                            return $table === 'migrations';
+                            return $table === $this->migrationsTableName;
                         })->map(function ($table) {
                             return '--exclude-table-data='.$table;
                         })->implode(' ');

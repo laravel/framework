@@ -63,6 +63,7 @@ class DumpCommand extends Command
     protected function schemaState(Connection $connection)
     {
         return $connection->getSchemaState()
+                ->setMigrationsTableName($this->laravel['config']['database.migrations'])
                 ->handleOutputUsing(function ($type, $buffer) {
                     $this->output->write($buffer);
                 });

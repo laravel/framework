@@ -37,6 +37,13 @@ abstract class SchemaState
     protected $output;
 
     /**
+     * The `migrations` table names.
+     *
+     * @var string
+     */
+    protected $migrationsTableName = 'migrations';
+
+    /**
      * Create a new dumper instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -96,6 +103,19 @@ abstract class SchemaState
     public function handleOutputUsing(callable $output)
     {
         $this->output = $output;
+
+        return $this;
+    }
+
+    /**
+     * Specify the `migrations` table name.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function setMigrationsTableName(string $name)
+    {
+        $this->migrationsTableName = $name;
 
         return $this;
     }
