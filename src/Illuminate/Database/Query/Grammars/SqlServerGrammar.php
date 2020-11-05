@@ -378,7 +378,7 @@ class SqlServerGrammar extends Grammar
             $sql .= 'when matched then update set '.$update.' ';
         }
 
-        $sql .= 'when not matched then insert ('.$columns.') values ('.$columns.')';
+        $sql .= 'when not matched then insert ('.$columns.') values ('.$columns.');';
 
         return $sql;
     }
