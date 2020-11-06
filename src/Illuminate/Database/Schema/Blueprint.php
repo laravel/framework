@@ -859,7 +859,7 @@ class Blueprint
             $model = new $model;
         }
 
-        return $model->getKeyType() === 'int' && $model->incrementing
+        return $model->getKeyType() === 'int' && $model->getIncrementing()
                     ? $this->foreignId($column ?: $model->getForeignKey())
                     : $this->foreignUuid($column ?: $model->getForeignKey());
     }
