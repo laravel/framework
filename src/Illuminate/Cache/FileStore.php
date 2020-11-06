@@ -3,13 +3,14 @@
 namespace Illuminate\Cache;
 
 use Exception;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\InteractsWithTime;
 
-class FileStore implements Store
+class FileStore implements Store, LockProvider
 {
-    use InteractsWithTime, RetrievesMultipleKeys;
+    use InteractsWithTime, RetrievesMultipleKeys, HasCacheLock;
 
     /**
      * The Illuminate Filesystem instance.

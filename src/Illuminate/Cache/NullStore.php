@@ -2,9 +2,11 @@
 
 namespace Illuminate\Cache;
 
-class NullStore extends TaggableStore
+use Illuminate\Contracts\Cache\LockProvider;
+
+class NullStore extends TaggableStore implements LockProvider
 {
-    use RetrievesMultipleKeys;
+    use RetrievesMultipleKeys, HasCacheLock;
 
     /**
      * Retrieve an item from the cache by key.
