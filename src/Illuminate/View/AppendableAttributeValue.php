@@ -23,7 +23,7 @@ class AppendableAttributeValue
     }
 
     /**
-     * Get the raw string value.
+     * Get the string value.
      *
      * @return string
      */
