@@ -68,7 +68,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('create temporary table "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
     }
 
-     public function testCreateTemporaryTableIfNotExists()
+    public function testCreateTemporaryTableIfNotExists()
     {
         $blueprint = new Blueprint('users');
         $blueprint->createIfNotExists();

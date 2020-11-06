@@ -84,8 +84,8 @@ class SQLiteGrammar extends Grammar
             $ifNotExists ? 'if not exists ' : '',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
-            (string)$this->addForeignKeys($blueprint),
-            (string)$this->addPrimaryKeys($blueprint)
+            (string) $this->addForeignKeys($blueprint),
+            (string) $this->addPrimaryKeys($blueprint)
         );
     }
 

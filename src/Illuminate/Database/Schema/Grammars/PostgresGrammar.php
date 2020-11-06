@@ -88,14 +88,12 @@ class PostgresGrammar extends Grammar
      */
     protected function compileCreateTable($blueprint, $ifNotExists = false)
     {
-        return array_values(array_filter(array_merge([
-            sprintf('%s table %s%s (%s)',
-                $blueprint->temporary ? 'create temporary' : 'create',
-                $ifNotExists ? 'if not exists ' : '',
-                $this->wrapTable($blueprint),
-                implode(', ', $this->getColumns($blueprint))
-            )
-        ], $this->compileAutoIncrementStartingValues($blueprint))));
+        return array_values(array_filter(array_merge([sprintf('%s table %s%s (%s)',
+            $blueprint->temporary ? 'create temporary' : 'create',
+            $ifNotExists ? 'if not exists ' : '',
+            $this->wrapTable($blueprint),
+            implode(', ', $this->getColumns($blueprint))
+        )], $this->compileAutoIncrementStartingValues($blueprint))));
     }
 
     /**
