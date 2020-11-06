@@ -1366,7 +1366,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return;
         }
 
-        return $this->setKeysForSelectQuery(static::newQueryWithoutScopes())
+        return $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
                         ->with(is_string($with) ? func_get_args() : $with)
                         ->first();
     }
@@ -1383,7 +1383,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         }
 
         $this->setRawAttributes(
-            $this->setKeysForSelectQuery(static::newQueryWithoutScopes())->firstOrFail()->attributes
+            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())->firstOrFail()->attributes
         );
 
         $this->load(collect($this->relations)->reject(function ($relation) {

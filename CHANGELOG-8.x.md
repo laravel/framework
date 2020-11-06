@@ -1,6 +1,55 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.11.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.12.3...8.x)
+
+
+## [v8.12.3 (2020-10-30)](https://github.com/laravel/framework/compare/v8.12.2...v8.12.3)
+
+### Fixed
+- Fixed `Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withAggregate()` ([20b0c6e](https://github.com/laravel/framework/commit/20b0c6e19b635466f776502b3f1260c7c51b04ae))
+
+
+## [v8.12.2 (2020-10-29)](https://github.com/laravel/framework/compare/v8.12.1...v8.12.2)
+
+### Fixed
+- [Add some fixes](https://github.com/laravel/framework/compare/v8.12.1...v8.12.2) 
+
+
+## [v8.12.1 (2020-10-29)](https://github.com/laravel/framework/compare/v8.12.0...v8.12.1)
+
+### Fixed
+- Fixed alias usage in `Eloquent` ([6091048](https://github.com/laravel/framework/commit/609104806b8b639710268c75c22f43034c2b72db))
+- Fixed `Illuminate\Support\Reflector::isCallable()` ([a90f344](https://github.com/laravel/framework/commit/a90f344c66f0a5bb1d718f8bbd20c257d4de9e02))
+
+
+## [v8.12.0 (2020-10-29)](https://github.com/laravel/framework/compare/v8.11.2...v8.12.0)
+
+### Added
+- Added ability to create observers with custom path via `make:observer` command ([#34911](https://github.com/laravel/framework/pull/34911))
+- Added `Illuminate\Database\Eloquent\Factories\Factory::lazy()` ([#34923](https://github.com/laravel/framework/pull/34923))
+- Added ability to make cast with custom stub file via `make:cast` command ([#34930](https://github.com/laravel/framework/pull/34930))
+- ADDED: Custom casts can implement increment/decrement logic  ([#34964](https://github.com/laravel/framework/pull/34964))
+- Added encrypted Eloquent cast ([#34937](https://github.com/laravel/framework/pull/34937), [#34948](https://github.com/laravel/framework/pull/34948))
+- Added `DatabaseRefreshed` event to be emitted after database refreshed ([#34952](https://github.com/laravel/framework/pull/34952), [f31bfe2](https://github.com/laravel/framework/commit/f31bfe2fb83829a900f75fccd12af4b69ffb6275))
+- Added `withMax()`|`withMin()`|`withSum()`|`withAvg()` methods to `Illuminate/Database/Eloquent/Concerns/QueriesRelationships` ([#34965](https://github.com/laravel/framework/pull/34965), [f4e4d95](https://github.com/laravel/framework/commit/f4e4d95c8d4c2f63f9bd80c2a4cfa6b2c78bab1b), [#35004](https://github.com/laravel/framework/pull/35004))
+- Added `explain()` to `Query\Builder` and `Eloquent\Builder` ([#34969](https://github.com/laravel/framework/pull/34969))
+- Make `multiple_of` validation rule handle non-integer values ([#34971](https://github.com/laravel/framework/pull/34971))
+- Added `setKeysForSelectQuery` method and use it when refreshing model data in Models ([#34974](https://github.com/laravel/framework/pull/34974))
+- Full PHP 8.0 Support ([#33388](https://github.com/laravel/framework/pull/33388))
+- Added `Illuminate\Support\Reflector::isCallable()` ([#34994](https://github.com/laravel/framework/pull/34994), [8c16891](https://github.com/laravel/framework/commit/8c16891c6e7a4738d63788f4447614056ab5136e), [31917ab](https://github.com/laravel/framework/commit/31917abcfa0db6ec6221bb07fc91b6e768ff5ec8), [11cfa4d](https://github.com/laravel/framework/commit/11cfa4d4c92bf2f023544d58d51b35c5d31dece0), [#34999](https://github.com/laravel/framework/pull/34999))
+- Added route regex registration methods ([#34997](https://github.com/laravel/framework/pull/34997), [3d405cc](https://github.com/laravel/framework/commit/3d405cc2eb66bba97433b46abaca52623c64c94b), [c2df0d5](https://github.com/laravel/framework/commit/c2df0d5faddeb7e58d1832c1c1f0f309619969af))
+- Added dontRelease option to RateLimited and RateLimitedWithRedis job middleware ([#35010](https://github.com/laravel/framework/pull/35010))
+
+### Fixed
+- Fixed check of file path in `Illuminate\Database\Schema\PostgresSchemaState::load()` ([268237f](https://github.com/laravel/framework/commit/268237fcda420e5c26ab2f0fbdb9b8783c276ff8))
+- Fixed: `PhpRedis (v5.3.2)` cluster - set default connection context to `null` ([#34935](https://github.com/laravel/framework/pull/34935))
+- Fixed Eloquent Model `loadMorph` and `loadMorphCount` methods ([#34972](https://github.com/laravel/framework/pull/34972))
+- Fixed ambigious column on many to many with select load ([5007986](https://github.com/laravel/framework/commit/500798623d100a9746b2931ae6191cb756521f05))
+- Fixed Postgres Dump ([#35018](https://github.com/laravel/framework/pull/35018))
+
+### Changed
+- Changed `make:factory` command ([#34947](https://github.com/laravel/framework/pull/34947), [4f38176](https://github.com/laravel/framework/commit/4f3817654a6376a2f6cd59dc5fb529ebad1d951f))
+- Make assertSee, assertSeeText, assertDontSee and assertDontSeeText accept an array ([#34982](https://github.com/laravel/framework/pull/34982), [2b98bcc](https://github.com/laravel/framework/commit/2b98bcca598eb919b2afd61e5fb5cb86aec4c706))
 
 
 ## [v8.11.2 (2020-10-20)](https://github.com/laravel/framework/compare/v8.11.1...v8.11.2)

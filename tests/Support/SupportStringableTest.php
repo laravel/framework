@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -527,5 +528,13 @@ class SupportStringableTest extends TestCase
     {
         $this->assertSame('Alien-----', (string) $this->stringable('Alien')->padRight(10, '-'));
         $this->assertSame('Alien     ', (string) $this->stringable('Alien')->padRight(10));
+    }
+
+    public function testChunk()
+    {
+        $chunks = $this->stringable('foobarbaz')->split(3);
+
+        $this->assertInstanceOf(Collection::class, $chunks);
+        $this->assertSame(['foo', 'bar', 'baz'], $chunks->all());
     }
 }

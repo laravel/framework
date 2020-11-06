@@ -39,7 +39,7 @@ class SqliteSchemaState extends SchemaState
     protected function appendMigrationData(string $path)
     {
         with($process = $this->makeProcess(
-            $this->baseCommand().' ".dump \'migrations\'"'
+            $this->baseCommand().' ".dump \''.$this->migrationTable.'\'"'
         ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));

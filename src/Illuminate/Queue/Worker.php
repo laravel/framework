@@ -746,7 +746,7 @@ class Worker
     /**
      * Set the name of the worker.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return $this
      */
     public function setName($name)

@@ -72,7 +72,7 @@ class EloquentWithCountTest extends DatabaseTestCase
 
         $result = Model1::withCount('twos')->toSql();
 
-        $this->assertSame('select "one".*, (select count(*) from "two" where "one"."id" = "two"."one_id" limit 1) as "twos_count" from "one"', $result);
+        $this->assertSame('select "one".*, (select count(*) from "two" where "one"."id" = "two"."one_id") as "twos_count" from "one"', $result);
     }
 }
 
