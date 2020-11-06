@@ -24,6 +24,6 @@ class AppendableAttributeValue
 
     public function __toString()
     {
-        return (string)$this->value;
+        return (string) $this->value;
     }
 }

@@ -50,13 +50,15 @@ class BladeTest extends TestCase
 
     public function test_appendable_attributes()
     {
-        $view = View::make('uses-appendable-panel', ['name' => 'Taylor'])->render();
+        $view = View::make('uses-appendable-panel', ['name' => 'Taylor', 'withOutside' => true])->render();
 
         $this->assertSame('<div class="mt-4 bg-gray-100" data-controller="inside-controller outside-controller" foo="bar">
     Hello Taylor
-</div>
+</div>', trim($view));
 
-<div class="mt-4 bg-gray-100" data-controller="inside-controller" foo="bar">
+        $view = View::make('uses-appendable-panel', ['name' => 'Taylor', 'withOutside' => false])->render();
+
+        $this->assertSame('<div class="mt-4 bg-gray-100" data-controller="inside-controller" foo="bar">
     Hello Taylor
 </div>', trim($view));
     }
