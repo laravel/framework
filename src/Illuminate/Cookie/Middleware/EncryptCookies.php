@@ -100,12 +100,33 @@ class EncryptCookies
      * Decrypt the given cookie and return the value.
      *
      * @param  string  $name
-     * @param  string  $cookie
-     * @return string
+     * @param  string|array  $cookie
+     * @return string|array
      */
     protected function decryptCookie($name, $cookie)
     {
-        return $this->encrypter->decrypt($cookie, static::serialized($name));
+        return is_array($cookie)
+            ? $this->decryptArray($cookie)
+            : $this->encrypter->decrypt($cookie, static::serialized($name));
+    }
+
+    /**
+     * Decrypt an array based cookie.
+     *
+     * @param  array  $cookie
+     * @return array
+     */
+    protected function decryptArray(array $cookie)
+    {
+        $decrypted = [];
+
+        foreach ($cookie as $key => $value) {
+            if (is_string($value)) {
+                $decrypted[$key] = $this->encrypter->decrypt($value, static::serialized($key));
+            }
+        }
+
+        return $decrypted;
     }
 
     /**
