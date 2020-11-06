@@ -43,6 +43,18 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals($expected, $statements);
     }
 
+    public function testCreateTableIfNotExists()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->createIfNotExists();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table if not exists "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
+    }
+
     public function testCreateTemporaryTable()
     {
         $blueprint = new Blueprint('users');
@@ -54,6 +66,19 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create temporary table "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
+    }
+
+     public function testCreateTemporaryTableIfNotExists()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->createIfNotExists();
+        $blueprint->temporary();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create temporary table if not exists "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
     }
 
     public function testDropTable()

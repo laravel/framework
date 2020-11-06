@@ -64,11 +64,38 @@ class PostgresGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        return array_values(array_filter(array_merge([sprintf('%s table %s (%s)',
-            $blueprint->temporary ? 'create temporary' : 'create',
-            $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint))
-        )], $this->compileAutoIncrementStartingValues($blueprint))));
+        return $this->compileCreateTable($blueprint);
+    }
+
+    /**
+     * Compile a create table (if not exists) command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param \Illuminate\Support\Fluent $command
+     * @return array
+     */
+    public function compileCreateIfNotExists(Blueprint $blueprint, Fluent $command)
+    {
+        return $this->compileCreateTable($blueprint, true);
+    }
+
+    /**
+     * Create the actual create table clause.
+     *
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param bool $ifNotExists
+     * @return array
+     */
+    protected function compileCreateTable($blueprint, $ifNotExists = false)
+    {
+        return array_values(array_filter(array_merge([
+            sprintf('%s table %s%s (%s)',
+                $blueprint->temporary ? 'create temporary' : 'create',
+                $ifNotExists ? 'if not exists ' : '',
+                $this->wrapTable($blueprint),
+                implode(', ', $this->getColumns($blueprint))
+            )
+        ], $this->compileAutoIncrementStartingValues($blueprint))));
     }
 
     /**

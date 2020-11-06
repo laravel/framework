@@ -258,7 +258,7 @@ class Blueprint
     public function creating()
     {
         return collect($this->commands)->contains(function ($command) {
-            return $command->name === 'create';
+            return $command->name === 'create' || $command->name === 'createIfNotExists';
         });
     }
 
@@ -270,6 +270,16 @@ class Blueprint
     public function create()
     {
         return $this->addCommand('create');
+    }
+
+    /**
+     * Indicate that the table needs to be created if it does not exist.
+     *
+     * @return \Illuminate\Support\Fluent
+     */
+    public function createIfNotExists()
+    {
+        return $this->addCommand('createIfNotExists');
     }
 
     /**

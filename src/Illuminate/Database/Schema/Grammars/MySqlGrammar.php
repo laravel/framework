@@ -56,12 +56,38 @@ class MySqlGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $sql = $this->compileCreateTable(
-            $blueprint, $command, $connection
-        );
+        $sql = $this->compileCreateTable($blueprint);
 
+        return $this->completeCreateTableStatement($sql, $connection, $blueprint);
+    }
+
+    /**
+     * Compile a create table (if not exists) command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array
+     */
+    public function compileCreateIfNotExists(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        $sql = $this->compileCreateTable($blueprint, true);
+
+        return $this->completeCreateTableStatement($sql, $connection, $blueprint);
+    }
+
+    /**
+     * Adds encoding options and engine configuration to the statement.
+     *
+     * @param $sql
+     * @param $connection
+     * @param $blueprint
+     * @return array
+     */
+    protected function completeCreateTableStatement($sql, $connection, $blueprint)
+    {
         // Once we have the primary SQL, we can add the encoding option to the SQL for
-        // the table.  Then, we can check if a storage engine has been supplied for
+        // the table. Then, we can check if a storage engine has been supplied for
         // the table. If so, we will add the engine declaration to the SQL query.
         $sql = $this->compileCreateEncoding(
             $sql, $connection, $blueprint
@@ -70,23 +96,25 @@ class MySqlGrammar extends Grammar
         // Finally, we will append the engine configuration onto this SQL statement as
         // the final thing we do before returning this finished SQL. Once this gets
         // added the query will be ready to execute against the real connections.
-        return array_values(array_filter(array_merge([$this->compileCreateEngine(
-            $sql, $connection, $blueprint
-        )], $this->compileAutoIncrementStartingValues($blueprint))));
+        return array_values(array_filter(array_merge([
+            $this->compileCreateEngine(
+                $sql, $connection, $blueprint
+            )
+        ], $this->compileAutoIncrementStartingValues($blueprint))));
     }
 
     /**
      * Create the main create table clause.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param  bool $ifNotExists
      * @return array
      */
-    protected function compileCreateTable($blueprint, $command, $connection)
+    protected function compileCreateTable($blueprint, $ifNotExists = false)
     {
-        return trim(sprintf('%s table %s (%s)',
+        return trim(sprintf('%s table %s%s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
+            $ifNotExists ? 'if not exists ' : '',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint))
         ));

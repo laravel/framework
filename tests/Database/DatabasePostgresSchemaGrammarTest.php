@@ -37,6 +37,19 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "id" serial primary key not null, add column "email" varchar(255) not null', $statements[0]);
     }
 
+    public function testBasicCreateTableIfNotExists()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->createIfNotExists();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $blueprint->string('name')->collation('nb_NO.utf8');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table if not exists "users" ("id" serial primary key not null, "email" varchar(255) not null, "name" varchar(255) collate "nb_NO.utf8" not null)', $statements[0]);
+    }
+
     public function testCreateTableWithAutoIncrementStartingValue()
     {
         $blueprint = new Blueprint('users');
@@ -75,6 +88,19 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create temporary table "users" ("id" serial primary key not null, "email" varchar(255) not null)', $statements[0]);
+    }
+
+    public function testCreateTemporaryTableIfNotExists()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->createIfNotExists();
+        $blueprint->temporary();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create temporary table if not exists "users" ("id" serial primary key not null, "email" varchar(255) not null)', $statements[0]);
     }
 
     public function testDropTable()
