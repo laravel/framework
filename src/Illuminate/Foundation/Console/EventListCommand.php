@@ -76,6 +76,42 @@ class EventListCommand extends Command
     }
 
     /**
+     * Adds the event / listeners on the dispatcher object to the given list.
+     *
+     * @param  array  $events
+     * @return array
+     */
+    protected function addListenersOnDispatcher(array $events)
+    {
+        foreach ($this->getRawListeners() as $event => $rawListeners) {
+            foreach ($rawListeners as $rawListener) {
+                if (is_string($rawListener)) {
+                    $events[$event][] = $rawListener;
+                } elseif ($rawListener instanceof Closure) {
+                    $events[$event][] = $this->stringifyClosure($rawListener);
+                }
+            }
+        }
+
+        return $events;
+    }
+
+    /**
+     * Get a displayable string representation of a Closure listener.
+     *
+     * @param  \Closure  $rawListener
+     * @return string
+     */
+    protected function stringifyClosure(Closure $rawListener)
+    {
+        $reflection = new ReflectionFunction($rawListener);
+
+        $path = str_replace(base_path(), '', $reflection->getFileName() ?: '');
+
+        return 'Closure at: '.$path.':'.$reflection->getStartLine();
+    }
+
+    /**
      * Filter the given events using the provided event name filter.
      *
      * @param  array  $events
@@ -103,53 +139,12 @@ class EventListCommand extends Command
     }
 
     /**
-     * Adds the event/listeners on the dispatcher object to the given list.
-     *
-     * @param  array  $events
-     *
-     * @return array
-     */
-    protected function addListenersOnDispatcher(array $events)
-    {
-        foreach ($this->getRawListeners() as $event => $rawListeners) {
-            foreach ($rawListeners as $rawListener) {
-                if (is_string($rawListener)) {
-                    $events[$event][] = $rawListener;
-                } elseif ($rawListener instanceof Closure) {
-                    $events[$event][] = $this->stringifyClosure($rawListener);
-                }
-            }
-        }
-
-        return $events;
-    }
-
-    /**
-     * Creates a printable string version of a closure.
-     *
-     * @param  Closure  $rawListener
-     *
-     * @return string
-     */
-    protected function stringifyClosure(Closure $rawListener)
-    {
-        $reflection = new ReflectionFunction($rawListener);
-        $path = str_replace(base_path(), '', $reflection->getFileName() ?: '');
-
-        return 'Closure at: '.$path.':'.$reflection->getStartLine();
-    }
-
-    /**
      * Gets the raw version of event listeners from dispatcher object.
      *
      * @return array
      */
     protected function getRawListeners()
     {
-        try {
-            return $this->getLaravel()->make('events')->getRawListeners();
-        } catch (\Throwable $e) {
-            return [];
-        }
+        return $this->getLaravel()->make('events')->getRawListeners();
     }
 }

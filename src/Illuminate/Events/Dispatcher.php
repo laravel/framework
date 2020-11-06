@@ -308,16 +308,6 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * Gets the raw version of listeners.
-     *
-     * @return array
-     */
-    protected function getRawListeners()
-    {
-        return $this->listeners;
-    }
-
-    /**
      * Get all of the listeners for a given event name.
      *
      * @param  string  $eventName
@@ -325,10 +315,8 @@ class Dispatcher implements DispatcherContract
      */
     public function getListeners($eventName)
     {
-        $listeners = $this->prepareListeners($eventName);
-
         $listeners = array_merge(
-            $listeners,
+            $this->prepareListeners($eventName),
             $this->wildcardsCache[$eventName] ?? $this->getWildcardListeners($eventName)
         );
 
@@ -373,6 +361,23 @@ class Dispatcher implements DispatcherContract
                     $listeners = array_merge($listeners, (array) $names);
                 }
             }
+        }
+
+        return $listeners;
+    }
+
+    /**
+     * Prepare the listeners for a given event.
+     *
+     * @param  string  $eventName
+     * @return \Closure[]
+     */
+    protected function prepareListeners(string $eventName)
+    {
+        $listeners = [];
+
+        foreach ($this->listeners[$eventName] ?? [] as $listener) {
+            $listeners[] = $this->makeListener($listener);
         }
 
         return $listeners;
@@ -566,9 +571,12 @@ class Dispatcher implements DispatcherContract
     {
         return tap($job, function ($job) use ($listener) {
             $job->tries = $listener->tries ?? null;
+
             $job->backoff = method_exists($listener, 'backoff')
                                 ? $listener->backoff() : ($listener->backoff ?? null);
+
             $job->timeout = $listener->timeout ?? null;
+
             $job->retryUntil = method_exists($listener, 'retryUntil')
                                 ? $listener->retryUntil() : null;
         });
@@ -633,18 +641,12 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * prepares the listeners of an event.
+     * Gets the raw, unprepared listeners.
      *
-     * @param  string  $eventName
-     * @return \Closure[]
+     * @return array
      */
-    protected function prepareListeners(string $eventName)
+    public function getRawListeners()
     {
-        $listeners = [];
-        foreach ($this->listeners[$eventName] ?? [] as $listener) {
-            $listeners[] = $this->makeListener($listener);
-        }
-
-        return $listeners;
+        return $this->listeners;
     }
 }
