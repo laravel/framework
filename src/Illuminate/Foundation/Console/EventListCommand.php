@@ -2,9 +2,11 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Str;
+use ReflectionFunction;
 
 class EventListCommand extends Command
 {
@@ -62,6 +64,8 @@ class EventListCommand extends Command
             $events = array_merge_recursive($events, $providerEvents);
         }
 
+        $events = $this->addListenersOnDispatcher($events);
+
         if ($this->filteringByEvent()) {
             $events = $this->filterEvents($events);
         }
@@ -69,6 +73,42 @@ class EventListCommand extends Command
         return collect($events)->map(function ($listeners, $event) {
             return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
         })->sortBy('Event')->values()->toArray();
+    }
+
+    /**
+     * Adds the event / listeners on the dispatcher object to the given list.
+     *
+     * @param  array  $events
+     * @return array
+     */
+    protected function addListenersOnDispatcher(array $events)
+    {
+        foreach ($this->getRawListeners() as $event => $rawListeners) {
+            foreach ($rawListeners as $rawListener) {
+                if (is_string($rawListener)) {
+                    $events[$event][] = $rawListener;
+                } elseif ($rawListener instanceof Closure) {
+                    $events[$event][] = $this->stringifyClosure($rawListener);
+                }
+            }
+        }
+
+        return $events;
+    }
+
+    /**
+     * Get a displayable string representation of a Closure listener.
+     *
+     * @param  \Closure  $rawListener
+     * @return string
+     */
+    protected function stringifyClosure(Closure $rawListener)
+    {
+        $reflection = new ReflectionFunction($rawListener);
+
+        $path = str_replace(base_path(), '', $reflection->getFileName() ?: '');
+
+        return 'Closure at: '.$path.':'.$reflection->getStartLine();
     }
 
     /**
@@ -96,5 +136,15 @@ class EventListCommand extends Command
     protected function filteringByEvent()
     {
         return ! empty($this->option('event'));
+    }
+
+    /**
+     * Gets the raw version of event listeners from dispatcher object.
+     *
+     * @return array
+     */
+    protected function getRawListeners()
+    {
+        return $this->getLaravel()->make('events')->getRawListeners();
     }
 }
