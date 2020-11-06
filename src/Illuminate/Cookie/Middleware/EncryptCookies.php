@@ -106,8 +106,8 @@ class EncryptCookies
     protected function decryptCookie($name, $cookie)
     {
         return is_array($cookie)
-            ? $this->decryptArray($cookie)
-            : $this->encrypter->decrypt($cookie, static::serialized($name));
+                         ? $this->decryptArray($cookie)
+                         : $this->encrypter->decrypt($cookie, static::serialized($name));
     }
 
     /**
