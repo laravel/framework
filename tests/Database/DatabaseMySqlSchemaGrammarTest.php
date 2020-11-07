@@ -885,6 +885,24 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP(1) not null', $statements[0]);
     }
 
+    public function testAddingTimestampWithOnUpdateCurrentSpecifyingPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('created_at', 1)->useCurrentOnUpdate();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) on update CURRENT_TIMESTAMP(1) not null', $statements[0]);
+    }
+
+    public function testAddingTimestampWithDefaultCurrentAndOnUpdateCurrentSpecifyingPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('created_at', 1)->useCurrent()->useCurrentOnUpdate();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP(1) on update CURRENT_TIMESTAMP(1) not null', $statements[0]);
+    }
+
     public function testAddingTimestampTz()
     {
         $blueprint = new Blueprint('users');
