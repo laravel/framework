@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Job as JobContract;
+use Throwable;
 
 trait InteractsWithQueue
 {
@@ -38,7 +39,7 @@ trait InteractsWithQueue
     /**
      * Fail the job from the queue.
      *
-     * @param  \Throwable|null  $exception
+     * @param  Throwable|null  $exception
      * @return void
      */
     public function fail($exception = null)

@@ -7,6 +7,7 @@ use DateTimeInterface;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
+use Throwable;
 
 class DynamoDbFailedJobProvider implements FailedJobProviderInterface
 {
@@ -52,7 +53,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      * @param  string  $connection
      * @param  string  $queue
      * @param  string  $payload
-     * @param  \Throwable  $exception
+     * @param  Throwable  $exception
      * @return string|int|null
      */
     public function log($connection, $queue, $payload, $exception)

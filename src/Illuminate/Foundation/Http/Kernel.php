@@ -396,7 +396,7 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     protected function reportException(Throwable $e)
@@ -408,7 +408,7 @@ class Kernel implements KernelContract
      * Render the exception to a response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function renderException($request, Throwable $e)

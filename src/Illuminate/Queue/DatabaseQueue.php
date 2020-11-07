@@ -9,6 +9,7 @@ use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Carbon;
 use PDO;
+use Throwable;
 
 class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
 {
@@ -191,7 +192,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function pop($queue = null)
     {
@@ -311,7 +312,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $id
      * @return void
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function deleteReserved($queue, $id)
     {

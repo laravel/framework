@@ -68,11 +68,11 @@ class CompilerEngine extends PhpEngine
     /**
      * Handle a view exception.
      *
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @param  int  $obLevel
      * @return void
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function handleViewException(Throwable $e, $obLevel)
     {
@@ -84,7 +84,7 @@ class CompilerEngine extends PhpEngine
     /**
      * Get the exception message for an exception.
      *
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @return string
      */
     protected function getMessage(Throwable $e)

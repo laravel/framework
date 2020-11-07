@@ -16,6 +16,7 @@ use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use LogicException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 /**
  * @mixin \Illuminate\Http\Response
@@ -722,7 +723,7 @@ class TestResponse implements ArrayAccess
      *
      * @return \Illuminate\Testing\AssertableJsonString
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function decodeResponseJson()
     {

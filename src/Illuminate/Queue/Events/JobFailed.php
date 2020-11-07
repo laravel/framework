@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue\Events;
 
+use Throwable;
+
 class JobFailed
 {
     /**
@@ -21,7 +23,7 @@ class JobFailed
     /**
      * The exception that caused the job to fail.
      *
-     * @var \Throwable
+     * @var Throwable
      */
     public $exception;
 
@@ -30,7 +32,7 @@ class JobFailed
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $exception
+     * @param  Throwable  $exception
      * @return void
      */
     public function __construct($connectionName, $job, $exception)

@@ -216,7 +216,7 @@ class PendingBatch
      *
      * @return \Illuminate\Bus\Batch
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function dispatch()
     {

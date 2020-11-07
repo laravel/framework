@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Throwable;
 
 class SendQueuedNotifications implements ShouldQueue
 {
@@ -107,7 +108,7 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * Call the failed method on the notification instance.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     public function failed($e)

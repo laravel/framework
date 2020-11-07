@@ -4,6 +4,7 @@ namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use Throwable;
 
 class SendQueuedMailable
 {
@@ -65,7 +66,7 @@ class SendQueuedMailable
     /**
      * Call the failed method on the mailable instance.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     public function failed($e)

@@ -7,6 +7,7 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 use RuntimeException;
+use Throwable;
 
 trait Queueable
 {
@@ -206,7 +207,7 @@ trait Queueable
     /**
      * Invoke all of the chain's failed job callbacks.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     public function invokeChainCatchCallbacks($e)

@@ -10,7 +10,7 @@ trait DetectsLostConnections
     /**
      * Determine if the given exception was caused by a lost connection.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return bool
      */
     protected function causedByLostConnection(Throwable $e)

@@ -85,7 +85,7 @@ class Connector
     /**
      * Handle an exception that occurred during connect execution.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @param  string  $dsn
      * @param  string  $username
      * @param  string  $password

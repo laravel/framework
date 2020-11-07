@@ -315,7 +315,7 @@ class Batch implements Arrayable, JsonSerializable
      * Record that a job within the batch failed to finish successfully, executing any callbacks if necessary.
      *
      * @param  string  $jobId
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     public function recordFailedJob(string $jobId, $e)
@@ -419,7 +419,7 @@ class Batch implements Arrayable, JsonSerializable
      *
      * @param  \Illuminate\Queue\SerializableClosure|callable  $handler
      * @param  \Illuminate\Bus\Batch  $batch
-     * @param  \Throwable|null  $e
+     * @param  Throwable|null  $e
      * @return void
      */
     protected function invokeHandlerCallback($handler, Batch $batch, Throwable $e = null)

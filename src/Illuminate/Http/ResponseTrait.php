@@ -18,7 +18,7 @@ trait ResponseTrait
     /**
      * The exception that triggered the error response (if applicable).
      *
-     * @var \Throwable|null
+     * @var Throwable|null
      */
     public $exception;
 
@@ -129,7 +129,7 @@ trait ResponseTrait
     /**
      * Set the exception to attach to the response.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return $this
      */
     public function withException(Throwable $e)

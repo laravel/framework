@@ -364,7 +364,7 @@ class Worker
     /**
      * Stop the worker if we have lost connection to a database.
      *
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @return void
      */
     protected function stopWorkerIfLostConnection($e)
@@ -382,7 +382,7 @@ class Worker
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function process($connectionName, $job, WorkerOptions $options)
     {
@@ -417,10 +417,10 @@ class Worker
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Illuminate\Queue\WorkerOptions  $options
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @return void
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function handleJobException($connectionName, $job, WorkerOptions $options, Throwable $e)
     {
@@ -463,7 +463,7 @@ class Worker
      * @param  int  $maxTries
      * @return void
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
     {
@@ -490,7 +490,7 @@ class Worker
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @return void
      */
     protected function markJobAsFailedIfWillExceedMaxAttempts($connectionName, $job, $maxTries, Throwable $e)
@@ -511,7 +511,7 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @return void
      */
     protected function markJobAsFailedIfWillExceedMaxExceptions($connectionName, $job, Throwable $e)
@@ -536,7 +536,7 @@ class Worker
      * Mark the given job as failed and raise the relevant event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @return void
      */
     protected function failJob($job, Throwable $e)
@@ -596,7 +596,7 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @return void
      */
     protected function raiseExceptionOccurredJobEvent($connectionName, $job, Throwable $e)

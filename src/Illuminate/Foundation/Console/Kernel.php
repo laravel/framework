@@ -358,7 +358,7 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     protected function reportException(Throwable $e)
@@ -370,7 +370,7 @@ class Kernel implements KernelContract
      * Render the given exception.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     protected function renderException($output, Throwable $e)

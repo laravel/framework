@@ -17,7 +17,7 @@ class ScheduledTaskFailed
     /**
      * The exception that was thrown.
      *
-     * @var \Throwable
+     * @var Throwable
      */
     public $exception;
 
@@ -25,7 +25,7 @@ class ScheduledTaskFailed
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $task
-     * @param  \Throwable  $exception
+     * @param  Throwable  $exception
      * @return void
      */
     public function __construct(Event $task, Throwable $exception)

@@ -66,11 +66,11 @@ class PhpEngine implements Engine
     /**
      * Handle a view exception.
      *
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @param  int  $obLevel
      * @return void
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function handleViewException(Throwable $e, $obLevel)
     {

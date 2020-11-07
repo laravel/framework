@@ -77,7 +77,7 @@ class HandleExceptions
      * the HTTP and Console kernels. But, fatal error exceptions must
      * be handled differently since they are not normal exceptions.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     public function handleException(Throwable $e)
@@ -100,7 +100,7 @@ class HandleExceptions
     /**
      * Render an exception to the console.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     protected function renderForConsole(Throwable $e)
@@ -111,7 +111,7 @@ class HandleExceptions
     /**
      * Render an exception as an HTTP response and send it.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     protected function renderHttpResponse(Throwable $e)

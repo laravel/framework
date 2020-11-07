@@ -2,6 +2,8 @@
 
 namespace Illuminate\Events;
 
+use Throwable;
+
 class InvokeQueuedClosure
 {
     /**
@@ -22,7 +24,7 @@ class InvokeQueuedClosure
      * @param  \Illuminate\Queue\SerializableClosure  $closure
      * @param  array  $arguments
      * @param  array  $catchCallbacks
-     * @param  \Throwable  $exception
+     * @param  Throwable  $exception
      * @return void
      */
     public function failed($closure, array $arguments, array $catchCallbacks, $exception)

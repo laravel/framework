@@ -50,7 +50,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * The exception thrown while running an application destruction callback.
      *
-     * @var \Throwable
+     * @var Throwable
      */
     protected $callbackException;
 

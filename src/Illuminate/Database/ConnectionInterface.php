@@ -3,6 +3,7 @@
 namespace Illuminate\Database;
 
 use Closure;
+use Throwable;
 
 interface ConnectionInterface
 {
@@ -121,7 +122,7 @@ interface ConnectionInterface
      * @param  int  $attempts
      * @return mixed
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function transaction(Closure $callback, $attempts = 1);
 

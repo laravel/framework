@@ -83,7 +83,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param  callable|null  $callback
      * @return array|string
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function render(callable $callback = null)
     {
@@ -162,7 +162,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      *
      * @return array
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function renderSections()
     {
@@ -429,7 +429,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      *
      * @return string
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function __toString()
     {

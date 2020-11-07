@@ -246,10 +246,10 @@ class Pipeline implements PipelineContract
      * Handle the given exception.
      *
      * @param  mixed  $passable
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return mixed
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function handleException($passable, Throwable $e)
     {
