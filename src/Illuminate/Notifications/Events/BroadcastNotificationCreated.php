@@ -92,7 +92,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
      */
     public function broadcastWith()
     {
-        if(method_exists($this->notification, 'broadcastWith')) {
+        if (method_exists($this->notification, 'broadcastWith')) {
             return $this->notification->broadcastWith();
         }
 
