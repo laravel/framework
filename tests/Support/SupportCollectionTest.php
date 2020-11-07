@@ -3144,6 +3144,80 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testRejectValuesRemovesElementsWithLooseComparison($collection)
+    {
+        $c = new $collection(['foo', 'bar']);
+        $this->assertEquals(['foo', 'bar'], $c->rejectValues([])->values()->all());
+
+        $c = new $collection(['foo', 'bar']);
+        $this->assertEquals(['foo'], $c->rejectValues(['bar'])->values()->all());
+
+        $c = new $collection(['foo', 'bar']);
+        $this->assertEquals([], $c->rejectValues(['foo', 'bar'])->values()->all());
+
+        $c = new $collection(['foo', 'bar', null, 0]);
+        $this->assertEquals(['foo'], $c->rejectValues(['bar', null])->values()->all());
+
+        $c = new $collection(['foo', 'bar', '123']);
+        $this->assertEquals(['foo'], $c->rejectValues(['bar', 123])->values()->all());
+
+        $c = new $collection(['foo', 'bar']);
+        $toReject = new $collection(['bar']);
+        $this->assertEquals(['foo'], $c->rejectValues($toReject)->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testRejectValuesRemovesElementsWithStrictComparison($collection)
+    {
+        $c = new $collection(['foo', 'bar', null, 0]);
+        $this->assertEquals(['foo', 0], $c->rejectValues(['bar', null], true)->values()->all());
+
+        $c = new $collection(['foo', 'bar', '123']);
+        $this->assertEquals(['foo', '123'], $c->rejectValues(['bar', 123], true)->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testKeepValuesKeepsElementsWithLooseComparison($collection)
+    {
+        $c = new $collection(['foo', 'bar']);
+        $this->assertEquals([], $c->keepValues([])->values()->all());
+
+        $c = new $collection(['foo', 'bar']);
+        $this->assertEquals(['bar'], $c->keepValues(['bar'])->values()->all());
+
+        $c = new $collection(['foo', 'bar']);
+        $this->assertEquals(['foo', 'bar'], $c->keepValues(['foo', 'bar'])->values()->all());
+
+        $c = new $collection(['foo', 'bar', null, 0]);
+        $this->assertEquals(['bar', null, 0], $c->keepValues(['bar', null])->values()->all());
+
+        $c = new $collection(['foo', 'bar', '123']);
+        $this->assertEquals(['bar', '123'], $c->keepValues(['bar', 123])->values()->all());
+
+        $c = new $collection(['foo', 'bar']);
+        $toKeep = new $collection(['bar']);
+        $this->assertEquals(['bar'], $c->keepValues($toKeep)->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testKeepValuesKeepsElementsWithStrictComparison($collection)
+    {
+        $c = new $collection(['foo', 'bar', null, 0]);
+        $this->assertEquals(['bar', null], $c->keepValues(['bar', null], true)->values()->all());
+
+        $c = new $collection(['foo', 'bar', '123']);
+        $this->assertEquals(['bar'], $c->keepValues(['bar', 123], true)->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSearchReturnsIndexOfFirstFoundItem($collection)
     {
         $c = new $collection([1, 2, 3, 4, 5, 2, 5, 'foo' => 'bar']);

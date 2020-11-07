@@ -734,6 +734,38 @@ trait EnumeratesValues
     }
 
     /**
+     * Create a collection of all elements that aren't present in the given list of values.
+     *
+     * @param  array|static  $values
+     * @param  bool  $strict
+     * @return static
+     */
+    public function rejectValues($values, bool $strict = false)
+    {
+        $values = $values instanceof static ? $values->toArray() : $values;
+
+        return $this->filter(function ($value) use ($values, $strict) {
+            return ! in_array($value, $values, $strict);
+        });
+    }
+
+    /**
+     * Create a collection of all elements provided they exist in the given list of values.
+     *
+     * @param  array|static  $values
+     * @param  bool  $strict
+     * @return static
+     */
+    public function keepValues($values, bool $strict = false)
+    {
+        $values = $values instanceof static ? $values->toArray() : $values;
+
+        return $this->filter(function ($value) use ($values, $strict) {
+            return in_array($value, $values, $strict);
+        });
+    }
+
+    /**
      * Return only unique items from the collection array.
      *
      * @param  string|callable|null  $key
