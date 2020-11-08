@@ -1,6 +1,23 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.12.3...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.13.0...8.x)
+
+
+## [v8.13.0 (2020-10-30)](https://github.com/laravel/framework/compare/v8.12.3...v8.13.0)
+
+### Added
+- Added `loadMax()` | `loadMin()` | `loadSum()` | `loadAvg()` methods to `Illuminate\Database\Eloquent\Collection`. Added `loadMax()` | `loadMin()` | `loadSum()` | `loadAvg()` | `loadMorphMax()` | `loadMorphMin()` | `loadMorphSum()` | `loadMorphAvg()` methods to `Illuminate\Database\Eloquent\Model` ([#35029](https://github.com/laravel/framework/pull/35029))
+- Modify `Illuminate\Database\Eloquent\Concerns\QueriesRelationships::has()` method to support MorphTo relations ([#35050](https://github.com/laravel/framework/pull/35050))
+- Added `Illuminate\Support\Stringable::chunk()` ([#35038](https://github.com/laravel/framework/pull/35038))
+
+### Fixed
+- Fixed a few issues in `Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withAggregate()` ([#35061](https://github.com/laravel/framework/pull/35061), [#35063](https://github.com/laravel/framework/pull/35063))
+
+### Changed
+- Set chain `queue` | `connection` | `delay` only when explicitly configured in ([#35047](https://github.com/laravel/framework/pull/35047))
+
+### Refactoring
+- Remove redundant unreachable return statements in some places ([#35053](https://github.com/laravel/framework/pull/35053))
 
 
 ## [v8.12.3 (2020-10-30)](https://github.com/laravel/framework/compare/v8.12.2...v8.12.3)
