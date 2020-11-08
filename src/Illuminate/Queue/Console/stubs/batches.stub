@@ -11,7 +11,7 @@ class Create{{tableClassName}}Table extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('{{table}}', function (Blueprint $table) {
             $table->string('id')->primary();
@@ -32,7 +32,7 @@ class Create{{tableClassName}}Table extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('{{table}}');
     }
