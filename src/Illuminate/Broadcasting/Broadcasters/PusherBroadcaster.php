@@ -88,7 +88,7 @@ class PusherBroadcaster extends Broadcaster
     protected function decodePusherResponse($request, $response)
     {
         if (! $request->input('callback', false)) {
-            return json_decode($response, true);
+            return response()->json(json_decode($response, true));
         }
 
         return response()->json(json_decode($response, true))
