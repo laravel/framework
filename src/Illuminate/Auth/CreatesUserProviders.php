@@ -91,4 +91,14 @@ trait CreatesUserProviders
     {
         return $this->app['config']['auth.defaults.provider'];
     }
+
+    /**
+     * Get the custom providers name.
+     *
+     * @return array
+     */
+    public function getCustomProviderCreators()
+    {
+        return array_keys($this->customProviderCreators);
+    }
 }

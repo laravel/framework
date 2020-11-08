@@ -8,6 +8,7 @@ use RuntimeException;
 /**
  * @method static \Illuminate\Auth\AuthManager extend(string $driver, \Closure $callback)
  * @method static \Illuminate\Auth\AuthManager provider(string $name, \Closure $callback)
+ * @method static \Illuminate\Auth\AuthManager getCustomProviderCreators()
  * @method static \Illuminate\Contracts\Auth\Authenticatable loginUsingId(mixed $id, bool $remember = false)
  * @method static \Illuminate\Contracts\Auth\Authenticatable|null user()
  * @method static \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard guard(string|null $name = null)
