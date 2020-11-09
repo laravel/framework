@@ -134,6 +134,19 @@ class PendingCommand
     }
 
     /**
+     * Specify output that should never be printed when the command runs.
+     *
+     * @param  string  $output
+     * @return $this
+     */
+    public function expectsOutputNever($output)
+    {
+        $this->test->expectedOutputNever[$output] = false;
+
+        return $this;
+    }
+
+    /**
      * Specify a table that should be printed when the command runs.
      *
      * @param  array  $headers
@@ -238,6 +251,10 @@ class PendingCommand
         if (count($this->test->expectedOutput)) {
             $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
         }
+
+        if ($output = array_search(true, $this->test->expectedOutputNever)) {
+            $this->test->fail('Output "'.$output.'" was printed.');
+        }
     }
 
     /**
@@ -296,6 +313,16 @@ class PendingCommand
                 ->with($output, Mockery::any())
                 ->andReturnUsing(function () use ($i) {
                     unset($this->test->expectedOutput[$i]);
+                });
+        }
+
+        foreach ($this->test->expectedOutputNever as $output => $displayed) {
+            $mock->shouldReceive('doWrite')
+                ->once()
+                ->ordered()
+                ->with($output, Mockery::any())
+                ->andReturnUsing(function () use ($output) {
+                    $this->test->expectedOutputNever[$output] = true;
                 });
         }
 
