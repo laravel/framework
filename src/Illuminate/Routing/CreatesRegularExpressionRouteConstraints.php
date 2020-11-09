@@ -18,6 +18,17 @@ trait CreatesRegularExpressionRouteConstraints
     }
 
     /**
+     * Specify that the given route parameters must be alphanumeric.
+     *
+     * @param  array|string  $parameters
+     * @return $this
+     */
+    public function whereAlphaNumeric($parameters)
+    {
+        return $this->assignExpressionToParameters($parameters, '[a-zA-Z0-9]+');
+    }
+
+    /**
      * Specify that the given route parameters must be numeric.
      *
      * @param  array|string  $parameters
