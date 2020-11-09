@@ -261,7 +261,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Run an associative map over each of the items.
      *
-     * The callback should return an associative array with a single key/value pair.
+     * The callback should return an associative array with a single key / value pair.
      *
      * @param  callable  $callback
      * @return \Illuminate\Support\Collection|static
