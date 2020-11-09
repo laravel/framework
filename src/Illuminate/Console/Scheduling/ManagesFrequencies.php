@@ -186,6 +186,18 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every custom hours.
+     *
+     * @param  int  $hours
+     * @return $this
+     */
+    public function everyHours($hours)
+    {
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, '*/'.$hours);
+    }
+
+    /**
      * Schedule the event to run every two hours.
      *
      * @return $this

@@ -81,7 +81,14 @@ class FrequencyTest extends TestCase
         $this->assertSame('15,30,45 * * * *', $this->event->hourlyAt([15, 30, 45])->getExpression());
     }
 
-    public function testHourly()
+    public function testEveryHours()
+    {
+        $this->assertSame('0 */1 * * *', $this->event->everyHours(1)->getExpression());
+        $this->assertSame('0 */7 * * *', $this->event->everyHours(7)->getExpression());
+        $this->assertSame('0 */20 * * *', $this->event->everyHours(20)->getExpression());
+    }
+
+    public function testEveryXHours()
     {
         $this->assertSame('0 */2 * * *', $this->event->everyTwoHours()->getExpression());
         $this->assertSame('0 */3 * * *', $this->event->everyThreeHours()->getExpression());
