@@ -82,6 +82,17 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every custom minutes.
+     *
+     * @param  int  $minutes
+     * @return $this
+     */
+    public function everyMinutes($minutes)
+    {
+        return $this->spliceIntoPosition(1, '*/'.$minutes);
+    }
+
+    /**
      * Schedule the event to run every two minutes.
      *
      * @return $this
