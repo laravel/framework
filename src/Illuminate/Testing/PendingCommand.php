@@ -310,7 +310,7 @@ class PendingCommand
      */
     private function applyTableOutputExpectations($mock)
     {
-        foreach ($this->test->expectedTables as $index => $consoleTable) {
+        foreach ($this->test->expectedTables as $i => $consoleTable) {
             $table = (new Table($output = new BufferedOutput))
                 ->setHeaders($consoleTable['headers'])
                 ->setRows($consoleTable['rows'])
@@ -330,7 +330,7 @@ class PendingCommand
                 $this->expectsOutput($line);
             }
 
-            unset($this->test->expectedTables[$index]);
+            unset($this->test->expectedTables[$i]);
         }
     }
 
