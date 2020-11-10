@@ -223,4 +223,30 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->reset([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
         $this->assertSame('default', $this->migrator->getConnection());
     }
+
+    public function testMigrationsCanWriteToTheOutput()
+    {
+        $output = m::mock(OutputStyle::class);
+
+        $messages = [
+            '<comment>Migrating:</comment>',
+            '<comment>Created table</comment>',
+            '<info>Migrated:</info>',
+            '<comment>Rolling back:</comment>',
+            '<error>Dropped table</error>',
+            '<info>Rolled back:</info>',
+        ];
+
+        foreach ($messages as $i => $message) {
+            $output->shouldReceive('writeln')->once()->ordered()->withArgs(function ($line) use ($message) {
+                $this->assertStringStartsWith($message, $line);
+                return true;
+            });
+        }
+
+        $this->migrator->setOutput($output);
+
+        $this->migrator->run([__DIR__.'/migrations/output']);
+        $this->migrator->rollback([__DIR__.'/migrations/output']);
+    }
 }

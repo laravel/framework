@@ -193,6 +193,10 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
+        if ($this->output && method_exists($migration, 'setOutput')) {
+            $migration->setOutput($this->output);
+        }
+
         $this->note("<comment>Migrating:</comment> {$name}");
 
         $startTime = microtime(true);
@@ -356,6 +360,10 @@ class Migrator
 
         if ($pretend) {
             return $this->pretendToRun($instance, 'down');
+        }
+
+        if ($this->output && method_exists($instance, 'setOutput')) {
+            $instance->setOutput($this->output);
         }
 
         $startTime = microtime(true);
