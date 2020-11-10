@@ -5,6 +5,7 @@ namespace Illuminate\Cache;
 use Exception;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\Filesystem\LockTimeoutException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\InteractsWithTime;
 
@@ -80,6 +81,45 @@ class FileStore implements Store, LockProvider
 
             return true;
         }
+
+        return false;
+    }
+
+    /**
+     * Store an item in the cache if the key doesn't exist.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function add($key, $value, $seconds)
+    {
+        $this->ensureCacheDirectoryExists($path = $this->path($key));
+
+        $file = $this->files->newFileForReadWrite($path);
+
+        try {
+            $file->getExclusiveLock();
+        } catch (LockTimeoutException $e) {
+            $file->close();
+
+            return false;
+        }
+
+        $expire = $file->read(10);
+
+        if (empty($expire) || $this->currentTime() >= $expire) {
+            $file->truncate()
+                ->write($this->expiration($seconds).serialize($value))
+                ->close();
+
+            $this->ensureFileHasCorrectPermissions($path);
+
+            return true;
+        }
+
+        $file->close();
 
         return false;
     }

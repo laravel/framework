@@ -186,6 +186,26 @@ class Filesystem
     }
 
     /**
+     * Create a new File instance for read and write.
+     *
+     * @return  \Illuminate\Filesystem\File
+     */
+    public function newFileForReadWrite($path)
+    {
+        return new File($this, $path, 'c+');
+    }
+
+    /**
+     * Create a new File instance for read and write.
+     *
+     * @return  \Illuminate\Filesystem\File
+     */
+    public function newFileForRead($path)
+    {
+        return new File($this, $path, 'r');
+    }
+
+    /**
      * Write the contents of a file, replacing it atomically if it already exists.
      *
      * @param  string  $path
