@@ -2,11 +2,9 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\LockProvider;
-
-class ApcStore extends TaggableStore implements LockProvider
+class ApcStore extends TaggableStore
 {
-    use RetrievesMultipleKeys, HasCacheLock;
+    use RetrievesMultipleKeys;
 
     /**
      * The APC wrapper instance.
