@@ -240,6 +240,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         foreach ($messages as $i => $message) {
             $output->shouldReceive('writeln')->once()->ordered()->withArgs(function ($line) use ($message) {
                 $this->assertStringStartsWith($message, $line);
+
                 return true;
             });
         }
