@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.2...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.3...6.x)
+
+
+## [v6.20.3 (2020-11-10)](https://github.com/laravel/framework/compare/v6.20.2...v6.20.3)
+
+### Changed
+- Turn the eloquent collection into a base collection if mapWithKeys loses models ([#35129](https://github.com/laravel/framework/pull/35129))
 
 
 ## [v6.20.2 (2020-10-29)](https://github.com/laravel/framework/compare/v6.20.1...v6.20.2)
