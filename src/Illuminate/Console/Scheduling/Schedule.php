@@ -18,7 +18,7 @@ use RuntimeException;
 class Schedule
 {
     use Macroable;
-    
+
     const SUNDAY = 0;
     const MONDAY = 1;
     const TUESDAY = 2;
