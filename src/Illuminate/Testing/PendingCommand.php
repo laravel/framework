@@ -139,9 +139,9 @@ class PendingCommand
      * @param  string  $output
      * @return $this
      */
-    public function expectsOutputNever($output)
+    public function doesntExpectOutput($output)
     {
-        $this->test->expectedOutputNever[$output] = false;
+        $this->test->unexpectedOutput[$output] = false;
 
         return $this;
     }
@@ -221,6 +221,7 @@ class PendingCommand
         }
 
         $this->verifyExpectations();
+        $this->flushExpectations();
 
         return $exitCode;
     }
@@ -252,7 +253,7 @@ class PendingCommand
             $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
         }
 
-        if ($output = array_search(true, $this->test->expectedOutputNever)) {
+        if ($output = array_search(true, $this->test->unexpectedOutput)) {
             $this->test->fail('Output "'.$output.'" was printed.');
         }
     }
@@ -316,13 +317,13 @@ class PendingCommand
                 });
         }
 
-        foreach ($this->test->expectedOutputNever as $output => $displayed) {
+        foreach ($this->test->unexpectedOutput as $output => $displayed) {
             $mock->shouldReceive('doWrite')
                 ->once()
                 ->ordered()
                 ->with($output, Mockery::any())
                 ->andReturnUsing(function () use ($output) {
-                    $this->test->expectedOutputNever[$output] = true;
+                    $this->test->unexpectedOutput[$output] = true;
                 });
         }
 
@@ -357,6 +358,20 @@ class PendingCommand
                 $this->expectsOutput($line);
             }
         }
+    }
+
+    /**
+     * Flush the expectations from the test case.
+     *
+     * @return void
+     */
+    protected function flushExpectations()
+    {
+        $this->test->expectedOutput = [];
+        $this->test->unexpectedOutput = [];
+        $this->test->expectedTables = [];
+        $this->test->expectedQuestions = [];
+        $this->test->expectedChoices = [];
     }
 
     /**
