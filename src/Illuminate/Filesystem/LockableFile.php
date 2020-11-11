@@ -4,7 +4,7 @@ namespace Illuminate\Filesystem;
 
 use Illuminate\Contracts\Filesystem\LockTimeoutException;
 
-class File
+class LockableFile
 {
     /**
      * The file resource.
@@ -14,13 +14,6 @@ class File
     protected $handle;
 
     /**
-     * The Illuminate Filesystem instance.
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $files;
-
-    /**
      * The file path.
      *
      * @var string
@@ -28,7 +21,7 @@ class File
     protected $path;
 
     /**
-     * Determine if the file is locked.
+     * Indicates if the file is locked.
      *
      * @var bool
      */
@@ -41,13 +34,37 @@ class File
      * @param  string  $mode
      * @return void
      */
-    public function __construct(Filesystem $files, $path, $mode)
+    public function __construct($path, $mode)
     {
-        $this->files = $files;
         $this->path = $path;
 
         $this->ensureDirectoryExists($path);
         $this->createResource($path, $mode);
+    }
+
+    /**
+     * Create the file's directory if necessary.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function ensureDirectoryExists($path)
+    {
+        if (! file_exists(dirname($path))) {
+            @mkdir(dirname($path), 0777, true);
+        }
+    }
+
+    /**
+     * Create the file resource.
+     *
+     * @param  string  $path
+     * @param  string  $mode
+     * @return void
+     */
+    protected function createResource($path, $mode)
+    {
+        $this->handle = @fopen($path, $mode);
     }
 
     /**
@@ -61,6 +78,16 @@ class File
         clearstatcache(true, $this->path);
 
         return fread($this->handle, $length ?? ($this->size() ?: 1));
+    }
+
+    /**
+     * Get the file size.
+     *
+     * @return int
+     */
+    public function size()
+    {
+        return filesize($this->path);
     }
 
     /**
@@ -95,12 +122,13 @@ class File
     /**
      * Get a shared lock on the file.
      *
+     * @param  bool  $block
      * @return $this
      */
     public function getSharedLock($block = false)
     {
         if (! flock($this->handle, LOCK_SH | ($block ? 0 : LOCK_NB))) {
-            throw new LockTimeoutException("Unable to acquire file lock at path {$path}.");
+            throw new LockTimeoutException("Unable to acquire file lock at path [{$path}].");
         }
 
         $this->isLocked = true;
@@ -111,12 +139,13 @@ class File
     /**
      * Get an exclusive lock on the file.
      *
+     * @param  bool  $block
      * @return bool
      */
     public function getExclusiveLock($block = false)
     {
         if (! flock($this->handle, LOCK_EX | ($block ? 0 : LOCK_NB))) {
-            throw new LockTimeoutException("Unable to acquire file lock at path {$path}.");
+            throw new LockTimeoutException("Unable to acquire file lock at path [{$path}].");
         }
 
         $this->isLocked = true;
@@ -150,38 +179,5 @@ class File
         }
 
         return fclose($this->handle);
-    }
-
-    /**
-     * Get the file size.
-     *
-     * @return int
-     */
-    public function size()
-    {
-        return filesize($this->path);
-    }
-
-    /**
-     * Create the file resource.
-     *
-     * @return void
-     */
-    protected function createResource($path, $mode)
-    {
-        $this->handle = @fopen($path, $mode);
-    }
-
-    /**
-     * Create the file directory if necessary.
-     *
-     * @param  string  $path
-     * @return void
-     */
-    protected function ensureDirectoryExists($path)
-    {
-        if (! $this->files->exists(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0777, true, true);
-        }
     }
 }

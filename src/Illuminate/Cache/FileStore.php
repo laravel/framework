@@ -7,11 +7,12 @@ use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Filesystem\LockTimeoutException;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\LockableFile;
 use Illuminate\Support\InteractsWithTime;
 
 class FileStore implements Store, LockProvider
 {
-    use InteractsWithTime, RetrievesMultipleKeys, HasCacheLock;
+    use InteractsWithTime, HasCacheLock, RetrievesMultipleKeys;
 
     /**
      * The Illuminate Filesystem instance.
@@ -97,7 +98,7 @@ class FileStore implements Store, LockProvider
     {
         $this->ensureCacheDirectoryExists($path = $this->path($key));
 
-        $file = $this->files->newFileForReadWrite($path);
+        $file = new LockableFile($path, 'c+');
 
         try {
             $file->getExclusiveLock();
