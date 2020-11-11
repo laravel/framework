@@ -1234,6 +1234,11 @@ class Builder
                             }];
             }
 
+            // If the "name" value is an array, the developer is trying to
+            // load deep relations. We'll now normalize this array to a
+            // string with dots so the nested relations can be added.
+            $name = is_array($name) ? implode('.', $name) : $name;
+
             // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
             // the relationship with its own key in the array of eager-load names.
