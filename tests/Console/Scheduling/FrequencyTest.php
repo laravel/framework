@@ -124,6 +124,11 @@ class FrequencyTest extends TestCase
         $this->assertSame('* * * * 1-5', $this->event->weekdays()->getExpression());
     }
 
+    public function testWeekends()
+    {
+        $this->assertSame('* * * * 6,0', $this->event->weekends()->getExpression());
+    }
+
     public function testSundays()
     {
         $this->assertSame('* * * * 0', $this->event->sundays()->getExpression());
