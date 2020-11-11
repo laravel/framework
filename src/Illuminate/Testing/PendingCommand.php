@@ -134,6 +134,19 @@ class PendingCommand
     }
 
     /**
+     * Specify output that should never be printed when the command runs.
+     *
+     * @param  string  $output
+     * @return $this
+     */
+    public function doesntExpectOutput($output)
+    {
+        $this->test->unexpectedOutput[$output] = false;
+
+        return $this;
+    }
+
+    /**
      * Specify a table that should be printed when the command runs.
      *
      * @param  array  $headers
@@ -208,6 +221,7 @@ class PendingCommand
         }
 
         $this->verifyExpectations();
+        $this->flushExpectations();
 
         return $exitCode;
     }
@@ -237,6 +251,10 @@ class PendingCommand
 
         if (count($this->test->expectedOutput)) {
             $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
+        }
+
+        if ($output = array_search(true, $this->test->unexpectedOutput)) {
+            $this->test->fail('Output "'.$output.'" was printed.');
         }
     }
 
@@ -299,6 +317,16 @@ class PendingCommand
                 });
         }
 
+        foreach ($this->test->unexpectedOutput as $output => $displayed) {
+            $mock->shouldReceive('doWrite')
+                ->once()
+                ->ordered()
+                ->with($output, Mockery::any())
+                ->andReturnUsing(function () use ($output) {
+                    $this->test->unexpectedOutput[$output] = true;
+                });
+        }
+
         return $mock;
     }
 
@@ -332,6 +360,20 @@ class PendingCommand
 
             unset($this->test->expectedTables[$i]);
         }
+    }
+
+    /**
+     * Flush the expectations from the test case.
+     *
+     * @return void
+     */
+    protected function flushExpectations()
+    {
+        $this->test->expectedOutput = [];
+        $this->test->unexpectedOutput = [];
+        $this->test->expectedTables = [];
+        $this->test->expectedQuestions = [];
+        $this->test->expectedChoices = [];
     }
 
     /**
