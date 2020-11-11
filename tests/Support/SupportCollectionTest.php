@@ -3387,6 +3387,17 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($c->min());
     }
 
+    public function testUntouched()
+    {
+        $c = new Collection([1, 2, 3]);
+
+        $c->transform(function ($item){
+            return $item * 2;
+        });
+
+        $this->assertEquals([1, 2, 3], $c->untouched()->all());
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */

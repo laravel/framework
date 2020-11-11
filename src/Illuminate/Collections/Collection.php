@@ -20,6 +20,13 @@ class Collection implements ArrayAccess, Enumerable
     protected $items = [];
 
     /**
+     * The untouched items in the collection
+     *
+     * @var array
+     */
+    protected $untouchedItems = [];
+
+    /**
      * Create a new collection.
      *
      * @param  mixed  $items
@@ -28,6 +35,8 @@ class Collection implements ArrayAccess, Enumerable
     public function __construct($items = [])
     {
         $this->items = $this->getArrayableItems($items);
+
+        $this->untouchedItems = $this->items;
     }
 
     /**
@@ -750,6 +759,16 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         return new static($new);
+    }
+
+    /**
+     * Get untouched items from the collection
+     *
+     * @return self
+     */
+    public function untouched()
+    {
+        return new static($this->untouchedItems);
     }
 
     /**
