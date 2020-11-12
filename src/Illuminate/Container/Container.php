@@ -64,18 +64,18 @@ class Container implements ArrayAccess, ContainerContract
     protected $abstractAliases = [];
 
     /**
-     * The extension closures for services.
-     *
-     * @var array[]
-     */
-    protected $extenders = [];
-
-    /**
      * The global extension closures for services.
      *
      * @var array[]
      */
     protected $globalExtenders = [];
+
+    /**
+     * The extension closures for services.
+     *
+     * @var array[]
+     */
+    protected $extenders = [];
 
     /**
      * All of the registered tags.
@@ -1192,7 +1192,20 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getExtenders($abstract)
     {
-        return $this->extenders[$this->getAlias($abstract)] ?? [];
+        return array_merge(
+            $this->globalExtenders,
+            $this->extenders[$this->getAlias($abstract)] ?? []
+        );
+    }
+
+    /**
+     * Remove all of the global extender callbacks.
+     *
+     * @return void
+     */
+    public function forgetGlobalExtenders()
+    {
+        $this->extenders = [];
     }
 
     /**
