@@ -140,7 +140,7 @@ class MorphTo extends BelongsTo
                                 (array) ($this->morphableEagerLoadCounts[get_class($instance)] ?? [])
                             );
 
-        if ($callback = $this->morphableConstraints[get_class($instance)] ?? null) {
+        if ($callback = ($this->morphableConstraints[get_class($instance)] ?? null)) {
             $callback($query);
         }
 
@@ -324,7 +324,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Specify constraints on the query for a given morph type.
+     * Specify constraints on the query for a given morph types.
      *
      * @param  array  $with
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
