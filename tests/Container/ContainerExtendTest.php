@@ -187,6 +187,75 @@ class ContainerExtendTest extends TestCase
 
         $this->assertSame('foo', $container->make('foo'));
     }
+
+    public function testGloballyExtendedBindings()
+    {
+        // Given a simple "foo" binding.
+        $container = new Container;
+        $container['foo'] = 'foo';
+
+        // When we append "bar" to all bindings.
+        $container->extend(function ($old, $container) {
+            return $old . 'bar';
+        });
+
+        // Then we resolve "foobar".
+        $this->assertSame('foobar', $container->make('foo'));
+    }
+
+    public function testGloballyExtendedSingletons()
+    {
+        // Given an registered "foo" singleton.
+        $container = new Container;
+        $container->singleton('foo', function () {
+            return (object) ['name' => 'taylor'];
+        });
+
+        // When we add the age property to all bindings.
+        $container->extend(function ($old, $container) {
+            $old->age = 26;
+
+            return $old;
+        });
+
+        // Then the "foo" singleton has the "age" property.
+        $result = $container->make('foo');
+        $this->assertSame('taylor', $result->name);
+        $this->assertEquals(26, $result->age);
+
+        // And it stays the same instance no matter how many times we resolve it.
+        $this->assertSame($result, $container->make('foo'));
+    }
+
+    public function testGloballyExtendedInstancesArePreserved()
+    {
+        // Given a "foo" simple binding.
+        $container = new Container;
+        $container->bind('foo', function () {
+            return (object) ['foo' => 'bind'];
+        });
+
+        // And a "foo" instance.
+        $obj = (object) ['foo' => 'instance'];
+        $container->instance('foo', $obj);
+
+        // When we extend all bindings twice.
+        $container->extend(function ($obj, $container) {
+            $obj->bar = 'extended_once';
+
+            return $obj;
+        });
+        $container->extend(function ($obj, $container) {
+            $obj->baz = 'extended_twice';
+
+            return $obj;
+        });
+
+        // Then the "foo" instance has been extended twice.
+        $this->assertSame('instance', $container->make('foo')->foo);
+        $this->assertSame('extended_once', $container->make('foo')->bar);
+        $this->assertSame('extended_twice', $container->make('foo')->baz);
+    }
 }
 
 class ContainerLazyExtendStub
