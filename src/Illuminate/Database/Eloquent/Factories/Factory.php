@@ -7,6 +7,7 @@ use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -626,10 +627,13 @@ abstract class Factory
     {
         $resolver = static::$modelNameResolver ?: function (self $factory) {
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
+            $rootNamespace = Container::getInstance()
+                            ->make(Application::class)
+                            ->getNamespace();
 
-            return class_exists('App\\Models\\'.$factoryBasename)
-                        ? 'App\\Models\\'.$factoryBasename
-                        : 'App\\'.$factoryBasename;
+            return class_exists($rootNamespace.'Models\\'.$factoryBasename)
+                        ? $rootNamespace.'Models\\'.$factoryBasename
+                        : $rootNamespace.$factoryBasename;
         };
 
         return $this->model ?: $resolver($this);
@@ -700,9 +704,13 @@ abstract class Factory
     public static function resolveFactoryName(string $modelName)
     {
         $resolver = static::$factoryNameResolver ?: function (string $modelName) {
-            $modelName = Str::startsWith($modelName, 'App\\Models\\')
-                ? Str::after($modelName, 'App\\Models\\')
-                : Str::after($modelName, 'App\\');
+            $rootNamespace = Container::getInstance()
+                            ->make(Application::class)
+                            ->getNamespace();
+
+            $modelName = Str::startsWith($modelName, $rootNamespace.'Models\\')
+                ? Str::after($modelName, $rootNamespace.'Models\\')
+                : Str::after($modelName, $rootNamespace);
 
             return static::$namespace.$modelName.'Factory';
         };

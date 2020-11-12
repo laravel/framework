@@ -9,15 +9,20 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Foundation\Application;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentFactoryTest extends TestCase
 {
     protected function setUp(): void
     {
-        Container::getInstance()->singleton(\Faker\Generator::class, function ($app, $parameters) {
+        $container = Container::getInstance();
+        $container->singleton(\Faker\Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
+        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
 
         $db = new DB;
 
@@ -81,7 +86,11 @@ class DatabaseEloquentFactoryTest extends TestCase
      */
     protected function tearDown(): void
     {
+        Mockery::close();
+
         $this->schema()->drop('users');
+
+        Container::setInstance(null);
     }
 
     public function test_basic_model_can_be_created()
@@ -319,6 +328,25 @@ class DatabaseEloquentFactoryTest extends TestCase
             'App\\Models\\Foo' => 'Factories\\FooFactory',
             'App\\Models\\Nested\\Foo' => 'Factories\\Nested\\FooFactory',
             'App\\Models\\Really\\Nested\\Foo' => 'Factories\\Really\\Nested\\FooFactory',
+        ];
+
+        foreach ($resolves as $model => $factory) {
+            $this->assertEquals($factory, Factory::resolveFactoryName($model));
+        }
+    }
+
+    public function test_resolve_non_app_nested_model_factories()
+    {
+        Container::getInstance()->instance(Application::class, $app = Mockery::mock(Application::class));
+        $app->shouldReceive('getNamespace')->andReturn('Foo\\');
+
+        Factory::useNamespace('Factories\\');
+
+        $resolves = [
+            'Foo\\Bar' => 'Factories\\BarFactory',
+            'Foo\\Models\\Bar' => 'Factories\\BarFactory',
+            'Foo\\Models\\Nested\\Bar' => 'Factories\\Nested\\BarFactory',
+            'Foo\\Models\\Really\\Nested\\Bar' => 'Factories\\Really\\Nested\\BarFactory',
         ];
 
         foreach ($resolves as $model => $factory) {
