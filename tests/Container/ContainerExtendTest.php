@@ -346,6 +346,63 @@ class ContainerExtendTest extends TestCase
         // Then the rebinding callback has been called.
         $this->assertTrue($testRebound);
     }
+
+    public function testGlobalExtensionWorksOnAliasedBindings()
+    {
+        // Given a singleton with an alias.
+        $container = new Container;
+        $container->singleton('something', function () {
+            return 'some value';
+        });
+        $container->alias('something', 'something-alias');
+
+        // When we register a global extender.
+        $container->extend(function ($value) {
+            return $value.' extended';
+        });
+
+        // Then both the singleton and its alias appear to be extended.
+        $this->assertSame('some value extended', $container->make('something'));
+        $this->assertSame('some value extended', $container->make('something-alias'));
+    }
+
+    public function testMultipleGlobalExtenders()
+    {
+        // Given a simple binding.
+        $container = new Container;
+        $container['foo'] = 'foo';
+
+        // When we register two global extenders.
+        $container->extend(function ($old, $container) {
+            return $old.'bar';
+        });
+        $container->extend(function ($old, $container) {
+            return $old.'baz';
+        });
+
+        // Then the binding has been extended by both global extenders.
+        $this->assertSame('foobarbaz', $container->make('foo'));
+    }
+
+    public function testForgetGlobalExtenders()
+    {
+        // Given a simple binding.
+        $container = new Container;
+        $container->bind('foo', function () {
+            return 'foo';
+        });
+
+        // And a global extender that appends "bar" to all bindings.
+        $container->extend(function ($obj, $container) {
+            return $obj . 'bar';
+        });
+
+        // When we forget all global extenders.
+        $container->forgetGlobalExtenders();
+
+        // Then the global extender is not applied when we next resolve that binding.
+        $this->assertSame('foo', $container->make('foo'));
+    }
 }
 
 class ContainerLazyExtendStub

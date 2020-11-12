@@ -1219,7 +1219,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function forgetGlobalExtenders()
     {
-        $this->extenders = [];
+        $this->globalExtenders = [];
     }
 
     /**
