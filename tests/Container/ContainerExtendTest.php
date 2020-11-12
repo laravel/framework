@@ -256,6 +256,96 @@ class ContainerExtendTest extends TestCase
         $this->assertSame('extended_once', $container->make('foo')->bar);
         $this->assertSame('extended_twice', $container->make('foo')->baz);
     }
+
+    public function testGlobalExtendersAreLazyInitialized()
+    {
+        // Given an uninitialized class.
+        ContainerLazyExtendStub::$initialized = false;
+
+        // And a simple binding of that class.
+        $container = new Container;
+        $container->bind(ContainerLazyExtendStub::class);
+
+        // When we add a global extender that initializes that class.
+        $container->extend(function ($obj, $container) {
+            $obj->init();
+
+            return $obj;
+        });
+
+        // Then the class is still not initialized.
+        $this->assertFalse(ContainerLazyExtendStub::$initialized);
+
+        // but will be initialized when resolved from the container.
+        $container->make(ContainerLazyExtendStub::class);
+        $this->assertTrue(ContainerLazyExtendStub::$initialized);
+    }
+
+    public function testGlobalExtendersCanBeCalledBeforeBind()
+    {
+        // Given a registered global extenders that appends "bar" to all bindings.
+        $container = new Container;
+        $container->extend(function ($old, $container) {
+            return $old.'bar';
+        });
+
+        // When we, later on, bind "foo" to the container.
+        $container['foo'] = 'foo';
+
+        // Then it gets resolved to "foobar".
+        $this->assertSame('foobar', $container->make('foo'));
+    }
+
+    public function testGlobalExtendersTriggerInstanceRebindingCallbacks()
+    {
+        // Given an indicator that the instance has no rebound.
+        $testRebound = false;
+
+        // And a rebinding callback that toggles that indicator to true.
+        $container = new Container;
+        $container->rebinding('foo', function () use (&$testRebound) {
+            $testRebound = true;
+        });
+
+        // And a "foo" instance already bound.
+        $obj = new stdClass;
+        $container->instance('foo', $obj);
+
+        // When we register a global extender.
+        $container->extend(function ($obj, $container) {
+            return $obj;
+        });
+
+        // Then the rebinding callback has been called.
+        $this->assertTrue($testRebound);
+    }
+
+    public function testGlobalExtendersTriggerBindRebindingCallback()
+    {
+        // Given an indicator that the instance has no rebound.
+        $testRebound = false;
+
+        // And a rebinding callback that toggles that indicator to true.
+        $container = new Container;
+        $container->rebinding('foo', function () use (&$testRebound) {
+            $testRebound = true;
+        });
+
+        // And an existing "foo" binding that has been resolved once.
+        $container->bind('foo', function () {
+            return new stdClass;
+        });
+        $container->make('foo');
+        $this->assertFalse($testRebound);
+
+        // When we register a global extender.
+        $container->extend(function ($obj, $container) {
+            return $obj;
+        });
+
+        // Then the rebinding callback has been called.
+        $this->assertTrue($testRebound);
+    }
 }
 
 class ContainerLazyExtendStub
