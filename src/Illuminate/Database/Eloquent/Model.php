@@ -747,9 +747,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return $query->{$method}($column, $amount, $extra);
         }
 
-        $this->{$column} = $this->isClassDeviable($column)
+        $currentValue = $this->getCurrentValue($column);
+
+        $newValue = $this->isClassDeviable($column)
             ? $this->deviateClassCastableAttribute($method, $column, $amount)
-            : $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
+            : $currentValue + ($method === 'increment' ? $amount : $amount * -1);
+
+        $this->setNewColumnValue($column, $newValue);
 
         $this->forceFill($extra);
 
@@ -1928,5 +1932,58 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public function __wakeup()
     {
         $this->bootIfNotBooted();
+    }
+
+    /**
+     * Gets the current value of a column.
+     *
+     * @param  string  $column
+     *
+     * @return mixed
+     */
+    protected function getCurrentValue($column)
+    {
+        if (! Str::contains($column, '->')) {
+            return $this->{$column};
+        }
+        [$column, $key] = $this->parseJsonColumnKey($column);
+
+        return Arr::get($this->{$column}, $key);
+    }
+
+    /**
+     * Sets the value on the property.
+     *
+     * @param  string  $column
+     * @param $newValue
+     *
+     * @return void
+     */
+    protected function setNewColumnValue($column, $newValue)
+    {
+        if (! Str::contains($column, '->')) {
+            $this->{$column} = $newValue;
+        } else {
+            [$column, $key] = $this->parseJsonColumnKey($column);
+
+            $array = $this->{$column};
+            Arr::set($array, $key, $newValue);
+            $this->{$column} = $array;
+        }
+    }
+
+    /**
+     * Parse a json column key reference.
+     *
+     * @param  string  $column
+     * @return array
+     */
+    protected function parseJsonColumnKey($column)
+    {
+        $values = explode('->', $column);
+        $column = array_shift($values);
+        $key = implode('.', $values);
+
+        return [$column, $key];
     }
 }

@@ -1428,6 +1428,9 @@ trait HasAttributes
         $modelAttributes = $this->getAttributes();
 
         foreach ($attributes as $attribute) {
+            if (Str::contains($attribute, '->')) {
+                $attribute = explode('->', $attribute)[0];
+            }
             $this->original[$attribute] = $modelAttributes[$attribute];
         }
 
