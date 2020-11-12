@@ -128,7 +128,7 @@ class LockableFile
     public function getSharedLock($block = false)
     {
         if (! flock($this->handle, LOCK_SH | ($block ? 0 : LOCK_NB))) {
-            throw new LockTimeoutException("Unable to acquire file lock at path [{$path}].");
+            throw new LockTimeoutException("Unable to acquire file lock at path [{$this->path}].");
         }
 
         $this->isLocked = true;
@@ -145,7 +145,7 @@ class LockableFile
     public function getExclusiveLock($block = false)
     {
         if (! flock($this->handle, LOCK_EX | ($block ? 0 : LOCK_NB))) {
-            throw new LockTimeoutException("Unable to acquire file lock at path [{$path}].");
+            throw new LockTimeoutException("Unable to acquire file lock at path [{$this->path}].");
         }
 
         $this->isLocked = true;
