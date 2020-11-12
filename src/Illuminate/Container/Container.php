@@ -71,6 +71,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $extenders = [];
 
     /**
+     * The global extension closures for services.
+     *
+     * @var array[]
+     */
+    protected $globalExtenders = [];
+
+    /**
      * All of the registered tags.
      *
      * @var array[]
@@ -378,14 +385,26 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * "Extend" an abstract type in the container.
      *
-     * @param  string  $abstract
-     * @param  \Closure  $closure
+     * @param  string|\Closure  $abstract
+     * @param  \Closure|null  $closure
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function extend($abstract, Closure $closure)
+    public function extend($abstract, $closure = null)
     {
+        if ($abstract instanceof Closure) {
+            $closure = $abstract;
+
+            foreach ($this->instances as $abstract => $instance) {
+                $this->instances[$abstract] = $closure($instance, $this);
+                $this->rebound($abstract);
+            }
+
+            $this->globalExtenders[] = $closure;
+            return;
+        }
+
         $abstract = $this->getAlias($abstract);
 
         if (isset($this->instances[$abstract])) {
