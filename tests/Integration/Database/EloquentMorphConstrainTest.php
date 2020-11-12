@@ -56,7 +56,7 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
                     },
                     Video::class => function ($query) {
                         $query->where('video_visible', true);
-                    }
+                    },
                 ]);
             }])
             ->get();
