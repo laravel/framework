@@ -395,6 +395,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         if ($abstract instanceof Closure) {
             $this->addGlobalExtender($abstract);
+
             return;
         }
 
@@ -412,6 +413,7 @@ class Container implements ArrayAccess, ContainerContract
             }
         }
     }
+
     /**
      * Add a global extender callback to the container.
      *

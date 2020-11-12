@@ -196,7 +196,7 @@ class ContainerExtendTest extends TestCase
 
         // When we append "bar" to all bindings.
         $container->extend(function ($old, $container) {
-            return $old . 'bar';
+            return $old.'bar';
         });
 
         // Then we resolve "foobar".
@@ -394,7 +394,7 @@ class ContainerExtendTest extends TestCase
 
         // And a global extender that appends "bar" to all bindings.
         $container->extend(function ($obj, $container) {
-            return $obj . 'bar';
+            return $obj.'bar';
         });
 
         // When we forget all global extenders.
