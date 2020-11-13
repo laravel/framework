@@ -3,6 +3,7 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 
 trait MustVerifyEmail
 {
@@ -46,5 +47,16 @@ trait MustVerifyEmail
     public function getEmailForVerification()
     {
         return $this->email;
+    }
+
+    /**
+     * Scope a query to only include users with verified email.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeHasVerifiedEmail(Builder $query)
+    {
+        return $query->whereNotNull('email_verified_at');
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Auth;
 
+use Illuminate\Database\Eloquent\Builder;
+
 interface MustVerifyEmail
 {
     /**
@@ -31,4 +33,12 @@ interface MustVerifyEmail
      * @return string
      */
     public function getEmailForVerification();
+
+    /**
+     * Scope a query to only include users with verified email.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeHasVerifiedEmail(Builder $query);
 }
