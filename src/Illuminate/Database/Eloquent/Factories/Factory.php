@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Factories;
 
 use Closure;
+use Throwable;
 use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -627,13 +628,12 @@ abstract class Factory
     {
         $resolver = static::$modelNameResolver ?: function (self $factory) {
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
-            $rootNamespace = Container::getInstance()
-                            ->make(Application::class)
-                            ->getNamespace();
 
-            return class_exists($rootNamespace.'Models\\'.$factoryBasename)
-                        ? $rootNamespace.'Models\\'.$factoryBasename
-                        : $rootNamespace.$factoryBasename;
+            $appNamespace = static::appNamespace();
+
+            return class_exists($appNamespace.'Models\\'.$factoryBasename)
+                        ? $appNamespace.'Models\\'.$factoryBasename
+                        : $appNamespace.$factoryBasename;
         };
 
         return $this->model ?: $resolver($this);
@@ -704,18 +704,32 @@ abstract class Factory
     public static function resolveFactoryName(string $modelName)
     {
         $resolver = static::$factoryNameResolver ?: function (string $modelName) {
-            $rootNamespace = Container::getInstance()
-                            ->make(Application::class)
-                            ->getNamespace();
+            $appNamespace = static::appNamespace();
 
-            $modelName = Str::startsWith($modelName, $rootNamespace.'Models\\')
-                ? Str::after($modelName, $rootNamespace.'Models\\')
-                : Str::after($modelName, $rootNamespace);
+            $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')
+                ? Str::after($modelName, $appNamespace.'Models\\')
+                : Str::after($modelName, $appNamespace);
 
             return static::$namespace.$modelName.'Factory';
         };
 
         return $resolver($modelName);
+    }
+
+    /**
+     * Get the application namespace for the application.
+     *
+     * @return string
+     */
+    protected static function appNamespace()
+    {
+        try {
+            return Container::getInstance()
+                            ->make(Application::class)
+                            ->getNamespace();
+        } catch (Throwable $e) {
+            return 'App\\';
+        }
     }
 
     /**
