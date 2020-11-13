@@ -82,7 +82,7 @@ class Stringable
     {
         return new static(basename($this->value, $suffix));
     }
-    
+
     /**
      * Get the basename of the class path.
      *

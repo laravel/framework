@@ -16,7 +16,7 @@ class SupportStringableTest extends TestCase
     {
         return new Stringable($string);
     }
-    
+
     public function testClassBasename()
     {
         $this->assertEquals(
