@@ -184,7 +184,7 @@ class MigrationCreator
      * Fire the registered post create hooks.
      *
      * @param  string|null  $table
-     * @param  string       $path
+     * @param  string  $path
      * @return void
      */
     protected function firePostCreateHooks($table, $path)
