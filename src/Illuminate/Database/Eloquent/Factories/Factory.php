@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Factories;
 
 use Closure;
-use Throwable;
 use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -12,6 +11,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Throwable;
 
 abstract class Factory
 {
