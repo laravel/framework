@@ -1431,6 +1431,7 @@ trait HasAttributes
             if (Str::contains($attribute, '->')) {
                 $attribute = explode('->', $attribute)[0];
             }
+
             $this->original[$attribute] = $modelAttributes[$attribute];
         }
 
