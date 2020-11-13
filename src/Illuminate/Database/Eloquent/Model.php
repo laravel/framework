@@ -1946,6 +1946,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         if (! Str::contains($column, '->')) {
             return $this->{$column};
         }
+
         [$column, $key] = $this->parseJsonColumnKey($column);
 
         return Arr::get($this->{$column}, $key);
