@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -125,6 +126,18 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->string('email');
                 $table->timestamps();
                 $table->softDeletes();
+            });
+
+            $this->schema($connection)->create('tags', function ($table) {
+                $table->increments('id');
+                $table->string('name');
+                $table->timestamps();
+            });
+
+            $this->schema($connection)->create('taggables', function ($table) {
+                $table->integer('tag_id');
+                $table->morphs('taggable');
+                $table->string('taxonomy')->nullable();
             });
         }
 
@@ -1742,6 +1755,53 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse(Model::isIgnoringTouch());
     }
 
+    public function testPivotsCanBeRefreshed()
+    {
+        EloquentTestFriendLevel::create(['id' => 1, 'level' => 'acquaintance']);
+        EloquentTestFriendLevel::create(['id' => 2, 'level' => 'friend']);
+
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user->friends()->create(['id' => 2, 'email' => 'abigailotwell@gmail.com'], ['friend_level_id' => 1]);
+
+        $pivot = $user->friends[0]->pivot;
+
+        // Simulate a change that happened externally
+        DB::table('friends')->where('user_id', 1)->where('friend_id', 2)->update([
+            'friend_level_id' => 2,
+        ]);
+
+        $this->assertInstanceOf(Pivot::class, $freshPivot = $pivot->fresh());
+        $this->assertEquals(2, $freshPivot->friend_level_id);
+
+        $this->assertSame($pivot, $pivot->refresh());
+        $this->assertEquals(2, $pivot->friend_level_id);
+    }
+
+    public function testMorphPivotsCanBeRefreshed()
+    {
+        $post = EloquentTestPost::create(['name' => 'MorphToMany Post', 'user_id' => 1]);
+        $post->tags()->create(['id' => 1, 'name' => 'News']);
+
+        $pivot = $post->tags[0]->pivot;
+
+        // Simulate a change that happened externally
+        DB::table('taggables')
+            ->where([
+                'taggable_type' => EloquentTestPost::class,
+                'taggable_id' => 1,
+                'tag_id' => 1,
+            ])
+            ->update([
+                'taxonomy' => 'primary',
+            ]);
+
+        $this->assertInstanceOf(MorphPivot::class, $freshPivot = $pivot->fresh());
+        $this->assertEquals('primary', $freshPivot->taxonomy);
+
+        $this->assertSame($pivot, $pivot->refresh());
+        $this->assertEquals('primary', $pivot->taxonomy);
+    }
+
     /**
      * Helpers...
      */
@@ -1908,6 +1968,17 @@ class EloquentTestPost extends Eloquent
     {
         return $this->belongsTo(self::class, 'parent_id');
     }
+
+    public function tags()
+    {
+        return $this->morphToMany(EloquentTestTag::class, 'taggable', null, null, 'tag_id')->withPivot('taxonomy');
+    }
+}
+
+class EloquentTestTag extends Eloquent
+{
+    protected $table = 'tags';
+    protected $guarded = [];
 }
 
 class EloquentTestFriendLevel extends Eloquent
