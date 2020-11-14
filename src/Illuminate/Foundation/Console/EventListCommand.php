@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Str;
 use ReflectionFunction;
 
@@ -57,12 +56,6 @@ class EventListCommand extends Command
     protected function getEvents()
     {
         $events = [];
-
-        foreach ($this->laravel->getProviders(EventServiceProvider::class) as $provider) {
-            $providerEvents = array_merge_recursive($provider->shouldDiscoverEvents() ? $provider->discoverEvents() : [], $provider->listens());
-
-            $events = array_merge_recursive($events, $providerEvents);
-        }
 
         $events = $this->addListenersOnDispatcher($events);
 
