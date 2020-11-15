@@ -1051,6 +1051,26 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Register a new before resolving callback for all types.
+     *
+     * @param  \Closure|string  $abstract
+     * @param  \Closure|null  $callback
+     * @return void
+     */
+    public function beforeResolving($abstract, Closure $callback = null)
+    {
+        if (is_string($abstract)) {
+            $abstract = $this->getAlias($abstract);
+        }
+
+        if ($abstract instanceof Closure && is_null($callback)) {
+            $this->globalBeforeResolvingCallbacks[] = $abstract;
+        } else {
+            $this->beforeResolvingCallbacks[$abstract][] = $callback;
+        }
+    }
+
+    /**
      * Register a new resolving callback.
      *
      * @param  \Closure|string  $abstract
@@ -1097,16 +1117,29 @@ class Container implements ArrayAccess, ContainerContract
      * @param  array  $parameters
      * @return void
      */
-    protected function fireBeforeResolvingCallbacks($abstract, $parameters)
+    protected function fireBeforeResolvingCallbacks($abstract, $parameters = [])
     {
-        foreach ($this->globalBeforeResolvingCallbacks as $callback) {
-            $callback($abstract, $parameters, $this);
-        }
+        $this->fireBeforeCallbackArray($abstract, $parameters, $this->globalBeforeResolvingCallbacks);
 
-        foreach ($this->beforeResolvingCallbacks as $type => $callback) {
+        foreach ($this->beforeResolvingCallbacks as $type => $callbacks) {
             if ($type === $abstract || is_subclass_of($abstract, $type)) {
-                $callback($abstract, $parameters, $this);
+                $this->fireBeforeCallbackArray($abstract, $parameters, $callbacks);
             }
+        }
+    }
+
+    /**
+     * Fire an array of callbacks with an object.
+     *
+     * @param  string  $abstract
+     * @param  array  $parameters
+     * @param  array  $callbacks
+     * @return void
+     */
+    protected function fireBeforeCallbackArray($abstract, $parameters, array $callbacks)
+    {
+        foreach ($callbacks as $callback) {
+            $callback($abstract, $parameters, $this);
         }
     }
 
