@@ -391,10 +391,10 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @throws \InvalidArgumentException
      */
-    public function extend($abstract, $closure = null)
+    public function extend($abstract, Closure $closure = null)
     {
         if ($abstract instanceof Closure) {
-            $this->addGlobalExtender($abstract);
+            $this->globalExtenders[] = $abstract;
 
             return;
         }
@@ -412,28 +412,6 @@ class Container implements ArrayAccess, ContainerContract
                 $this->rebound($abstract);
             }
         }
-    }
-
-    /**
-     * Add a global extender callback to the container.
-     *
-     * @param  \Closure  $closure
-     * @return void
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function addGlobalExtender(Closure $closure)
-    {
-        foreach ($this->instances as $abstract => $instance) {
-            $this->instances[$abstract] = $closure($instance, $this);
-            $this->rebound($abstract);
-        }
-
-        foreach (array_keys($this->resolved) as $abstract) {
-            $this->rebound($abstract);
-        }
-
-        $this->globalExtenders[] = $closure;
     }
 
     /**

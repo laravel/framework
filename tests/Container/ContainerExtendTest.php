@@ -227,34 +227,21 @@ class ContainerExtendTest extends TestCase
         $this->assertSame($result, $container->make('foo'));
     }
 
-    public function testGloballyExtendedInstancesArePreserved()
+    public function testResolvedInstancesAreNotAffectedByNewGlobalExtenders()
     {
-        // Given a "foo" simple binding.
+        // Given an already resolved "foo" instance.
         $container = new Container;
-        $container->bind('foo', function () {
-            return (object) ['foo' => 'bind'];
-        });
+        $container->instance('foo', (object) ['foo' => 'original']);
 
-        // And a "foo" instance.
-        $obj = (object) ['foo' => 'instance'];
-        $container->instance('foo', $obj);
-
-        // When we extend all bindings twice.
+        // When we add a new global extender.
         $container->extend(function ($obj, $container) {
-            $obj->bar = 'extended_once';
-
-            return $obj;
-        });
-        $container->extend(function ($obj, $container) {
-            $obj->baz = 'extended_twice';
+            $obj->foo = 'extended';
 
             return $obj;
         });
 
-        // Then the "foo" instance has been extended twice.
-        $this->assertSame('instance', $container->make('foo')->foo);
-        $this->assertSame('extended_once', $container->make('foo')->bar);
-        $this->assertSame('extended_twice', $container->make('foo')->baz);
+        // Then the "foo" instance was not extended.
+        $this->assertSame('original', $container->make('foo')->foo);
     }
 
     public function testGlobalExtendersAreLazyInitialized()
@@ -296,7 +283,7 @@ class ContainerExtendTest extends TestCase
         $this->assertSame('foobar', $container->make('foo'));
     }
 
-    public function testGlobalExtendersTriggerInstanceRebindingCallbacks()
+    public function testGlobalExtendersDoNotTriggerInstanceRebindingCallbacks()
     {
         // Given an indicator that the instance has no rebound.
         $testRebound = false;
@@ -311,16 +298,16 @@ class ContainerExtendTest extends TestCase
         $obj = new stdClass;
         $container->instance('foo', $obj);
 
-        // When we register a global extender.
+        // When we register a new global extender.
         $container->extend(function ($obj, $container) {
             return $obj;
         });
 
-        // Then the rebinding callback has been called.
-        $this->assertTrue($testRebound);
+        // Then the rebinding callback was not called.
+        $this->assertFalse($testRebound);
     }
 
-    public function testGlobalExtendersTriggerBindRebindingCallback()
+    public function testGlobalExtendersDoNotTriggerBindRebindingCallback()
     {
         // Given an indicator that the instance has no rebound.
         $testRebound = false;
@@ -338,13 +325,13 @@ class ContainerExtendTest extends TestCase
         $container->make('foo');
         $this->assertFalse($testRebound);
 
-        // When we register a global extender.
+        // When we register a new global extender.
         $container->extend(function ($obj, $container) {
             return $obj;
         });
 
-        // Then the rebinding callback has been called.
-        $this->assertTrue($testRebound);
+        // Then the rebinding callback was not called.
+        $this->assertFalse($testRebound);
     }
 
     public function testGlobalExtensionWorksOnAliasedBindings()
