@@ -211,11 +211,7 @@ class BelongsToMany extends Relation
         // We need to join to the intermediate table on the related model's primary
         // key column with the intermediate table's foreign key for the related
         // model instance. Then we can set the "where" for the parent models.
-        $baseTable = $this->related->getTable();
-
-        $key = $baseTable.'.'.$this->relatedKey;
-
-        $query->join($this->table, $key, '=', $this->getQualifiedRelatedPivotKeyName());
+        $query->join($this->table, $this->getQualifiedRelatedKeyName(), '=', $this->getQualifiedRelatedPivotKeyName());
 
         return $this;
     }
@@ -361,7 +357,7 @@ class BelongsToMany extends Relation
     {
         $this->pivotWheres[] = func_get_args();
 
-        return $this->where($this->table.'.'.$column, $operator, $value, $boolean);
+        return $this->where($this->qualifyColumn($column), $operator, $value, $boolean);
     }
 
     /**
@@ -375,7 +371,7 @@ class BelongsToMany extends Relation
      */
     public function wherePivotBetween($column, array $values, $boolean = 'and', $not = false)
     {
-        return $this->whereBetween($this->table.'.'.$column, $values, $boolean, $not);
+        return $this->whereBetween($this->qualifyColumn($column), $values, $boolean, $not);
     }
 
     /**
@@ -428,7 +424,7 @@ class BelongsToMany extends Relation
     {
         $this->pivotWhereIns[] = func_get_args();
 
-        return $this->whereIn($this->table.'.'.$column, $values, $boolean, $not);
+        return $this->whereIn($this->qualifyColumn($column), $values, $boolean, $not);
     }
 
     /**
@@ -523,7 +519,7 @@ class BelongsToMany extends Relation
     {
         $this->pivotWhereNulls[] = func_get_args();
 
-        return $this->whereNull($this->table.'.'.$column, $boolean, $not);
+        return $this->whereNull($this->qualifyColumn($column), $boolean, $not);
     }
 
     /**
@@ -809,7 +805,7 @@ class BelongsToMany extends Relation
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey];
 
         return collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
-            return $this->table.'.'.$column.' as pivot_'.$column;
+            return $this->qualifyColumn($column).' as pivot_'.$column;
         })->unique()->all();
     }
 
@@ -1223,13 +1219,28 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Qualify the given column name by the pivot table.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function qualifyColumn($column)
+    {
+        if (Str::contains($column, '.')) {
+            return $column;
+        }
+
+        return $this->table.'.'.$column;
+    }
+
+    /**
      * Get the fully qualified foreign key for the relation.
      *
      * @return string
      */
     public function getQualifiedForeignPivotKeyName()
     {
-        return $this->table.'.'.$this->foreignPivotKey;
+        return $this->qualifyColumn($this->foreignPivotKey);
     }
 
     /**
@@ -1249,7 +1260,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedRelatedPivotKeyName()
     {
-        return $this->table.'.'.$this->relatedPivotKey;
+        return $this->qualifyColumn($this->relatedPivotKey);
     }
 
     /**
@@ -1280,6 +1291,16 @@ class BelongsToMany extends Relation
     public function getRelatedKeyName()
     {
         return $this->relatedKey;
+    }
+
+    /**
+     * Get the fully qualified related key name for the relation.
+     *
+     * @return string
+     */
+    public function getQualifiedRelatedKeyName()
+    {
+        return $this->related->qualifyColumn($this->relatedKey);
     }
 
     /**
