@@ -106,6 +106,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $reboundCallbacks = [];
 
     /**
+     * All of the global before resolving callbacks.
+     *
+     * @var \Closure[]
+     */
+    protected $globalBeforeResolvingCallbacks = [];
+
+    /**
      * All of the global resolving callbacks.
      *
      * @var \Closure[]
@@ -118,6 +125,13 @@ class Container implements ArrayAccess, ContainerContract
      * @var \Closure[]
      */
     protected $globalAfterResolvingCallbacks = [];
+
+    /**
+     * All of the before resolving callbacks by class type.
+     *
+     * @var array[]
+     */
+    protected $beforeResolvingCallbacks = [];
 
     /**
      * All of the resolving callbacks by class type.
@@ -667,6 +681,10 @@ class Container implements ArrayAccess, ContainerContract
     {
         $abstract = $this->getAlias($abstract);
 
+        if ($raiseEvents) {
+            $this->fireBeforeResolvingCallbacks($abstract, $parameters);
+        }
+
         $concrete = $this->getContextualConcrete($abstract);
 
         $needsContextualBuild = ! empty($parameters) || ! is_null($concrete);
@@ -1069,6 +1087,26 @@ class Container implements ArrayAccess, ContainerContract
             $this->globalAfterResolvingCallbacks[] = $abstract;
         } else {
             $this->afterResolvingCallbacks[$abstract][] = $callback;
+        }
+    }
+
+    /**
+     * Fire all of the before resolving callbacks.
+     *
+     * @param  string  $abstract
+     * @param  array  $parameters
+     * @return void
+     */
+    protected function fireBeforeResolvingCallbacks($abstract, $parameters)
+    {
+        foreach ($this->globalBeforeResolvingCallbacks as $callback) {
+            $callback($abstract, $parameters, $this);
+        }
+
+        foreach ($this->beforeResolvingCallbacks as $type => $callback) {
+            if ($type === $abstract || is_subclass_of($abstract, $type)) {
+                $callback($abstract, $parameters, $this);
+            }
         }
     }
 
