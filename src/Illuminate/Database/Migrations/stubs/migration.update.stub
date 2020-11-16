@@ -7,13 +7,19 @@ use Illuminate\Support\Facades\Schema;
 class {{ class }} extends Migration
 {
     /**
+     * The name of the database table to use.
+     * @var string
+     */
+    protected $table = '{{ table }}';
+
+    /**
      * Run the migrations.
      *
      * @return void
      */
     public function up()
     {
-        Schema::table('{{ table }}', function (Blueprint $table) {
+        Schema::table($this->table, function (Blueprint $table) {
             //
         });
     }
@@ -25,7 +31,7 @@ class {{ class }} extends Migration
      */
     public function down()
     {
-        Schema::table('{{ table }}', function (Blueprint $table) {
+        Schema::table($this->table, function (Blueprint $table) {
             //
         });
     }
