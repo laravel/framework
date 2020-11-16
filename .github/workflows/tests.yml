@@ -8,8 +8,8 @@ on:
 
 jobs:
   linux_tests:
-
     runs-on: ubuntu-latest
+
     services:
       mysql:
         image: mysql:5.7
@@ -64,8 +64,8 @@ jobs:
           DB_USERNAME: root
 
   windows_tests:
-
     runs-on: windows-latest
+
     strategy:
       fail-fast: true
       matrix:
