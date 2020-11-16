@@ -60,7 +60,7 @@ class SqliteSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $process = $this->makeProcess($this->baseCommand().' < $LARAVEL_LOAD_PATH');
+        $process = $this->makeProcess($this->baseCommand().' < "${:LARAVEL_LOAD_PATH}"');
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
@@ -74,7 +74,7 @@ class SqliteSchemaState extends SchemaState
      */
     protected function baseCommand()
     {
-        return 'sqlite3 $LARAVEL_LOAD_DATABASE';
+        return 'sqlite3 "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**

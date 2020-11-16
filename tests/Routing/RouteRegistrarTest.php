@@ -620,6 +620,18 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereAlphaNumericRegistration()
+    {
+        $wheres = ['1a2b3c' => '[a-zA-Z0-9]+'];
+
+        $this->router->get('/{foo}')->whereAlphaNumeric(['1a2b3c']);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {

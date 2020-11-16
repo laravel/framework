@@ -17,6 +17,14 @@ class SupportStringableTest extends TestCase
         return new Stringable($string);
     }
 
+    public function testClassBasename()
+    {
+        $this->assertEquals(
+            class_basename(static::class),
+            $this->stringable(static::class)->classBasename()
+        );
+    }
+
     public function testIsAscii()
     {
         $this->assertTrue($this->stringable('A')->isAscii());

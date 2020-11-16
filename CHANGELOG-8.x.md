@@ -1,6 +1,49 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.12.3...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.14.0...8.x)
+
+
+## [v8.14.0 (2020-11-10)](https://github.com/laravel/framework/compare/v8.13.0...v8.14.0)
+
+### Added
+- Added ability to dispatch unique jobs ([#35042](https://github.com/laravel/framework/pull/35042), [2123e60](https://github.com/laravel/framework/commit/2123e603af027e7590974864715c028357ea4969))
+- Added `Model::encryptUsing()` ([#35080](https://github.com/laravel/framework/pull/35080))
+- Added support to MySQL dump and import using socket ([#35083](https://github.com/laravel/framework/pull/35083), [c43054b](https://github.com/laravel/framework/commit/c43054b9decad4f66937c229e4ef0f32760c8611))
+- Allow custom broadcastWith in notification broadcast channel ([#35142](https://github.com/laravel/framework/pull/35142))
+- Added `Illuminate\Routing\CreatesRegularExpressionRouteConstraints::whereAlphaNumeric()` ([#35154](https://github.com/laravel/framework/pull/35154))
+
+### Fixed
+- Fixed typo in `make:seeder` command name inside ModelMakeCommand ([#35107](https://github.com/laravel/framework/pull/35107))
+- Fix SQL Server grammar for upsert (missing semicolon) ([#35112](https://github.com/laravel/framework/pull/35112))
+- Respect migration table name in config when dumping schema ([110eb15](https://github.com/laravel/framework/commit/110eb15a77f84da0d83ebc2bb123eec08ecc19ca))
+- Respect theme when previewing notification ([ed4411d](https://github.com/laravel/framework/commit/ed4411d310f259f75e95e882b748ba9d76d7cfad))
+- Fix appendable attributes in Blade components ([#35131](https://github.com/laravel/framework/pull/35131)) 
+- Remove decrypting array cookies from cookie decrypting ([#35130](https://github.com/laravel/framework/pull/35130)) 
+- Turn the eloquent collection into a base collection if mapWithKeys loses models ([#35129](https://github.com/laravel/framework/pull/35129))
+
+### Changed
+- Move dispatching of DatabaseRefreshed event to fire before seeders are run ([#35091](https://github.com/laravel/framework/pull/35091))
+- Handle returning false from reportable callback ([55f0b5e](https://github.com/laravel/framework/commit/55f0b5e7449b87b7340a761bf9e6456fdc8ffc4d))
+- Update `Illuminate\Database\Schema\Grammars\MySqlGrammar::typeTimestamp()` ([#35143](https://github.com/laravel/framework/pull/35143))
+- Remove expectedTables after converting to expectedOutput in PendingCommand ([#35163](https://github.com/laravel/framework/pull/35163)) 
+- Change SQLite schema command environment variables to work on Windows ([#35164](https://github.com/laravel/framework/pull/35164))
+  
+  
+## [v8.13.0 (2020-11-03)](https://github.com/laravel/framework/compare/v8.12.3...v8.13.0)
+
+### Added
+- Added `loadMax()` | `loadMin()` | `loadSum()` | `loadAvg()` methods to `Illuminate\Database\Eloquent\Collection`. Added `loadMax()` | `loadMin()` | `loadSum()` | `loadAvg()` | `loadMorphMax()` | `loadMorphMin()` | `loadMorphSum()` | `loadMorphAvg()` methods to `Illuminate\Database\Eloquent\Model` ([#35029](https://github.com/laravel/framework/pull/35029))
+- Modify `Illuminate\Database\Eloquent\Concerns\QueriesRelationships::has()` method to support MorphTo relations ([#35050](https://github.com/laravel/framework/pull/35050))
+- Added `Illuminate\Support\Stringable::chunk()` ([#35038](https://github.com/laravel/framework/pull/35038))
+
+### Fixed
+- Fixed a few issues in `Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withAggregate()` ([#35061](https://github.com/laravel/framework/pull/35061), [#35063](https://github.com/laravel/framework/pull/35063))
+
+### Changed
+- Set chain `queue` | `connection` | `delay` only when explicitly configured in ([#35047](https://github.com/laravel/framework/pull/35047))
+
+### Refactoring
+- Remove redundant unreachable return statements in some places ([#35053](https://github.com/laravel/framework/pull/35053))
 
 
 ## [v8.12.3 (2020-10-30)](https://github.com/laravel/framework/compare/v8.12.2...v8.12.3)

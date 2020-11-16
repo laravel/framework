@@ -501,7 +501,7 @@ class Worker
             $this->failJob($job, $e);
         }
 
-        if ($maxTries > 0 && $job->attempts() >= $maxTries) {
+        if (! $job->retryUntil() && $maxTries > 0 && $job->attempts() >= $maxTries) {
             $this->failJob($job, $e);
         }
     }

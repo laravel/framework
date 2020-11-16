@@ -84,6 +84,16 @@ class Stringable
     }
 
     /**
+     * Get the basename of the class path.
+     *
+     * @return static
+     */
+    public function classBasename()
+    {
+        return new static(class_basename($this->value));
+    }
+
+    /**
      * Get the portion of a string before the first occurrence of a given value.
      *
      * @param  string  $search

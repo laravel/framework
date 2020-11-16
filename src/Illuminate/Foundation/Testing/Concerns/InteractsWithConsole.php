@@ -23,6 +23,13 @@ trait InteractsWithConsole
     public $expectedOutput = [];
 
     /**
+     * All of the output lines that aren't expected to be displayed.
+     *
+     * @var array
+     */
+    public $unexpectedOutput = [];
+
+    /**
      * All of the expected ouput tables.
      *
      * @var array

@@ -11,6 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route fallback(array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route get(string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route|null getCurrentRoute()
+ * @method static \Illuminate\Routing\RouteCollectionInterface getRoutes()
  * @method static \Illuminate\Routing\Route match(array|string $methods, string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route options(string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route patch(string $uri, array|string|callable|null $action = null)
