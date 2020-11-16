@@ -893,8 +893,7 @@ class Connection implements ConnectionInterface
     {
         $connection = $this->getDoctrineConnection();
 
-        // v2 expects only one param, and v3 two. We don't need to care about
-        // this, and can always pass them both. In v2, the 2nd is ignored.
+        // Doctrine v2 expects one parameter while v3 expects two. 2nd will be ignored on v2...
         return $this->getDoctrineDriver()->getSchemaManager(
             $connection,
             $connection->getDatabasePlatform()
