@@ -8,6 +8,7 @@ class {{ class }} extends Migration
 {
     /**
      * The name of the database table to use.
+     *
      * @var string
      */
     protected $table = '{{ table }}';
