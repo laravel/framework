@@ -230,7 +230,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function createAblyDriver(array $config)
     {
-        return new AblyBroadcaster(new AblyRest($config['key']));
+        return new AblyBroadcaster(new AblyRest($config));
     }
 
     /**
