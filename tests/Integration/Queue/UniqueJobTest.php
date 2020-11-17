@@ -143,6 +143,23 @@ class UniqueJobTest extends TestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testLockCanBeReleasedBeforeProcessing()
+    {
+        UniqueUntilStartTestJob::$handled = false;
+
+        dispatch($job = new UniqueUntilStartTestJob);
+
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+
+        $this->artisan('queue:work', [
+            'connection' => 'database',
+            '--once' => true,
+        ]);
+
+        $this->assertTrue($job::$handled);
+        $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job));
@@ -196,4 +213,13 @@ class UniqueTestRetryJob extends UniqueTestFailJob
     public $tries = 2;
 
     public $connection = 'database';
+}
+
+class UniqueUntilStartTestJob extends UniqueTestJob
+{
+    public $tries = 2;
+
+    public $connection = 'database';
+
+    public $uniqueUntilStart = true;
 }

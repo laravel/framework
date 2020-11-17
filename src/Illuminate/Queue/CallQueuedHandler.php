@@ -59,6 +59,10 @@ class CallQueuedHandler
             return $this->handleModelNotFound($job, $e);
         }
 
+        if ($command->uniqueUntilStart ?? false) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
+
         $this->dispatchThroughMiddleware($job, $command);
 
         if (! $job->isReleased()) {
