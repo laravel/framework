@@ -47,7 +47,7 @@ trait CallsCommands
      * @param  array  $arguments
      * @return int
      */
-    public function callWithoutOutput($command, array $arguments = [])
+    public function callSilently($command, array $arguments = [])
     {
         return $this->callSilent($command, $arguments);
     }
