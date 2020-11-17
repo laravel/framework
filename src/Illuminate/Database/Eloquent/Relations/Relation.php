@@ -56,6 +56,13 @@ abstract class Relation
     public static $morphMap = [];
 
     /**
+     * Indicates if the morph relation type should default to table name.
+     *
+     * @var bool
+     */
+    public static $tableNameAsMorphType = false;
+
+    /**
      * Create a new relation instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -339,6 +346,16 @@ abstract class Relation
         }
 
         return static::$morphMap;
+    }
+
+    /**
+     * Changes the default morph type to table name.
+     *
+     * @return void
+     */
+    public static function tableNameAsMorphType()
+    {
+        self::$tableNameAsMorphType = true;
     }
 
     /**
