@@ -280,6 +280,17 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('normal file content', $filesystemAdapter->read($storagePath));
     }
 
+    public function testPutFileAsGivenPathWithTrailingSlash()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $storagePath = $filesystemAdapter->putFileAs('directory/', $filePath, 'new.txt');
+
+        $this->assertSame('directory/new.text', $storagePath);
+    }
+
     public function testPutFile()
     {
         file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
@@ -318,5 +329,16 @@ class FilesystemAdapterTest extends TestCase
             $storagePath,
             'uploaded file content'
         );
+    }
+
+    public function testPutFileGivenPathWithTrailingSlash()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $storagePath = $filesystemAdapter->putFile('directory/', $filePath);
+
+        $this->assertStringStartsNotWith('directory//', $storagePath);
     }
 }

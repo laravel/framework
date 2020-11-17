@@ -274,7 +274,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         // they provide better performance than alternatives. Once we write the file this
         // stream will get closed automatically by us so the developer doesn't have to.
         $result = $this->put(
-            $path = trim($path.'/'.$name, '/'), $stream, $options
+            $path = trim(rtrim($path, '/').'/'.$name, '/'), $stream, $options
         );
 
         if (is_resource($stream)) {
