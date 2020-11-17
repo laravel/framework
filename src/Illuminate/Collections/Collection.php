@@ -1266,7 +1266,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  ...$items
      * @return static
      */
-    public function zip($items)
+    public function zip(...$items)
     {
         $arrayableItems = array_map(function ($items) {
             return $this->getArrayableItems($items);
