@@ -211,7 +211,12 @@ class BelongsToMany extends Relation
         // We need to join to the intermediate table on the related model's primary
         // key column with the intermediate table's foreign key for the related
         // model instance. Then we can set the "where" for the parent models.
-        $query->join($this->table, $this->getQualifiedRelatedKeyName(), '=', $this->getQualifiedRelatedPivotKeyName());
+        $query->join(
+            $this->table,
+            $this->getQualifiedRelatedKeyName(),
+            '=',
+            $this->getQualifiedRelatedPivotKeyName()
+        );
 
         return $this;
     }
@@ -1219,21 +1224,6 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Qualify the given column name by the pivot table.
-     *
-     * @param  string  $column
-     * @return string
-     */
-    public function qualifyColumn($column)
-    {
-        if (Str::contains($column, '.')) {
-            return $column;
-        }
-
-        return $this->table.'.'.$column;
-    }
-
-    /**
      * Get the fully qualified foreign key for the relation.
      *
      * @return string
@@ -1341,5 +1331,18 @@ class BelongsToMany extends Relation
     public function getPivotColumns()
     {
         return $this->pivotColumns;
+    }
+
+    /**
+     * Qualify the given column name by the pivot table.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function qualifyColumn($column)
+    {
+        return Str::contains($column, '.')
+                    ? $column
+                    : $this->table.'.'.$column;
     }
 }
