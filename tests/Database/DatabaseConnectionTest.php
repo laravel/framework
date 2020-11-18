@@ -29,6 +29,8 @@ class DatabaseConnectionTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        Connection::$afterTransactionCallbacks = [];
     }
 
     public function testSettingDefaultCallsGetDefaultGrammar()
@@ -430,6 +432,8 @@ class DatabaseConnectionTest extends TestCase
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection([], $pdo);
 
+        $connection::$totalTransactions = 0;
+
         $connection->beginTransaction();
         $this->assertEquals(1, $connection::$totalTransactions);
 
@@ -441,6 +445,8 @@ class DatabaseConnectionTest extends TestCase
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection([], $pdo);
+
+        $connection::$totalTransactions = 0;
 
         $name = 'mohamed';
 

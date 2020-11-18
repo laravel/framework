@@ -25,6 +25,8 @@ class QueueConnectionTest extends TestCase
     protected function tearDown(): void
     {
         QueueConnectionTestJob::$ran = false;
+        Connection::$totalTransactions;
+        Connection::$afterTransactionCallbacks = [];
     }
 
     public function testJobWontGetDispatchedInsideATransaction()
