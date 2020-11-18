@@ -245,10 +245,10 @@ trait InteractsWithIO
      * @param  \Closure  $callback
      * @return mixed|void
      */
-    public function withProgressBar($totalSteps = 0, Closure $callback)
+    public function withProgressBar($totalSteps, Closure $callback)
     {
         $bar = $this->output->createProgressBar(
-            is_iterable($totalSteps) ? count($totalSteps) : $totalSteps
+            is_iterable($totalSteps) ? count($totalSteps) : (is_int($totalSteps) ? $totalSteps : 0)
         );
 
         $bar->start();
