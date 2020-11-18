@@ -9,6 +9,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pipeline\Pipeline;
 use ReflectionClass;
@@ -28,6 +29,13 @@ class CallQueuedHandler
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
+
+    /**
+     * Indicates if the unique job lock has been released.
+     *
+     * @var bool
+     */
+    protected $uniqueLockReleased = false;
 
     /**
      * Create a new handler instance.
@@ -57,6 +65,10 @@ class CallQueuedHandler
             );
         } catch (ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
+        }
+
+        if ($command instanceof ShouldBeUniqueUntilProcessing) {
+            $this->ensureUniqueJobLockIsReleased($command);
         }
 
         $this->dispatchThroughMiddleware($job, $command);
@@ -167,7 +179,7 @@ class CallQueuedHandler
      */
     protected function ensureUniqueJobLockIsReleased($command)
     {
-        if (! $command instanceof ShouldBeUnique) {
+        if (! $command instanceof ShouldBeUnique || $this->uniqueLockReleased) {
             return;
         }
 
@@ -182,6 +194,8 @@ class CallQueuedHandler
         $cache->lock(
             'laravel_unique_job:'.get_class($command).$uniqueId
         )->forceRelease();
+
+        $this->uniqueLockReleased = true;
     }
 
     /**
