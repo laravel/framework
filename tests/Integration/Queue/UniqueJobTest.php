@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -215,11 +216,9 @@ class UniqueTestRetryJob extends UniqueTestFailJob
     public $connection = 'database';
 }
 
-class UniqueUntilStartTestJob extends UniqueTestJob
+class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUntilProcessing
 {
     public $tries = 2;
 
     public $connection = 'database';
-
-    public $uniqueUntilStart = true;
 }

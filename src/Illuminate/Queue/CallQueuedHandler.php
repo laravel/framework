@@ -9,6 +9,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pipeline\Pipeline;
 use ReflectionClass;
@@ -66,7 +67,7 @@ class CallQueuedHandler
             return $this->handleModelNotFound($job, $e);
         }
 
-        if ($command->uniqueUntilStart ?? false) {
+        if ($command instanceof ShouldBeUniqueUntilProcessing) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
@@ -178,7 +179,7 @@ class CallQueuedHandler
      */
     protected function ensureUniqueJobLockIsReleased($command)
     {
-        if (! ($command instanceof ShouldBeUnique) || $this->uniqueLockReleased) {
+        if (! $command instanceof ShouldBeUnique || $this->uniqueLockReleased) {
             return;
         }
 
