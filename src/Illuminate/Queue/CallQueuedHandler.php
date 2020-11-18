@@ -30,6 +30,13 @@ class CallQueuedHandler
     protected $container;
 
     /**
+     * Indicates if the unique job lock has been released.
+     *
+     * @var bool
+     */
+    protected $uniqueLockReleased = false;
+
+    /**
      * Create a new handler instance.
      *
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
@@ -171,7 +178,7 @@ class CallQueuedHandler
      */
     protected function ensureUniqueJobLockIsReleased($command)
     {
-        if (! $command instanceof ShouldBeUnique) {
+        if (! ($command instanceof ShouldBeUnique) || $this->uniqueLockReleased) {
             return;
         }
 
@@ -186,6 +193,8 @@ class CallQueuedHandler
         $cache->lock(
             'laravel_unique_job:'.get_class($command).$uniqueId
         )->forceRelease();
+
+        $this->uniqueLockReleased = true;
     }
 
     /**
