@@ -12,6 +12,13 @@ abstract class Migration
     protected $connection;
 
     /**
+     * The Tag titles of migration file.
+     *
+     * @var string|array
+     */
+    public $tags = [];
+
+    /**
      * Enables, if supported, wrapping the migration within a transaction.
      *
      * @var bool

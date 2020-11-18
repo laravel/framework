@@ -53,6 +53,7 @@ class FreshCommand extends Command
             '--schema-path' => $this->input->getOption('schema-path'),
             '--force' => true,
             '--step' => $this->option('step'),
+            '--tags' => $this->option('tags'),
         ]));
 
         if ($this->laravel->bound(Dispatcher::class)) {
@@ -101,6 +102,7 @@ class FreshCommand extends Command
     protected function getOptions()
     {
         return [
+            ['tags', null, InputOption::VALUE_OPTIONAL, 'Indicates the tagged migrations to be run'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
             ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views'],
             ['drop-types', null, InputOption::VALUE_NONE, 'Drop all tables and types (Postgres only)'],

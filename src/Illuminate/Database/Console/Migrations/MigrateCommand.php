@@ -20,6 +20,7 @@ class MigrateCommand extends BaseCommand
     protected $signature = 'migrate {--database= : The database connection to use}
                 {--force : Force the operation to run when in production}
                 {--path=* : The path(s) to the migrations files to be executed}
+                {--tags= : Indicates the tagged migrations to be run}
                 {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
                 {--schema-path= : The path to a schema dump file}
                 {--pretend : Dump the SQL queries that would be run}
@@ -83,6 +84,7 @@ class MigrateCommand extends BaseCommand
                     ->run($this->getMigrationPaths(), [
                         'pretend' => $this->option('pretend'),
                         'step' => $this->option('step'),
+                        'tags' => $this->option('tags'),
                     ]);
 
             // Finally, if the "seed" option has been given, we will re-run the database

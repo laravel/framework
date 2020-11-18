@@ -162,7 +162,7 @@ class Migrator
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
+            $this->runUp($file, $batch, $pretend, $options['tags'] ?? null);
 
             if ($step) {
                 $batch++;
@@ -178,9 +178,10 @@ class Migrator
      * @param  string  $file
      * @param  int  $batch
      * @param  bool  $pretend
+     * @param  string|null  $tags
      * @return void
      */
-    protected function runUp($file, $batch, $pretend)
+    protected function runUp($file, $batch, $pretend, $tags)
     {
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
@@ -191,6 +192,10 @@ class Migrator
 
         if ($pretend) {
             return $this->pretendToRun($migration, 'up');
+        }
+
+        if ($tags && ! array_intersect((array) $migration->tags, explode(',', $tags))) {
+            return;
         }
 
         $this->note("<comment>Migrating:</comment> {$name}");
