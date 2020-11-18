@@ -231,6 +231,7 @@ class CallQueuedHandler
         if (! $command instanceof ShouldBeUniqueUntilProcessing) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
+
         $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);
         $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);
 
