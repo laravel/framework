@@ -425,6 +425,38 @@ class DatabaseConnectionTest extends TestCase
         $this->assertSame($connection, $schema->getConnection());
     }
 
+    public function testTotalTransactionsIsUpdated()
+    {
+        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $connection = $this->getMockConnection([], $pdo);
+
+        $connection->beginTransaction();
+        $this->assertEquals(1, $connection::$totalTransactions);
+
+        $connection->commit();
+        $this->assertEquals(0, $connection::$totalTransactions);
+    }
+
+    public function testAfterTransactionCallbacksAreCalled()
+    {
+        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $connection = $this->getMockConnection([], $pdo);
+
+        $name = 'mohamed';
+
+        $connection->beginTransaction();
+
+        Connection::$afterTransactionCallbacks[] = function () use (&$name) {
+            $name = 'zain';
+        };
+
+        $this->assertEquals('mohamed', $name);
+
+        $connection->commit();
+
+        $this->assertEquals('zain', $name);
+    }
+
     protected function getMockConnection($methods = [], $pdo = null)
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;

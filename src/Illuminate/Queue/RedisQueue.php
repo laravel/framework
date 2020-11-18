@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
+use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Support\Str;
 
@@ -121,12 +122,14 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $this->getConnection()->eval(
-            LuaScripts::push(), 2, $this->getQueue($queue),
-            $this->getQueue($queue).':notify', $payload
-        );
+        return $this->afterTransactions(function () use ($payload, $queue, $options) {
+            $this->getConnection()->eval(
+                LuaScripts::push(), 2, $this->getQueue($queue),
+                $this->getQueue($queue).':notify', $payload
+            );
 
-        return json_decode($payload, true)['id'] ?? null;
+            return json_decode($payload, true)['id'] ?? null;
+        });
     }
 
     /**
@@ -153,11 +156,13 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function laterRaw($delay, $payload, $queue = null)
     {
-        $this->getConnection()->zadd(
-            $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
-        );
+        return $this->afterTransactions(function () use ($delay, $payload, $queue) {
+            $this->getConnection()->zadd(
+                $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
+            );
 
-        return json_decode($payload, true)['id'] ?? null;
+            return json_decode($payload, true)['id'] ?? null;
+        });
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Container\Container;
+use Illuminate\Database\Connection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
@@ -253,6 +254,25 @@ abstract class Queue
         }
 
         return $payload;
+    }
+
+    /**
+     * Run the given callback after database transactions.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    protected function afterTransactions($callback)
+    {
+        if (Connection::$totalTransactions > 0) {
+            Connection::$afterTransactionCallbacks[] = function () use ($callback) {
+                $callback();
+            };
+
+            return;
+        }
+
+        return $callback();
     }
 
     /**

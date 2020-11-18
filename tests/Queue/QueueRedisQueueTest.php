@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Database\Connection;
 use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
@@ -13,6 +14,13 @@ use PHPUnit\Framework\TestCase;
 
 class QueueRedisQueueTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Connection::$totalTransactions = 0;
+
+        parent::setUp();
+    }
+
     protected function tearDown(): void
     {
         m::close();

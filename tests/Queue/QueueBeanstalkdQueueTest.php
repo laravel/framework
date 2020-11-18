@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Connection;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Support\Str;
@@ -13,6 +14,13 @@ use PHPUnit\Framework\TestCase;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Connection::$totalTransactions = 0;
+
+        parent::setUp();
+    }
+
     protected function tearDown(): void
     {
         m::close();

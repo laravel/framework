@@ -113,6 +113,20 @@ class Connection implements ConnectionInterface
     protected $transactions = 0;
 
     /**
+     * The total number of active transactions.
+     *
+     * @var int
+     */
+    public static $totalTransactions = 0;
+
+    /**
+     * The callbacks to invoke after transactions.
+     *
+     * @var callable[]
+     */
+    public static $afterTransactionCallbacks = [];
+
+    /**
      * Indicates if changes have been made to the database.
      *
      * @var int

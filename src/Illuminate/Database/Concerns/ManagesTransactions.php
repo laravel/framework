@@ -44,7 +44,7 @@ trait ManagesTransactions
                     $this->getPdo()->commit();
                 }
 
-                $this->transactions = max(0, $this->transactions - 1);
+                $this->decrementTransactionsCount();
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
@@ -76,7 +76,7 @@ trait ManagesTransactions
         // let the developer handle it in another way. We will decrement too.
         if ($this->causedByConcurrencyError($e) &&
             $this->transactions > 1) {
-            $this->transactions--;
+            $this->decrementTransactionsCount();
 
             throw $e;
         }
@@ -105,7 +105,7 @@ trait ManagesTransactions
     {
         $this->createTransaction();
 
-        $this->transactions++;
+        $this->incrementTransactionsCount();
 
         $this->fireConnectionEvent('beganTransaction');
     }
@@ -178,7 +178,7 @@ trait ManagesTransactions
             $this->getPdo()->commit();
         }
 
-        $this->transactions = max(0, $this->transactions - 1);
+        $this->decrementTransactionsCount();
 
         $this->fireConnectionEvent('committed');
     }
@@ -195,7 +195,7 @@ trait ManagesTransactions
      */
     protected function handleCommitTransactionException(Throwable $e, $currentAttempt, $maxAttempts)
     {
-        $this->transactions = max(0, $this->transactions - 1);
+        $this->decrementTransactionsCount();
 
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
@@ -203,7 +203,7 @@ trait ManagesTransactions
         }
 
         if ($this->causedByLostConnection($e)) {
-            $this->transactions = 0;
+            $this->updateTransactionsCount(0);
         }
 
         throw $e;
@@ -239,7 +239,7 @@ trait ManagesTransactions
             $this->handleRollBackException($e);
         }
 
-        $this->transactions = $toLevel;
+        $this->updateTransactionsCount($toLevel);
 
         $this->fireConnectionEvent('rollingBack');
     }
@@ -274,7 +274,7 @@ trait ManagesTransactions
     protected function handleRollBackException(Throwable $e)
     {
         if ($this->causedByLostConnection($e)) {
-            $this->transactions = 0;
+            $this->updateTransactionsCount(0);
         }
 
         throw $e;
@@ -288,5 +288,64 @@ trait ManagesTransactions
     public function transactionLevel()
     {
         return $this->transactions;
+    }
+
+    /**
+     * Increment the number of transactions.
+     *
+     * @return void
+     */
+    protected function incrementTransactionsCount()
+    {
+        $this->transactions++;
+
+        static::$totalTransactions++;
+    }
+
+    /**
+     * Decrement the number of transactions.
+     *
+     * @return void
+     */
+    protected function decrementTransactionsCount()
+    {
+        $this->transactions = max(0, $this->transactions - 1);
+
+        static::$totalTransactions = max(0, static::$totalTransactions - 1);
+
+        if (static::$totalTransactions == 0) {
+            $this->callAfterTransactionCallbacks();
+        }
+    }
+
+    /**
+     * Update the number of transactions.
+     *
+     * @param  integer  $count
+     * @return void
+     */
+    protected function updateTransactionsCount($count)
+    {
+        static::$totalTransactions = static::$totalTransactions + $count - $this->transactions;
+
+        $this->transactions = $count;
+
+        if (static::$totalTransactions == 0) {
+            $this->callAfterTransactionCallbacks();
+        }
+    }
+
+    /**
+     * Execute the after transaction callbacks.
+     *
+     * @return void
+     */
+    protected function callAfterTransactionCallbacks()
+    {
+        foreach (static::$afterTransactionCallbacks as $callback) {
+            call_user_func($callback);
+        }
+
+        static::$afterTransactionCallbacks= [];
     }
 }
