@@ -321,7 +321,7 @@ trait ManagesTransactions
     /**
      * Update the number of transactions.
      *
-     * @param  integer  $count
+     * @param  int  $count
      * @return void
      */
     protected function updateTransactionsCount($count)
@@ -346,6 +346,6 @@ trait ManagesTransactions
             call_user_func($callback);
         }
 
-        static::$afterTransactionCallbacks= [];
+        static::$afterTransactionCallbacks = [];
     }
 }

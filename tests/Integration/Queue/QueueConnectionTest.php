@@ -2,13 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase;
 
 /**
