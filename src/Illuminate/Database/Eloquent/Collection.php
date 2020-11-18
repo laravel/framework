@@ -281,6 +281,23 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key / value pair.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function mapWithKeys(callable $callback)
+    {
+        $result = parent::mapWithKeys($callback);
+
+        return $result->contains(function ($item) {
+            return ! $item instanceof Model;
+        }) ? $result->toBase() : $result;
+    }
+
+    /**
      * Reload a fresh model instance from the database for all the entities.
      *
      * @param  array|string  $with
