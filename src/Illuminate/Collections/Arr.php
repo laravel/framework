@@ -707,7 +707,7 @@ class Arr
                         $values = array_reverse($values);
                     }
 
-                    $result = static::compareValues(...$values);
+                    $result = $values[0] <=> $values[1];
                 }
 
                 // if result is 0, values are equal
@@ -721,17 +721,5 @@ class Arr
         });
 
         return $array;
-    }
-
-    /**
-     * Compare two values
-     *
-     * @param  mixed    $a
-     * @param  mixed    $b
-     * @return int
-     */
-    protected static function compareValues($a, $b)
-    {
-        return $a <=> $b;
     }
 }
