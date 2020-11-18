@@ -349,7 +349,7 @@ abstract class Relation
     }
 
     /**
-     * Changes the default morph type to table name.
+     * Specifies that the morph types should be table names.
      *
      * @return void
      */
