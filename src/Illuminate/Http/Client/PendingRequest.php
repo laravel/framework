@@ -87,7 +87,7 @@ class PendingRequest
     /**
      * The callbacks that should execute before the request is sent.
      *
-     * @var array
+     * @var \Illuminate\Support\Collection
      */
     protected $beforeSendingCallbacks;
 
