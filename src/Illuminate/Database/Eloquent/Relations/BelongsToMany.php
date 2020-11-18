@@ -362,7 +362,7 @@ class BelongsToMany extends Relation
     {
         $this->pivotWheres[] = func_get_args();
 
-        return $this->where($this->qualifyColumn($column), $operator, $value, $boolean);
+        return $this->where($this->qualifyPivotColumn($column), $operator, $value, $boolean);
     }
 
     /**
@@ -376,7 +376,7 @@ class BelongsToMany extends Relation
      */
     public function wherePivotBetween($column, array $values, $boolean = 'and', $not = false)
     {
-        return $this->whereBetween($this->qualifyColumn($column), $values, $boolean, $not);
+        return $this->whereBetween($this->qualifyPivotColumn($column), $values, $boolean, $not);
     }
 
     /**
@@ -429,7 +429,7 @@ class BelongsToMany extends Relation
     {
         $this->pivotWhereIns[] = func_get_args();
 
-        return $this->whereIn($this->qualifyColumn($column), $values, $boolean, $not);
+        return $this->whereIn($this->qualifyPivotColumn($column), $values, $boolean, $not);
     }
 
     /**
@@ -524,7 +524,7 @@ class BelongsToMany extends Relation
     {
         $this->pivotWhereNulls[] = func_get_args();
 
-        return $this->whereNull($this->qualifyColumn($column), $boolean, $not);
+        return $this->whereNull($this->qualifyPivotColumn($column), $boolean, $not);
     }
 
     /**
@@ -810,7 +810,7 @@ class BelongsToMany extends Relation
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey];
 
         return collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
-            return $this->qualifyColumn($column).' as pivot_'.$column;
+            return $this->qualifyPivotColumn($column).' as pivot_'.$column;
         })->unique()->all();
     }
 
@@ -1230,7 +1230,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedForeignPivotKeyName()
     {
-        return $this->qualifyColumn($this->foreignPivotKey);
+        return $this->qualifyPivotColumn($this->foreignPivotKey);
     }
 
     /**
@@ -1250,7 +1250,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedRelatedPivotKeyName()
     {
-        return $this->qualifyColumn($this->relatedPivotKey);
+        return $this->qualifyPivotColumn($this->relatedPivotKey);
     }
 
     /**
@@ -1339,7 +1339,7 @@ class BelongsToMany extends Relation
      * @param  string  $column
      * @return string
      */
-    public function qualifyColumn($column)
+    public function qualifyPivotColumn($column)
     {
         return Str::contains($column, '.')
                     ? $column
