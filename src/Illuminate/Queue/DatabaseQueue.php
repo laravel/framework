@@ -233,7 +233,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     protected function getLockForPopping()
     {
         $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
-        $databaseVersion = $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+        $databaseVersion = $this->database->getConfig('version') ?? $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
         if ($databaseEngine == 'mysql' && ! strpos($databaseVersion, 'MariaDB') && version_compare($databaseVersion, '8.0.1', '>=') ||
             $databaseEngine == 'pgsql' && version_compare($databaseVersion, '9.5', '>=')) {
