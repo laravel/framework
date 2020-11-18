@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Testing\Wormhole;
+use PHPUnit\Framework\TestCase;
 
 class WormholeTest extends TestCase
 {
