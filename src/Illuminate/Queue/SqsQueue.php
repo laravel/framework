@@ -96,7 +96,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->afterTransactions(function () use ($payload, $queue, $options) {
+        return $this->afterTransactions(function () use ($payload, $queue) {
             return $this->sqs->sendMessage([
                 'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
             ])->get('MessageId');
