@@ -731,6 +731,10 @@ trait HasRelationships
             return array_search(static::class, $morphMap, true);
         }
 
+        if (Relation::$tableNameAsMorphType) {
+            return $this->getTable();
+        }
+
         return static::class;
     }
 
