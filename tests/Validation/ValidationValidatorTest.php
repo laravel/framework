@@ -596,6 +596,19 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('really required!', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'custom' => [
+                '*' => [
+                    'max.string' => 'max :max chars!',
+                ],
+            ],
+        ]);
+        $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'max:2']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('max 2 chars!', $v->messages()->first('name'));
     }
 
     public function testCustomValidationLinesAreRespectedWithAsterisks()
@@ -3752,6 +3765,30 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('foo!', $v->messages()->first('name'));
+    }
+
+    public function testFallbackMessages()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'max:2']);
+        $v->setFallbackMessages(['*' => 'fallback']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('fallback', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'max:2']);
+        $v->setFallbackMessages(['max' => 'fallback']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('fallback', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'max:2']);
+        $v->setFallbackMessages(['max.string' => 'fallback']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('fallback', $v->messages()->first('name'));
     }
 
     public function testClassBasedCustomValidators()
