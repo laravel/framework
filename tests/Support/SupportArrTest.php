@@ -941,10 +941,10 @@ class SupportArrTest extends TestCase
 
         // sort using callable
         $sortedWithCallable = array_values(Arr::sortByMany($unsorted, [
-            function($a, $b) {
+            function ($a, $b) {
                 return $a['name'] <=> $b['name'];
             },
-            function($a, $b) {
+            function ($a, $b) {
                 return $b['age'] <=> $a['age'];
             },
             ['meta.key', true],

@@ -688,22 +688,19 @@ class Arr
      */
     public static function sortByMany($array, $comparisons = [])
     {
-        usort($array, function($a, $b) use($comparisons) {
-
-            foreach($comparisons as $cmp)
-            {
+        usort($array, function ($a, $b) use ($comparisons) {
+            foreach ($comparisons as $cmp) {
                 // destruct comparison array to variables
                 // with order set by default to 1
                 [$prop, $ascending] = static::wrap($cmp) + [1 => true];
                 $result = 0;
 
-                if(is_callable($prop)) {
+                if (is_callable($prop)) {
                     $result = $prop($a, $b);
-                }
-                else {
+                } else {
                     $values = [static::get($a, $prop), static::get($b, $prop)];
 
-                    if(!$ascending) {
+                    if (! $ascending) {
                         $values = array_reverse($values);
                     }
 
@@ -712,7 +709,7 @@ class Arr
 
                 // if result is 0, values are equal
                 // so we have to order items by next comparison
-                if($result === 0) {
+                if ($result === 0) {
                     continue;
                 }
 
