@@ -604,7 +604,7 @@ class Arr
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
-     * @param  callable|string|null  $callback
+     * @param  callable|array|string|null  $callback
      * @return array
      */
     public static function sort($array, $callback = null)
