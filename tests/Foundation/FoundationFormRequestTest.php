@@ -115,6 +115,18 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'Adam'], $request->all());
     }
 
+    public function testValidatedMethodReturnsOfPartTheValidatedData()
+    {
+        $request = $this->createRequest([
+            'name'  => 'Taylor Otwell',
+        ]);
+
+        $request->validateResolved();
+
+        $this->assertEquals('Taylor Otwell', $request->validated('name'));
+        $this->assertEquals('default', $request->validated('default', 'default'));
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
