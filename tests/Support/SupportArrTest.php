@@ -914,7 +914,7 @@ class SupportArrTest extends TestCase
         ];
 
         // sort using keys
-        $sorted = array_values(Arr::sortByMany($unsorted, [
+        $sorted = array_values(Arr::sort($unsorted, [
             'name',
             'age',
             'meta.key',
@@ -927,7 +927,7 @@ class SupportArrTest extends TestCase
         ], $sorted);
 
         // sort with order
-        $sortedWithOrder = array_values(Arr::sortByMany($unsorted, [
+        $sortedWithOrder = array_values(Arr::sort($unsorted, [
             'name',
             ['age', false],
             ['meta.key', true],
@@ -940,7 +940,7 @@ class SupportArrTest extends TestCase
         ], $sortedWithOrder);
 
         // sort using callable
-        $sortedWithCallable = array_values(Arr::sortByMany($unsorted, [
+        $sortedWithCallable = array_values(Arr::sort($unsorted, [
             function ($a, $b) {
                 return $a['name'] <=> $b['name'];
             },

@@ -604,7 +604,7 @@ class Arr
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
-     * @param  callable|string|null  $callback
+     * @param  callable|array|string|null  $callback
      * @return array
      */
     public static function sort($array, $callback = null)
@@ -677,46 +677,5 @@ class Arr
         }
 
         return is_array($value) ? $value : [$value];
-    }
-
-    /**
-     * Sort giiven array by many properties.
-     *
-     * @param  array  $array
-     * @param  array  $comparisons
-     * @return array
-     */
-    public static function sortByMany($array, $comparisons = [])
-    {
-        usort($array, function ($a, $b) use ($comparisons) {
-            foreach ($comparisons as $cmp) {
-                // destruct comparison array to variables
-                // with order set by default to 1
-                [$prop, $ascending] = static::wrap($cmp) + [1 => true];
-                $result = 0;
-
-                if (is_callable($prop)) {
-                    $result = $prop($a, $b);
-                } else {
-                    $values = [static::get($a, $prop), static::get($b, $prop)];
-
-                    if (! $ascending) {
-                        $values = array_reverse($values);
-                    }
-
-                    $result = $values[0] <=> $values[1];
-                }
-
-                // if result is 0, values are equal
-                // so we have to order items by next comparison
-                if ($result === 0) {
-                    continue;
-                }
-
-                return $result;
-            }
-        });
-
-        return $array;
     }
 }
