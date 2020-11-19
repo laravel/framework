@@ -1063,6 +1063,17 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Chunk the collection into a set number of chunks.
+     *
+     * @param  int  $chunks
+     * @return static
+     */
+    public function chunkInto($chunks)
+    {
+        return $this->chunk(ceil($this->count() / $chunks));
+    }
+
+    /**
      * Chunk the collection into chunks with a callback.
      *
      * @param  callable  $callback
