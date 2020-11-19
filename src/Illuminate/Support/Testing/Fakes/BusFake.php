@@ -187,10 +187,10 @@ class BusFake implements QueueingDispatcher
     /**
      * Assert if a batch was dispatched based on a truth-test callback.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return void
      */
-    public function assertBatched(callable $callback)
+    public function assertBatched(callable $callback = null)
     {
         PHPUnit::assertTrue(
             $this->batched($callback)->count() > 0,
@@ -245,14 +245,18 @@ class BusFake implements QueueingDispatcher
     /**
      * Get all of the pending batches matching a truth-test callback.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return \Illuminate\Support\Collection
      */
-    public function batched(callable $callback)
+    public function batched(callable $callback = null)
     {
         if (empty($this->batches)) {
             return collect();
         }
+
+        $callback = $callback ?: function () {
+            return true;
+        };
 
         return collect($this->batches)->filter(function ($batch) use ($callback) {
             return $callback($batch);
