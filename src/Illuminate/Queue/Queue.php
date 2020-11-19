@@ -257,7 +257,7 @@ abstract class Queue
     }
 
     /**
-     * Run the given callback after database transactions.
+     * Enqueue a jobs using the given callback.
      *
      * @param  \Illuminate\Contracts\Queue\Queue  $connection
      * @param  callable  $callback
