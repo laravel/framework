@@ -45,8 +45,8 @@ trait FormatsMessages
         // If the rule being validated is a "size" rule, we will need to gather the
         // specific error message for the type of attribute being validated such
         // as a number, file or string which all have different message types.
-        elseif (in_array($rule, $this->sizeRules)) {
-            return $this->getSizeMessage($attribute, $rule);
+        if (in_array($rule, $this->sizeRules) && ! is_null($value = $this->getSizeMessage($attribute, $lowerRule))) {
+            return $value;
         }
 
         // Finally, if no developer specified messages have been set, and no other
@@ -55,6 +55,10 @@ trait FormatsMessages
         $key = "validation.{$lowerRule}";
 
         if ($key != ($value = $this->translator->get($key))) {
+            return $value;
+        }
+
+        if (in_array($rule, $this->sizeRules) && ! is_null($value = $this->getSizeFallback($attribute, $lowerRule))) {
             return $value;
         }
 
@@ -162,21 +166,48 @@ trait FormatsMessages
      * Get the proper error message for an attribute and size rule.
      *
      * @param  string  $attribute
-     * @param  string  $rule
-     * @return string
+     * @param  string  $lowerRule
+     * @return string|null
      */
-    protected function getSizeMessage($attribute, $rule)
+    protected function getSizeMessage($attribute, $lowerRule)
     {
-        $lowerRule = Str::snake($rule);
-
         // There are three different types of size validations. The attribute may be
         // either a number, file, or string so we will check a few things to know
         // which type of value it is and return the correct line for that type.
         $type = $this->getAttributeType($attribute);
 
-        $key = "validation.{$lowerRule}.{$type}";
+        $customMessage = $this->getCustomMessageFromTranslator(
+            $customKey = "validation.custom.{$attribute}.{$lowerRule}.{$type}"
+        );
 
-        return $this->translator->get($key);
+        if ($customMessage !== $customKey) {
+            return $customMessage;
+        }
+
+        $sizeKey = "validation.{$lowerRule}.{$type}";
+
+        if ($sizeKey != ($value = $this->translator->get($sizeKey))) {
+            return $value;
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the size rule fallback if it exists.
+     *
+     * @param  string  $attribute
+     * @param  string  $lowerRule
+     * @return string|null
+     */
+    protected function getSizeFallback($attribute, $lowerRule)
+    {
+        $type = $this->getAttributeType($attribute);
+        $key = "{$lowerRule}.{$type}";
+
+        return $this->getFromLocalArray(
+            $attribute, $key, $this->fallbackMessages
+        );
     }
 
     /**

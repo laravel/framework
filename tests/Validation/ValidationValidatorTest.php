@@ -634,15 +634,17 @@ class ValidationValidatorTest extends TestCase
                 'validation' => [
                     'custom.*' => [
                         'integer' => 'should be integer!',
+                        'max.numeric' => 'max :max!',
                     ],
                 ],
             ],
         ]);
-        $v = new Validator($trans, ['validation' => ['custom' => ['string', 'string']]], ['validation.custom.*' => 'integer']);
+        $v = new Validator($trans, ['validation' => ['custom' => ['string', 'string', 10]]], ['validation.custom.*' => 'integer|max:2']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('should be integer!', $v->messages()->first('validation.custom.0'));
         $this->assertSame('should be integer!', $v->messages()->first('validation.custom.1'));
+        $this->assertSame('max 2!', $v->messages()->first('validation.custom.2'));
     }
 
     public function testInlineValidationMessagesAreRespected()
@@ -3752,6 +3754,13 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('foo!', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'max:5']);
+        $v->setFallbackMessages(['max.string' => 'too long!']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('too long!', $v->messages()->first('name'));
     }
 
     public function testClassBasedCustomValidators()
