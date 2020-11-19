@@ -159,9 +159,11 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {
-        return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
-            $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
-        ));
+        return $this->enqueueUsing($this, function () use ($queue, $payload, $delay, $attempts) {
+            return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
+                $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
+            ));
+        });
     }
 
     /**

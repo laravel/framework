@@ -122,7 +122,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->afterTransactions(function () use ($payload, $queue) {
+        return $this->enqueueUsing($this, function () use ($payload, $queue) {
             $this->getConnection()->eval(
                 LuaScripts::push(), 2, $this->getQueue($queue),
                 $this->getQueue($queue).':notify', $payload
@@ -156,7 +156,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function laterRaw($delay, $payload, $queue = null)
     {
-        return $this->afterTransactions(function () use ($delay, $payload, $queue) {
+        return $this->enqueueUsing($this, function () use ($delay, $payload, $queue) {
             $this->getConnection()->zadd(
                 $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
             );

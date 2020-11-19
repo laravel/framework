@@ -259,12 +259,13 @@ abstract class Queue
     /**
      * Run the given callback after database transactions.
      *
+     * @param  \Illuminate\Contracts\Queue\Queue  $connection
      * @param  callable  $callback
      * @return mixed
      */
-    protected function afterTransactions($callback)
+    protected function enqueueUsing($connection, $callback)
     {
-        if (Connection::$totalTransactions > 0) {
+        if (! $connection instanceof DatabaseQueue && Connection::$totalTransactions > 0) {
             Connection::$afterTransactionCallbacks[] = function () use ($callback) {
                 $callback();
             };
