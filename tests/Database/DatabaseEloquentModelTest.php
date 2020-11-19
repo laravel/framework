@@ -300,7 +300,8 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDestroyMethodCallsQueryBuilderCorrectlyWithEmptyIds()
     {
-        EloquentModelEmptyDestroyStub::destroy([]);
+        $count = EloquentModelEmptyDestroyStub::destroy([]);
+        $this->assertSame(0, $count);
     }
 
     public function testWithMethodCallsQueryBuilderCorrectly()
