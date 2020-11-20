@@ -32,7 +32,7 @@ class DbCommand extends Command
         $connection = $this->getConnection();
 
         (new Process(
-            [$this->getCommand($connection), ...$this->getArgs($connection)],
+            array_merge([$this->getCommand($connection)], $this->getArgs($connection)),
             null, $this->getEnv($connection)
         ))->setTimeout(null)->setTty(true)->mustRun(function ($type, $buffer) {
             $this->output->write($buffer);
@@ -63,7 +63,7 @@ class DbCommand extends Command
      * Get the arguments for the database client command.
      *
      * @param  array  $connection
-     * @return string
+     * @return array
      */
     public function getArgs($connection)
     {
