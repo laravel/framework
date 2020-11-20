@@ -169,7 +169,7 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array|null
      */
-    protected function getpgsqlEnv(array $connection)
+    protected function getPgsqlEnv(array $connection)
     {
         return array_merge(...$this->buildOptionalArguments([
             'username' => ['PGUSER' => $connection['username']],
