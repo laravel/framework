@@ -28,7 +28,7 @@ class SetRequestForConsole
             ]);
         }
 
-        $app->instance('request', Request::create(
+        $app->instance('request', new Request(
             $uri, 'GET', [], [], [], $server
         ));
     }
