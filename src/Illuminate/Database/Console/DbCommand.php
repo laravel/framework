@@ -186,7 +186,7 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array
      */
-    protected function buildOptionalArguments(array $args,array $connection)
+    protected function buildOptionalArguments(array $args, array $connection)
     {
         return array_values(array_filter($args, function ($key) use ($connection) {
             return ! empty($connection[$key]);
