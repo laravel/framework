@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Console;
 
-use UnexpectedValueException;
 use Illuminate\Console\Command;
 use Symfony\Component\Process\Process;
+use UnexpectedValueException;
 
 class DbCommand extends Command
 {
