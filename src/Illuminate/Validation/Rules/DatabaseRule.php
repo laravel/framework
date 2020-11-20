@@ -58,10 +58,6 @@ trait DatabaseRule
      */
     public function resolveTableName($table)
     {
-        if (! Str::contains($table, '\\') || ! class_exists($table)) {
-            return $table;
-        }
-
         if (is_subclass_of($table, Model::class)) {
             $model = new $table;
 
