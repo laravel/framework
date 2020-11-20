@@ -481,13 +481,21 @@ abstract class Factory
     /**
      * Define an attached relationship for the model.
      *
-     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model  $factory
      * @param  callable|array  $pivot
      * @param  string|null  $relationship
      * @return static
      */
-    public function hasAttached(self $factory, $pivot = [], $relationship = null)
+    public function hasAttached($factory, $pivot = [], $relationship = null)
     {
+        if ($factory instanceof Collection || $factory instanceof Model) {
+            $factory = Collection::wrap($factory);
+
+            return $this->afterCreating(function ($model) use ($factory, $pivot, $relationship) {
+                $model->{$relationship ?: Str::camel(Str::plural(class_basename($factory->first())))}()->attach($factory, $pivot);
+            });
+        }
+
         return $this->newInstance([
             'has' => $this->has->concat([new BelongsToManyRelationship(
                 $factory,

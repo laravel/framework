@@ -305,6 +305,28 @@ class DatabaseEloquentFactoryTest extends TestCase
         unset($_SERVER['__test.role.creating-user']);
     }
 
+    public function test_belongs_to_many_relationship_with_existing_model_instances()
+    {
+        $roles = FactoryTestRoleFactory::times(3)->afterCreating(function ($role) {
+                            $_SERVER['__test.role.creating-role'] = $role;
+                        })
+                        ->create();
+        $users = FactoryTestUserFactory::times(3)
+                        ->hasAttached($roles, ['admin' => 'Y'], 'roles')
+                        ->create();
+
+        $this->assertCount(3, FactoryTestRole::all());
+
+        $user = FactoryTestUser::latest()->first();
+
+        $this->assertCount(3, $user->roles);
+        $this->assertSame('Y', $user->roles->first()->pivot->admin);
+
+        $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-role']);
+
+        unset($_SERVER['__test.role.creating-role']);
+    }
+
     public function test_sequences()
     {
         $users = FactoryTestUserFactory::times(2)->sequence(
