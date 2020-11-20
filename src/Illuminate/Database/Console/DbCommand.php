@@ -13,7 +13,7 @@ class DbCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'db {--database= : The database connection to use}';
+    protected $signature = 'db {connection? : The database connection to use}';
 
     /**
      * The console command description.
@@ -49,7 +49,7 @@ class DbCommand extends Command
     public function getConnection()
     {
         $connection = $this->laravel['config']['database.connections.'.
-            (($db = $this->option('database')) ?? $this->laravel['config']['database.default'])
+            (($db = $this->argument('connection')) ?? $this->laravel['config']['database.default'])
         ];
 
         if (empty($connection)) {
