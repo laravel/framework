@@ -65,7 +65,7 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array
      */
-    public function getArgs($connection)
+    public function getArgs(array $connection)
     {
         $driver = ucfirst($connection['driver']);
 
@@ -78,7 +78,7 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array|null
      */
-    public function getEnv($connection)
+    public function getEnv(array $connection)
     {
         $driver = ucfirst($connection['driver']);
 
@@ -95,13 +95,13 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return string
      */
-    public function getCommand($connection)
+    public function getCommand(array $connection)
     {
         return [
-            'mysql'     => 'mysql',
-            'pgsql'     => 'psql',
-            'sqlite'    => 'sqlite3',
-            'sqlsrv'    => 'sqlcmd',
+            'mysql' => 'mysql',
+            'pgsql' => 'psql',
+            'sqlite' => 'sqlite3',
+            'sqlsrv' => 'sqlcmd',
         ][$connection['driver']];
     }
 
@@ -111,16 +111,16 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array
      */
-    protected function getMysqlArgs($connection)
+    protected function getMysqlArgs(array $connection)
     {
         return array_merge([
             '--host='.$connection['host'],
             '--port='.$connection['port'],
             '--user='.$connection['username'],
         ], $this->buildOptionalArguments([
-            'password'      => '--password='.$connection['password'],
-            'unix_socket'   => '--socket='.$connection['unix_socket'],
-            'charset'       => '--default-character-set='.$connection['charset'],
+            'password' => '--password='.$connection['password'],
+            'unix_socket' => '--socket='.$connection['unix_socket'],
+            'charset' => '--default-character-set='.$connection['charset'],
         ], $connection), [$connection['database']]);
     }
 
@@ -130,7 +130,7 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array
      */
-    protected function getPgsqlArgs($connection)
+    protected function getPgsqlArgs(array $connection)
     {
         return [$connection['database']];
     }
@@ -141,7 +141,7 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array
      */
-    protected function getSqliteArgs($connection)
+    protected function getSqliteArgs(array $connection)
     {
         return [$connection['database']];
     }
@@ -152,14 +152,14 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array
      */
-    protected function getSqlsrvArgs($connection)
+    protected function getSqlsrvArgs(array $connection)
     {
         return $this->buildOptionalArguments([
-            'database'      => '-d '.$connection['database'],
-            'username'      => '-U '.$connection['username'],
-            'password'      => '-P '.$connection['password'],
-            'host'          => '-S tcp:'.$connection['host']
-                                .($connection['port'] ? ','.$connection['port'] : ''),
+            'database' => '-d '.$connection['database'],
+            'username' => '-U '.$connection['username'],
+            'password' => '-P '.$connection['password'],
+            'host' => '-S tcp:'.$connection['host']
+                        .($connection['port'] ? ','.$connection['port'] : ''),
         ], $connection);
     }
 
@@ -169,13 +169,13 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array|null
      */
-    protected function getpgsqlEnv($connection)
+    protected function getpgsqlEnv(array $connection)
     {
         return array_merge(...$this->buildOptionalArguments([
-            'username'      => ['PGUSER' => $connection['username']],
-            'host'          => ['PGHOST' => $connection['host']],
-            'port'          => ['PGPORT' => $connection['port']],
-            'password'      => ['PGPASSWORD' => $connection['password']],
+            'username' => ['PGUSER' => $connection['username']],
+            'host' => ['PGHOST' => $connection['host']],
+            'port' => ['PGPORT' => $connection['port']],
+            'password' => ['PGPASSWORD' => $connection['password']],
         ], $connection));
     }
 
@@ -186,7 +186,7 @@ class DbCommand extends Command
      * @param  array  $connection
      * @return array
      */
-    protected function buildOptionalArguments($args, $connection)
+    protected function buildOptionalArguments(array $args,array $connection)
     {
         return array_values(array_filter($args, function ($key) use ($connection) {
             return ! empty($connection[$key]);
