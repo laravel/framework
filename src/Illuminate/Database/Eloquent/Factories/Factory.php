@@ -500,12 +500,18 @@ abstract class Factory
     /**
      * Define a parent relationship for the model.
      *
-     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\Model  $factory
      * @param  string|null  $relationship
      * @return static
      */
-    public function for(self $factory, $relationship = null)
+    public function for($factory, $relationship = null)
     {
+        if ($factory instanceof Model) {
+            return $this->afterMaking(function ($model) use ($factory, $relationship) {
+                $model->{$relationship ?: Str::camel(class_basename($factory))}()->associate($factory);
+            });
+        }
+
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
             $factory,
             $relationship ?: Str::camel(class_basename($factory->modelName()))
