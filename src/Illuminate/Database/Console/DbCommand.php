@@ -20,7 +20,7 @@ class DbCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Open the database CLI';
+    protected $description = 'Drop into the database CLI.';
 
     /**
      * Execute the console command.
@@ -147,7 +147,7 @@ class DbCommand extends Command
     }
 
     /**
-     * Get the arguments for the sqlite CLI.
+     * Get the arguments for the SQL Server CLI.
      *
      * @param  array  $connection
      * @return array
