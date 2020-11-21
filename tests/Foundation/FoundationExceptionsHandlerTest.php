@@ -105,7 +105,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $response = $this->handler->render($this->request, new Exception('My custom error message'))->getContent();
 
         $this->assertStringNotContainsString('<!DOCTYPE html>', $response);
-        $this->assertStringContainsString('"message": "My custom error message"', $response);
+        $this->assertStringContainsString('"message":"My custom error message"', $response);
         $this->assertStringContainsString('"file":', $response);
         $this->assertStringContainsString('"line":', $response);
         $this->assertStringContainsString('"trace":', $response);
@@ -138,7 +138,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $response = $this->handler->render($this->request, new Exception('This error message should not be visible'))->getContent();
 
-        $this->assertStringContainsString('"message": "Server Error"', $response);
+        $this->assertStringContainsString('"message":"Server Error"', $response);
         $this->assertStringNotContainsString('<!DOCTYPE html>', $response);
         $this->assertStringNotContainsString('This error message should not be visible', $response);
         $this->assertStringNotContainsString('"file":', $response);
@@ -153,9 +153,9 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $response = $this->handler->render($this->request, new HttpException(403, 'My custom error message'))->getContent();
 
-        $this->assertStringContainsString('"message": "My custom error message"', $response);
+        $this->assertStringContainsString('"message":"My custom error message"', $response);
         $this->assertStringNotContainsString('<!DOCTYPE html>', $response);
-        $this->assertStringNotContainsString('"message": "Server Error"', $response);
+        $this->assertStringNotContainsString('"message":"Server Error"', $response);
         $this->assertStringNotContainsString('"file":', $response);
         $this->assertStringNotContainsString('"line":', $response);
         $this->assertStringNotContainsString('"trace":', $response);
@@ -168,9 +168,9 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $response = $this->handler->render($this->request, new AccessDeniedHttpException('My custom error message'))->getContent();
 
-        $this->assertStringContainsString('"message": "My custom error message"', $response);
+        $this->assertStringContainsString('"message":"My custom error message"', $response);
         $this->assertStringNotContainsString('<!DOCTYPE html>', $response);
-        $this->assertStringNotContainsString('"message": "Server Error"', $response);
+        $this->assertStringNotContainsString('"message":"Server Error"', $response);
         $this->assertStringNotContainsString('"file":', $response);
         $this->assertStringNotContainsString('"line":', $response);
         $this->assertStringNotContainsString('"trace":', $response);
@@ -227,7 +227,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $response = $this->handler->render($this->request, new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
 
         $this->assertEquals(404, $response->getStatusCode());
-        $this->assertStringContainsString('"message": "Bad hostname provided."', $response->getContent());
+        $this->assertStringContainsString('"message":"Bad hostname provided."', $response->getContent());
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
