@@ -42,8 +42,9 @@ class PusherBroadcaster extends Broadcaster
     {
         $channelName = $this->normalizeChannelName($request->channel_name);
 
-        if ($this->isGuardedChannel($request->channel_name) &&
-            ! $this->retrieveUser($request, $channelName)) {
+        if (empty($request->channel_name) ||
+            ($this->isGuardedChannel($request->channel_name) &&
+            ! $this->retrieveUser($request, $channelName))) {
             throw new AccessDeniedHttpException;
         }
 
@@ -120,7 +121,7 @@ class PusherBroadcaster extends Broadcaster
 
         throw new BroadcastException(
             ! empty($response['body'])
-                ? sprintf('Pusher error: %s.', $response['status'])
+                ? sprintf('Pusher error: %s.', $response['body'])
                 : 'Failed to connect to Pusher.'
         );
     }

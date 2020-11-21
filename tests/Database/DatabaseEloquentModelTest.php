@@ -293,6 +293,17 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelDestroyStub::destroy(new Collection([1, 2, 3]));
     }
 
+    public function testDestroyMethodCallsQueryBuilderCorrectlyWithMultipleArgs()
+    {
+        EloquentModelDestroyStub::destroy(1, 2, 3);
+    }
+
+    public function testDestroyMethodCallsQueryBuilderCorrectlyWithEmptyIds()
+    {
+        $count = EloquentModelEmptyDestroyStub::destroy([]);
+        $this->assertSame(0, $count);
+    }
+
     public function testWithMethodCallsQueryBuilderCorrectly()
     {
         $result = EloquentModelWithStub::with('foo', 'bar');
@@ -1197,6 +1208,23 @@ class DatabaseEloquentModelTest extends TestCase
             $this->assertEquals(EloquentModelStub::class, $model->getMorphClass());
         } finally {
             Relation::morphMap([], false);
+        }
+    }
+
+    public function testCorrectMorphClassIsReturnedOnChangingDefault()
+    {
+        Relation::tableNameAsMorphType();
+        Relation::morphMap(['alias' => EloquentModelCamelStub::class]);
+        Relation::morphMap(['alias2' => 'AnotherModel']);
+        $model = new EloquentModelStub;
+        $model2 = new EloquentModelCamelStub;
+
+        try {
+            $this->assertEquals('stub', $model->getMorphClass());
+            $this->assertEquals('alias', $model2->getMorphClass());
+        } finally {
+            Relation::morphMap([], false);
+            Relation::$tableNameAsMorphType = false;
         }
     }
 
@@ -2378,6 +2406,17 @@ class EloquentModelDestroyStub extends Model
         $mock->shouldReceive('whereIn')->once()->with('id', [1, 2, 3])->andReturn($mock);
         $mock->shouldReceive('get')->once()->andReturn([$model = m::mock(stdClass::class)]);
         $model->shouldReceive('delete')->once();
+
+        return $mock;
+    }
+}
+
+class EloquentModelEmptyDestroyStub extends Model
+{
+    public function newQuery()
+    {
+        $mock = m::mock(Builder::class);
+        $mock->shouldReceive('whereIn')->never();
 
         return $mock;
     }

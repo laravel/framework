@@ -411,6 +411,19 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch('event');
         $this->assertEquals(['fired 1', 'fired 2'], $_SERVER['__event.test']);
     }
+
+    public function testDuplicateListenersWillFire()
+    {
+        $d = new Dispatcher;
+        $d->listen('event', TestListener::class);
+        $d->listen('event', TestListener::class);
+        $d->listen('event', TestListener::class.'@handle');
+        $d->listen('event', TestListener::class.'@handle');
+        $d->dispatch('event');
+
+        $this->assertEquals(4, TestListener::$counter);
+        TestListener::$counter = 0;
+    }
 }
 
 class ExampleEvent
@@ -438,5 +451,15 @@ class TestEventListener
     public function onFooEvent($foo, $bar)
     {
         return 'baz';
+    }
+}
+
+class TestListener
+{
+    public static $counter = 0;
+
+    public function handle()
+    {
+        self::$counter++;
     }
 }
