@@ -1042,6 +1042,17 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Split a collection into a certain number of groups, and fill the first groups completely.
+     *
+     * @param  int  $numberOfGroups
+     * @return static
+     */
+    public function splitIn($numberOfGroups)
+    {
+        return $this->chunk(ceil($this->count() / $numberOfGroups));
+    }
+
+    /**
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
@@ -1060,17 +1071,6 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         return new static($chunks);
-    }
-
-    /**
-     * Chunk the collection into a set number of chunks.
-     *
-     * @param  int  $chunks
-     * @return static
-     */
-    public function chunkInto($chunks)
-    {
-        return $this->chunk(ceil($this->count() / $chunks));
     }
 
     /**

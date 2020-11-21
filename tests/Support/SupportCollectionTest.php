@@ -1648,10 +1648,10 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testChunkInto($collection)
+    public function testSplitIn($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        $data = $data->chunkInto(3);
+        $data = $data->splitIn(3);
 
         $this->assertInstanceOf($collection, $data);
         $this->assertInstanceOf($collection, $data->first());
