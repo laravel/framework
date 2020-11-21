@@ -10,6 +10,7 @@ use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Console\Scheduling\ScheduleWorkCommand;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Database\Console\DbCommand;
 use Illuminate\Database\Console\DumpCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
@@ -88,6 +89,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ClearResets' => ClearResetsCommand::class,
         'ConfigCache' => ConfigCacheCommand::class,
         'ConfigClear' => ConfigClearCommand::class,
+        'Db' => DbCommand::class,
         'DbWipe' => WipeCommand::class,
         'Down' => DownCommand::class,
         'Environment' => EnvironmentCommand::class,
@@ -326,6 +328,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         $this->app->singleton(ControllerMakeCommand::class, function ($app) {
             return new ControllerMakeCommand($app['files']);
         });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDbCommand()
+    {
+        $this->app->singleton(DbCommand::class);
     }
 
     /**
