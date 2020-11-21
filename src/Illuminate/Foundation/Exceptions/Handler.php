@@ -610,7 +610,7 @@ class Handler implements ExceptionHandlerContract
             $this->convertExceptionToArray($e),
             $this->isHttpException($e) ? $e->getStatusCode() : 500,
             $this->isHttpException($e) ? $e->getHeaders() : [],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            JSON_UNESCAPED_SLASHES
         );
     }
 
