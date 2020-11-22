@@ -160,7 +160,7 @@ class DbCommand extends Command
             'username' => ['-U', $connection['username']],
             'password' => ['-P', $connection['password']],
             'host' => ['-S', 'tcp:'.$connection['host']
-                        .($connection['port'] ? ','.$connection['port'] : '')],
+                        .($connection['port'] ? ','.$connection['port'] : ''), ],
         ], $connection));
     }
 
