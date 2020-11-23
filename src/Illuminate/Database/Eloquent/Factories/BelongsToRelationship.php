@@ -10,7 +10,7 @@ class BelongsToRelationship
     /**
      * The related factory instance.
      *
-     * @var \Illuminate\Database\Eloquent\Factories\Factory
+     * @var \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\Model
      */
     protected $factory;
 
@@ -52,7 +52,7 @@ class BelongsToRelationship
         $relationship = $model->{$this->relationship}();
 
         return $relationship instanceof MorphTo ? [
-            $relationship->getMorphType() => $this->factory instanceof Model ? $this->factory->getMorphClass() : $this->factory->newModel()->getMorphClass(),
+            $relationship->getMorphType() => $this->factory instanceof Factory ? $this->factory->newModel()->getMorphClass() : $this->factory->getMorphClass(),
             $relationship->getForeignKeyName() => $this->resolver($relationship->getOwnerKeyName()),
         ] : [
             $relationship->getForeignKeyName() => $this->resolver($relationship->getOwnerKeyName()),
@@ -69,7 +69,7 @@ class BelongsToRelationship
     {
         return function () use ($key) {
             if (! $this->resolved) {
-                $instance = $this->factory instanceof Model ? $this->factory : $this->factory->create();
+                $instance = $this->factory instanceof Factory ? $this->factory->create() : $this->factory;
 
                 return $this->resolved = $key ? $instance->{$key} : $instance->getKey();
             }
