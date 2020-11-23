@@ -92,9 +92,11 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushToDatabase($queue, $this->createPayload(
-            $job, $this->getQueue($queue), $data
-        ));
+        $payload = $this->createPayload($job, $this->getQueue($queue), $data);
+
+        return $this->enqueueUsing($this, function () use ($queue, $payload) {
+            return $this->pushToDatabase($queue, $payload);
+        });
     }
 
     /**
@@ -121,9 +123,11 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->pushToDatabase($queue, $this->createPayload(
-            $job, $this->getQueue($queue), $data
-        ), $delay);
+        $payload = $this->createPayload($job, $this->getQueue($queue), $data);
+
+        return $this->enqueueUsing($this, function () use ($queue, $delay, $payload) {
+            return $this->pushToDatabase($queue, $payload, $delay);
+        });
     }
 
     /**
@@ -171,11 +175,9 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {
-        return $this->enqueueUsing($this, function () use ($queue, $payload, $delay, $attempts) {
-            return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
-                $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
-            ));
-        });
+        return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
+            $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
+        ));
     }
 
     /**

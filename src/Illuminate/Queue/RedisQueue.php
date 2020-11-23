@@ -122,7 +122,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        $payload = $this->createPayload($job, $this->getQueue($queue), $data);
+
+        return $this->enqueueUsing($this, function () use ($payload, $queue) {
+            return $this->pushRaw($payload, $queue);
+        });
     }
 
     /**
@@ -135,14 +139,12 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->enqueueUsing($this, function () use ($payload, $queue) {
-            $this->getConnection()->eval(
-                LuaScripts::push(), 2, $this->getQueue($queue),
-                $this->getQueue($queue).':notify', $payload
-            );
+        $this->getConnection()->eval(
+            LuaScripts::push(), 2, $this->getQueue($queue),
+            $this->getQueue($queue).':notify', $payload
+        );
 
-            return json_decode($payload, true)['id'] ?? null;
-        });
+        return json_decode($payload, true)['id'] ?? null;
     }
 
     /**
@@ -156,7 +158,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->laterRaw($delay, $this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        $payload = $this->createPayload($job, $this->getQueue($queue), $data);
+
+        return $this->enqueueUsing($this, function () use ($payload, $delay, $queue) {
+            return $this->laterRaw($delay, $payload, $queue);
+        });
     }
 
     /**
@@ -169,13 +175,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function laterRaw($delay, $payload, $queue = null)
     {
-        return $this->enqueueUsing($this, function () use ($delay, $payload, $queue) {
-            $this->getConnection()->zadd(
-                $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
-            );
+        $this->getConnection()->zadd(
+            $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
+        );
 
-            return json_decode($payload, true)['id'] ?? null;
-        });
+        return json_decode($payload, true)['id'] ?? null;
     }
 
     /**

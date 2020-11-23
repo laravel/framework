@@ -89,7 +89,11 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        $payload = $this->createPayload($job, $this->getQueue($queue), $data);
+
+        return $this->enqueueUsing($this, function () use ($payload, $queue) {
+            return $this->pushRaw($payload, $queue);
+        });
     }
 
     /**
@@ -102,11 +106,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->enqueueUsing($this, function () use ($payload, $queue) {
-            return $this->pheanstalk->useTube($this->getQueue($queue))->put(
-                $payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun
-            );
-        });
+        return $this->pheanstalk->useTube($this->getQueue($queue))->put(
+            $payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun
+        );
     }
 
     /**
