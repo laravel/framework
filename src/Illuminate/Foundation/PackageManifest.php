@@ -4,6 +4,7 @@ namespace Illuminate\Foundation;
 
 use Exception;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Composer;
 
 class PackageManifest
 {
@@ -43,16 +44,23 @@ class PackageManifest
     public $manifest;
 
     /**
+     * @var \Illuminate\Support\Composer
+     */
+    public $composer;
+
+    /**
      * Create a new package manifest instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  \Illuminate\Support\Composer  $composer
      * @param  string  $basePath
      * @param  string  $manifestPath
      * @return void
      */
-    public function __construct(Filesystem $files, $basePath, $manifestPath)
+    public function __construct(Filesystem $files, Composer $composer, $basePath, $manifestPath)
     {
         $this->files = $files;
+        $this->composer = $composer;
         $this->basePath = $basePath;
         $this->manifestPath = $manifestPath;
         $this->vendorPath = $basePath.'/vendor';
@@ -133,6 +141,8 @@ class PackageManifest
             $ignore = array_merge($ignore, $configuration['dont-discover'] ?? []);
         })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
             return $ignoreAll || in_array($package, $ignore);
+        })->when(method_exists(app(), 'isProduction') && app()->isProduction(), function($packages) {
+            return $packages->intersectByKeys(array_flip($this->composer->getDependencies(false)));
         })->filter()->all());
     }
 

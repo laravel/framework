@@ -75,6 +75,27 @@ class Composer
     }
 
     /**
+     * Get the package dependencies.
+     *
+     * @param  bool  $includeDev
+     * @return array
+     */
+    public function getDependencies($includeDev = true)
+    {
+        $command = array_merge($this->findComposer(), ['show', '-N']);
+
+        if (! $includeDev) {
+            $command[] = '--no-dev';
+        }
+
+        $process = $this->getProcess($command);
+
+        $process->run();
+
+        return array_map('trim', array_filter(explode("\n", $process->getOutput())));
+    }
+
+    /**
      * Get the PHP binary.
      *
      * @return string

@@ -17,6 +17,7 @@ use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Composer;
 use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -197,7 +198,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this->singleton(PackageManifest::class, function () {
             return new PackageManifest(
-                new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
+                new Filesystem,
+                new Composer(new Filesystem, $this->basePath()),
+                $this->basePath(),
+                $this->getCachedPackagesPath()
             );
         });
     }
