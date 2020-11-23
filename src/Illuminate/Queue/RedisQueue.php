@@ -47,6 +47,13 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $blockFor = null;
 
     /**
+     * Indicate that pushes should be delayed till after database transactions commit.
+     *
+     * @var bool
+     */
+    protected $pushAfterCommits = false;
+
+    /**
      * Create a new Redis queue instance.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
@@ -56,13 +63,19 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  int|null  $blockFor
      * @return void
      */
-    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60, $blockFor = null)
+    public function __construct(Redis $redis,
+                                $default = 'default',
+                                $connection = null,
+                                $retryAfter = 60,
+                                $blockFor = null,
+                                $pushAfterCommits = false)
     {
         $this->redis = $redis;
         $this->default = $default;
         $this->blockFor = $blockFor;
         $this->connection = $connection;
         $this->retryAfter = $retryAfter;
+        $this->pushAfterCommits = $pushAfterCommits;
     }
 
     /**

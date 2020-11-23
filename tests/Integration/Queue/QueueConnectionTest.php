@@ -18,6 +18,7 @@ class QueueConnectionTest extends TestCase
     {
         $app['config']->set('app.debug', 'true');
         $app['config']->set('queue.default', 'sqs');
+        $app['config']->set('queue.connections.sqs.after_commits', true);
     }
 
     protected function tearDown(): void

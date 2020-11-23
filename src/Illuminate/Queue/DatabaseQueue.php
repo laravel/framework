@@ -41,6 +41,13 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     protected $retryAfter = 60;
 
     /**
+     * Indicate that pushes should be delayed till after database transactions commit.
+     *
+     * @var bool
+     */
+    protected $pushAfterCommits = false;
+
+    /**
      * Create a new database queue instance.
      *
      * @param  \Illuminate\Database\Connection  $database
@@ -49,12 +56,17 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  int  $retryAfter
      * @return void
      */
-    public function __construct(Connection $database, $table, $default = 'default', $retryAfter = 60)
+    public function __construct(Connection $database,
+                                $table,
+                                $default = 'default',
+                                $retryAfter = 60,
+                                $pushAfterCommits = false)
     {
         $this->table = $table;
         $this->default = $default;
         $this->database = $database;
         $this->retryAfter = $retryAfter;
+        $this->pushAfterCommits = $pushAfterCommits;
     }
 
     /**

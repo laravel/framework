@@ -265,7 +265,7 @@ abstract class Queue
      */
     protected function enqueueUsing($connection, $callback)
     {
-        if (! $connection instanceof DatabaseQueue && Connection::$totalTransactions > 0) {
+        if ($connection->pushAfterCommits ?? false && Connection::$totalTransactions > 0) {
             Connection::$afterTransactionCallbacks[] = function () use ($callback) {
                 $callback();
             };

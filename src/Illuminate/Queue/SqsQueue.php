@@ -39,6 +39,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     private $suffix;
 
     /**
+     * Indicate that pushes should be delayed till after database transactions commit.
+     *
+     * @var bool
+     */
+    protected $pushAfterCommits = false;
+
+    /**
      * Create a new Amazon SQS queue instance.
      *
      * @param  \Aws\Sqs\SqsClient  $sqs
@@ -47,12 +54,17 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $suffix
      * @return void
      */
-    public function __construct(SqsClient $sqs, $default, $prefix = '', $suffix = '')
+    public function __construct(SqsClient $sqs,
+                                $default,
+                                $prefix = '',
+                                $suffix = '',
+                                $pushAfterCommits = false)
     {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
         $this->suffix = $suffix;
+        $this->pushAfterCommits = $pushAfterCommits;
     }
 
     /**

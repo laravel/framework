@@ -38,6 +38,13 @@ class BeanstalkdQueue extends Queue implements QueueContract
     protected $blockFor;
 
     /**
+     * Indicate that pushes should be delayed till after database transactions commit.
+     *
+     * @var bool
+     */
+    protected $pushAfterCommits = false;
+
+    /**
      * Create a new Beanstalkd queue instance.
      *
      * @param  \Pheanstalk\Pheanstalk  $pheanstalk
@@ -46,12 +53,17 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  int  $blockFor
      * @return void
      */
-    public function __construct(Pheanstalk $pheanstalk, $default, $timeToRun, $blockFor = 0)
+    public function __construct(Pheanstalk $pheanstalk,
+                                $default,
+                                $timeToRun,
+                                $blockFor = 0,
+                                $pushAfterCommits = false)
     {
         $this->default = $default;
         $this->blockFor = $blockFor;
         $this->timeToRun = $timeToRun;
         $this->pheanstalk = $pheanstalk;
+        $this->pushAfterCommits = $pushAfterCommits;
     }
 
     /**
