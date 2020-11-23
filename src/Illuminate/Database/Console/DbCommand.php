@@ -155,13 +155,13 @@ class DbCommand extends Command
      */
     protected function getSqlsrvArguments(array $connection)
     {
-        return $this->getOptionalArguments([
-            'database' => '-d '.$connection['database'],
-            'username' => '-U '.$connection['username'],
-            'password' => '-P '.$connection['password'],
-            'host' => '-S tcp:'.$connection['host']
-                        .($connection['port'] ? ','.$connection['port'] : ''),
-        ], $connection);
+        return array_merge(...$this->getOptionalArguments([
+            'database' => ['-d', $connection['database']],
+            'username' => ['-U', $connection['username']],
+            'password' => ['-P', $connection['password']],
+            'host' => ['-S', 'tcp:'.$connection['host']
+                        .($connection['port'] ? ','.$connection['port'] : ''), ],
+        ], $connection));
     }
 
     /**
