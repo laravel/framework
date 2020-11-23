@@ -514,11 +514,6 @@ abstract class Factory
      */
     public function for($factory, $relationship = null)
     {
-        if ($factory instanceof Model) {
-            return $this->afterMaking(function ($model) use ($factory, $relationship) {
-                $model->{$relationship ?: Str::camel(class_basename($factory))}()->associate($factory);
-            });
-        }
 
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
             $factory,
