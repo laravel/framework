@@ -278,6 +278,20 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestComment::all());
     }
 
+    public function test_morph_to_relationship_with_existing_model_instance()
+    {
+        $post = FactoryTestPostFactory::new(['title' => 'Test Title'])->create();
+        $posts = FactoryTestCommentFactory::times(3)
+                        ->for($post, 'commentable')
+                        ->create();
+
+        $this->assertSame('Test Title', FactoryTestPost::first()->title);
+        $this->assertCount(3, FactoryTestPost::first()->comments);
+
+        $this->assertCount(1, FactoryTestPost::all());
+        $this->assertCount(3, FactoryTestComment::all());
+    }
+
     public function test_belongs_to_many_relationship()
     {
         $users = FactoryTestUserFactory::times(3)
@@ -311,7 +325,7 @@ class DatabaseEloquentFactoryTest extends TestCase
                             $_SERVER['__test.role.creating-role'] = $role;
                         })
                         ->create();
-        $users = FactoryTestUserFactory::times(3)
+        FactoryTestUserFactory::times(3)
                         ->hasAttached($roles, ['admin' => 'Y'], 'roles')
                         ->create();
 

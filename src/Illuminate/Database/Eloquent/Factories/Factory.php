@@ -488,14 +488,6 @@ abstract class Factory
      */
     public function hasAttached($factory, $pivot = [], $relationship = null)
     {
-        if ($factory instanceof Collection || $factory instanceof Model) {
-            $factory = Collection::wrap($factory);
-
-            return $this->afterCreating(function ($model) use ($factory, $pivot, $relationship) {
-                $model->{$relationship ?: Str::camel(Str::plural(class_basename($factory->first())))}()->attach($factory, $pivot);
-            });
-        }
-
         return $this->newInstance([
             'has' => $this->has->concat([new BelongsToManyRelationship(
                 $factory,
@@ -514,11 +506,6 @@ abstract class Factory
      */
     public function for($factory, $relationship = null)
     {
-        if ($factory instanceof Model) {
-            return $this->afterMaking(function ($model) use ($factory, $relationship) {
-                $model->{$relationship ?: Str::camel(class_basename($factory))}()->associate($factory);
-            });
-        }
 
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
             $factory,
