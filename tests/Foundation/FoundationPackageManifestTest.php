@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Foundation;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest;
 use Illuminate\Support\Composer;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 
 class FoundationPackageManifestTest extends TestCase
 {
