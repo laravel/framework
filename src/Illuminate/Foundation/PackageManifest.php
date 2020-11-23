@@ -141,7 +141,7 @@ class PackageManifest
             $ignore = array_merge($ignore, $configuration['dont-discover'] ?? []);
         })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
             return $ignoreAll || in_array($package, $ignore);
-        })->when(method_exists(app(), 'isProduction') && app()->isProduction(), function($packages) {
+        })->when(method_exists(app(), 'isProduction') && app()->isProduction(), function ($packages) {
             return $packages->intersectByKeys(array_flip($this->composer->getDependencies(false)));
         })->filter()->all());
     }
