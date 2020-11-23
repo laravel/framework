@@ -22,11 +22,11 @@ trait InteractsWithTime
     /**
      * Travel to another time.
      *
-     * @param  \DateTimeInterface  $date
+     * @param  \DateTimeInterface|Closure|Carbon|string|false|null  $date
      * @param  callable|null  $callback
      * @return mixed
      */
-    public function travelTo(DateTimeInterface $date, $callback = null)
+    public function travelTo($date, $callback = null)
     {
         Carbon::setTestNow($date);
 
