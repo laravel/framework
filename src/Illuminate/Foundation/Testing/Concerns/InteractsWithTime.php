@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use DateTimeInterface;
 use Illuminate\Foundation\Testing\Wormhole;
 use Illuminate\Support\Carbon;
 
