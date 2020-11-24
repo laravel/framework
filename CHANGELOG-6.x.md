@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.3...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.4...6.x)
+
+
+## [v6.20.4 (2020-11-17)](https://github.com/laravel/framework/compare/v6.20.3...v6.20.4)
+
+### Fixed
+- Fixed pivot restoration ([#35218](https://github.com/laravel/framework/pull/35218))
 
 
 ## [v6.20.3 (2020-11-10)](https://github.com/laravel/framework/compare/v6.20.2...v6.20.3)

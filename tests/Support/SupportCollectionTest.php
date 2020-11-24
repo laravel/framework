@@ -1648,6 +1648,22 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSplitIn($collection)
+    {
+        $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = $data->splitIn(3);
+
+        $this->assertInstanceOf($collection, $data);
+        $this->assertInstanceOf($collection, $data->first());
+        $this->assertCount(3, $data);
+        $this->assertEquals([1, 2, 3, 4], $data->get(0)->values()->toArray());
+        $this->assertEquals([5, 6, 7, 8], $data->get(1)->values()->toArray());
+        $this->assertEquals([9, 10], $data->get(2)->values()->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testChunkWhileOnEqualElements($collection)
     {
         $data = (new $collection(['A', 'A', 'B', 'B', 'C', 'C', 'C']))

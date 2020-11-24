@@ -202,7 +202,10 @@ class NotificationSender
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
                             ->onConnection($notification->connection)
                             ->onQueue($queue)
-                            ->delay($notification->delay)
+                            ->delay(is_array($notification->delay) ?
+                                    ($notification->delay[$channel] ?? null)
+                                    : $notification->delay
+                            )
                             ->afterTransactions($notification->dispatchAfterTransactions)
                             ->through(
                                 array_merge(

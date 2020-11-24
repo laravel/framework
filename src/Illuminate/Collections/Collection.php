@@ -1042,6 +1042,17 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Split a collection into a certain number of groups, and fill the first groups completely.
+     *
+     * @param  int  $numberOfGroups
+     * @return static
+     */
+    public function splitIn($numberOfGroups)
+    {
+        return $this->chunk(ceil($this->count() / $numberOfGroups));
+    }
+
+    /**
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
@@ -1110,13 +1121,17 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Sort the collection using the given callback.
      *
-     * @param  callable|string  $callback
+     * @param  callable|array|string  $callback
      * @param  int  $options
      * @param  bool  $descending
      * @return static
      */
     public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
     {
+        if (is_array($callback)) {
+            return $this->sortByMany($callback);
+        }
+
         $results = [];
 
         $callback = $this->valueRetriever($callback);
@@ -1139,6 +1154,50 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         return new static($results);
+    }
+
+    /**
+     * Sort the collection using multiple comparisons.
+     *
+     * @param  array  $comparisons
+     * @return static
+     */
+    protected function sortByMany(array $comparisons = [])
+    {
+        $items = $this->items;
+
+        usort($items, function ($a, $b) use ($comparisons) {
+            foreach ($comparisons as $comparison) {
+                $comparison = Arr::wrap($comparison);
+
+                $prop = $comparison[0];
+
+                $ascending = Arr::get($comparison, 1, true) === true ||
+                             Arr::get($comparison, 1, true) === 'asc';
+
+                $result = 0;
+
+                if (is_callable($prop)) {
+                    $result = $prop($a, $b);
+                } else {
+                    $values = [Arr::get($a, $prop), Arr::get($b, $prop)];
+
+                    if (! $ascending) {
+                        $values = array_reverse($values);
+                    }
+
+                    $result = $values[0] <=> $values[1];
+                }
+
+                if ($result === 0) {
+                    continue;
+                }
+
+                return $result;
+            }
+        });
+
+        return new static($items);
     }
 
     /**
