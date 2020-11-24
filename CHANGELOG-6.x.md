@@ -1,6 +1,16 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.4...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.5...6.x)
+
+
+## [v6.20.5 (2020-11-24)](https://github.com/laravel/framework/compare/v6.20.4...v6.20.5)
+
+### Fixed
+- Fixing BroadcastException message in PusherBroadcaster@broadcast ([#35290](https://github.com/laravel/framework/pull/35290))
+- Fixed generic DetectsLostConnection string ([#35323](https://github.com/laravel/framework/pull/35323))
+
+### Changed
+- Updated `aws/aws-sdk-php` suggest to `^3.155` ([#35267](https://github.com/laravel/framework/pull/35267))
 
 
 ## [v6.20.4 (2020-11-17)](https://github.com/laravel/framework/compare/v6.20.3...v6.20.4)
