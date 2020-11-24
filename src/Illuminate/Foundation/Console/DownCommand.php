@@ -100,7 +100,7 @@ class DownCommand extends Command
     {
         (new RegisterErrorViewPaths)();
 
-        return view($this->option('render'))->render();
+        return view($this->option('render'),['command' => $this])->render();
     }
 
     /**
