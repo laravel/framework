@@ -51,7 +51,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @var bool
      */
-    protected $pushAfterCommits = false;
+    protected $dispatchAfterTransaction = false;
 
     /**
      * Create a new Redis queue instance.
@@ -68,14 +68,14 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
                                 $connection = null,
                                 $retryAfter = 60,
                                 $blockFor = null,
-                                $pushAfterCommits = false)
+                                $dispatchAfterTransaction = false)
     {
         $this->redis = $redis;
         $this->default = $default;
         $this->blockFor = $blockFor;
         $this->connection = $connection;
         $this->retryAfter = $retryAfter;
-        $this->pushAfterCommits = $pushAfterCommits;
+        $this->dispatchAfterTransaction = $dispatchAfterTransaction;
     }
 
     /**
@@ -124,7 +124,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $payload = $this->createPayload($job, $this->getQueue($queue), $data);
 
-        return $this->enqueueUsing($this, function () use ($payload, $queue) {
+        return $this->enqueueUsing($this, $job, function () use ($payload, $queue) {
             return $this->pushRaw($payload, $queue);
         });
     }
@@ -160,7 +160,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $payload = $this->createPayload($job, $this->getQueue($queue), $data);
 
-        return $this->enqueueUsing($this, function () use ($payload, $delay, $queue) {
+        return $this->enqueueUsing($this, $job, function () use ($payload, $delay, $queue) {
             return $this->laterRaw($delay, $payload, $queue);
         });
     }

@@ -45,7 +45,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @var bool
      */
-    protected $pushAfterCommits = false;
+    protected $dispatchAfterTransaction = false;
 
     /**
      * Create a new database queue instance.
@@ -60,13 +60,13 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
                                 $table,
                                 $default = 'default',
                                 $retryAfter = 60,
-                                $pushAfterCommits = false)
+                                $dispatchAfterTransaction = false)
     {
         $this->table = $table;
         $this->default = $default;
         $this->database = $database;
         $this->retryAfter = $retryAfter;
-        $this->pushAfterCommits = $pushAfterCommits;
+        $this->dispatchAfterTransaction = $dispatchAfterTransaction;
     }
 
     /**
@@ -94,7 +94,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     {
         $payload = $this->createPayload($job, $this->getQueue($queue), $data);
 
-        return $this->enqueueUsing($this, function () use ($queue, $payload) {
+        return $this->enqueueUsing($this, $job, function () use ($queue, $payload) {
             return $this->pushToDatabase($queue, $payload);
         });
     }
@@ -125,7 +125,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     {
         $payload = $this->createPayload($job, $this->getQueue($queue), $data);
 
-        return $this->enqueueUsing($this, function () use ($queue, $delay, $payload) {
+        return $this->enqueueUsing($this, $job, function () use ($queue, $delay, $payload) {
             return $this->pushToDatabase($queue, $payload, $delay);
         });
     }

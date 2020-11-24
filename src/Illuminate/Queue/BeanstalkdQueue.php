@@ -42,7 +42,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      *
      * @var bool
      */
-    protected $pushAfterCommits = false;
+    protected $dispatchAfterTransaction = false;
 
     /**
      * Create a new Beanstalkd queue instance.
@@ -57,13 +57,13 @@ class BeanstalkdQueue extends Queue implements QueueContract
                                 $default,
                                 $timeToRun,
                                 $blockFor = 0,
-                                $pushAfterCommits = false)
+                                $dispatchAfterTransaction = false)
     {
         $this->default = $default;
         $this->blockFor = $blockFor;
         $this->timeToRun = $timeToRun;
         $this->pheanstalk = $pheanstalk;
-        $this->pushAfterCommits = $pushAfterCommits;
+        $this->dispatchAfterTransaction = $dispatchAfterTransaction;
     }
 
     /**
@@ -91,7 +91,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     {
         $payload = $this->createPayload($job, $this->getQueue($queue), $data);
 
-        return $this->enqueueUsing($this, function () use ($payload, $queue) {
+        return $this->enqueueUsing($this, $job, function () use ($payload, $queue) {
             return $this->pushRaw($payload, $queue);
         });
     }
@@ -122,7 +122,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->enqueueUsing($this, function () use ($delay, $job, $data, $queue) {
+        return $this->enqueueUsing($this, $job, function () use ($delay, $job, $data, $queue) {
             $pheanstalk = $this->pheanstalk->useTube($this->getQueue($queue));
 
             return $pheanstalk->put(

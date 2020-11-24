@@ -43,7 +43,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @var bool
      */
-    protected $pushAfterCommits = false;
+    protected $dispatchAfterTransaction = false;
 
     /**
      * Create a new Amazon SQS queue instance.
@@ -58,13 +58,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
                                 $default,
                                 $prefix = '',
                                 $suffix = '',
-                                $pushAfterCommits = false)
+                                $dispatchAfterTransaction = false)
     {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
         $this->suffix = $suffix;
-        $this->pushAfterCommits = $pushAfterCommits;
+        $this->dispatchAfterTransaction = $dispatchAfterTransaction;
     }
 
     /**
@@ -97,7 +97,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     {
         $payload = $this->createPayload($job, $queue ?: $this->default, $data);
 
-        return $this->enqueueUsing($this, function () use ($payload, $queue) {
+        return $this->enqueueUsing($this, $job, function () use ($payload, $queue) {
             return $this->pushRaw($payload, $queue);
         });
     }
@@ -128,7 +128,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->enqueueUsing($this, function () use ($data, $delay, $job, $queue) {
+        return $this->enqueueUsing($this, $job, function () use ($data, $delay, $job, $queue) {
             return $this->sqs->sendMessage([
                 'QueueUrl' => $this->getQueue($queue),
                 'MessageBody' => $this->createPayload($job, $queue ?: $this->default, $data),

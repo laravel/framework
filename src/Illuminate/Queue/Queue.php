@@ -260,12 +260,14 @@ abstract class Queue
      * Enqueue a jobs using the given callback.
      *
      * @param  \Illuminate\Contracts\Queue\Queue  $connection
+     * @param  \Closure|string|object  $job
      * @param  callable  $callback
      * @return mixed
      */
-    protected function enqueueUsing($connection, $callback)
+    protected function enqueueUsing($connection, $job, $callback)
     {
-        if ($connection->pushAfterCommits ?? false && Connection::$totalTransactions > 0) {
+        if (Connection::$totalTransactions > 0 &&
+            $this->shouldDispatchAfterTransactions($connection, $job)) {
             Connection::$afterTransactionCallbacks[] = function () use ($callback) {
                 $callback();
             };
@@ -308,5 +310,25 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Determine if the job should be dispatched after database transactions.
+     *
+     * @param  \Illuminate\Contracts\Queue\Queue  $connection
+     * @param  \Closure|string|object  $job
+     * @return bool
+     */
+    protected function shouldDispatchAfterTransactions($connection, $job)
+    {
+        if (is_object($job) && isset($job->dispatchAfterTransaction)) {
+            return $job->dispatchAfterTransaction;
+        }
+
+        if (isset($connection->dispatchAfterTransaction)) {
+            return $connection->dispatchAfterTransaction;
+        }
+
+        return false;
     }
 }
