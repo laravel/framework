@@ -321,12 +321,12 @@ abstract class Queue
      */
     protected function shouldDispatchAfterTransactions($connection, $job)
     {
-        if (is_object($job) && isset($job->dispatchAfterTransaction)) {
-            return $job->dispatchAfterTransaction;
+        if (is_object($job) && isset($job->dispatchAfterTransactions)) {
+            return $job->dispatchAfterTransactions;
         }
 
-        if (isset($connection->dispatchAfterTransaction)) {
-            return $connection->dispatchAfterTransaction;
+        if (isset($connection->dispatchAfterTransactions)) {
+            return $connection->dispatchAfterTransactions;
         }
 
         return false;

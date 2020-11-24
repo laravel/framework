@@ -45,7 +45,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @var bool
      */
-    protected $dispatchAfterTransaction = false;
+    protected $dispatchAfterTransactions = false;
 
     /**
      * Create a new database queue instance.
@@ -54,19 +54,20 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $table
      * @param  string  $default
      * @param  int  $retryAfter
+     * @param  bool  $dispatchAfterTransactions
      * @return void
      */
     public function __construct(Connection $database,
                                 $table,
                                 $default = 'default',
                                 $retryAfter = 60,
-                                $dispatchAfterTransaction = false)
+                                $dispatchAfterTransactions = false)
     {
         $this->table = $table;
         $this->default = $default;
         $this->database = $database;
         $this->retryAfter = $retryAfter;
-        $this->dispatchAfterTransaction = $dispatchAfterTransaction;
+        $this->dispatchAfterTransactions = $dispatchAfterTransactions;
     }
 
     /**

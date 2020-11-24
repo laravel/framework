@@ -100,6 +100,19 @@ class PendingDispatch
     }
 
     /**
+     * Indicate that the job should be dispatched after database transactions.
+     *
+     * @param  bool|null  $value
+     * @return $this
+     */
+    public function afterTransactions($value = true)
+    {
+        $this->job->afterTransactions($value);
+
+        return $this;
+    }
+
+    /**
      * Set the jobs that should run if this job is successful.
      *
      * @param  array  $chain

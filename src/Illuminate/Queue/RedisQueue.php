@@ -51,7 +51,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @var bool
      */
-    protected $dispatchAfterTransaction = false;
+    protected $dispatchAfterTransactions = false;
 
     /**
      * Create a new Redis queue instance.
@@ -61,6 +61,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string|null  $connection
      * @param  int  $retryAfter
      * @param  int|null  $blockFor
+     * @param  bool  $dispatchAfterTransactions
      * @return void
      */
     public function __construct(Redis $redis,
@@ -68,14 +69,14 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
                                 $connection = null,
                                 $retryAfter = 60,
                                 $blockFor = null,
-                                $dispatchAfterTransaction = false)
+                                $dispatchAfterTransactions = false)
     {
         $this->redis = $redis;
         $this->default = $default;
         $this->blockFor = $blockFor;
         $this->connection = $connection;
         $this->retryAfter = $retryAfter;
-        $this->dispatchAfterTransaction = $dispatchAfterTransaction;
+        $this->dispatchAfterTransactions = $dispatchAfterTransactions;
     }
 
     /**

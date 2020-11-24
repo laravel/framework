@@ -42,7 +42,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      *
      * @var bool
      */
-    protected $dispatchAfterTransaction = false;
+    protected $dispatchAfterTransactions = false;
 
     /**
      * Create a new Beanstalkd queue instance.
@@ -51,19 +51,20 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  string  $default
      * @param  int  $timeToRun
      * @param  int  $blockFor
+     * @param  bool $dispatchAfterTransactions
      * @return void
      */
     public function __construct(Pheanstalk $pheanstalk,
                                 $default,
                                 $timeToRun,
                                 $blockFor = 0,
-                                $dispatchAfterTransaction = false)
+                                $dispatchAfterTransactions = false)
     {
         $this->default = $default;
         $this->blockFor = $blockFor;
         $this->timeToRun = $timeToRun;
         $this->pheanstalk = $pheanstalk;
-        $this->dispatchAfterTransaction = $dispatchAfterTransaction;
+        $this->dispatchAfterTransactions = $dispatchAfterTransactions;
     }
 
     /**

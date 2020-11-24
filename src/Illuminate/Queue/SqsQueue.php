@@ -43,7 +43,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @var bool
      */
-    protected $dispatchAfterTransaction = false;
+    protected $dispatchAfterTransactions = false;
 
     /**
      * Create a new Amazon SQS queue instance.
@@ -52,19 +52,20 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $default
      * @param  string  $prefix
      * @param  string  $suffix
+     * @param  bool  $dispatchAfterTransactions
      * @return void
      */
     public function __construct(SqsClient $sqs,
                                 $default,
                                 $prefix = '',
                                 $suffix = '',
-                                $dispatchAfterTransaction = false)
+                                $dispatchAfterTransactions = false)
     {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
         $this->suffix = $suffix;
-        $this->dispatchAfterTransaction = $dispatchAfterTransaction;
+        $this->dispatchAfterTransactions = $dispatchAfterTransactions;
     }
 
     /**
