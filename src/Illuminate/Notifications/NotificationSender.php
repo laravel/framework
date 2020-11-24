@@ -203,6 +203,7 @@ class NotificationSender
                             ->onConnection($notification->connection)
                             ->onQueue($queue)
                             ->delay($notification->delay)
+                            ->afterTransactions($notification->dispatchAfterTransactions)
                             ->through(
                                 array_merge(
                                     method_exists($notification, 'middleware') ? $notification->middleware() : [],

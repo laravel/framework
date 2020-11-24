@@ -39,6 +39,7 @@ class SendQueuedMailable
         $this->mailable = $mailable;
         $this->tries = property_exists($mailable, 'tries') ? $mailable->tries : null;
         $this->timeout = property_exists($mailable, 'timeout') ? $mailable->timeout : null;
+        $this->dispatchAfterTransactions = property_exists($mailable, 'dispatchAfterTransactions') ? $mailable->dispatchAfterTransactions : null;
     }
 
     /**
