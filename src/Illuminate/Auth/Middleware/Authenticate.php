@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
+use Illuminate\Http\Request;
 
 class Authenticate implements AuthenticatesRequests
 {
@@ -37,7 +38,7 @@ class Authenticate implements AuthenticatesRequests
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function handle($request, Closure $next, ...$guards)
+    public function handle(Request $request, Closure $next, ...$guards)
     {
         $this->authenticate($request, $guards);
 
@@ -53,7 +54,7 @@ class Authenticate implements AuthenticatesRequests
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    protected function authenticate($request, array $guards)
+    protected function authenticate(Request $request, array $guards)
     {
         if (empty($guards)) {
             $guards = [null];
@@ -77,7 +78,7 @@ class Authenticate implements AuthenticatesRequests
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    protected function unauthenticated($request, array $guards)
+    protected function unauthenticated(Request $request, array $guards)
     {
         throw new AuthenticationException(
             'Unauthenticated.', $guards, $this->redirectTo($request)
@@ -90,7 +91,7 @@ class Authenticate implements AuthenticatesRequests
      * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
-    protected function redirectTo($request)
+    protected function redirectTo(Request $request)
     {
         //
     }
