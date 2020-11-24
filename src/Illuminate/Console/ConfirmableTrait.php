@@ -13,13 +13,12 @@ trait ConfirmableTrait
      * @param  \Closure|bool|null  $callback
      * @return bool
      */
-    public function confirmToProceed($warning = 'Application In Production!', $callback = null)
+    public function confirmToProceed($warning = null, $callback = null)
     {
         $callback = is_null($callback) ? $this->getDefaultConfirmCallback() : $callback;
+        $warning = value($callback);
 
-        $shouldConfirm = value($callback);
-
-        if ($shouldConfirm) {
+        if ($warning) {
             if ($this->hasOption('force') && $this->option('force')) {
                 return true;
             }
@@ -46,7 +45,31 @@ trait ConfirmableTrait
     protected function getDefaultConfirmCallback()
     {
         return function () {
-            return $this->getLaravel()->environment() === 'production';
+            if ($this->getLaravel()->environment() === 'local') {
+                $connection = $this->app['config']['database.default'];
+
+                if ($this->app['config']['database.connections.'.$connection.'.host']) {
+                    $host = $this->app['config']['database.connections.'.$connection.'.host'];
+                }
+
+                if ($this->app['config']['database.connections.'.$connection.'.write.host']) {
+                    $host = $this->app['config']['database.connections.'.$connection.'.write.host'];
+                }
+
+                if ($host) {
+                    $remoteDatabase = $host !== 'localhost' && $host !== '127.0.0.1';
+                }
+
+                if ($remoteDatabase) {
+                    return 'You May Be Connected To A Remote Database!';
+                }
+            }
+
+            if ($this->getLaravel()->environment() === 'production') {
+                return 'Application In Production!';
+            }
+
+            return;
         };
     }
 }
