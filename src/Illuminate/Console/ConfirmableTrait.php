@@ -13,17 +13,23 @@ trait ConfirmableTrait
      * @param  \Closure|bool|null  $callback
      * @return bool
      */
-    public function confirmToProceed($warning = null, $callback = null)
+    public function confirmToProceed($warning = 'Application In Production!', $callback = null)
     {
         $callback = is_null($callback) ? $this->getDefaultConfirmCallback() : $callback;
-        $warning = value($callback);
+        $shouldConfirm = value($callback);
 
-        if ($warning) {
+        if ($shouldConfirm) {
             if ($this->hasOption('force') && $this->option('force')) {
                 return true;
             }
 
-            $this->alert($warning);
+            if ($shouldConfirm === 'remote') {
+                $this->alert('You May Be Connected To A Remote Database!');
+            }
+
+            if ($shouldConfirm === 'production') {
+                $this->alert($warning);
+            }
 
             $confirmed = $this->confirm('Do you really wish to run this command?');
 
@@ -61,12 +67,12 @@ trait ConfirmableTrait
                 }
 
                 if ($remoteDatabase) {
-                    return 'You May Be Connected To A Remote Database!';
+                    return 'remote';
                 }
             }
 
             if ($this->getLaravel()->environment() === 'production') {
-                return 'Application In Production!';
+                return 'production';
             }
 
             return false;
