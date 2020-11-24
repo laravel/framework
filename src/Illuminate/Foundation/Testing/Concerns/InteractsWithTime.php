@@ -21,7 +21,7 @@ trait InteractsWithTime
     /**
      * Travel to another time.
      *
-     * @param  \DateTimeInterface|Closure|Carbon|string|false|null $date
+     * @param  \DateTimeInterface|\Closure|\Illuminate\Support\Carbon|string|bool|null  $date
      * @param  callable|null  $callback
      * @return mixed
      */
