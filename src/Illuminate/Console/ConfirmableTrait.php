@@ -69,7 +69,7 @@ trait ConfirmableTrait
                 return 'Application In Production!';
             }
 
-            return;
+            return false;
         };
     }
 }
