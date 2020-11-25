@@ -3,11 +3,13 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Factory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -80,6 +82,59 @@ class MailFake implements Factory, Mailer, MailQueue
             $times, $count,
             "The expected [{$mailable}] mailable was sent {$count} times instead of {$times} times."
         );
+    }
+
+    /**
+     * Parse the given view name or array.
+     *
+     * @param  string|array  $view
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function parseView($view)
+    {
+        if (! is_array($view)) {
+            $view = [$view];
+        }
+
+        return [
+            $view[0] ?? $view['html'] ?? null,
+            $view[1] ?? $view['text'] ?? null,
+            $view['raw'] ?? null,
+        ];
+    }
+
+    /**
+     * Render the given message as a view.
+     *
+     * @param  string|array  $view
+     * @param  array  $data
+     * @return array
+     */
+    public function render($view, array $data = [])
+    {
+        [$html, $plain, $raw] = $this->parseView($view);
+
+        return [
+            'html' => $this->renderView($html, $data),
+            'text' => $this->renderView($plain, $data),
+            'raw' => $raw
+        ];
+    }
+
+    /**
+     * Render the given view.
+     *
+     * @param  string  $view
+     * @param  array  $data
+     * @return string
+     */
+    protected function renderView($view, $data)
+    {
+        return $view instanceof Htmlable
+            ? $view->toHtml()
+            : Container::getInstance()->make(\Illuminate\Contracts\View\Factory::class)->make($view, $data)->render();
     }
 
     /**

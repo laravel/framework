@@ -2,14 +2,19 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Testing\Fakes\MailFake;
+use Illuminate\Contracts\View\Factory as FactoryContract;
+use Illuminate\View\Factory;
+use Illuminate\View\View;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
+use Mockery as m;
 
 class SupportTestingMailFakeTest extends TestCase
 {
@@ -172,6 +177,51 @@ class SupportTestingMailFakeTest extends TestCase
             return $mail->hasTo($user);
         });
     }
+
+    public function testRender()
+    {
+        $viewFactory = m::mock(Factory::class);
+        $view = m::mock(View::class);
+        $viewFactory->shouldReceive('make')->twice()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('Hello Taylor HTML');
+        $view->shouldReceive('render')->once()->andReturn('Hello Taylor TEXT');
+
+        $this->fake->to('taylor@laravel.com')->send(new MailableWithContentsStub);
+
+        Container::getInstance()->instance('mailer', $this->fake);
+        Container::getInstance()->instance(FactoryContract::class, $viewFactory);
+
+        $this->fake->assertSent(function (MailableWithContentsStub $mail) {
+            $rendered = $mail->render();
+            $this->assertStringContainsString('Taylor HTML', $rendered['html']);
+            $this->assertStringContainsString('Taylor TEXT', $rendered['text']);
+            return true;
+        });
+    }
+
+    public function testRenderMarkdown()
+    {
+        $viewFactory = m::mock(Factory::class);
+        $view = m::mock(View::class);
+        $viewFactory->shouldReceive('make')->once()->andReturn($view);
+        $viewFactory->shouldReceive('flushFinderCache')->once();
+        $viewFactory->shouldReceive('replaceNamespace')->once()->andReturn($viewFactory);
+        $viewFactory->shouldReceive('exists')->once()->andReturn(false);
+        $view->shouldReceive('render')->once()->andReturn('Hello Taylor');
+
+        $this->fake->to('taylor@laravel.com')->send(new MarkdownMailableStub);
+
+        Container::getInstance()->instance('mailer', $this->fake);
+        Container::getInstance()->instance(FactoryContract::class, $viewFactory);
+
+        $this->fake->assertSent(function (MarkdownMailableStub $mail) {
+            $rendered = $mail->render();
+            $this->assertStringContainsString('Taylor</p>', $rendered['html']);
+            $this->assertStringContainsString('Taylor', $rendered['text']);
+            $this->assertStringNotContainsString('Taylor</p>', $rendered['text']);
+            return true;
+        });
+    }
 }
 
 class MailableStub extends Mailable implements MailableContract
@@ -207,6 +257,45 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
     {
         $this->with('first_name', 'Taylor')
              ->withLastName('Otwell');
+    }
+}
+
+class MailableWithContentsStub extends Mailable implements MailableContract
+{
+    public $framework = 'Laravel';
+
+    protected $version = '6.0';
+
+    public $name = 'Taylor';
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        $this->view('emails.html.hello')
+            ->text('emails.plain.hello');
+    }
+}
+
+class MarkdownMailableStub extends Mailable implements MailableContract
+{
+    public $framework = 'Laravel';
+
+    protected $version = '6.0';
+
+    public $name = 'Taylor';
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        $this->markdown('emails.markdown.hello');
     }
 }
 
