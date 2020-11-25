@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.16.0...8.x)
 
 
-## [v8.16.0 (2020-11-17)](https://github.com/laravel/framework/compare/v8.15.0...v8.16.0)
+## [v8.16.0 (2020-11-24)](https://github.com/laravel/framework/compare/v8.15.0...v8.16.0)
 
 ### Added
 - Added `Illuminate\Console\Concerns\InteractsWithIO::withProgressBar()` ([4e52a60](https://github.com/laravel/framework/commit/4e52a606e91619f6082ed8d46f8d64f9d4dbd0b2), [169fd2b](https://github.com/laravel/framework/commit/169fd2b5156650a067aa77a38681875d2a6c5e57))
