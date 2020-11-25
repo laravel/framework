@@ -715,7 +715,9 @@ class Router implements BindingRegistrar, RegistrarContract
                 return true;
             }
 
-            $reflection = new ReflectionClass($name);
+            [$className] = explode(':', $name, 2);
+
+            $reflection = new ReflectionClass($className);
 
             return collect($excluded)->contains(function ($exclude) use ($reflection) {
                 return $reflection->isSubclassOf($exclude);
