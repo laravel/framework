@@ -204,11 +204,11 @@ class SupportTestingMailFakeTest extends TestCase
     {
         $viewFactory = m::mock(Factory::class);
         $view = m::mock(View::class);
-        $viewFactory->shouldReceive('make')->once()->andReturn($view);
-        $viewFactory->shouldReceive('flushFinderCache')->once();
-        $viewFactory->shouldReceive('replaceNamespace')->once()->andReturn($viewFactory);
+        $viewFactory->shouldReceive('make')->times(3)->andReturn($view);
+        $viewFactory->shouldReceive('flushFinderCache')->twice();
+        $viewFactory->shouldReceive('replaceNamespace')->twice()->andReturn($viewFactory);
         $viewFactory->shouldReceive('exists')->once()->andReturn(false);
-        $view->shouldReceive('render')->once()->andReturn('Hello Taylor');
+        $view->shouldReceive('render')->times(3)->andReturn('Hello Taylor');
 
         $this->fake->to('taylor@laravel.com')->send(new MarkdownMailableStub);
 
@@ -223,6 +223,11 @@ class SupportTestingMailFakeTest extends TestCase
 
             return true;
         });
+    }
+
+    protected function tearDown(): void
+    {
+        m::close();
     }
 }
 
