@@ -52,7 +52,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('default', 2);
         $manager->begin('admin', 1);
 
-        $manager->rollback('default', 2);
+        $manager->rollback('default', 1);
 
         $this->assertCount(2, $manager->getTransactions());
 
@@ -71,7 +71,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('default', 2);
         $manager->begin('admin', 1);
 
-        $manager->rollback('default', 1);
+        $manager->rollback('default', 0);
 
         $this->assertCount(1, $manager->getTransactions());
 

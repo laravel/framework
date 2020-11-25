@@ -46,7 +46,7 @@ class DatabaseTransactionsManager
     {
         $this->transactions = $this->transactions->reject(function ($transaction) use ($connection, $level) {
             return $transaction->connection == $connection &&
-                $transaction->level >= $level;
+                $transaction->level > $level;
         })->values();
     }
 
