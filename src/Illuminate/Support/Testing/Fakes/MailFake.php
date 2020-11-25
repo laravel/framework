@@ -119,7 +119,7 @@ class MailFake implements Factory, Mailer, MailQueue
         return [
             'html' => $this->renderView($html, $data),
             'text' => $this->renderView($plain, $data),
-            'raw' => $raw
+            'raw' => $raw,
         ];
     }
 

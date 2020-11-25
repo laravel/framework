@@ -6,15 +6,15 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Testing\Fakes\MailFake;
-use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
+use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use Mockery as m;
 
 class SupportTestingMailFakeTest extends TestCase
 {
@@ -195,6 +195,7 @@ class SupportTestingMailFakeTest extends TestCase
             $rendered = $mail->render();
             $this->assertStringContainsString('Taylor HTML', $rendered['html']);
             $this->assertStringContainsString('Taylor TEXT', $rendered['text']);
+
             return true;
         });
     }
@@ -219,6 +220,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->assertStringContainsString('Taylor</p>', $rendered['html']);
             $this->assertStringContainsString('Taylor', $rendered['text']);
             $this->assertStringNotContainsString('Taylor</p>', $rendered['text']);
+
             return true;
         });
     }
