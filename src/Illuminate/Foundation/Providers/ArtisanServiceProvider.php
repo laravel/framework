@@ -49,6 +49,7 @@ use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
+use Illuminate\Foundation\Console\ScopeMakeCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Foundation\Console\StubPublishCommand;
@@ -155,6 +156,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'RequestMake' => RequestMakeCommand::class,
         'ResourceMake' => ResourceMakeCommand::class,
         'RuleMake' => RuleMakeCommand::class,
+        'ScopeMake' => ScopeMakeCommand::class,
         'SeederMake' => SeederMakeCommand::class,
         'SessionTable' => SessionTableCommand::class,
         'Serve' => ServeCommand::class,
@@ -773,6 +775,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(RuleMakeCommand::class, function ($app) {
             return new RuleMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerScopeMakeCommand()
+    {
+        $this->app->singleton(ScopeMakeCommand::class, function ($app) {
+            return new ScopeMakeCommand($app['files']);
         });
     }
 
