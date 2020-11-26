@@ -2,10 +2,14 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
+use const E_DEPRECATED;
+use const E_USER_DEPRECATED;
 use ErrorException;
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
+use function in_array;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Throwable;
@@ -67,8 +71,19 @@ class HandleExceptions
      */
     public function handleError($level, $message, $file = '', $line = 0, $context = [])
     {
+        $e = new ErrorException($message, 0, $level, $file, $line);
+
+        if ($level === E_USER_DEPRECATED || $level === E_DEPRECATED) {
+            $this->app->make(LoggerInterface::class)->warning(
+                $e->getMessage(),
+                ['exception' => $e]
+            );
+
+            return;
+        }
+
         if (error_reporting() & $level) {
-            throw new ErrorException($message, 0, $level, $file, $line);
+            throw $e;
         }
     }
 
