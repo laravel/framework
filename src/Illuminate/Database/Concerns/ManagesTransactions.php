@@ -324,11 +324,11 @@ trait ManagesTransactions
     }
 
     /**
-     * Execute the callback within a transaction context.
+     * Execute the callback after a transaction commits.
      *
      * @return void
      */
-    public function withinTransaction($callback)
+    public function afterCommit($callback)
     {
         if ($this->transactionsManager) {
             return $this->transactionsManager->addCallback($callback);
