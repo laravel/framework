@@ -70,7 +70,7 @@ class DatabaseTransactionsTest extends TestCase
             'name' => 'zain', 'value' => 1,
         ]);
 
-        $this->connection()->transaction(function() use ($transactionManager){
+        $this->connection()->transaction(function () {
             $this->connection()->table('users')->where(['name' => 'zain'])->update([
                 'value' => 2,
             ]);
@@ -109,12 +109,12 @@ class DatabaseTransactionsTest extends TestCase
             'name' => 'zain', 'value' => 1,
         ]);
 
-        $this->connection()->transaction(function() use ($transactionManager){
+        $this->connection()->transaction(function () {
             $this->connection()->table('users')->where(['name' => 'zain'])->update([
                 'value' => 2,
             ]);
 
-            $this->connection()->transaction(function() use ($transactionManager){
+            $this->connection()->transaction(function () {
                 $this->connection()->table('users')->where(['name' => 'zain'])->update([
                     'value' => 2,
                 ]);
@@ -138,17 +138,17 @@ class DatabaseTransactionsTest extends TestCase
             'name' => 'zain', 'value' => 1,
         ]);
 
-        $this->connection()->transaction(function() use ($transactionManager){
+        $this->connection()->transaction(function () {
             $this->connection()->table('users')->where(['name' => 'zain'])->update([
                 'value' => 2,
             ]);
 
-            $this->connection('second_connection')->transaction(function() use ($transactionManager){
+            $this->connection('second_connection')->transaction(function () {
                 $this->connection('second_connection')->table('users')->where(['name' => 'zain'])->update([
                     'value' => 2,
                 ]);
 
-                $this->connection('second_connection')->transaction(function() use ($transactionManager){
+                $this->connection('second_connection')->transaction(function () {
                     $this->connection('second_connection')->table('users')->where(['name' => 'zain'])->update([
                         'value' => 2,
                     ]);
@@ -171,7 +171,7 @@ class DatabaseTransactionsTest extends TestCase
         ]);
 
         try {
-            $this->connection()->transaction(function () use ($transactionManager) {
+            $this->connection()->transaction(function () {
                 $this->connection()->table('users')->where(['name' => 'zain'])->update([
                     'value' => 2,
                 ]);
@@ -220,12 +220,12 @@ class DatabaseTransactionsTest extends TestCase
         ]);
 
         try {
-            $this->connection()->transaction(function () use ($transactionManager) {
+            $this->connection()->transaction(function () {
                 $this->connection()->table('users')->where(['name' => 'zain'])->update([
                     'value' => 2,
                 ]);
 
-                $this->connection()->transaction(function () use ($transactionManager) {
+                $this->connection()->transaction(function () {
                     $this->connection()->table('users')->where(['name' => 'zain'])->update([
                         'value' => 2,
                     ]);
