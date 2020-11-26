@@ -38,7 +38,9 @@ class HandleExceptions
 
         $this->app = $app;
 
-        error_reporting(-1);
+        if (! $app->environment('production')) {
+            error_reporting(-1);
+        }
 
         set_error_handler([$this, 'handleError']);
 
