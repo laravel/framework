@@ -2,28 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use DateTime;
-use ErrorException;
-use Exception;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseTransactionsManager;
-use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Database\Events\TransactionBeginning;
-use Illuminate\Database\Events\TransactionCommitted;
-use Illuminate\Database\Events\TransactionRolledBack;
-use Illuminate\Database\Query\Builder as BaseBuilder;
-use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Database\Query\Processors\Processor;
-use Illuminate\Database\QueryException;
-use Illuminate\Database\Schema\Builder;
-use Mockery as m;
-use PDO;
-use PDOException;
-use PDOStatement;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use stdClass;
 
 class DatabaseTransactionsManagerTest extends TestCase
 {
@@ -104,7 +84,6 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('default', 1);
 
         $manager->addCallback(function () use (&$callbacks) {
-
         });
 
         $manager->begin('default', 2);
@@ -112,7 +91,6 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('admin', 1);
 
         $manager->addCallback(function () use (&$callbacks) {
-
         });
 
         $this->assertCount(1, $manager->getTransactions()[0]->getCallbacks());
