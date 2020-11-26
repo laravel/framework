@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Concerns;
 
 use Closure;
+use RuntimeException;
 use Throwable;
 
 trait ManagesTransactions
@@ -320,5 +321,19 @@ trait ManagesTransactions
     public function transactionLevel()
     {
         return $this->transactions;
+    }
+
+    /**
+     * Execute the callback within a transaction context.
+     *
+     * @return void
+     */
+    public function withinTransaction($callback)
+    {
+        if ($this->transactionsManager) {
+            return $this->transactionsManager->addCallback($callback);
+        }
+
+        throw new RuntimeException('Transactions Manager has not been set.');
     }
 }

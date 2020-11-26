@@ -171,4 +171,18 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertCount(1, $callbacks);
         $this->assertEquals(['default', 1], $callbacks[0]);
     }
+
+    public function testCallbackIsExecutedIfNoTransactions()
+    {
+        $callbacks = [];
+
+        $manager = (new DatabaseTransactionsManager());
+
+        $manager->addCallback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 1];
+        });
+
+        $this->assertCount(1, $callbacks);
+        $this->assertEquals(['default', 1], $callbacks[0]);
+    }
 }

@@ -77,7 +77,11 @@ class DatabaseTransactionsManager
      */
     public function addCallback($callback)
     {
-        $this->transactions->last()->addCallback($callback);
+        if ($current = $this->transactions->last()) {
+            return $current->addCallback($callback);
+        }
+
+        call_user_func($callback);
     }
 
     /**
