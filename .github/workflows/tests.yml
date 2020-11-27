@@ -8,8 +8,8 @@ on:
 
 jobs:
   linux_tests:
-
     runs-on: ubuntu-latest
+
     services:
       mysql:
         image: mysql:5.7
@@ -40,7 +40,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, memcached
           tools: composer:v2
           coverage: none
 
@@ -72,8 +72,8 @@ jobs:
           DB_USERNAME: root
 
   windows_tests:
-
     runs-on: windows-latest
+
     strategy:
       fail-fast: true
       matrix:
@@ -95,7 +95,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached
           tools: composer:v2
           coverage: none
 
