@@ -383,8 +383,10 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             if ($function) {
+                $predictedColumn = $this->getQuery()->from === $relation->getQuery()->getQuery()->from ? "{$relation->getRelationCountHash(true)}.$column" : $column;
+
                 $expression = sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap(
-                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($column)
+                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($predictedColumn)
                 ));
             } else {
                 $expression = $column;
