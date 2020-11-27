@@ -5,7 +5,7 @@ namespace Illuminate\Database;
 class DatabaseTransactionsManager
 {
     /**
-     * All the recorded transactions.
+     * All of the recorded transactions.
      *
      * @var \Illuminate\Support\Collection
      */
@@ -46,7 +46,7 @@ class DatabaseTransactionsManager
     {
         $this->transactions = $this->transactions->reject(function ($transaction) use ($connection, $level) {
             return $transaction->connection == $connection &&
-                $transaction->level > $level;
+                   $transaction->level > $level;
         })->values();
     }
 
@@ -72,8 +72,8 @@ class DatabaseTransactionsManager
     /**
      * Register a transaction callback.
      *
-     * @param  callable $callback
-     * @return void.
+     * @param  callable  $callback
+     * @return void
      */
     public function addCallback($callback)
     {

@@ -1172,7 +1172,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Unset the event transaction manager for this connection.
+     * Unset the transaction manager for this connection.
      *
      * @return void
      */
