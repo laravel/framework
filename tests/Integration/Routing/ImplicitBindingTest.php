@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -40,7 +39,9 @@ class ImplicitBindingTest extends TestCase
     {
         $user = ImplicitBindingModel::create(['name' => 'Dries']);
 
-        Route::post('/user/{user}', function (ImplicitBindingModel $user) {dd($user);
+        Route::post('/user/{user}', function (ImplicitBindingModel $user) {
+            dd($user);
+
             return $user;
         });
 
