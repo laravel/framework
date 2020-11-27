@@ -63,6 +63,13 @@ abstract class Relation
     public static $tableNameAsMorphType = false;
 
     /**
+     * The count of self joins.
+     *
+     * @var int
+     */
+    protected static $selfJoinCount = 0;
+
+    /**
      * Create a new relation instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -218,6 +225,17 @@ abstract class Relation
         return $query->select($columns)->whereColumn(
             $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
         );
+    }
+
+    /**
+     * Get a relationship join table hash.
+     *
+     * @param  bool $lockCount
+     * @return string
+     */
+    public function getRelationCountHash($lockCount = false)
+    {
+        return 'laravel_reserved_'.($lockCount ? static::$selfJoinCount : static::$selfJoinCount++);
     }
 
     /**
