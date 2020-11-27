@@ -73,7 +73,15 @@ class MailMakeCommand extends GeneratorCommand
         $class = parent::buildClass($name);
 
         if ($this->option('markdown')) {
-            $class = str_replace('DummyView', $this->option('markdown'), $class);
+            $view = $this->option('markdown');
+
+            $searches = [
+                'DummyView' => $view,
+                '{{ view }}' => $view,
+                '{{view}}' => $view,
+            ];
+
+            $class = str_replace(array_keys($searches), array_values($searches), $class);
         }
 
         return $class;
@@ -87,8 +95,21 @@ class MailMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->option('markdown')
-                        ? __DIR__.'/stubs/markdown-mail.stub'
-                        : __DIR__.'/stubs/mail.stub';
+                        ? $this->resolveStubPath('/stubs/markdown-mail.stub')
+                        : $this->resolveStubPath('/stubs/mail.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
