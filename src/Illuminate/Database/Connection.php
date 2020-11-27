@@ -113,6 +113,13 @@ class Connection implements ConnectionInterface
     protected $transactions = 0;
 
     /**
+     * The transaction manager instance.
+     *
+     * @var \Illuminate\Database\DatabaseTransactionsManager
+     */
+    protected $transactionsManager;
+
+    /**
      * Indicates if changes have been made to the database.
      *
      * @var int
@@ -1149,6 +1156,29 @@ class Connection implements ConnectionInterface
     public function unsetEventDispatcher()
     {
         $this->events = null;
+    }
+
+    /**
+     * Set the transaction manager instance on the connection.
+     *
+     * @param  \Illuminate\Database\DatabaseTransactionsManager  $manager
+     * @return $this
+     */
+    public function setTransactionManager($manager)
+    {
+        $this->transactionsManager = $manager;
+
+        return $this;
+    }
+
+    /**
+     * Unset the transaction manager for this connection.
+     *
+     * @return void
+     */
+    public function unsetTransactionManager()
+    {
+        $this->transactionsManager = null;
     }
 
     /**
