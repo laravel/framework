@@ -174,6 +174,10 @@ class DatabaseManager implements ConnectionResolverInterface
             $connection->setEventDispatcher($this->app['events']);
         }
 
+        if ($this->app->bound('db.transactions')) {
+            $connection->setTransactionManager($this->app['db.transactions']);
+        }
+
         // Here we'll set a reconnector callback. This reconnector can be any callable
         // so we will set a Closure to reconnect from this manager with the name of
         // the connection, which will allow us to reconnect from the connections.
