@@ -282,12 +282,12 @@ class BelongsTo extends Relation
     /**
      * Get a relationship join table hash.
      *
-     * @param  bool $lockCount
+     * @param  bool  $incrementJoinCount
      * @return string
      */
-    public function getRelationCountHash($lockCount = false)
+    public function getRelationCountHash($incrementJoinCount = true)
     {
-        return 'laravel_reserved_'.($lockCount ? static::$selfJoinCount : static::$selfJoinCount++);
+        return 'laravel_reserved_'.($incrementJoinCount ? static::$selfJoinCount++ : static::$selfJoinCount);
     }
 
     /**
