@@ -834,6 +834,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select min("eloquent_builder_test_model_far_related_stubs"."id") from "eloquent_builder_test_model_far_related_stubs" inner join "user_role" on "eloquent_builder_test_model_far_related_stubs"."id" = "user_role"."related_id" where "eloquent_builder_test_model_parent_stubs"."id" = "user_role"."self_id") as "roles_min_id" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
+    public function testWithMinOnSelfRelated()
+    {
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+
+        $sql = $model->withMin('childFoos', 'created_at')->toSql();
+
+        // alias has a dynamic hash, so replace with a static string for comparison
+        $alias = 'self_alias_hash';
+        $aliasRegex = '/\b(laravel_reserved_\d)(\b|$)/i';
+
+        $sql = preg_replace($aliasRegex, $alias, $sql);
+
+        $this->assertSame('select "self_related_stubs".*, (select min("self_alias_hash"."created_at") from "self_related_stubs" as "self_alias_hash" where "self_related_stubs"."id" = "self_alias_hash"."parent_id") as "child_foos_min_created_at" from "self_related_stubs"', $sql);
+    }
+
     public function testWithCountAndConstraintsAndHaving()
     {
         $model = new EloquentBuilderTestModelParentStub;
