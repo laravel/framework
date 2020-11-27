@@ -1058,6 +1058,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Split a collection into a certain number of groups, and fill the first groups completely.
+     *
+     * @param  int  $numberOfGroups
+     * @return static
+     */
+    public function splitIn($numberOfGroups)
+    {
+        return $this->chunk(ceil($this->count() / $numberOfGroups));
+    }
+
+    /**
      * Chunk the collection into chunks with a callback.
      *
      * @param  callable  $callback

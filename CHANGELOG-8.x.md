@@ -1,6 +1,66 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.14.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.16.0...8.x)
+
+
+## [v8.16.0 (2020-11-24)](https://github.com/laravel/framework/compare/v8.15.0...v8.16.0)
+
+### Added
+- Added `Illuminate\Console\Concerns\InteractsWithIO::withProgressBar()` ([4e52a60](https://github.com/laravel/framework/commit/4e52a606e91619f6082ed8d46f8d64f9d4dbd0b2), [169fd2b](https://github.com/laravel/framework/commit/169fd2b5156650a067aa77a38681875d2a6c5e57))
+- Added `Illuminate\Console\Concerns\CallsCommands::callSilently()` as alias for `callSilent()` ([7f3101b](https://github.com/laravel/framework/commit/7f3101bf6e8a0f048a243a55be7fc79eb359b609), [0294433](https://github.com/laravel/framework/commit/029443349294e3b6e7bebfe9c23a51a9821ec497))
+- Added option to release unique job locks before processing ([#35255](https://github.com/laravel/framework/pull/35255), [b53f13e](https://github.com/laravel/framework/commit/b53f13ef6c8625176defcb83d2fb8d4d5887d068))
+- Added ably broadcaster ([e0f3f8e](https://github.com/laravel/framework/commit/e0f3f8e8241e1ea34a3a3b8c543871cdc00290bf), [6381aa9](https://github.com/laravel/framework/commit/6381aa994756429156b7376e98606458b052b1d7))
+- Added ability to define table name as default morph type ([#35257](https://github.com/laravel/framework/pull/35257))
+- Allow overriding the MySQL server version for database queue driver ([#35263](https://github.com/laravel/framework/pull/35263))
+- Added `Illuminate\Foundation\Testing\Wormhole::back()` ([#35261](https://github.com/laravel/framework/pull/35261))
+- Support delaying notifications per channel ([#35273](https://github.com/laravel/framework/pull/35273))
+- Allow sorting on multiple criteria ([#35277](https://github.com/laravel/framework/pull/35277), [53eb307](https://github.com/laravel/framework/commit/53eb307fea077299d409adf3ba0307a8fda4c4d1))
+- Added `Illuminate/Database/Console/DbCommand.php` command ([#35304](https://github.com/laravel/framework/pull/35304), [b559b3e](https://github.com/laravel/framework/commit/b559b3e7c4995ef468b35e8a6117ef24fdeca053))
+- Added Collections `splitIn` methods ([#35295](https://github.com/laravel/framework/pull/35295))
+
+### Fixed
+- Fixed rendering of notifications with config custom theme ([325a335](https://github.com/laravel/framework/commit/325a335ccf45426eabb27131ed48aa6114434c99))
+- Fixing BroadcastException message in PusherBroadcaster@broadcast ([#35290](https://github.com/laravel/framework/pull/35290))
+- Fixed generic DetectsLostConnection string ([#35323](https://github.com/laravel/framework/pull/35323))
+- Fixed SQL Server command generation ([#35317](https://github.com/laravel/framework/pull/35317))
+- Fixed route model binding on cached closure routes ([eb3e262](https://github.com/laravel/framework/commit/eb3e262c870739a6e9705b851e0066b3473eed2b))
+
+### Changed
+- Disable CSRF on broadcast route ([acb4b77](https://github.com/laravel/framework/commit/acb4b77adc6e257e132e3b036abe1ec88885cfb7))
+- Easily set a null cache driver ([#35262](https://github.com/laravel/framework/pull/35262))
+- Updated `aws/aws-sdk-php` suggest to `^3.155` ([#35267](https://github.com/laravel/framework/pull/35267))
+- Ensure ShouldBeUniqueUntilProcessing job lock is released once ([#35270](https://github.com/laravel/framework/pull/35270))
+- Rename qualifyColumn to qualifyPivotColumn in BelongsToMany & MorphToMany ([#35276](https://github.com/laravel/framework/pull/35276))
+- Check if AsPivot trait is used instead of Pivot Model in `Illuminate\Database\Eloquent\Relations\BelongsToMany` ([#35271](https://github.com/laravel/framework/pull/35271))
+- Avoid no-op database query in Model::destroy() with empty ids ([#35294](https://github.com/laravel/framework/pull/35294))
+- Use --no-owner and --no-acl with pg_restore ([#35309](https://github.com/laravel/framework/pull/35309))
+
+
+## [v8.15.0 (2020-11-17)](https://github.com/laravel/framework/compare/v8.14.0...v8.15.0)
+
+### Added
+- Added lock support for file and null cache drivers ([#35139](https://github.com/laravel/framework/pull/35139), [a345185](https://github.com/laravel/framework/commit/a3451859d1cff45fba423cf577d00f5b2b648c7a))
+- Added a `doesntExpectOutput` method for console command testing ([#35160](https://github.com/laravel/framework/pull/35160), [c90fc5f](https://github.com/laravel/framework/commit/c90fc5f6b8e91e3f6b0f2f3a74cad7d8a49bc71b))
+- Added support of MorphTo relationship eager loading constraints ([#35190](https://github.com/laravel/framework/pull/35190))
+- Added `Illuminate\Http\ResponseTrait::withoutCookie()` ([e9483c4](https://github.com/laravel/framework/commit/e9483c441d5f0c8598d438d6024db8b1a7aa55fe))
+- Use dynamic app namespace in Eloquent Factory instead of App\ string ([#35204](https://github.com/laravel/framework/pull/35204), [4885bd2](https://github.com/laravel/framework/commit/4885bd2d4ecf79de175d5308569ab0d608e8f55b))
+- Added `read` / `unread` scopes to database notifications ([#35215](https://github.com/laravel/framework/pull/35215))
+- Added `classBasename()` method to `Stringable` ([#35219](https://github.com/laravel/framework/pull/35219))
+- Added before resolving callbacks to container ([#35228](https://github.com/laravel/framework/pull/35228))
+- Adds the possibility of testing file upload content ([#35231](https://github.com/laravel/framework/pull/35231))
+- Added lost connection messages for MySQL persistent connections ([#35224](https://github.com/laravel/framework/pull/35224))
+- Added Support DBAL v3.0 ([#35236](https://github.com/laravel/framework/pull/35236))
+
+### Fixed
+- Update MySqlSchemaState.php to support MariaDB dump ([#35184](https://github.com/laravel/framework/pull/35184))
+- Fixed pivot and morphpivot fresh and refresh methods ([#35193](https://github.com/laravel/framework/pull/35193))
+- Fixed pivot restoration ([#35218](https://github.com/laravel/framework/pull/35218))
+
+### Changed
+- Updated `EmailVerificationRequest.php` to check if user is not already verified ([#35174](https://github.com/laravel/framework/pull/35174))
+- Make `Validator::parseNamedParameters()` public ([#35183](https://github.com/laravel/framework/pull/35183))
+- Ignore max attempts if retryUntil is set in `queue:work` ([#35214](https://github.com/laravel/framework/pull/35214))
+- Explode string channels on `Illuminate/Log/LogManager::createStackDriver()` ([e5b86f2](https://github.com/laravel/framework/commit/e5b86f2efec2959fb0e85ad5ee5de18f430643c4))
 
 
 ## [v8.14.0 (2020-11-10)](https://github.com/laravel/framework/compare/v8.13.0...v8.14.0)
