@@ -5,9 +5,9 @@ namespace Illuminate\Http\Concerns;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Symfony\Component\VarDumper\VarDumper;
 use SplFileInfo;
 use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
 
 trait InteractsWithInput
 {
@@ -478,7 +478,7 @@ trait InteractsWithInput
 
         call_user_func_array([$this, 'dump'], $keys);
 
-        die(1);
+        exit(1);
     }
 
     /**
