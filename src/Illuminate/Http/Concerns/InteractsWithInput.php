@@ -5,6 +5,7 @@ namespace Illuminate\Http\Concerns;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Symfony\Component\VarDumper\VarDumper;
 use SplFileInfo;
 use stdClass;
 
@@ -264,7 +265,9 @@ trait InteractsWithInput
     public function input($key = null, $default = null)
     {
         return data_get(
-            $this->getInputSource()->all() + $this->query->all(), $key, $default
+            $this->getInputSource()->all() + $this->query->all(),
+            $key,
+            $default
         );
     }
 
@@ -461,5 +464,40 @@ trait InteractsWithInput
         }
 
         return $this->$source->get($key, $default);
+    }
+
+    /**
+     * Dump the items and end the script.
+     *
+     * @param  array|mixed $keys
+     * @return void
+     */
+    public function dd(...$keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        call_user_func_array([$this, 'dump'], $keys);
+
+        die(1);
+    }
+
+    /**
+     * Dump the items.
+     *
+     * @return $this
+     */
+    public function dump($keys = [])
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        if (count($keys) > 0) {
+            $data = $this->only($keys);
+        } else {
+            $data = $this->all();
+        }
+
+        VarDumper::dump($data);
+
+        return $this;
     }
 }
