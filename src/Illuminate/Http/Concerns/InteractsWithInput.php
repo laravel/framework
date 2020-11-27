@@ -465,9 +465,9 @@ trait InteractsWithInput
     }
 
     /**
-     * Dump the items and end the script.
+     * Dump the request items and end the script.
      *
-     * @param  array|mixed $keys
+     * @param  array|mixed  $keys
      * @return void
      */
     public function dd(...$keys)
@@ -488,13 +488,7 @@ trait InteractsWithInput
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        if (count($keys) > 0) {
-            $data = $this->only($keys);
-        } else {
-            $data = $this->all();
-        }
-
-        VarDumper::dump($data);
+        VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
 
         return $this;
     }
