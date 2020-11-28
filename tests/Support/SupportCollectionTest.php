@@ -1542,6 +1542,35 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSortByCallable($collection)
+    {
+        $data = new $collection([['name' => 'taylor'], ['name' => 'dayle']]);
+        $data = $data->sortBy([$this, 'sortByName'], SORT_STRING);
+
+        $this->assertEquals([['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
+    }
+
+    public function sortByName(array $value)
+    {
+        return $value['name'];
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSortByCallableClosure($collection)
+    {
+        $data = new $collection([['name' => 'taylor'], ['name' => 'dayle']]);
+        $data = $data->sortBy(function($value) {
+            return $value['name'];
+        }, SORT_STRING);
+
+        $this->assertEquals([['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSortByAlwaysReturnsAssoc($collection)
     {
         $data = new $collection(['a' => 'taylor', 'b' => 'dayle']);
