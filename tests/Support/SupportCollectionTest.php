@@ -1571,6 +1571,36 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSortByMultipleCriteria($collection)
+    {
+        $data = new $collection([
+            ['name' => 'taylor', 'foo'=>'foo'], ['name' => 'taylor', 'foo'=>'bar'],
+            ['name' => 'dayle', 'foo'=>'foo'],  ['name' => 'dayle', 'foo'=>'bar']
+        ]);
+        $data = $data->sortBy(['name', 'foo'], SORT_STRING);
+
+        $this->assertEquals(
+            [
+                ['name' => 'dayle', 'foo'=>'bar'],  ['name' => 'dayle', 'foo'=>'foo'],
+                ['name' => 'taylor', 'foo'=>'bar'], ['name' => 'taylor', 'foo'=>'foo']
+            ], array_values($data->all()));
+
+        $data = new $collection([
+            ['name' => 'taylor', 'foo'=>'foo'], ['name' => 'taylor', 'foo'=>'bar'],
+            ['name' => 'dayle', 'foo'=>'foo'],  ['name' => 'dayle', 'foo'=>'bar']
+        ]);
+        $data = $data->sortBy(['foo', 'name'], SORT_STRING);
+
+        $this->assertEquals(
+            [
+                ['name' => 'dayle', 'foo'=>'bar'],  ['name' => 'taylor', 'foo'=>'bar'],
+                ['name' => 'dayle', 'foo'=>'foo'], ['name' => 'taylor', 'foo'=>'foo']
+            ], array_values($data->all()));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSortByAlwaysReturnsAssoc($collection)
     {
         $data = new $collection(['a' => 'taylor', 'b' => 'dayle']);
