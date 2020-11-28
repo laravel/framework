@@ -35,3 +35,4 @@ interface Kernel
      */
     public function getApplication();
 }
+

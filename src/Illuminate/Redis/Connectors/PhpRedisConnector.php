@@ -129,9 +129,7 @@ class PhpRedisConnector implements Connector
         }
 
         if (version_compare(phpversion('redis'), '5.3.0', '>=')) {
-            if (! is_null($context = Arr::get($config, 'context'))) {
-                $parameters[] = $context;
-            }
+            $parameters[] = Arr::get($config, 'context', []);
         }
 
         $client->{($persistent ? 'pconnect' : 'connect')}(...$parameters);
@@ -159,9 +157,7 @@ class PhpRedisConnector implements Connector
         }
 
         if (version_compare(phpversion('redis'), '5.3.2', '>=')) {
-            if (! is_null($context = Arr::get($options, 'context'))) {
-                $parameters[] = $context;
-            }
+            $parameters[] = Arr::get($options, 'context');
         }
 
         return tap(new RedisCluster(...$parameters), function ($client) use ($options) {

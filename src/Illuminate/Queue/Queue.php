@@ -5,7 +5,6 @@ namespace Illuminate\Queue;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Container\Container;
-use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
@@ -174,7 +173,7 @@ abstract class Queue
             return;
         }
 
-        return collect(Arr::wrap($job->backoff ?? $job->backoff()))
+        return collect($job->backoff ?? $job->backoff())
             ->map(function ($backoff) {
                 return $backoff instanceof DateTimeInterface
                                 ? $this->secondsUntil($backoff) : $backoff;
