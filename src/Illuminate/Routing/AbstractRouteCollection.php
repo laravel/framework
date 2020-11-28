@@ -106,8 +106,8 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         }
 
         if (count($explode) == 2) {
-            $path_to_call = $controller_path.$explode[0].DIRECTORY_SEPARATOR.$explode[count($explode) - 2];
-            $class_to_call = $explode[count($explode) - 2];
+            $path_to_call = $controller_path.$explode[0];
+            $class_to_call = $explode[0];
             $method_to_call = $explode[count($explode) - 1];
         }
 
