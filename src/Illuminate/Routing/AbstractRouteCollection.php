@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 use IteratorAggregate;
 use LogicException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\RouteCollection as SymfonyRouteCollection;
 
@@ -57,7 +56,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         } catch (\Throwable $th) {
             $this->printErrorPage($this->default_error_message, 404);
         }
-
     }
 
     /**
@@ -87,7 +85,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         // \app\Http\Controllers\
         $controller_path = ucwords(ltrim($application->path(), DIRECTORY_SEPARATOR)).
                                 DIRECTORY_SEPARATOR.
-                                "Http".
+                                'Http'.
                                 DIRECTORY_SEPARATOR.
                                 'Controllers'.
                                 DIRECTORY_SEPARATOR;
@@ -102,19 +100,19 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
 
         // and we read the class and method from last array
 
-        if(count($explode) >= 3) {
+        if (count($explode) >= 3) {
             $path_to_call = $controller_path.$explode[0].DIRECTORY_SEPARATOR.$explode[count($explode) - 2];
             $class_to_call = $explode[count($explode) - 2];
             $method_to_call = $explode[count($explode) - 1];
         }
 
-        if(count($explode) == 2) {
+        if (count($explode) == 2) {
             $path_to_call = $controller_path.$explode[0].DIRECTORY_SEPARATOR.$explode[count($explode) - 2];
             $class_to_call = $explode[count($explode) - 2];
             $method_to_call = $explode[count($explode) - 1];
         }
 
-        if(count($explode) == 1) {
+        if (count($explode) == 1) {
             $path_to_call = $controller_path.$explode[0];
             $class_to_call = $explode[0];
             $method_to_call = $this->default_method_in_auto_routing;
@@ -129,7 +127,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         // call controller and method
         $call_class = new $path_to_call;
 
-        if(!method_exists($call_class, $method_to_call)) {
+        if(! method_exists($call_class, $method_to_call)) {
             return $this->printErrorPage($this->default_error_message, 404);
         }
 
