@@ -127,7 +127,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         // call controller and method
         $call_class = new $path_to_call;
 
-        if(! method_exists($call_class, $method_to_call)) {
+        if (! method_exists($call_class, $method_to_call)) {
             return $this->printErrorPage($this->default_error_message, 404);
         }
 
