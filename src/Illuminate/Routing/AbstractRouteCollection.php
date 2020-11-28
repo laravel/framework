@@ -65,7 +65,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      * created by
      * teguhrijanandi02@gmail.com
      */
-
     protected function autoRouting()
     {
         $application = new Application;
