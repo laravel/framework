@@ -76,11 +76,11 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     public function testCreatePivotTable()
     {
-        $this->db->connection()->getSchemaBuilder()->createPivotTable(Test::class, Example::class,function (Blueprint $table){
+        $this->db->connection()->getSchemaBuilder()->createPivotTable(Test::class, Example::class, function (Blueprint $table) {
             $table->integer('id');
         });
         $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasTable('example_test'));
-        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumns('example_test',['id', 'example_id','test_id']));
+        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumns('example_test',['id', 'example_id', 'test_id']));
     }
 
 
@@ -148,5 +148,11 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 }
 
 
-class Test extends Model {}
-class Example extends Model {}
+class Test extends Model
+{
+
+}
+class Example extends Model
+{
+
+}

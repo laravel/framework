@@ -203,9 +203,9 @@ class Builder
     /**
      * Create a new pivot table for a many-to-many relation on the schema.
      *
-     * @param \Illuminate\Database\Eloquent\Model|string $firstModel
-     * @param \Illuminate\Database\Eloquent\Model|string $secondModel
-     * @param Closure|null $callback
+     * @param  \Illuminate\Database\Eloquent\Model|string $firstModel
+     * @param  \Illuminate\Database\Eloquent\Model|string $secondModel
+     * @param  \Closure|null $callback
      * @return void
      */
     public function createPivotTable($firstModel, $secondModel, Closure $callback = null)
@@ -223,7 +223,7 @@ class Builder
             $blueprint->create();
             $blueprint->foreignIdFor($firstModel);
             $blueprint->foreignIdFor($secondModel);
-            if($callback) {
+            if ($callback) {
                 $callback($blueprint);
             }
         }));
