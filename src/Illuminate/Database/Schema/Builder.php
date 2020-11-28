@@ -201,6 +201,35 @@ class Builder
     }
 
     /**
+     * Create a new pivot table for a many-to-many relation on the schema.
+     *
+     * @param \Illuminate\Database\Eloquent\Model|string $firstModel
+     * @param \Illuminate\Database\Eloquent\Model|string $secondModel
+     * @param Closure|null $callback
+     * @return void
+     */
+    public function createPivotTable($firstModel, $secondModel, Closure $callback = null)
+    {
+        if (is_string($firstModel)) {
+            $firstModel = new $firstModel;
+        }
+        if (is_string($secondModel)) {
+            $secondModel = new $secondModel;
+        }
+
+        $table = $firstModel->joiningTable($secondModel);
+
+        $this->build(tap($this->createBlueprint($table), function ($blueprint) use ($callback, $firstModel, $secondModel) {
+            $blueprint->create();
+            $blueprint->foreignIdFor($firstModel);
+            $blueprint->foreignIdFor($secondModel);
+            if($callback) {
+                $callback($blueprint);
+            }
+        }));
+    }
+
+    /**
      * Drop a table from the schema.
      *
      * @param  string  $table

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Facade;
 use PHPUnit\Framework\TestCase;
@@ -73,6 +74,16 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumn('table1', 'name'));
     }
 
+    public function testCreatePivotTable()
+    {
+        $this->db->connection()->getSchemaBuilder()->createPivotTable(Test::class, Example::class,function (Blueprint $table){
+            $table->integer('id');
+        });
+        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasTable('example_test'));
+        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumns('example_test',['id', 'example_id','test_id']));
+    }
+
+
     public function testHasColumnAndIndexWithPrefixIndexDisabled()
     {
         $this->db->addConnection([
@@ -135,3 +146,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         return $this->db->connection()->getSchemaBuilder();
     }
 }
+
+
+class Test extends Model {}
+class Example extends Model {}
