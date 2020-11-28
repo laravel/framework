@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use ArrayIterator;
 use Countable;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -13,19 +14,18 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\RouteCollection as SymfonyRouteCollection;
-use Illuminate\Foundation\Application;
 
 abstract class AbstractRouteCollection implements Countable, IteratorAggregate, RouteCollectionInterface
 {
     /**
-     * We define default method in auto routing
+     * We define default method in auto routing.
      */
     protected $default_method_in_auto_routing = 'index';
 
     /**
-     * Define default error message in auto routing
+     * Define default error message in auto routing.
      */
-    protected $default_error_message = "Not Found";
+    protected $default_error_message = 'Not Found';
 
     /**
      * Handle the matched route.
@@ -62,7 +62,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
 
     /**
      * Auto routing
-     * This for testing my new idea only
+     * This for testing my new idea only.
      *
      * created by
      * teguhrijanandi02@gmail.com
@@ -85,11 +85,11 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         // define controller path
         // and the result is
         // \app\Http\Controllers\
-        $controller_path = ucwords(ltrim($application->path(), DIRECTORY_SEPARATOR)) .
-                                DIRECTORY_SEPARATOR .
-                                "Http" .
-                                DIRECTORY_SEPARATOR .
-                                'Controllers' .
+        $controller_path = ucwords(ltrim($application->path(), DIRECTORY_SEPARATOR)).
+                                DIRECTORY_SEPARATOR.
+                                "Http".
+                                DIRECTORY_SEPARATOR.
+                                'Controllers'.
                                 DIRECTORY_SEPARATOR;
 
         // Explode REQUEST_URI
@@ -103,19 +103,19 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         // and we read the class and method from last array
 
         if(count($explode) >= 3) {
-            $path_to_call = $controller_path . $explode[0] . DIRECTORY_SEPARATOR . $explode[ count($explode) - 2 ];
-            $class_to_call = $explode[ count($explode) - 2 ];
-            $method_to_call = $explode[ count($explode) - 1 ];
+            $path_to_call = $controller_path.$explode[0].DIRECTORY_SEPARATOR.$explode[count($explode) - 2];
+            $class_to_call = $explode[count($explode) - 2];
+            $method_to_call = $explode[count($explode) - 1];
         }
 
         if(count($explode) == 2) {
-            $path_to_call = $controller_path . $explode[0] . DIRECTORY_SEPARATOR . $explode[ count($explode) - 2 ];
-            $class_to_call = $explode[ count($explode) - 2 ];
-            $method_to_call = $explode[ count($explode) - 1 ];
+            $path_to_call = $controller_path.$explode[0].DIRECTORY_SEPARATOR.$explode[count($explode) - 2];
+            $class_to_call = $explode[count($explode) - 2];
+            $method_to_call = $explode[count($explode) - 1];
         }
 
         if(count($explode) == 1) {
-            $path_to_call = $controller_path . $explode[0];
+            $path_to_call = $controller_path.$explode[0];
             $class_to_call = $explode[0];
             $method_to_call = $this->default_method_in_auto_routing;
         }
@@ -134,7 +134,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         }
 
         return $call_class->$method_to_call();
-
     }
 
     protected function printErrorPage($message, $code)
@@ -146,7 +145,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
                     <meta charset="utf-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-                    <title>'. $code .' Error</title>
+                    <title>'.$code.' Error</title>
 
                     <!-- Fonts -->
                     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -167,11 +166,11 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
                         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
                             <div class="flex items-center pt-8 sm:justify-start sm:pt-0">
                                 <div class="px-4 text-lg text-gray-500 border-r border-gray-400 tracking-wider">
-                                    '. $code .'
+                                    '.$code.'
                                 </div>
 
                                 <div class="ml-4 text-lg text-gray-500 uppercase tracking-wider">
-                                    '. $message .'
+                                    '.$message.'
                                 </div>
                             </div>
                         </div>
