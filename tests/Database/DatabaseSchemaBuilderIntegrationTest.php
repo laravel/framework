@@ -80,7 +80,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             $table->integer('id');
         });
         $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasTable('example_test'));
-        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumns('example_test',['id', 'example_id', 'test_id']));
+        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumns('example_test', ['id', 'example_id', 'test_id']));
     }
 
 
@@ -147,12 +147,9 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
     }
 }
 
-
 class Test extends Model
 {
-
 }
 class Example extends Model
 {
-
 }
