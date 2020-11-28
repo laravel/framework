@@ -83,7 +83,6 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumns('example_test', ['id', 'example_id', 'test_id']));
     }
 
-
     public function testHasColumnAndIndexWithPrefixIndexDisabled()
     {
         $this->db->addConnection([
