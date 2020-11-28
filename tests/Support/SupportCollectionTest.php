@@ -1533,7 +1533,7 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals([['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
 
-        $data = new $collection([['name' => 'taylor'], ['name' => 'dayle']]);
+        $data = new $collection([['name' => 'dayle'], ['name' => 'taylor']]);
         $data = $data->sortBy('name', SORT_STRING);
 
         $this->assertEquals([['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
