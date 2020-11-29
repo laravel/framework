@@ -493,7 +493,7 @@ trait HasAttributes
 
         if (method_exists($parent, $method)) {
             $query = $relation->getQuery()->getQuery();
-            $where = array_reduce($query->wheres ?: [], function($dat, $v) use ($query) {
+            $where = array_reduce($query->wheres ?: [], function ($dat, $v) use ($query) {
                 if (isset($v['values']) || isset($v['value'])) {
                     $key = Arr::get($v, 'column');
                     if (Str::startsWith($key, "{$query->from}.")) {
@@ -503,7 +503,7 @@ trait HasAttributes
                 }
 
                 return $dat;
-            },[]);
+            }, []);
             $results = $parent->$method($relation, isset($models) ? $models : [$this], $where);
         }
 
