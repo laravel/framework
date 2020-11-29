@@ -589,13 +589,16 @@ class Builder
 
         $constraints($relation);
 
+        $models = $relation->initRelation($models, $name);
+        $results = $relation->getParent()->eagerLoadRelationFromModel($relation, $name, $models);
+        if (is_null($results)) {
+            $results = $relation->getEager();
+        }
+
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays
         // of models which have been eagerly hydrated and are readied for return.
-        return $relation->match(
-            $relation->initRelation($models, $name),
-            $relation->getEager(), $name
-        );
+        return $relation->match($models, $results, $name);
     }
 
     /**
