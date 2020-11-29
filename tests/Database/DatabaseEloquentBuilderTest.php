@@ -517,11 +517,13 @@ class DatabaseEloquentBuilderTest extends TestCase
             $_SERVER['__eloquent.constrain'] = $query;
         }]);
         $relation = m::mock(stdClass::class);
+        $relation->shouldReceive('getParent')->once()->andReturn($builder);
         $relation->shouldReceive('addEagerConstraints')->once()->with(['models']);
         $relation->shouldReceive('initRelation')->once()->with(['models'], 'orders')->andReturn(['models']);
         $relation->shouldReceive('getEager')->once()->andReturn(['results']);
         $relation->shouldReceive('match')->once()->with(['models'], ['results'], 'orders')->andReturn(['models.matched']);
         $builder->shouldReceive('getRelation')->once()->with('orders')->andReturn($relation);
+        $builder->shouldReceive('eagerLoadRelationFromModel')->once()->with($relation, 'orders', ['models'])->andReturn(null);
         $results = $builder->eagerLoadRelations(['models']);
 
         $this->assertEquals(['models.matched'], $results);

@@ -485,7 +485,7 @@ trait HasAttributes
      *
      * @return mixed
      */
-    public function eagerLoadRelationFromModel(Relation $relation, $name, array $models = null)
+    public function eagerLoadRelationFromModel($relation, $name, array $models = null)
     {
         $results = null;
         $parent = $relation->getParent();
