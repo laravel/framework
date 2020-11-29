@@ -2626,6 +2626,51 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testRecursiveNull()
+    {
+        $c = new Collection();
+        $c->recursive();
+        $this->assertEmpty($c);
+    }
+
+    public function testRecursiveArray()
+    {
+        $c = new Collection(['foo', 'bar', 'fruits' => 'banana']);
+        $c->recursive();
+        $this->assertSame($c->all(), ['foo', 'bar', 'fruits' => 'banana']);
+    }
+
+    public function testRecursiveMultiDimensionalArray()
+    {
+        $c = new Collection([
+            'foo' => 'bar',
+            'food' =>
+                ['fruits' => ['banana', 'orange'],
+                'vegetables' => 'tomato'
+            ]]);
+        $c->recursive();
+        $this->assertInstanceOf(Collection::class, $a = $c->get('food'));
+        $this->assertInstanceOf(Collection::class, $b = $a->get('fruits'));
+        $this->assertSame('bar', $c['foo']);
+        $this->assertSame('tomato', $a->get('vegetables'));
+        $this->assertSame(['banana', 'orange'], $b->all());
+    }
+
+    public function testRecursiveCollections()
+    {
+        $a = ['foo', 'bar'];
+        $b = new Collection(['fruits' => ['banana', 'orange']]);
+        $c = new Collection(['vegetables' => 'tomato']);
+        $d = new Collection(['food' => [$a ,$b, $c]]);
+        $d->recursive();
+        $aa = new Collection(['foo', 'bar']);
+        $bb = ['fruits' => ['banana', 'orange']];
+        $cc = ['vegetables' => 'tomato'];
+        $dd = new Collection(['food' => [$aa ,$bb, $cc]]);
+        $dd->recursive();
+        $this->assertEquals($d->all(), $dd->all());
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */

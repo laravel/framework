@@ -13,6 +13,13 @@ class Collection implements ArrayAccess, Enumerable
     use EnumeratesValues, Macroable;
 
     /**
+     * Whether all collections should be recursive by default.
+     *
+     * @var bool $recursive
+     */
+    protected static $recursive = false;
+
+    /**
      * The items contained in the collection.
      *
      * @var array
@@ -23,11 +30,26 @@ class Collection implements ArrayAccess, Enumerable
      * Create a new collection.
      *
      * @param  mixed  $items
+     * @param bool|null $recursive
      * @return void
      */
-    public function __construct($items = [])
+    public function __construct($items = [], $recursive = null)
     {
         $this->items = $this->getArrayableItems($items);
+        if ($recursive ?? static::$recursive) {
+            $this->recursive();
+        }
+    }
+
+    /**
+     * Set whether all collections should be recursive.
+     *
+     * @param bool $recursive
+     * @return void
+     */
+    public static function setRecursive($recursive = true)
+    {
+        static::$recursive = $recursive;
     }
 
     /**
@@ -1302,6 +1324,24 @@ class Collection implements ArrayAccess, Enumerable
     public function transform(callable $callback)
     {
         $this->items = $this->map($callback)->all();
+
+        return $this;
+    }
+
+    /**
+     * Recursively transform each item in the collection into collections.
+     *
+     * @return $this
+     */
+    public function recursive()
+    {
+        $this->transform(function ($item) {
+            if (is_array($item) || is_object($item)) {
+                return new static($item, true);
+            }
+
+            return $item;
+        });
 
         return $this;
     }

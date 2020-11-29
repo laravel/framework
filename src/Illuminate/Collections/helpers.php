@@ -7,12 +7,13 @@ if (! function_exists('collect')) {
     /**
      * Create a collection from the given value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     * @param bool|null $recursive
      * @return \Illuminate\Support\Collection
      */
-    function collect($value = null)
+    function collect($value = null, $recursive = null)
     {
-        return new Collection($value);
+        return new Collection($value, $recursive);
     }
 }
 
