@@ -2871,7 +2871,7 @@ class ValidationValidatorTest extends TestCase
         $file7->expects($this->any())->method('getClientOriginalExtension')->willReturn('webp');
         $v = new Validator($trans, ['x' => $file7], ['x' => 'Image']);
         $this->assertTrue($v->passes());
-        
+
         $file8 = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file8->expects($this->any())->method('guessExtension')->willReturn('jpg');
         $file8->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpg');
