@@ -42,5 +42,8 @@ class WormholeTest extends TestCase
 
         // Assert the time travel was successful...
         $this->assertEquals($future->format('Y-m-d'), now()->format('Y-m-d'));
+
+        // Restore the default Date Factory...
+        Date::useDefault();
     }
 }
