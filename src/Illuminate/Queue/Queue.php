@@ -35,6 +35,13 @@ abstract class Queue
     protected static $createPayloadCallbacks = [];
 
     /**
+     * Indicate the job should be dispatched after database transactions.
+     *
+     * @var bool|null
+     */
+    public $dispatchAfterCommit;
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $queue

@@ -53,6 +53,13 @@ trait Queueable
     public $delay;
 
     /**
+     * Indicate the job should be dispatched after database transactions.
+     *
+     * @var bool|null
+     */
+    public $dispatchAfterCommit;
+
+    /**
      * The middleware the job should be dispatched through.
      *
      * @var array
@@ -129,6 +136,19 @@ trait Queueable
     public function delay($delay)
     {
         $this->delay = $delay;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the job should be dispatched after database transactions.
+     *
+     * @param  bool|null  $value
+     * @return $this
+     */
+    public function afterCommit($value = true)
+    {
+        $this->dispatchAfterCommit = $value;
 
         return $this;
     }
