@@ -277,7 +277,6 @@ abstract class Queue
             return $this->container->make('db.transactions')->addCallback(
                 $callback
             );
-
         }
 
         return $callback();

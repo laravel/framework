@@ -32,7 +32,6 @@ class QueueConnectionTest extends TestCase
 
     public function testJobWontGetDispatchedInsideATransaction()
     {
-
         $this->app->singleton('db.transactions', function () {
             $transactionManager = m::mock(DatabaseTransactionsManager::class);
             $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
