@@ -39,7 +39,7 @@ abstract class Queue
      *
      * @var bool|null
      */
-    public $dispatchAfterCommit;
+    protected $dispatchAfterCommit;
 
     /**
      * Push a new job onto the queue.
@@ -272,7 +272,34 @@ abstract class Queue
      */
     protected function enqueueUsing($job, $callback)
     {
+        if ($this->shouldDispatchAfterCommit($job) &&
+            $this->container->bound('db.transactions')) {
+            return $this->container->make('db.transactions')->addCallback(
+                $callback
+            );
+
+        }
+
         return $callback();
+    }
+
+    /**
+     * Determine if the job should be dispatched after database transactions.
+     *
+     * @param  \Closure|string|object  $job
+     * @return bool
+     */
+    protected function shouldDispatchAfterCommit($job)
+    {
+        if (is_object($job) && isset($job->dispatchAfterCommit)) {
+            return $job->dispatchAfterCommit;
+        }
+
+        if (isset($this->dispatchAfterCommit)) {
+            return $this->dispatchAfterCommit;
+        }
+
+        return false;
     }
 
     /**

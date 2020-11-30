@@ -143,12 +143,23 @@ trait Queueable
     /**
      * Indicate that the job should be dispatched after database transactions.
      *
-     * @param  bool|null  $value
      * @return $this
      */
-    public function afterCommit($value = true)
+    public function afterCommit()
     {
-        $this->dispatchAfterCommit = $value;
+        $this->dispatchAfterCommit = true;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the job should be dispatched before database transactions.
+     *
+     * @return $this
+     */
+    public function beforeCommit()
+    {
+        $this->dispatchAfterCommit = false;
 
         return $this;
     }
