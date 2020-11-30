@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Queue;
 use Aws\Sqs\Exception\SqsException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
@@ -41,7 +40,6 @@ class QueueConnectionTest extends TestCase
             return $transactionManager;
         });
 
-
         Bus::dispatch(new QueueConnectionTestJob);
     }
 
@@ -53,7 +51,6 @@ class QueueConnectionTest extends TestCase
 
             return $transactionManager;
         });
-
 
         try {
             Bus::dispatch((new QueueConnectionTestJob)->beforeCommit());
@@ -72,7 +69,6 @@ class QueueConnectionTest extends TestCase
 
             return $transactionManager;
         });
-
 
         try {
             Bus::dispatch((new QueueConnectionTestJob)->afterCommit());
