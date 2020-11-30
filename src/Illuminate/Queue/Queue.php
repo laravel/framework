@@ -265,7 +265,7 @@ abstract class Queue
      */
     protected function enqueueUsing($job, $callback)
     {
-        return call_user_func($callback);
+        return $callback();
     }
 
     /**

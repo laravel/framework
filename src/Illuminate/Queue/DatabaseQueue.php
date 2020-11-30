@@ -80,7 +80,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->enqueueUsing($job, function () use ($data, $queue, $job) {
+        return $this->enqueueUsing($job, function () use ($job, $data, $queue) {
             return $this->pushToDatabase($queue, $this->createPayload(
                 $job, $this->getQueue($queue), $data
             ));
@@ -111,7 +111,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->enqueueUsing($job, function () use ($delay, $data, $queue, $job) {
+        return $this->enqueueUsing($job, function () use ($delay, $job, $data, $queue) {
             return $this->pushToDatabase($queue, $this->createPayload(
                 $job, $this->getQueue($queue), $data
             ), $delay);
