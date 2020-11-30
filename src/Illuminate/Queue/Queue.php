@@ -257,6 +257,18 @@ abstract class Queue
     }
 
     /**
+     * Enqueue a job using the given callback.
+     *
+     * @param  callable  $callback
+     * @param  \Closure|string|object  $job
+     * @return mixed
+     */
+    protected function enqueueUsing($job, $callback)
+    {
+        return call_user_func($callback);
+    }
+
+    /**
      * Get the connection name for the queue.
      *
      * @return string
