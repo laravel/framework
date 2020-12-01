@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use stdClass;
 
 class PipelineTest extends TestCase
 {
@@ -167,6 +168,22 @@ class PipelineTest extends TestCase
 
         unset($_SERVER['__test.pipe.one']);
     }
+
+    public function testPipelineUsageWithAdditionalData()
+    {
+        $data = new stdClass;
+
+        $result = (new Pipeline(new Container))
+                    ->send('foo')
+                    ->with($data)
+                    ->through([PipelineTestAdditionalDataPipe::class])
+                    ->thenReturn();
+
+        $this->assertSame('foo', $result);
+        $this->assertSame($data, $_SERVER['__test.pipe.data']);
+
+        unset($_SERVER['__test.pipe.data']);
+    }
 }
 
 class PipelineTestPipeOne
@@ -199,6 +216,16 @@ class PipelineTestParameterPipe
     public function handle($piped, $next, $parameter1 = null, $parameter2 = null)
     {
         $_SERVER['__test.pipe.parameters'] = [$parameter1, $parameter2];
+
+        return $next($piped);
+    }
+}
+
+class PipelineTestAdditionalDataPipe
+{
+    public function handle($piped, $next, $data = null)
+    {
+        $_SERVER['__test.pipe.data'] = $data;
 
         return $next($piped);
     }

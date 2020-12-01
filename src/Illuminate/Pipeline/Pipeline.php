@@ -32,6 +32,13 @@ class Pipeline implements PipelineContract
     protected $pipes = [];
 
     /**
+     * Additional data passed through the pipes.
+     *
+     * @var array
+     */
+    protected $with = [];
+
+    /**
      * The method to call on each pipe.
      *
      * @var string
@@ -71,6 +78,19 @@ class Pipeline implements PipelineContract
     public function through($pipes)
     {
         $this->pipes = is_array($pipes) ? $pipes : func_get_args();
+
+        return $this;
+    }
+
+    /**
+     * Set the method to call on the pipes.
+     *
+     * @param  array|mixed  $with
+     * @return \Illuminate\Pipeline\Pipeline
+     */
+    public function with($with)
+    {
+        $this->with = is_array($with) ? $with : func_get_args();
 
         return $this;
     }
@@ -146,7 +166,7 @@ class Pipeline implements PipelineContract
                         // If the pipe is a callable, then we will call it directly, but otherwise we
                         // will resolve the pipes out of the dependency container and call it with
                         // the appropriate method and arguments, returning the results back out.
-                        return $pipe($passable, $stack);
+                        return $pipe($passable, $stack, ...$this->with);
                     } elseif (! is_object($pipe)) {
                         [$name, $parameters] = $this->parsePipeString($pipe);
 
@@ -164,8 +184,8 @@ class Pipeline implements PipelineContract
                     }
 
                     $carry = method_exists($pipe, $this->method)
-                                    ? $pipe->{$this->method}(...$parameters)
-                                    : $pipe(...$parameters);
+                                    ? $pipe->{$this->method}(...$parameters, ...$this->with)
+                                    : $pipe(...$parameters, ...$this->with);
 
                     return $this->handleCarry($carry);
                 } catch (Throwable $e) {
