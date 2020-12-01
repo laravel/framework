@@ -75,4 +75,3 @@ class ListenerTestListenerAfterCommit
         static::$ran = true;
     }
 }
-
