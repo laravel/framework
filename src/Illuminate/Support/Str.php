@@ -179,9 +179,17 @@ class Str
      */
     public static function contains($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
-            if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
-                return true;
+        if (version_compare(PHP_VERSION, '8.0', '>=')) {
+            foreach ((array) $needles as $needle) {
+                if (str_contains($haystack, $needle)) {
+                    return true;
+                }
+            }
+        } else {
+            foreach ((array) $needles as $needle) {
+                if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
+                    return true;
+                }
             }
         }
 
@@ -215,9 +223,17 @@ class Str
      */
     public static function endsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
-            if ($needle !== '' && substr($haystack, -strlen($needle)) === (string) $needle) {
-                return true;
+        if (function_exists('str_ends_with')) {
+            foreach ((array) $needles as $needle) {
+                if (str_ends_with($haystack, $needle)) {
+                    return true;
+                }
+            }
+        } else {
+            foreach ((array) $needles as $needle) {
+                if ($needle !== '' && substr($haystack, -strlen($needle)) === (string) $needle) {
+                    return true;
+                }
             }
         }
 
@@ -652,9 +668,17 @@ class Str
      */
     public static function startsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
-            if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
-                return true;
+        if (function_exists('str_starts_with')) {
+            foreach ((array) $needles as $needle) {
+                if (str_starts_with($haystack, $needle)) {
+                    return true;
+                }
+            }
+        } else {
+            foreach ((array) $needles as $needle) {
+                if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
+                    return true;
+                }
             }
         }
 
