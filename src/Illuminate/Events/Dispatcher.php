@@ -432,7 +432,14 @@ class Dispatcher implements DispatcherContract
             return $this->createQueuedHandlerCallable($class, $method);
         }
 
-        return [$this->container->make($class), $method];
+        $listener = $this->container->make($class);
+
+        if ($listener->dispatchAfterCommit ?? null &&
+            $this->container->bound('db.transactions')) {
+            return $this->createCallbackForListenerRunningAfterCommits($listener, $method);
+        }
+
+        return [$listener, $method];
     }
 
     /**
@@ -480,6 +487,26 @@ class Dispatcher implements DispatcherContract
             if ($this->handlerWantsToBeQueued($class, $arguments)) {
                 $this->queueHandler($class, $method, $arguments);
             }
+        };
+    }
+
+    /**
+     * Create a callable for dispatching a listener after database transactions.
+     *
+     * @param  mixed  $listener
+     * @param  string  $method
+     * @return \Closure
+     */
+    protected function createCallbackForListenerRunningAfterCommits($listener, $method)
+    {
+        return function () use ($method, $listener) {
+            $payload = func_get_args();
+
+            $this->container->make('db.transactions')->addCallback(
+                function () use ($listener, $method, $payload) {
+                    $listener->$method(...$payload);
+                }
+            );
         };
     }
 
