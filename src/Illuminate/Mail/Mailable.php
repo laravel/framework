@@ -13,13 +13,12 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
-use Illuminate\Support\Traits\Macroable;
 use ReflectionClass;
 use ReflectionProperty;
 
 class Mailable implements MailableContract, Renderable
 {
-    use ForwardsCalls, Localizable, Macroable;
+    use ForwardsCalls, Localizable;
 
     /**
      * The locale of the message.
