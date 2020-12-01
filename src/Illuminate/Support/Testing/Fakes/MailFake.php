@@ -11,8 +11,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Testing\TestMailable;
-use PHPUnit\Framework\Assert as PHPUnit;
 use Mockery as m;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Factory, Mailer, MailQueue
 {
@@ -253,7 +253,9 @@ class MailFake implements Factory, Mailer, MailQueue
         $renderer = new TestMailable($mailable);
 
         foreach (get_class_methods($renderer) as $method) {
-            if (Str::startsWith($method, '__')) continue;
+            if (Str::startsWith($method, '__')) {
+                continue;
+            }
             $mock->shouldReceive($method)->andReturnUsing($renderer->{$method}());
         }
 

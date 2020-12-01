@@ -4,11 +4,12 @@ namespace Illuminate\Testing;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Mailable;
 use Illuminate\Testing\Assert as PHPUnit;
-use \Illuminate\Contracts\View\Factory;
 
-class TestMailable {
+class TestMailable
+{
     /**
      * The mailable to delegate to.
      *
