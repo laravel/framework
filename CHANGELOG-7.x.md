@@ -1,6 +1,20 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.29.3...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.30.0...7.x)
+
+
+## [v7.30.0 (2020-12-01)](https://github.com/laravel/framework/compare/v7.29.3...v7.30.0)
+
+### Fixed
+- Turn the eloquent collection into a base collection if mapWithKeys loses models ([#35129](https://github.com/laravel/framework/pull/35129))
+- Fixed pivot restoration ([#35218](https://github.com/laravel/framework/pull/35218))
+- Fixing BroadcastException message in PusherBroadcaster@broadcast ([#35290](https://github.com/laravel/framework/pull/35290))
+- Fixed generic DetectsLostConnection string ([#35323](https://github.com/laravel/framework/pull/35323))
+- Backport Redis context option ([#35370](https://github.com/laravel/framework/pull/35370))
+- Fixed validating image/jpeg images after Symfony/Mime update ([#35419](https://github.com/laravel/framework/pull/35419))
+
+### Changed
+- Updated `aws/aws-sdk-php` suggest to `^3.155` ([#35267](https://github.com/laravel/framework/pull/35267))
 
 
 ## [v7.29.3 (2020-11-03)](https://github.com/laravel/framework/compare/v7.29.2...v7.29.3)
