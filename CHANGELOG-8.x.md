@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.16.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.16.1...8.x)
+
+
+## [v8.16.1 (2020-11-25)](https://github.com/laravel/framework/compare/v8.16.0...v8.16.1)
+
+### Fixed
+- Fixed reflection exception in `Illuminate\Routing\Router::gatherRouteMiddleware()` ([c6e8357](https://github.com/laravel/framework/commit/c6e8357e19b10a800df8a67446f23310f4e83d1f))
 
 
 ## [v8.16.0 (2020-11-24)](https://github.com/laravel/framework/compare/v8.15.0...v8.16.0)
