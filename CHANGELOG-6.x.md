@@ -1,6 +1,13 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.5...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.6...6.x)
+
+
+## [v6.20.6 (2020-12-01)](https://github.com/laravel/framework/compare/v6.20.5...v6.20.6)
+
+### Fixed
+- Backport Redis context option ([#35370](https://github.com/laravel/framework/pull/35370))
+- Fixed validating image/jpeg images after Symfony/Mime update ([#35419](https://github.com/laravel/framework/pull/35419))
 
 
 ## [v6.20.5 (2020-11-24)](https://github.com/laravel/framework/compare/v6.20.4...v6.20.5)
