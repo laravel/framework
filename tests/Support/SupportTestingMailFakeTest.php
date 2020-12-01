@@ -178,7 +178,7 @@ class SupportTestingMailFakeTest extends TestCase
         });
     }
 
-    public function testRender()
+    public function testSeeInHtml()
     {
         $viewFactory = m::mock(Factory::class);
         $view = m::mock(View::class);
@@ -192,15 +192,11 @@ class SupportTestingMailFakeTest extends TestCase
         Container::getInstance()->instance(FactoryContract::class, $viewFactory);
 
         $this->fake->assertSent(function (MailableWithContentsStub $mail) {
-            $rendered = $mail->render();
-            $this->assertStringContainsString('Taylor HTML', $rendered['html']);
-            $this->assertStringContainsString('Taylor TEXT', $rendered['text']);
-
-            return true;
+            return $mail->seeInHtml('Taylor HTML') && $mail->seeInText('Taylor TEXT') && $mail->seeInHtml('Taylor HTML');
         });
     }
 
-    public function testRenderMarkdown()
+    public function testSeeInHtmlMarkdown()
     {
         $viewFactory = m::mock(Factory::class);
         $view = m::mock(View::class);
@@ -216,10 +212,7 @@ class SupportTestingMailFakeTest extends TestCase
         Container::getInstance()->instance(FactoryContract::class, $viewFactory);
 
         $this->fake->assertSent(function (MarkdownMailableStub $mail) {
-            $rendered = $mail->render();
-            $this->assertStringContainsString('Taylor</p>', $rendered['html']);
-            $this->assertStringContainsString('Taylor', $rendered['text']);
-            $this->assertStringNotContainsString('Taylor</p>', $rendered['text']);
+            return $mail->seeInHtml('Taylor</p>') && $mail->seeInText('Taylor') && $mail->dontSeeInText('Taylor</p>');
 
             return true;
         });

@@ -3,15 +3,16 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Factory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
+use Illuminate\Testing\TestMailable;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Mockery as m;
 
 class MailFake implements Factory, Mailer, MailQueue
 {
@@ -82,59 +83,6 @@ class MailFake implements Factory, Mailer, MailQueue
             $times, $count,
             "The expected [{$mailable}] mailable was sent {$count} times instead of {$times} times."
         );
-    }
-
-    /**
-     * Parse the given view name or array.
-     *
-     * @param  string|array  $view
-     * @return array
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function parseView($view)
-    {
-        if (! is_array($view)) {
-            $view = [$view];
-        }
-
-        return [
-            $view[0] ?? $view['html'] ?? null,
-            $view[1] ?? $view['text'] ?? null,
-            $view['raw'] ?? null,
-        ];
-    }
-
-    /**
-     * Render the given message as a view.
-     *
-     * @param  string|array  $view
-     * @param  array  $data
-     * @return array
-     */
-    public function render($view, array $data = [])
-    {
-        [$html, $plain, $raw] = $this->parseView($view);
-
-        return [
-            'html' => $this->renderView($html, $data),
-            'text' => $this->renderView($plain, $data),
-            'raw' => $raw,
-        ];
-    }
-
-    /**
-     * Render the given view.
-     *
-     * @param  string  $view
-     * @param  array  $data
-     * @return string
-     */
-    protected function renderView($view, $data)
-    {
-        return $view instanceof Htmlable
-            ? $view->toHtml()
-            : Container::getInstance()->make(\Illuminate\Contracts\View\Factory::class)->make($view, $data)->render();
     }
 
     /**
@@ -253,7 +201,7 @@ class MailFake implements Factory, Mailer, MailQueue
         };
 
         return $this->mailablesOf($mailable)->filter(function ($mailable) use ($callback) {
-            return $callback($mailable);
+            return $callback($this->decorateMailable($mailable));
         });
     }
 
@@ -286,8 +234,30 @@ class MailFake implements Factory, Mailer, MailQueue
         };
 
         return $this->queuedMailablesOf($mailable)->filter(function ($mailable) use ($callback) {
-            return $callback($mailable);
+            return $callback($this->decorateMailable($mailable));
         });
+    }
+
+    /**
+     * @param  $mailable
+     * @return m\MockInterface
+     */
+    protected function decorateMailable($mailable)
+    {
+        $mock = m::mock($mailable);
+
+        foreach (get_object_vars($mailable) as $property => $value) {
+            $mock->{$property} = $value;
+        }
+
+        $renderer = new TestMailable($mailable);
+
+        foreach (get_class_methods($renderer) as $method) {
+            if (Str::startsWith($method, '__')) continue;
+            $mock->shouldReceive($method)->andReturnUsing($renderer->{$method}());
+        }
+
+        return $mock;
     }
 
     /**
@@ -372,6 +342,18 @@ class MailFake implements Factory, Mailer, MailQueue
     public function raw($text, $callback)
     {
         //
+    }
+
+    /**
+     * Return the arguments so that they can be tested.
+     *
+     * @param  string|array  $view
+     * @param  array  $data
+     * @return array
+     */
+    public function render($view, array $data = [])
+    {
+        return func_get_args();
     }
 
     /**
