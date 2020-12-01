@@ -268,7 +268,17 @@ abstract class Queue
      */
     protected function enqueueUsing($job, $payload, $queue, $delay, $callback)
     {
-        return $callback($payload, $queue, $delay);
+        try {
+            return $callback($payload, $queue, $delay);
+        } catch (\Throwable $e) {
+            $this->container['queue.secondary']->push(
+                $this->getConnectionName(),
+                $queue,
+                serialize($job),
+                $delay,
+                $e
+            );
+        }
     }
 
     /**

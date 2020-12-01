@@ -68,6 +68,7 @@ use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
 use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
 use Illuminate\Queue\Console\RetryBatchCommand as QueueRetryBatchCommand;
 use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
+use Illuminate\Queue\Console\SecondaryQueueTableCommand;
 use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
@@ -150,6 +151,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'PolicyMake' => 'command.policy.make',
         'ProviderMake' => 'command.provider.make',
         'QueueFailedTable' => 'command.queue.failed-table',
+        'QueueSecondaryTable' => 'command.queue.secondary-table',
         'QueueTable' => 'command.queue.table',
         'QueueBatchesTable' => 'command.queue.batches-table',
         'RequestMake' => 'command.request.make',
@@ -761,6 +763,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.queue.table', function ($app) {
             return new TableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueSecondaryTableCommand()
+    {
+        $this->app->singleton('command.queue.secondary-table', function ($app) {
+            return new SecondaryQueueTableCommand($app['files'], $app['composer']);
         });
     }
 
