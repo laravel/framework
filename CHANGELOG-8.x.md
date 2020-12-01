@@ -1,6 +1,30 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.16.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.17.0...8.x)
+
+
+## [v8.17.0 (2020-12-01)](https://github.com/laravel/framework/compare/v8.16.1...v8.17.0)
+
+### Added
+- Added: Transaction aware code execution ([#35373](https://github.com/laravel/framework/pull/35373), [9565598](https://github.com/laravel/framework/commit/95655988ea1fb0c260ca792751e2e9da81afc3a7))
+- Added dd() and dump() to the request object ([#35384](https://github.com/laravel/framework/pull/35384), [c43e08f](https://github.com/laravel/framework/commit/c43e08f98afe5dcf742956510e9ab170ea11ce45))
+- Enqueue all jobs using a enqueueUsing method ([#35415](https://github.com/laravel/framework/pull/35415), [010d4d7](https://github.com/laravel/framework/commit/010d4d7ea7ec5581dfbf8b6ba84b812f8e4cb649), [#35437](https://github.com/laravel/framework/pull/35437))
+
+### Fixed
+- Fix issue with polymorphic morphMaps with literal 0 ([#35364](https://github.com/laravel/framework/pull/35364))
+- Fixed Self-Relation issue in withAggregate method ([#35392](https://github.com/laravel/framework/pull/35392), [aec5cca](https://github.com/laravel/framework/commit/aec5cca4ace65bc4b4ca054170b645f1073ac9ca), [#35394](https://github.com/laravel/framework/pull/35394))
+- Fixed Use PHP_EOL instead of `\n` in PendingCommand ([#35409](https://github.com/laravel/framework/pull/35409))
+- Fixed validating image/jpeg images after Symfony/Mime update ([#35419](https://github.com/laravel/framework/pull/35419))
+- Fixed fail to morph with custom casting to objects ([#35420](https://github.com/laravel/framework/pull/35420))
+- Fixed `Illuminate\Collections\Collection::sortBy()` ([307f6fb](https://github.com/laravel/framework/commit/307f6fb8d9579427a9521a07e8700355a3e9d948))
+- Don't overwrite minute and hour when specifying a time with twiceMonthly() ([#35436](https://github.com/laravel/framework/pull/35436))
+
+### Changed
+- Make DownCommand retryAfter available to prerendered view ([#35357](https://github.com/laravel/framework/pull/35357), [b1ee97e](https://github.com/laravel/framework/commit/b1ee97e5ae03dae293e3256b8c3013209d0fd9b0))
+- Set default value on cloud driver ([0bb7fe4](https://github.com/laravel/framework/commit/0bb7fe4758d617b07b84f6fabfcfe2ca2cdb0964))
+- Update Tailwind pagination focus styles ([#35365](https://github.com/laravel/framework/pull/35365))
+- Redis: allow to pass connection name ([#35402](https://github.com/laravel/framework/pull/35402))
+- Change Wormhole to use the Date Factory ([#35421](https://github.com/laravel/framework/pull/35421))
 
 
 ## [v8.16.1 (2020-11-25)](https://github.com/laravel/framework/compare/v8.16.0...v8.16.1)
