@@ -104,6 +104,11 @@ class FrequencyTest extends TestCase
         $this->assertSame('0 0 1,16 * *', $this->event->twiceMonthly(1, 16)->getExpression());
     }
 
+    public function testTwiceMonthlyAtTime()
+    {
+        $this->assertSame('30 1 1,16 * *', $this->event->twiceMonthly(1, 16, '1:30')->getExpression());
+    }
+
     public function testMonthlyOnWithMinutes()
     {
         $this->assertSame('15 15 4 * *', $this->event->monthlyOn(4, '15:15')->getExpression());
