@@ -562,6 +562,18 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Add an "order by" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  string  $direction
+     * @return $this
+     */
+    public function orderPivotBy($column, $direction = 'asc')
+    {
+        return $this->orderBy($this->table.'.'.$column, $direction);
+    }
+
+    /**
      * Find a related model by its primary key or return new instance of the related model.
      *
      * @param  mixed  $id
