@@ -152,7 +152,7 @@ class Pipeline implements PipelineContract
 
                         // If the pipe is a string we will parse the string and resolve the class out
                         // of the dependency injection container. We can then build a callable and
-                        // execute the pipe function giving in the parameters that are required.
+                        // execute the pipe function passing in the parameters which are required.
                         $pipe = $this->getContainer()->make($name);
 
                         $parameters = array_merge([$passable, $stack], $parameters);
