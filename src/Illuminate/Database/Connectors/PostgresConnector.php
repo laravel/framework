@@ -93,8 +93,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function configureSearchPath($connection, $config)
     {
-        if (isset($config['search_path']) || isset($config['schema'])) {
-            $searchPath = $this->formatSearchPath($config['search_path'] ?? $config['schema']);
+        if (isset($config['search_path'])) {
+            $searchPath = $this->formatSearchPath($config['search_path']);
 
             $connection->prepare("set search_path to {$searchPath}")->execute();
         }
@@ -109,15 +109,16 @@ class PostgresConnector extends Connector implements ConnectorInterface
     protected function formatSearchPath($searchPath)
     {
         if (is_array($searchPath)) {
-            return '"'.implode('", "', $searchPath).'"';
+            $searchPath = '"'.implode('", "', $searchPath).'"';
         }
 
         preg_match_all('/[a-zA-z0-9$]{1,}/i', $searchPath, $matches);
+
         return '"'.implode('", "', $matches[0]).'"';
     }
 
     /**
-     * Set the schema on the connection.
+     * Set the application name on the connection.
      *
      * @param  \PDO  $connection
      * @param  array  $config
