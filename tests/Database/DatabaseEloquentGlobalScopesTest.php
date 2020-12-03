@@ -133,22 +133,22 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals(['taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
 
         // Where applied
-        $query = $model->newQuery()->where('col1', 'val1')->whenWhere(true,'col2', 'val2');
+        $query = $model->newQuery()->where('col1', 'val1')->whenWhere(true, 'col2', 'val2');
         $this->assertSame('select "email", "password" from "table" where "col1" = ? and "col2" = ? and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
 
         // Where is not applied
-        $query = $model->newQuery()->where('col1', 'val1')->whenWhere(false,'col2', 'val2');
+        $query = $model->newQuery()->where('col1', 'val1')->whenWhere(false, 'col2', 'val2');
         $this->assertSame('select "email", "password" from "table" where "col1" = ? and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals(['val1', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
 
         // Use condition as value
-        $query = $model->newQuery()->where('col1', 'val1')->whenWhere('val2','col2');
+        $query = $model->newQuery()->where('col1', 'val1')->whenWhere('val2', 'col2');
         $this->assertSame('select "email", "password" from "table" where "col1" = ? and "col2" = ? and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
 
         // With all whenWhere parameters passed
-        $query = $model->newQuery()->where('col1', 'val1')->whenWhere(true,'col2', '!=', 'val2', 'or');
+        $query = $model->newQuery()->where('col1', 'val1')->whenWhere(true, 'col2', '!=', 'val2', 'or');
         $this->assertSame('select "email", "password" from "table" where ("col1" = ? or "col2" != ?) and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
     }
