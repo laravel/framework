@@ -563,7 +563,7 @@ class BelongsToMany extends Relation
      * @param  string  $direction
      * @return $this
      */
-    public function orderPivotBy($column, $direction = 'asc')
+    public function orderByPivot($column, $direction = 'asc')
     {
         return $this->orderBy($this->qualifyPivotColumn($column), $direction);
     }

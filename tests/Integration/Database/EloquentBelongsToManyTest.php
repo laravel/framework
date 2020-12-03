@@ -906,7 +906,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
     }
 
-    public function testOrderPivotByMethod()
+    public function testOrderByPivotMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -921,10 +921,10 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             ['post_id' => $post->id, 'tag_id' => $tag4->id, 'flag' => 'foo2'],
         ]);
 
-        $relationTag1 = $post->tagsWithCustomExtraPivot()->orderPivotBy('flag', 'asc')->first();
+        $relationTag1 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', 'asc')->first();
         $this->assertEquals($relationTag1->getAttributes(), $tag2->getAttributes());
 
-        $relationTag2 = $post->tagsWithCustomExtraPivot()->orderPivotBy('flag', 'desc')->first();
+        $relationTag2 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', 'desc')->first();
         $this->assertEquals($relationTag2->getAttributes(), $tag3->getAttributes());
     }
 }
