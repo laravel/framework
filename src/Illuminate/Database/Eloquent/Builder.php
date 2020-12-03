@@ -292,6 +292,7 @@ class Builder
             if ($operator === null && $value === null) {
                 $operator = $condition;
             }
+
             $this->where($column, $operator, $value, $boolean);
         }
 
