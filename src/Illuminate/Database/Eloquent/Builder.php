@@ -279,11 +279,11 @@ class Builder
     /**
      * Add an "when where" clause that runs "where" when condition is true.
      *
-     * @param mixed $condition
-     * @param \Closure|array|string|\Illuminate\Database\Query\Expression $column
-     * @param mixed $operator
-     * @param mixed $value
-     * @param string $boolean
+     * @param  mixed  $condition
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed   $operator
+     * @param  mixed   $value
+     * @param  string   $boolean
      * @return $this
      */
     public function whenWhere($condition, $column, $operator = null, $value = null, $boolean = 'and')

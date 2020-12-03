@@ -845,6 +845,29 @@ class Builder
     }
 
     /**
+     * Add an "when where" clause that runs "where" when condition is true.
+     *
+     * @param  mixed  $condition
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whenWhere($condition, $column, $operator = null, $value = null, $boolean = 'and')
+    {
+        if ($condition) {
+            if ($operator === null && $value === null) {
+                $operator = $condition;
+            }
+
+            $this->where($column, $operator, $value, $boolean);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a "where" clause comparing two columns to the query.
      *
      * @param  string|array  $first
