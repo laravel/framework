@@ -31,7 +31,7 @@ class QueuedEventsTest extends TestCase
             return $queue;
         });
 
-        $d->listen('some.event', TestDispatcherQueuedHandler::class . '@someMethod');
+        $d->listen('some.event', TestDispatcherQueuedHandler::class.'@someMethod');
         $d->dispatch('some.event', ['foo', 'bar']);
     }
 
