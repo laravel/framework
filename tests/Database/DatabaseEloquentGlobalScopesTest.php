@@ -123,6 +123,58 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals($mainQuery, $query->toSql());
         $this->assertEquals(['bar', 1, 'baz', 1], $query->getBindings());
     }
+
+    public function testGlobalScopesWithWhenWhereConditionsAreNested()
+    {
+        $model = new EloquentClosureGlobalScopesWithOrTestModel;
+
+        $query = $model->newQuery();
+        $this->assertSame('select "email", "password" from "table" where ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
+        $this->assertEquals(['taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+
+        // Where applied
+        $query = $model->newQuery()->where('col1', 'val1')->whenWhere(true,'col2', 'val2');
+        $this->assertSame('select "email", "password" from "table" where "col1" = ? and "col2" = ? and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
+        $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+
+        // Where is not applied
+        $query = $model->newQuery()->where('col1', 'val1')->whenWhere(false,'col2', 'val2');
+        $this->assertSame('select "email", "password" from "table" where "col1" = ? and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
+        $this->assertEquals(['val1', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+
+        // Use condition as value
+        $query = $model->newQuery()->where('col1', 'val1')->whenWhere('val2','col2');
+        $this->assertSame('select "email", "password" from "table" where "col1" = ? and "col2" = ? and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
+        $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+
+        // With all whenWhere parameters passed
+        $query = $model->newQuery()->where('col1', 'val1')->whenWhere(true,'col2', '!=', 'val2', 'or');
+        $this->assertSame('select "email", "password" from "table" where ("col1" = ? or "col2" != ?) and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
+        $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+    }
+
+    public function testRegularScopesWithWhenWhereConditionsAreNested()
+    {
+        // Where applied
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->whenWhere(true, 'bar', 'bar')->approved();
+        $this->assertSame('select * from "table" where "foo" = ? and "bar" = ? and ("approved" = ? or "should_approve" = ?)', $query->toSql());
+        $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
+
+        // Where is not applied
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->whenWhere(false, 'bar', 'bar')->approved();
+        $this->assertSame('select * from "table" where "foo" = ? and ("approved" = ? or "should_approve" = ?)', $query->toSql());
+        $this->assertEquals(['foo', 1, 0], $query->getBindings());
+
+        // Use condition as value
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->whenWhere('bar', 'bar')->approved();
+        $this->assertSame('select * from "table" where "foo" = ? and "bar" = ? and ("approved" = ? or "should_approve" = ?)', $query->toSql());
+        $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
+
+        // With all whenWhere parameters passed
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->whenWhere(true, 'bar', '!=', 'bar', 'or')->approved();
+        $this->assertSame('select * from "table" where ("foo" = ? or "bar" != ?) and ("approved" = ? or "should_approve" = ?)', $query->toSql());
+        $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
+    }
 }
 
 class EloquentClosureGlobalScopesTestModel extends Model
