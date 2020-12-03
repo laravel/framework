@@ -504,14 +504,14 @@ class Dispatcher implements DispatcherContract
     /**
      * Queue the handler class.
      *
-     * @param  object  $instance
+     * @param  object  $listener
      * @param  string  $method
      * @param  array  $arguments
      * @return void
      */
-    protected function queueHandler($instance, $method, $arguments)
+    protected function queueHandler($listener, $method, $arguments)
     {
-        [$listener, $job] = $this->createJob($instance, $method, $arguments);
+        $job = $this->createJob($listener, $method, $arguments);
 
         $connection = $this->resolveQueue()->connection(
             $listener->connection ?? null
@@ -532,13 +532,13 @@ class Dispatcher implements DispatcherContract
      * @param  object  $listener
      * @param  string  $method
      * @param  array  $arguments
-     * @return array
+     * @return mixed
      */
     protected function createJob($listener, $method, $arguments)
     {
-        return [$listener, $this->propagateListenerOptions(
+        return $this->propagateListenerOptions(
             $listener, new CallQueuedListener(get_class($listener), $method, $arguments)
-        )];
+        );
     }
 
     /**
