@@ -16,11 +16,11 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
-        "illuminate/collections": "^8.0",
-        "illuminate/contracts": "^8.0",
-        "illuminate/macroable": "^8.0",
-        "illuminate/filesystem": "^8.0",
-        "illuminate/support": "^8.0"
+        "illuminate/collections": "^9.0",
+        "illuminate/contracts": "^9.0",
+        "illuminate/macroable": "^9.0",
+        "illuminate/filesystem": "^9.0",
+        "illuminate/support": "^9.0"
     },
     "autoload": {
         "psr-4": {
@@ -29,7 +29,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "8.x-dev"
+            "dev-master": "9.x-dev"
         }
     },
     "config": {

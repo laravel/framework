@@ -4,14 +4,14 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 
-class ProviderMakeCommand extends GeneratorCommand
+class ScopeMakeCommand extends GeneratorCommand
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'make:provider';
+    protected $name = 'make:scope';
 
     /**
      * The name of the console command.
@@ -20,21 +20,21 @@ class ProviderMakeCommand extends GeneratorCommand
      *
      * @var string|null
      */
-    protected static $defaultName = 'make:provider';
+    protected static $defaultName = 'make:scope';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new service provider class';
+    protected $description = 'Create a new scope class';
 
     /**
      * The type of class being generated.
      *
      * @var string
      */
-    protected $type = 'Provider';
+    protected $type = 'Scope';
 
     /**
      * Get the stub file for the generator.
@@ -43,7 +43,20 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/provider.stub';
+        return $this->resolveStubPath('/stubs/scope.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
@@ -54,6 +67,6 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\Providers';
+        return is_dir(app_path('Models')) ? $rootNamespace.'\\Models\\Scopes' : $rootNamespace.'\Scopes';
     }
 }

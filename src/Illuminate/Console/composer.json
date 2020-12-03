@@ -15,12 +15,12 @@
     ],
     "require": {
         "php": "^7.3|^8.0",
-        "illuminate/collections": "^8.0",
-        "illuminate/contracts": "^8.0",
-        "illuminate/macroable": "^8.0",
-        "illuminate/support": "^8.0",
-        "symfony/console": "^5.1",
-        "symfony/process": "^5.1"
+        "illuminate/collections": "^9.0",
+        "illuminate/contracts": "^9.0",
+        "illuminate/macroable": "^9.0",
+        "illuminate/support": "^9.0",
+        "symfony/console": "^5.2",
+        "symfony/process": "^5.2"
     },
     "autoload": {
         "psr-4": {
@@ -29,16 +29,16 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "8.x-dev"
+            "dev-master": "9.x-dev"
         }
     },
     "suggest": {
         "dragonmantank/cron-expression": "Required to use scheduler (^3.0.2).",
-        "guzzlehttp/guzzle": "Required to use the ping methods on schedules (^6.5.5|^7.0.1).",
-        "illuminate/bus": "Required to use the scheduled job dispatcher (^8.0).",
-        "illuminate/container": "Required to use the scheduler (^8.0).",
-        "illuminate/filesystem": "Required to use the generator command (^8.0).",
-        "illuminate/queue": "Required to use closures for scheduled jobs (^8.0)."
+        "guzzlehttp/guzzle": "Required to use the ping methods on schedules (^7.2).",
+        "illuminate/bus": "Required to use the scheduled job dispatcher (^9.0).",
+        "illuminate/container": "Required to use the scheduler (^9.0).",
+        "illuminate/filesystem": "Required to use the generator command (^9.0).",
+        "illuminate/queue": "Required to use closures for scheduled jobs (^9.0)."
     },
     "config": {
         "sort-packages": true

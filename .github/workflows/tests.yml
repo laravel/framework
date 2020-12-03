@@ -50,14 +50,6 @@ jobs:
       - name: Setup problem matchers
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
-      - name: Set Minimum Guzzle Version
-        uses: nick-invision/retry@v1
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require guzzlehttp/guzzle:^7.2 --no-interaction --no-update
-        if: matrix.php >= 8
-
       - name: Install dependencies
         uses: nick-invision/retry@v1
         with:
@@ -101,14 +93,6 @@ jobs:
 
       - name: Setup problem matchers
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
-      - name: Set Minimum Guzzle Version
-        uses: nick-invision/retry@v1
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require guzzlehttp/guzzle:^7.2 --no-interaction --no-update
-        if: matrix.php >= 8
 
       - name: Install dependencies
         uses: nick-invision/retry@v1

@@ -16,11 +16,11 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
-        "illuminate/collections": "^8.0",
-        "illuminate/container": "^8.0",
-        "illuminate/contracts": "^8.0",
-        "illuminate/macroable": "^8.0",
-        "illuminate/support": "^8.0",
+        "illuminate/collections": "^9.0",
+        "illuminate/container": "^9.0",
+        "illuminate/contracts": "^9.0",
+        "illuminate/macroable": "^9.0",
+        "illuminate/support": "^9.0",
         "league/commonmark": "^1.3",
         "psr/log": "^1.0",
         "swiftmailer/swiftmailer": "^6.0",
@@ -33,12 +33,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "8.x-dev"
+            "dev-master": "9.x-dev"
         }
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SES mail driver (^3.155).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun mail driver (^6.5.5|^7.0.1).",
+        "guzzlehttp/guzzle": "Required to use the Mailgun mail driver (^7.2).",
         "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
     },
     "config": {
