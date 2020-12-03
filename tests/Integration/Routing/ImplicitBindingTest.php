@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
@@ -43,15 +42,15 @@ class ImplicitBindingTest extends TestCase
             dd($user);
 
             return $user;
-        });
+        })->middleware('web');
 
-        // Artisan::call('route:cache');
+        $this->artisan('route:cache')->run();
 
         $response = $this->post("/user/{$user->id}");
 
         $this->assertSame($user->toJson(), $response->content());
 
-        Artisan::call('route:clear');
+        $this->artisan('route:clear')->run();
     }
 }
 
