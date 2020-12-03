@@ -19,7 +19,7 @@ class SupportNamespacedItemResolverTest extends TestCase
 
     public function testParsedItemsAreCached()
     {
-        $r = $this->getMockBuilder(NamespacedItemResolver::class)->setMethods(['parseBasicSegments', 'parseNamespacedSegments'])->getMock();
+        $r = $this->getMockBuilder(NamespacedItemResolver::class)->onlyMethods(['parseBasicSegments', 'parseNamespacedSegments'])->getMock();
         $r->setParsedKey('foo.bar', ['foo']);
         $r->expects($this->never())->method('parseBasicSegments');
         $r->expects($this->never())->method('parseNamespacedSegments');

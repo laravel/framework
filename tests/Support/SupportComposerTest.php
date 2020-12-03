@@ -59,7 +59,7 @@ class SupportComposerTest extends TestCase
         $process->shouldReceive('run')->once();
 
         $composer = $this->getMockBuilder(Composer::class)
-            ->setMethods(['getProcess'])
+            ->onlyMethods(['getProcess'])
             ->setConstructorArgs([$files, $directory])
             ->getMock();
         $composer->expects($this->once())
