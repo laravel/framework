@@ -1787,14 +1787,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, basename(__FILE__)])->getMock();
-        $file->expects($this->any())->method('isValid')->willReturn(true);
-        $file->expects($this->at(1))->method('getSize')->willReturn(3072);
+        $file->method('isValid')->willReturn(true);
+        $file->method('getSize')->willReturn(3072);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Max:10']);
         $this->assertTrue($v->passes());
 
         $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, basename(__FILE__)])->getMock();
-        $file->expects($this->at(0))->method('isValid')->willReturn(true);
-        $file->expects($this->at(1))->method('getSize')->willReturn(4072);
+        $file->method('isValid')->willReturn(true);
+        $file->method('getSize')->willReturn(4072);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Max:2']);
         $this->assertFalse($v->passes());
 
