@@ -477,8 +477,10 @@ class Dispatcher implements DispatcherContract
                 return is_object($a) ? clone $a : $a;
             }, func_get_args());
 
-            if ($this->handlerWantsToBeQueued($class, $arguments)) {
-                $this->queueHandler($class, $method, $arguments);
+            $instance = $this->container->make($class);
+
+            if ($this->handlerWantsToBeQueued($instance, $arguments)) {
+                $this->queueHandler($instance, $method, $arguments);
             }
         };
     }
@@ -486,14 +488,12 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the event handler wants to be queued.
      *
-     * @param  string  $class
+     * @param  object  $instance
      * @param  array  $arguments
      * @return bool
      */
-    protected function handlerWantsToBeQueued($class, $arguments)
+    protected function handlerWantsToBeQueued($instance, $arguments)
     {
-        $instance = $this->container->make($class);
-
         if (method_exists($instance, 'shouldQueue')) {
             return $instance->shouldQueue($arguments[0]);
         }
@@ -504,14 +504,14 @@ class Dispatcher implements DispatcherContract
     /**
      * Queue the handler class.
      *
-     * @param  string  $class
+     * @param  object  $instance
      * @param  string  $method
      * @param  array  $arguments
      * @return void
      */
-    protected function queueHandler($class, $method, $arguments)
+    protected function queueHandler($instance, $method, $arguments)
     {
-        [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
+        [$listener, $job] = $this->createJob($instance, $method, $arguments);
 
         $connection = $this->resolveQueue()->connection(
             $listener->connection ?? null
@@ -527,19 +527,17 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * Create the listener and job for a queued listener.
+     * Create the job for a queued listener.
      *
-     * @param  string  $class
+     * @param  object  $listener
      * @param  string  $method
      * @param  array  $arguments
      * @return array
      */
-    protected function createListenerAndJob($class, $method, $arguments)
+    protected function createJob($listener, $method, $arguments)
     {
-        $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
-
         return [$listener, $this->propagateListenerOptions(
-            $listener, new CallQueuedListener($class, $method, $arguments)
+            $listener, new CallQueuedListener(get_class($listener), $method, $arguments)
         )];
     }
 
