@@ -21,6 +21,20 @@ class QueueFake extends QueueManager implements Queue
     protected $jobs = [];
 
     /**
+     * Connection name which was taken from the queued listener.
+     *
+     * @var string|null
+     */
+    protected $selectedQueuedListenerConnection = null;
+
+    /**
+     * Delay value which was taken from the queued listener.
+     *
+     * @var int|null
+     */
+    protected $selectedQueuedListenerDelay = null;
+
+    /**
      * Assert if a job was pushed based on a truth-test callback.
      *
      * @param  string|\Closure  $job
@@ -213,6 +227,30 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
+     * @param string $expectedConnection
+     */
+    public function assertQueuedListenerConnectionWas(string $expectedConnection): void
+    {
+        PHPUnit::assertEquals(
+            $expectedConnection,
+            $this->selectedQueuedListenerConnection,
+            "The last queued listener expected connection was [{$this->selectedQueuedListenerConnection}]"
+        );
+    }
+
+    /**
+     * @param int $expectedDelay
+     */
+    public function assertQueuedListenerDelayWas(int $expectedDelay): void
+    {
+        PHPUnit::assertEquals(
+            $expectedDelay,
+            $this->selectedQueuedListenerDelay,
+            "The last queued listener expected delay was [{$this->selectedQueuedListenerDelay}]"
+        );
+    }
+
+    /**
      * Get all of the jobs matching a truth-test callback.
      *
      * @param  string  $job
@@ -253,6 +291,8 @@ class QueueFake extends QueueManager implements Queue
      */
     public function connection($value = null)
     {
+        $this->selectedQueuedListenerConnection = $value;
+
         return $this;
     }
 
@@ -336,6 +376,8 @@ class QueueFake extends QueueManager implements Queue
      */
     public function laterOn($queue, $delay, $job, $data = '')
     {
+        $this->selectedQueuedListenerDelay = $delay;
+
         return $this->push($job, $data, $queue);
     }
 

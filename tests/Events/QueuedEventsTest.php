@@ -31,7 +31,7 @@ class QueuedEventsTest extends TestCase
             return $queue;
         });
 
-        $d->listen('some.event', TestDispatcherQueuedHandler::class.'@someMethod');
+        $d->listen('some.event', TestDispatcherQueuedHandler::class . '@someMethod');
         $d->dispatch('some.event', ['foo', 'bar']);
     }
 
@@ -65,6 +65,31 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->assertPushedOn('some_other_queue', CallQueuedListener::class);
+    }
+
+    public function testQueueOptionsWereTakenFromConstructor()
+    {
+        $dispatcher = new Dispatcher();
+
+        $fakeQueue = new QueueFake(new Container());
+
+        $dispatcher->setQueueResolver(function () use ($fakeQueue): QueueFake {
+            return $fakeQueue;
+        });
+
+        $dispatcher->listen('some.event', TestEventListenerWithQueueOptionsDeclaredInTheConstructor::class);
+        $dispatcher->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushedOn('constructor_queue', CallQueuedListener::class);
+        $fakeQueue->assertQueuedListenerConnectionWas('constructor_connection');
+        $fakeQueue->assertQueuedListenerDelayWas(3600 * 200);
+
+        $dispatcher->listen('some.event', TestEventListenerWithQueueOptionsDeclaredWithinProperties::class);
+        $dispatcher->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushedOn('property_queue', CallQueuedListener::class);
+        $fakeQueue->assertQueuedListenerConnectionWas('property_connection');
+        $fakeQueue->assertQueuedListenerDelayWas(3600 * 80);
     }
 }
 
@@ -102,5 +127,36 @@ class TestDispatcherGetQueue implements ShouldQueue
     public function viaQueue()
     {
         return 'some_other_queue';
+    }
+}
+
+class TestEventListenerWithQueueOptionsDeclaredInTheConstructor implements ShouldQueue
+{
+    public $queue = 'property_queue';
+    public $connection = 'property_connection';
+    public $delay = 3600 * 80;
+
+    public function __construct()
+    {
+        $this->queue = 'constructor_queue';
+        $this->connection = 'constructor_connection';
+        $this->delay = 3600 * 200;
+    }
+
+    public function handle()
+    {
+        //
+    }
+}
+
+class TestEventListenerWithQueueOptionsDeclaredWithinProperties implements ShouldQueue
+{
+    public $queue = 'property_queue';
+    public $connection = 'property_connection';
+    public $delay = 3600 * 80;
+
+    public function handle()
+    {
+        //
     }
 }
