@@ -67,7 +67,7 @@ class DatabaseSecondaryQueueProvider implements SecondaryQueueProviderInterface
      */
     public function all()
     {
-        return $this->getTable()->orderBy('id', 'desc')->get()->all();
+        return $this->getTable()->orderBy('id', 'asc')->get()->all();
     }
 
     /**

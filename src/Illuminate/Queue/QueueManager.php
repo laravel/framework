@@ -138,6 +138,15 @@ class QueueManager implements FactoryContract, MonitorContract
             $this->connections[$name] = $this->resolve($name);
 
             $this->connections[$name]->setContainer($this->app);
+
+            $this->connections[$name]->configurePushingRetries(
+                $this->app['config']['queue.retry_pushing.times'] ?? 0,
+                $this->app['config']['queue.retry_pushing.sleep'] ?? 0
+            );
+
+            if ($this->app['config']['queue.secondary.enabled'] ?? false) {
+                $this->connections[$name]->enableSecondaryQueue();
+            }
         }
 
         return $this->connections[$name];

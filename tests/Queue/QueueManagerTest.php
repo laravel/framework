@@ -35,6 +35,7 @@ class QueueManagerTest extends TestCase
         });
 
         $queue->shouldReceive('setContainer')->once()->with($app);
+        $queue->shouldReceive('configurePushingRetries')->once()->with(0, 0);
         $this->assertSame($queue, $manager->connection('sync'));
     }
 
@@ -57,6 +58,7 @@ class QueueManagerTest extends TestCase
             return $connector;
         });
         $queue->shouldReceive('setContainer')->once()->with($app);
+        $queue->shouldReceive('configurePushingRetries')->once()->with(0, 0);
 
         $this->assertSame($queue, $manager->connection('foo'));
     }
@@ -79,6 +81,7 @@ class QueueManagerTest extends TestCase
             return $connector;
         });
         $queue->shouldReceive('setContainer')->once()->with($app);
+        $queue->shouldReceive('configurePushingRetries')->once()->with(0, 0);
 
         $this->assertSame($queue, $manager->connection('null'));
     }

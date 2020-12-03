@@ -28,6 +28,20 @@ abstract class Queue
     protected $connectionName;
 
     /**
+     * Pushing retries configuration.
+     *
+     * @var array
+     */
+    protected $pushingRetriesConfiguration;
+
+    /**
+     * Indicate if the secondary queue is enabled.
+     *
+     * @var bool
+     */
+    protected $secondaryQueue;
+
+    /**
      * The create payload callbacks.
      *
      * @var callable[]
@@ -269,15 +283,19 @@ abstract class Queue
     protected function enqueueUsing($job, $payload, $queue, $delay, $callback)
     {
         try {
-            return $callback($payload, $queue, $delay);
-        } catch (\Throwable $e) {
-            $this->container['queue.secondary']->push(
-                $this->getConnectionName(),
-                $queue,
-                serialize($job),
-                $delay,
-                $e
+            return retry(
+                ($this->pushingRetriesConfiguration['times'] ?? 1) + 1,
+                function () use ($delay, $queue, $payload, $callback) {
+                    return $callback($payload, $queue, $delay);
+                },
+                $this->pushingRetriesConfiguration['sleep'] ?? 0
             );
+        } catch (\Throwable $e) {
+            if ($this->secondaryQueue) {
+                return $this->storeInSecondaryQueue($job, $queue, $delay, $e);
+            }
+
+            throw $e;
         }
     }
 
@@ -313,5 +331,44 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Configure pushing retries.
+     *
+     * @return void
+     */
+    public function configurePushingRetries($times, $sleep)
+    {
+        $this->pushingRetriesConfiguration = compact('times', 'sleep');
+    }
+
+    /**
+     * Enable storing in the secondary queue.
+     *
+     * @return void
+     */
+    public function enableSecondaryQueue()
+    {
+        $this->secondaryQueue = true;
+    }
+
+    /**
+     * Store the given job in the secondary queue.
+     *
+     * @param  mixed  $job
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param  \Throwable  $e
+     */
+    protected function storeInSecondaryQueue($job, $queue, $delay, $e): void
+    {
+        $this->container['queue.secondary']->push(
+            $this->getConnectionName(),
+            $queue,
+            serialize($job),
+            $delay,
+            $e
+        );
     }
 }

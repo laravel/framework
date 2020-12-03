@@ -65,6 +65,7 @@ use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
 use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
+use Illuminate\Queue\Console\PushCommand as QueuePushCommand;
 use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
 use Illuminate\Queue\Console\RetryBatchCommand as QueueRetryBatchCommand;
 use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
@@ -108,6 +109,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueListen' => 'command.queue.listen',
         'QueueRestart' => 'command.queue.restart',
         'QueueRetry' => 'command.queue.retry',
+        'QueuePush' => 'command.queue.push',
         'QueueRetryBatch' => 'command.queue.retry-batch',
         'QueueWork' => 'command.queue.work',
         'RouteCache' => 'command.route.cache',
@@ -703,6 +705,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.queue.retry', function () {
             return new QueueRetryCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueuePushCommand()
+    {
+        $this->app->singleton('command.queue.push', function () {
+            return new QueuePushCommand();
         });
     }
 
