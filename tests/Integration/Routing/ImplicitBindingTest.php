@@ -5,10 +5,27 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 
 class ImplicitBindingTest extends TestCase
 {
+    use InteractsWithPublishedFiles;
+
+    protected $files = [
+        'routes/testbench.php',
+    ];
+
+    /**
+     * Teardown the test environment.
+     */
+    protected function tearDown(): void
+    {
+        $this->tearDownInteractsWithPublishedFiles();
+
+        parent::tearDown();
+    }
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('app.debug', 'true');
@@ -50,7 +67,11 @@ PHP;
 
         $this->artisan('route:cache')->run();
 
-        $this->reloadApplicationWithCachedRoutes();
+        $this->reloadApplication();
+
+        $this->assertFilenameExists('bootstrap/cache/routes-v7.php');
+
+        $this->requireApplicationCachedRoutes();
 
         $user = ImplicitBindingModel::create(['name' => 'Dries']);
 
