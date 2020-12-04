@@ -271,7 +271,7 @@ class Factory
     public function assertSentInOrder($requestSequence)
     {
         $this->assertSentCount(count($requestSequence));
-        
+
         foreach ($requestSequence as $orderPosition => $url) {
             PHPUnit::assertEquals($url, $this->recorded[$orderPosition][0]->url());
         }
