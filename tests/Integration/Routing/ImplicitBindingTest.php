@@ -52,7 +52,7 @@ class ImplicitBindingTest extends TestCase
         });
     }
 
-    public function testPreviousUrlWithoutSession()
+    public function testImplicitModelBindingWithRouteCachingEnabled()
     {
         $route = <<<PHP
 <?php
