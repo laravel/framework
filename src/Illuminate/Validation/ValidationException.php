@@ -77,7 +77,6 @@ class ValidationException extends Exception
         }));
     }
 
-
     /**
      * Create a summary error message from the validation errors.
      *
@@ -89,7 +88,7 @@ class ValidationException extends Exception
     {
         $messages = $validator->errors()->all();
 
-        if (!count($messages)) {
+        if (! count($messages)) {
             return 'The given data was invalid.';
         }
 

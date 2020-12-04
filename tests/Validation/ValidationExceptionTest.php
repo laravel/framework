@@ -17,7 +17,6 @@ class ValidationExceptionTest extends TestCase
         $this->assertEquals('The given data was invalid.', $exception->getMessage());
     }
 
-
     public function testExceptionSummarizesOneError()
     {
         $exception = $this->getException([], ['foo' => 'required']);
@@ -25,10 +24,9 @@ class ValidationExceptionTest extends TestCase
         $this->assertEquals('validation.required', $exception->getMessage());
     }
 
-
     public function testExceptionSummarizesTwoErrors()
     {
-        $exception = $this->getException([], [ 'foo' => 'required', 'bar' => 'required' ]);
+        $exception = $this->getException([], ['foo' => 'required', 'bar' => 'required']);
 
         $this->assertEquals('validation.required (and 1 more error)', $exception->getMessage());
     }
