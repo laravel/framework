@@ -62,7 +62,7 @@ class DatabaseConnectionTest extends TestCase
         $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare'])->getMock();
         $writePdo->expects($this->never())->method('prepare');
         $statement = $this->getMockBuilder('PDOStatement')
-            ->setMethods(['setFetchMode', 'execute', 'fetchAll', 'bindValue'])
+            ->onlyMethods(['setFetchMode', 'execute', 'fetchAll', 'bindValue'])
             ->getMock();
         $statement->expects($this->once())->method('setFetchMode');
         $statement->expects($this->once())->method('bindValue')->with('foo', 'bar', 2);
