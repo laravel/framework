@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
 
@@ -38,7 +37,7 @@ class ImplicitBindingTest extends TestCase
 
     public function testPreviousUrlWithoutSession()
     {
-            $route = <<<PHP
+        $route = <<<PHP
 <?php
 
 use Illuminate\Tests\Integration\Routing\ImplicitBindingModel;
