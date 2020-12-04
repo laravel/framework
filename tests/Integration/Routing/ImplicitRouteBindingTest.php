@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 
-class ImplicitBindingTest extends TestCase
+class ImplicitRouteBindingTest extends TestCase
 {
     use InteractsWithPublishedFiles;
 
@@ -52,7 +52,7 @@ class ImplicitBindingTest extends TestCase
         });
     }
 
-    public function testImplicitModelBindingWithRouteCachingEnabled()
+    public function testWithRouteCachingEnabled()
     {
         $route = <<<PHP
 <?php
@@ -63,6 +63,7 @@ Route::post('/user/{user}', function (ImplicitBindingModel \$user) {
     return \$user;
 })->middleware('web');
 PHP;
+
         file_put_contents(base_path('routes/testbench.php'), $route);
 
         $this->artisan('route:cache')->run();
