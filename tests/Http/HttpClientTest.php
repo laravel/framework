@@ -646,4 +646,22 @@ class HttpClientTest extends TestCase
 
         $this->factory->assertSentInOrder($exampleUrls);
     }
+
+    public function testWrongNumberOfRequestsThrowAssertionFailed()
+    {
+        $this->factory->fake();
+
+        $exampleUrls = [
+            'http://example.com/1',
+            'http://example.com/2',
+            'http://example.com/3',
+        ];
+
+        $this->factory->get($exampleUrls[0]);
+        $this->factory->get($exampleUrls[1]);
+
+        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+
+        $this->factory->assertSentInOrder($exampleUrls);
+    }
 }
