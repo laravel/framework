@@ -610,4 +610,40 @@ class HttpClientTest extends TestCase
 
         $this->assertSame(json_encode(['page' => 'foo']), stream_get_contents($resource));
     }
+
+    public function testCanAssertAgainstOrderOfHttpRequests()
+    {
+        $this->factory->fake();
+
+        $exampleUrls = [
+            'http://example.com/1',
+            'http://example.com/2',
+            'http://example.com/3',
+        ];
+
+        foreach($exampleUrls as $url){
+            $this->factory->get($url);
+        }
+
+        $this->factory->assertSentInOrder($exampleUrls);
+    }
+
+    public function testAssertionsSentOutOfOrderThrowAssertionFailed()
+    {
+        $this->factory->fake();
+
+        $exampleUrls = [
+            'http://example.com/1',
+            'http://example.com/2',
+            'http://example.com/3',
+        ];
+
+        $this->factory->get($exampleUrls[0]);
+        $this->factory->get($exampleUrls[2]);
+        $this->factory->get($exampleUrls[1]);
+
+        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+
+        $this->factory->assertSentInOrder($exampleUrls);
+    }
 }
