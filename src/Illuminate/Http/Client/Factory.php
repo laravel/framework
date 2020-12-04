@@ -264,19 +264,17 @@ class Factory
 
     /**
      * Assert that requests were sent in the order specified.
-     * 
+     *
      * @param  array  $requestSequence
      * @return void
      */
     public function assertSentInOrder($requestSequence)
     {
-        
         $this->assertSentCount(count($requestSequence));
         
-        foreach($requestSequence as $orderPosition => $url){
+        foreach ($requestSequence as $orderPosition => $url) {
             PHPUnit::assertEquals($url, $this->recorded[$orderPosition][0]->url());
-        }    
-
+        }
     }
 
     /**
