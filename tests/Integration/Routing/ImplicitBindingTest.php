@@ -10,7 +10,7 @@ use Orchestra\Testbench\TestCase;
 
 class ImplicitBindingTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $app['config']->set('app.debug', 'true');
 
@@ -23,32 +23,44 @@ class ImplicitBindingTest extends TestCase
         ]);
     }
 
-    protected function setUp(): void
+    protected function defineDatabaseMigrations(): void
     {
-        parent::setUp();
-
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
+
+        $this->beforeApplicationDestroyed(function () {
+            Schema::dropIfExists('users');
+        });
     }
 
     public function testPreviousUrlWithoutSession()
     {
-        $user = ImplicitBindingModel::create(['name' => 'Dries']);
+            $route = <<<PHP
+<?php
 
-        Route::post('/user/{user}', function (ImplicitBindingModel $user) {
-            dd($user);
+use Illuminate\Tests\Integration\Routing\ImplicitBindingModel;
 
-            return $user;
-        })->middleware('web');
+Route::post('/user/{user}', function (ImplicitBindingModel \$user) {
+    return \$user;
+})->middleware('web');
+PHP;
+        file_put_contents(base_path('routes/testbench.php'), $route);
 
         $this->artisan('route:cache')->run();
 
-        $response = $this->post("/user/{$user->id}");
+        $this->reloadApplicationWithCachedRoutes();
 
-        $this->assertSame($user->toJson(), $response->content());
+        $user = ImplicitBindingModel::create(['name' => 'Dries']);
+
+        $response = $this->postJson("/user/{$user->id}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
 
         $this->artisan('route:clear')->run();
     }
