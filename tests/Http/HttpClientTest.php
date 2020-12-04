@@ -621,7 +621,7 @@ class HttpClientTest extends TestCase
             'http://example.com/3',
         ];
 
-        foreach($exampleUrls as $url){
+        foreach ($exampleUrls as $url) {
             $this->factory->get($url);
         }
 
