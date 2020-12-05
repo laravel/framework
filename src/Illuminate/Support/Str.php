@@ -175,12 +175,15 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|string[]  $needles
+     * @param  bool $insensitive
      * @return bool
      */
-    public static function contains($haystack, $needles)
+    public static function contains($haystack, $needles, $insensitive = false)
     {
+        $method = $insensitive ? 'mb_stripos' : 'mb_strpos';
+
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
+            if ($needle !== '' && $method($haystack, $needle) !== false) {
                 return true;
             }
         }
