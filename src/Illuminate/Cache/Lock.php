@@ -91,7 +91,7 @@ abstract class Lock implements LockContract
 
         if ($result && is_callable($callback)) {
             try {
-                return $callback();
+                return $callback($this);
             } finally {
                 $this->release();
             }
@@ -123,7 +123,7 @@ abstract class Lock implements LockContract
 
         if (is_callable($callback)) {
             try {
-                return $callback();
+                return $callback($this);
             } finally {
                 $this->release();
             }

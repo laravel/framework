@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
+use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
@@ -43,7 +44,9 @@ class FileCacheLockTest extends TestCase
         Carbon::setTestNow();
 
         Cache::lock('foo')->forceRelease();
-        $this->assertSame('taylor', Cache::lock('foo', 10)->block(1, function () {
+        $this->assertSame('taylor', Cache::lock('foo', 10)->block(1, function ($lock) {
+            $this->assertInstanceOf(Lock::class, $lock);
+
             return 'taylor';
         }));
 
@@ -74,7 +77,9 @@ class FileCacheLockTest extends TestCase
         $firstLock = Cache::lock('foo', 10);
 
         try {
-            $firstLock->block(1, function () {
+            $firstLock->block(1, function ($lock) {
+                $this->assertInstanceOf(Lock::class, $lock);
+
                 throw new Exception('failed');
             });
         } catch (Exception $e) {

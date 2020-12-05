@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
@@ -44,7 +45,9 @@ class NoLockTest extends TestCase
         Carbon::setTestNow();
 
         Cache::lock('foo')->forceRelease();
-        $this->assertSame('taylor', Cache::lock('foo', 10)->block(1, function () {
+        $this->assertSame('taylor', Cache::lock('foo', 10)->block(1, function ($lock) {
+            $this->assertInstanceOf(Lock::class, $lock);
+
             return 'taylor';
         }));
 
