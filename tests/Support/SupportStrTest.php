@@ -188,6 +188,20 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::contains('', ''));
     }
 
+    public function testStrContainsInsensitive()
+    {
+        $this->assertTrue(Str::containsInsensitive('Taylor', 'tay'));
+        $this->assertTrue(Str::containsInsensitive('Taylor', 'TaY'));
+        $this->assertTrue(Str::containsInsensitive('taylor', 'taylor'));
+        $this->assertTrue(Str::containsInsensitive('taylor', 'Taylor'));
+        $this->assertTrue(Str::containsInsensitive('taylor', ['Ylo']));
+        $this->assertTrue(Str::containsInsensitive('taylor', ['xxx', 'Ylo']));
+        $this->assertFalse(Str::containsInsensitive('taylor', 'xxx'));
+        $this->assertFalse(Str::containsInsensitive('taylor', ['xxx']));
+        $this->assertFalse(Str::containsInsensitive('taylor', ''));
+        $this->assertFalse(Str::containsInsensitive('', ''));
+    }
+
     public function testStrContainsAll()
     {
         $this->assertTrue(Str::containsAll('taylor otwell', ['taylor', 'otwell']));

@@ -189,6 +189,24 @@ class Str
     }
 
     /**
+     * Determine if a given string contains a given substring with insensitive mode.
+     *
+     * @param  string  $haystack
+     * @param  string|string[]  $needles
+     * @return bool
+     */
+    public static function containsInsensitive($haystack, $needles)
+    {
+        foreach ((array) $needles as $needle) {
+            if ($needle !== '' && mb_stripos($haystack, $needle) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if a given string contains all array values.
      *
      * @param  string  $haystack
