@@ -56,7 +56,7 @@ class Response implements ArrayAccess
      */
     public function json($key = null, $default = null)
     {
-        if (! $this->decoded) {
+        if (!$this->decoded) {
             $this->decoded = json_decode($this->body(), true);
         }
 
@@ -118,6 +118,16 @@ class Response implements ArrayAccess
     public function effectiveUri()
     {
         return $this->transferStats->getEffectiveUri();
+    }
+
+    /**
+     * Get the handler stats of the response.
+     *
+     * @return \Psr\Http\Message\UriInterface
+     */
+    public function handlerStats()
+    {
+        return $this->transferStats->getHandlerStats();
     }
 
     /**
@@ -223,8 +233,7 @@ class Response implements ArrayAccess
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throw()
-    {
+    function throw () {
         $callback = func_get_args()[0] ?? null;
 
         if ($this->failed()) {
@@ -307,7 +316,7 @@ class Response implements ArrayAccess
     public function __call($method, $parameters)
     {
         return static::hasMacro($method)
-                    ? $this->macroCall($method, $parameters)
-                    : $this->response->{$method}(...$parameters);
+        ? $this->macroCall($method, $parameters)
+        : $this->response->{$method}(...$parameters);
     }
 }
