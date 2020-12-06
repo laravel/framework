@@ -217,12 +217,11 @@ trait GuardsAttributes
     protected function isGuardableColumn($key)
     {
         if (! isset(static::$guardableColumns[get_class($this)])) {
-            static::$guardableColumns[get_class($this)] = $this->getConnection()
-                        ->getSchemaBuilder()
-                        ->getColumnListing($this->getTable());
+            $columnListing = $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+            static::$guardableColumns[get_class($this)] = array_map('strtolower', $columnListing);
         }
 
-        return in_array($key, static::$guardableColumns[get_class($this)]);
+        return in_array(strtolower($key), static::$guardableColumns[get_class($this)]);
     }
 
     /**
