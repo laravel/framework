@@ -121,6 +121,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Get the handler stats of the response.
+     *
+     * @return \Psr\Http\Message\UriInterface
+     */
+    public function handlerStats()
+    {
+        return $this->transferStats->getHandlerStats();
+    }
+
+    /**
      * Determine if the request was successful.
      *
      * @return bool
