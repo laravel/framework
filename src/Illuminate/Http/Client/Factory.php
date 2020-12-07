@@ -265,22 +265,22 @@ class Factory
     /**
      * Assert that the given request were sent in the given order.
      *
-     * @param  array  $requestSequence
+     * @param  array  $callbacks
      * @return void
      */
-    public function assertSentInOrder($requestSequence)
+    public function assertSentInOrder($callbacks)
     {
-        $this->assertSentCount(count($requestSequence));
+        $this->assertSentCount(count($callbacks));
 
-        foreach ($requestSequence as $orderPosition => $url) {
+        foreach ($callbacks as $index => $url) {
             $callback = is_callable($url) ? $url : function($request) use ($url) {
                 return $request->url() == $url;
             };
 
             PHPUnit::assertTrue($callback(
-                $this->recorded[$orderPosition][0],
-                $this->recorded[$orderPosition][1]
-            ));
+                $this->recorded[$index][0],
+                $this->recorded[$index][1]
+            ), 'An expected request (#'.($index + 1).') was not recorded.');
         }
     }
 
