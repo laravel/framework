@@ -12,7 +12,9 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Str;
 use ReflectionClass;
+use RuntimeException;
 
 class CallQueuedHandler
 {
@@ -54,7 +56,7 @@ class CallQueuedHandler
     {
         try {
             $command = $this->setJobInstanceIfNecessary(
-                $job, unserialize($data['command'])
+                $job, $this->getCommand($data)
             );
         } catch (ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
@@ -226,7 +228,7 @@ class CallQueuedHandler
      */
     public function failed(array $data, $e, string $uuid)
     {
-        $command = unserialize($data['command']);
+        $command = $this->getCommand($data);
 
         if (! $command instanceof ShouldBeUniqueUntilProcessing) {
             $this->ensureUniqueJobLockIsReleased($command);
@@ -271,5 +273,24 @@ class CallQueuedHandler
         if (method_exists($command, 'invokeChainCatchCallbacks')) {
             $command->invokeChainCatchCallbacks($e);
         }
+    }
+
+    /**
+     * Get the command from the given payload.
+     *
+     * @param  array  $data
+     * @return mixed
+     */
+    protected function getCommand(array $data)
+    {
+        if (Str::startsWith($data['command'], 'O:')) {
+            return unserialize($data['command']);
+        }
+
+        if ($this->container->bound('encrypter')) {
+            return unserialize($this->container['encrypter']->decrypt($data['command']));
+        }
+
+        throw new RuntimeException('Unable to extract job payload.');
     }
 }

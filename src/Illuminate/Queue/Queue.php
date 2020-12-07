@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\UsesEncryption;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
@@ -142,10 +143,14 @@ abstract class Queue
             ],
         ]);
 
+        $command = $job instanceof UsesEncryption && $this->container->bound('encrypter')
+                    ? $this->container['encrypter']->encrypt(serialize(clone $job))
+                    : serialize(clone $job);
+
         return array_merge($payload, [
             'data' => [
                 'commandName' => get_class($job),
-                'command' => serialize(clone $job),
+                'command' => $command,
             ],
         ]);
     }
