@@ -185,29 +185,19 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
-     * Assert if a batch was dispatched based on a truth-test callback.
+     * Assert if a chain of jobs was dispatched.
      *
-     * @param  callable  $callback
-     * @return void
-     */
-    public function assertBatched(callable $callback)
-    {
-        PHPUnit::assertTrue(
-            $this->batched($callback)->count() > 0,
-            'The expected batch was not dispatched.'
-        );
-    }
-
-    /**
-     * Assert if a job was dispatched based on a truth-test callback.
-     *
-     * @param  string|\Closure  $command
      * @param  array  $expectedChain
-     * @param  callable|null  $callback
      * @return void
      */
-    public function assertDispatchedWithChain($command, $expectedChain = [], $callback = null)
+    public function assertChained(array $expectedChain = [])
     {
+        $command = $expectedChain[0];
+
+        $expectedChain = array_slice($expectedChain, 1);
+
+        $callback = null;
+
         if ($command instanceof Closure) {
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
@@ -304,6 +294,20 @@ class BusFake implements QueueingDispatcher
         return ! collect($chain)->contains(function ($job) {
             return ! is_object($job);
         });
+    }
+
+    /**
+     * Assert if a batch was dispatched based on a truth-test callback.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function assertBatched(callable $callback)
+    {
+        PHPUnit::assertTrue(
+            $this->batched($callback)->count() > 0,
+            'The expected batch was not dispatched.'
+        );
     }
 
     /**
