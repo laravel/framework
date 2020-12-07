@@ -149,11 +149,11 @@ class Mailable implements MailableContract, Renderable
     public $mailer;
 
     /**
-     * The rendered views for assertions.
+     * The rendered mailable views for testing / assertions.
      *
      * @var array
      */
-    protected $assertionableRender;
+    protected $assertionableRenderStrings;
 
     /**
      * The callback that should be invoked while building the view data.
@@ -926,11 +926,11 @@ class Mailable implements MailableContract, Renderable
      */
     protected function renderForAssertions()
     {
-        if ($this->assertionableRender) {
-            return $this->assertionableRender;
+        if ($this->assertionableRenderStrings) {
+            return $this->assertionableRenderStrings;
         }
 
-        return $this->assertionableRender = $this->withLocale($this->locale, function () {
+        return $this->assertionableRenderStrings = $this->withLocale($this->locale, function () {
             Container::getInstance()->call([$this, 'build']);
 
             $html = Container::getInstance()->make('mailer')->render(
