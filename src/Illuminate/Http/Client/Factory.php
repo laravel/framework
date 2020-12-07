@@ -273,7 +273,16 @@ class Factory
         $this->assertSentCount(count($requestSequence));
 
         foreach ($requestSequence as $orderPosition => $url) {
-            PHPUnit::assertEquals($url, $this->recorded[$orderPosition][0]->url());
+
+            $callback = $url;
+            if(!is_callable($url)){
+                $callback = function($request) use ($url) {
+                    return $request->url() == $url;
+                };
+            }
+
+            PHPUnit::assertTrue( $callback( $this->recorded[ $orderPosition ][0], $this->recorded[ $orderPosition ][1] ) );
+
         }
     }
 
