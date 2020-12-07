@@ -164,12 +164,12 @@ class PostgresBuilder extends Builder
     {
         $table = explode('.', $table);
 
-        if (is_array($schema = $this->connection->getConfig('schema'))) {
-            if (in_array($table[0], $schema)) {
+        if (is_array($searchPath = $this->connection->getConfig('search_path'))) {
+            if (in_array($table[0], $searchPath)) {
                 return [array_shift($table), implode('.', $table)];
             }
 
-            $schema = head($schema);
+            $schema = head($searchPath);
         }
 
         return [$schema ?: 'public', implode('.', $table)];

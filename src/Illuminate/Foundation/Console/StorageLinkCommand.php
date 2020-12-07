@@ -14,6 +14,15 @@ class StorageLinkCommand extends Command
     protected $signature = 'storage:link {--relative : Create the symbolic link using relative paths}';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'storage:link';
+
+    /**
      * The console command description.
      *
      * @var string

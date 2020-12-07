@@ -105,12 +105,12 @@ abstract class Factory
      * Create a new factory instance.
      *
      * @param  int|null  $count
-     * @param  \Illuminate\Support\Collection  $states
-     * @param  \Illuminate\Support\Collection  $has
-     * @param  \Illuminate\Support\Collection  $for
-     * @param  \Illuminate\Support\Collection  $afterMaking
-     * @param  \Illuminate\Support\Collection  $afterCreating
-     * @param  string  $connection
+     * @param  \Illuminate\Support\Collection|null  $states
+     * @param  \Illuminate\Support\Collection|null  $has
+     * @param  \Illuminate\Support\Collection|null  $for
+     * @param  \Illuminate\Support\Collection|null  $afterMaking
+     * @param  \Illuminate\Support\Collection|null  $afterCreating
+     * @param  string|null  $connection
      * @return void
      */
     public function __construct($count = null,

@@ -15,10 +15,10 @@
     ],
     "require": {
         "php": "^7.3|^8.0",
-        "illuminate/collections": "^8.0",
-        "illuminate/contracts": "^8.0",
-        "illuminate/macroable": "^8.0",
-        "illuminate/support": "^8.0"
+        "illuminate/collections": "^9.0",
+        "illuminate/contracts": "^9.0",
+        "illuminate/macroable": "^9.0",
+        "illuminate/support": "^9.0"
     },
     "autoload": {
         "psr-4": {
@@ -27,15 +27,15 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "8.x-dev"
+            "dev-master": "9.x-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to assert console commands (^8.0).",
-        "illuminate/database": "Required to assert databases (^8.0).",
-        "illuminate/http": "Required to assert responses (^8.0).",
+        "illuminate/console": "Required to assert console commands (^9.0).",
+        "illuminate/database": "Required to assert databases (^9.0).",
+        "illuminate/http": "Required to assert responses (^9.0).",
         "mockery/mockery": "Required to use mocking (^1.4.2).",
-        "phpunit/phpunit": "Required to use assertions and run tests (^8.5.8|^9.3.3)."
+        "phpunit/phpunit": "Required to use assertions and run tests (^9.4)."
     },
     "config": {
         "sort-packages": true

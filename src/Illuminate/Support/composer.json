@@ -18,9 +18,9 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "doctrine/inflector": "^1.4|^2.0",
-        "illuminate/collections": "^8.0",
-        "illuminate/contracts": "^8.0",
-        "illuminate/macroable": "^8.0",
+        "illuminate/collections": "^9.0",
+        "illuminate/contracts": "^9.0",
+        "illuminate/macroable": "^9.0",
         "nesbot/carbon": "^2.31",
         "voku/portable-ascii": "^1.4.8"
     },
@@ -37,14 +37,14 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "8.x-dev"
+            "dev-master": "9.x-dev"
         }
     },
     "suggest": {
-        "illuminate/filesystem": "Required to use the composer class (^8.0).",
+        "illuminate/filesystem": "Required to use the composer class (^9.0).",
         "ramsey/uuid": "Required to use Str::uuid() (^4.0).",
-        "symfony/process": "Required to use the composer class (^5.1).",
-        "symfony/var-dumper": "Required to use the dd function (^5.1).",
+        "symfony/process": "Required to use the composer class (^5.2).",
+        "symfony/var-dumper": "Required to use the dd function (^5.2).",
         "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.2)."
     },
     "config": {

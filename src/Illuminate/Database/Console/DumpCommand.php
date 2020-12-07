@@ -23,6 +23,15 @@ class DumpCommand extends Command
                 {--prune : Delete all existing migration files}';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'schema:dump';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -32,6 +41,8 @@ class DumpCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param  \Illuminate\Database\ConnectionResolverInterface  $connections
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return int
      */
     public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
