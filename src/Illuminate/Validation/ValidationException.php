@@ -78,10 +78,9 @@ class ValidationException extends Exception
     }
 
     /**
-     * Create a summary error message from the validation errors.
+     * Create a error message summary from the validation errors.
      *
-     * @param \Illuminate\Contracts\Validation\Validator      $validator
-     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return string
      */
     protected static function summarize($validator)
@@ -96,7 +95,8 @@ class ValidationException extends Exception
 
         if ($additional = count($messages)) {
             $pluralized = 1 === $additional ? 'error' : 'errors';
-            $message .= " (and $additional more $pluralized)";
+
+            $message .= " (and {$additional} more {$pluralized})";
         }
 
         return $message;
