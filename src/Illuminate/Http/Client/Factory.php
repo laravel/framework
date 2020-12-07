@@ -263,7 +263,7 @@ class Factory
     }
 
     /**
-     * Assert that requests were sent in the order specified.
+     * Assert that the given request were sent in the given order.
      *
      * @param  array  $requestSequence
      * @return void
@@ -273,16 +273,14 @@ class Factory
         $this->assertSentCount(count($requestSequence));
 
         foreach ($requestSequence as $orderPosition => $url) {
+            $callback = is_callable($url) ? $url : function($request) use ($url) {
+                return $request->url() == $url;
+            };
 
-            $callback = $url;
-            if(!is_callable($url)){
-                $callback = function($request) use ($url) {
-                    return $request->url() == $url;
-                };
-            }
-
-            PHPUnit::assertTrue( $callback( $this->recorded[ $orderPosition ][0], $this->recorded[ $orderPosition ][1] ) );
-
+            PHPUnit::assertTrue($callback(
+                $this->recorded[$orderPosition][0],
+                $this->recorded[$orderPosition][1]
+            ));
         }
     }
 
