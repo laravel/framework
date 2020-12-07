@@ -665,21 +665,22 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentInOrder($exampleUrls);
     }
 
-    public function testCanAssertAgainstOrderOfHttpRequestsWithCallables() {
+    public function testCanAssertAgainstOrderOfHttpRequestsWithCallables()
+    {
         $this->factory->fake();
 
         $exampleUrls = [
-            function($request) {
+            function ($request) {
                 return $request->url() == 'http://example.com/1';
             },
-            function($request) {
+            function ($request) {
                 return $request->url() == 'http://example.com/2';
             },
-            function($request) {
+            function ($request) {
                 return $request->url() == 'http://example.com/3';
             },
         ];
-            
+
         $this->factory->get('http://example.com/1');
         $this->factory->get('http://example.com/2');
         $this->factory->get('http://example.com/3');
@@ -687,7 +688,8 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentInOrder($exampleUrls);
     }
 
-    public function testCanAssertAgainstOrderOfHttpRequestsWithCallablesAndHeaders() {
+    public function testCanAssertAgainstOrderOfHttpRequestsWithCallablesAndHeaders()
+    {
         $this->factory->fake();
 
         $executionOrder = [
@@ -704,7 +706,7 @@ class HttpClientTest extends TestCase
                        $request->hasHeader('X-Test-Header', 'bar') &&
                        $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
                        $request['name'] === 'Taylor';
-            }
+            },
         ];
 
         $this->factory->withHeaders([
@@ -724,7 +726,8 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentInOrder($executionOrder);
     }
 
-    public function testCanAssertAgainstOrderOfHttpRequestsWithCallablesAndHeadersFailsCorrectly() {
+    public function testCanAssertAgainstOrderOfHttpRequestsWithCallablesAndHeadersFailsCorrectly()
+    {
         $this->factory->fake();
 
         $executionOrder = [
