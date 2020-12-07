@@ -235,7 +235,7 @@ class Factory
         $this->assertSentCount(count($callbacks));
 
         foreach ($callbacks as $index => $url) {
-            $callback = is_callable($url) ? $url : function($request) use ($url) {
+            $callback = is_callable($url) ? $url : function ($request) use ($url) {
                 return $request->url() == $url;
             };
 
