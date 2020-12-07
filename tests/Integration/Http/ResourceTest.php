@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
 use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
@@ -38,6 +39,68 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new PostResource(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+                'abstract' => 'Test abstract',
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayBeConvertedToJsonUsingToResourceTraitFunction()
+    {
+        JsonResource::guessResourceNamesUsing(function ($modelName) {
+            $namespace = 'Illuminate\\Tests\\Integration\\Http\\Fixtures\\';
+            $modelName = Str::after($modelName, $namespace);
+
+            return $namespace.$modelName.'Resource';
+        });
+
+        Route::get('/', function () {
+            return (new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+                'abstract' => 'Test abstract',
+            ]))->toResource();
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayBeConvertedToJsonUsingForResourceFunction()
+    {
+        JsonResource::guessResourceNamesUsing(function ($modelName) {
+            $namespace = 'Illuminate\\Tests\\Integration\\Http\\Fixtures\\';
+            $modelName = Str::after($modelName, $namespace);
+
+            return $namespace.$modelName.'Resource';
+        });
+
+        Route::get('/', function () {
+            return Post::resource()->for(new Post([
                 'id' => 5,
                 'title' => 'Test Title',
                 'abstract' => 'Test abstract',
@@ -768,6 +831,30 @@ class ResourceTest extends TestCase
         );
         $createdPosts->each(function ($post) use ($response) {
             $this->assertTrue($response->getOriginalContent()->contains($post));
+        });
+    }
+
+    public function testCollectionCanBeConvertedToResourceWhenUsingResourceForFunction()
+    {
+        JsonResource::guessResourceNamesUsing(function ($modelName) {
+            return PostResource::class;
+        });
+
+        $createdPosts = collect([
+            new Post(['id' => 5, 'title' => 'Test Title']),
+            new Post(['id' => 6, 'title' => 'Test Title 2']),
+        ]);
+
+        Route::get('/', function () use ($createdPosts) {
+            return Post::resource()->for($createdPosts);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $createdPosts->each(function ($post) use ($response) {
+            $this->assertTrue($response->getOriginalContent()->contains($post->toResource()));
         });
     }
 

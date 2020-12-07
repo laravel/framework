@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Integration\Http\Fixtures;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Resources\HasResource;
 
 class Post extends Model
 {
+    use HasResource;
+
     /**
      * The attributes that aren't mass assignable.
      *

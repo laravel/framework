@@ -8,9 +8,13 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use JsonSerializable;
+use Throwable;
 
 class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
@@ -47,12 +51,26 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static $wrap = 'data';
 
     /**
+     * The default namespace where factories reside.
+     *
+     * @var string
+     */
+    protected static $namespace = 'App\\Http\\Resources\\';
+
+    /**
+     * The resource name resolver.
+     *
+     * @var callable
+     */
+    protected static $resourceNameResolver;
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
      * @return void
      */
-    public function __construct($resource)
+    public function __construct($resource = null)
     {
         $this->resource = $resource;
     }
@@ -65,6 +83,10 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public static function make(...$parameters)
     {
+        if (($parameters[0] ?? null) instanceof Collection) {
+            return static::collection($parameters[0]);
+        }
+
         return new static(...$parameters);
     }
 
@@ -165,6 +187,23 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
+     * Sets the resource for a model or collection of models
+     *
+     * @param mixed $resource
+     * @return $this|AnonymousResourceCollection
+     */
+    public function for($resource)
+    {
+        if ($resource instanceof Collection) {
+            return static::collection($resource);
+        }
+
+        $this->resource = $resource;
+
+        return $this;
+    }
+
+    /**
      * Customize the response for a request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -229,5 +268,81 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function jsonSerialize()
     {
         return $this->resolve(Container::getInstance()->make('request'));
+    }
+
+    /**
+     * Get a new resource instance for the given model name.
+     *
+     * @param string $modelName
+     * @param mixed ...$parameters
+     * @return static
+     */
+    public static function resourceForModel(string $modelName, ...$parameters)
+    {
+        $resource = static::resolveResourceName($modelName);
+
+        return $resource::make(...$parameters);
+    }
+
+    /**
+     * Specify the callback that should be invoked to guess factory names based on dynamic relationship names.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function guessResourceNamesUsing(callable $callback)
+    {
+        static::$resourceNameResolver = $callback;
+    }
+
+    /**
+     * Specify the default namespace that contains the application's API resources.
+     *
+     * @param  string  $namespace
+     * @return void
+     */
+    public static function useNamespace(string $namespace)
+    {
+        static::$namespace = $namespace;
+    }
+
+    /**
+     * Get the resource name for the given model name.
+     *
+     * @param  string  $modelName
+     * @return string
+     */
+    public static function resolveResourceName(string $modelName)
+    {
+        $resolver = static::$resourceNameResolver ?: function (string $modelName) {
+            $appNamespace = static::appNamespace();
+
+            $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')
+                ? Str::after($modelName, $appNamespace.'Models\\')
+                : Str::after($modelName, $appNamespace);
+            $resourceName = static::$namespace.$modelName;
+
+            return class_exists($resourceName)
+                ? $resourceName
+                : $resourceName.'Resource';
+        };
+
+        return $resolver($modelName);
+    }
+
+    /**
+     * Get the application namespace for the application.
+     *
+     * @return string
+     */
+    protected static function appNamespace()
+    {
+        try {
+            return Container::getInstance()
+                ->make(Application::class)
+                ->getNamespace();
+        } catch (Throwable $e) {
+            return 'App\\';
+        }
     }
 }
