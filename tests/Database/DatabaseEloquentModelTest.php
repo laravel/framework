@@ -1211,23 +1211,6 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
-    public function testCorrectMorphClassIsReturnedOnChangingDefault()
-    {
-        Relation::tableNameAsMorphType();
-        Relation::morphMap(['alias' => EloquentModelCamelStub::class]);
-        Relation::morphMap(['alias2' => 'AnotherModel']);
-        $model = new EloquentModelStub;
-        $model2 = new EloquentModelCamelStub;
-
-        try {
-            $this->assertEquals('stub', $model->getMorphClass());
-            $this->assertEquals('alias', $model2->getMorphClass());
-        } finally {
-            Relation::morphMap([], false);
-            Relation::$tableNameAsMorphType = false;
-        }
-    }
-
     public function testHasManyCreatesProperRelation()
     {
         $model = new EloquentModelStub;
