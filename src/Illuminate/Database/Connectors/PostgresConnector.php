@@ -116,7 +116,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
             $searchPath = $matches[0];
         }
 
-        array_walk($searchPath, function(&$schema) {
+        array_walk($searchPath, function (&$schema) {
             $schema = trim($schema, '\'"');
         });
 
@@ -131,7 +131,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function formatSearchPath($searchPath)
     {
-        return count($searchPath) === 1 ? '"' . $searchPath[0] . '"' : '"'.implode('", "', $searchPath).'"';
+        return count($searchPath) === 1 ? '"'.$searchPath[0].'"' : '"'.implode('", "', $searchPath).'"';
     }
 
     /**
