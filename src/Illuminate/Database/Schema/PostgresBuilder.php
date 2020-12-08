@@ -12,12 +12,12 @@ class PostgresBuilder extends Builder
      */
     public function hasTable($table)
     {
-        [$schema, $table] = $this->parseSchemaAndTable($table);
+        [$database, $schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
         return count($this->connection->select(
-            $this->grammar->compileTableExists(), [$schema, $table]
+            $this->grammar->compileTableExists(), [$database, $schema, $table]
         )) > 0;
     }
 
@@ -143,35 +143,77 @@ class PostgresBuilder extends Builder
      */
     public function getColumnListing($table)
     {
-        [$schema, $table] = $this->parseSchemaAndTable($table);
+        [$database, $schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
         $results = $this->connection->select(
-            $this->grammar->compileColumnListing(), [$schema, $table]
+            $this->grammar->compileColumnListing(), [$database, $schema, $table]
         );
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
     }
 
     /**
-     * Parse the table name and extract the schema and table.
+     * Parse the search_path.
      *
-     * @param  string  $table
+     * @param string|array  $searchPath
      * @return array
      */
-    protected function parseSchemaAndTable($table)
+    protected function parseSearchPath($searchPath)
     {
-        $table = explode('.', $table);
+        if (is_string($searchPath)) {
+            preg_match_all('/[a-zA-z0-9$]{1,}/i', $searchPath, $matches);
 
-        if (is_array($searchPath = $this->connection->getConfig('search_path'))) {
-            if (in_array($table[0], $searchPath)) {
-                return [array_shift($table), implode('.', $table)];
-            }
-
-            $schema = head($searchPath);
+            $searchPath = $matches[0];
         }
 
-        return [$schema ?: 'public', implode('.', $table)];
+        array_walk($searchPath, function(&$schema) {
+            $schema = trim($schema, '\'"');
+        });
+
+        return $searchPath;
+    }
+
+    /**
+     * Parse the database object reference and extract the database, schema, and
+     * table.
+     *
+     * @param  string  $reference
+     * @return array
+     */
+    protected function parseSchemaAndTable($reference)
+    {
+        $searchPath = $this->parseSearchPath(
+            $this->connection->getConfig('search_path') ?: 'public'
+        );
+
+        $parts = explode('.', $reference);
+
+        // Use the connection's configured database by default.
+
+        $database = $this->connection->getConfig('database');
+
+        // If the reference contains a database name, use that instead.
+
+        if (count($parts) === 3) {
+            $database = $parts[0];
+
+            array_shift($parts);
+        }
+
+        // Use the first schema in the search_path by default.
+
+        $schema = $searchPath[0];
+
+        // If the reference contains a schema, use that instead.
+
+        if (count($parts) === 2) {
+            $schema = $parts[0];
+
+            array_shift($parts);
+        }
+
+        return [$database, $schema, $parts[0]];
     }
 }
