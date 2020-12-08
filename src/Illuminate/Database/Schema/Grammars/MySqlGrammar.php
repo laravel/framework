@@ -1034,7 +1034,7 @@ class MySqlGrammar extends Grammar
     protected function modifyCheck(Blueprint $blueprint, Fluent $column)
     {
         if (! is_null($column->check)) {
-            return ' check ('.$this->wrap($column->name).' '.$column->check.' ) ';
+            return ' check ('.$this->wrap($column->name).' '.$column->check.')';
         }
     }
 
