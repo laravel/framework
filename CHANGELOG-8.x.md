@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.17.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.17.1...8.x)
+
+
+## [v8.17.1 (2020-12-02)](https://github.com/laravel/framework/compare/v8.17.0...v8.17.1)
+
+### Fixed
+- Fixed an issue with the database queue driver ([#35449](https://github.com/laravel/framework/pull/35449))
 
 
 ## [v8.17.0 (2020-12-01)](https://github.com/laravel/framework/compare/v8.16.1...v8.17.0)
