@@ -68,7 +68,8 @@ class PostgresGrammar extends Grammar
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint))
-        )], $this->compileAutoIncrementStartingValues($blueprint))));
+        )], $this->compileAutoIncrementStartingValues($blueprint),
+            $this->compileTableComment($blueprint))));
     }
 
     /**
@@ -97,6 +98,20 @@ class PostgresGrammar extends Grammar
         return collect($blueprint->autoIncrementingStartingValues())->map(function ($value, $column) use ($blueprint) {
             return 'alter sequence '.$blueprint->getTable().'_'.$column.'_seq restart with '.$value;
         })->all();
+    }
+
+    /**
+     * Compile table comment.
+     *
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @return array
+     */
+    public function compileTableComment(Blueprint $blueprint)
+    {
+        if (isset($blueprint->comment)) {
+            return sprintf('comment on table %s is %s', $this->wrapTable($blueprint), "'" . str_replace("'", "''", $blueprint->comment) . "'");
+        }
+        return;
     }
 
     /**
