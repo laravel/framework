@@ -64,6 +64,14 @@ class Blueprint
      */
     public $collation;
 
+    
+    /**
+     * The comment that should be used for the table.
+     *
+     * @var string
+     */
+    public $comment;
+
     /**
      * Whether to make the table temporary.
      *

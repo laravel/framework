@@ -66,6 +66,9 @@ class MySqlGrammar extends Grammar
         $sql = $this->compileCreateEncoding(
             $sql, $connection, $blueprint
         );
+        
+        // If present, add the table comment
+        $sql = $this->compileTableComment($sql, $blueprint);
 
         // Finally, we will append the engine configuration onto this SQL statement as
         // the final thing we do before returning this finished SQL. Once this gets
@@ -122,6 +125,22 @@ class MySqlGrammar extends Grammar
 
         return $sql;
     }
+
+    /**
+     * Append the comment to a command.
+     *
+     * @param  string  $sql
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return string
+     */
+    protected function compileTableComment($sql, Blueprint $blueprint)
+    {
+        if (isset($blueprint->comment)) {
+            $sql .= " comment '".addslashes($blueprint->comment)."'";
+        }
+        return $sql;
+    }
+    
 
     /**
      * Append the engine specifications to a command.
