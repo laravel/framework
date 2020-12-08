@@ -63,6 +63,20 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create table "users" ("id" serial primary key not null, "email" varchar(255) not null)', $statements[0]);
         $this->assertSame('comment on column "users"."email" is \'my first comment\'', $statements[1]);
     }
+    
+    public function testCreateTableWithComment()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $blueprint->comment = "Test of table comment";
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        
+        $this->assertCount(2, $statements);
+        $this->assertSame('create table "users" ("id" serial primary key not null, "email" varchar(255) not null)', $statements[0]);
+        $this->assertSame('comment on table "users" is \'Test of table comment\'', $statements[1]);
+    }
 
     public function testCreateTemporaryTable()
     {
