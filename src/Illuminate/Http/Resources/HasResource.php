@@ -10,7 +10,7 @@ trait HasResource
      * Get a new resource instance for the given resource(s)
      *
      * @param mixed ...$parameters
-     * @return JsonResource
+     * @return \Illuminate\Http\Resources\Json\JsonResource
      */
     public static function resource(...$parameters)
     {
@@ -21,8 +21,8 @@ trait HasResource
     /**
      * Create a new resource instance for the model.
      *
-     * @param static $model
-     * @return JsonResource
+     * @param static|null $model
+     * @return \Illuminate\Http\Resources\Json\JsonResource
      */
     protected static function newResource($model = null)
     {
@@ -32,7 +32,7 @@ trait HasResource
     /**
      * Get the resource representation of the model
      *
-     * @return JsonResource
+     * @return \Illuminate\Http\Resources\Json\JsonResource
      */
     public function toResource()
     {

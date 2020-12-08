@@ -190,7 +190,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      * Sets the resource for a model or collection of models
      *
      * @param mixed $resource
-     * @return $this|AnonymousResourceCollection
+     * @return $this|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function for($resource)
     {
