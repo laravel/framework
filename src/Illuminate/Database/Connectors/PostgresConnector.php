@@ -94,10 +94,33 @@ class PostgresConnector extends Connector implements ConnectorInterface
     protected function configureSearchPath($connection, $config)
     {
         if (isset($config['search_path'])) {
-            $searchPath = $this->formatSearchPath($config['search_path']);
+            $searchPath = $this->formatSearchPath(
+                $this->parseSearchPath($config['search_path'])
+            );
 
             $connection->prepare("set search_path to {$searchPath}")->execute();
         }
+    }
+
+    /**
+     * Parse the search_path.
+     *
+     * @param string|array  $searchPath
+     * @return array
+     */
+    protected function parseSearchPath($searchPath)
+    {
+        if (is_string($searchPath)) {
+            preg_match_all('/[a-zA-z0-9$]{1,}/i', $searchPath, $matches);
+
+            $searchPath = $matches[0];
+        }
+
+        array_walk($searchPath, function(&$schema) {
+            $schema = trim($schema, '\'"');
+        });
+
+        return $searchPath;
     }
 
     /**
@@ -108,13 +131,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function formatSearchPath($searchPath)
     {
-        if (is_array($searchPath)) {
-            $searchPath = '"'.implode('", "', $searchPath).'"';
-        }
-
-        preg_match_all('/[a-zA-z0-9$]{1,}/i', $searchPath, $matches);
-
-        return '"'.implode('", "', $matches[0]).'"';
+        return count($searchPath) === 1 ? '"' . $searchPath[0] . '"' : '"'.implode('", "', $searchPath).'"';
     }
 
     /**
