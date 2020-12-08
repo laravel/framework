@@ -69,11 +69,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->string('foo')->nullable()->check("<> 'hejsan'");
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        
+
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" varchar(255) null check ("foo" <> \'hejsan\')', $statements[0]);
     }
-    
+
     public function testCreateTemporaryTable()
     {
         $blueprint = new Blueprint('users');
