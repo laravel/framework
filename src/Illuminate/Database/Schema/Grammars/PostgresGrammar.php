@@ -19,7 +19,7 @@ class PostgresGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $modifiers = ['Collate', 'Increment', 'Nullable', 'Default', 'VirtualAs', 'StoredAs'];
+    protected $modifiers = ['Collate', 'Increment', 'Nullable', 'Default', 'VirtualAs', 'StoredAs', 'Check'];
 
     /**
      * The columns available as serials.
@@ -991,6 +991,20 @@ class PostgresGrammar extends Grammar
     {
         if ($column->storedAs !== null) {
             return " generated always as ({$column->storedAs}) stored";
+        }
+    }
+
+    /**
+     * Get the SQL for a generated stored column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCheck(Blueprint $blueprint, Fluent $column)
+    {
+        if ($column->check !== null) {
+            return sprintf(' check ("%s" %s)', $column->name, $column->check);
         }
     }
 }

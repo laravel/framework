@@ -16,7 +16,7 @@ class MySqlGrammar extends Grammar
      */
     protected $modifiers = [
         'Unsigned', 'Charset', 'Collate', 'VirtualAs', 'StoredAs', 'Nullable',
-        'Srid', 'Default', 'Increment', 'Comment', 'After', 'First',
+        'Srid', 'Default', 'Increment', 'Comment', 'After', 'First', 'Check',
     ];
 
     /**
@@ -1021,6 +1021,20 @@ class MySqlGrammar extends Grammar
     {
         if (! is_null($column->after)) {
             return ' after '.$this->wrap($column->after);
+        }
+    }
+
+    /**
+     * Get the SQL for a "check" column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCheck(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->check)) {
+            return ' check ('.$this->wrap($column->name).' '.$column->check.' ) ';
         }
     }
 
