@@ -536,6 +536,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `links` add `url` varchar(2083) character set ascii not null, add `url_hash_virtual` varchar(64) character set ascii as (sha2(url, 256)), add `url_hash_stored` varchar(64) character set ascii as (sha2(url, 256)) stored', $statements[0]);
     }
+    
+    public function testAddingColumnCheck()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('foo')->nullable()->check("<> 'hejsan'");
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` varchar(255) null check (`foo` <> \'hejsan\')', $statements[0]);
+    }
 
     public function testAddingString()
     {
