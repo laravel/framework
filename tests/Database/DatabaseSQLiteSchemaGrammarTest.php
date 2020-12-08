@@ -741,6 +741,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "foo" varchar not null', $statements[0]);
     }
 
+    public function testAddingIpAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "ip_address" varchar not null', $statements[0]);
+    }
+
     public function testAddingMacAddress()
     {
         $blueprint = new Blueprint('users');
@@ -749,6 +759,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" varchar not null', $statements[0]);
+    }
+
+    public function testAddingMacAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "mac_address" varchar not null', $statements[0]);
     }
 
     public function testAddingGeometry()

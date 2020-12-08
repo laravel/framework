@@ -1201,7 +1201,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function ipAddress($column)
+    public function ipAddress($column = 'ip_address')
     {
         return $this->addColumn('ipAddress', $column);
     }
@@ -1212,7 +1212,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function macAddress($column)
+    public function macAddress($column = 'mac_address')
     {
         return $this->addColumn('macAddress', $column);
     }
