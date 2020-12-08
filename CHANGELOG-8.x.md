@@ -1,6 +1,18 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.17.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.17.2...8.x)
+
+
+## [v8.17.2 (2020-12-03)](https://github.com/laravel/framework/compare/v8.17.1...v8.17.2)
+
+### Added
+- Added `Illuminate\Database\Eloquent\Relations\BelongsToMany::orderByPivot()` ([#35455](https://github.com/laravel/framework/pull/35455), [6f83a50](https://github.com/laravel/framework/commit/6f83a5099725dc47fbec1b0cf1bcc64f80f9dc86))
+
+
+## [v8.17.1 (2020-12-02)](https://github.com/laravel/framework/compare/v8.17.0...v8.17.1)
+
+### Fixed
+- Fixed an issue with the database queue driver ([#35449](https://github.com/laravel/framework/pull/35449))
 
 
 ## [v8.17.0 (2020-12-01)](https://github.com/laravel/framework/compare/v8.16.1...v8.17.0)
