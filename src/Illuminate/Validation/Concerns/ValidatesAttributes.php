@@ -1216,6 +1216,10 @@ trait ValidatesAttributes
             return false;
         }
 
+        if (in_array('jpg', $parameters) || in_array('jpeg', $parameters)) {
+            $parameters = array_unique(array_merge($parameters, ['jpg', 'jpeg']));
+        }
+
         return $value->getPath() !== '' && in_array($value->guessExtension(), $parameters);
     }
 
