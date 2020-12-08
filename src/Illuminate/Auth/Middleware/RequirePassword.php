@@ -53,7 +53,7 @@ class RequirePassword
      * @param  int|null  $passwordTimeoutSeconds
      * @return mixed
      */
-    public function handle($request, Closure $next, $redirectToRoute = null, int $passwordTimeoutSeconds = null)
+    public function handle($request, Closure $next, $redirectToRoute = null, $passwordTimeoutSeconds = null)
     {
         if ($this->shouldConfirmPassword($request, $passwordTimeoutSeconds)) {
             if ($request->expectsJson()) {
@@ -77,7 +77,7 @@ class RequirePassword
      * @param  int|null  $passwordTimeoutSeconds
      * @return bool
      */
-    protected function shouldConfirmPassword($request, int $passwordTimeoutSeconds = null)
+    protected function shouldConfirmPassword($request, $passwordTimeoutSeconds = null)
     {
         $confirmedAt = time() - $request->session()->get('auth.password_confirmed_at', 0);
 
