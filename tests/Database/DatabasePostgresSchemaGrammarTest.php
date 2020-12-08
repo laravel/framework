@@ -998,6 +998,20 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('drop type "alpha","beta","gamma" cascade', $statement);
     }
 
+    public function testCompileTableExists()
+    {
+        $statement = $this->getGrammar()->compileTableExists();
+
+        $this->assertSame('select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = \'BASE TABLE\'', $statement);
+    }
+
+    public function testCompileColumnListing()
+    {
+        $statement = $this->getGrammar()->compileColumnListing();
+
+        $this->assertSame('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', $statement);
+    }
+
     protected function getConnection()
     {
         return m::mock(Connection::class);
