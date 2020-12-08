@@ -64,7 +64,6 @@ class Blueprint
      */
     public $collation;
 
-    
     /**
      * The comment that should be used for the table.
      *

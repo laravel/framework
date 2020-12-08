@@ -139,12 +139,12 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->increments('id');
         $blueprint->string('email');
         $blueprint->comment = "Test of comment's capability";
-        
+
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
         $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
         $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        
+
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);

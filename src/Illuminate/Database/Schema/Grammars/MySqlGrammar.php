@@ -66,7 +66,7 @@ class MySqlGrammar extends Grammar
         $sql = $this->compileCreateEncoding(
             $sql, $connection, $blueprint
         );
-        
+
         // If present, add the table comment
         $sql = $this->compileTableComment($sql, $blueprint);
 
@@ -138,9 +138,9 @@ class MySqlGrammar extends Grammar
         if (isset($blueprint->comment)) {
             $sql .= " comment '".addslashes($blueprint->comment)."'";
         }
+
         return $sql;
     }
-    
 
     /**
      * Append the engine specifications to a command.
