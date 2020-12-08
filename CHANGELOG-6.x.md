@@ -1,6 +1,13 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.6...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.7...6.x)
+
+
+## [v6.20.7 (2020-12-08)](https://github.com/laravel/framework/compare/v6.20.6...v6.20.7)
+
+### Fixed
+- Backport for fix issue with polymorphic morphMaps with literal 0 ([#35487](https://github.com/laravel/framework/pull/35487))
+- Fixed mime validation for jpeg files ([#35518](https://github.com/laravel/framework/pull/35518))
 
 
 ## [v6.20.6 (2020-12-01)](https://github.com/laravel/framework/compare/v6.20.5...v6.20.6)
