@@ -51,18 +51,18 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static $wrap = 'data';
 
     /**
-     * The default namespace where factories reside.
-     *
-     * @var string
-     */
-    protected static $namespace = 'App\\Http\\Resources\\';
-
-    /**
      * The resource name resolver.
      *
      * @var callable
      */
     protected static $resourceNameResolver;
+
+    /**
+     * The resource namespace resolver.
+     *
+     * @var callable
+     */
+    protected static $resourceNamespaceResolver;
 
     /**
      * Create a new resource instance.
@@ -296,14 +296,30 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Specify the default namespace that contains the application's API resources.
+     * Specify the callback that should be invoked to get the namespace of the API resources.
      *
-     * @param  string  $namespace
+     * @param  callable  $callback
      * @return void
      */
-    public static function useNamespace(string $namespace)
+    public static function resolveResourceNamespaceUsing(callable $callback)
     {
-        static::$namespace = $namespace;
+        static::$resourceNamespaceResolver = $callback;
+    }
+
+    /**
+     * Get the namespace for the application's API resources.
+     *
+     * @return string
+     */
+    public static function resolveResourceNamespace()
+    {
+        $resolver = static::$resourceNamespaceResolver ?: function () {
+            $appNamespace = static::appNamespace();
+
+            return $appNamespace.'Http\\Resources\\';
+        };
+
+        return $resolver();
     }
 
     /**
@@ -315,12 +331,11 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static function resolveResourceName(string $modelName)
     {
         $resolver = static::$resourceNameResolver ?: function (string $modelName) {
-            $appNamespace = static::appNamespace();
-
-            $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')
-                ? Str::after($modelName, $appNamespace.'Models\\')
-                : Str::after($modelName, $appNamespace);
-            $resourceName = static::$namespace.$modelName;
+            $modelName = class_basename($modelName);
+            $resourceNamespace = static::resolveResourceNamespace();
+            $resourceName = Str::endsWith($resourceNamespace, '\\')
+                ? $resourceNamespace.$modelName
+                : $resourceNamespace.'\\'.$modelName;
 
             return class_exists($resourceName)
                 ? $resourceName
