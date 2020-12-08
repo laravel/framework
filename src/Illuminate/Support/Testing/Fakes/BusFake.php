@@ -190,7 +190,7 @@ class BusFake implements QueueingDispatcher
      * @param  array  $expectedChain
      * @return void
      */
-    public function assertChained(array $expectedChain = [])
+    public function assertChained(array $expectedChain)
     {
         $command = $expectedChain[0];
 
