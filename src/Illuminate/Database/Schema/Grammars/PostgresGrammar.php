@@ -69,7 +69,7 @@ class PostgresGrammar extends Grammar
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint))
         )], $this->compileAutoIncrementStartingValues($blueprint),
-            $this->compileTableComment($blueprint))));
+            [$this->compileTableComment($blueprint)])));
     }
 
     /**
