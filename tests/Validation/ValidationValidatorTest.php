@@ -2916,7 +2916,7 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $uploadedFile = [__FILE__, '', null, null, null, true];
+        $uploadedFile = [__FILE__, '', null, null, true];
 
         $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('getMimeType')->willReturn('text/rtf');
