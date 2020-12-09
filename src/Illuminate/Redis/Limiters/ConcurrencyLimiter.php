@@ -2,9 +2,9 @@
 
 namespace Illuminate\Redis\Limiters;
 
-use Throwable;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ConcurrencyLimiter
 {
