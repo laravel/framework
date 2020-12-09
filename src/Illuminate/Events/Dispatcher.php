@@ -490,12 +490,12 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the given event handler should be dispatched after all database transactions have committed.
      *
-     * @param  mixed  $listener
+     * @param  object|mixed  $listener
      * @return bool
      */
     protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
     {
-        return ($listener->dispatchAfterCommit ?? null) && $this->container->bound('db.transactions');
+        return ($listener->afterCommit ?? null) && $this->container->bound('db.transactions');
     }
 
     /**

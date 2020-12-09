@@ -68,7 +68,7 @@ class ListenerTestListenerAfterCommit
 {
     public static $ran = false;
 
-    public $dispatchAfterCommit = true;
+    public $afterCommit = true;
 
     public function handle()
     {
