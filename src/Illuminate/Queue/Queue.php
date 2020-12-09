@@ -32,7 +32,7 @@ abstract class Queue
      *
      * @return $this
      */
-    protected $afterCommit;
+    protected $dispatchAfterCommit;
 
     /**
      * The create payload callbacks.
