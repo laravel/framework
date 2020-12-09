@@ -278,7 +278,7 @@ abstract class Queue
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
-                $callback
+                $this->afterCommitCallback($payload, $queue, $delay, $callback)
             );
         }
 
@@ -302,6 +302,22 @@ abstract class Queue
         }
 
         return false;
+    }
+
+    /**
+     * Create the after commit callback.
+     *
+     * @param  string  $payload
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param  callable  $callback
+     * @return callable
+     */
+    protected function afterCommitCallback($payload, $queue, $delay, $callback)
+    {
+        return function () use ($delay, $queue, $payload, $callback) {
+            return $callback($payload, $queue, $delay);
+        };
     }
 
     /**
