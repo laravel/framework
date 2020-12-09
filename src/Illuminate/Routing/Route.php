@@ -155,7 +155,7 @@ class Route
      * @var string
      */
     public $comment = '';
-    
+
     /**
      * Create a new Route instance.
      *
@@ -1192,7 +1192,7 @@ class Route
     public function comment($comment)
     {
         $this->comment = $comment;
-        
+
         return $this;
     }
 
