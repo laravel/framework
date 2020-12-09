@@ -29,7 +29,7 @@ class PaginatedResourceResponse extends ResourceResponse
                 if (is_array($item)) {
                     return Arr::get($item, 'resource');
                 } elseif ($item instanceof \stdClass) {
-                    return (array)$item;
+                    return (array) $item;
                 } else {
                     return $item->resource;
                 }
