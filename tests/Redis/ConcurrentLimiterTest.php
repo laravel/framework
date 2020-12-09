@@ -152,7 +152,6 @@ class ConcurrentLimiterTest extends TestCase
                 throw new Error();
             });
         } catch (Error $e) {
-
         }
 
         $lock = new ConcurrencyLimiter($this->redis(), 'key', 1, 5);
