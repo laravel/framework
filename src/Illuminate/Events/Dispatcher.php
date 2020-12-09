@@ -434,12 +434,9 @@ class Dispatcher implements DispatcherContract
 
         $listener = $this->container->make($class);
 
-        if ($listener->dispatchAfterCommit ?? null &&
-            $this->container->bound('db.transactions')) {
-            return $this->createCallbackForListenerRunningAfterCommits($listener, $method);
-        }
-
-        return [$listener, $method];
+        return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
+                    ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
+                    : [$listener, $method];
     }
 
     /**
@@ -488,6 +485,17 @@ class Dispatcher implements DispatcherContract
                 $this->queueHandler($class, $method, $arguments);
             }
         };
+    }
+
+    /**
+     * Determine if the given event handler should be dispatched after all database transactions have committed.
+     *
+     * @param  mixed  $listener
+     * @return bool
+     */
+    protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
+    {
+        return ($listener->dispatchAfterCommit ?? null) && $this->container->bound('db.transactions');
     }
 
     /**
