@@ -595,8 +595,8 @@ class Dispatcher implements DispatcherContract
 
             $job->timeout = $listener->timeout ?? null;
 
-            $job->dispatchAfterCommit = property_exists($listener, 'dispatchAfterCommit')
-                                ? $listener->dispatchAfterCommit : null;
+            $job->afterCommit = property_exists($listener, 'afterCommit')
+                                ? $listener->afterCommit : null;
 
             $job->retryUntil = method_exists($listener, 'retryUntil')
                                 ? $listener->retryUntil() : null;

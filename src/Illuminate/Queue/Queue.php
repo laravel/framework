@@ -32,7 +32,7 @@ abstract class Queue
      *
      * @return $this
      */
-    protected $dispatchAfterCommit;
+    protected $afterCommit;
 
     /**
      * The create payload callbacks.
@@ -295,8 +295,8 @@ abstract class Queue
      */
     protected function shouldDispatchAfterCommit($job)
     {
-        if (is_object($job) && isset($job->dispatchAfterCommit)) {
-            return $job->dispatchAfterCommit;
+        if (is_object($job) && isset($job->afterCommit)) {
+            return $job->afterCommit;
         }
 
         if (isset($this->dispatchAfterCommit)) {

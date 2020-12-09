@@ -64,7 +64,7 @@ class SendQueuedNotifications implements ShouldQueue
         $this->notifiables = $this->wrapNotifiables($notifiables);
         $this->tries = property_exists($notification, 'tries') ? $notification->tries : null;
         $this->timeout = property_exists($notification, 'timeout') ? $notification->timeout : null;
-        $this->dispatchAfterCommit = property_exists($notification, 'dispatchAfterCommit') ? $notification->dispatchAfterCommit : null;
+        $this->afterCommit = property_exists($notification, 'afterCommit') ? $notification->afterCommit : null;
     }
 
     /**

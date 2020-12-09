@@ -57,7 +57,7 @@ trait Queueable
      *
      * @var bool|null
      */
-    public $dispatchAfterCommit;
+    public $afterCommit;
 
     /**
      * The middleware the job should be dispatched through.
@@ -147,7 +147,7 @@ trait Queueable
      */
     public function afterCommit()
     {
-        $this->dispatchAfterCommit = true;
+        $this->afterCommit = true;
 
         return $this;
     }
@@ -159,7 +159,7 @@ trait Queueable
      */
     public function beforeCommit()
     {
-        $this->dispatchAfterCommit = false;
+        $this->afterCommit = false;
 
         return $this;
     }

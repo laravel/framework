@@ -42,7 +42,7 @@ class SendQueuedMailable
         $this->mailable = $mailable;
         $this->tries = property_exists($mailable, 'tries') ? $mailable->tries : null;
         $this->timeout = property_exists($mailable, 'timeout') ? $mailable->timeout : null;
-        $this->dispatchAfterCommit = property_exists($mailable, 'dispatchAfterCommit') ? $mailable->dispatchAfterCommit : null;
+        $this->afterCommit = property_exists($mailable, 'afterCommit') ? $mailable->afterCommit : null;
     }
 
     /**
