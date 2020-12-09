@@ -22,7 +22,7 @@
         "illuminate/contracts": "^8.0",
         "illuminate/macroable": "^8.0",
         "illuminate/support": "^8.0",
-        "symfony/console": "^5.1"
+        "symfony/console": "^5.1.4"
     },
     "autoload": {
         "psr-4": {
@@ -41,7 +41,7 @@
         "illuminate/events": "Required to use the observers with Eloquent (^8.0).",
         "illuminate/filesystem": "Required to use the migrations (^8.0).",
         "illuminate/pagination": "Required to paginate the result set (^8.0).",
-        "symfony/finder": "Required to use Eloquent model factories (^5.1)."
+        "symfony/finder": "Required to use Eloquent model factories (^5.1.4)."
     },
     "config": {
         "sort-packages": true

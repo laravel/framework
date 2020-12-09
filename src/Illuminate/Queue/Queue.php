@@ -266,20 +266,23 @@ abstract class Queue
     /**
      * Enqueue a job using the given callback.
      *
-     * @param  callable  $callback
      * @param  \Closure|string|object  $job
+     * @param  string  $payload
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param  callable  $callback
      * @return mixed
      */
-    protected function enqueueUsing($job, $callback)
+    protected function enqueueUsing($job, $payload, $queue, $delay, $callback)
     {
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
-                $callback
+                $callback($payload, $queue, $delay)
             );
         }
 
-        return $callback();
+        return $callback($payload, $queue, $delay);
     }
 
     /**

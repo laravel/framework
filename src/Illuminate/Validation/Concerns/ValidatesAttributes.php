@@ -1036,7 +1036,7 @@ trait ValidatesAttributes
      */
     public function validateImage($attribute, $value)
     {
-        return $this->validateMimes($attribute, $value, ['jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']);
+        return $this->validateMimes($attribute, $value, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']);
     }
 
     /**
@@ -1186,6 +1186,10 @@ trait ValidatesAttributes
 
         if ($this->shouldBlockPhpUpload($value, $parameters)) {
             return false;
+        }
+
+        if (in_array('jpg', $parameters) || in_array('jpeg', $parameters)) {
+            $parameters = array_unique(array_merge($parameters, ['jpg', 'jpeg']));
         }
 
         return $value->getPath() !== '' && in_array($value->guessExtension(), $parameters);

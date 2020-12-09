@@ -314,6 +314,7 @@ trait ManagesTransactions
     /**
      * Execute the callback after a transaction commits.
      *
+     * @param  callable  $callback
      * @return void
      */
     public function afterCommit($callback)

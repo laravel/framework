@@ -26,7 +26,7 @@
         "illuminate/support": "^8.0",
         "opis/closure": "^3.6",
         "ramsey/uuid": "^4.0",
-        "symfony/process": "^5.1"
+        "symfony/process": "^5.1.4"
     },
     "autoload": {
         "psr-4": {

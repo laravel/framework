@@ -206,6 +206,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Get the handler stats of the response.
+     *
+     * @return array
+     */
+    public function handlerStats()
+    {
+        return $this->transferStats->getHandlerStats();
+    }
+
+    /**
      * Get the underlying PSR response for the response.
      *
      * @return \Psr\Http\Message\ResponseInterface

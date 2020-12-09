@@ -1,7 +1,7 @@
 version: '3'
 services:
   memcached:
-    image: memcached:1.5-alpine
+    image: memcached:1.6-alpine
     ports:
       - "11211:11211"
     restart: always

@@ -1128,7 +1128,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
     {
-        if (is_array($callback)) {
+        if (is_array($callback) && ! is_callable($callback)) {
             return $this->sortByMany($callback);
         }
 
