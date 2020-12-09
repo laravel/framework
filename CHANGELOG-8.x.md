@@ -1,9 +1,9 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.17.3...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.18.0...8.x)
 
 
-## [v8.17.3 (2020-12-08)](https://github.com/laravel/framework/compare/v8.17.2...v8.17.3)
+## [v8.18.0 (2020-12-08)](https://github.com/laravel/framework/compare/v8.17.2...v8.18.0)
 
 ### Added
 - Added `Illuminate\Http\Client\Factory::assertSentInOrder()` ([#35525](https://github.com/laravel/framework/pull/35525), [d257ce2](https://github.com/laravel/framework/commit/d257ce2e93dfe52151be3d0386fcc4ea281ca8d5), [2fd1411](https://github.com/laravel/framework/commit/2fd141158eb5aead8aa2afff51bcd98250b6bbe6))
