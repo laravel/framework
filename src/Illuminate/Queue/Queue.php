@@ -278,7 +278,7 @@ abstract class Queue
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
-                $callback($payload, $queue, $delay)
+                $callback
             );
         }
 
