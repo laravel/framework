@@ -2,7 +2,7 @@
 
 namespace Illuminate\Redis\Limiters;
 
-use Exception;
+use Throwable;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Support\Str;
 
@@ -61,7 +61,7 @@ class ConcurrencyLimiter
      * @return bool
      *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function block($timeout, $callback = null)
     {
@@ -82,7 +82,7 @@ class ConcurrencyLimiter
                 return tap($callback(), function () use ($slot, $id) {
                     $this->release($slot, $id);
                 });
-            } catch (Exception $exception) {
+            } catch (Throwable $exception) {
                 $this->release($slot, $id);
 
                 throw $exception;
