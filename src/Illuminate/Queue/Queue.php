@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Container\Container;
+use Illuminate\Database\DatabaseTransactionManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
@@ -28,18 +29,18 @@ abstract class Queue
     protected $connectionName;
 
     /**
+     * Indicates that jobs should be dispatched after all database transactions have committed.
+     *
+     * @return $this
+     */
+    protected $dispatchAfterCommit;
+
+    /**
      * The create payload callbacks.
      *
      * @var callable[]
      */
     protected static $createPayloadCallbacks = [];
-
-    /**
-     * Indicate the job should be dispatched after database transactions.
-     *
-     * @var bool|null
-     */
-    protected $dispatchAfterCommit;
 
     /**
      * Push a new job onto the queue.
@@ -278,7 +279,9 @@ abstract class Queue
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
-                $this->afterCommitCallback($payload, $queue, $delay, $callback)
+                function () use ($payload, $queue, $delay, $callback) {
+                    return $callback($payload, $queue, $delay);
+                }
             );
         }
 
@@ -286,7 +289,7 @@ abstract class Queue
     }
 
     /**
-     * Determine if the job should be dispatched after database transactions.
+     * Determine if the job should be dispatched after all database transactions have committed.
      *
      * @param  \Closure|string|object  $job
      * @return bool
@@ -302,22 +305,6 @@ abstract class Queue
         }
 
         return false;
-    }
-
-    /**
-     * Create the after commit callback.
-     *
-     * @param  string  $payload
-     * @param  string  $queue
-     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
-     * @param  callable  $callback
-     * @return callable
-     */
-    protected function afterCommitCallback($payload, $queue, $delay, $callback)
-    {
-        return function () use ($delay, $queue, $payload, $callback) {
-            return $callback($payload, $queue, $delay);
-        };
     }
 
     /**

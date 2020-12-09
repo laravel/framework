@@ -53,7 +53,7 @@ trait Queueable
     public $delay;
 
     /**
-     * Indicate the job should be dispatched after database transactions.
+     * Indicates whether the job should be dispatched after all database transactions have committed.
      *
      * @var bool|null
      */
@@ -141,7 +141,7 @@ trait Queueable
     }
 
     /**
-     * Indicate that the job should be dispatched after database transactions.
+     * Indicate that the job should be dispatched after all database transactions have committed.
      *
      * @return $this
      */
@@ -153,7 +153,7 @@ trait Queueable
     }
 
     /**
-     * Indicate that the job should be dispatched before database transactions.
+     * Indicate that the job should not wait until database transactions have been committed before dispatching.
      *
      * @return $this
      */

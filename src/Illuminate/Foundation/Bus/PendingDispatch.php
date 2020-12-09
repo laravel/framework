@@ -100,7 +100,7 @@ class PendingDispatch
     }
 
     /**
-     * Indicate that the job should be dispatched after database transactions.
+     * Indicate that the job should be dispatched after all database transactions have committed.
      *
      * @return $this
      */
@@ -112,7 +112,7 @@ class PendingDispatch
     }
 
     /**
-     * Indicate that the job should be dispatched before database transactions.
+     * Indicate that the job should not wait until database transactions have been committed before dispatching.
      *
      * @return $this
      */
