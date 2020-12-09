@@ -1,6 +1,23 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.17.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.18.0...8.x)
+
+
+## [v8.18.0 (2020-12-08)](https://github.com/laravel/framework/compare/v8.17.2...v8.18.0)
+
+### Added
+- Added `Illuminate\Http\Client\Factory::assertSentInOrder()` ([#35525](https://github.com/laravel/framework/pull/35525), [d257ce2](https://github.com/laravel/framework/commit/d257ce2e93dfe52151be3d0386fcc4ea281ca8d5), [2fd1411](https://github.com/laravel/framework/commit/2fd141158eb5aead8aa2afff51bcd98250b6bbe6))
+- Added `Illuminate\Http\Client\Response::handlerStats()` ([#35520](https://github.com/laravel/framework/pull/35520))
+- Added support for attaching existing model instances in factories ([#35494](https://github.com/laravel/framework/pull/35494))
+- Added `assertChained()` and `assertDispatchedWithoutChain()` methods to `Illuminate\Support\Testing\Fakes\BusFake` class ([#35523](https://github.com/laravel/framework/pull/35523), [f1b8cac](https://github.com/laravel/framework/commit/f1b8cacfe2a8863894e258ce35a77decedbea36f), [236c67d](https://github.com/laravel/framework/commit/236c67db52f755bb475ba325148e9053733968aa))
+- Allow testing of html and plain text bodies right off mailables ([afb858a](https://github.com/laravel/framework/commit/afb858ad9c944bd3f9ad56c3e4485527d77a7327), [b7391e4](https://github.com/laravel/framework/commit/b7391e486fc68c1c422668a277eaac2bcbe72b2b))
+ 
+### Fixed
+- Fixed Application flush method ([#35482](https://github.com/laravel/framework/pull/35482))
+- Fixed mime validation for jpeg files ([#35518](https://github.com/laravel/framework/pull/35518))
+
+### Revert
+- Revert [Added ability to define table name as default morph type](https://github.com/laravel/framework/pull/35257) ([#35533](https://github.com/laravel/framework/pull/35533))
 
 
 ## [v8.17.2 (2020-12-03)](https://github.com/laravel/framework/compare/v8.17.1...v8.17.2)

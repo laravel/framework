@@ -492,7 +492,11 @@ abstract class Factory
             'has' => $this->has->concat([new BelongsToManyRelationship(
                 $factory,
                 $pivot,
-                $relationship ?: Str::camel(Str::plural(class_basename($factory->modelName())))
+                $relationship ?: Str::camel(Str::plural(class_basename(
+                    $factory instanceof Factory
+                        ? $factory->modelName()
+                        : Collection::wrap($factory)->first()
+                )))
             )]),
         ]);
     }
@@ -508,7 +512,9 @@ abstract class Factory
     {
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
             $factory,
-            $relationship ?: Str::camel(class_basename($factory->modelName()))
+            $relationship ?: Str::camel(class_basename(
+                $factory instanceof Factory ? $factory->modelName() : $factory
+            ))
         )])]);
     }
 
