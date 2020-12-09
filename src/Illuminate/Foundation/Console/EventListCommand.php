@@ -58,7 +58,7 @@ class EventListCommand extends Command
         }
 
         return collect($events)->map(function ($listeners, $event) {
-            return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
+            return ['Event' => $event, 'Listeners' => implode("\n", $listeners)];
         })->sortBy('Event')->values()->toArray();
     }
 
