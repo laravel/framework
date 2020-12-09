@@ -150,6 +150,13 @@ class Route
     public static $validators;
 
     /**
+     * The Comment.
+     *
+     * @var string
+     */
+    public $comment = '';
+    
+    /**
      * Create a new Route instance.
      *
      * @param  array|string  $methods
@@ -1174,6 +1181,19 @@ class Route
         $this->compileRoute();
 
         unset($this->router, $this->container);
+    }
+
+    /**
+     * Set the comment.
+     *
+     * @param  string  $comment
+     * @return static
+     */
+    public function comment($comment)
+    {
+        $this->comment = $comment;
+        
+        return $this;
     }
 
     /**
