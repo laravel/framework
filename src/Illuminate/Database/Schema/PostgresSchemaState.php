@@ -22,11 +22,11 @@ class PostgresSchemaState extends SchemaState
                         ->reject(function ($table) {
                             return $table === $this->migrationTable;
                         })->map(function ($table) {
-                            return '--exclude-table-data=' . $table;
+                            return '--exclude-table-data='.$table;
                         })->implode(' ');
 
         $this->makeProcess(
-            $this->baseDumpCommand() . ' --file=$LARAVEL_LOAD_PATH ' . $extraDumpFlags ?? '' . $excludedTables
+            $this->baseDumpCommand().' --file=$LARAVEL_LOAD_PATH '.($extraDumpFlags ?? '').$excludedTables
         )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));

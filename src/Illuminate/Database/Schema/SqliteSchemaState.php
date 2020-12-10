@@ -17,17 +17,17 @@ class SqliteSchemaState extends SchemaState
     public function dump(Connection $connection, $path, $extraDumpFlags = null)
     {
         with($process = $this->makeProcess(
-            $this->baseCommand(). $extraDumpFlags ?? '' .' .schema'
+            $this->baseCommand().($extraDumpFlags ?? '').' .schema'
         ))->setTimeout(null)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
 
         $migrations = collect(preg_split("/\r\n|\n|\r/", $process->getOutput()))->filter(function ($line) {
             return stripos($line, 'sqlite_sequence') === false &&
-                   strlen($line) > 0;
+                strlen($line) > 0;
         })->all();
 
-        $this->files->put($path, implode(PHP_EOL, $migrations).PHP_EOL);
+        $this->files->put($path, implode(PHP_EOL, $migrations) . PHP_EOL);
 
         $this->appendMigrationData($path);
     }
