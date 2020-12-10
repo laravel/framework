@@ -62,7 +62,7 @@ class PostgresSchemaState extends SchemaState
         $command = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD pg_dump --no-owner --no-acl -Fc --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER $LARAVEL_LOAD_DATABASE';
 
         if ($extraFlags = $this->extraDumpCommandFlags()) {
-            $command .= ' ' . $extraFlags;
+            $command .= ' '.$extraFlags;
         }
 
         return $command;

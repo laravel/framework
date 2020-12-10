@@ -86,7 +86,7 @@ class MySqlSchemaState extends SchemaState
         $command = 'mysqldump '.$this->connectionString().' --skip-add-locks --skip-comments --skip-set-charset --tz-utc';
 
         if ($extraFlags = $this->extraDumpCommandFlags()) {
-            $command .= ' ' . $extraFlags;
+            $command .= ' '.$extraFlags;
         }
 
         if (! $this->connection->isMaria()) {
