@@ -109,7 +109,7 @@ abstract class SchemaState
      */
     public function setExtraDumpCommandFlags($options = '')
     {
-        $this->extraDumpCommandFlags = is_string($options) && !empty($options) ? $options : '';
+        $this->extraDumpCommandFlags = is_string($options) && ! empty($options) ? $options : '';
 
         return $this;
     }
