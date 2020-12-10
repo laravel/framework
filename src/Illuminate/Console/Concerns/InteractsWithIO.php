@@ -377,7 +377,7 @@ trait InteractsWithIO
      * @param  int|string|null  $verbosity
      * @return void
      */
-    public function link(string $display, string $url, bool $urlHint = false, $verbosity = null): void
+    public function link(string $display, string $url, bool $urlHint = false, $verbosity = null)
     {
         $toDisplay = '<href='.$url.'>'.$display.'</>';
 
