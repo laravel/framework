@@ -12,12 +12,12 @@ class PostgresBuilder extends Builder
      */
     public function hasTable($table)
     {
-        [$schema, $table] = $this->parseSchemaAndTable($table);
+        [$database, $schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
         return count($this->connection->select(
-            $this->grammar->compileTableExists(), [$schema, $table]
+            $this->grammar->compileTableExists(), [$database, $schema, $table]
         )) > 0;
     }
 
@@ -143,35 +143,72 @@ class PostgresBuilder extends Builder
      */
     public function getColumnListing($table)
     {
-        [$schema, $table] = $this->parseSchemaAndTable($table);
+        [$database, $schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
         $results = $this->connection->select(
-            $this->grammar->compileColumnListing(), [$schema, $table]
+            $this->grammar->compileColumnListing(), [$database, $schema, $table]
         );
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
     }
 
     /**
-     * Parse the table name and extract the schema and table.
+     * Parse the database object reference and extract the database, schema, and table.
      *
-     * @param  string  $table
+     * @param  string  $reference
      * @return array
      */
-    protected function parseSchemaAndTable($table)
+    protected function parseSchemaAndTable($reference)
     {
-        $table = explode('.', $table);
+        $searchPath = $this->parseSearchPath(
+            $this->connection->getConfig('search_path') ?: 'public'
+        );
 
-        if (is_array($searchPath = $this->connection->getConfig('search_path'))) {
-            if (in_array($table[0], $searchPath)) {
-                return [array_shift($table), implode('.', $table)];
-            }
+        $parts = explode('.', $reference);
 
-            $schema = head($searchPath);
+        $database = $this->connection->getConfig('database');
+
+        // If the reference contains a database name, we will use that instead of the
+        // default database name for the connection. This allows the database name
+        // to be specified in the query instead of at the full connection level.
+        if (count($parts) === 3) {
+            $database = $parts[0];
+            array_shift($parts);
         }
 
-        return [$schema ?: 'public', implode('.', $table)];
+        // We will use the default schema unless the schema has been specified in the
+        // query. If the schema has been specified in the query then we can use it
+        // instead of a default schema configured in the connection search path.
+        $schema = $searchPath[0];
+
+        if (count($parts) === 2) {
+            $schema = $parts[0];
+            array_shift($parts);
+        }
+
+        return [$database, $schema, $parts[0]];
+    }
+
+    /**
+     * Parse the "search_path" value into an array.
+     *
+     * @param  string|array  $searchPath
+     * @return array
+     */
+    protected function parseSearchPath($searchPath)
+    {
+        if (is_string($searchPath)) {
+            preg_match_all('/[a-zA-z0-9$]{1,}/i', $searchPath, $matches);
+
+            $searchPath = $matches[0];
+        }
+
+        array_walk($searchPath, function (&$schema) {
+            $schema = trim($schema, '\'"');
+        });
+
+        return $searchPath;
     }
 }
