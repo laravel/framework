@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Doctrine\DBAL\Types\Type;
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
 use Illuminate\Contracts\Queue\EntityResolver;
@@ -45,6 +46,30 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->registerEloquentFactory();
 
         $this->registerQueueableEntityResolver();
+
+        $this->registerDBALTypes();
+    }
+
+    /**
+     * Add any custom types to the DBAL library.
+     *
+     * @return void
+     */
+    protected function registerDBALTypes()
+    {
+        if (! class_exists(Type::class)) {
+            return;
+        }
+
+        $types = config('database.dbal.types');
+
+        if (! is_array($types)) {
+            return;
+        }
+
+        foreach ($types as $typeName => $typeClassDefinition) {
+            \Schema::registerCustomDoctrineType($typeClassDefinition, $typeName, $typeName);
+        }
     }
 
     /**
