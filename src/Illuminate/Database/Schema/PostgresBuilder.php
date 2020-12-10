@@ -181,7 +181,9 @@ class PostgresBuilder extends Builder
         // We will use the default schema unless the schema has been specified in the
         // query. If the schema has been specified in the query then we can use it
         // instead of a default schema configured in the connection search path.
-        $schema = $searchPath[0];
+        $schema = $searchPath[0] === '$user'
+            ? $this->connection->getConfig('username')
+            : $searchPath[0];
 
         if (count($parts) === 2) {
             $schema = $parts[0];

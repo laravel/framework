@@ -59,6 +59,29 @@ class DatabasePostgresBuilderTest extends TestCase
     }
 
     /**
+     * Ensure that when the reference is unqualified (i.e., does not contain a
+     * database name or a schema), and the first schema in the search_path is
+     * the special variable '$user', the database specified on the connection is
+     * used, the first schema in the search_path is used, and the variable
+     * resolves to the username specified on the connection.
+     */
+    public function testWhenFirstSchemaInSearchPathIsVariableHasTableWithUnqualifiedSchemaReferenceIsCorrect()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
+        $connection->shouldReceive('getConfig')->with('search_path')->andReturn('$user');
+        $grammar = m::mock(PostgresGrammar::class);
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
+        $connection->shouldReceive('select')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'foouser', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('getTablePrefix');
+        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
+        $builder = $this->getBuilder($connection);
+
+        $builder->hasTable('foo');
+    }
+
+    /**
      * Ensure that when the reference is qualified only with a schema, that
      * the database specified on the connection is used, and the specified
      * schema is used, even if it is not within the search_path.
@@ -136,6 +159,32 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileColumnListing')->andReturn('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?');
         $connection->shouldReceive('select')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('getTablePrefix');
+        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
+        $processor = m::mock(PostgresProcessor::class);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $processor->shouldReceive('processColumnListing')->andReturn(['some_column']);
+        $builder = $this->getBuilder($connection);
+
+        $builder->getColumnListing('foo');
+    }
+
+    /**
+     * Ensure that when the reference is unqualified (i.e., does not contain a
+     * database name or a schema), and the first schema in the search_path is
+     * the special variable '$user', the database specified on the connection is
+     * used, the first schema in the search_path is used, and the variable
+     * resolves to the username specified on the connection.
+     */
+    public function testWhenFirstSchemaInSearchPathIsVariableGetColumnListingWithUnqualifiedSchemaReferenceIsCorrect()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
+        $connection->shouldReceive('getConfig')->with('search_path')->andReturn('$user');
+        $grammar = m::mock(PostgresGrammar::class);
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $grammar->shouldReceive('compileColumnListing')->andReturn('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?');
+        $connection->shouldReceive('select')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'foouser', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);
