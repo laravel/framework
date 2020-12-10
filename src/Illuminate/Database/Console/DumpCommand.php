@@ -20,6 +20,7 @@ class DumpCommand extends Command
     protected $signature = 'schema:dump
                 {--database= : The database connection to use}
                 {--path= : The path where the schema dump file should be stored}
+                {--extra-dump-flags= : Extra dumper flags pushed to executed command}
                 {--prune : Delete all existing migration files}';
 
     /**
@@ -40,9 +41,11 @@ class DumpCommand extends Command
     {
         $connection = $connections->connection($database = $this->input->getOption('database'));
 
-        $this->schemaState($connection)->dump(
-            $connection, $path = $this->path($connection)
-        );
+        $this->schemaState($connection)
+            ->setExtraDumpCommandFlags($this->input->getOption('extra-dump-flags'))
+            ->dump(
+                $connection, $path = $this->path($connection)
+            );
 
         $dispatcher->dispatch(new SchemaDumped($connection, $path));
 

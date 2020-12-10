@@ -75,7 +75,7 @@ class SqliteSchemaState extends SchemaState
      */
     protected function baseCommand()
     {
-        return 'sqlite3 "${:LARAVEL_LOAD_DATABASE}"';
+        return 'sqlite3 '.($this->extraDumpCommandFlags() ?? '').' "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**

@@ -37,6 +37,13 @@ abstract class SchemaState
     protected $processFactory;
 
     /**
+     * Extra flags added to be the dumper command.
+     *
+     * @var string
+     */
+    public $extraDumpCommandFlags = '';
+
+    /**
      * The output callable instance.
      *
      * @var callable
@@ -92,6 +99,29 @@ abstract class SchemaState
     public function makeProcess(...$arguments)
     {
         return call_user_func($this->processFactory, ...$arguments);
+    }
+
+    /**
+     * Set extra dump command flags.
+     *
+     * @param  string  $options
+     * @return $this
+     */
+    public function setExtraDumpCommandFlags($options = '')
+    {
+        $this->extraDumpCommandFlags = is_string($options) && !empty($options) ? $options : '';
+
+        return $this;
+    }
+
+    /**
+     * Get extra dump command flags.
+     *
+     * @return void
+     */
+    public function extraDumpCommandFlags()
+    {
+        return $this->extraDumpCommandFlags;
     }
 
     /**
