@@ -4221,7 +4221,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->whenEmpty(function ($collection) {
+        $data = $data->whenEmpty(function ($data) {
             return $data->concat(['adam']);
         });
 
