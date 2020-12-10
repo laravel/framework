@@ -4171,7 +4171,9 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->when(fn($data) => $data->contains('michael'), function ($data) {
+        $data = $data->when(function ($data) {
+            return $data->contains('michael');
+        }, function ($data) {
             return $data->concat(['adam']);
         });
 
@@ -4179,7 +4181,9 @@ class SupportCollectionTest extends TestCase
 
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->when(fn($data) => $data->contains('poppy'), function ($data) {
+        $data = $data->when(function ($data) {
+            return $data->contains('poppy');
+         }, function ($data) {
             return $data->concat(['adam']);
         });
 
@@ -4193,7 +4197,9 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->when(fn($data) => $data->contains('taylor'), function ($data) {
+        $data = $data->when(function ($data) {
+            return $data->contains('taylor');
+        }, function ($data) {
             return $data->concat(['adam']);
         }, function ($data) {
             return $data->concat(['taylor']);
@@ -4209,7 +4215,9 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->when(fn($data) => $data->concat(['taylor']));
+        $data = $data->when(function ($data) {
+            return $data->concat(['taylor']);
+        });
 
         $this->assertSame(['michael', 'tom'], $data->toArray());
     }
