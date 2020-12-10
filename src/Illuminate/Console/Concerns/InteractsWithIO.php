@@ -369,6 +369,26 @@ trait InteractsWithIO
     }
 
     /**
+     * Write a clickable link to the console.
+     *
+     * @param  string  $display
+     * @param  string  $url
+     * @param  bool  $urlHint
+     * @param  int|string|null  $verbosity
+     * @return void
+     */
+    public function link(string $display, string $url, bool $urlHint = false, $verbosity = null): void
+    {
+        $toDisplay = '<href='.$url.'>'.$display.'</>';
+
+        if ($urlHint) {
+            $toDisplay .= ' ('.$url.')';
+        }
+
+        $this->line($toDisplay, null, $verbosity);
+    }
+
+    /**
      * Write a blank line.
      *
      * @param  int  $count
