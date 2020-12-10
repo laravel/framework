@@ -4189,6 +4189,22 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhenWithCallableDefault($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->when(fn($data) => $data->contains('taylor'), function ($data) {
+            return $data->concat(['adam']);
+        }, function ($data) {
+            return $data->concat(['taylor']);
+        });
+
+        $this->assertSame(['michael', 'tom', 'taylor'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhenEmpty($collection)
     {
         $data = new $collection(['michael', 'tom']);
