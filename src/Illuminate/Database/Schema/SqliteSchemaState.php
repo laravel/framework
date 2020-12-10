@@ -27,7 +27,7 @@ class SqliteSchemaState extends SchemaState
                 strlen($line) > 0;
         })->all();
 
-        $this->files->put($path, implode(PHP_EOL, $migrations) . PHP_EOL);
+        $this->files->put($path, implode(PHP_EOL, $migrations).PHP_EOL);
 
         $this->appendMigrationData($path);
     }
