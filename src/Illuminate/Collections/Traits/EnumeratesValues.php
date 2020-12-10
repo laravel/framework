@@ -463,6 +463,8 @@ trait EnumeratesValues
      */
     public function when($value, callable $callback = null, callable $default = null)
     {
+        $value = is_callable($value) ? $value(clone $this) : $value;
+
         if (! $callback) {
             return new HigherOrderWhenProxy($this, $value);
         }
