@@ -4183,7 +4183,7 @@ class SupportCollectionTest extends TestCase
 
         $data = $data->when(function ($data) {
             return $data->contains('poppy');
-         }, function ($data) {
+        }, function ($data) {
             return $data->concat(['adam']);
         });
 
