@@ -3,10 +3,8 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\UsesEncryption;
-use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
@@ -15,12 +13,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use Illuminate\Tests\Integration\Database\EloquentCollectionLoadMissingTest\Comment;
-use Illuminate\Tests\Integration\Database\EloquentCollectionLoadMissingTest\Post;
-use Illuminate\Tests\Integration\Database\EloquentCollectionLoadMissingTest\Revision;
-use Illuminate\Tests\Integration\Database\EloquentCollectionLoadMissingTest\User;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
