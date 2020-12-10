@@ -14,12 +14,13 @@ class MySqlSchemaState extends SchemaState
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
+     * @param  string|null  $extraDumpFlags
      * @return void
      */
-    public function dump(Connection $connection, $path)
+    public function dump(Connection $connection, $path, $extraDumpFlags = null)
     {
         $this->executeDumpProcess($this->makeProcess(
-            $this->baseDumpCommand().' --routines --result-file="${:LARAVEL_LOAD_PATH}" --no-data'
+            $this->baseDumpCommand() . ' --routines --result-file="${:LARAVEL_LOAD_PATH}" ' . $extraDumpFlags ?? '' . '--no-data'
         ), $this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
@@ -53,7 +54,7 @@ class MySqlSchemaState extends SchemaState
     protected function appendMigrationData(string $path)
     {
         $process = $this->executeDumpProcess($this->makeProcess(
-            $this->baseDumpCommand().' '.$this->migrationTable.' --no-create-info --skip-extended-insert --skip-routines --compact'
+            $this->baseDumpCommand() . ' ' . $this->migrationTable . ' --no-create-info --skip-extended-insert --skip-routines --compact'
         ), null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
@@ -69,7 +70,7 @@ class MySqlSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $command = 'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
+        $command = 'mysql ' . $this->connectionString() . ' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
 
         $this->makeProcess($command)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
@@ -83,13 +84,13 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        $command = 'mysqldump '.$this->connectionString().' --skip-add-locks --skip-comments --skip-set-charset --tz-utc';
+        $command = 'mysqldump ' . $this->connectionString() . ' --skip-add-locks --skip-comments --skip-set-charset --tz-utc';
 
-        if (! $this->connection->isMaria()) {
+        if (!$this->connection->isMaria()) {
             $command .= ' --column-statistics=0 --set-gtid-purged=OFF';
         }
 
-        return $command.' "${:LARAVEL_LOAD_DATABASE}"';
+        return $command . ' "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
@@ -102,8 +103,8 @@ class MySqlSchemaState extends SchemaState
         $value = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
 
         $value .= $this->connection->getConfig()['unix_socket'] ?? false
-                        ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
-                        : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
+            ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
+            : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
 
         return $value;
     }

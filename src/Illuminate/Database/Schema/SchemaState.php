@@ -71,9 +71,10 @@ abstract class SchemaState
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
+     * @param  string|null  $extraDumpFlags
      * @return void
      */
-    abstract public function dump(Connection $connection, $path);
+    abstract public function dump(Connection $connection, $path, $extraDumpFlags = null);
 
     /**
      * Load the given schema file into the database.

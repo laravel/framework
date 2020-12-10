@@ -9,14 +9,15 @@ class SqliteSchemaState extends SchemaState
     /**
      * Dump the database's schema into a file.
      *
-     * @param  \Illuminate\Database\Connection
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
+     * @param  string|null  $extraDumpFlags
      * @return void
      */
-    public function dump(Connection $connection, $path)
+    public function dump(Connection $connection, $path, $extraDumpFlags = null)
     {
         with($process = $this->makeProcess(
-            $this->baseCommand().' .schema'
+            $this->baseCommand(). $extraDumpFlags ?? '' .' .schema'
         ))->setTimeout(null)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
