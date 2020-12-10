@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      memcached:
+        image: memcached:1.6-alpine
+        ports:
+          - 11211:11211
       mysql:
         image: mysql:5.7
         env:
@@ -43,9 +47,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, memcached
           tools: composer:v2
           coverage: none
-
-      - name: Setup Memcached
-        uses: niden/actions-memcached@v7
 
       - name: Setup problem matchers
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"

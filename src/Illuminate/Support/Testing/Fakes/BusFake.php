@@ -185,6 +185,118 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
+     * Assert if a chain of jobs was dispatched.
+     *
+     * @param  array  $expectedChain
+     * @return void
+     */
+    public function assertChained(array $expectedChain)
+    {
+        $command = $expectedChain[0];
+
+        $expectedChain = array_slice($expectedChain, 1);
+
+        $callback = null;
+
+        if ($command instanceof Closure) {
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        }
+
+        PHPUnit::assertTrue(
+            $this->dispatched($command, $callback)->isNotEmpty(),
+            "The expected [{$command}] job was not dispatched."
+        );
+
+        PHPUnit::assertTrue(
+            collect($expectedChain)->isNotEmpty(),
+            'The expected chain can not be empty.'
+        );
+
+        $this->isChainOfObjects($expectedChain)
+            ? $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
+            : $this->assertDispatchedWithChainOfClasses($command, $expectedChain, $callback);
+    }
+
+    /**
+     * Assert if a job was dispatched with an empty chain based on a truth-test callback.
+     *
+     * @param  string|\Closure  $command
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertDispatchedWithoutChain($command, $callback = null)
+    {
+        if ($command instanceof Closure) {
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        }
+
+        PHPUnit::assertTrue(
+            $this->dispatched($command, $callback)->isNotEmpty(),
+            "The expected [{$command}] job was not dispatched."
+        );
+
+        $this->assertDispatchedWithChainOfClasses($command, [], $callback);
+    }
+
+    /**
+     * Assert if a job was dispatched with chained jobs based on a truth-test callback.
+     *
+     * @param  string  $command
+     * @param  array  $expectedChain
+     * @param  callable|null  $callback
+     * @return void
+     */
+    protected function assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
+    {
+        $chain = collect($expectedChain)->map(function ($job) {
+            return serialize($job);
+        })->all();
+
+        PHPUnit::assertTrue(
+            $this->dispatched($command, $callback)->filter(function ($job) use ($chain) {
+                return $job->chained == $chain;
+            })->isNotEmpty(),
+            'The expected chain was not dispatched.'
+        );
+    }
+
+    /**
+     * Assert if a job was dispatched with chained jobs based on a truth-test callback.
+     *
+     * @param  string  $command
+     * @param  array  $expectedChain
+     * @param  callable|null  $callback
+     * @return void
+     */
+    protected function assertDispatchedWithChainOfClasses($command, $expectedChain, $callback)
+    {
+        $matching = $this->dispatched($command, $callback)->map->chained->map(function ($chain) {
+            return collect($chain)->map(function ($job) {
+                return get_class(unserialize($job));
+            });
+        })->filter(function ($chain) use ($expectedChain) {
+            return $chain->all() === $expectedChain;
+        });
+
+        PHPUnit::assertTrue(
+            $matching->isNotEmpty(), 'The expected chain was not dispatched.'
+        );
+    }
+
+    /**
+     * Determine if the given chain is entirely composed of objects.
+     *
+     * @param  array  $chain
+     * @return bool
+     */
+    protected function isChainOfObjects($chain)
+    {
+        return ! collect($chain)->contains(function ($job) {
+            return ! is_object($job);
+        });
+    }
+
+    /**
      * Assert if a batch was dispatched based on a truth-test callback.
      *
      * @param  callable  $callback

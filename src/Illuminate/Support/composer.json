@@ -43,8 +43,8 @@
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (^8.0).",
         "ramsey/uuid": "Required to use Str::uuid() (^4.0).",
-        "symfony/process": "Required to use the composer class (^5.1).",
-        "symfony/var-dumper": "Required to use the dd function (^5.1).",
+        "symfony/process": "Required to use the composer class (^5.1.4).",
+        "symfony/var-dumper": "Required to use the dd function (^5.1.4).",
         "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.2)."
     },
     "config": {

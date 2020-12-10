@@ -610,4 +610,159 @@ class HttpClientTest extends TestCase
 
         $this->assertSame(json_encode(['page' => 'foo']), stream_get_contents($resource));
     }
+
+    public function testCanAssertAgainstOrderOfHttpRequestsWithUrlStrings()
+    {
+        $this->factory->fake();
+
+        $exampleUrls = [
+            'http://example.com/1',
+            'http://example.com/2',
+            'http://example.com/3',
+        ];
+
+        foreach ($exampleUrls as $url) {
+            $this->factory->get($url);
+        }
+
+        $this->factory->assertSentInOrder($exampleUrls);
+    }
+
+    public function testAssertionsSentOutOfOrderThrowAssertionFailed()
+    {
+        $this->factory->fake();
+
+        $exampleUrls = [
+            'http://example.com/1',
+            'http://example.com/2',
+            'http://example.com/3',
+        ];
+
+        $this->factory->get($exampleUrls[0]);
+        $this->factory->get($exampleUrls[2]);
+        $this->factory->get($exampleUrls[1]);
+
+        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+
+        $this->factory->assertSentInOrder($exampleUrls);
+    }
+
+    public function testWrongNumberOfRequestsThrowAssertionFailed()
+    {
+        $this->factory->fake();
+
+        $exampleUrls = [
+            'http://example.com/1',
+            'http://example.com/2',
+            'http://example.com/3',
+        ];
+
+        $this->factory->get($exampleUrls[0]);
+        $this->factory->get($exampleUrls[1]);
+
+        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+
+        $this->factory->assertSentInOrder($exampleUrls);
+    }
+
+    public function testCanAssertAgainstOrderOfHttpRequestsWithCallables()
+    {
+        $this->factory->fake();
+
+        $exampleUrls = [
+            function ($request) {
+                return $request->url() == 'http://example.com/1';
+            },
+            function ($request) {
+                return $request->url() == 'http://example.com/2';
+            },
+            function ($request) {
+                return $request->url() == 'http://example.com/3';
+            },
+        ];
+
+        $this->factory->get('http://example.com/1');
+        $this->factory->get('http://example.com/2');
+        $this->factory->get('http://example.com/3');
+
+        $this->factory->assertSentInOrder($exampleUrls);
+    }
+
+    public function testCanAssertAgainstOrderOfHttpRequestsWithCallablesAndHeaders()
+    {
+        $this->factory->fake();
+
+        $executionOrder = [
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/json' &&
+                       $request->hasHeader('Content-Type', 'application/json') &&
+                       $request->hasHeader('X-Test-Header', 'foo') &&
+                       $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                       $request['name'] === 'Taylor';
+            },
+            function (Request $request) {
+                return $request->url() === 'http://bar.com/json' &&
+                       $request->hasHeader('Content-Type', 'application/json') &&
+                       $request->hasHeader('X-Test-Header', 'bar') &&
+                       $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                       $request['name'] === 'Taylor';
+            },
+        ];
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json', [
+            'name' => 'Taylor',
+        ]);
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'bar',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://bar.com/json', [
+            'name' => 'Taylor',
+        ]);
+
+        $this->factory->assertSentInOrder($executionOrder);
+    }
+
+    public function testCanAssertAgainstOrderOfHttpRequestsWithCallablesAndHeadersFailsCorrectly()
+    {
+        $this->factory->fake();
+
+        $executionOrder = [
+            function (Request $request) {
+                return $request->url() === 'http://bar.com/json' &&
+                       $request->hasHeader('Content-Type', 'application/json') &&
+                       $request->hasHeader('X-Test-Header', 'bar') &&
+                       $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                       $request['name'] === 'Taylor';
+            },
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/json' &&
+                       $request->hasHeader('Content-Type', 'application/json') &&
+                       $request->hasHeader('X-Test-Header', 'foo') &&
+                       $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                       $request['name'] === 'Taylor';
+            },
+        ];
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json', [
+            'name' => 'Taylor',
+        ]);
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'bar',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://bar.com/json', [
+            'name' => 'Taylor',
+        ]);
+
+        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+
+        $this->factory->assertSentInOrder($executionOrder);
+    }
 }

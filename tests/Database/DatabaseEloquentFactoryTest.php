@@ -250,10 +250,39 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestPost::all());
     }
 
+    public function test_belongs_to_relationship_with_existing_model_instance()
+    {
+        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
+        $posts = FactoryTestPostFactory::times(3)
+                        ->for($user, 'user')
+                        ->create();
+
+        $this->assertCount(3, $posts->filter(function ($post) use ($user) {
+            return $post->user->is($user);
+        }));
+
+        $this->assertCount(1, FactoryTestUser::all());
+        $this->assertCount(3, FactoryTestPost::all());
+    }
+
     public function test_morph_to_relationship()
     {
         $posts = FactoryTestCommentFactory::times(3)
                         ->for(FactoryTestPostFactory::new(['title' => 'Test Title']), 'commentable')
+                        ->create();
+
+        $this->assertSame('Test Title', FactoryTestPost::first()->title);
+        $this->assertCount(3, FactoryTestPost::first()->comments);
+
+        $this->assertCount(1, FactoryTestPost::all());
+        $this->assertCount(3, FactoryTestComment::all());
+    }
+
+    public function test_morph_to_relationship_with_existing_model_instance()
+    {
+        $post = FactoryTestPostFactory::new(['title' => 'Test Title'])->create();
+        $posts = FactoryTestCommentFactory::times(3)
+                        ->for($post, 'commentable')
                         ->create();
 
         $this->assertSame('Test Title', FactoryTestPost::first()->title);
@@ -288,6 +317,29 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         unset($_SERVER['__test.role.creating-role']);
         unset($_SERVER['__test.role.creating-user']);
+    }
+
+    public function test_belongs_to_many_relationship_with_existing_model_instances()
+    {
+        $roles = FactoryTestRoleFactory::times(3)
+                        ->afterCreating(function ($role) {
+                            $_SERVER['__test.role.creating-role'] = $role;
+                        })
+                        ->create();
+        FactoryTestUserFactory::times(3)
+                        ->hasAttached($roles, ['admin' => 'Y'], 'roles')
+                        ->create();
+
+        $this->assertCount(3, FactoryTestRole::all());
+
+        $user = FactoryTestUser::latest()->first();
+
+        $this->assertCount(3, $user->roles);
+        $this->assertSame('Y', $user->roles->first()->pivot->admin);
+
+        $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-role']);
+
+        unset($_SERVER['__test.role.creating-role']);
     }
 
     public function test_sequences()

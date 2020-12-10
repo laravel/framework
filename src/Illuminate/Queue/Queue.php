@@ -29,6 +29,13 @@ abstract class Queue
     protected $connectionName;
 
     /**
+     * Indicates that jobs should be dispatched after all database transactions have committed.
+     *
+     * @return $this
+     */
+    protected $dispatchAfterCommit;
+
+    /**
      * The create payload callbacks.
      *
      * @var callable[]
@@ -273,7 +280,35 @@ abstract class Queue
      */
     protected function enqueueUsing($job, $payload, $queue, $delay, $callback)
     {
+        if ($this->shouldDispatchAfterCommit($job) &&
+            $this->container->bound('db.transactions')) {
+            return $this->container->make('db.transactions')->addCallback(
+                function () use ($payload, $queue, $delay, $callback) {
+                    return $callback($payload, $queue, $delay);
+                }
+            );
+        }
+
         return $callback($payload, $queue, $delay);
+    }
+
+    /**
+     * Determine if the job should be dispatched after all database transactions have committed.
+     *
+     * @param  \Closure|string|object  $job
+     * @return bool
+     */
+    protected function shouldDispatchAfterCommit($job)
+    {
+        if (is_object($job) && isset($job->afterCommit)) {
+            return $job->afterCommit;
+        }
+
+        if (isset($this->dispatchAfterCommit)) {
+            return $this->dispatchAfterCommit;
+        }
+
+        return false;
     }
 
     /**
