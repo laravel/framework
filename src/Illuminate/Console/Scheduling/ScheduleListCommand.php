@@ -13,7 +13,7 @@ class ScheduleListCommand extends Command
      *
      * @var string
      */
-    protected $name = 'schedule:list';
+    protected $signature = 'schedule:list {--timezone= : The timezone that times should be displayed in}';
 
     /**
      * The console command description.
@@ -36,8 +36,9 @@ class ScheduleListCommand extends Command
                 $event->command,
                 $event->expression,
                 $event->description,
-                (new CronExpression($event->expression))->getPreviousRunDate(Carbon::now()),
-                (new CronExpression($event->expression))->getNextRunDate(Carbon::now()),
+                (new CronExpression($event->expression))
+                            ->getNextRunDate(Carbon::now())
+                            ->setTimezone($this->option('timezone', config('app.timezone'))),
             ];
         }
 
@@ -45,7 +46,6 @@ class ScheduleListCommand extends Command
             'Command',
             'Interval',
             'Description',
-            'Last Run',
             'Next Due',
         ], $rows ?? []);
     }
