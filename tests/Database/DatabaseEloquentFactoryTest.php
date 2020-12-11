@@ -265,6 +265,22 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestPost::all());
     }
 
+    public function test_belongs_to_relationship_with_existing_model_instance_and_state()
+    {
+        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
+        $posts = FactoryTestPostFactory::times(3)
+                        ->withUserState()
+                        ->for($user, 'user')
+                        ->create();
+
+        $this->assertCount(3, $posts->filter(function ($post) use ($user) {
+            return $post->user->is($user);
+        }));
+
+        $this->assertCount(1, FactoryTestUser::all());
+        $this->assertCount(3, FactoryTestPost::all());
+    }
+
     public function test_belongs_to_relationship_with_existing_model_instance_with_relationship_name_implied_from_model()
     {
         $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
@@ -539,6 +555,15 @@ class FactoryTestPostFactory extends Factory
             'user_id' => FactoryTestUserFactory::new(),
             'title' => $this->faker->name,
         ];
+    }
+
+    public function withUserState()
+    {
+        return $this->state(function () {
+            return [
+                'user_id' => FactoryTestUserFactory::new(),
+            ];
+        });
     }
 }
 
