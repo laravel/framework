@@ -762,7 +762,7 @@ abstract class Factory
         }
 
         if (Str::startsWith($method, 'for')) {
-            return $this->for($factory->state($parameters[0] ?? []), $relationship);
+            return $this->for($parameters[0] instanceof Factory ? $factory->state($parameters[0] ?? []) : $parameters[0], $relationship);
         } elseif (Str::startsWith($method, 'has')) {
             return $this->has(
                 $factory
