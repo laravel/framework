@@ -7,6 +7,7 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
@@ -80,6 +81,25 @@ class CallQueuedHandler
         if (! $job->isDeletedOrReleased()) {
             $job->delete();
         }
+    }
+
+    /**
+     * Get the command from the given payload.
+     *
+     * @param  array  $data
+     * @return mixed
+     */
+    protected function getCommand(array $data)
+    {
+        if (Str::startsWith($data['command'], 'O:')) {
+            return unserialize($data['command']);
+        }
+
+        if ($this->container->bound(Encrypter::class)) {
+            return unserialize($this->container[Encrypter::class]->decrypt($data['command']));
+        }
+
+        throw new RuntimeException('Unable to extract job payload.');
     }
 
     /**
@@ -273,24 +293,5 @@ class CallQueuedHandler
         if (method_exists($command, 'invokeChainCatchCallbacks')) {
             $command->invokeChainCatchCallbacks($e);
         }
-    }
-
-    /**
-     * Get the command from the given payload.
-     *
-     * @param  array  $data
-     * @return mixed
-     */
-    protected function getCommand(array $data)
-    {
-        if (Str::startsWith($data['command'], 'O:')) {
-            return unserialize($data['command']);
-        }
-
-        if ($this->container->bound('encrypter')) {
-            return unserialize($this->container['encrypter']->decrypt($data['command']));
-        }
-
-        throw new RuntimeException('Unable to extract job payload.');
     }
 }

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Contracts\Queue\UsesEncryption;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
@@ -93,7 +93,7 @@ class JobEncryptionTest extends DatabaseTestCase
     }
 }
 
-class JobEncryptionTestEncryptedJob implements ShouldQueue, UsesEncryption
+class JobEncryptionTestEncryptedJob implements ShouldQueue, ShouldBeEncrypted
 {
     use Dispatchable, Queueable;
 
