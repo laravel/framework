@@ -16,6 +16,15 @@ class ScheduleListCommand extends Command
     protected $signature = 'schedule:list {--timezone= : The timezone that times should be displayed in}';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'schedule:list';
+
+    /**
      * The console command description.
      *
      * @var string
