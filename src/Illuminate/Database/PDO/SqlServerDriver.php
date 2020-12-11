@@ -9,7 +9,7 @@ class SqlServerDriver extends AbstractSQLServerDriver
     public function connect(array $params)
     {
         return new SqlServerConnection(
-            new Connection($params)
+            new Connection($params['pdo'])
         );
     }
 }
