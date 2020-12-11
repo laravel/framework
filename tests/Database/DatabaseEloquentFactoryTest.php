@@ -250,26 +250,25 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestPost::all());
     }
 
-    public function test_belongs_to_relationship_with_existing_model_instance()
+    public function test_belongs_to_relationship_overriding_state()
     {
-        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
         $posts = FactoryTestPostFactory::times(3)
-                        ->for($user, 'user')
+                        ->withUserState()
+                        ->for(FactoryTestUserFactory::new(['name' => 'Taylor Otwell']), 'user')
                         ->create();
 
-        $this->assertCount(3, $posts->filter(function ($post) use ($user) {
-            return $post->user->is($user);
+        $this->assertCount(3, $posts->filter(function ($post) {
+            return $post->user->name == 'Taylor Otwell';
         }));
 
         $this->assertCount(1, FactoryTestUser::all());
         $this->assertCount(3, FactoryTestPost::all());
     }
 
-    public function test_belongs_to_relationship_with_existing_model_instance_and_state()
+    public function test_belongs_to_relationship_with_existing_model_instance()
     {
         $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
         $posts = FactoryTestPostFactory::times(3)
-                        ->withUserState()
                         ->for($user, 'user')
                         ->create();
 
