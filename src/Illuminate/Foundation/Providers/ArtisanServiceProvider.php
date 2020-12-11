@@ -931,7 +931,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(ScheduleListCommand::class);
     }
-  
+
     /**
      * Register the command.
      *
