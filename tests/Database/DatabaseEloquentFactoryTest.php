@@ -265,6 +265,21 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestPost::all());
     }
 
+    public function test_belongs_to_relationship_with_existing_model_instance_with_relationship_name_implied_from_model()
+    {
+        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
+        $posts = FactoryTestPostFactory::times(3)
+                        ->for($user)
+                        ->create();
+
+        $this->assertCount(3, $posts->filter(function ($post) use ($user) {
+            return $post->factoryTestUser->is($user);
+        }));
+
+        $this->assertCount(1, FactoryTestUser::all());
+        $this->assertCount(3, FactoryTestPost::all());
+    }
+
     public function test_morph_to_relationship()
     {
         $posts = FactoryTestCommentFactory::times(3)
@@ -336,6 +351,29 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $this->assertCount(3, $user->roles);
         $this->assertSame('Y', $user->roles->first()->pivot->admin);
+
+        $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-role']);
+
+        unset($_SERVER['__test.role.creating-role']);
+    }
+
+    public function test_belongs_to_many_relationship_with_existing_model_instances_with_relationship_name_implied_from_model()
+    {
+        $roles = FactoryTestRoleFactory::times(3)
+                        ->afterCreating(function ($role) {
+                            $_SERVER['__test.role.creating-role'] = $role;
+                        })
+                        ->create();
+        FactoryTestUserFactory::times(3)
+                        ->hasAttached($roles, ['admin' => 'Y'])
+                        ->create();
+
+        $this->assertCount(3, FactoryTestRole::all());
+
+        $user = FactoryTestUser::latest()->first();
+
+        $this->assertCount(3, $user->factoryTestRoles);
+        $this->assertSame('Y', $user->factoryTestRoles->first()->pivot->admin);
 
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-role']);
 
@@ -484,6 +522,11 @@ class FactoryTestUser extends Eloquent
     {
         return $this->belongsToMany(FactoryTestRole::class, 'role_user', 'user_id', 'role_id')->withPivot('admin');
     }
+
+    public function factoryTestRoles()
+    {
+        return $this->belongsToMany(FactoryTestRole::class, 'role_user', 'user_id', 'role_id')->withPivot('admin');
+    }
 }
 
 class FactoryTestPostFactory extends Factory
@@ -504,6 +547,11 @@ class FactoryTestPost extends Eloquent
     protected $table = 'posts';
 
     public function user()
+    {
+        return $this->belongsTo(FactoryTestUser::class, 'user_id');
+    }
+
+    public function factoryTestUser()
     {
         return $this->belongsTo(FactoryTestUser::class, 'user_id');
     }
