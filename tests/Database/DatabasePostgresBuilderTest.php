@@ -241,6 +241,51 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->getColumnListing('mydatabase.myapp.foo');
     }
 
+    /**
+     * Ensure that when the search_path contains just one schema, only that
+     * schema is passed into the query that is executed to acquire the list
+     * of tables to be dropped.
+     */
+    public function testDropAllTablesWithOneSchemaInSearchPath()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
+        $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
+        $grammar = m::mock(PostgresGrammar::class);
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $grammar->shouldReceive('compileGetAllTables')->with(['public'])->andReturn("select tablename from pg_catalog.pg_tables where schemaname in ('public')");
+        $connection->shouldReceive('select')->with("select tablename from pg_catalog.pg_tables where schemaname in ('public')")->andReturn(['users']);
+        $grammar->shouldReceive('compileDropAllTables')->with(['users'])->andReturn('drop table "'.implode('","', ['users']).'" cascade');
+        $connection->shouldReceive('statement')->with('drop table "'.implode('","', ['users']).'" cascade');
+        $builder = $this->getBuilder($connection);
+
+        $builder->dropAllTables();
+    }
+
+    /**
+     * Ensure that when the search_path contains more than one schema, both
+     * schemas are passed into the query that is executed to acquire the list
+     * of tables to be dropped. Furthermore, ensure that the special '$user'
+     * variable is resolved to the username specified on the database connection
+     * in the process.
+     */
+    public function testDropAllTablesWithMoreThanOneSchemaInSearchPath()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
+        $connection->shouldReceive('getConfig')->with('search_path')->andReturn('"$user", public');
+        $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
+        $grammar = m::mock(PostgresGrammar::class);
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $grammar->shouldReceive('compileGetAllTables')->with(['foouser', 'public'])->andReturn("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','public')");
+        $connection->shouldReceive('select')->with("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','public')")->andReturn(['users', 'users']);
+        $grammar->shouldReceive('compileDropAllTables')->with(['users', 'users'])->andReturn('drop table "'.implode('","', ['users', 'users']).'" cascade');
+        $connection->shouldReceive('statement')->with('drop table "'.implode('","', ['users', 'users']).'" cascade');
+        $builder = $this->getBuilder($connection);
+
+        $builder->dropAllTables();
+    }
+
     protected function getConnection()
     {
         return m::mock(Connection::class);
