@@ -45,10 +45,10 @@ trait InteractsWithContainer
      * Mock an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $mock
+     * @param  array  ...$args
      * @return \Mockery\MockInterface
      */
-    protected function mock($abstract, Closure $mock = null)
+    protected function mock($abstract, ...$args)
     {
         return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
     }
@@ -57,23 +57,10 @@ trait InteractsWithContainer
      * Mock a partial instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $mock
+     * @param  array  ...$args
      * @return \Mockery\MockInterface
      */
-    protected function partialMock($abstract, Closure $mock = null)
-    {
-        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args()))->makePartial());
-    }
-
-    /**
-     * Mock a partial instance of an object with arguments in the container.
-     *
-     * @param  string  $abstract
-     * @param  array  $arguments
-     * @param  Closure|null  $mock
-     * @return \Mockery\MockInterface
-     */
-    protected function partialMockWithArguments($abstract, $arguments = [], Closure $mock = null)
+    protected function partialMock($abstract, ...$args)
     {
         return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args()))->makePartial());
     }
