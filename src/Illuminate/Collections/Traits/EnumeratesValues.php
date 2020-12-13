@@ -293,7 +293,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Apply the callback if the evaluated check is truthy.
+     * Apply the callback if the evaluated check for the collection is truthy.
      *
      * @param  callable  $check
      * @param  callable|null  $callback

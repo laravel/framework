@@ -4530,6 +4530,18 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertSame(['michael', 'tom', 'taylor'], $data->toArray());
+
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->if(function ($data) {
+            return $data->contains('tom');
+        }, function ($data) {
+            return $data->concat(['adam']);
+        }, function ($data) {
+            return $data->concat(['taylor']);
+        });
+
+        $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
     }
 
     /**
