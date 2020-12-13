@@ -68,7 +68,7 @@ class DatabaseServiceProvider extends ServiceProvider
         }
 
         foreach ($types as $typeName => $typeClassDefinition) {
-            \Schema::registerCustomDoctrineType($typeClassDefinition, $typeName, $typeName);
+            Type::addType($typeName, $typeClassDefinition);
         }
     }
 
