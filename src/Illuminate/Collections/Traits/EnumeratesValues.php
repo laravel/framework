@@ -293,6 +293,19 @@ trait EnumeratesValues
     }
 
     /**
+     * Apply the callback if the evaluated check is truthy.
+     *
+     * @param  callable  $check
+     * @param  callable|null  $callback
+     * @param  callable|null  $default
+     * @return static|mixed
+     */
+    public function if(callable $check, callable $callback = null, callable $default = null)
+    {
+        return $this->when($check(clone $this), $callback, $default);
+    }
+
+    /**
      * Determine if the collection is not empty.
      *
      * @return bool

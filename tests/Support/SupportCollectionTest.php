@@ -4489,6 +4489,72 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIf($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->if(function ($data) {
+            return $data->contains('michael');
+        }, function ($data) {
+            return $data->concat(['adam']);
+        });
+
+        $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
+
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->if(function ($data) {
+            return $data->contains('adam');
+        }, function ($data) {
+            return $data->concat(['adam']);
+        });
+
+        $this->assertSame(['michael', 'tom'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIfDefault($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->if(function ($data) {
+            return $data->contains('poppy');
+        }, function ($data) {
+            return $data->concat(['adam']);
+        }, function ($data) {
+            return $data->concat(['taylor']);
+        });
+
+        $this->assertSame(['michael', 'tom', 'taylor'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIfHigherOrder($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->if(function ($data) {
+            return $data->contains('tom');
+        })->concat(['taylor']);
+
+        $this->assertSame(['michael', 'tom', 'taylor'], $data->toArray());
+
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->if(function ($data) {
+            return $data->contains('poppy');
+        })->concat(['taylor']);
+
+        $this->assertSame(['michael', 'tom'], $data->toArray());
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array
