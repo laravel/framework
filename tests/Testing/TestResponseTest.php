@@ -2,8 +2,12 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Contracts\View\View;
+use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Response;
 use Illuminate\Testing\TestResponse;
@@ -13,6 +17,7 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class TestResponseTest extends TestCase
 {
@@ -1152,6 +1157,100 @@ class TestResponseTest extends TestCase
         $response->tap(function ($response) {
             $this->assertInstanceOf(TestResponse::class, $response);
         })->assertStatus(418);
+    }
+
+    public function testAssertPlainCookie()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response())->withCookie(new Cookie('cookie-name', 'cookie-value'))
+        );
+
+        $response->assertPlainCookie('cookie-name', 'cookie-value');
+    }
+
+    public function testAssertCookie()
+    {
+        $container = Container::getInstance();
+        $encrypter = new Encrypter(str_repeat('a', 16));
+        $container->singleton('encrypter', function() use ($encrypter) {
+            return $encrypter;
+        });
+
+        $cookieName = 'cookie-name';
+        $cookieValue = 'cookie-value';
+        $encryptedValue = $encrypter->encrypt(CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue, false);
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response())->withCookie(new Cookie($cookieName, $encryptedValue))
+        );
+
+        $response->assertCookie($cookieName, $cookieValue);
+    }
+
+    public function testAssertCookieExpired()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response())->withCookie(new Cookie('cookie-name', 'cookie-value', time() - 5000))
+        );
+
+        $response->assertCookieExpired('cookie-name');
+    }
+
+
+    public function testAssertCookieNotExpired()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response())->withCookie(new Cookie('cookie-name', 'cookie-value', time() + 5000))
+        );
+
+        $response->assertCookieNotExpired('cookie-name');
+    }
+
+
+    public function testAssertCookieMissing()
+    {
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertCookieMissing('cookie-name');
+    }
+
+    public function testGetDecryptedCookie()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response())->withCookie(new Cookie('cookie-name', 'cookie-value'))
+        );
+
+        $cookie = $response->getCookie('cookie-name');
+
+        $this->assertInstanceOf(Cookie::class, $cookie);
+        $this->assertEquals('cookie-name', $cookie->getName());
+        $this->assertEquals('cookie-value', $cookie->getValue());
+    }
+
+
+    public function testGetEncryptedCookie()
+    {
+        $container = Container::getInstance();
+        $encrypter = new Encrypter(str_repeat('a', 16));
+        $container->singleton('encrypter', function() use ($encrypter) {
+            return $encrypter;
+        });
+
+        $cookieName = 'cookie-name';
+        $cookieValue = 'cookie-value';
+        $encryptedValue = $encrypter->encrypt(
+            CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue, false
+        );
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response())->withCookie(new Cookie($cookieName, $encryptedValue))
+        );
+
+        $cookie = $response->getCookie($cookieName, true);
+
+        $this->assertInstanceOf(Cookie::class, $cookie);
+        $this->assertEquals($cookieName, $cookie->getName());
+        $this->assertEquals($cookieValue, $cookie->getValue());
     }
 
     private function makeMockResponse($content)
