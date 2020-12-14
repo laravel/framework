@@ -118,17 +118,16 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $this->prepareCookiesForJsonRequest());
     }
 
-
     public function testFollowingRedirects()
     {
         $router = $this->app->make(Registrar::class);
         $url = $this->app->make(UrlGenerator::class);
 
-        $router->get('from', function() use ($url) {
+        $router->get('from', function () use ($url) {
             return new RedirectResponse($url->to('to'));
         });
 
-        $router->get('to', function() {
+        $router->get('to', function () {
             return 'OK';
         });
 
@@ -138,28 +137,27 @@ class MakesHttpRequestsTest extends TestCase
             ->assertSee('OK');
     }
 
-
     public function testFollowingRedirectsTerminatesInExpectedOrder()
     {
         $router = $this->app->make(Registrar::class);
         $url = $this->app->make(UrlGenerator::class);
 
         $callOrder = [];
-        TerminatingMiddleware::$callback = function($request) use (&$callOrder) {
+        TerminatingMiddleware::$callback = function ($request) use (&$callOrder) {
             $callOrder[] = $request->path();
         };
 
-        $router->get('from', function() use ($url) {
+        $router->get('from', function () use ($url) {
             return new RedirectResponse($url->to('to'));
         })->middleware(TerminatingMiddleware::class);
 
-        $router->get('to', function() {
+        $router->get('to', function () {
             return 'OK';
         })->middleware(TerminatingMiddleware::class);
 
         $this->followingRedirects()->get('from');
 
-        $this->assertEquals([ 'from', 'to' ], $callOrder);
+        $this->assertEquals(['from', 'to'], $callOrder);
     }
 }
 
@@ -168,6 +166,7 @@ class MyMiddleware
     public function handle($request, $next)
     {
         return $next($request.'WithMiddleware');
+
     }
 }
 
