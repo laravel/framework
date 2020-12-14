@@ -123,6 +123,7 @@ class ResourceTest extends TestCase
 
     public function testResourceClassCanBeDiscoveredBasedOnNamespaceResolution()
     {
+        JsonResource::guessResourceNamesUsing();
         JsonResource::resolveResourceNamespaceUsing(function () {
             return 'Illuminate\\Tests\\Integration\\Http\\Fixtures\\Resources\\';
         });
@@ -134,6 +135,7 @@ class ResourceTest extends TestCase
         ]));
 
         $this->assertInstanceOf(\Illuminate\Tests\Integration\Http\Fixtures\Resources\PostResource::class, $resource);
+        JsonResource::resolveResourceNamespaceUsing();
     }
 
     public function testResourcesMayBeConvertedToJsonWithToJsonMethod()

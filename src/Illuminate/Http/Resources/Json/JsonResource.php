@@ -287,10 +287,10 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Specify the callback that should be invoked to guess factory names based on dynamic relationship names.
      *
-     * @param  callable  $callback
+     * @param callable|null $callback
      * @return void
      */
-    public static function guessResourceNamesUsing(callable $callback)
+    public static function guessResourceNamesUsing(callable $callback = null)
     {
         static::$resourceNameResolver = $callback;
     }
@@ -298,10 +298,10 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Specify the callback that should be invoked to get the namespace of the API resources.
      *
-     * @param  callable  $callback
+     * @param callable|null $callback
      * @return void
      */
-    public static function resolveResourceNamespaceUsing(callable $callback)
+    public static function resolveResourceNamespaceUsing(callable $callback = null)
     {
         static::$resourceNamespaceResolver = $callback;
     }
