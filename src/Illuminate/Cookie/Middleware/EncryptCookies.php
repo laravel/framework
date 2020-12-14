@@ -76,17 +76,15 @@ class EncryptCookies
     protected function decrypt(Request $request)
     {
         foreach ($request->cookies as $key => $cookie) {
-            if ($this->isDisabled($key) || is_array($cookie)) {
+            if ($this->isDisabled($key)) {
                 continue;
             }
 
             try {
                 $value = $this->decryptCookie($key, $cookie);
 
-                $hasValidPrefix = strpos($value, CookieValuePrefix::create($key, $this->encrypter->getKey())) === 0;
-
                 $request->cookies->set(
-                    $key, $hasValidPrefix ? CookieValuePrefix::remove($value) : null
+                    $key, $this->validateValue($key, $value)
                 );
             } catch (DecryptException $e) {
                 $request->cookies->set($key, null);
@@ -94,6 +92,36 @@ class EncryptCookies
         }
 
         return $request;
+    }
+
+    /**
+     * Validate and remove the cookie value prefix from the value.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return string|array|null
+     */
+    protected function validateValue(string $key, $value)
+    {
+        return is_array($value) ? $this->validateArray($key, $value) :
+            CookieValuePrefix::validate($key, $value, $this->encrypter->getKey());
+    }
+
+    /**
+     * Validate and remove the cookie value prefix from all values of an array.
+     *
+     * @param  string  $key
+     * @param  array  $value
+     * @return array
+     */
+    protected function validateArray(string $key, array $value)
+    {
+        $stripped = [];
+        foreach ($value as $subKey => $subValue) {
+            $stripped[$subKey] = $this->validateValue("${key}[${subKey}]", $subValue);
+        }
+
+        return $stripped;
     }
 
     /**
@@ -123,6 +151,9 @@ class EncryptCookies
         foreach ($cookie as $key => $value) {
             if (is_string($value)) {
                 $decrypted[$key] = $this->encrypter->decrypt($value, static::serialized($key));
+            }
+            if (is_array($value)) {
+                $decrypted[$key] = $this->decryptArray($value);
             }
         }
 
