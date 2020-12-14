@@ -1171,7 +1171,7 @@ class TestResponseTest extends TestCase
     {
         $container = Container::getInstance();
         $encrypter = new Encrypter(str_repeat('a', 16));
-        $container->singleton('encrypter', function() use ($encrypter) {
+        $container->singleton('encrypter', function () use ($encrypter) {
             return $encrypter;
         });
 
@@ -1195,7 +1195,6 @@ class TestResponseTest extends TestCase
         $response->assertCookieExpired('cookie-name');
     }
 
-
     public function testAssertCookieNotExpired()
     {
         $response = TestResponse::fromBaseResponse(
@@ -1204,7 +1203,6 @@ class TestResponseTest extends TestCase
 
         $response->assertCookieNotExpired('cookie-name');
     }
-
 
     public function testAssertCookieMissing()
     {
@@ -1226,12 +1224,11 @@ class TestResponseTest extends TestCase
         $this->assertEquals('cookie-value', $cookie->getValue());
     }
 
-
     public function testGetEncryptedCookie()
     {
         $container = Container::getInstance();
         $encrypter = new Encrypter(str_repeat('a', 16));
-        $container->singleton('encrypter', function() use ($encrypter) {
+        $container->singleton('encrypter', function () use ($encrypter) {
             return $encrypter;
         });
 
