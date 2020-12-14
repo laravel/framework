@@ -290,7 +290,7 @@ class TestResponse implements ArrayAccess
     public function assertCookie($cookieName, $value = null, $encrypted = true, $unserialize = false)
     {
         PHPUnit::assertNotNull(
-            $cookie = $this->getCookie($cookieName, $encrypted, $unserialize),
+            $cookie = $this->getCookie($cookieName, $encrypted && ! is_null($value), $unserialize),
             "Cookie [{$cookieName}] not present on response."
         );
 
