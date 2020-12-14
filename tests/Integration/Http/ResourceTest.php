@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
@@ -135,6 +136,30 @@ class ResourceTest extends TestCase
         ]));
 
         $this->assertInstanceOf(\Illuminate\Tests\Integration\Http\Fixtures\Resources\PostResource::class, $resource);
+        JsonResource::resolveResourceNamespaceUsing();
+    }
+
+    public function testResourceClassCanBeDiscoveredBasedOnNamespaceResolutionForACollection()
+    {
+        JsonResource::guessResourceNamesUsing();
+        JsonResource::resolveResourceNamespaceUsing(function () {
+            return 'Illuminate\\Tests\\Integration\\Http\\Fixtures\\Resources\\';
+        });
+
+        $resource = Post::resource(collect([
+            new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+                'abstract' => 'Test abstract',
+            ]),
+            new Post([
+                'id' => 6,
+                'title' => 'Test Title 2',
+                'abstract' => 'Test abstract 2',
+            ]),
+        ]));
+
+        $this->assertInstanceOf(AnonymousResourceCollection::class, $resource);
         JsonResource::resolveResourceNamespaceUsing();
     }
 
