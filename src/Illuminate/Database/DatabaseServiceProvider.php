@@ -61,11 +61,7 @@ class DatabaseServiceProvider extends ServiceProvider
             return;
         }
 
-        $types = config('database.dbal.types');
-
-        if (! is_array($types)) {
-            return;
-        }
+        $types = config('database.dbal.types', []);
 
         foreach ($types as $typeName => $typeClassDefinition) {
             Type::addType($typeName, $typeClassDefinition);
