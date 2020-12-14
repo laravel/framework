@@ -4,7 +4,6 @@ namespace Illuminate\Testing;
 
 use ArrayAccess;
 use Closure;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
@@ -385,7 +384,7 @@ class TestResponse implements ArrayAccess
             if ($cookie->getName() === $cookieName) {
                 if ($decrypt) {
                     $decryptedValue = CookieValuePrefix::remove(
-                        app(EncrypterContract::class)->decrypt($cookie->getValue(), $unserialize)
+                        app('encrypter')->decrypt($cookie->getValue(), $unserialize)
                     );
                     $cookie = new Cookie(
                         $cookie->getName(), $decryptedValue, $cookie->getExpiresTime(), $cookie->getPath(),

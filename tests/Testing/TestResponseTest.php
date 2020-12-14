@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
@@ -1172,7 +1171,7 @@ class TestResponseTest extends TestCase
     {
         $container = Container::getInstance();
         $encrypter = new Encrypter(str_repeat('a', 16));
-        $container->singleton(EncrypterContract::class, function() use ($encrypter) {
+        $container->singleton('encrypter', function() use ($encrypter) {
             return $encrypter;
         });
 
@@ -1232,7 +1231,7 @@ class TestResponseTest extends TestCase
     {
         $container = Container::getInstance();
         $encrypter = new Encrypter(str_repeat('a', 16));
-        $container->singleton(EncrypterContract::class, function() use ($encrypter) {
+        $container->singleton('encrypter', function() use ($encrypter) {
             return $encrypter;
         });
 
