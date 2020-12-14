@@ -244,7 +244,6 @@ trait MakesHttpRequests
         return $this;
     }
 
-
     /**
      * Use cookies that were set in last response during next request.
      *
@@ -256,7 +255,6 @@ trait MakesHttpRequests
 
         return $this;
     }
-
 
     /**
      * Do not use cookies that were set in last response during next request.
@@ -669,11 +667,11 @@ trait MakesHttpRequests
         }
 
         return collect($this->lastResponse->headers->getCookies())
-            ->reject(function(Cookie $cookie) {
+            ->reject(function (Cookie $cookie) {
                 return 0 !== $cookie->getExpiresTime()
                     && Date::createFromTimestamp($cookie->getExpiresTime())->isPast();
             })
-            ->mapWithKeys(function(Cookie $cookie) {
+            ->mapWithKeys(function (Cookie $cookie) {
                 return [$cookie->getName() => $cookie->getValue()];
             })
             ->all();

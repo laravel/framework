@@ -116,20 +116,20 @@ class MakesHttpRequestsTest extends TestCase
         $now = Date::now();
 
         $encrypter = new Encrypter(str_repeat('a', 16));
-        $this->app->singleton(EncrypterContract::class, function() use ($encrypter) {
+        $this->app->singleton(EncrypterContract::class, function () use ($encrypter) {
             return $encrypter;
         });
 
         $router = $this->app->make(Registrar::class);
 
-        $router->get('set-cookies', function() {
+        $router->get('set-cookies', function () {
             return (new Response('OK'))
                 ->withCookie('unencrypted-cookie', 'unencrypted-value')
                 ->withCookie('expiring-cookie', 'expiring-value', 10)
                 ->withCookie('encrypted-cookie', 'encrypted-value');
         })->middleware(MyEncryptCookiesMiddleware::class);
 
-        $router->get('forget-cookies', function() {
+        $router->get('forget-cookies', function () {
             return (new Response('OK'))
                 ->withCookie('unencrypted-cookie', '', -2628000)
                 ->withCookie('expiring-cookie', '', -2628000)
