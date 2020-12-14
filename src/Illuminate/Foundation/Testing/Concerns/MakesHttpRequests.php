@@ -257,6 +257,19 @@ trait MakesHttpRequests
         return $this;
     }
 
+
+    /**
+     * Do not use cookies that were set in last response during next request.
+     *
+     * @return $this
+     */
+    public function ignoringCookiesFromLastResponse()
+    {
+        $this->useCookiesFromLastResponse = false;
+
+        return $this;
+    }
+
     /**
      * Automatically follow any redirects returned from the response.
      *

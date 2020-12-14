@@ -147,6 +147,12 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertEquals('unencrypted-value', $cookies['unencrypted-cookie']);
         $this->assertEquals('expiring-value', $cookies['expiring-cookie']);
 
+        // Ensure that calling ignoringCookiesFromLastResponse() disables this
+        $this->ignoringCookiesFromLastResponse();
+        $this->assertEmpty($this->prepareCookiesForRequest());
+
+        $this->usingCookiesFromLastResponse();
+
         // Time-travel past the expiration of the "expiring-cookie"
         // and ensure it won't be used for the next request
         Date::setTestNow($now->copy()->addMinutes(11));
