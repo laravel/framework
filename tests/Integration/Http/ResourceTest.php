@@ -94,7 +94,7 @@ class ResourceTest extends TestCase
     {
         JsonResource::guessResourceNamesUsing(function ($modelName) {
             $namespace = 'Illuminate\\Tests\\Integration\\Http\\Fixtures\\';
-            $modelName = Str::after($modelName, $namespace);
+            $modelName = class_basename($modelName);
 
             return $namespace.$modelName.'Resource';
         });
@@ -119,6 +119,21 @@ class ResourceTest extends TestCase
                 'title' => 'Test Title',
             ],
         ]);
+    }
+
+    public function testResourceClassCanBeDiscoveredBasedOnNamespaceResolution()
+    {
+        JsonResource::resolveResourceNamespaceUsing(function () {
+            return 'Illuminate\\Tests\\Integration\\Http\\Fixtures\\Resources\\';
+        });
+
+        $resource = Post::resource(new Post([
+            'id' => 5,
+            'title' => 'Test Title',
+            'abstract' => 'Test abstract',
+        ]));
+
+        $this->assertInstanceOf(\Illuminate\Tests\Integration\Http\Fixtures\Resources\PostResource::class, $resource);
     }
 
     public function testResourcesMayBeConvertedToJsonWithToJsonMethod()

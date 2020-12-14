@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 trait HasResource
 {
     /**
-     * Get a new resource instance for the given resource(s)
+     * Get a new resource instance for the given resource(s).
      *
      * @param mixed ...$parameters
      * @return \Illuminate\Http\Resources\Json\JsonResource
@@ -30,7 +30,7 @@ trait HasResource
     }
 
     /**
-     * Get the resource representation of the model
+     * Get the resource representation of the model.
      *
      * @return \Illuminate\Http\Resources\Json\JsonResource
      */
