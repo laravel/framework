@@ -124,6 +124,9 @@ class EncryptCookies
             if (is_string($value)) {
                 $decrypted[$key] = $this->encrypter->decrypt($value, static::serialized($key));
             }
+            if (is_array($value)) {
+                $decrypted[$key] = $this->decryptArray($value);
+            }
         }
 
         return $decrypted;
