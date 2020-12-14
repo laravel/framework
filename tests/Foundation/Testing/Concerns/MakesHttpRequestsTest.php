@@ -2,6 +2,19 @@
 
 namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Cookie\CookieJar;
+use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Encryption\Encrypter;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Date;
 use Orchestra\Testbench\TestCase;
 
 class MakesHttpRequestsTest extends TestCase
@@ -104,6 +117,56 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('new-value', $this->unencryptedCookies['new-cookie']);
     }
 
+    public function testUsingCookiesFromLastResponse()
+    {
+        $now = Date::now();
+
+        $encrypter = new Encrypter(str_repeat('a', 16));
+        $this->app->singleton(EncrypterContract::class, function() use ($encrypter) {
+            return $encrypter;
+        });
+
+        $router = $this->app->make(Registrar::class);
+
+        $router->get('set-cookies', function() {
+            return (new Response('OK'))
+                ->withCookie('unencrypted-cookie', 'unencrypted-value')
+                ->withCookie('expiring-cookie', 'expiring-value', 10)
+                ->withCookie('encrypted-cookie', 'encrypted-value');
+        })->middleware(MyEncryptCookiesMiddleware::class);
+
+        $router->get('unset-cookies', function() {
+            return (new Response('OK'))
+                ->withCookie('unencrypted-cookie', '', -2628000)
+                ->withCookie('expiring-cookie', '', -2628000)
+                ->withCookie('encrypted-cookie', '', -2628000);
+        })->middleware(MyEncryptCookiesMiddleware::class);
+
+        $this->get('set-cookies');
+
+        $this->usingCookiesFromLastResponse();
+
+        $cookies = $this->prepareCookiesForRequest();
+
+        $this->assertEquals('encrypted-value', CookieValuePrefix::remove($encrypter->decrypt($cookies['encrypted-cookie'], false)));
+        $this->assertEquals('unencrypted-value', $cookies['unencrypted-cookie']);
+        $this->assertEquals('expiring-value', $cookies['expiring-cookie']);
+
+        Date::setTestNow($now->copy()->addMinutes(11));
+        $cookies = $this->prepareCookiesForRequest();
+
+        $this->assertArrayHasKey('encrypted-cookie', $cookies);
+        $this->assertArrayHasKey('unencrypted-cookie', $cookies);
+        $this->assertArrayNotHasKey('expiring-cookie', $cookies);
+
+        $this->usingCookiesFromLastResponse()->get('unset-cookies');
+        $cookies = $this->prepareCookiesForRequest();
+
+        $this->assertArrayNotHasKey('encrypted-cookie', $cookies);
+        $this->assertArrayNotHasKey('unencrypted-cookie', $cookies);
+        $this->assertArrayNotHasKey('expiring-cookie', $cookies);
+    }
+
     public function testWithoutAndWithCredentials()
     {
         $this->encryptCookies = false;
@@ -114,6 +177,14 @@ class MakesHttpRequestsTest extends TestCase
         $this->defaultCookies = ['foo' => 'bar'];
         $this->assertSame(['foo' => 'bar'], $this->prepareCookiesForJsonRequest());
     }
+}
+
+class MyEncryptCookiesMiddleware extends EncryptCookies
+{
+    protected $except = [
+        'unencrypted-cookie',
+        'expiring-cookie',
+    ];
 }
 
 class MyMiddleware

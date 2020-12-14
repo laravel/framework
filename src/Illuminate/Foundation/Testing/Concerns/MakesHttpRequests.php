@@ -5,8 +5,10 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -55,6 +57,13 @@ trait MakesHttpRequests
     protected $encryptCookies = true;
 
     /**
+     * Indicates whether cookies should be applied across requests similar to a browser.
+     *
+     * @var bool
+     */
+    protected $useCookiesFromLastResponse = false;
+
+    /**
      * Indicated whether JSON requests should be performed "with credentials" (cookies).
      *
      * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
@@ -62,6 +71,13 @@ trait MakesHttpRequests
      * @var bool
      */
     protected $withCredentials = false;
+
+    /**
+     * The last response returned from a HTTP request.
+     *
+     * @var TestResponse
+     */
+    protected $lastResponse;
 
     /**
      * Define additional headers to be sent with the request.
@@ -224,6 +240,19 @@ trait MakesHttpRequests
     public function withUnencryptedCookie(string $name, string $value)
     {
         $this->unencryptedCookies[$name] = $value;
+
+        return $this;
+    }
+
+
+    /**
+     * Use cookies that were set in last response during next request.
+     *
+     * @return $this
+     */
+    public function usingCookiesFromLastResponse()
+    {
+        $this->useCookiesFromLastResponse = true;
 
         return $this;
     }
@@ -514,7 +543,7 @@ trait MakesHttpRequests
 
         $kernel->terminate($request, $response);
 
-        return $this->createTestResponse($response);
+        return $this->lastResponse = $this->createTestResponse($response);
     }
 
     /**
@@ -597,12 +626,44 @@ trait MakesHttpRequests
     protected function prepareCookiesForRequest()
     {
         if (! $this->encryptCookies) {
-            return array_merge($this->defaultCookies, $this->unencryptedCookies);
+            return array_merge($this->defaultCookies, $this->getUnencryptedCookies());
         }
 
         return collect($this->defaultCookies)->map(function ($value, $key) {
             return encrypt(CookieValuePrefix::create($key, app('encrypter')->getKey()).$value, false);
-        })->merge($this->unencryptedCookies)->all();
+        })->merge($this->getUnencryptedCookies())->all();
+    }
+
+    /**
+     * Get all unencrypted cookies for request.
+     *
+     * @return array
+     */
+    protected function getUnencryptedCookies()
+    {
+        return array_merge($this->getRawCookiesFromLastResponse(), $this->unencryptedCookies);
+    }
+
+    /**
+     * Get unexpired cookies from last response if enabled.
+     *
+     * @return array
+     */
+    protected function getRawCookiesFromLastResponse()
+    {
+        if (! $this->useCookiesFromLastResponse || is_null($this->lastResponse)) {
+            return [];
+        }
+
+        return collect($this->lastResponse->headers->getCookies())
+            ->reject(function(Cookie $cookie) {
+                return 0 !== $cookie->getExpiresTime()
+                    && Date::createFromTimestamp($cookie->getExpiresTime())->isPast();
+            })
+            ->mapWithKeys(function(Cookie $cookie) {
+                return [$cookie->getName() => $cookie->getValue()];
+            })
+            ->all();
     }
 
     /**
