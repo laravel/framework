@@ -1204,6 +1204,15 @@ class TestResponseTest extends TestCase
         $response->assertCookieNotExpired('cookie-name');
     }
 
+    public function testAssertSessionCookieNotExpired()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response())->withCookie(new Cookie('cookie-name', 'cookie-value', 0))
+        );
+
+        $response->assertCookieNotExpired('cookie-name');
+    }
+
     public function testAssertCookieMissing()
     {
         $response = TestResponse::fromBaseResponse(new Response());
