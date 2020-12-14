@@ -4,6 +4,7 @@ namespace Illuminate\Testing;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
@@ -317,7 +318,7 @@ class TestResponse implements ArrayAccess
     public function assertCookieExpired($cookieName)
     {
         PHPUnit::assertNotNull(
-            $cookie = $this->getCookie($cookieName),
+            $cookie = $this->getCookie($cookieName, false),
             "Cookie [{$cookieName}] not present on response."
         );
 
@@ -340,7 +341,7 @@ class TestResponse implements ArrayAccess
     public function assertCookieNotExpired($cookieName)
     {
         PHPUnit::assertNotNull(
-            $cookie = $this->getCookie($cookieName),
+            $cookie = $this->getCookie($cookieName, false),
             "Cookie [{$cookieName}] not present on response."
         );
 
@@ -363,7 +364,7 @@ class TestResponse implements ArrayAccess
     public function assertCookieMissing($cookieName)
     {
         PHPUnit::assertNull(
-            $this->getCookie($cookieName),
+            $this->getCookie($cookieName, false),
             "Cookie [{$cookieName}] is present on response."
         );
 
@@ -378,12 +379,12 @@ class TestResponse implements ArrayAccess
      * @param  bool  $unserialize
      * @return \Symfony\Component\HttpFoundation\Cookie|null
      */
-    public function getCookie($cookieName, $decrypt = false, $unserialize = false)
+    public function getCookie($cookieName, $decrypt = true, $unserialize = false)
     {
         foreach ($this->headers->getCookies() as $cookie) {
             if ($cookie->getName() === $cookieName) {
                 if ($decrypt) {
-                    $decryptedValue = CookieValuePrefix::remove(app('encrypter')->decrypt($cookie->getValue(), $unserialize));
+                    $decryptedValue = CookieValuePrefix::remove(app(EncrypterContract::class)->decrypt($cookie->getValue(), $unserialize));
                     $cookie = new Cookie(
                         $cookie->getName(), $decryptedValue, $cookie->getExpiresTime(), $cookie->getPath(),
                         $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly(),
