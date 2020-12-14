@@ -61,7 +61,7 @@ class DatabaseServiceProvider extends ServiceProvider
             return;
         }
 
-        $types = config('database.dbal.types', []);
+        $types = $this->app['config']->get('database.dbal.types', []);
 
         foreach ($types as $typeName => $typeClassDefinition) {
             Type::addType($typeName, $typeClassDefinition);
