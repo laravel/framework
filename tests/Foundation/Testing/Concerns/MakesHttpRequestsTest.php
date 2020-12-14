@@ -2,18 +2,12 @@
 
 namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Cookie\CookieJar;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
 use Orchestra\Testbench\TestCase;
 
