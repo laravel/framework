@@ -1172,7 +1172,7 @@ class TestResponseTest extends TestCase
     {
         $container = Container::getInstance();
         $encrypter = new Encrypter(str_repeat('a', 16));
-        $container->singleton('encrypter', function() use ($encrypter) {
+        $container->singleton(EncrypterContract::class, function() use ($encrypter) {
             return $encrypter;
         });
 
@@ -1220,7 +1220,7 @@ class TestResponseTest extends TestCase
             (new Response())->withCookie(new Cookie('cookie-name', 'cookie-value'))
         );
 
-        $cookie = $response->getCookie('cookie-name');
+        $cookie = $response->getCookie('cookie-name', false);
 
         $this->assertInstanceOf(Cookie::class, $cookie);
         $this->assertEquals('cookie-name', $cookie->getName());
@@ -1232,7 +1232,7 @@ class TestResponseTest extends TestCase
     {
         $container = Container::getInstance();
         $encrypter = new Encrypter(str_repeat('a', 16));
-        $container->singleton('encrypter', function() use ($encrypter) {
+        $container->singleton(EncrypterContract::class, function() use ($encrypter) {
             return $encrypter;
         });
 
@@ -1246,7 +1246,7 @@ class TestResponseTest extends TestCase
             (new Response())->withCookie(new Cookie($cookieName, $encryptedValue))
         );
 
-        $cookie = $response->getCookie($cookieName, true);
+        $cookie = $response->getCookie($cookieName);
 
         $this->assertInstanceOf(Cookie::class, $cookie);
         $this->assertEquals($cookieName, $cookie->getName());
