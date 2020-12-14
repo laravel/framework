@@ -384,7 +384,9 @@ class TestResponse implements ArrayAccess
         foreach ($this->headers->getCookies() as $cookie) {
             if ($cookie->getName() === $cookieName) {
                 if ($decrypt) {
-                    $decryptedValue = CookieValuePrefix::remove(app(EncrypterContract::class)->decrypt($cookie->getValue(), $unserialize));
+                    $decryptedValue = CookieValuePrefix::remove(
+                        app(EncrypterContract::class)->decrypt($cookie->getValue(), $unserialize)
+                    );
                     $cookie = new Cookie(
                         $cookie->getName(), $decryptedValue, $cookie->getExpiresTime(), $cookie->getPath(),
                         $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly(),
