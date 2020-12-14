@@ -42,30 +42,9 @@ class DatabaseServiceProvider extends ServiceProvider
         Model::clearBootedModels();
 
         $this->registerConnectionServices();
-
         $this->registerEloquentFactory();
-
         $this->registerQueueableEntityResolver();
-
-        $this->registerDBALTypes();
-    }
-
-    /**
-     * Add any custom types to the DBAL library.
-     *
-     * @return void
-     */
-    protected function registerDBALTypes()
-    {
-        if (! class_exists(Type::class)) {
-            return;
-        }
-
-        $types = config('database.dbal.types', []);
-
-        foreach ($types as $typeName => $typeClassDefinition) {
-            Type::addType($typeName, $typeClassDefinition);
-        }
+        $this->registerDoctrineTypes();
     }
 
     /**
@@ -128,5 +107,23 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->app->singleton(EntityResolver::class, function () {
             return new QueueEntityResolver;
         });
+    }
+
+    /**
+     * Register custom types with the Doctrine DBAL library.
+     *
+     * @return void
+     */
+    protected function registerDoctrineTypes()
+    {
+        if (! class_exists(Type::class)) {
+            return;
+        }
+
+        $types = $this->app['config']->get('database.dbal.types', []);
+
+        foreach ($types as $name => $class) {
+            Type::addType($name, $class);
+        }
     }
 }

@@ -8,52 +8,42 @@ use Doctrine\DBAL\Types\Type;
 
 class TimestampType extends Type
 {
-    public function getName()
-    {
-        return 'timestamp';
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
         $name = $platform->getName();
 
-        // See https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html
         switch ($name) {
-            case 'mssql':
-                return $this->getMSSQLPlatformSQLDeclaration($fieldDeclaration);
-
             case 'mysql':
             case 'mysql2':
-                return $this->getMySQLPlatformSQLDeclaration($fieldDeclaration);
+                return $this->getMySqlPlatformSQLDeclaration($fieldDeclaration);
 
             case 'postgresql':
             case 'pgsql':
             case 'postgres':
-                return $this->getPostgreSQLPlatformSQLDeclaration($fieldDeclaration);
+                return $this->getPostgresPlatformSQLDeclaration($fieldDeclaration);
+
+            case 'mssql':
+                return $this->getSqlServerPlatformSQLDeclaration($fieldDeclaration);
 
             case 'sqlite':
             case 'sqlite3':
-                return $this->getSqlitePlatformSQLDeclaration($fieldDeclaration);
+                return $this->getSQLitePlatformSQLDeclaration($fieldDeclaration);
 
             default:
                 throw new DBALException('Invalid platform: '.$name);
         }
     }
 
-    // https://docs.microsoft.com/en-us/sql/t-sql/data-types/rowversion-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15
-    // timestamp in MSSQL is not a field for storing datetime data
-    protected function getMSSQLPlatformSQLDeclaration(array $fieldDeclaration)
-    {
-        $columnType = 'DATETIME';
-
-        if ($fieldDeclaration['precision']) {
-            $columnType = 'DATETIME2('.$fieldDeclaration['precision'].')';
-        }
-
-        return $columnType;
-    }
-
-    protected function getMySQLPlatformSQLDeclaration(array $fieldDeclaration)
+    /**
+     * Get the SQL declaration for MySQL.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    protected function getMySqlPlatformSQLDeclaration(array $fieldDeclaration)
     {
         $columnType = 'TIMESTAMP';
 
@@ -70,22 +60,46 @@ class TimestampType extends Type
         return $columnType;
     }
 
-    protected function getPostgreSQLPlatformSQLDeclaration(array $fieldDeclaration)
+    /**
+     * Get the SQL declaration for PostgreSQL.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    protected function getPostgresPlatformSQLDeclaration(array $fieldDeclaration)
     {
-        $columnType = 'TIMESTAMP('.(int) $fieldDeclaration['precision'].')';
-
-        return $columnType;
+        return 'TIMESTAMP('.(int) $fieldDeclaration['precision'].')';
     }
 
     /**
-     * Laravel creates timestamps as datetime in SQLite.
+     * Get the SQL declaration for SQL Server.
      *
-     * SQLite does not store microseconds without custom hacks.
+     * @param  array  $fieldDeclaration
+     * @return string
      */
-    protected function getSqlitePlatformSQLDeclaration(array $fieldDeclaration)
+    protected function getSqlServerPlatformSQLDeclaration(array $fieldDeclaration)
     {
-        $columnType = 'DATETIME';
+        return $fieldDeclaration['precision'] ?? false
+                    ? 'DATETIME2('.$fieldDeclaration['precision'].')'
+                    : 'DATETIME';
+    }
 
-        return $columnType;
+    /**
+     * Get the SQL declaration for SQLite.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    protected function getSQLitePlatformSQLDeclaration(array $fieldDeclaration)
+    {
+        return 'DATETIME';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'timestamp';
     }
 }
