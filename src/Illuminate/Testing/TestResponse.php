@@ -324,7 +324,7 @@ class TestResponse implements ArrayAccess
         $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
 
         PHPUnit::assertTrue(
-            $expiresAt->lessThan(Carbon::now()),
+            0 !== $cookie->getExpiresTime() && $expiresAt->lessThan(Carbon::now()),
             "Cookie [{$cookieName}] is not expired, it expires at [{$expiresAt}]."
         );
 
