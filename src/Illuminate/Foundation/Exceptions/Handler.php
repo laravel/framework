@@ -20,6 +20,7 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
@@ -80,7 +81,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * A list of the internal exception types that should not be reported.
      *
-     * @var array
+     * @var string[]
      */
     protected $internalDontReport = [
         AuthenticationException::class,
@@ -96,7 +97,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * A list of the inputs that are never flashed for validation exceptions.
      *
-     * @var array
+     * @var string[]
      */
     protected $dontFlash = [
         'password',
@@ -209,7 +210,7 @@ class Handler implements ExceptionHandlerContract
             return;
         }
 
-        if (is_callable($reportCallable = [$e, 'report'])) {
+        if (Reflector::isCallable($reportCallable = [$e, 'report'])) {
             if ($this->container->call($reportCallable) !== false) {
                 return;
             }
@@ -314,7 +315,7 @@ class Handler implements ExceptionHandlerContract
 
         foreach ($this->renderCallbacks as $renderCallback) {
             if (is_a($e, $this->firstClosureParameterType($renderCallback))) {
-                $response = $renderCallback($e);
+                $response = $renderCallback($e, $request);
 
                 if (! is_null($response)) {
                     return $response;
@@ -416,7 +417,7 @@ class Handler implements ExceptionHandlerContract
     {
         return redirect($exception->redirectTo ?? url()->previous())
                     ->withInput(Arr::except($request->input(), $this->dontFlash))
-                    ->withErrors($exception->errors(), $exception->errorBag);
+                    ->withErrors($exception->errors(), $request->input('_error_bag', $exception->errorBag));
     }
 
     /**
@@ -464,7 +465,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function convertExceptionToResponse(Throwable $e)
     {
-        return SymfonyResponse::create(
+        return new SymfonyResponse(
             $this->renderExceptionContent($e),
             $this->isHttpException($e) ? $e->getStatusCode() : 500,
             $this->isHttpException($e) ? $e->getHeaders() : []

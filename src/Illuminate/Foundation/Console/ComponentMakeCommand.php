@@ -17,6 +17,15 @@ class ComponentMakeCommand extends GeneratorCommand
     protected $name = 'make:component';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'make:component';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -53,16 +62,22 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function writeView()
     {
-        $view = $this->getView();
-
-        $path = resource_path('views').'/'.str_replace('.', '/', 'components.'.$view);
+        $path = $this->viewPath(
+            str_replace('.', '/', 'components.'.$this->getView()).'.blade.php'
+        );
 
         if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
 
+        if ($this->files->exists($path) && ! $this->option('force')) {
+            $this->error('View already exists!');
+
+            return;
+        }
+
         file_put_contents(
-            $path.'.blade.php',
+            $path,
             '<div>
     <!-- '.Inspiring::quote().' -->
 </div>'

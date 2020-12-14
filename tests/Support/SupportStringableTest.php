@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -14,6 +15,14 @@ class SupportStringableTest extends TestCase
     protected function stringable($string = '')
     {
         return new Stringable($string);
+    }
+
+    public function testClassBasename()
+    {
+        $this->assertEquals(
+            class_basename(static::class),
+            $this->stringable(static::class)->classBasename()
+        );
     }
 
     public function testIsAscii()
@@ -509,5 +518,31 @@ class SupportStringableTest extends TestCase
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', 1, 2));
         $this->assertSame(3, $this->stringable('laravelPHPFramework')->substrCount('a', 1, -2));
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
+    }
+
+    public function testPadBoth()
+    {
+        $this->assertSame('__Alien___', (string) $this->stringable('Alien')->padBoth(10, '_'));
+        $this->assertSame('  Alien   ', (string) $this->stringable('Alien')->padBoth(10));
+    }
+
+    public function testPadLeft()
+    {
+        $this->assertSame('-=-=-Alien', (string) $this->stringable('Alien')->padLeft(10, '-='));
+        $this->assertSame('     Alien', (string) $this->stringable('Alien')->padLeft(10));
+    }
+
+    public function testPadRight()
+    {
+        $this->assertSame('Alien-----', (string) $this->stringable('Alien')->padRight(10, '-'));
+        $this->assertSame('Alien     ', (string) $this->stringable('Alien')->padRight(10));
+    }
+
+    public function testChunk()
+    {
+        $chunks = $this->stringable('foobarbaz')->split(3);
+
+        $this->assertInstanceOf(Collection::class, $chunks);
+        $this->assertSame(['foo', 'bar', 'baz'], $chunks->all());
     }
 }

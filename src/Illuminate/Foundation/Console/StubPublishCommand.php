@@ -15,6 +15,15 @@ class StubPublishCommand extends Command
     protected $signature = 'stub:publish {--force : Overwrite any existing files}';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'stub:publish';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -33,10 +42,13 @@ class StubPublishCommand extends Command
         }
 
         $files = [
+            __DIR__.'/stubs/cast.stub' => $stubsPath.'/cast.stub',
             __DIR__.'/stubs/job.queued.stub' => $stubsPath.'/job.queued.stub',
             __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
             __DIR__.'/stubs/model.pivot.stub' => $stubsPath.'/model.pivot.stub',
             __DIR__.'/stubs/model.stub' => $stubsPath.'/model.stub',
+            __DIR__.'/stubs/observer.stub' => $stubsPath.'/observer.stub',
+            __DIR__.'/stubs/observer.plain.stub' => $stubsPath.'/observer.plain.stub',
             __DIR__.'/stubs/request.stub' => $stubsPath.'/request.stub',
             __DIR__.'/stubs/resource.stub' => $stubsPath.'/resource.stub',
             __DIR__.'/stubs/resource-collection.stub' => $stubsPath.'/resource-collection.stub',
@@ -51,6 +63,7 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Foundation/Console/stubs/policy.plain.stub') => $stubsPath.'/policy.plain.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/policy.stub') => $stubsPath.'/policy.stub',
             realpath(__DIR__.'/../../Foundation/Console/stubs/rule.stub') => $stubsPath.'/rule.stub',
+            realpath(__DIR__.'/../../Foundation/Console/stubs/scope.stub') => $stubsPath.'/scope.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.api.stub') => $stubsPath.'/controller.api.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.invokable.stub') => $stubsPath.'/controller.invokable.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.model.api.stub') => $stubsPath.'/controller.model.api.stub',

@@ -37,6 +37,20 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "id" serial primary key not null, add column "email" varchar(255) not null', $statements[0]);
     }
 
+    public function testCreateTableWithAutoIncrementStartingValue()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->increments('id')->startingValue(1000);
+        $blueprint->string('email');
+        $blueprint->string('name')->collation('nb_NO.utf8');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create table "users" ("id" serial primary key not null, "email" varchar(255) not null, "name" varchar(255) collate "nb_NO.utf8" not null)', $statements[0]);
+        $this->assertSame('alter sequence users_id_seq restart with 1000', $statements[1]);
+    }
+
     public function testCreateTableAndCommentColumn()
     {
         $blueprint = new Blueprint('users');
@@ -842,6 +856,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "foo" inet not null', $statements[0]);
     }
 
+    public function testAddingIpAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "ip_address" inet not null', $statements[0]);
+    }
+
     public function testAddingMacAddress()
     {
         $blueprint = new Blueprint('users');
@@ -850,6 +874,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" macaddr not null', $statements[0]);
+    }
+
+    public function testAddingMacAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "mac_address" macaddr not null', $statements[0]);
     }
 
     public function testCompileForeign()
@@ -982,6 +1016,20 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statement = $this->getGrammar()->compileDropAllTypes(['alpha', 'beta', 'gamma']);
 
         $this->assertSame('drop type "alpha","beta","gamma" cascade', $statement);
+    }
+
+    public function testCompileTableExists()
+    {
+        $statement = $this->getGrammar()->compileTableExists();
+
+        $this->assertSame('select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = \'BASE TABLE\'', $statement);
+    }
+
+    public function testCompileColumnListing()
+    {
+        $statement = $this->getGrammar()->compileColumnListing();
+
+        $this->assertSame('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', $statement);
     }
 
     protected function getConnection()

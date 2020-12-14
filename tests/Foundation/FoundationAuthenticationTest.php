@@ -29,7 +29,7 @@ class FoundationAuthenticationTest extends TestCase
     ];
 
     /**
-     * @var \Mockery
+     * @return \Illuminate\Contracts\Auth\Guard|\Mockery\LegacyMockInterface|\Mockery\MockInterface
      */
     protected function mockGuard()
     {

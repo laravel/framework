@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,7 +23,6 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class DatabaseEloquentIntegrationTest extends TestCase
 {
@@ -126,6 +126,18 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->string('email');
                 $table->timestamps();
                 $table->softDeletes();
+            });
+
+            $this->schema($connection)->create('tags', function ($table) {
+                $table->increments('id');
+                $table->string('name');
+                $table->timestamps();
+            });
+
+            $this->schema($connection)->create('taggables', function ($table) {
+                $table->integer('tag_id');
+                $table->morphs('taggable');
+                $table->string('taxonomy')->nullable();
             });
         }
 
@@ -352,7 +364,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         );
 
         $this->assertSame('Mohamed Said', $user3->name);
-        $this->assertEquals(EloquentTestUser::count(), 2);
+        $this->assertEquals(2, EloquentTestUser::count());
     }
 
     public function testUpdateOrCreateOnDifferentConnection()
@@ -369,8 +381,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
             ['name' => 'Mohamed Said']
         );
 
-        $this->assertEquals(EloquentTestUser::count(), 1);
-        $this->assertEquals(EloquentTestUser::on('second_connection')->count(), 2);
+        $this->assertEquals(1, EloquentTestUser::count());
+        $this->assertEquals(2, EloquentTestUser::on('second_connection')->count());
     }
 
     public function testCheckAndCreateMethodsOnMultiConnections()
@@ -785,9 +797,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testHasOnMorphToRelationship()
     {
-        $this->expectException(RuntimeException::class);
+        $post = EloquentTestPost::create(['name' => 'Morph Post', 'user_id' => 1]);
+        (new EloquentTestPhoto)->imageable()->associate($post)->fill(['name' => 'Morph Photo'])->save();
 
-        EloquentTestPhoto::has('imageable')->get();
+        $photos = EloquentTestPhoto::has('imageable')->get();
+
+        $this->assertEquals(1, $photos->count());
     }
 
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
@@ -1220,8 +1235,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $defaultConnectionPost = EloquentTestPhoto::with('imageable')->first()->imageable;
         $secondConnectionPost = EloquentTestPhoto::on('second_connection')->with('imageable')->first()->imageable;
 
-        $this->assertEquals($defaultConnectionPost->name, 'Default Connection Post');
-        $this->assertEquals($secondConnectionPost->name, 'Second Connection Post');
+        $this->assertSame('Default Connection Post', $defaultConnectionPost->name);
+        $this->assertSame('Second Connection Post', $secondConnectionPost->name);
     }
 
     public function testBelongsToManyCustomPivot()
@@ -1340,10 +1355,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::find(1)->update(['name' => 'Mathieu TUDISCO']);
         EloquentTestUser::find(2)->update(['email' => 'dev@mathieutu.ovh']);
 
-        $this->assertEquals($users->map->fresh(), $users->fresh());
+        $this->assertCount(3, $users);
+        $this->assertNotEquals('Mathieu TUDISCO', $users[0]->name);
+        $this->assertNotEquals('dev@mathieutu.ovh', $users[1]->email);
 
-        $users = new Collection;
-        $this->assertEquals($users->map->fresh(), $users->fresh());
+        $refreshedUsers = $users->fresh();
+
+        $this->assertCount(2, $refreshedUsers);
+        $this->assertEquals('Mathieu TUDISCO', $refreshedUsers[0]->name);
+        $this->assertEquals('dev@mathieutu.ovh', $refreshedUsers[1]->email);
     }
 
     public function testTimestampsUsingDefaultDateFormat()
@@ -1411,6 +1431,34 @@ class DatabaseEloquentIntegrationTest extends TestCase
         // but Date::hasFormat() can be used instead to check date formatting:
         $this->assertTrue(Date::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
         $this->assertFalse(Date::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
+    }
+
+    public function testSpecialFormats()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('!Y-d-m \\Y');
+        $model->setRawAttributes([
+            'updated_at' => '2017-05-11 Y',
+        ]);
+
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2017-11-05 00:00:00.000000', $date->format('Y-m-d H:i:s.u'), 'the date should respect the whole format');
+
+        $model->setDateFormat('Y d m|');
+        $model->setRawAttributes([
+            'updated_at' => '2020 11 09',
+        ]);
+
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2020-09-11 00:00:00.000000', $date->format('Y-m-d H:i:s.u'), 'the date should respect the whole format');
+
+        $model->setDateFormat('Y d m|*');
+        $model->setRawAttributes([
+            'updated_at' => '2020 11 09 foo',
+        ]);
+
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2020-09-11 00:00:00.000000', $date->format('Y-m-d H:i:s.u'), 'the date should respect the whole format');
     }
 
     public function testUpdatingChildModelTouchesParent()
@@ -1707,6 +1755,53 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse(Model::isIgnoringTouch());
     }
 
+    public function testPivotsCanBeRefreshed()
+    {
+        EloquentTestFriendLevel::create(['id' => 1, 'level' => 'acquaintance']);
+        EloquentTestFriendLevel::create(['id' => 2, 'level' => 'friend']);
+
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user->friends()->create(['id' => 2, 'email' => 'abigailotwell@gmail.com'], ['friend_level_id' => 1]);
+
+        $pivot = $user->friends[0]->pivot;
+
+        // Simulate a change that happened externally
+        DB::table('friends')->where('user_id', 1)->where('friend_id', 2)->update([
+            'friend_level_id' => 2,
+        ]);
+
+        $this->assertInstanceOf(Pivot::class, $freshPivot = $pivot->fresh());
+        $this->assertEquals(2, $freshPivot->friend_level_id);
+
+        $this->assertSame($pivot, $pivot->refresh());
+        $this->assertEquals(2, $pivot->friend_level_id);
+    }
+
+    public function testMorphPivotsCanBeRefreshed()
+    {
+        $post = EloquentTestPost::create(['name' => 'MorphToMany Post', 'user_id' => 1]);
+        $post->tags()->create(['id' => 1, 'name' => 'News']);
+
+        $pivot = $post->tags[0]->pivot;
+
+        // Simulate a change that happened externally
+        DB::table('taggables')
+            ->where([
+                'taggable_type' => EloquentTestPost::class,
+                'taggable_id' => 1,
+                'tag_id' => 1,
+            ])
+            ->update([
+                'taxonomy' => 'primary',
+            ]);
+
+        $this->assertInstanceOf(MorphPivot::class, $freshPivot = $pivot->fresh());
+        $this->assertEquals('primary', $freshPivot->taxonomy);
+
+        $this->assertSame($pivot, $pivot->refresh());
+        $this->assertEquals('primary', $pivot->taxonomy);
+    }
+
     /**
      * Helpers...
      */
@@ -1873,6 +1968,17 @@ class EloquentTestPost extends Eloquent
     {
         return $this->belongsTo(self::class, 'parent_id');
     }
+
+    public function tags()
+    {
+        return $this->morphToMany(EloquentTestTag::class, 'taggable', null, null, 'tag_id')->withPivot('taxonomy');
+    }
+}
+
+class EloquentTestTag extends Eloquent
+{
+    protected $table = 'tags';
+    protected $guarded = [];
 }
 
 class EloquentTestFriendLevel extends Eloquent

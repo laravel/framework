@@ -2,12 +2,13 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Support\Str;
 
-class RedisQueue extends Queue implements QueueContract
+class RedisQueue extends Queue implements QueueContract, ClearableQueue
 {
     /**
      * The Redis factory implementation.
@@ -52,15 +53,22 @@ class RedisQueue extends Queue implements QueueContract
      * @param  string|null  $connection
      * @param  int  $retryAfter
      * @param  int|null  $blockFor
+     * @param  bool  $dispatchAfterCommit
      * @return void
      */
-    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60, $blockFor = null)
+    public function __construct(Redis $redis,
+                                $default = 'default',
+                                $connection = null,
+                                $retryAfter = 60,
+                                $blockFor = null,
+                                $dispatchAfterCommit = false)
     {
         $this->redis = $redis;
         $this->default = $default;
         $this->blockFor = $blockFor;
         $this->connection = $connection;
         $this->retryAfter = $retryAfter;
+        $this->dispatchAfterCommit = $dispatchAfterCommit;
     }
 
     /**
@@ -107,7 +115,15 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        return $this->enqueueUsing(
+            $job,
+            $this->createPayload($job, $this->getQueue($queue), $data),
+            $queue,
+            null,
+            function ($payload, $queue) {
+                return $this->pushRaw($payload, $queue);
+            }
+        );
     }
 
     /**
@@ -139,7 +155,15 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->laterRaw($delay, $this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        return $this->enqueueUsing(
+            $job,
+            $this->createPayload($job, $this->getQueue($queue), $data),
+            $queue,
+            $delay,
+            function ($payload, $queue, $delay) {
+                return $this->laterRaw($delay, $payload, $queue);
+            }
+        );
     }
 
     /**
@@ -283,6 +307,22 @@ class RedisQueue extends Queue implements QueueContract
         $this->getConnection()->eval(
             LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved',
             $job->getReservedJob(), $this->availableAt($delay)
+        );
+    }
+
+    /**
+     * Delete all of the jobs from the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function clear($queue)
+    {
+        $queue = $this->getQueue($queue);
+
+        return $this->getConnection()->eval(
+            LuaScripts::clear(), 4, $queue, $queue.':delayed',
+            $queue.':reserved', $queue.':notify'
         );
     }
 

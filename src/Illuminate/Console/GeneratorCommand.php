@@ -25,7 +25,7 @@ abstract class GeneratorCommand extends Command
     /**
      * Reserved names that cannot be used for generation.
      *
-     * @var array
+     * @var string[]
      */
     protected $reservedNames = [
         '__halt_compiler',
@@ -387,6 +387,19 @@ abstract class GeneratorCommand extends Command
         $name = strtolower($name);
 
         return in_array($name, $this->reservedNames);
+    }
+
+    /**
+     * Get the first view directory path from the application configuration.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    protected function viewPath($path = '')
+    {
+        $views = $this->laravel['config']['view.paths'][0] ?? resource_path('views');
+
+        return $views.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**

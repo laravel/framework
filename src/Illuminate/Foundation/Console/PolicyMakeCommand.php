@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use LogicException;
 use Symfony\Component\Console\Input\InputOption;
 
 class PolicyMakeCommand extends GeneratorCommand
@@ -14,6 +15,15 @@ class PolicyMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $name = 'make:policy';
+
+    /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'make:policy';
 
     /**
      * The console command description.
@@ -78,8 +88,12 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $guard = $this->option('guard') ?: $config->get('auth.defaults.guard');
 
+        if (is_null($guardProvider = $config->get('auth.guards.'.$guard.'.provider'))) {
+            throw new LogicException('The ['.$guard.'] guard is not defined in your "auth" configuration file.');
+        }
+
         return $config->get(
-            'auth.providers.'.$config->get('auth.guards.'.$guard.'.provider').'.model'
+            'auth.providers.'.$guardProvider.'.model'
         );
     }
 

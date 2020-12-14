@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use JsonSerializable;
 use Mockery as m;
@@ -143,7 +144,7 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('Taylor', $data->shift());
         $this->assertSame('Otwell', $data->first());
         $this->assertSame('Otwell', $data->shift());
-        $this->assertEquals(null, $data->first());
+        $this->assertNull($data->first());
     }
 
     /**
@@ -374,7 +375,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testToJsonEncodesTheJsonSerializeResult($collection)
     {
-        $c = $this->getMockBuilder($collection)->setMethods(['jsonSerialize'])->getMock();
+        $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();
         $c->expects($this->once())->method('jsonSerialize')->willReturn('foo');
         $results = $c->toJson();
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
@@ -385,7 +386,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testCastingToStringJsonEncodesTheToArrayResult($collection)
     {
-        $c = $this->getMockBuilder($collection)->setMethods(['jsonSerialize'])->getMock();
+        $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();
         $c->expects($this->once())->method('jsonSerialize')->willReturn('foo');
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
@@ -1647,6 +1648,22 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSplitIn($collection)
+    {
+        $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = $data->splitIn(3);
+
+        $this->assertInstanceOf($collection, $data);
+        $this->assertInstanceOf($collection, $data->first());
+        $this->assertCount(3, $data);
+        $this->assertEquals([1, 2, 3, 4], $data->get(0)->values()->toArray());
+        $this->assertEquals([5, 6, 7, 8], $data->get(1)->values()->toArray());
+        $this->assertEquals([9, 10], $data->get(2)->values()->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testChunkWhileOnEqualElements($collection)
     {
         $data = (new $collection(['A', 'A', 'B', 'B', 'C', 'C', 'C']))
@@ -1782,6 +1799,17 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo,bar', $data->implode('email', ','));
 
         $data = new $collection(['taylor', 'dayle']);
+        $this->assertSame('taylordayle', $data->implode(''));
+        $this->assertSame('taylor,dayle', $data->implode(','));
+
+        $data = new $collection([
+            ['name' => Str::of('taylor'), 'email' => Str::of('foo')],
+            ['name' => Str::of('dayle'), 'email' => Str::of('bar')],
+        ]);
+        $this->assertSame('foobar', $data->implode('email'));
+        $this->assertSame('foo,bar', $data->implode('email', ','));
+
+        $data = new $collection([Str::of('taylor'), Str::of('dayle')]);
         $this->assertSame('taylordayle', $data->implode(''));
         $this->assertSame('taylor,dayle', $data->implode(','));
     }
@@ -2166,6 +2194,16 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testEmptyMethod($collection)
+    {
+        $collection = $collection::empty();
+
+        $this->assertCount(0, $collection->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testTimesMethod($collection)
     {
         $two = $collection::times(2, function ($number) {
@@ -2186,6 +2224,42 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($zero->isEmpty());
         $this->assertTrue($negative->isEmpty());
         $this->assertEquals(range(1, 5), $range->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testRangeMethod($collection)
+    {
+        $this->assertSame(
+            [1, 2, 3, 4, 5],
+            $collection::range(1, 5)->all()
+        );
+
+        $this->assertSame(
+            [-2, -1, 0, 1, 2],
+            $collection::range(-2, 2)->all()
+        );
+
+        $this->assertSame(
+            [-4, -3, -2],
+            $collection::range(-4, -2)->all()
+        );
+
+        $this->assertSame(
+            [5, 4, 3, 2, 1],
+            $collection::range(5, 1)->all()
+        );
+
+        $this->assertSame(
+            [2, 1, 0, -1, -2],
+            $collection::range(2, -2)->all()
+        );
+
+        $this->assertSame(
+            [-2, -3, -4],
+            $collection::range(-2, -4)->all()
+        );
     }
 
     /**
@@ -3544,6 +3618,20 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testPipeInto($collection)
+    {
+        $data = new $collection([
+            'first', 'second',
+        ]);
+
+        $instance = $data->pipeInto(TestCollectionMapIntoObject::class);
+
+        $this->assertSame($data, $instance->value);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testMedianValueWithArrayCollection($collection)
     {
         $data = new $collection([1, 2, 2, 4]);
@@ -3956,27 +4044,27 @@ class SupportCollectionTest extends TestCase
 
         [$tims, $others] = $data->partition('name', 'Tim')->all();
 
-        $this->assertEquals($tims->values()->all(), [
+        $this->assertEquals([
             ['name' => 'Tim', 'age' => 17],
             ['name' => 'Tim', 'age' => 41],
-        ]);
+        ], $tims->values()->all());
 
-        $this->assertEquals($others->values()->all(), [
+        $this->assertEquals([
             ['name' => 'Agatha', 'age' => 62],
             ['name' => 'Kristina', 'age' => 33],
-        ]);
+        ], $others->values()->all());
 
         [$adults, $minors] = $data->partition('age', '>=', 18)->all();
 
-        $this->assertEquals($adults->values()->all(), [
+        $this->assertEquals([
             ['name' => 'Agatha', 'age' => 62],
             ['name' => 'Kristina', 'age' => 33],
             ['name' => 'Tim', 'age' => 41],
-        ]);
+        ], $adults->values()->all());
 
-        $this->assertEquals($minors->values()->all(), [
+        $this->assertEquals([
             ['name' => 'Tim', 'age' => 17],
-        ]);
+        ], $minors->values()->all());
     }
 
     /**

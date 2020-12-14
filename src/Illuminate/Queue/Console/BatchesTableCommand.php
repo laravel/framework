@@ -17,6 +17,15 @@ class BatchesTableCommand extends Command
     protected $name = 'queue:batches-table';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'queue:batches-table';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -57,7 +66,7 @@ class BatchesTableCommand extends Command
      */
     public function handle()
     {
-        $table = $this->laravel['config']['queue.batches.table'] ?? 'job_batches';
+        $table = $this->laravel['config']['queue.batching.table'] ?? 'job_batches';
 
         $this->replaceMigration(
             $this->createBaseMigration($table), $table, Str::studly($table)

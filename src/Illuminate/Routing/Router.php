@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use ReflectionClass;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -115,7 +116,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * All of the verbs supported by the router.
      *
-     * @var array
+     * @var string[]
      */
     public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
@@ -708,7 +709,21 @@ class Router implements BindingRegistrar, RegistrarContract
         $middleware = collect($route->gatherMiddleware())->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->reject(function ($name) use ($excluded) {
-            return in_array($name, $excluded, true);
+            if (empty($excluded)) {
+                return false;
+            } elseif (in_array($name, $excluded, true)) {
+                return true;
+            }
+
+            if (! class_exists($name)) {
+                return false;
+            }
+
+            $reflection = new ReflectionClass($name);
+
+            return collect($excluded)->contains(function ($exclude) use ($reflection) {
+                return class_exists($exclude) && $reflection->isSubclassOf($exclude);
+            });
         })->values();
 
         return $this->sortMiddleware($middleware);
@@ -1049,7 +1064,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Get the currently dispatched route instance.
      *
-     * @return \Illuminate\Routing\Route
+     * @return \Illuminate\Routing\Route|null
      */
     public function getCurrentRoute()
     {
@@ -1230,6 +1245,29 @@ class Router implements BindingRegistrar, RegistrarContract
             ->setContainer($this->container);
 
         $this->container->instance('routes', $this->routes);
+    }
+
+    /**
+     * Remove any duplicate middleware from the given array.
+     *
+     * @param  array  $middleware
+     * @return array
+     */
+    public static function uniqueMiddleware(array $middleware)
+    {
+        $seen = [];
+        $result = [];
+
+        foreach ($middleware as $value) {
+            $key = \is_object($value) ? \spl_object_id($value) : $value;
+
+            if (! isset($seen[$key])) {
+                $seen[$key] = true;
+                $result[] = $value;
+            }
+        }
+
+        return $result;
     }
 
     /**

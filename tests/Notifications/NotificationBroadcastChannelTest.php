@@ -88,6 +88,21 @@ class NotificationBroadcastChannelTest extends TestCase
         $channel = new BroadcastChannel($events);
         $channel->send($notifiable, $notification);
     }
+
+    public function testNotificationIsBroadcastedWithCustomAdditionalPayload()
+    {
+        $notification = new CustomBroadcastWithTestNotification;
+        $notification->id = 1;
+        $notifiable = m::mock();
+
+        $event = new BroadcastNotificationCreated(
+            $notifiable, $notification, $notification->toArray($notifiable)
+        );
+
+        $data = $event->broadcastWith();
+
+        $this->assertArrayHasKey('additional', $data);
+    }
 }
 
 class NotificationBroadcastChannelTestNotification extends Notification
@@ -134,5 +149,18 @@ class TestNotificationBroadCastedNow extends Notification
     public function toBroadcast()
     {
         return (new BroadcastMessage([]))->onConnection('sync');
+    }
+}
+
+class CustomBroadcastWithTestNotification extends Notification
+{
+    public function toArray($notifiable)
+    {
+        return ['invoice_id' => 1];
+    }
+
+    public function broadcastWith()
+    {
+        return ['id' => 1, 'type' => 'custom', 'additional' => 'custom'];
     }
 }

@@ -17,21 +17,21 @@ class PostgresGrammar extends Grammar
     /**
      * The possible column modifiers.
      *
-     * @var array
+     * @var string[]
      */
     protected $modifiers = ['Collate', 'Increment', 'Nullable', 'Default', 'VirtualAs', 'StoredAs'];
 
     /**
      * The columns available as serials.
      *
-     * @var array
+     * @var string[]
      */
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
      * The commands to be executed outside of create or alter command.
      *
-     * @var array
+     * @var string[]
      */
     protected $fluentCommands = ['Comment'];
 
@@ -42,7 +42,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
+        return "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
     }
 
     /**
@@ -52,7 +52,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileColumnListing()
     {
-        return 'select column_name from information_schema.columns where table_schema = ? and table_name = ?';
+        return 'select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?';
     }
 
     /**
@@ -60,15 +60,15 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return array
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('%s table %s (%s)',
+        return array_values(array_filter(array_merge([sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint))
-        );
+        )], $this->compileAutoIncrementStartingValues($blueprint))));
     }
 
     /**
@@ -80,10 +80,23 @@ class PostgresGrammar extends Grammar
      */
     public function compileAdd(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('alter table %s %s',
+        return array_values(array_filter(array_merge([sprintf('alter table %s %s',
             $this->wrapTable($blueprint),
             implode(', ', $this->prefixArray('add column', $this->getColumns($blueprint)))
-        );
+        )], $this->compileAutoIncrementStartingValues($blueprint))));
+    }
+
+    /**
+     * Compile the auto incrementing column starting values.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return array
+     */
+    public function compileAutoIncrementStartingValues(Blueprint $blueprint)
+    {
+        return collect($blueprint->autoIncrementingStartingValues())->map(function ($value, $column) use ($blueprint) {
+            return 'alter sequence '.$blueprint->getTable().'_'.$column.'_seq restart with '.$value;
+        })->all();
     }
 
     /**
@@ -233,12 +246,12 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to retrieve all table names.
      *
-     * @param  string|array  $schema
+     * @param  string|array  $searchPath
      * @return string
      */
-    public function compileGetAllTables($schema)
+    public function compileGetAllTables($searchPath)
     {
-        return "select tablename from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $schema)."')";
+        return "select tablename from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
     }
 
     /**
@@ -247,9 +260,9 @@ class PostgresGrammar extends Grammar
      * @param  string|array  $schema
      * @return string
      */
-    public function compileGetAllViews($schema)
+    public function compileGetAllViews($searchPath)
     {
-        return "select viewname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $schema)."')";
+        return "select viewname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
     }
 
     /**

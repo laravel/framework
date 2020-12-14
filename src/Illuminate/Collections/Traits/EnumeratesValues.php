@@ -35,7 +35,11 @@ use Traversable;
  * @property-read HigherOrderCollectionProxy $some
  * @property-read HigherOrderCollectionProxy $sortBy
  * @property-read HigherOrderCollectionProxy $sortByDesc
+ * @property-read HigherOrderCollectionProxy $skipUntil
+ * @property-read HigherOrderCollectionProxy $skipWhile
  * @property-read HigherOrderCollectionProxy $sum
+ * @property-read HigherOrderCollectionProxy $takeUntil
+ * @property-read HigherOrderCollectionProxy $takeWhile
  * @property-read HigherOrderCollectionProxy $unique
  * @property-read HigherOrderCollectionProxy $until
  */
@@ -44,7 +48,7 @@ trait EnumeratesValues
     /**
      * The methods that can be proxied.
      *
-     * @var array
+     * @var string[]
      */
     protected static $proxies = [
         'average',
@@ -110,6 +114,34 @@ trait EnumeratesValues
     }
 
     /**
+     * Create a new instance with no items.
+     *
+     * @return static
+     */
+    public static function empty()
+    {
+        return new static([]);
+    }
+
+    /**
+     * Create a new collection by invoking the callback a given amount of times.
+     *
+     * @param  int  $number
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public static function times($number, callable $callback = null)
+    {
+        if ($number < 1) {
+            return new static;
+        }
+
+        return static::range(1, $number)
+            ->when($callback)
+            ->map($callback);
+    }
+
+    /**
      * Alias for the "avg" method.
      *
      * @param  callable|string|null  $callback
@@ -169,7 +201,7 @@ trait EnumeratesValues
      */
     public function dd(...$args)
     {
-        call_user_func_array([$this, 'dump'], $args);
+        $this->dump(...$args);
 
         exit(1);
     }
@@ -661,6 +693,17 @@ trait EnumeratesValues
     }
 
     /**
+     * Pass the collection into a new class.
+     *
+     * @param  string  $class
+     * @return mixed
+     */
+    public function pipeInto($class)
+    {
+        return new $class($this);
+    }
+
+    /**
      * Pass the collection to the given callback and then return it.
      *
      * @param  callable  $callback
@@ -721,21 +764,6 @@ trait EnumeratesValues
     public function uniqueStrict($key = null)
     {
         return $this->unique($key, true);
-    }
-
-    /**
-     * Take items in the collection until the given condition is met.
-     *
-     * This is an alias to the "takeUntil" method.
-     *
-     * @param  mixed  $value
-     * @return static
-     *
-     * @deprecated Use the "takeUntil" method directly.
-     */
-    public function until($value)
-    {
-        return $this->takeUntil($value);
     }
 
     /**

@@ -42,7 +42,7 @@ trait ManagesComponents
     /**
      * Start a component rendering process.
      *
-     * @param  \Illuminate\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
+     * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
      * @param  array  $data
      * @return void
      */
@@ -114,7 +114,7 @@ trait ManagesComponents
             $this->componentData[count($this->componentStack)],
             ['slot' => $defaultSlot],
             $this->slots[count($this->componentStack)],
-            ['__laravel_slots' => $slots],
+            ['__laravel_slots' => $slots]
         );
     }
 

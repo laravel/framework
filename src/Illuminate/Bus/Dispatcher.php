@@ -146,7 +146,7 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Create a new batch of queueable jobs.
      *
-     * @param  \Illuminate\Support\Collection|array  $jobs
+     * @param  \Illuminate\Support\Collection|array|mixed  $jobs
      * @return \Illuminate\Bus\PendingBatch
      */
     public function batch($jobs)

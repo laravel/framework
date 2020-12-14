@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
 {
-    use Macroable, RouteDependencyResolverTrait;
+    use CreatesRegularExpressionRouteConstraints, Macroable, RouteDependencyResolverTrait;
 
     /**
      * The URI pattern the route responds to.
@@ -238,8 +238,7 @@ class Route
      */
     protected function isSerializedClosure()
     {
-        return is_string($this->action['uses']) &&
-               Str::startsWith($this->action['uses'], 'C:32:"Opis\\Closure\\SerializableClosure') !== false;
+        return RouteAction::containsSerializedClosure($this->action);
     }
 
     /**
@@ -303,7 +302,7 @@ class Route
     {
         $this->compileRoute();
 
-        foreach ($this->getValidators() as $validator) {
+        foreach (self::getValidators() as $validator) {
             if (! $includingMethod && $validator instanceof MethodValidator) {
                 continue;
             }
@@ -852,11 +851,15 @@ class Route
     /**
      * Set the handler for the route.
      *
-     * @param  \Closure|string  $action
+     * @param  \Closure|array|string  $action
      * @return $this
      */
     public function uses($action)
     {
+        if (is_array($action)) {
+            $action = $action[0].'@'.$action[1];
+        }
+
         $action = is_string($action) ? $this->addGroupNamespaceToStringUses($action) : $action;
 
         return $this->setAction(array_merge($this->action, $this->parseAction([
@@ -943,9 +946,9 @@ class Route
 
         $this->computedMiddleware = [];
 
-        return $this->computedMiddleware = array_unique(array_merge(
+        return $this->computedMiddleware = Router::uniqueMiddleware(array_merge(
             $this->middleware(), $this->controllerMiddleware()
-        ), SORT_REGULAR);
+        ));
     }
 
     /**
@@ -1100,7 +1103,7 @@ class Route
     {
         return new SymfonyRoute(
             preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri()), $this->getOptionalParameterNames(),
-            $this->wheres, ['utf8' => true, 'action' => $this->action],
+            $this->wheres, ['utf8' => true],
             $this->getDomain() ?: '', [], $this->methods
         );
     }

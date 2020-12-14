@@ -409,7 +409,7 @@ class Arr
      * Pluck an array of values from an array.
      *
      * @param  iterable  $array
-     * @param  string|array  $value
+     * @param  string|array|int|null  $value
      * @param  string|array|null  $key
      * @return array
      */
@@ -604,7 +604,7 @@ class Arr
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
-     * @param  callable|string|null  $callback
+     * @param  callable|array|string|null  $callback
      * @return array
      */
     public static function sort($array, $callback = null)

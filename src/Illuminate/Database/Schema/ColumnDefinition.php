@@ -25,6 +25,7 @@ use Illuminate\Support\Fluent;
  * @method $this unique(string $indexName = null) Add a unique index
  * @method $this unsigned() Set the INTEGER column as UNSIGNED (MySQL)
  * @method $this useCurrent() Set the TIMESTAMP column to use CURRENT_TIMESTAMP as default value
+ * @method $this useCurrentOnUpdate() Set the TIMESTAMP column to use CURRENT_TIMESTAMP when updating (MySQL)
  * @method $this virtualAs(string $expression) Create a virtual generated column (MySQL/SQLite)
  */
 class ColumnDefinition extends Fluent

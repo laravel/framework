@@ -12,14 +12,14 @@ class AuthenticationTestUser extends Authenticatable
     /**
      * The attributes that aren't mass assignable.
      *
-     * @var array
+     * @var string[]
      */
     protected $guarded = [];
 
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var string[]
      */
     protected $hidden = [
         'password', 'remember_token',

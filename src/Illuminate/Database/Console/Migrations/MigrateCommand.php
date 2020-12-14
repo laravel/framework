@@ -6,7 +6,6 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
 
 class MigrateCommand extends BaseCommand
@@ -127,8 +126,7 @@ class MigrateCommand extends BaseCommand
         // First, we will make sure that the connection supports schema loading and that
         // the schema file exists before we proceed any further. If not, we will just
         // continue with the standard migration operation as normal without errors.
-        if ($connection instanceof SQLiteConnection ||
-            $connection instanceof SqlServerConnection ||
+        if ($connection instanceof SqlServerConnection ||
             ! is_file($path = $this->schemaPath($connection))) {
             return;
         }
@@ -166,6 +164,14 @@ class MigrateCommand extends BaseCommand
      */
     protected function schemaPath($connection)
     {
-        return $this->option('schema-path') ?: database_path('schema/'.$connection->getName().'-schema.sql');
+        if ($this->option('schema-path')) {
+            return $this->option('schema-path');
+        }
+
+        if (file_exists($path = database_path('schema/'.$connection->getName().'-schema.dump'))) {
+            return $path;
+        }
+
+        return database_path('schema/'.$connection->getName().'-schema.sql');
     }
 }

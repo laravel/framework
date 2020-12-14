@@ -64,12 +64,14 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Load a set of relationship counts onto the collection.
+     * Load a set of aggregations over relationship's column onto the collection.
      *
      * @param  array|string  $relations
+     * @param  string  $column
+     * @param  string  $function
      * @return $this
      */
-    public function loadCount($relations)
+    public function loadAggregate($relations, $column, $function = null)
     {
         if ($this->isEmpty()) {
             return $this;
@@ -78,23 +80,81 @@ class Collection extends BaseCollection implements QueueableCollection
         $models = $this->first()->newModelQuery()
             ->whereKey($this->modelKeys())
             ->select($this->first()->getKeyName())
-            ->withCount(...func_get_args())
-            ->get();
+            ->withAggregate($relations, $column, $function)
+            ->get()
+            ->keyBy($this->first()->getKeyName());
 
         $attributes = Arr::except(
             array_keys($models->first()->getAttributes()),
             $models->first()->getKeyName()
         );
 
-        $models->each(function ($model) use ($attributes) {
-            $this->where($this->first()->getKeyName(), $model->getKey())
-                ->each
-                ->forceFill(Arr::only($model->getAttributes(), $attributes))
-                ->each
-                ->syncOriginalAttributes($attributes);
+        $this->each(function ($model) use ($models, $attributes) {
+            $extraAttributes = Arr::only($models->get($model->getKey())->getAttributes(), $attributes);
+
+            $model->forceFill($extraAttributes)->syncOriginalAttributes($attributes);
         });
 
         return $this;
+    }
+
+    /**
+     * Load a set of relationship counts onto the collection.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadCount($relations)
+    {
+        return $this->loadAggregate($relations, '*', 'count');
+    }
+
+    /**
+     * Load a set of relationship's max column values onto the collection.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMax($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'max');
+    }
+
+    /**
+     * Load a set of relationship's min column values onto the collection.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadMin($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'min');
+    }
+
+    /**
+     * Load a set of relationship's column summations onto the collection.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadSum($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'sum');
+    }
+
+    /**
+     * Load a set of relationship's average column values onto the collection.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadAvg($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'avg');
     }
 
     /**
@@ -282,6 +342,23 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key / value pair.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function mapWithKeys(callable $callback)
+    {
+        $result = parent::mapWithKeys($callback);
+
+        return $result->contains(function ($item) {
+            return ! $item instanceof Model;
+        }) ? $result->toBase() : $result;
+    }
+
+    /**
      * Reload a fresh model instance from the database for all the entities.
      *
      * @param  array|string  $with
@@ -301,9 +378,11 @@ class Collection extends BaseCollection implements QueueableCollection
             ->get()
             ->getDictionary();
 
-        return $this->map(function ($model) use ($freshModels) {
-            return $model->exists && isset($freshModels[$model->getKey()])
-                    ? $freshModels[$model->getKey()] : null;
+        return $this->filter(function ($model) use ($freshModels) {
+            return $model->exists && isset($freshModels[$model->getKey()]);
+        })
+        ->map(function ($model) use ($freshModels) {
+            return $freshModels[$model->getKey()];
         });
     }
 
@@ -358,7 +437,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  string|callable|null  $key
      * @param  bool  $strict
-     * @return static|\Illuminate\Support\Collection
+     * @return static
      */
     public function unique($key = null, $strict = false)
     {
@@ -485,7 +564,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function zip($items)
     {
-        return call_user_func_array([$this->toBase(), 'zip'], func_get_args());
+        return $this->toBase()->zip(...func_get_args());
     }
 
     /**

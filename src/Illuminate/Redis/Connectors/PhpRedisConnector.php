@@ -102,6 +102,10 @@ class PhpRedisConnector implements Connector
             if (! empty($config['scan'])) {
                 $client->setOption(Redis::OPT_SCAN, $config['scan']);
             }
+
+            if (! empty($config['name'])) {
+                $client->client('SETNAME', $config['name']);
+            }
         });
     }
 
@@ -129,7 +133,9 @@ class PhpRedisConnector implements Connector
         }
 
         if (version_compare(phpversion('redis'), '5.3.0', '>=')) {
-            $parameters[] = Arr::get($config, 'context', []);
+            if (! is_null($context = Arr::get($config, 'context'))) {
+                $parameters[] = $context;
+            }
         }
 
         $client->{($persistent ? 'pconnect' : 'connect')}(...$parameters);
@@ -157,7 +163,9 @@ class PhpRedisConnector implements Connector
         }
 
         if (version_compare(phpversion('redis'), '5.3.2', '>=')) {
-            $parameters[] = Arr::get($options, 'context', []);
+            if (! is_null($context = Arr::get($options, 'context'))) {
+                $parameters[] = $context;
+            }
         }
 
         return tap(new RedisCluster(...$parameters), function ($client) use ($options) {
@@ -171,6 +179,10 @@ class PhpRedisConnector implements Connector
 
             if (! empty($options['failover'])) {
                 $client->setOption(RedisCluster::OPT_SLAVE_FAILOVER, $options['failover']);
+            }
+
+            if (! empty($options['name'])) {
+                $client->client('SETNAME', $options['name']);
             }
         });
     }

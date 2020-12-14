@@ -9,6 +9,39 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
+/**
+ * @method \Illuminate\Http\Client\PendingRequest accept(string $contentType)
+ * @method \Illuminate\Http\Client\PendingRequest acceptJson()
+ * @method \Illuminate\Http\Client\PendingRequest asForm()
+ * @method \Illuminate\Http\Client\PendingRequest asJson()
+ * @method \Illuminate\Http\Client\PendingRequest asMultipart()
+ * @method \Illuminate\Http\Client\PendingRequest attach(string $name, string $contents, string|null $filename = null, array $headers = [])
+ * @method \Illuminate\Http\Client\PendingRequest baseUrl(string $url)
+ * @method \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
+ * @method \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)
+ * @method \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
+ * @method \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0)
+ * @method \Illuminate\Http\Client\PendingRequest stub(callable $callback)
+ * @method \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
+ * @method \Illuminate\Http\Client\PendingRequest withBasicAuth(string $username, string $password)
+ * @method \Illuminate\Http\Client\PendingRequest withBody(resource|string $content, string $contentType)
+ * @method \Illuminate\Http\Client\PendingRequest withCookies(array $cookies, string $domain)
+ * @method \Illuminate\Http\Client\PendingRequest withDigestAuth(string $username, string $password)
+ * @method \Illuminate\Http\Client\PendingRequest withHeaders(array $headers)
+ * @method \Illuminate\Http\Client\PendingRequest withOptions(array $options)
+ * @method \Illuminate\Http\Client\PendingRequest withToken(string $token, string $type = 'Bearer')
+ * @method \Illuminate\Http\Client\PendingRequest withoutRedirecting()
+ * @method \Illuminate\Http\Client\PendingRequest withoutVerifying()
+ * @method \Illuminate\Http\Client\Response delete(string $url, array $data = [])
+ * @method \Illuminate\Http\Client\Response get(string $url, array $query = [])
+ * @method \Illuminate\Http\Client\Response head(string $url, array $query = [])
+ * @method \Illuminate\Http\Client\Response patch(string $url, array $data = [])
+ * @method \Illuminate\Http\Client\Response post(string $url, array $data = [])
+ * @method \Illuminate\Http\Client\Response put(string $url, array $data = [])
+ * @method \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
+ *
+ * @see \Illuminate\Http\Client\PendingRequest
+ */
 class Factory
 {
     use Macroable {
@@ -192,6 +225,28 @@ class Factory
     }
 
     /**
+     * Assert that the given request were sent in the given order.
+     *
+     * @param  array  $callbacks
+     * @return void
+     */
+    public function assertSentInOrder($callbacks)
+    {
+        $this->assertSentCount(count($callbacks));
+
+        foreach ($callbacks as $index => $url) {
+            $callback = is_callable($url) ? $url : function ($request) use ($url) {
+                return $request->url() == $url;
+            };
+
+            PHPUnit::assertTrue($callback(
+                $this->recorded[$index][0],
+                $this->recorded[$index][1]
+            ), 'An expected request (#'.($index + 1).') was not recorded.');
+        }
+    }
+
+    /**
      * Assert that a request / response pair was not recorded matching a given truth test.
      *
      * @param  callable  $callback
@@ -266,6 +321,16 @@ class Factory
     }
 
     /**
+     * Create a new pending request instance for this factory.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
+    protected function newPendingRequest()
+    {
+        return new PendingRequest($this);
+    }
+
+    /**
      * Execute a method against a new pending request instance.
      *
      * @param  string  $method
@@ -278,7 +343,7 @@ class Factory
             return $this->macroCall($method, $parameters);
         }
 
-        return tap(new PendingRequest($this), function ($request) {
+        return tap($this->newPendingRequest(), function ($request) {
             $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
     }

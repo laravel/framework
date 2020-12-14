@@ -419,6 +419,26 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param  string  $driver
      */
+    public function testClear($driver)
+    {
+        $this->setQueue($driver);
+
+        $job1 = new RedisQueueIntegrationTestJob(30);
+        $job2 = new RedisQueueIntegrationTestJob(40);
+
+        $this->queue->push($job1);
+        $this->queue->push($job2);
+
+        $this->assertEquals(2, $this->queue->clear(null));
+        $this->assertEquals(0, $this->queue->size());
+        $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default:notify'));
+    }
+
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param  string  $driver
+     */
     public function testSize($driver)
     {
         $this->setQueue($driver);

@@ -20,6 +20,15 @@ class RouteListCommand extends Command
     protected $name = 'route:list';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'route:list';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -36,14 +45,14 @@ class RouteListCommand extends Command
     /**
      * The table headers for the command.
      *
-     * @var array
+     * @var string[]
      */
     protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
 
     /**
      * The columns to display when using the "compact" flag.
      *
-     * @var array
+     * @var string[]
      */
     protected $compactColumns = ['method', 'uri', 'action'];
 

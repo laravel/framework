@@ -14,14 +14,14 @@ class BladeTest extends TestCase
     {
         $view = View::make('hello', ['name' => 'Taylor'])->render();
 
-        $this->assertEquals('Hello Taylor', trim($view));
+        $this->assertSame('Hello Taylor', trim($view));
     }
 
     public function test_rendering_a_component()
     {
         $view = View::make('uses-panel', ['name' => 'Taylor'])->render();
 
-        $this->assertEquals('<div class="ml-2">
+        $this->assertSame('<div class="ml-2">
     Hello Taylor
 </div>', trim($view));
     }
@@ -30,7 +30,35 @@ class BladeTest extends TestCase
     {
         $view = View::make('uses-panel-dynamically', ['name' => 'Taylor'])->render();
 
-        $this->assertEquals('<div class="ml-2">
+        $this->assertSame('<div class="ml-2" wire:model="foo" wire:model.lazy="bar">
+    Hello Taylor
+</div>', trim($view));
+    }
+
+    public function test_rendering_the_same_dynamic_component_with_different_attributes()
+    {
+        $view = View::make('varied-dynamic-calls')->render();
+
+        $this->assertSame('<span class="text-medium">
+    Hello Taylor
+</span>
+  
+ <span >
+    Hello Samuel
+</span>', trim($view));
+    }
+
+    public function test_appendable_attributes()
+    {
+        $view = View::make('uses-appendable-panel', ['name' => 'Taylor', 'withInjectedValue' => true])->render();
+
+        $this->assertSame('<div class="mt-4 bg-gray-100" data-controller="inside-controller outside-controller" foo="bar">
+    Hello Taylor
+</div>', trim($view));
+
+        $view = View::make('uses-appendable-panel', ['name' => 'Taylor', 'withInjectedValue' => false])->render();
+
+        $this->assertSame('<div class="mt-4 bg-gray-100" data-controller="inside-controller" foo="bar">
     Hello Taylor
 </div>', trim($view));
     }

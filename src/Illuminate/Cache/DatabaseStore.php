@@ -155,8 +155,6 @@ class DatabaseStore implements LockProvider, Store
                     'expiration' => $expiration,
                 ]) >= 1;
         }
-
-        return false;
     }
 
     /**

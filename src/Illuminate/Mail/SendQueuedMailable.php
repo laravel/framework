@@ -2,11 +2,14 @@
 
 namespace Illuminate\Mail;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
 class SendQueuedMailable
 {
+    use Queueable;
+
     /**
      * The mailable message instance.
      *
@@ -39,6 +42,7 @@ class SendQueuedMailable
         $this->mailable = $mailable;
         $this->tries = property_exists($mailable, 'tries') ? $mailable->tries : null;
         $this->timeout = property_exists($mailable, 'timeout') ? $mailable->timeout : null;
+        $this->afterCommit = property_exists($mailable, 'afterCommit') ? $mailable->afterCommit : null;
     }
 
     /**

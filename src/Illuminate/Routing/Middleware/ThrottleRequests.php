@@ -85,7 +85,7 @@ class ThrottleRequests
         $limiterResponse = call_user_func($limiter, $request);
 
         if ($limiterResponse instanceof Response) {
-            return $limit;
+            return $limiterResponse;
         } elseif ($limiterResponse instanceof Unlimited) {
             return $next($request);
         }
@@ -235,7 +235,7 @@ class ThrottleRequests
      * @param  int  $maxAttempts
      * @param  int  $remainingAttempts
      * @param  int|null  $retryAfter
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
+     * @param  \Symfony\Component\HttpFoundation\Response|null  $response
      * @return array
      */
     protected function getHeaders($maxAttempts,

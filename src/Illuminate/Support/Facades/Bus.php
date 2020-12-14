@@ -8,7 +8,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
 
 /**
  * @method static \Illuminate\Bus\Batch|null findBatch(string $batchId)
- * @method static \Illuminate\Bus\PendingBatch batch(array $jobs)
+ * @method static \Illuminate\Bus\PendingBatch batch(array|mixed $jobs)
  * @method static \Illuminate\Contracts\Bus\Dispatcher map(array $map)
  * @method static \Illuminate\Contracts\Bus\Dispatcher pipeThrough(array $pipes)
  * @method static \Illuminate\Foundation\Bus\PendingChain chain(array $jobs)
@@ -18,7 +18,11 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static mixed dispatchNow($command, $handler = null)
  * @method static void assertDispatched(string $command, callable|int $callback = null)
  * @method static void assertDispatchedTimes(string $command, int $times = 1)
- * @method static void assertNotDispatched(string $command, callable|int $callback = null)
+ * @method static void assertNotDispatched(string $command, callable $callback = null)
+ * @method static void assertDispatchedAfterResponse(string $command, callable|int $callback = null)
+ * @method static void assertDispatchedAfterResponseTimes(string $command, int $times = 1)
+ * @method static void assertNotDispatchedAfterResponse(string $command, callable $callback = null)
+ * @method static void assertBatched(callable $callback)
  *
  * @see \Illuminate\Contracts\Bus\Dispatcher
  */

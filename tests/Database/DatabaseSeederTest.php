@@ -87,7 +87,7 @@ class DatabaseSeederTest extends TestCase
         $seeder = new TestDepsSeeder;
         $seeder->setContainer($container);
 
-        $seeder->__invoke('test1', 'test2');
+        $seeder->__invoke(['test1', 'test2']);
 
         $container->shouldHaveReceived('call')->once()->with([$seeder, 'run'], ['test1', 'test2']);
     }

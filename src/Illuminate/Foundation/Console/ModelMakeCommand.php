@@ -16,6 +16,15 @@ class ModelMakeCommand extends GeneratorCommand
     protected $name = 'make:model';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'make:model';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -72,7 +81,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createFactory()
     {
-        $factory = Str::studly(class_basename($this->argument('name')));
+        $factory = Str::studly($this->argument('name'));
 
         $this->call('make:factory', [
             'name' => "{$factory}Factory",
@@ -108,7 +117,7 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $seeder = Str::studly(class_basename($this->argument('name')));
 
-        $this->call('make:seed', [
+        $this->call('make:seeder', [
             'name' => "{$seeder}Seeder",
         ]);
     }

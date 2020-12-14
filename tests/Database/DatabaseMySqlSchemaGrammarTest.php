@@ -47,6 +47,25 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
     }
 
+    public function testAutoIncrementStartingValue()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->increments('id')->startingValue(1000);
+        $blueprint->string('email');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
+        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
+        $this->assertSame('alter table `users` auto_increment = 1000', $statements[1]);
+    }
+
     public function testEngineCreateTable()
     {
         $blueprint = new Blueprint('users');
@@ -593,6 +612,17 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` int not null auto_increment primary key', $statements[0]);
     }
 
+    public function testAddingIncrementsWithStartingValues()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->id()->startingValue(1000);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
+        $this->assertSame('alter table `users` auto_increment = 1000', $statements[1]);
+    }
+
     public function testAddingMediumInteger()
     {
         $blueprint = new Blueprint('users');
@@ -855,6 +885,24 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP(1) not null', $statements[0]);
     }
 
+    public function testAddingTimestampWithOnUpdateCurrentSpecifyingPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('created_at', 1)->useCurrentOnUpdate();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) on update CURRENT_TIMESTAMP(1) not null', $statements[0]);
+    }
+
+    public function testAddingTimestampWithDefaultCurrentAndOnUpdateCurrentSpecifyingPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('created_at', 1)->useCurrent()->useCurrentOnUpdate();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP(1) on update CURRENT_TIMESTAMP(1) not null', $statements[0]);
+    }
+
     public function testAddingTimestampTz()
     {
         $blueprint = new Blueprint('users');
@@ -961,6 +1009,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` varchar(45) not null', $statements[0]);
     }
 
+    public function testAddingIpAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `ip_address` varchar(45) not null', $statements[0]);
+    }
+
     public function testAddingMacAddress()
     {
         $blueprint = new Blueprint('users');
@@ -969,6 +1027,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `foo` varchar(17) not null', $statements[0]);
+    }
+
+    public function testAddingMacAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `mac_address` varchar(17) not null', $statements[0]);
     }
 
     public function testAddingGeometry()
