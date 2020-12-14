@@ -15,6 +15,7 @@ use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use LogicException;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -289,7 +290,7 @@ class TestResponse implements ArrayAccess
     public function assertCookie($cookieName, $value = null, $encrypted = true, $unserialize = false)
     {
         PHPUnit::assertNotNull(
-            $cookie = $this->getCookie($cookieName),
+            $cookie = $this->getCookie($cookieName, $encrypted, $unserialize),
             "Cookie [{$cookieName}] not present on response."
         );
 
@@ -299,13 +300,9 @@ class TestResponse implements ArrayAccess
 
         $cookieValue = $cookie->getValue();
 
-        $actual = $encrypted
-            ? CookieValuePrefix::remove(app('encrypter')->decrypt($cookieValue, $unserialize))
-            : $cookieValue;
-
         PHPUnit::assertEquals(
-            $value, $actual,
-            "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
+            $value, $cookieValue,
+            "Cookie [{$cookieName}] was found, but value [{$cookieValue}] does not match [{$value}]."
         );
 
         return $this;
@@ -377,12 +374,23 @@ class TestResponse implements ArrayAccess
      * Get the given cookie from the response.
      *
      * @param  string  $cookieName
+     * @param  bool  $decrypt
+     * @param  bool  $unserialize
      * @return \Symfony\Component\HttpFoundation\Cookie|null
      */
-    protected function getCookie($cookieName)
+    public function getCookie($cookieName, $decrypt = false, $unserialize = false)
     {
         foreach ($this->headers->getCookies() as $cookie) {
             if ($cookie->getName() === $cookieName) {
+                if ($decrypt) {
+                    $decryptedValue = CookieValuePrefix::remove(app('encrypter')->decrypt($cookie->getValue(), $unserialize));
+                    $cookie = new Cookie(
+                        $cookie->getName(), $decryptedValue, $cookie->getExpiresTime(), $cookie->getPath(),
+                        $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly(),
+                        $cookie->isRaw(), $cookie->getSameSite()
+                    );
+                }
+
                 return $cookie;
             }
         }
