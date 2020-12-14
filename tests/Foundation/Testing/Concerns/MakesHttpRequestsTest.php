@@ -135,7 +135,7 @@ class MakesHttpRequestsTest extends TestCase
                 ->withCookie('encrypted-cookie', 'encrypted-value');
         })->middleware(MyEncryptCookiesMiddleware::class);
 
-        $router->get('unset-cookies', function() {
+        $router->get('forget-cookies', function() {
             return (new Response('OK'))
                 ->withCookie('unencrypted-cookie', '', -2628000)
                 ->withCookie('expiring-cookie', '', -2628000)
@@ -146,22 +146,25 @@ class MakesHttpRequestsTest extends TestCase
 
         $this->usingCookiesFromLastResponse();
 
+        // Ensure that cookies set in the response to get('set-cookies')
+        // are prepared for the next request
         $cookies = $this->prepareCookiesForRequest();
-
         $this->assertEquals('encrypted-value', CookieValuePrefix::remove($encrypter->decrypt($cookies['encrypted-cookie'], false)));
         $this->assertEquals('unencrypted-value', $cookies['unencrypted-cookie']);
         $this->assertEquals('expiring-value', $cookies['expiring-cookie']);
 
+        // Time-travel past the expiration of the "expiring-cookie"
+        // and ensure it won't be used for the next request
         Date::setTestNow($now->copy()->addMinutes(11));
         $cookies = $this->prepareCookiesForRequest();
-
         $this->assertArrayHasKey('encrypted-cookie', $cookies);
         $this->assertArrayHasKey('unencrypted-cookie', $cookies);
         $this->assertArrayNotHasKey('expiring-cookie', $cookies);
 
-        $this->usingCookiesFromLastResponse()->get('unset-cookies');
+        // Ensure that cookies that are "forgotten" (i.e. set to expire one
+        // month in the past) are not used in the next request
+        $this->usingCookiesFromLastResponse()->get('forget-cookies');
         $cookies = $this->prepareCookiesForRequest();
-
         $this->assertArrayNotHasKey('encrypted-cookie', $cookies);
         $this->assertArrayNotHasKey('unencrypted-cookie', $cookies);
         $this->assertArrayNotHasKey('expiring-cookie', $cookies);
