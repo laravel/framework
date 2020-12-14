@@ -84,6 +84,10 @@ class ValidationException extends Exception
      */
     public function errors()
     {
+        if ($this->errorBag) {
+            return [$this->errorBag => $this->validator->errors()->messages()];
+        }
+        
         return $this->validator->errors()->messages();
     }
 
