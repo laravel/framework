@@ -166,7 +166,6 @@ class MyMiddleware
     public function handle($request, $next)
     {
         return $next($request.'WithMiddleware');
-
     }
 }
 
