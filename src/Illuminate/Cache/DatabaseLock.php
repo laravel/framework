@@ -128,6 +128,16 @@ class DatabaseLock extends Lock
     }
 
     /**
+     * Get the name of the database connection.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connection->getName();
+    }
+
+    /**
      * Returns the owner value written into the driver for this lock.
      *
      * @return string

@@ -62,6 +62,16 @@ class RedisLock extends Lock
     }
 
     /**
+     * Get the name of the Redis connection.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->redis->getName();
+    }
+
+    /**
      * Returns the owner value written into the driver for this lock.
      *
      * @return string

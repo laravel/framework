@@ -29,6 +29,13 @@ class RedisStore extends TaggableStore implements LockProvider
     protected $connection;
 
     /**
+     * The name of the connection that should be used for locks.
+     *
+     * @var string
+     */
+    protected $lockConnection;
+
+    /**
      * Create a new Redis store.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
@@ -181,7 +188,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return new RedisLock($this->connection(), $this->prefix.$name, $seconds, $owner);
+        return new RedisLock($this->lockConnection(), $this->prefix.$name, $seconds, $owner);
     }
 
     /**
@@ -243,6 +250,16 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Get the Redis connection instance for the lock.
+     *
+     * @return \Illuminate\Redis\Connections\Connection
+     */
+    public function lockConnection()
+    {
+        return $this->redis->connection($this->lockConnection ?? $this->connection);
+    }
+
+    /**
      * Set the connection name to be used.
      *
      * @param  string  $connection
@@ -251,6 +268,17 @@ class RedisStore extends TaggableStore implements LockProvider
     public function setConnection($connection)
     {
         $this->connection = $connection;
+    }
+
+    /**
+     * Set the lock connection name to be used.
+     *
+     * @param  string  $connection
+     * @return void
+     */
+    public function setLockConnection($connection)
+    {
+        $this->lockConnection = $connection;
     }
 
     /**

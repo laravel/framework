@@ -24,6 +24,13 @@ class DatabaseStore implements LockProvider, Store
     protected $connection;
 
     /**
+     * The database connection instance for the lock.
+     *
+     * @var \Illuminate\Database\ConnectionInterface
+     */
+    protected $lockConnection;
+
+    /**
      * The name of the cache table.
      *
      * @var string
@@ -265,7 +272,7 @@ class DatabaseStore implements LockProvider, Store
     public function lock($name, $seconds = 0, $owner = null)
     {
         return new DatabaseLock(
-            $this->connection,
+            $this->lockConnection ?? $this->connection,
             $this->lockTable,
             $this->prefix.$name,
             $seconds,
@@ -329,6 +336,17 @@ class DatabaseStore implements LockProvider, Store
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Set the lock connection to be used.
+     *
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @return void
+     */
+    public function setLockConnection($connection)
+    {
+        $this->lockConnection = $connection;
     }
 
     /**
