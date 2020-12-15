@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Http\RedirectResponse;
 use Orchestra\Testbench\TestCase;
 
 class MakesHttpRequestsTest extends TestCase
@@ -114,6 +117,48 @@ class MakesHttpRequestsTest extends TestCase
         $this->defaultCookies = ['foo' => 'bar'];
         $this->assertSame(['foo' => 'bar'], $this->prepareCookiesForJsonRequest());
     }
+
+    public function testFollowingRedirects()
+    {
+        $router = $this->app->make(Registrar::class);
+        $url = $this->app->make(UrlGenerator::class);
+
+        $router->get('from', function () use ($url) {
+            return new RedirectResponse($url->to('to'));
+        });
+
+        $router->get('to', function () {
+            return 'OK';
+        });
+
+        $this->followingRedirects()
+            ->get('from')
+            ->assertOk()
+            ->assertSee('OK');
+    }
+
+    public function testFollowingRedirectsTerminatesInExpectedOrder()
+    {
+        $router = $this->app->make(Registrar::class);
+        $url = $this->app->make(UrlGenerator::class);
+
+        $callOrder = [];
+        TerminatingMiddleware::$callback = function ($request) use (&$callOrder) {
+            $callOrder[] = $request->path();
+        };
+
+        $router->get('from', function () use ($url) {
+            return new RedirectResponse($url->to('to'));
+        })->middleware(TerminatingMiddleware::class);
+
+        $router->get('to', function () {
+            return 'OK';
+        })->middleware(TerminatingMiddleware::class);
+
+        $this->followingRedirects()->get('from');
+
+        $this->assertEquals(['from', 'to'], $callOrder);
+    }
 }
 
 class MyMiddleware
@@ -121,5 +166,20 @@ class MyMiddleware
     public function handle($request, $next)
     {
         return $next($request.'WithMiddleware');
+    }
+}
+
+class TerminatingMiddleware
+{
+    public static $callback;
+
+    public function handle($request, $next)
+    {
+        return $next($request);
+    }
+
+    public function terminate($request, $response)
+    {
+        call_user_func(static::$callback, $request, $response);
     }
 }
