@@ -177,14 +177,14 @@ class MakesHttpRequestsTest extends TestCase
         // for our tests, and one that unsets them
         $router = $this->app->make(Registrar::class);
 
-        $router->get('set-cookies', function() {
+        $router->get('set-cookies', function () {
             return (new Response('OK'))
                 ->withCookie('unencrypted-cookie', 'unencrypted-value')
                 ->withCookie('expiring-cookie', 'expiring-value', 10)
                 ->withCookie('encrypted-cookie', 'encrypted-value');
         })->middleware(MyEncryptCookiesMiddleware::class);
 
-        $router->get('forget-cookies', function() {
+        $router->get('forget-cookies', function () {
             return (new Response('OK'))
                 ->withCookie('unencrypted-cookie', '', -2628000)
                 ->withCookie('expiring-cookie', '', -2628000)
