@@ -1,6 +1,13 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.18.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.18.1...8.x)
+
+
+## [v8.18.1 (2020-12-09)](https://github.com/laravel/framework/compare/v8.18.0...v8.18.1)
+
+### Fixed
+- Bumped minimum Symfony version ([#35535](https://github.com/laravel/framework/pull/35535))
+- Fixed passing model instances to factories ([#35541](https://github.com/laravel/framework/pull/35541))
 
 
 ## [v8.18.0 (2020-12-08)](https://github.com/laravel/framework/compare/v8.17.2...v8.18.0)
