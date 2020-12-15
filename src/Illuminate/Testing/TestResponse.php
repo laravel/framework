@@ -382,18 +382,25 @@ class TestResponse implements ArrayAccess
     {
         foreach ($this->headers->getCookies() as $cookie) {
             if ($cookie->getName() === $cookieName) {
-                if ($decrypt) {
-                    $decryptedValue = CookieValuePrefix::remove(
-                        app('encrypter')->decrypt($cookie->getValue(), $unserialize)
-                    );
-                    $cookie = new Cookie(
-                        $cookie->getName(), $decryptedValue, $cookie->getExpiresTime(), $cookie->getPath(),
-                        $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly(),
-                        $cookie->isRaw(), $cookie->getSameSite()
-                    );
+                if (! $decrypt) {
+                    return $cookie;
                 }
 
-                return $cookie;
+                $decryptedValue = CookieValuePrefix::remove(
+                    app('encrypter')->decrypt($cookie->getValue(), $unserialize)
+                );
+
+                return new Cookie(
+                    $cookie->getName(),
+                    $decryptedValue,
+                    $cookie->getExpiresTime(),
+                    $cookie->getPath(),
+                    $cookie->getDomain(),
+                    $cookie->isSecure(),
+                    $cookie->isHttpOnly(),
+                    $cookie->isRaw(),
+                    $cookie->getSameSite()
+                );
             }
         }
     }
