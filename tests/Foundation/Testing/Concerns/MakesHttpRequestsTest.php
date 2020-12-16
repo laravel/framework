@@ -128,7 +128,7 @@ class MakesHttpRequestsTest extends TestCase
             return new RedirectResponse($url->to('intermediate'));
         });
 
-        $router->get('intermediate', function() use ($url) {
+        $router->get('intermediate', function () use ($url) {
             return new RedirectResponse($url->to('to'));
         });
 
@@ -145,12 +145,11 @@ class MakesHttpRequestsTest extends TestCase
             ->assertSee('OK');
     }
 
-
     public function testAssertFollowedRedirectTriggersWithoutRedirectChain()
     {
         $router = $this->app->make(Registrar::class);
 
-        $router->get('to', function() {
+        $router->get('to', function () {
             return 'OK';
         });
 
@@ -163,7 +162,7 @@ class MakesHttpRequestsTest extends TestCase
     {
         $router = $this->app->make(Registrar::class);
 
-        $router->get('to', function() {
+        $router->get('to', function () {
             return 'OK';
         });
 
@@ -172,12 +171,11 @@ class MakesHttpRequestsTest extends TestCase
         $this->followingRedirects()->get('to')->assertFollowedRedirect('to');
     }
 
-
     public function testAssertFollowedRedirectThroughTriggersWithoutRedirectChain()
     {
         $router = $this->app->make(Registrar::class);
 
-        $router->get('to', function() {
+        $router->get('to', function () {
             return 'OK';
         });
 

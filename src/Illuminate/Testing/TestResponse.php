@@ -229,35 +229,35 @@ class TestResponse implements ArrayAccess
         return $this;
     }
 
-	/**
-	 * Assert that the response is the result of following redirects to a URI.
-	 *
-	 * @param string|null $uri
-	 * @return $this
-	 */
-	public function assertFollowedRedirect($uri = null)
-	{
-		PHPUnit::assertNotEmpty($this->redirectChain, 'Response is not part of a redirect chain.');
+    /**
+     * Assert that the response is the result of following redirects to a URI.
+     *
+     * @param string|null $uri
+     * @return $this
+     */
+    public function assertFollowedRedirect($uri = null)
+    {
+        PHPUnit::assertNotEmpty($this->redirectChain, 'Response is not part of a redirect chain.');
 
-		if (! is_null($uri)) {
+        if (! is_null($uri)) {
             PHPUnit::assertEquals(app('url')->to($uri), end($this->redirectChain));
         }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Assert that the response is the result of following redirects that included a URI.
-	 *
-	 * @param string $uri
-	 * @return $this
-	 */
-	public function assertFollowedRedirectThrough($uri)
-	{
-		PHPUnit::assertContains(app('url')->to($uri), $this->redirectChain);
+    /**
+     * Assert that the response is the result of following redirects that included a URI.
+     *
+     * @param string $uri
+     * @return $this
+     */
+    public function assertFollowedRedirectThrough($uri)
+    {
+        PHPUnit::assertContains(app('url')->to($uri), $this->redirectChain);
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * Asserts that the response contains the given header and equals the optional value.
