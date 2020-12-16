@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use DateTimeInterface;
 use Illuminate\Foundation\Testing\Wormhole;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\CarbonImmutable;
 
 trait InteractsWithTime
 {
@@ -29,10 +30,12 @@ trait InteractsWithTime
     public function travelTo(DateTimeInterface $date, $callback = null)
     {
         Carbon::setTestNow($date);
+        CarbonImmutable::setTestNow($date);
 
         if ($callback) {
             return tap($callback(), function () {
                 Carbon::setTestNow();
+                CarbonImmutable::setTestNow();
             });
         }
     }
@@ -45,6 +48,7 @@ trait InteractsWithTime
     public function travelBack()
     {
         Carbon::setTestNow();
+        CarbonImmutable::setTestNow();
 
         return Carbon::now();
     }
