@@ -201,9 +201,9 @@ class CacheManager implements FactoryContract
 
         $store = new RedisStore($redis, $this->getPrefix($config), $connection);
 
-        $store->setLockConnection($config['lock_connection'] ?? $connection);
-
-        return $this->repository($store);
+        return $this->repository(
+            $store->setLockConnection($config['lock_connection'] ?? $connection)
+        );
     }
 
     /**
@@ -224,11 +224,9 @@ class CacheManager implements FactoryContract
             $config['lock_lottery'] ?? [2, 100]
         );
 
-        $store->setLockConnection(
+        return $this->repository($store->setLockConnection(
             $this->app['db']->connection($config['lock_connection'] ?? $config['connection'] ?? null)
-        );
-
-        return $this->repository($store);
+        ));
     }
 
     /**

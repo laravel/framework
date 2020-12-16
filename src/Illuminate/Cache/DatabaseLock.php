@@ -128,16 +128,6 @@ class DatabaseLock extends Lock
     }
 
     /**
-     * Get the name of the database connection.
-     *
-     * @return string
-     */
-    public function getConnectionName()
-    {
-        return $this->connection->getName();
-    }
-
-    /**
      * Returns the owner value written into the driver for this lock.
      *
      * @return string
@@ -145,5 +135,15 @@ class DatabaseLock extends Lock
     protected function getCurrentOwner()
     {
         return optional($this->connection->table($this->table)->where('key', $this->name)->first())->owner;
+    }
+
+    /**
+     * Get the name of the database connection being used to manage the lock.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connection->getName();
     }
 }

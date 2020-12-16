@@ -24,7 +24,7 @@ class DatabaseStore implements LockProvider, Store
     protected $connection;
 
     /**
-     * The database connection instance for the lock.
+     * The database connection instance that should be used to manage locks.
      *
      * @var \Illuminate\Database\ConnectionInterface
      */
@@ -339,14 +339,16 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
-     * Set the lock connection to be used.
+     * Specify the name of the connection that should be used to manage locks.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @return void
+     * @return $this
      */
     public function setLockConnection($connection)
     {
         $this->lockConnection = $connection;
+
+        return $this;
     }
 
     /**
