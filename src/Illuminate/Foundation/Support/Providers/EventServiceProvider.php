@@ -23,6 +23,12 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [];
 
     /**
+     * Determine if events and listeners should be automatically discovered.
+     *
+     */
+    protected $shouldDiscoverEvents = false;
+
+    /**
      * Register the application's event listeners.
      *
      * @return void
@@ -102,7 +108,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function shouldDiscoverEvents()
     {
-        return false;
+        return $this->shouldDiscoverEvents;
     }
 
     /**
