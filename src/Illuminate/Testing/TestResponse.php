@@ -41,6 +41,13 @@ class TestResponse implements ArrayAccess
     protected $streamedContent;
 
     /**
+     * The chain of URLs that were followed to get this response.
+     *
+     * @var array
+     */
+    protected $redirectChain = [];
+
+    /**
      * Create a new test response instance.
      *
      * @param  \Illuminate\Http\Response  $response
@@ -60,6 +67,20 @@ class TestResponse implements ArrayAccess
     public static function fromBaseResponse($response)
     {
         return new static($response);
+    }
+
+    /**
+     * Set the chain of URLs that were followed to get this response.
+     *
+     * @param array $redirectChain
+     *
+     * @return $this
+     */
+    public function fromRedirectChain($redirectChain)
+    {
+        $this->redirectChain = $redirectChain;
+
+        return $this;
     }
 
     /**
@@ -207,6 +228,36 @@ class TestResponse implements ArrayAccess
 
         return $this;
     }
+
+	/**
+	 * Assert that the response is the result of following redirects to a URI.
+	 *
+	 * @param string|null $uri
+	 * @return $this
+	 */
+	public function assertFollowedRedirect($uri = null)
+	{
+		PHPUnit::assertNotEmpty($this->redirectChain, 'Response is not part of a redirect chain.');
+
+		if (! is_null($uri)) {
+            PHPUnit::assertEquals(app('url')->to($uri), end($this->redirectChain));
+        }
+
+		return $this;
+	}
+
+	/**
+	 * Assert that the response is the result of following redirects that included a URI.
+	 *
+	 * @param string $uri
+	 * @return $this
+	 */
+	public function assertFollowedRedirectThrough($uri)
+	{
+		PHPUnit::assertContains(app('url')->to($uri), $this->redirectChain);
+
+		return $this;
+	}
 
     /**
      * Asserts that the response contains the given header and equals the optional value.

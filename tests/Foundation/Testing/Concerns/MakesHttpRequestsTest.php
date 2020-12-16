@@ -6,6 +6,7 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Http\RedirectResponse;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\ExpectationFailedException;
 
 class MakesHttpRequestsTest extends TestCase
 {
@@ -124,6 +125,10 @@ class MakesHttpRequestsTest extends TestCase
         $url = $this->app->make(UrlGenerator::class);
 
         $router->get('from', function () use ($url) {
+            return new RedirectResponse($url->to('intermediate'));
+        });
+
+        $router->get('intermediate', function() use ($url) {
             return new RedirectResponse($url->to('to'));
         });
 
@@ -133,8 +138,52 @@ class MakesHttpRequestsTest extends TestCase
 
         $this->followingRedirects()
             ->get('from')
+            ->assertFollowedRedirect()
+            ->assertFollowedRedirect('to')
+            ->assertFollowedRedirectThrough('intermediate')
             ->assertOk()
             ->assertSee('OK');
+    }
+
+
+    public function testAssertFollowedRedirectTriggersWithoutRedirectChain()
+    {
+        $router = $this->app->make(Registrar::class);
+
+        $router->get('to', function() {
+            return 'OK';
+        });
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->followingRedirects()->get('to')->assertFollowedRedirect();
+    }
+
+    public function testAssertFollowedRedirectTriggersWithoutRedirectChainWithUri()
+    {
+        $router = $this->app->make(Registrar::class);
+
+        $router->get('to', function() {
+            return 'OK';
+        });
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->followingRedirects()->get('to')->assertFollowedRedirect('to');
+    }
+
+
+    public function testAssertFollowedRedirectThroughTriggersWithoutRedirectChain()
+    {
+        $router = $this->app->make(Registrar::class);
+
+        $router->get('to', function() {
+            return 'OK';
+        });
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->followingRedirects()->get('to')->assertFollowedRedirectThrough('to');
     }
 
     public function testFollowingRedirectsTerminatesInExpectedOrder()

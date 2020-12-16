@@ -48,6 +48,13 @@ trait MakesHttpRequests
     protected $followRedirects = false;
 
     /**
+     * When following redirects, this holds the URLs that were followed.
+     *
+     * @var array
+     */
+    protected $lastRedirectChain = [];
+
+    /**
      * Indicates whether cookies should be encrypted.
      *
      * @var bool
@@ -511,7 +518,7 @@ trait MakesHttpRequests
         $kernel->terminate($request, $response);
 
         if ($this->followRedirects) {
-            $response = $this->followRedirects($response);
+            return $this->createTestResponse($this->followRedirects($response))->fromRedirectChain($this->lastRedirectChain);
         }
 
         return $this->createTestResponse($response);
@@ -624,9 +631,13 @@ trait MakesHttpRequests
     protected function followRedirects($response)
     {
         $this->followRedirects = false;
+        $this->lastRedirectChain = [];
 
         while ($response->isRedirect()) {
-            $response = $this->get($response->headers->get('Location'));
+            $location = $response->headers->get('Location');
+            $this->lastRedirectChain[] = $location;
+
+            $response = $this->get($location);
         }
 
         return $response;
