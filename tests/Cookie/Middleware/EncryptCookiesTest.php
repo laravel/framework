@@ -97,7 +97,6 @@ class EncryptCookiesTest extends TestCase
 
     public function testCookieDecryption()
     {
-
         $cookies = [
             'encrypted_cookie' => $this->getEncryptedCookieValue('encrypted_cookie', 'value'),
             'encrypted' => [
@@ -124,6 +123,7 @@ class EncryptCookiesTest extends TestCase
                 $this->assertSame('value', $cookies['encrypted']['nested']['array_cookie']);
                 $this->assertArrayHasKey('unencrypted_cookie', $cookies);
                 $this->assertSame('value', $cookies['unencrypted_cookie']);
+
                 return new Response;
             }
         );
