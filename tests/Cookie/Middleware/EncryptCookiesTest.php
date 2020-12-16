@@ -90,7 +90,7 @@ class EncryptCookiesTest extends TestCase
         $encrypter = $this->container->make(EncrypterContract::class);
 
         return $encrypter->encrypt(
-            CookieValuePrefix::create($key, $encrypter->getKey()) . $value,
+            CookieValuePrefix::create($key, $encrypter->getKey()).$value,
             false
         );
     }
@@ -103,10 +103,10 @@ class EncryptCookiesTest extends TestCase
             'encrypted' => [
                 'array_cookie' => $this->getEncryptedCookieValue('encrypted[array_cookie]', 'value'),
                 'nested' => [
-                    'array_cookie' => $this->getEncryptedCookieValue('encrypted[nested][array_cookie]', 'value')
-                ]
+                    'array_cookie' => $this->getEncryptedCookieValue('encrypted[nested][array_cookie]', 'value'),
+                ],
             ],
-            'unencrypted_cookie' => 'value'
+            'unencrypted_cookie' => 'value',
         ];
 
         $this->container->make(EncryptCookiesTestMiddleware::class)->handle(
