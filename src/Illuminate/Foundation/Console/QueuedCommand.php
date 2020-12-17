@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -9,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 
 class QueuedCommand implements ShouldQueue
 {
-    use Dispatchable, Queueable;
+    use Batchable, Dispatchable, Queueable;
 
     /**
      * The data to pass to the Artisan command.
@@ -37,6 +38,10 @@ class QueuedCommand implements ShouldQueue
      */
     public function handle(KernelContract $kernel)
     {
+        if ($this->batch() && $this->batch()->cancelled()) {
+            return;
+        }
+        
         $kernel->call(...array_values($this->data));
     }
 }
