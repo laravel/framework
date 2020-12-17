@@ -80,6 +80,10 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
+        if (version_compare(phpversion(), '8.0.0', '>=')) {
+            $this->markTestSkipped('Test broken on PHP 8.');
+        }
+
         $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['increment'])->getMock();
         $memcache->expects($this->once())->method('increment')->with($this->equalTo('foo'), $this->equalTo(5));
         $store = new MemcachedStore($memcache);
@@ -90,6 +94,10 @@ class CacheMemcachedStoreTest extends TestCase
     {
         if (! class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
+        }
+
+        if (version_compare(phpversion(), '8.0.0', '>=')) {
+            $this->markTestSkipped('Test broken on PHP 8.');
         }
 
         $memcache = $this->getMockBuilder(Memcached::class)->setMethods(['decrement'])->getMock();
