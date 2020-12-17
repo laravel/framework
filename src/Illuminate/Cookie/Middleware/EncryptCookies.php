@@ -108,7 +108,7 @@ class EncryptCookies
     }
 
     /**
-     * Strip a valid value prefix from the value.
+     * Validate and remove the cookie value prefix from all values of an array.
      *
      * @param  string  $key
      * @param  array  $value
