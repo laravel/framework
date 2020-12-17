@@ -140,7 +140,6 @@ trait InteractsWithPivotTable
         return $this->sync($idsWithDefaults, $detaching);
     }
 
-
     /**
      * Format the sync / toggle record list so that it is keyed by ID.
      *
