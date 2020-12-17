@@ -128,7 +128,7 @@ trait InteractsWithPivotTable
      *
      * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
      * @param  bool  $detaching
-     * @param  array $defaults
+     * @param  array  $defaults
      * @return array
      */
     public function syncWithPivotDefaults($ids, array $defaults, bool $detaching = true)
