@@ -133,7 +133,7 @@ trait InteractsWithPivotTable
      */
     public function syncWithPivotDefaults($ids, array $defaults, bool $detaching = true)
     {
-        $idsWithDefaults = collect($this->parseIds($ids))->mapWithKeys(function($id) use ($defaults) {
+        $idsWithDefaults = collect($this->parseIds($ids))->mapWithKeys(function ($id) use ($defaults) {
             return [$id => $defaults];
         });
 
