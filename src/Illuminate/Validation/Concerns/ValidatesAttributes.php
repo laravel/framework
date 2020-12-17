@@ -1142,6 +1142,10 @@ trait ValidatesAttributes
      */
     public function validateJson($attribute, $value)
     {
+        if (is_array($value)) {
+            return false;
+        }
+
         if (! is_scalar($value) && ! method_exists($value, '__toString')) {
             return false;
         }
