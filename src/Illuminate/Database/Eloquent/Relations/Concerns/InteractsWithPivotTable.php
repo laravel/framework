@@ -124,6 +124,24 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Sync the intermediate tables with a list of IDs or collection of models with default values.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
+     * @param  bool  $detaching
+     * @param  array $defaults
+     * @return array
+     */
+    public function syncWithPivotDefaults($ids, array $defaults, bool $detaching = true)
+    {
+        $idsWithDefaults = collect($this->parseIds($ids))->mapWithKeys(function($id) use ($defaults) {
+            return [$id => $defaults];
+        });
+
+        return $this->sync($idsWithDefaults, $detaching);
+    }
+
+
+    /**
      * Format the sync / toggle record list so that it is keyed by ID.
      *
      * @param  array  $records
