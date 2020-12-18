@@ -157,7 +157,7 @@ trait BuildsQueries
      */
     public function when($value, $callback, $default = null)
     {
-        if ($value) {
+        if ($value !== null) {
             return $callback($this, $value) ?: $this;
         } elseif ($default) {
             return $default($this, $value) ?: $this;
