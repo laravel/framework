@@ -101,7 +101,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
         $user = BelongsToManySyncTestTestUser::query()->first();
         $articleIDs = BelongsToManySyncTestTestArticle::all()->pluck('id')->toArray();
 
-        $changes = $user->articles()->syncWithPivotDefaults($articleIDs, ['visible' => true]);
+        $changes = $user->articles()->syncWithPivotValues($articleIDs, ['visible' => true]);
 
         collect($changes['attached'])->each(function ($id) {
             $this->assertSame(gettype($id), (new BelongsToManySyncTestTestArticle)->getKeyType());
