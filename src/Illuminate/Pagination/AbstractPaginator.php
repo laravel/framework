@@ -332,7 +332,10 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function lastItem()
     {
-        return count($this->items) > 0 ? $this->firstItem() + $this->count() - 1 : null;
+        $total = count($this->items);
+        $to = $this->firstItem() + $this->perPage() - 1;
+
+        return $total > 0 ? ($to > $total ? $total : $to) : null;
     }
 
     /**
