@@ -7,6 +7,13 @@ use Illuminate\Contracts\Validation\Rule;
 class {{ class }} implements Rule
 {
     /**
+     * The validation error message.
+     *
+     * @var string
+     */
+    protected $message = 'The validation error message.';
+
+    /**
      * Create a new rule instance.
      *
      * @return void
@@ -35,6 +42,6 @@ class {{ class }} implements Rule
      */
     public function message()
     {
-        return 'The validation error message.';
+        return $this->message;
     }
 }
