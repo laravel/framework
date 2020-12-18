@@ -164,7 +164,7 @@ interface Container extends ContainerInterface
     public function resolved($abstract);
 
     /**
-     * Register a new before resolving callback for all types.
+     * Register a new before resolving callback.
      *
      * @param  \Closure|string  $abstract
      * @param  \Closure|null  $callback
