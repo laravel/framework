@@ -5,11 +5,19 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\MemcachedStore;
 use Illuminate\Support\Carbon;
 use Memcached;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class CacheMemcachedStoreTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        m::close();
+
+        parent::tearDown();
+    }
+
     public function testGetReturnsNullWhenNotFound()
     {
         if (! class_exists(Memcached::class)) {
@@ -80,9 +88,15 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['increment'])->getMock();
-        $memcache->expects($this->once())->method('increment')->with($this->equalTo('foo'), $this->equalTo(5));
-        $store = new MemcachedStore($memcache);
+        /* @link https://github.com/php-memcached-dev/php-memcached/pull/468 */
+        if (version_compare(phpversion(), '8.0.0', '>=')) {
+            $this->markTestSkipped('Test broken due to parse error in PHP Memcached.');
+        }
+
+        $memcached = m::mock(Memcached::class);
+        $memcached->shouldReceive('increment')->with('foo', 5)->once()->andReturn(5);
+
+        $store = new MemcachedStore($memcached);
         $store->increment('foo', 5);
     }
 
@@ -92,9 +106,15 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['decrement'])->getMock();
-        $memcache->expects($this->once())->method('decrement')->with($this->equalTo('foo'), $this->equalTo(5));
-        $store = new MemcachedStore($memcache);
+        /* @link https://github.com/php-memcached-dev/php-memcached/pull/468 */
+        if (version_compare(phpversion(), '8.0.0', '>=')) {
+            $this->markTestSkipped('Test broken due to parse error in PHP Memcached.');
+        }
+
+        $memcached = m::mock(Memcached::class);
+        $memcached->shouldReceive('decrement')->with('foo', 5)->once()->andReturn(0);
+
+        $store = new MemcachedStore($memcached);
         $store->decrement('foo', 5);
     }
 

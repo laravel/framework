@@ -1,6 +1,27 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.18.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.19.0...8.x)
+
+
+## [v8.19.0 (2020-12-15)](https://github.com/laravel/framework/compare/v8.18.1...v8.19.0)
+
+### Added
+- Delay pushing jobs to queue until database transactions are committed ([#35422](https://github.com/laravel/framework/pull/35422), [095d922](https://github.com/laravel/framework/commit/095d9221e837e7a7d8bd00d14184e619b962173a), [fa34d93](https://github.com/laravel/framework/commit/fa34d93ad0cda78e8956b2680ba7bada02bcabb2), [db0d0ba](https://github.com/laravel/framework/commit/db0d0ba94cf8a5c1e1fa4621bd4a16032aff800d), [d9b803a](https://github.com/laravel/framework/commit/d9b803a1a4898e7d5b3145e51c77499815ce3401), [3e55841](https://github.com/laravel/framework/commit/3e5584165fb66d8228bae79a856eac51ce147df5))
+- Added `Illuminate\View\ComponentAttributeBag::has()` ([#35562](https://github.com/laravel/framework/pull/35562))
+- Create ScheduleListCommand ([#35574](https://github.com/laravel/framework/pull/35574), [97d7834](https://github.com/laravel/framework/commit/97d783449c5330b1e5fb9104f6073869ad3079c1))
+- Introducing Job Encryption ([#35527](https://github.com/laravel/framework/pull/35527), [f80f647](https://github.com/laravel/framework/commit/f80f647852106942e4a0ef3e9963f8f7a99122cf), [8c16156](https://github.com/laravel/framework/commit/8c16156636311e42883d9e84a6d71fa135bc2b73))
+
+### Fixed
+- Handle `Throwable` exceptions on `Illuminate\Redis\Limiters\ConcurrencyLimiter::block()` ([#35546](https://github.com/laravel/framework/pull/35546))
+- Fixed PDO passing in SqlServerDriver ([#35564](https://github.com/laravel/framework/pull/35564))
+- When following redirects, terminate each test request in proper order ([#35604](https://github.com/laravel/framework/pull/35604))
+
+
+## [v8.18.1 (2020-12-09)](https://github.com/laravel/framework/compare/v8.18.0...v8.18.1)
+
+### Fixed
+- Bumped minimum Symfony version ([#35535](https://github.com/laravel/framework/pull/35535))
+- Fixed passing model instances to factories ([#35541](https://github.com/laravel/framework/pull/35541))
 
 
 ## [v8.18.0 (2020-12-08)](https://github.com/laravel/framework/compare/v8.17.2...v8.18.0)
