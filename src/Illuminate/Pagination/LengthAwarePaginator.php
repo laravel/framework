@@ -183,6 +183,19 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     {
         return $this->lastPage;
     }
+    
+    /**
+     * Get the number of the last item in the slice.
+     *
+     * @return int
+     */
+    public function lastItem()
+    {
+        $total = count($this->items);
+        $to = $this->firstItem() + $this->perPage() - 1;
+
+        return $total > 0 ? ($to > $total ? $total : $to) : null;
+    }
 
     /**
      * Get the instance as an array.
