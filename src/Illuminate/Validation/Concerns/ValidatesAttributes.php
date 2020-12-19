@@ -1937,4 +1937,17 @@ trait ValidatesAttributes
             $this->numericRules[] = $rule;
         }
     }
+    
+    /**
+    * Validate an attribute is not array.
+    * @param  string  $attribute
+    * @param  mixed  $value
+    */
+    public function validateNotArray($attribute, $value)
+    {
+        if(is_array($value) && $this->hasRule($attribute, 'Array'))
+           {
+               return false;
+           }    
+    }  
 }
