@@ -306,6 +306,23 @@ trait ValidatesAttributes
     }
 
     /**
+    * Validate an attribute is not array.
+    * @param  string  $attribute
+    * @param  mixed  $value
+    * @return bool
+    */
+    public function validateNotArray($attribute, $value)
+    {
+        if(is_array($value))
+           {
+               return false;
+           }
+        if(!is_array($value))
+        {
+            return true;
+        }
+    } 
+    /**
      * Validate the size of an attribute is between a set of values.
      *
      * @param  string  $attribute
