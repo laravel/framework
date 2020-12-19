@@ -519,7 +519,7 @@ trait HasAttributes
     public function mergeCasts($casts)
     {
         $this->casts = array_merge($this->casts, $casts);
-        
+
         return $this;
     }
 
