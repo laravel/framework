@@ -454,6 +454,19 @@ class SupportStrTest extends TestCase
         $this->assertSame('Мама мыла раму', Str::ucfirst('мама мыла раму'));
     }
 
+    public function testMultipleSpaceClean()
+    {
+        $this->assertSame('a b c d e', Str::multipleSpaceClean('a b  c   d    e'));
+        $this->assertSame('a b c d e ', Str::multipleSpaceClean('a b  c   d    e   '));
+        $this->assertSame(' a b c d e', Str::multipleSpaceClean('  a b  c   d    e'));
+        $this->assertSame(' a b c d e ', Str::multipleSpaceClean('  a b  c   d    e   '));
+
+        $this->assertSame('你 好 是 这 文', Str::multipleSpaceClean('你 好  是   这    文'));
+        $this->assertSame('你 好 是 这 文 ', Str::multipleSpaceClean('你 好  是   这    文   '));
+        $this->assertSame(' 你 好 是 这 文', Str::multipleSpaceClean('   你 好  是   这    文'));
+        $this->assertSame(' 你 好 是 这 文 ', Str::multipleSpaceClean('   你 好  是   这    文   '));
+    }
+
     public function testUuid()
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());

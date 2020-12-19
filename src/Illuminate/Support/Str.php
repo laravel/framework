@@ -725,6 +725,17 @@ class Str
     }
 
     /**
+     * Make a string's multiple space characters clean.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function multipleSpaceClean($string)
+    {
+        return preg_replace('!\s+!', ' ', $string);
+    }
+
+    /**
      * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface
