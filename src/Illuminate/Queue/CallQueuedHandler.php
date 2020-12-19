@@ -230,10 +230,10 @@ class CallQueuedHandler
         }
 
         if ($shouldDelete) {
-            return $job->delete();
+            $job->delete();
         }
 
-        return $job->fail($e);
+        $job->fail($e);
     }
 
     /**
