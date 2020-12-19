@@ -937,9 +937,6 @@ class Mailable implements MailableContract, Renderable
                 $view = $this->buildView(), $this->buildViewData()
             );
 
-            // If the given view is an array with numeric keys, we will just assume that
-            // both a "pretty" and "plain" view were provided, so we will use the
-            // plain index since it should contain both views with numerical keys.
             if (is_array($view) && isset($view[1])) {
                 $text = $view[1];
             }
