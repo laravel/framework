@@ -736,6 +736,18 @@ class Str
     }
 
     /**
+     * Trim that additionally removes slashes.
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function utrim(string $string)
+    {
+        return trim($string, " \t\n\r\0\x0B/\\");
+    }
+
+    /**
      * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface
