@@ -467,6 +467,12 @@ class SupportStrTest extends TestCase
         $this->assertSame(' 你 好 是 这 文 ', Str::multipleSpaceClean('   你 好  是   这    文   '));
     }
 
+    public function testUtrim()
+    {
+        $this->assertSame('hello world', Str::utrim("\hello world \n"),);
+        $this->assertSame('你好', Str::utrim("\你好 \n"),);
+    }
+
     public function testUuid()
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
