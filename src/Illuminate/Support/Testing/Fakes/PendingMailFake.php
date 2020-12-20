@@ -22,11 +22,11 @@ class PendingMailFake extends PendingMail
      * Send a new mailable message instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
-     * @return void
+     * @return mixed
      */
     public function send(Mailable $mailable)
     {
-        $this->mailer->send($this->fill($mailable));
+        return $this->mailer->send($this->fill($mailable));
     }
 
     /**
