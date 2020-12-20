@@ -737,7 +737,7 @@ class Stringable implements JsonSerializable
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array
+     * @return string
      */
     public function jsonSerialize()
     {
