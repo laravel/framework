@@ -724,6 +724,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert the object into something JSON serializable.
+     *
+     * @return string
+     */
+    public function jsonSerialize()
+    {
+        return $this->__toString();
+    }
+
+    /**
      * Proxy dynamic properties onto methods.
      *
      * @param  string  $key
@@ -732,16 +742,6 @@ class Stringable implements JsonSerializable
     public function __get($key)
     {
         return $this->{$key}();
-    }
-
-    /**
-     * Convert the object into something JSON serializable.
-     *
-     * @return string
-     */
-    public function jsonSerialize()
-    {
-        return $this->__toString();
     }
 
     /**
