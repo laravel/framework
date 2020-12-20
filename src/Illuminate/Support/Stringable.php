@@ -4,9 +4,10 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 
-class Stringable
+class Stringable implements JsonSerializable
 {
     use Macroable;
 
@@ -720,6 +721,16 @@ class Stringable
         $this->dump();
 
         exit(1);
+    }
+
+    /**
+     * Convert the object into something JSON serializable.
+     *
+     * @return string
+     */
+    public function jsonSerialize()
+    {
+        return $this->__toString();
     }
 
     /**
