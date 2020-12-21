@@ -14,7 +14,7 @@ class Dimensions
     /**
      * Create a new dimensions rule instance.
      *
-     * @param  array  $constraints;
+     * @param  array  $constraints
      * @return void
      */
     public function __construct(array $constraints = [])
