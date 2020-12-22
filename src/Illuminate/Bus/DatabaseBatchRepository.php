@@ -252,7 +252,7 @@ class DatabaseBatchRepository implements BatchRepository
     public function prune(\DateTimeInterface $before)
     {
         $query = $this->connection->table($this->table)
-            ->where('finished_at', '<', $before);
+            ->where('finished_at', '<', $before->getTimestamp());
 
         $totalDeleted = 0;
 
