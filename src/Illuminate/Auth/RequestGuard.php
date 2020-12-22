@@ -82,8 +82,6 @@ class RequestGuard implements Guard
     {
         $this->request = $request;
 
-        $this->user = null;
-
         return $this;
     }
 }
