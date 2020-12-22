@@ -81,6 +81,8 @@ class RequestGuard implements Guard
     public function setRequest(Request $request)
     {
         $this->request = $request;
+        
+        $this->user = null;
 
         return $this;
     }
