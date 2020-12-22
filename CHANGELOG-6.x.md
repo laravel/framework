@@ -1,6 +1,13 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.7...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.8...6.x)
+
+
+## [v6.20.8 (2020-12-22)](https://github.com/laravel/framework/compare/v6.20.7...v6.20.8)
+
+### Fixed
+- Fixed `Illuminate\Validation\Concerns\ValidatesAttributes::validateJson()` for PHP8 ([#35646](https://github.com/laravel/framework/pull/35646))
+- Catch DecryptException with invalid X-XSRF-TOKEN in `Illuminate\Foundation\Http\Middleware\VerifyCsrfToken` ([#35671](https://github.com/laravel/framework/pull/35671))
 
 
 ## [v6.20.7 (2020-12-08)](https://github.com/laravel/framework/compare/v6.20.6...v6.20.7)
