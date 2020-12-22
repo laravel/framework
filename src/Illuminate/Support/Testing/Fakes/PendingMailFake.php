@@ -21,7 +21,7 @@ class PendingMailFake extends PendingMail
     /**
      * Send a new mailable message instance.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable;
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
      */
     public function send(Mailable $mailable)
@@ -32,7 +32,7 @@ class PendingMailFake extends PendingMail
     /**
      * Send a mailable message immediately.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable;
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
      * @deprecated Use send() instead.
      */
@@ -44,7 +44,7 @@ class PendingMailFake extends PendingMail
     /**
      * Push the given mailable onto the queue.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable;
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
      */
     public function queue(Mailable $mailable)
