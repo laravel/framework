@@ -1,6 +1,15 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.30.0...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.30.1...7.x)
+
+
+## [v7.30.1 (2020-12-22)](https://github.com/laravel/framework/compare/v7.30.0...v7.30.1)
+
+### Fixed
+- Backport for fix issue with polymorphic morphMaps with literal 0 ([#35487](https://github.com/laravel/framework/pull/35487))
+- Fixed mime validation for jpeg files ([#35518](https://github.com/laravel/framework/pull/35518))
+- Fixed `Illuminate\Validation\Concerns\ValidatesAttributes::validateJson()` for PHP8 ([#35646](https://github.com/laravel/framework/pull/35646))
+- Catch DecryptException with invalid X-XSRF-TOKEN in `Illuminate\Foundation\Http\Middleware\VerifyCsrfToken` ([#35671](https://github.com/laravel/framework/pull/35671))
 
 
 ## [v7.30.0 (2020-12-01)](https://github.com/laravel/framework/compare/v7.29.3...v7.30.0)
