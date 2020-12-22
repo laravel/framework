@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.20.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.20.1...8.x)
+
+
+## [v8.20.1 (2020-12-22)](https://github.com/laravel/framework/compare/v8.20.0...v8.20.1)
+
+### Revert
+- Revert [Clear a cached user in RequestGuard if a request is changed](https://github.com/laravel/framework/pull/35692) ([ca8ccd6](https://github.com/laravel/framework/commit/ca8ccd6757d5639f0e5fb241b3df6878da6ce34e))
 
 
 ## [v8.20.0 (2020-12-22)](https://github.com/laravel/framework/compare/v8.19.0...v8.20.0)
