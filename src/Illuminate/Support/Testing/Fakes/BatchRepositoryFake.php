@@ -8,7 +8,6 @@ use Illuminate\Bus\Batch;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\UpdatedBatchJobCounts;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
 
