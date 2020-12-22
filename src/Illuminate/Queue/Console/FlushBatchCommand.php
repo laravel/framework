@@ -25,16 +25,22 @@ class FlushBatchCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return int|null
+     * @return void
      */
     public function handle()
     {
-        $hours = $this->option('hours');
+        $count = 0;
 
-        $before = Carbon::now()->subHours($hours);
+        $repository = $this->laravel[BatchRepository::class];
 
-        $count = $this->laravel[BatchRepository::class]->prune($before);
+        if (method_exists($repository, 'prune')) {
+            $hours = $this->option('hours');
 
-        $this->info("{$count} entries deleted successfully.");
+            $before = Carbon::now()->subHours($hours);
+
+            $count = $repository->prune($before);
+        }
+
+        $this->info("{$count} entries deleted!");
     }
 }
