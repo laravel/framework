@@ -8,6 +8,7 @@ use Illuminate\Bus\Batch;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\UpdatedBatchJobCounts;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
 
@@ -133,5 +134,16 @@ class BatchRepositoryFake implements BatchRepository
     public function transaction(Closure $callback)
     {
         return $callback();
+    }
+
+    /**
+     * Prune all of the entries older than the given date.
+     *
+     * @param  \DateTimeInterface  $before
+     * @return int
+     */
+    public function prune(\DateTimeInterface $before)
+    {
+        return 0;
     }
 }

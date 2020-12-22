@@ -64,6 +64,7 @@ use Illuminate\Queue\Console\BatchesTableCommand;
 use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
+use Illuminate\Queue\Console\FlushBatchCommand as FlushBatchQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
 use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
@@ -105,6 +106,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueClear' => 'command.queue.clear',
         'QueueFailed' => 'command.queue.failed',
         'QueueFlush' => 'command.queue.flush',
+        'QueueFlushBatch' => 'command.queue.flush-batch',
         'QueueForget' => 'command.queue.forget',
         'QueueListen' => 'command.queue.listen',
         'QueueRestart' => 'command.queue.restart',
@@ -669,6 +671,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.queue.flush', function () {
             return new FlushFailedQueueCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueFlushBatchCommand()
+    {
+        $this->app->singleton('command.queue.flush-batch', function () {
+            return new FlushBatchQueueCommand;
         });
     }
 

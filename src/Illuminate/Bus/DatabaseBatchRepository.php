@@ -244,6 +244,28 @@ class DatabaseBatchRepository implements BatchRepository
     }
 
     /**
+     * Prune all of the entries older than the given date.
+     *
+     * @param  \DateTimeInterface  $before
+     * @return int
+     */
+    public function prune(\DateTimeInterface $before)
+    {
+        $query = $this->connection->table($this->table)
+            ->where('finished_at', '<', $before);
+
+        $totalDeleted = 0;
+
+        do {
+            $deleted = $query->take(1000)->delete();
+
+            $totalDeleted += $deleted;
+        } while ($deleted !== 0);
+
+        return $totalDeleted;
+    }
+
+    /**
      * Convert the given raw batch to a Batch object.
      *
      * @param  object  $batch
