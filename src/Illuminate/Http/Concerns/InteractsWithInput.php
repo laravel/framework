@@ -334,7 +334,9 @@ trait InteractsWithInput
      */
     public function query($key = null, $default = null)
     {
-        return $this->retrieveItem('query', $key, $default);
+        return data_get(
+            $this->query->all(), $key, $default
+        );
     }
 
     /**
