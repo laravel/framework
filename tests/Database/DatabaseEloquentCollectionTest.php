@@ -31,6 +31,20 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(20, $c->max('foo'));
     }
 
+    public function testColumnsFromCollection()
+    {
+        $c = new Collection([(object) ['id' => 1, 'name' => 'Laravel', 'foo' => 10], (object) ['id' => 2, 'name' => 'Lumen', 'foo' => 20]]);
+        $this->assertSame([10, 20], $c->columns('foo')->toArray());
+        $this->assertSame([['name' => 'Laravel'], ['name' => 'Lumen']], $c->columns(['name'])->toArray());
+        $this->assertSame([['id' => 1, 'name' => 'Laravel'], ['id' => 2, 'name' => 'Lumen']], $c->columns(['id', 'name'])->toArray());
+        $c1 = $c->columns(['id', 'name']);
+        $this->assertInstanceOf(BaseCollection::class, $c1);
+        $this->assertSame('Laravel', $c1->first()['name']);
+        $c2 = $c->columns(['id', 'name'], false);
+        $this->assertInstanceOf(BaseCollection::class, $c2);
+        $this->assertSame('Laravel', $c2->first()->name);
+    }
+
     public function testGettingMinItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
