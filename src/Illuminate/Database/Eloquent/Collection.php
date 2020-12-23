@@ -466,6 +466,35 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Returns only the columns from the collection with the specified keys.
+     *
+     * @param string|array|null $keys
+     */
+    public function columns($keys): BaseCollection
+    {
+        if (is_null($keys)) {
+            return new BaseCollection([]);
+        }
+        $result = [];
+        $isSingleColumn = is_string($keys);
+        foreach ($this->items as $item) {
+            if ($isSingleColumn) {
+                $result[] = $item->{$keys};
+            } else {
+                $result[] = value(static function () use ($item, $keys) {
+                    $res = [];
+                    foreach ($keys as $key) {
+                        $res[$key] = $item->{$key};
+                    }
+                    return $res;
+                });
+            }
+        }
+
+        return new BaseCollection($result);
+    }
+
+    /**
      * Returns all models in the collection except the models with specified keys.
      *
      * @param  mixed  $keys
