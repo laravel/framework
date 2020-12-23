@@ -4,7 +4,6 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Carbon\CarbonImmutable;
 use Closure;
-use DateTimeInterface;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
@@ -134,16 +133,5 @@ class BatchRepositoryFake implements BatchRepository
     public function transaction(Closure $callback)
     {
         return $callback();
-    }
-
-    /**
-     * Prune all of the entries older than the given date.
-     *
-     * @param  DateTimeInterface  $before
-     * @return int
-     */
-    public function prune(DateTimeInterface $before)
-    {
-        return 0;
     }
 }

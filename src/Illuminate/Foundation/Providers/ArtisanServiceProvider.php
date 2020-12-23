@@ -63,11 +63,11 @@ use Illuminate\Notifications\Console\NotificationTableCommand;
 use Illuminate\Queue\Console\BatchesTableCommand;
 use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
-use Illuminate\Queue\Console\FlushBatchCommand as FlushBatchQueueCommand;
 use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
 use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
+use Illuminate\Queue\Console\PruneBatchesCommand as PruneBatchesQueueCommand;
 use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
 use Illuminate\Queue\Console\RetryBatchCommand as QueueRetryBatchCommand;
 use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
@@ -106,9 +106,9 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueClear' => 'command.queue.clear',
         'QueueFailed' => 'command.queue.failed',
         'QueueFlush' => 'command.queue.flush',
-        'QueueFlushBatch' => 'command.queue.flush-batch',
         'QueueForget' => 'command.queue.forget',
         'QueueListen' => 'command.queue.listen',
+        'QueuePruneBatches' => 'command.queue.prune-batches',
         'QueueRestart' => 'command.queue.restart',
         'QueueRetry' => 'command.queue.retry',
         'QueueRetryBatch' => 'command.queue.retry-batch',
@@ -679,10 +679,10 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerQueueFlushBatchCommand()
+    protected function registerQueueListenCommand()
     {
-        $this->app->singleton('command.queue.flush-batch', function () {
-            return new FlushBatchQueueCommand;
+        $this->app->singleton('command.queue.listen', function ($app) {
+            return new QueueListenCommand($app['queue.listener']);
         });
     }
 
@@ -691,10 +691,10 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerQueueListenCommand()
+    protected function registerQueuePruneBatchesCommand()
     {
-        $this->app->singleton('command.queue.listen', function ($app) {
-            return new QueueListenCommand($app['queue.listener']);
+        $this->app->singleton('command.queue.prune-batches', function () {
+            return new PruneBatchesQueueCommand;
         });
     }
 

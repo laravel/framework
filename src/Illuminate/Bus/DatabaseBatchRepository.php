@@ -9,7 +9,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
 
-class DatabaseBatchRepository implements BatchRepository
+class DatabaseBatchRepository implements BatchRepository, Prunable
 {
     /**
      * The batch factory instance.

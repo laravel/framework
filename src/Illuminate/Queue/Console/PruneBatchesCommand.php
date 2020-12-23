@@ -4,16 +4,17 @@ namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
 use Illuminate\Bus\BatchRepository;
+use Illuminate\Bus\Prunable;
 use Illuminate\Console\Command;
 
-class FlushBatchCommand extends Command
+class PruneBatchesCommand extends Command
 {
     /**
      * The console command signature.
      *
      * @var string
      */
-    protected $signature = 'queue:flush-batch {--hours=24 : The number of hours to retain batch data}';
+    protected $signature = 'queue:prune-batches {--hours=24 : The number of hours to retain batch data}';
 
     /**
      * The console command description.
@@ -33,7 +34,7 @@ class FlushBatchCommand extends Command
 
         $repository = $this->laravel[BatchRepository::class];
 
-        if (method_exists($repository, 'prune')) {
+        if ($repository instanceof Prunable) {
             $hours = $this->option('hours');
 
             $before = Carbon::now()->subHours($hours);
