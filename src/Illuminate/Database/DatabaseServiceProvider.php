@@ -123,7 +123,9 @@ class DatabaseServiceProvider extends ServiceProvider
         $types = $this->app['config']->get('database.dbal.types', []);
 
         foreach ($types as $name => $class) {
-            Type::addType($name, $class);
+            if (! Type::hasType($name)) {
+                Type::addType($name, $class);
+            }
         }
     }
 }
