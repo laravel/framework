@@ -469,9 +469,9 @@ class Collection extends BaseCollection implements QueueableCollection
      * Returns only the columns from the collection with the specified keys.
      *
      * @param string|array|null $keys
-     * @param bool $associative When <b>TRUE</b>, returned objects will be converted into associative arrays.
+     * @return BaseCollection
      */
-    public function columns($keys, bool $associative = true): BaseCollection
+    public function columns($keys)
     {
         if (is_null($keys)) {
             return new BaseCollection([]);
@@ -480,14 +480,17 @@ class Collection extends BaseCollection implements QueueableCollection
         $isSingleColumn = is_string($keys);
         foreach ($this->items as $item) {
             if ($isSingleColumn) {
-                $result[] = $item->{$keys};
+                $value = $item->{$keys} ?? null;
+                $result[] = $value instanceof Arrayable ? $value->toArray() : $value;
             } else {
-                $result[] = value(static function () use ($item, $keys, $associative) {
+                $result[] = value(static function () use ($item, $keys) {
                     $res = [];
                     foreach ($keys as $key) {
-                        $res[$key] = $item->{$key};
+                        $value = $item->{$key} ?? null;
+                        $res[$key] = $value instanceof Arrayable ? $value->toArray() : $value;
                     }
-                    return $associative ? $res : (object) $res;
+
+                    return $res;
                 });
             }
         }

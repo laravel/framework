@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Fluent;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -40,9 +41,13 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c1 = $c->columns(['id', 'name']);
         $this->assertInstanceOf(BaseCollection::class, $c1);
         $this->assertSame('Laravel', $c1->first()['name']);
-        $c2 = $c->columns(['id', 'name'], false);
-        $this->assertInstanceOf(BaseCollection::class, $c2);
-        $this->assertSame('Laravel', $c2->first()->name);
+        $this->assertSame([['id' => 1, 'key' => null], ['id' => 2, 'key' => null]], $c->columns(['id', 'key'])->toArray());
+
+        $fluent1 = new Fluent(['id' => 1, 'name' => 'Laravel']);
+        $fluent2 = new Fluent(['id' => 2, 'name' => 'Lumen']);
+        $c = new Collection([(object) ['id' => 1, 'fluent' => $fluent1], (object) ['id' => 1, 'fluent' => $fluent2]]);
+        $this->assertSame([['id' => 1, 'name' => 'Laravel'], ['id' => 2, 'name' => 'Lumen']], $c->columns('fluent')->toArray());
+        $this->assertSame([['fluent' => ['id' => 1, 'name' => 'Laravel']], ['fluent' => ['id' => 2, 'name' => 'Lumen']]], $c->columns(['fluent'])->toArray());
     }
 
     public function testGettingMinItemsFromCollection()
