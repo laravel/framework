@@ -16,6 +16,15 @@ class SessionTableCommand extends Command
     protected $name = 'session:table';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'session:table';
+
+    /**
      * The console command description.
      *
      * @var string

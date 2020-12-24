@@ -20,6 +20,15 @@ class RouteListCommand extends Command
     protected $name = 'route:list';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'route:list';
+
+    /**
      * The console command description.
      *
      * @var string
