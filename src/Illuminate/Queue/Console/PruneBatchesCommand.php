@@ -35,11 +35,7 @@ class PruneBatchesCommand extends Command
         $repository = $this->laravel[BatchRepository::class];
 
         if ($repository instanceof Prunable) {
-            $hours = $this->option('hours');
-
-            $before = Carbon::now()->subHours($hours);
-
-            $count = $repository->prune($before);
+            $count = $repository->prune(Carbon::now()->subHours($this->option('hours')));
         }
 
         $this->info("{$count} entries deleted!");

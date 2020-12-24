@@ -9,7 +9,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
 
-class DatabaseBatchRepository implements BatchRepository, Prunable
+class DatabaseBatchRepository implements PrunableBatchRepository
 {
     /**
      * The batch factory instance.
@@ -232,22 +232,9 @@ class DatabaseBatchRepository implements BatchRepository, Prunable
     }
 
     /**
-     * Execute the given Closure within a storage specific transaction.
-     *
-     * @param  \Closure  $callback
-     * @return mixed
-     */
-    public function transaction(Closure $callback)
-    {
-        return $this->connection->transaction(function () use ($callback) {
-            return $callback();
-        });
-    }
-
-    /**
      * Prune all of the entries older than the given date.
      *
-     * @param  DateTimeInterface  $before
+     * @param  \DateTimeInterface  $before
      * @return int
      */
     public function prune(DateTimeInterface $before)
@@ -265,6 +252,19 @@ class DatabaseBatchRepository implements BatchRepository, Prunable
         } while ($deleted !== 0);
 
         return $totalDeleted;
+    }
+
+    /**
+     * Execute the given Closure within a storage specific transaction.
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public function transaction(Closure $callback)
+    {
+        return $this->connection->transaction(function () use ($callback) {
+            return $callback();
+        });
     }
 
     /**
