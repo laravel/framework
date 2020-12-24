@@ -1,6 +1,31 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.19.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.20.1...8.x)
+
+
+## [v8.20.1 (2020-12-22)](https://github.com/laravel/framework/compare/v8.20.0...v8.20.1)
+
+### Revert
+- Revert [Clear a cached user in RequestGuard if a request is changed](https://github.com/laravel/framework/pull/35692) ([ca8ccd6](https://github.com/laravel/framework/commit/ca8ccd6757d5639f0e5fb241b3df6878da6ce34e))
+
+
+## [v8.20.0 (2020-12-22)](https://github.com/laravel/framework/compare/v8.19.0...v8.20.0)
+
+### Added
+- Added `Illuminate\Database\DBAL\TimestampType` ([a5761d4](https://github.com/laravel/framework/commit/a5761d4187abea654cb422c2f70054a880ffd2e0), [cff3705](https://github.com/laravel/framework/commit/cff37055cbf031109ae769e8fd6ad1951be47aa6) [382445f](https://github.com/laravel/framework/commit/382445f8487de45a05ebe121837f917b92560a97), [810047e](https://github.com/laravel/framework/commit/810047e1f184f8a4def372885591e4fbb6996b51))
+- Added ability to specify a separate lock connection ([#35621](https://github.com/laravel/framework/pull/35621), [3d95235](https://github.com/laravel/framework/commit/3d95235a6ad8525886071ad68e818a225786064f))
+- Added `Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable::syncWithPivotValues()` ([#35644](https://github.com/laravel/framework/pull/35644), [49b3ce0](https://github.com/laravel/framework/commit/49b3ce098d8a612797b195c4e3774b1e00c604c8))
+
+### Fixed
+- Fixed `Illuminate\Validation\Concerns\ValidatesAttributes::validateJson()` for PHP8 ([#35646](https://github.com/laravel/framework/pull/35646))
+- Fixed `assertCookieExpired()` and `assertCookieNotExpired()` methods in `Illuminate\Testing\TestResponse` ([#35637](https://github.com/laravel/framework/pull/35637))
+- Fixed: Account for a numerical array of views in Mailable::renderForAssertions() ([#35662](https://github.com/laravel/framework/pull/35662))
+- Catch DecryptException with invalid X-XSRF-TOKEN in `Illuminate\Foundation\Http\Middleware\VerifyCsrfToken` ([#35671](https://github.com/laravel/framework/pull/35671))
+
+### Changed
+- Check configuration in `Illuminate\Foundation\Console\Kernel::scheduleCache()` ([a253d0e](https://github.com/laravel/framework/commit/a253d0e40d3deb293d54df9f4455879af5365aab))
+- Modify `Model::mergeCasts` to return `$this` ([#35683](https://github.com/laravel/framework/pull/35683))
+- Clear a cached user in RequestGuard if a request is changed ([#35692](https://github.com/laravel/framework/pull/35692))
 
 
 ## [v8.19.0 (2020-12-15)](https://github.com/laravel/framework/compare/v8.18.1...v8.19.0)

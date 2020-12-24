@@ -4,11 +4,12 @@ namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
 use Closure;
+use DateTimeInterface;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
 
-class DatabaseBatchRepository implements BatchRepository
+class DatabaseBatchRepository implements PrunableBatchRepository
 {
     /**
      * The batch factory instance.
@@ -228,6 +229,29 @@ class DatabaseBatchRepository implements BatchRepository
     public function delete(string $batchId)
     {
         $this->connection->table($this->table)->where('id', $batchId)->delete();
+    }
+
+    /**
+     * Prune all of the entries older than the given date.
+     *
+     * @param  \DateTimeInterface  $before
+     * @return int
+     */
+    public function prune(DateTimeInterface $before)
+    {
+        $query = $this->connection->table($this->table)
+            ->whereNotNull('finished_at')
+            ->where('finished_at', '<', $before->getTimestamp());
+
+        $totalDeleted = 0;
+
+        do {
+            $deleted = $query->take(1000)->delete();
+
+            $totalDeleted += $deleted;
+        } while ($deleted !== 0);
+
+        return $totalDeleted;
     }
 
     /**
