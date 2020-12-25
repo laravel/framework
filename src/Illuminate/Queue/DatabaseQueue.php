@@ -47,6 +47,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $table
      * @param  string  $default
      * @param  int  $retryAfter
+     * @param  bool  $dispatchAfterCommit
      * @return void
      */
     public function __construct(Connection $database,
