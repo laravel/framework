@@ -4,7 +4,7 @@ namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
 use Illuminate\Bus\BatchRepository;
-use Illuminate\Bus\Prunable;
+use Illuminate\Bus\PrunableBatchRepository;
 use Illuminate\Console\Command;
 
 class PruneBatchesCommand extends Command
@@ -34,7 +34,7 @@ class PruneBatchesCommand extends Command
 
         $repository = $this->laravel[BatchRepository::class];
 
-        if ($repository instanceof Prunable) {
+        if ($repository instanceof PrunableBatchRepository) {
             $count = $repository->prune(Carbon::now()->subHours($this->option('hours')));
         }
 
