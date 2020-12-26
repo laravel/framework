@@ -82,6 +82,26 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every odd minute.
+     *
+     * @return $this
+     */
+    public function everyOddMinute()
+    {
+        return $this->spliceIntoPosition(1, '1-59/2');
+    }
+
+    /**
+     * Schedule the event to run every even minute.
+     *
+     * @return $this
+     */
+    public function everyEvenMinute()
+    {
+        return $this->spliceIntoPosition(1, '0-58/2');
+    }
+
+    /**
      * Schedule the event to run every two minutes.
      *
      * @return $this
@@ -172,6 +192,28 @@ trait ManagesFrequencies
         $offset = is_array($offset) ? implode(',', $offset) : $offset;
 
         return $this->spliceIntoPosition(1, $offset);
+    }
+
+    /**
+     * Schedule the event to run every odd hour.
+     *
+     * @return $this
+     */
+    public function everyOddHour()
+    {
+        return $this->spliceIntoPosition(1, 0)
+            ->spliceIntoPosition(2, '1-59/2');
+    }
+
+    /**
+     * Schedule the event to run every even hour.
+     *
+     * @return $this
+     */
+    public function everyEvenHour()
+    {
+        return $this->spliceIntoPosition(1, 0)
+            ->spliceIntoPosition(2, '0-58/2');
     }
 
     /**
