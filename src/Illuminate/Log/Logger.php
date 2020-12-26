@@ -250,7 +250,7 @@ class Logger implements LoggerInterface
     protected function formatContext($context, $message)
     {
         if ($message instanceof Throwable
-            && !isset($context['exception'])
+            && ! isset($context['exception'])
         ) {
             $context['exception'] = $message;
         }
