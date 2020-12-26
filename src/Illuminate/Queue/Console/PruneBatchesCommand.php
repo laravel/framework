@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
-use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PrunableBatchRepository;
 use Illuminate\Console\Command;
 
@@ -26,17 +25,14 @@ class PruneBatchesCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param  PrunableBatchRepository $repository
      * @return void
      */
-    public function handle()
+    public function handle(PrunableBatchRepository $repository)
     {
-        $count = 0;
-
-        $repository = $this->laravel[BatchRepository::class];
-
-        if ($repository instanceof PrunableBatchRepository) {
-            $count = $repository->prune(Carbon::now()->subHours($this->option('hours')));
-        }
+        $count = $repository->prune(
+            Carbon::now()->subHours($this->option('hours'))
+        );
 
         $this->info("{$count} entries deleted!");
     }
