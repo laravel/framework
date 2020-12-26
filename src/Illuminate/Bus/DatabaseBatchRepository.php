@@ -239,19 +239,16 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function prune(DateTimeInterface $before)
     {
-        $query = $this->connection->table($this->table)
+        $items = $this->connection->table($this->table)
             ->whereNotNull('finished_at')
-            ->where('finished_at', '<', $before->getTimestamp());
+            ->where('finished_at', '<', $before->getTimestamp())
+            ->cursor();
 
-        $totalDeleted = 0;
+        foreach ($items as $item) {
+            $item->delete();
+        }
 
-        do {
-            $deleted = $query->take(1000)->delete();
-
-            $totalDeleted += $deleted;
-        } while ($deleted !== 0);
-
-        return $totalDeleted;
+        return $items->count();
     }
 
     /**
