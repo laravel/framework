@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Str;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -48,6 +50,8 @@ class DatabaseEloquentFactoryTest extends TestCase
             $table->increments('id');
             $table->string('name');
             $table->string('options')->nullable();
+            $table->string('password')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
         });
 
@@ -234,6 +238,15 @@ class DatabaseEloquentFactoryTest extends TestCase
         unset($_SERVER['__test.post.creating-post']);
         unset($_SERVER['__test.post.creating-user']);
         unset($_SERVER['__test.post.state-user']);
+    }
+
+    public function test_states_can_collide()
+    {
+        $this->expectExceptionMessage('State password can not be combined with email');
+        $user = FactoryTestUserFactory::new()->email()->password()->create();
+
+        $this->expectExceptionMessage('State email can not be combined with password');
+        $user = FactoryTestUserFactory::new()->password()->email()->create();
     }
 
     public function test_belongs_to_relationship()
@@ -498,12 +511,37 @@ class FactoryTestUserFactory extends Factory
 {
     protected $model = FactoryTestUser::class;
 
+    protected $collidingStates = [
+        'email' => ['password'],
+        'password' => ['email'],
+    ];
+
     public function definition()
     {
         return [
             'name' => $this->faker->name,
+            'email' => null,
+            'password' => null,
             'options' => null,
         ];
+    }
+
+    public function email(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'email' => $this->faker->email,
+            ];
+        }, 'email');
+    }
+
+    public function password(): Factory
+    {
+        return $this->state(function ($attributes) {
+            return [
+                'password' => Hash::make(Str::random(10)),
+            ];
+        }, 'password');
     }
 }
 

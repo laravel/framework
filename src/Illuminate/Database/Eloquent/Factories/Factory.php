@@ -39,6 +39,20 @@ abstract class Factory
     protected $states;
 
     /**
+     * The states that were called
+     *
+     * @var array|null
+     */
+    protected $calledStates;
+
+    /**
+     * The states that will collide
+     *
+     * @var array|null $collidingStates
+     */
+    protected $collidingStates;
+
+    /**
      * The parent relationships that will be applied to the model.
      *
      * @var \Illuminate\Support\Collection
@@ -119,7 +133,9 @@ abstract class Factory
                                 ?Collection $for = null,
                                 ?Collection $afterMaking = null,
                                 ?Collection $afterCreating = null,
-                                $connection = null)
+                                $connection = null,
+                                ?array $calledStates = null,
+                                ?array $collidingStates = null)
     {
         $this->count = $count;
         $this->states = $states ?: new Collection;
@@ -129,6 +145,16 @@ abstract class Factory
         $this->afterCreating = $afterCreating ?: new Collection;
         $this->connection = $connection;
         $this->faker = $this->withFaker();
+
+        if($calledStates)
+        {
+            $this->calledStates = $calledStates;
+        }
+
+        if($collidingStates)
+        {
+            $this->collidingStates = $collidingStates;
+        }
     }
 
     /**
@@ -424,11 +450,20 @@ abstract class Factory
     /**
      * Add a new state transformation to the model definition.
      *
-     * @param  callable|array  $state
+     * @param callable|array $state
+     * @param string|null    $calledState
+     *
      * @return static
+     * @throws \Exception
      */
-    public function state($state)
+    public function state($state, ?string $calledState = null)
     {
+        if ($calledState) {
+            $this->checkStateCollides($calledState);
+
+            $this->calledStates[] = $calledState;
+        }
+
         return $this->newInstance([
             'states' => $this->states->concat([
                 is_callable($state) ? $state : function () use ($state) {
@@ -436,6 +471,23 @@ abstract class Factory
                 },
             ]),
         ]);
+    }
+
+    /**
+     * @param $newState
+     *
+     * @return void
+     * @throws \Exception
+     */
+    private function checkStateCollides($newState): void
+    {
+        if (is_array($this->calledStates) && count($this->calledStates) > 0) {
+            foreach ($this->calledStates as $calledState) {
+                if (in_array($newState, $this->collidingStates[$calledState])) {
+                    throw new \Exception('State '.$newState.' can not be combined with '.$calledState);
+                }
+            }
+        }
     }
 
     /**
@@ -609,6 +661,8 @@ abstract class Factory
             'afterMaking' => $this->afterMaking,
             'afterCreating' => $this->afterCreating,
             'connection' => $this->connection,
+            'calledStates' => $this->calledStates,
+            'collidingStates' => $this->collidingStates,
         ], $arguments)));
     }
 
