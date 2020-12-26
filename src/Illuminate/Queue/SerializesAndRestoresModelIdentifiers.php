@@ -82,11 +82,11 @@ trait SerializesAndRestoresModelIdentifiers
 
         $collectionClass = get_class($collection);
 
-        return new $collectionClass(
+        return (new $collectionClass(
             collect($value->id)->map(function ($id) use ($collection) {
                 return $collection[$id] ?? null;
             })->filter()
-        );
+        ))->load($value->relations ?? []);
     }
 
     /**
