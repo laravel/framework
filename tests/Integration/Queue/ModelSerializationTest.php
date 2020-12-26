@@ -167,6 +167,35 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($unSerialized->order->getRelations(), $order->getRelations());
     }
 
+    public function testItReloadsCollectionRelationships()
+    {
+        $order1 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $order2 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order1->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order1->id, 'product_id' => $product2->id]);
+        Line::create(['order_id' => $order2->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order2->id, 'product_id' => $product2->id]);
+
+        $orders = Order::all();
+
+        $orders->load('line', 'lines', 'products');
+
+        $serialized = serialize(new CollectionRelationSerializationTestClass($orders));
+        $unSerialized = unserialize($serialized);
+
+        $this->assertEquals($unSerialized->orders[0]->getRelations(), $orders[0]->getRelations());
+        $this->assertEquals($unSerialized->orders[1]->getRelations(), $orders[1]->getRelations());
+    }
+
     public function testItReloadsNestedRelationships()
     {
         $order = tap(Order::create(), function (Order $order) {
@@ -463,6 +492,18 @@ class ModelRelationSerializationTestClass
     public function __construct($order)
     {
         $this->order = $order;
+    }
+}
+
+class CollectionRelationSerializationTestClass
+{
+    use SerializesModels;
+
+    public $orders;
+
+    public function __construct($orders)
+    {
+        $this->orders = $orders;
     }
 }
 
