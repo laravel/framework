@@ -26,6 +26,27 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
+    public function testMethodsPassExceptionAdditionsToMonolog()
+    {
+        $exception = new RuntimeException('Test error message.');
+
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog->shouldReceive('error')->once()->with('Test error message.', ['foo' => 'bar', 'exception' => $exception]);
+
+        $writer->error($exception, ['foo' => 'bar']);
+    }
+
+    public function testMethodsPassExceptionAdditionsToMonologWithoutOverwritingExplicitContext()
+    {
+        $exception1 = new RuntimeException('Test error message 1.');
+        $exception2 = new RuntimeException('Test error message 2.');
+
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog->shouldReceive('error')->once()->with('Test error message 1.', ['foo' => 'bar', 'exception' => $exception2]);
+
+        $writer->error($exception1, ['foo' => 'bar', 'exception' => $exception2]);
+    }
+
     public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);

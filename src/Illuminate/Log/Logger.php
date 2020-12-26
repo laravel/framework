@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Log\Events\MessageLogged;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Throwable;
 
 class Logger implements LoggerInterface
 {
@@ -171,6 +172,7 @@ class Logger implements LoggerInterface
      */
     protected function writeLog($level, $message, $context)
     {
+        $context = $this->formatContext($context, $message);
         $message = $this->formatMessage($message);
 
         $this->logger->{$level}($message, $context);
@@ -227,9 +229,33 @@ class Logger implements LoggerInterface
             return $message->toJson();
         } elseif ($message instanceof Arrayable) {
             return var_export($message->toArray(), true);
+        } elseif ($message instanceof Throwable) {
+            return $message->getMessage();
         }
 
         return $message;
+    }
+
+    /**
+     * Format the context for the logger.
+     *
+     * If the message is an object that extends Throwable, and the context does
+     * not contain anything in the exception key, the message will be passed
+     * there, so that later, additional processing can be performed on it.
+     *
+     * @param  array  $context
+     * @param  mixed  $message
+     * @return void
+     */
+    protected function formatContext($context, $message)
+    {
+        if ($message instanceof Throwable
+            && !isset($context['exception'])
+        ) {
+            $context['exception'] = $message;
+        }
+
+        return $context;
     }
 
     /**
