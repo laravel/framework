@@ -292,8 +292,12 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function add($key, $value, $ttl = null)
     {
+        $seconds = null;
+
         if ($ttl !== null) {
-            if ($this->getSeconds($ttl) <= 0) {
+            $seconds = $this->getSeconds($ttl);
+
+            if ($seconds <= 0) {
                 return false;
             }
 
@@ -301,8 +305,6 @@ class Repository implements ArrayAccess, CacheContract
             // has a chance to override this logic. Some drivers better support the way
             // this operation should work with a total "atomic" implementation of it.
             if (method_exists($this->store, 'add')) {
-                $seconds = $this->getSeconds($ttl);
-
                 return $this->store->add(
                     $this->itemKey($key), $value, $seconds
                 );
@@ -313,7 +315,7 @@ class Repository implements ArrayAccess, CacheContract
         // so it exists for subsequent requests. Then, we will return true so it is
         // easy to know if the value gets added. Otherwise, we will return false.
         if (is_null($this->get($key))) {
-            return $this->put($key, $value, $ttl);
+            return $this->put($key, $value, $seconds);
         }
 
         return false;
