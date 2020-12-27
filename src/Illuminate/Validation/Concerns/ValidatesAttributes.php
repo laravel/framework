@@ -749,7 +749,7 @@ trait ValidatesAttributes
     {
         $idColumn = $idColumn ?? $parameters[3] ?? 'id';
 
-        return [$idColumn, $this->prepareUniqueId($parameters[2])];
+        return [$idColumn, $this->getValue($this->prepareUniqueId($parameters[2]))];
     }
 
     /**
@@ -853,7 +853,7 @@ trait ValidatesAttributes
         $count = count($segments);
 
         for ($i = 0; $i < $count; $i += 2) {
-            $extra[$segments[$i]] = $segments[$i + 1];
+            $extra[$segments[$i]] = $this->getValue($segments[$i + 1]);
         }
 
         return $extra;
