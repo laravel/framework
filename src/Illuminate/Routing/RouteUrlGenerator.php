@@ -164,8 +164,13 @@ class RouteUrlGenerator
 
         $port = (int) $this->request->getPort();
 
-        return ($secure && $port === 443) || (! $secure && $port === 80)
-                    ? $domain : $domain.':'.$port;
+        $needsPort = ($secure && $port !== 443) || (!$secure && $port !== 80);
+
+		if (is_numeric(Str::afterLast($domain, ':'))) {
+			$needsPort = false;
+		}
+
+		return $needsPort ? $domain . ':' . $port : $domain;
     }
 
     /**
