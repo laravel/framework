@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -11,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Mockery;
 use PHPUnit\Framework\TestCase;
