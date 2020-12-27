@@ -243,10 +243,20 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_states_can_collide()
     {
         $this->expectExceptionMessage('State password can not be combined with email');
-        $user = FactoryTestUserFactory::new()->email()->password()->create();
+        FactoryTestUserFactory::new()->email()->password()->create();
+        $this->assertCount(0, FactoryTestUser::count());
 
         $this->expectExceptionMessage('State email can not be combined with password');
-        $user = FactoryTestUserFactory::new()->password()->email()->create();
+        FactoryTestUserFactory::new()->password()->email()->create();
+        $this->assertCount(0, FactoryTestUser::count());
+
+        $this->expectExceptionMessage('State password can not be combined with email');
+        FactoryTestUserFactory::new()->email()->password()->make();
+        $this->assertCount(0, FactoryTestUser::count());
+
+        $this->expectExceptionMessage('State email can not be combined with password');
+        FactoryTestUserFactory::new()->password()->email()->make();
+        $this->assertCount(0, FactoryTestUser::count());
     }
 
     public function test_belongs_to_relationship()
