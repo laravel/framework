@@ -166,11 +166,11 @@ class RouteUrlGenerator
 
         $needsPort = ($secure && $port !== 443) || (!$secure && $port !== 80);
 
-		if (is_numeric(Str::afterLast($domain, ':'))) {
-			$needsPort = false;
-		}
+        if (is_numeric(Str::afterLast($domain, ':'))) {
+            $needsPort = false;
+        }
 
-		return $needsPort ? $domain . ':' . $port : $domain;
+        return $needsPort ? $domain . ':' . $port : $domain;
     }
 
     /**
