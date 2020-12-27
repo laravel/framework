@@ -472,12 +472,12 @@ abstract class Factory
     }
 
     /**
-     * @param $newState
+     * @param string $newState
      *
      * @return void
      * @throws \Exception
      */
-    private function checkStateCollides($newState): void
+    private function checkStateCollides(string $newState)
     {
         if (is_array($this->collidingStates) && count($this->collidingStates) > 0 && is_array($this->calledStates) && count($this->calledStates) > 0) {
             foreach ($this->calledStates as $calledState) {
