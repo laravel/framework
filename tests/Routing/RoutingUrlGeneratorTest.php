@@ -457,8 +457,15 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
+        /*
+         * Domains with ports...
+         */
+        $route = new Route(['GET'], 'foo/bar', ['as' => 'baz', 'domain' => 'domain.foo.com:3000']);
+        $routes->add($route);
+
         $this->assertSame('http://sub.foo.com:8080/foo/bar', $url->route('foo'));
         $this->assertSame('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell']));
+        $this->assertSame('http://domain.foo.com:3000/foo/bar', $url->route('baz'));
     }
 
     public function testRoutesWithDomainsStripsProtocols()
