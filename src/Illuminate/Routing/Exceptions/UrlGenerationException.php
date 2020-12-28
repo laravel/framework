@@ -17,17 +17,17 @@ class UrlGenerationException extends Exception
      */
     public static function forMissingParameters(Route $route, array $parameters = [])
     {
-        $paramterLabel = Str::plural('parameter', count($parameters));
+        $parameterLabel = Str::plural('parameter', count($parameters));
 
         $message = sprintf(
             'Missing required %s for [Route: %s] [URI: %s]',
-            $paramterLabel,
+            $parameterLabel,
             $route->getName(),
             $route->uri()
         );
 
         if (count($parameters) > 0) {
-            $message .= sprintf(' [Missing %s: %s]', $paramterLabel, implode(', ', $parameters));
+            $message .= sprintf(' [Missing %s: %s]', $parameterLabel, implode(', ', $parameters));
         }
 
         $message .= '.';
