@@ -2172,6 +2172,33 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
     }
 
+    public function testGetOriginalIncrementWithExtra()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->timestamps = false;
+        $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(Connection::class));
+        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
+        $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
+            $builder = m::mock(BaseBuilder::class.'[increment]', [$connection, $grammar, $processor]);
+            $builder->shouldReceive('increment')->withAnyArgs()->andReturn(1);
+
+            return $builder;
+        });
+        $model->intAttribute = '1';
+        $model->floatAttribute = '0.1234';
+        $model->exists = true;
+        $model->syncOriginal();
+
+        $model->increment('intAttribute', 1, [
+            'floatAttribute' => '123.4',
+        ]);
+
+        $this->assertSame(2, $model->getOriginal('intAttribute'));
+        $this->assertSame(123.4, $model->getOriginal('floatAttribute'));
+    }
+
     public function testUnsavedModel()
     {
         $user = new UnsavedModel;
