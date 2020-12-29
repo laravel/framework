@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class MaintenanceModeTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         @unlink(storage_path('framework/down'));
     }

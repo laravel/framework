@@ -13,7 +13,7 @@ use Mockery;
 
 class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
     }
