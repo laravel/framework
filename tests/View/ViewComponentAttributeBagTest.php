@@ -64,5 +64,31 @@ class ViewComponentAttributeBagTest extends TestCase
             ]);
 
         $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
+
+        $bag = (new ComponentAttributeBag)
+            ->merge([
+                'test-extract-1' => 'extracted-1',
+                'test-extract-2' => 'extracted-2',
+                'test-discard-1' => 'discarded-1',
+                'test-discard-2' => 'discarded-2'
+            ]);
+
+        $this->assertSame('test-extract-1="extracted-1" test-extract-2="extracted-2"', (string) $bag->exceptProps([
+            'test-discard-1',
+            'test-discard-2' => 'defaultValue'
+        ]));
+
+        $bag = (new ComponentAttributeBag)
+            ->merge([
+                'test-extract-1' => 'extracted-1',
+                'test-extract-2' => 'extracted-2',
+                'test-discard-1' => 'discarded-1',
+                'test-discard-2' => 'discarded-2'
+            ]);
+
+        $this->assertSame('test-extract-1="extracted-1" test-extract-2="extracted-2"', (string) $bag->onlyProps([
+            'test-extract-1',
+            'test-extract-2' => 'defaultValue'
+        ]));
     }
 }

@@ -41,8 +41,14 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert type="foo" limit="5" @click="foo" wire:click="changePlan(\'{{ $plan }}\')" required /><x-alert /></div>');
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['type' => 'foo','limit' => '5','@click' => 'foo','wire:click' => 'changePlan(\''.e(\$plan).'\')','required' => true]); ?>\n".
 "@endcomponentClass  @component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes([]); ?>\n".
 '@endcomponentClass </div>', trim($result));
     }
@@ -52,6 +58,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert type="" limit=\'\' @click="" required /></div>');
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['type' => '','limit' => '','@click' => '','required' => true]); ?>\n".
 '@endcomponentClass </div>', trim($result));
     }
@@ -61,6 +70,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile user-id="1"></x-profile>');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => '1'])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
     }
 
@@ -69,6 +81,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :user-id="1"></x-profile>');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => 1])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
     }
 
@@ -77,6 +92,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :src="\'foo\'"></x-profile>');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['src' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('foo')]); ?> @endcomponentClass", trim($result));
     }
 
@@ -85,6 +103,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['foo:alert' => TestAlertComponent::class])->compileTags('<x-foo:alert></x-foo:alert>');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'foo:alert', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
     }
 
@@ -93,6 +114,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['foo:alert' => TestAlertComponent::class])->compileTags('<x:foo:alert></x-foo:alert>');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'foo:alert', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
     }
 
@@ -101,6 +125,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert/></div>');
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes([]); ?>\n".
 '@endcomponentClass </div>', trim($result));
     }
@@ -140,6 +167,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<x-alert class="bar" wire:model="foo" x-on:click="bar" @click="baz" />');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['class' => 'bar','wire:model' => 'foo','x-on:click' => 'bar','@click' => 'baz']); ?>\n".
 '@endcomponentClass', trim($result));
     }
@@ -149,6 +179,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<x-alert title="foo" class="bar" wire:model="foo" />');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', ['title' => 'foo'])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['class' => 'bar','wire:model' => 'foo']); ?>\n".
 '@endcomponentClass', trim($result));
     }
@@ -159,6 +192,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile class="bar" {{ $attributes }} wire:model="foo"></x-profile>');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes),'wire:model' => 'foo']); ?> @endcomponentClass", trim($result));
     }
 
@@ -169,6 +205,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert title="foo" class="bar" {{ $attributes->merge([\'class\' => \'test\']) }} wire:model="foo" /></div>');
 
         $this->assertSame("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', ['title' => 'foo'])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes->merge(['class' => 'test'])),'wire:model' => 'foo']); ?>\n".
             '@endcomponentClass </div>', trim($result));
     }
@@ -178,6 +217,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile></x-profile>Words');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes([]); ?> @endcomponentClass Words", trim($result));
     }
 
@@ -186,6 +228,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<x-alert/>Words');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes([]); ?>\n".
 '@endcomponentClass Words', trim($result));
     }
@@ -195,6 +240,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<x-alert :title="$title" class="bar" />');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', ['title' => \$title])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['class' => 'bar']); ?>\n".
 '@endcomponentClass', trim($result));
     }
@@ -205,6 +253,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-alert>');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes([]); ?>
  @endcomponentClass", trim($result));
     }
@@ -221,6 +272,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileTags('<x-anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
         $this->assertSame("@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
 '@endcomponentClass', trim($result));
     }
@@ -237,6 +291,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileTags('<x-package::anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
         $this->assertSame("@component('Illuminate\View\AnonymousComponent', 'package::anonymous-component', ['view' => 'package::components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
 '@endcomponentClass', trim($result));
     }
