@@ -47,6 +47,7 @@ trait DetectsLostConnections
             'SQLSTATE[HY000]: General error: 7 SSL SYSCALL error: EOF detected',
             'SQLSTATE[HY000] [2002] Connection timed out',
             'SSL: Connection timed out',
+            'SQLSTATE[HY000]: General error: 1105 The last transaction was aborted due to Seamless Scaling. Please retry.',
         ]);
     }
 }
