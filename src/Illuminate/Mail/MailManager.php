@@ -327,8 +327,13 @@ class MailManager implements FactoryContract
      */
     protected function createPostmarkTransport(array $config)
     {
+        $headers = isset($config['message_stream_id']) ? [
+            'X-PM-Message-Stream' => $config['message_stream_id'],
+        ] : [];
+
         return tap(new PostmarkTransport(
-            $config['token'] ?? $this->app['config']->get('services.postmark.token')
+            $config['token'] ?? $this->app['config']->get('services.postmark.token'),
+            $headers
         ), function ($transport) {
             $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
         });
