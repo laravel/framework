@@ -212,10 +212,15 @@ trait FormatsMessages
      */
     public function makeReplacements($message, $attribute, $rule, $parameters)
     {
+        $explicitKeys = $this->getExplicitKeys($attribute);
+
         $message = $this->replaceAttributePlaceholder(
             $message, $this->getDisplayableAttribute($attribute)
         );
 
+        $message = $this->replaceKeyPlaceholder($message, $explicitKeys);
+        $message = $this->replaceIndexPlaceholder($message, $explicitKeys);
+        $message = $this->replaceIterationPlaceholder($message, $explicitKeys);
         $message = $this->replaceInputPlaceholder($message, $attribute);
 
         if (isset($this->replacers[Str::snake($rule)])) {
@@ -293,6 +298,82 @@ trait FormatsMessages
             [$value, Str::upper($value), Str::ucfirst($value)],
             $message
         );
+    }
+
+    /**
+     * Replace the :key{n} placeholders in the given message.
+     *
+     * @param  string  $message
+     * @param  array  $explicitKeys
+     * @return string
+     */
+    protected function replaceKeyPlaceholder($message, $explicitKeys)
+    {
+        if (count($explicitKeys) > 0) {
+            foreach ($explicitKeys as $explicitKeyIndex => $explicitKey) {
+                $message = str_replace(
+                    [":key$explicitKeyIndex", ":KEY$explicitKeyIndex", ":Key$explicitKeyIndex"],
+                    [$explicitKey, Str::upper($explicitKey), Str::ucfirst($explicitKey)],
+                    $message
+                );
+            }
+            $firstKey = $explicitKeys[0];
+            $message = str_replace(
+                [':key', ':KEY', ':Key'],
+                [$firstKey, Str::upper($firstKey), Str::ucfirst($firstKey)],
+                $message
+            );
+        }
+
+        return $message;
+    }
+
+    /**
+     * Replace the :index{n} placeholders in the given message.
+     *
+     * @param  string  $message
+     * @param  array  $explicitKeys
+     * @return string
+     */
+    protected function replaceIndexPlaceholder($message, $explicitKeys)
+    {
+        if (count($explicitKeys) > 0) {
+            foreach ($explicitKeys as $explicitKeyIndex => $explicitKey) {
+                if (is_numeric($explicitKey)) {
+                    $message = str_replace(":index$explicitKeyIndex", $explicitKey, $message);
+                }
+            }
+            $firstKey = $explicitKeys[0];
+            if (is_numeric($firstKey)) {
+                $message = str_replace(':index', $firstKey, $message);
+            }
+        }
+
+        return $message;
+    }
+
+    /**
+     * Replace the :iteration{n} placeholders in the given message.
+     *
+     * @param  string  $message
+     * @param  array  $explicitKeys
+     * @return string
+     */
+    protected function replaceIterationPlaceholder($message, $explicitKeys)
+    {
+        if (count($explicitKeys) > 0) {
+            foreach ($explicitKeys as $explicitKeyIndex => $explicitKey) {
+                if (is_numeric($explicitKey)) {
+                    $message = str_replace(":iteration$explicitKeyIndex", intval($explicitKey) + 1, $message);
+                }
+            }
+            $firstKey = $explicitKeys[0];
+            if (is_numeric($firstKey)) {
+                $message = str_replace(':iteration', intval($firstKey) + 1, $message);
+            }
+        }
+
+        return $message;
     }
 
     /**

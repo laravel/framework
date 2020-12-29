@@ -415,6 +415,70 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('First name is required!', $v->messages()->first('names.0'));
     }
 
+    public function testKeyIsReplaced()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines([
+            'validation.required' => ':attribute is required!',
+            'validation.attributes.name.*' => 'Any name(:key)',
+            'validation.attributes.name_nested.*.*' => 'Any name(:key0)(:key1)',
+        ], 'en');
+        $v = new Validator($trans, ['name' => ['', 'Foo', '']], ['name.*' => 'required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('Any name(0) is required!', $v->messages()->first('name.0'));
+        $this->assertSame('Any name(2) is required!', $v->messages()->first('name.2'));
+
+        $v = new Validator($trans, ['name_nested' => [['en' => 'Foo', 'fa' => ''], ['en' => '', 'fa' => 'Bar']]], ['name_nested.*.*' => 'required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('Any name(0)(fa) is required!', $v->messages()->first('name_nested.0.fa'));
+        $this->assertSame('Any name(1)(en) is required!', $v->messages()->first('name_nested.1.en'));
+    }
+
+    public function testIndexIsReplaced()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines([
+            'validation.required' => ':attribute is required!',
+            'validation.attributes.name.*' => 'Any name(:index)',
+            'validation.attributes.name_nested.*.*' => 'Any name(:index0)(:index1)',
+        ], 'en');
+        $v = new Validator($trans, ['name' => ['', 'Foo', '']], ['name.*' => 'required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('Any name(0) is required!', $v->messages()->first('name.0'));
+        $this->assertSame('Any name(2) is required!', $v->messages()->first('name.2'));
+
+        $v = new Validator($trans, ['name_nested' => [['', 'Foo'], ['Bar', '']]], ['name_nested.*.*' => 'required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('Any name(0)(0) is required!', $v->messages()->first('name_nested.0.0'));
+        $this->assertSame('Any name(1)(1) is required!', $v->messages()->first('name_nested.1.1'));
+    }
+
+    public function testIterationIsReplaced()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines([
+            'validation.required' => ':attribute is required!',
+            'validation.attributes.name.*' => 'Any name(:iteration)',
+            'validation.attributes.name_nested.*.*' => 'Any name(:iteration0)(:iteration1)',
+        ], 'en');
+        $v = new Validator($trans, ['name' => ['', 'Foo', '']], ['name.*' => 'required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('Any name(1) is required!', $v->messages()->first('name.0'));
+        $this->assertSame('Any name(3) is required!', $v->messages()->first('name.2'));
+
+        $v = new Validator($trans, ['name_nested' => [['', 'Foo'], ['Bar', '', '']]], ['name_nested.*.*' => 'required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('Any name(1)(1) is required!', $v->messages()->first('name_nested.0.0'));
+        $this->assertSame('Any name(2)(2) is required!', $v->messages()->first('name_nested.1.1'));
+        $this->assertSame('Any name(2)(3) is required!', $v->messages()->first('name_nested.1.2'));
+    }
+
     public function testInputIsReplaced()
     {
         $trans = $this->getIlluminateArrayTranslator();
