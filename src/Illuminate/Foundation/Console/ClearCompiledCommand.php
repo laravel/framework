@@ -21,6 +21,29 @@ class ClearCompiledCommand extends Command
     protected $description = 'Remove the compiled class file';
 
     /**
+     * Has OPCache extension.
+     *
+     * @var bool
+     */
+    protected $hasOpcache;
+
+    /**
+     * Create a new console command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->hasOpcache = function_exists('opcache_reset');
+
+        if ($this->hasOpcache) {
+            $this->description = 'Remove the compiled class file and clear OPCache';
+        }
+
+        parent::__construct();
+    }
+
+    /**
      * Execute the console command.
      *
      * @return void
@@ -35,6 +58,14 @@ class ClearCompiledCommand extends Command
             @unlink($packagesPath);
         }
 
-        $this->info('Compiled services and packages files removed!');
+        if ($this->hasOpcache) {
+            @opcache_reset();
+        }
+
+        $message = $this->hasOpcache
+            ? 'OPCache and compiled services and packages files removed!'
+            : 'Compiled services and packages files removed!';
+
+        $this->info($message);
     }
 }

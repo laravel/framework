@@ -17,6 +17,7 @@ class ComposerScripts
         require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
         static::clearCompiled();
+        static::clearOpcache();
     }
 
     /**
@@ -30,6 +31,7 @@ class ComposerScripts
         require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
         static::clearCompiled();
+        static::clearOpcache();
     }
 
     /**
@@ -43,6 +45,7 @@ class ComposerScripts
         require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
         static::clearCompiled();
+        static::clearOpcache();
     }
 
     /**
@@ -60,6 +63,18 @@ class ComposerScripts
 
         if (is_file($packagesPath = $laravel->getCachedPackagesPath())) {
             @unlink($packagesPath);
+        }
+    }
+
+    /**
+     * Resets the contents of the opcode cache.
+     *
+     * @return void
+     */
+    protected static function clearOpcache()
+    {
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
         }
     }
 }
