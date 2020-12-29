@@ -170,7 +170,9 @@ class Batch implements Arrayable, JsonSerializable
                 $count += count($job);
 
                 return with($this->prepareBatchedChain($job), function ($chain) {
-                    return $chain->first()->chain($chain->slice(1)->values()->all());
+                    return $chain->first()
+                            ->allOnQueue($this->options['queue'] ?? null)
+                            ->chain($chain->slice(1)->values()->all());
                 });
             } else {
                 $job->withBatchId($this->id);
