@@ -28,9 +28,9 @@ class AuthenticationException extends Exception
      * @param  string|null  $redirectTo
      * @return void
      */
-    public function __construct($message = 'Unauthenticated.', array $guards = [], $redirectTo = null)
+    public function __construct($message = null, array $guards = [], $redirectTo = null)
     {
-        parent::__construct($message);
+        parent::__construct($message ?? trans('Unauthenticated.'));
 
         $this->guards = $guards;
         $this->redirectTo = $redirectTo;
