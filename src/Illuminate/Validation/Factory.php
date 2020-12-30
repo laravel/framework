@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
+use Illuminate\Contracts\Validation\ImplicitRule as ImplicitRuleContract;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Str;
 
@@ -214,7 +215,17 @@ class Factory implements FactoryContract
      */
     public function extendImplicit($rule, $extension, $message = null)
     {
-        $this->implicitExtensions[$rule] = $extension;
+        if ($extension instanceof ImplicitRuleContract) {
+            $this->implicitExtensions[$rule] = function ($attribute, $value) use ($extension) {
+                return $extension->passes(...func_get_args());
+            };
+
+            if (! $message) {
+                $message = $extension->message();
+            }
+        } else {
+            $this->implicitExtensions[$rule] = $extension;
+        }
 
         if ($message) {
             $this->fallbackMessages[Str::snake($rule)] = $message;
