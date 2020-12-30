@@ -190,7 +190,7 @@ class Factory implements FactoryContract
     {
         if ($extension instanceof RuleContract) {
             $this->extensions[$rule] = function ($attribute, $value) use ($extension) {
-                return $extension->passes(...func_get_args());
+                return $extension->passes($attribute, $value);
             };
 
             if (! $message) {
@@ -217,7 +217,7 @@ class Factory implements FactoryContract
     {
         if ($extension instanceof ImplicitRuleContract) {
             $this->implicitExtensions[$rule] = function ($attribute, $value) use ($extension) {
-                return $extension->passes(...func_get_args());
+                return $extension->passes($attribute, $value);
             };
 
             if (! $message) {
