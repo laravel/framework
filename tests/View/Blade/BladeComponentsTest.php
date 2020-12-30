@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\View\ComponentAttributeBag;
+use Mockery as m;
+
 class BladeComponentsTest extends AbstractBladeTestCase
 {
     public function testComponentsAreCompiled()
@@ -51,5 +54,23 @@ class BladeComponentsTest extends AbstractBladeTestCase
     public function testEndSlotsAreCompiled()
     {
         $this->assertSame('<?php $__env->endSlot(); ?>', $this->compiler->compileString('@endslot'));
+    }
+
+    public function testPropsAreExtractedFromParentAttributesCorrectlyForClassComponents()
+    {
+        $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
+
+        $component = m::mock(\Illuminate\View\Component::class);
+        $component->shouldReceive('withName', 'test');
+        $component->shouldReceive('shouldRender')->andReturn(false);
+
+        $__env = m::mock(\Illuminate\View\Factory::class);
+        $__env->shouldReceive('getContainer->make')->with('Test', ['foo' => 'bar', 'other' => 'ok'])->andReturn($component);
+
+        $template = $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])');
+
+        ob_start();
+        eval(" ?> $template <?php endif; ");
+        ob_get_clean();
     }
 }

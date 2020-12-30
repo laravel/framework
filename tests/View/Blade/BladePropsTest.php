@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\View\ComponentAttributeBag;
+
 class BladePropsTest extends AbstractBladeTestCase
 {
     public function testPropsAreCompiled()
@@ -18,5 +20,27 @@ class BladePropsTest extends AbstractBladeTestCase
     if (array_key_exists($__key, $__defined_vars)) unset($$__key);
 } ?>
 <?php unset($__defined_vars); ?>', $this->compiler->compileString('@props([\'one\' => true, \'two\' => \'string\'])'));
+    }
+
+    public function testPropsAreExtractedFromParentAttributesCorrectly()
+    {
+        $test1 = $test2 = $test4 = null;
+
+        $attributes = new ComponentAttributeBag(['test1' => 'value1', 'test2' => 'value2', 'test3' => 'value3']);
+
+        $template = $this->compiler->compileString('@props([\'test1\' => \'default\', \'test2\', \'test4\' => \'default\'])');
+
+        ob_start();
+        eval(" ?> $template <?php ");
+        ob_get_clean();
+
+        $this->assertSame($test1, 'value1');
+        $this->assertSame($test2, 'value2');
+        $this->assertSame(isset($test3), false);
+        $this->assertSame($test4, 'default');
+
+        $this->assertSame($attributes->get('test1'), null);
+        $this->assertSame($attributes->get('test2'), null);
+        $this->assertSame($attributes->get('test3'), 'value3');
     }
 }

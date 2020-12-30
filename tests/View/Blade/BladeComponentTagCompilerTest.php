@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
+use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
 use Mockery;
 
@@ -339,6 +340,40 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->expectException(InvalidArgumentException::class);
 
         $this->compiler()->compileTags('<x-alert />');
+    }
+
+    public function testAttributesTreatedAsPropsAreRemovedFromFinalAttributes()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $container->instance(Factory::class, $factory = Mockery::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $factory->shouldReceive('exists')->andReturn(false);
+        Container::setInstance($container);
+
+        $attributes = new ComponentAttributeBag(['userId' => 'bar', 'other' => 'ok']);
+
+        $component = Mockery::mock(\Illuminate\View\Component::class);
+        $component->shouldReceive('withName', 'test');
+        $component->shouldReceive('shouldRender')->andReturn(true);
+        $component->shouldReceive('resolveView')->andReturn('');
+        $component->shouldReceive('data')->andReturn([]);
+        $component->shouldReceive('withAttributes');
+
+        $__env = Mockery::mock(\Illuminate\View\Factory::class);
+        $__env->shouldReceive('getContainer->make')->with(TestProfileComponent::class, ['userId' => 'bar', 'other' => 'ok'])->andReturn($component);
+        $__env->shouldReceive('startComponent');
+        $__env->shouldReceive('renderComponent');
+
+        $template = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile {{ $attributes }} />');
+        $template = $this->compiler->compileString($template);
+
+        ob_start();
+        eval(" ?> $template <?php ");
+        ob_get_clean();
+
+        $this->assertSame($attributes->get('userId'), null);
+        $this->assertSame($attributes->get('other'), 'ok');
     }
 
     protected function mockViewFactory($existsSucceeds = true)
