@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Str;
 
 class Factory implements FactoryContract
@@ -186,7 +187,17 @@ class Factory implements FactoryContract
      */
     public function extend($rule, $extension, $message = null)
     {
-        $this->extensions[$rule] = $extension;
+        if ($extension instanceof RuleContract) {
+            $this->extensions[$rule] = function ($attribute, $value) use ($extension) {
+                return $extension->passes(...func_get_args());
+            };
+
+            if (! $message) {
+                $message = $extension->message();
+            }
+        } else {
+            $this->extensions[$rule] = $extension;
+        }
 
         if ($message) {
             $this->fallbackMessages[Str::snake($rule)] = $message;
