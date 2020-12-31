@@ -505,7 +505,7 @@ trait MakesHttpRequests
         );
 
         $response = $kernel->handle(
-            $request = $this->createFromBase($symfonyRequest)
+            $request = $this->createRequestFromBase($symfonyRequest)
         );
 
         if ($this->followRedirects) {
