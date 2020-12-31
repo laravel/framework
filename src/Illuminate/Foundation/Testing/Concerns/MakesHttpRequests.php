@@ -505,7 +505,7 @@ trait MakesHttpRequests
         );
 
         $response = $kernel->handle(
-            $request = Request::createFromBase($symfonyRequest)
+            $request = $this->createFromBase($symfonyRequest)
         );
 
         if ($this->followRedirects) {
@@ -515,6 +515,17 @@ trait MakesHttpRequests
         $kernel->terminate($request, $response);
 
         return $this->createTestResponse($response);
+    }
+
+    /**
+     * Create an Illuminate request from a Symfony instance.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @return \Illuminate\Http\Request
+     */
+    protected function createRequestFromBase(SymfonyRequest $request)
+    {
+        return Request::createFromBase($request);
     }
 
     /**
