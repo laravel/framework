@@ -161,7 +161,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function onlyProps($keys)
     {
-        return $this->only($this->extractPropsNames($keys));
+        return $this->only($this->extractPropNames($keys));
     }
 
     /**
@@ -172,7 +172,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function exceptProps($keys)
     {
-        return $this->except($this->extractPropsNames($keys));
+        return $this->except($this->extractPropNames($keys));
     }
 
     /**
@@ -181,7 +181,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      * @param  mixed|array  $keys
      * @return array
      */
-    protected function extractPropsNames($keys)
+    protected function extractPropNames($keys)
     {
         $props = [];
 
