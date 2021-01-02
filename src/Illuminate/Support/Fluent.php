@@ -140,7 +140,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function __call($method, $parameters)
     {
-        $this->attributes[$method] = count($parameters) > 0 ? $parameters[0] : true;
+        $this->attributes[$method] = count($parameters) > 0 ? $parameters[array_key_first($parameters)] : true;
 
         return $this;
     }
