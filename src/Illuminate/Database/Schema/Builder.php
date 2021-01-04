@@ -95,6 +95,28 @@ class Builder
     }
 
     /**
+     * Create a database in the schema if the database not exists.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function createDatabaseIfNotExists($name)
+    {
+        throw new LogicException('This database driver does not support create databases.');
+    }
+
+    /**
+     * Drop a database from the schema if the database exists.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function dropDatabaseIfExists($name)
+    {
+        throw new LogicException('This database driver does not support drop databases.');
+    }
+
+    /**
      * Determine if the given table exists.
      *
      * @param  string  $table

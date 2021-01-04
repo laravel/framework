@@ -27,6 +27,37 @@ class MySqlGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
+     * Compile a create database if not exists command.
+     *
+     * @param  string $name
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    public function compileCreateDatabaseIfNotExists($name, $connection)
+    {
+        return sprintf(
+            'CREATE DATABASE IF NOT EXISTS %s CHARACTER SET %s COLLATE %s;',
+            $this->wrapValue($name),
+            $this->wrapValue($connection->getConfig('charset')),
+            $this->wrapValue($connection->getConfig('collation')),
+        );
+    }
+
+    /**
+     * Compile a drop database if exists command.
+     *
+     * @param  string $name
+     * @return string
+     */
+    public function compileDropDatabaseIfExists($name)
+    {
+        return sprintf(
+            'DROP DATABASE IF EXISTS %s;',
+            $this->wrapValue($name)
+        );
+    }
+
+    /**
      * Compile the query to determine the list of tables.
      *
      * @return string

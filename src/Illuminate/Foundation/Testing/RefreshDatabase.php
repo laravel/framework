@@ -3,6 +3,8 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Testing;
 
 trait RefreshDatabase
 {
@@ -13,9 +15,15 @@ trait RefreshDatabase
      */
     public function refreshDatabase()
     {
-        $this->usingInMemoryDatabase()
-                        ? $this->refreshInMemoryDatabase()
-                        : $this->refreshTestDatabase();
+        if ($this->usingInMemoryDatabase()) {
+            return $this->refreshInMemoryDatabase();
+        }
+
+        Testing::whenRunningInParallel(function () {
+            $this->switchToTemporaryDatabase();
+        });
+
+        $this->refreshTestDatabase();
     }
 
     /**
@@ -28,6 +36,67 @@ trait RefreshDatabase
         $default = config('database.default');
 
         return config("database.connections.$default.database") === ':memory:';
+    }
+
+    /**
+     * Switch to the temporary test database.
+     *
+     * @return void
+     */
+    protected function switchToTemporaryDatabase()
+    {
+        $default = config('database.default');
+
+        config()->set(
+            "database.connections.{$default}.database",
+            RefreshDatabaseState::$temporaryDatabase,
+        );
+    }
+
+    /**
+     * Creates a temporary database, if needed.
+     *
+     * @beforeClass
+     *
+     * @return void
+     */
+    public static function setUpTemporaryDatabase()
+    {
+        tap(new static(), function ($testCase) {
+            $testCase->refreshApplication();
+
+            if ($testCase->usingInMemoryDatabase()) {
+                return;
+            }
+
+            Testing::whenRunningInParallel(function () use ($testCase) {
+                $name = $testCase->getConnection()->getConfig('database');
+
+                Schema::createDatabaseIfNotExists(
+                    RefreshDatabaseState::$temporaryDatabase = Testing::addTokenIfNeeded($name)
+                );
+            });
+        })->app->flush();
+    }
+
+    /**
+     * Drop the temporary database, if any.
+     *
+     * @afterClass
+     *
+     * @return void
+     */
+    public static function tearDownTemporaryDatabase()
+    {
+        if (RefreshDatabaseState::$temporaryDatabase) {
+            tap(new static(), function ($testCase) {
+                $testCase->refreshApplication();
+
+                Schema::dropDatabaseIfExists(
+                    RefreshDatabaseState::$temporaryDatabase,
+                );
+            })->app->flush();
+        }
     }
 
     /**

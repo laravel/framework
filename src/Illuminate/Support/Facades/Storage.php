@@ -54,6 +54,8 @@ class Storage extends Facade
             $root = storage_path('framework/testing/disks/'.$disk)
         );
 
+        $root = Testing::addTokenIfNeeded($root);
+
         static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
             'root' => $root,
         ])));
