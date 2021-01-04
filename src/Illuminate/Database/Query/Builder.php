@@ -402,10 +402,8 @@ class Builder
      *
      * @return $this
      */
-    public function distinct()
+    public function distinct(...$columns)
     {
-        $columns = func_get_args();
-
         if (count($columns) > 0) {
             $this->distinct = is_array($columns[0]) || is_bool($columns[0]) ? $columns[0] : $columns;
         } else {
