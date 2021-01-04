@@ -24,7 +24,7 @@ class DatabaseSchemaBuilderTest extends TestCase
         $builder = new Builder($connection);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support create databases.');
+        $this->expectExceptionMessage('This database driver does not support creating databases.');
 
         $builder->createDatabaseIfNotExists('foo');
     }
@@ -37,7 +37,7 @@ class DatabaseSchemaBuilderTest extends TestCase
         $builder = new Builder($connection);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support drop databases.');
+        $this->expectExceptionMessage('This database driver does not support dropping databases.');
 
         $builder->dropDatabaseIfExists('foo');
     }

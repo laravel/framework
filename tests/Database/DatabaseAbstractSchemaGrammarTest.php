@@ -20,7 +20,7 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase
         $grammar = new class extends Grammar {};
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support create databases.');
+        $this->expectExceptionMessage('This database driver does not support creating databases.');
 
         $grammar->compileCreateDatabaseIfNotExists('foo', m::mock(Connection::class));
     }
@@ -30,7 +30,7 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase
         $grammar = new class extends Grammar {};
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support drop databases.');
+        $this->expectExceptionMessage('This database driver does not support dropping databases.');
 
         $grammar->compileDropDatabaseIfExists('foo');
     }

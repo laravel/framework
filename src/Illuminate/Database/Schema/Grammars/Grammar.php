@@ -37,7 +37,7 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileCreateDatabaseIfNotExists($name, $connection)
     {
-        throw new LogicException('This database driver does not support create databases.');
+        throw new LogicException('This database driver does not support creating databases.');
     }
 
     /**
@@ -48,7 +48,7 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileDropDatabaseIfExists($name)
     {
-        throw new LogicException('This database driver does not support drop databases.');
+        throw new LogicException('This database driver does not support dropping databases.');
     }
 
     /**

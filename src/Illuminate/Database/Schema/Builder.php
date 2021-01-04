@@ -102,7 +102,7 @@ class Builder
      */
     public function createDatabaseIfNotExists($name)
     {
-        throw new LogicException('This database driver does not support create databases.');
+        throw new LogicException('This database driver does not support creating databases.');
     }
 
     /**
@@ -113,7 +113,7 @@ class Builder
      */
     public function dropDatabaseIfExists($name)
     {
-        throw new LogicException('This database driver does not support drop databases.');
+        throw new LogicException('This database driver does not support dropping databases.');
     }
 
     /**
