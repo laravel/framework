@@ -209,11 +209,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $this->migrate($prefixed = $this->getQueue($queue));
 
-        if (empty($nextJob = $this->retrieveNextJob($prefixed))) {
-            return;
-        }
-
-        [$job, $reserved] = $nextJob;
+        [$job, $reserved] = $this->retrieveNextJob($prefixed);
 
         if ($reserved) {
             return new RedisJob(
