@@ -4,11 +4,11 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\MysqlGrammar;
-use Illuminate\Database\Schema\MysqlBuilder;
+use Illuminate\Database\Schema\MySqlBuilder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-class DatabaseMysqlBuilderTest extends TestCase
+class DatabaseMySqlBuilderTest extends TestCase
 {
     protected function tearDown(): void
     {
@@ -27,7 +27,7 @@ class DatabaseMysqlBuilderTest extends TestCase
             'CREATE DATABASE IF NOT EXISTS `my_temporary_database` CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;'
         )->andReturn(true);
 
-        $builder = new MysqlBuilder($connection);
+        $builder = new MySqlBuilder($connection);
         $builder->createDatabaseIfNotExists('my_temporary_database');
     }
 
@@ -41,7 +41,7 @@ class DatabaseMysqlBuilderTest extends TestCase
             'DROP DATABASE IF EXISTS `my_database_a`;'
         )->andReturn(true);
 
-        $builder = new MysqlBuilder($connection);
+        $builder = new MySqlBuilder($connection);
 
         $builder->dropDatabaseIfExists('my_database_a');
     }
