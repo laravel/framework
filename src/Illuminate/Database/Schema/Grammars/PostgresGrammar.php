@@ -65,7 +65,6 @@ class PostgresGrammar extends Grammar
         );
     }
 
-
     /**
      * Compile the query to determine if a table exists.
      *
