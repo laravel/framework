@@ -24,7 +24,7 @@ class ApcWrapper
             throw new RuntimeException('APC(u) is not enabled');
         }
 
-        if (php_sapi_name() == 'cli' && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (php_sapi_name() == 'cli' && ! filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
             throw new RuntimeException('APC(u) is not enabled for CLI');
         }
         
