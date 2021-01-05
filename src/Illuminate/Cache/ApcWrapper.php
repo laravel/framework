@@ -20,7 +20,7 @@ class ApcWrapper
      */
     public function __construct()
     {
-        if (filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (! filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN)) {
             throw new RuntimeException('APC(u) is not enabled');
         }
 
