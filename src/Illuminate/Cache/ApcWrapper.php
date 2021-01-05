@@ -18,6 +18,14 @@ class ApcWrapper
      */
     public function __construct()
     {
+        if (filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN)) {
+            throw new RuntimeException('APC(u) is not enabled');
+        }
+
+        if (php_sapi_name() == 'cli' && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
+            throw new RuntimeException('APC(u) is not enabled for CLI');
+        }
+        
         $this->apcu = function_exists('apcu_fetch');
     }
 
