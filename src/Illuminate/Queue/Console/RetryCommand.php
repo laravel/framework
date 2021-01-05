@@ -93,8 +93,23 @@ class RetryCommand extends Command
     protected function retryJob($job)
     {
         $this->laravel['queue']->connection($job->connection)->pushRaw(
-            $this->resetAttempts($job->payload), $job->queue
+            $this->retryRefresh($job->payload), $job->queue
         );
+    }
+
+    /**
+     * Possibly refresh job attempts and retryUntil value
+     *
+     * @param  string  $payload
+     * @return string
+     */
+    protected function retryRefresh($payload)
+    {
+        $payload = $this->resetAttempts($payload);
+
+        $payload = $this->refreshRetryUntil($payload);
+
+        return $payload;
     }
 
     /**
@@ -112,6 +127,25 @@ class RetryCommand extends Command
         if (isset($payload['attempts'])) {
             $payload['attempts'] = 0;
         }
+
+        return json_encode($payload);
+    }
+
+    /**
+     * Refreshes a jobs retryUntil time with it's own retryUntil method
+     *
+     * @param  string  $payload
+     * @return string
+     */
+    protected function refreshRetryUntil($payload)
+    {
+        $payload = json_decode($payload, true);
+
+        $jobInstance = unserialize($payload['data']['command']);
+
+        $newRetryUntil = $jobInstance->retryUntil()->timestamp;
+
+        $payload['retryUntil'] = $newRetryUntil;
 
         return json_encode($payload);
     }
