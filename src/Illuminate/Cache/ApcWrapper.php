@@ -2,6 +2,8 @@
 
 namespace Illuminate\Cache;
 
+use RuntimeException;
+
 class ApcWrapper
 {
     /**
