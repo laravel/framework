@@ -93,29 +93,14 @@ class RetryCommand extends Command
     protected function retryJob($job)
     {
         $this->laravel['queue']->connection($job->connection)->pushRaw(
-            $this->retryRefresh($job->payload), $job->queue
+            $this->refreshRetryUntil($this->resetAttempts($job->payload)), $job->queue
         );
-    }
-
-    /**
-     * Possibly refresh job attempts and retryUntil value.
-     *
-     * @param  string  $payload
-     * @return string
-     */
-    protected function retryRefresh($payload)
-    {
-        $payload = $this->resetAttempts($payload);
-
-        $payload = $this->refreshRetryUntil($payload);
-
-        return $payload;
     }
 
     /**
      * Reset the payload attempts.
      *
-     * Applicable to Redis jobs which store attempts in their payload.
+     * Applicable to Redis and other jobs which store attempts in their payload.
      *
      * @param  string  $payload
      * @return string
@@ -132,7 +117,7 @@ class RetryCommand extends Command
     }
 
     /**
-     * Refreshes a jobs retryUntil time with it's own retryUntil method.
+     * Refresh the "retry until" timestamp for the job.
      *
      * @param  string  $payload
      * @return string
@@ -141,12 +126,10 @@ class RetryCommand extends Command
     {
         $payload = json_decode($payload, true);
 
-        $jobInstance = unserialize($payload['data']['command']);
+        $instance = unserialize($payload['data']['command']);
 
-        if (method_exists($jobInstance, 'retryUntil')) {
-            $newRetryUntil = $jobInstance->retryUntil()->timestamp;
-
-            $payload['retryUntil'] = $newRetryUntil;
+        if (is_object($instance) && method_exists($instance, 'retryUntil')) {
+            $payload['retryUntil'] = $instance->retryUntil()->timestamp;
         }
 
         return json_encode($payload);
