@@ -72,9 +72,10 @@ trait RefreshDatabase
             Testing::whenRunningInParallel(function () use ($testCase) {
                 $name = $testCase->getConnection()->getConfig('database');
 
-                Schema::createDatabaseIfNotExists(
-                    RefreshDatabaseState::$temporaryDatabase = Testing::addTokenIfNeeded($name)
-                );
+                RefreshDatabaseState::$temporaryDatabase = Testing::addTokenIfNeeded($name);
+
+                Schema::dropDatabaseIfExists(RefreshDatabaseState::$temporaryDatabase);
+                Schema::createDatabase(RefreshDatabaseState::$temporaryDatabase);
             });
         })->app->flush();
     }

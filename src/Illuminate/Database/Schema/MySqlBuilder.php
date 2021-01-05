@@ -5,15 +5,15 @@ namespace Illuminate\Database\Schema;
 class MySqlBuilder extends Builder
 {
     /**
-     * Create a database in the schema if the database not exists.
+     * Create a database in the schema.
      *
      * @param  string $name
      * @return bool
      */
-    public function createDatabaseIfNotExists($name)
+    public function createDatabase($name)
     {
         return $this->connection->statement(
-            $this->grammar->compileCreateDatabaseIfNotExists($name, $this->connection)
+            $this->grammar->compileCreateDatabase($name, $this->connection)
         );
     }
 

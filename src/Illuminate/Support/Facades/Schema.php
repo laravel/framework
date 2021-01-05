@@ -4,7 +4,7 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static \Illuminate\Database\Schema\Builder create(string $table, \Closure $callback)
- * @method static \Illuminate\Database\Schema\Builder createDatabaseIfNotExists(string $name)
+ * @method static \Illuminate\Database\Schema\Builder createDatabase(string $name)
  * @method static \Illuminate\Database\Schema\Builder disableForeignKeyConstraints()
  * @method static \Illuminate\Database\Schema\Builder drop(string $table)
  * @method static \Illuminate\Database\Schema\Builder dropDatabaseIfExists(string $name)

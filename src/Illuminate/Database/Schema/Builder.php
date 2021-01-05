@@ -95,12 +95,12 @@ class Builder
     }
 
     /**
-     * Create a database in the schema if the database not exists.
+     * Create a database in the schema.
      *
      * @param  string  $name
      * @return bool
      */
-    public function createDatabaseIfNotExists($name)
+    public function createDatabase($name)
     {
         throw new LogicException('This database driver does not support creating databases.');
     }

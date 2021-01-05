@@ -16,7 +16,7 @@ class DatabaseSchemaBuilderTest extends TestCase
         m::close();
     }
 
-    public function testCreateDatabaseIfNotExists()
+    public function testCreateDatabase()
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(stdClass::class);
@@ -26,7 +26,7 @@ class DatabaseSchemaBuilderTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('This database driver does not support creating databases.');
 
-        $builder->createDatabaseIfNotExists('foo');
+        $builder->createDatabase('foo');
     }
 
     public function testDropDatabaseIfExists()

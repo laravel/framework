@@ -15,14 +15,14 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase
         m::close();
     }
 
-    public function testCreateDatabaseIfNotExists()
+    public function testCreateDatabase()
     {
         $grammar = new class extends Grammar {};
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('This database driver does not support creating databases.');
 
-        $grammar->compileCreateDatabaseIfNotExists('foo', m::mock(Connection::class));
+        $grammar->compileCreateDatabase('foo', m::mock(Connection::class));
     }
 
     public function testDropDatabaseIfExists()

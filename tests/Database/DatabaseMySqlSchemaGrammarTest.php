@@ -1149,16 +1149,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
     }
 
-    public function testCreateDatabaseIfNotExists()
+    public function testCreateDatabase()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_foo');
         $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
 
-        $statement = $this->getGrammar()->compileCreateDatabaseIfNotExists('my_database_a', $connection);
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
 
         $this->assertSame(
-            'CREATE DATABASE IF NOT EXISTS `my_database_a` CHARACTER SET `utf8mb4_foo` COLLATE `utf8mb4_unicode_ci_foo`;',
+            'CREATE DATABASE `my_database_a` DEFAULT CHARACTER SET `utf8mb4_foo` DEFAULT COLLATE `utf8mb4_unicode_ci_foo`',
             $statement
         );
 
@@ -1166,10 +1166,10 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_bar');
         $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
 
-        $statement = $this->getGrammar()->compileCreateDatabaseIfNotExists('my_database_b', $connection);
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
 
         $this->assertSame(
-            'CREATE DATABASE IF NOT EXISTS `my_database_b` CHARACTER SET `utf8mb4_bar` COLLATE `utf8mb4_unicode_ci_bar`;',
+            'CREATE DATABASE `my_database_b` DEFAULT CHARACTER SET `utf8mb4_bar` DEFAULT COLLATE `utf8mb4_unicode_ci_bar`',
             $statement
         );
     }
@@ -1179,14 +1179,14 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_a');
 
         $this->assertSame(
-            'DROP DATABASE IF EXISTS `my_database_a`;',
+            'DROP DATABASE IF EXISTS `my_database_a`',
             $statement
         );
 
         $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_b');
 
         $this->assertSame(
-            'DROP DATABASE IF EXISTS `my_database_b`;',
+            'DROP DATABASE IF EXISTS `my_database_b`',
             $statement
         );
     }

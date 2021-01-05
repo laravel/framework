@@ -29,13 +29,13 @@ abstract class Grammar extends BaseGrammar
     protected $fluentCommands = [];
 
     /**
-     * Compile a create database if not exists command.
+     * Compile a create database command.
      *
      * @param  string $name
      * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
-    public function compileCreateDatabaseIfNotExists($name, $connection)
+    public function compileCreateDatabase($name, $connection)
     {
         throw new LogicException('This database driver does not support creating databases.');
     }
