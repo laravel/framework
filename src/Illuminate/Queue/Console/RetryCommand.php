@@ -98,7 +98,7 @@ class RetryCommand extends Command
     }
 
     /**
-     * Possibly refresh job attempts and retryUntil value
+     * Possibly refresh job attempts and retryUntil value.
      *
      * @param  string  $payload
      * @return string
@@ -132,7 +132,7 @@ class RetryCommand extends Command
     }
 
     /**
-     * Refreshes a jobs retryUntil time with it's own retryUntil method
+     * Refreshes a jobs retryUntil time with it's own retryUntil method.
      *
      * @param  string  $payload
      * @return string
