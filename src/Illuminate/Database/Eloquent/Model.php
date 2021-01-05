@@ -847,7 +847,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
             $saved = $this->isDirty() ?
-                        $this->performUpdate($query) : true;
+                        $this->performUpdate($query) : false;
         }
 
         // If the model is brand new, we'll insert it into our database and set the
