@@ -143,9 +143,11 @@ class RetryCommand extends Command
 
         $jobInstance = unserialize($payload['data']['command']);
 
-        $newRetryUntil = $jobInstance->retryUntil()->timestamp;
+        if (method_exists($jobInstance, 'retryUntil')) {
+            $newRetryUntil = $jobInstance->retryUntil()->timestamp;
 
-        $payload['retryUntil'] = $newRetryUntil;
+            $payload['retryUntil'] = $newRetryUntil;
+        }
 
         return json_encode($payload);
     }
