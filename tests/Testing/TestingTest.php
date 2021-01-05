@@ -13,7 +13,7 @@ class TestingTest extends TestCase
     {
         parent::setUp();
 
-        putenv('LARAVEL_PARALLEL_TESTING=1');
+        $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
     }
 
     public function testWhenRunningInParallel()
@@ -79,6 +79,6 @@ class TestingTest extends TestCase
 
         m::close();
         Testing::tokenResolver(null);
-        putenv('LARAVEL_PARALLEL_TESTING=0');
+        unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
     }
 }

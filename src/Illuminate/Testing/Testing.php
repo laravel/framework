@@ -65,7 +65,7 @@ class Testing
      */
     protected function inParallel()
     {
-        return $this->app->runningUnitTests() && getenv('LARAVEL_PARALLEL_TESTING') && $this->token();
+        return $this->app->runningUnitTests() && ! empty($_SERVER['LARAVEL_PARALLEL_TESTING']) && $this->token();
     }
 
     /**
@@ -77,7 +77,7 @@ class Testing
     {
         return static::$tokenResolver
             ? call_user_func(static::$tokenResolver)
-            : getenv('TEST_TOKEN');
+            : ($_SERVER['TEST_TOKEN'] ?? false);
     }
 
     /**
