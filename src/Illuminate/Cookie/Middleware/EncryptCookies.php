@@ -83,9 +83,7 @@ class EncryptCookies
             try {
                 $value = $this->decryptCookie($key, $cookie);
 
-                $request->cookies->set(
-                    $key, $this->validateValue($key, $value)
-                );
+                $request->cookies->set($key, $this->validateValue($key, $value));
             } catch (DecryptException $e) {
                 $request->cookies->set($key, null);
             }
@@ -103,8 +101,9 @@ class EncryptCookies
      */
     protected function validateValue(string $key, $value)
     {
-        return is_array($value) ? $this->validateArray($key, $value) :
-            CookieValuePrefix::validate($key, $value, $this->encrypter->getKey());
+        return is_array($value)
+                    ? $this->validateArray($key, $value)
+                    : CookieValuePrefix::validate($key, $value, $this->encrypter->getKey());
     }
 
     /**
@@ -116,12 +115,13 @@ class EncryptCookies
      */
     protected function validateArray(string $key, array $value)
     {
-        $stripped = [];
-        foreach ($value as $subKey => $subValue) {
-            $stripped[$subKey] = $this->validateValue("${key}[${subKey}]", $subValue);
+        $validated = [];
+
+        foreach ($value as $index => $subValue) {
+            $validated[$index] = $this->validateValue("${key}[${index}]", $subValue);
         }
 
-        return $stripped;
+        return $validated;
     }
 
     /**
@@ -152,6 +152,7 @@ class EncryptCookies
             if (is_string($value)) {
                 $decrypted[$key] = $this->encrypter->decrypt($value, static::serialized($key));
             }
+
             if (is_array($value)) {
                 $decrypted[$key] = $this->decryptArray($value);
             }

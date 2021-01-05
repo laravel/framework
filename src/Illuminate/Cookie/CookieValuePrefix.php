@@ -28,7 +28,7 @@ class CookieValuePrefix
     }
 
     /**
-     * Validate a cookie value contains a valid prefix and return it without or null.
+     * Validate a cookie value contains a valid prefix. If it does, return the cookie value with the prefix removed. Otherwise, return null.
      *
      * @param  string  $cookieName
      * @param  string  $cookieValue
