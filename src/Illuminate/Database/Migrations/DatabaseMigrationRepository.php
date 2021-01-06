@@ -147,11 +147,17 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     {
         $schema = $this->getConnection()->getSchemaBuilder();
 
-        $schema->create($this->table, function ($table) {
+        $schema->create($this->table, function ($table) use ($schema) {
             // The migrations table is responsible for keeping track of which of the
             // migrations have actually run for the application. We'll create the
             // table to hold the migration file's path as well as the batch ID.
-            $table->increments('id');
+
+            // In case of sqlite, we use the alias to 'rowid' column
+            if ($schema->getConnection()->getDriverName() === 'sqlite') {
+                $table->integer('id')->primary();
+            } else {
+                $table->increments('id');
+            }
             $table->string('migration');
             $table->integer('batch');
         });
