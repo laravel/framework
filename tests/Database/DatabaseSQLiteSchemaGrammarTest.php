@@ -361,7 +361,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" varchar null default \'bar\'', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" varchar default \'bar\'', $statements[0]);
     }
 
     public function testAddingText()
@@ -663,8 +663,8 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(2, $statements);
         $this->assertEquals([
-            'alter table "users" add column "created_at" datetime null',
-            'alter table "users" add column "updated_at" datetime null',
+            'alter table "users" add column "created_at" datetime',
+            'alter table "users" add column "updated_at" datetime',
         ], $statements);
     }
 
@@ -675,8 +675,8 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(2, $statements);
         $this->assertEquals([
-            'alter table "users" add column "created_at" datetime null',
-            'alter table "users" add column "updated_at" datetime null',
+            'alter table "users" add column "created_at" datetime',
+            'alter table "users" add column "updated_at" datetime',
         ], $statements);
     }
 
@@ -687,7 +687,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "remember_token" varchar null', $statements[0]);
+        $this->assertSame('alter table "users" add column "remember_token" varchar', $statements[0]);
     }
 
     public function testAddingBinary()
