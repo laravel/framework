@@ -586,11 +586,15 @@ if (! function_exists('report')) {
     /**
      * Report an exception.
      *
-     * @param  \Throwable  $exception
+     * @param  \Throwable|string  $exception
      * @return void
      */
-    function report(Throwable $exception)
+    function report($exception)
     {
+        if (is_string($exception)) {
+            $exception = new Exception($exception);
+        }
+
         app(ExceptionHandler::class)->report($exception);
     }
 }
