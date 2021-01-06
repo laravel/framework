@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Composer;
+use Illuminate\Tests\Database\stubs\SpecificPackageServiceProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -100,6 +101,21 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->setBasePath('/home/laravel');
         $creator->shouldReceive('create')->once()->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true);
         $this->runCommand($command, ['name' => 'create_foo', '--path' => 'vendor/laravel-package/migrations', '--create' => 'users']);
+    }
+
+    public function testCanSpecifyServiceProviderToCreateMigrationsFor()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
+        );
+        $app = new Application;
+        $app->register(SpecificPackageServiceProvider::class);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $creator->shouldReceive('create')->once()->with('create_users_table', SpecificPackageServiceProvider::expectedDirectory(), 'users', true);
+
+        $this->runCommand($command, ['name' => 'create_users_table', '--provider' => '\\Illuminate\\Tests\\Database\\stubs\\SpecificPackageServiceProvider']);
     }
 
     protected function runCommand($command, $input = [])
