@@ -18,18 +18,18 @@ class ParallelTesting
     protected $tokenResolver;
 
     /**
-     * All of the registered "setUp" callbacks.
+     * All of the registered "setUp" test case callbacks.
      *
      * @var array
      */
-    protected $setUpCallbacks = [];
+    protected $setUpTestCaseCallbacks = [];
 
     /**
-     * All of the registered "beforeProcessDestroyed" callbacks.
+     * All of the registered "tearDown" process callbacks.
      *
      * @var array
      */
-    protected $beforeProcessDestroyedCallbacks = [];
+    protected $tearDownProcessCallbacks = [];
 
     /**
      * Set a callback that should be used when resolving the unique process token.
@@ -43,55 +43,51 @@ class ParallelTesting
     }
 
     /**
-     * Register a callback to run before process gets destroyed.
+     * Register a "setUp" test case callback.
      *
      * @param  callable  $callback
-     * @return $this
+     * @return void
      */
-    public function beforeProcessDestroyed($callback)
+    public function setUpTestCase($callback)
     {
-        $this->beforeProcessDestroyedCallbacks[] = $callback;
-
-        return $this;
+        $this->setUpTestCaseCallbacks[] = $callback;
     }
 
     /**
-     * Register a callback to run on test setup.
+     * Register a "tearDown" process callback.
      *
      * @param  callable  $callback
-     * @return $this
+     * @return void
      */
-    public function setUp($callback)
+    public function tearDownProcess($callback)
     {
-        $this->setUpCallbacks[] = $callback;
-
-        return $this;
+        $this->tearDownProcessCallbacks[] = $callback;
     }
 
     /**
-     * Call all of the "beforeProcessDestroyed" callbacks.
+     * Call all of the "tearDown" process callbacks.
      *
      * @return void
      */
-    public function callBeforeProcessDestroyedCallbacks()
+    public function callTearDownProcessCallbacks()
     {
         $this->whenRunningInParallel(function () {
-            foreach ($this->beforeProcessDestroyedCallbacks as $callback) {
+            foreach ($this->tearDownProcessCallbacks as $callback) {
                 $callback();
             }
         });
     }
 
     /**
-     * Call all of the "setUp" callbacks.
+     * Call all of the "setUp" test case callbacks.
      *
      * @param  \Illuminate\Foundation\Testing\TestCase  $testCase
      * @return void
      */
-    public function callSetUpCallbacks($testCase)
+    public function callSetUpTestCaseCallbacks($testCase)
     {
         $this->whenRunningInParallel(function () use ($testCase) {
-            foreach ($this->setUpCallbacks as $callback) {
+            foreach ($this->setUpTestCaseCallbacks as $callback) {
                 $callback($testCase);
             }
         });

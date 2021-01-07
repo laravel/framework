@@ -78,8 +78,8 @@ class ParallelRunner implements RunnerInterface
         try {
             $this->runner->run();
         } finally {
-            $this->forEachProcess(function ($app) {
-                ParallelTesting::callBeforeProcessDestroyedCallbacks();
+            $this->forEachProcess(function () {
+                ParallelTesting::callTearDownProcessCallbacks();
             });
         }
     }

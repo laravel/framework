@@ -25,7 +25,7 @@ trait TemporaryDatabases
      */
     protected function bootTemporaryDatabases()
     {
-        ParallelTesting::setUp(function ($testCase) {
+        ParallelTesting::setUpTestCase(function ($testCase) {
 
             $uses = array_flip(class_uses_recursive(get_class($testCase)));
 
@@ -38,7 +38,7 @@ trait TemporaryDatabases
             }
         });
 
-        ParallelTesting::beforeProcessDestroyed(function () {
+        ParallelTesting::tearDownProcess(function () {
             $this->whenNotUsingInMemoryDatabase(function ($database) {
                 Schema::dropDatabaseIfExists(
                     $this->temporaryDatabaseName($database)
