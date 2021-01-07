@@ -7,7 +7,7 @@ use Illuminate\Support\Traits\Macroable;
 
 class PendingResourceRegistration
 {
-    use Macroable;
+    use CreatesRegularExpressionRouteConstraints, Macroable;
 
     /**
      * The resource registrar.

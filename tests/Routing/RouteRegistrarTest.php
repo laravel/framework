@@ -149,6 +149,25 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('controller-middleware');
     }
 
+    public function testCanRegisterNamespacedGroupRouteWithControllerActionArray()
+    {
+        $this->router->group(['namespace' => 'WhatEver'], function () {
+            $this->router->middleware('controller-middleware')
+                ->get('users', [RouteRegistrarControllerStub::class, 'index']);
+        });
+
+        $this->seeResponse('controller', Request::create('users', 'GET'));
+        $this->seeMiddleware('controller-middleware');
+
+        $this->router->group(['namespace' => 'WhatEver'], function () {
+            $this->router->middleware('controller-middleware')
+                ->get('users', ['\\'.RouteRegistrarControllerStub::class, 'index']);
+        });
+
+        $this->seeResponse('controller', Request::create('users', 'GET'));
+        $this->seeMiddleware('controller-middleware');
+    }
+
     public function testCanRegisterRouteWithArrayAndControllerAction()
     {
         $this->router->middleware('controller-middleware')->put('users', [
@@ -568,6 +587,44 @@ class RouteRegistrarTest extends TestCase
 
         $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->where($wheres);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereNumberRegistration()
+    {
+        $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereNumber(['foo', 'bar']);
+        $this->router->get('/api/{bar}/{foo}')->whereNumber(['bar', 'foo']);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereAlphaRegistration()
+    {
+        $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereAlpha(['foo', 'bar']);
+        $this->router->get('/api/{bar}/{foo}')->whereAlpha(['bar', 'foo']);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereAlphaNumericRegistration()
+    {
+        $wheres = ['1a2b3c' => '[a-zA-Z0-9]+'];
+
+        $this->router->get('/{foo}')->whereAlphaNumeric(['1a2b3c']);
 
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {

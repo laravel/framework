@@ -7,8 +7,10 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\FileStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
@@ -240,7 +242,7 @@ class CacheRepositoryTest extends TestCase
         $repo::macro(__CLASS__, function () {
             return 'Taylor';
         });
-        $this->assertEquals($repo->{__CLASS__}(), 'Taylor');
+        $this->assertSame('Taylor', $repo->{__CLASS__}());
     }
 
     public function testForgettingCacheKey()
@@ -310,6 +312,22 @@ class CacheRepositoryTest extends TestCase
         $taggedCache->shouldReceive('setDefaultCacheTime');
         $store->shouldReceive('tags')->once()->with(['foo', 'bar', 'baz'])->andReturn($taggedCache);
         $repo->tags('foo', 'bar', 'baz');
+    }
+
+    public function testTaggableRepositoriesSupportTags()
+    {
+        $taggable = m::mock(TaggableStore::class);
+        $taggableRepo = new Repository($taggable);
+
+        $this->assertTrue($taggableRepo->supportsTags());
+    }
+
+    public function testNonTaggableRepositoryDoesNotSupportTags()
+    {
+        $nonTaggable = m::mock(FileStore::class);
+        $nonTaggableRepo = new Repository($nonTaggable);
+
+        $this->assertFalse($nonTaggableRepo->supportsTags());
     }
 
     protected function getRepository()

@@ -460,12 +460,14 @@ class DatabaseEloquentBuilderTest extends TestCase
             return $bar;
         });
 
-        Builder::macro('bam', [Builder::class, 'getQuery']);
+        Builder::macro('bam', function () {
+            return $this->getQuery();
+        });
 
         $builder = $this->getBuilder();
 
         $this->assertTrue(Builder::hasGlobalMacro('foo'));
-        $this->assertEquals($builder->foo('bar'), 'bar');
+        $this->assertEquals('bar', $builder->foo('bar'));
         $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
@@ -489,7 +491,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('hydrate')->once()->with($records)->andReturn(new Collection(['hydrated']));
         $models = $builder->getModels(['foo']);
 
-        $this->assertEquals($models, ['hydrated']);
+        $this->assertEquals(['hydrated'], $models);
     }
 
     public function testEagerLoadRelationsLoadTopLevelRelationships()
@@ -812,6 +814,39 @@ class DatabaseEloquentBuilderTest extends TestCase
         });
 
         $this->assertSame('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithMin()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withMin('foo', 'price');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select min("eloquent_builder_test_model_close_related_stubs"."price") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min_price" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithMinOnBelongsToMany()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withMin('roles', 'id');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select min("eloquent_builder_test_model_far_related_stubs"."id") from "eloquent_builder_test_model_far_related_stubs" inner join "user_role" on "eloquent_builder_test_model_far_related_stubs"."id" = "user_role"."related_id" where "eloquent_builder_test_model_parent_stubs"."id" = "user_role"."self_id") as "roles_min_id" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithMinOnSelfRelated()
+    {
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+
+        $sql = $model->withMin('childFoos', 'created_at')->toSql();
+
+        // alias has a dynamic hash, so replace with a static string for comparison
+        $alias = 'self_alias_hash';
+        $aliasRegex = '/\b(laravel_reserved_\d)(\b|$)/i';
+
+        $sql = preg_replace($aliasRegex, $alias, $sql);
+
+        $this->assertSame('select "self_related_stubs".*, (select min("self_alias_hash"."created_at") from "self_related_stubs" as "self_alias_hash" where "self_related_stubs"."id" = "self_alias_hash"."parent_id") as "child_foos_min_created_at" from "self_related_stubs"', $sql);
     }
 
     public function testWithCountAndConstraintsAndHaving()
@@ -1315,6 +1350,31 @@ class DatabaseEloquentBuilderTest extends TestCase
         Carbon::setTestNow(null);
     }
 
+    public function testUpsert()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table')->andReturn('foo_table');
+        $query->from = 'foo_table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder->setModel($model);
+
+        $query->shouldReceive('upsert')->once()
+            ->with([
+                ['email' => 'foo', 'name' => 'bar', 'updated_at' => $now, 'created_at' => $now],
+                ['name' => 'bar2', 'email' => 'foo2', 'updated_at' => $now, 'created_at' => $now],
+            ], ['email'], ['email', 'name', 'updated_at'])->andReturn(2);
+
+        $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
+
+        $this->assertEquals(2, $result);
+
+        Carbon::setTestNow(null);
+    }
+
     public function testWithCastsMethod()
     {
         $builder = new Builder($this->getMockQueryBuilder());
@@ -1454,6 +1514,16 @@ class EloquentBuilderTestModelParentStub extends Model
     public function activeFoo()
     {
         return $this->belongsTo(EloquentBuilderTestModelCloseRelatedStub::class, 'foo_id')->where('active', true);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(
+            EloquentBuilderTestModelFarRelatedStub::class,
+            'user_role',
+            'self_id',
+            'related_id'
+        );
     }
 }
 

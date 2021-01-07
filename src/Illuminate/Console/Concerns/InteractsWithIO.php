@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Closure;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
@@ -238,6 +239,38 @@ trait InteractsWithIO
     }
 
     /**
+     * Execute a given callback while advancing a progress bar.
+     *
+     * @param  iterable|int  $totalSteps
+     * @param  \Closure  $callback
+     * @return mixed|void
+     */
+    public function withProgressBar($totalSteps, Closure $callback)
+    {
+        $bar = $this->output->createProgressBar(
+            is_iterable($totalSteps) ? count($totalSteps) : $totalSteps
+        );
+
+        $bar->start();
+
+        if (is_iterable($totalSteps)) {
+            foreach ($totalSteps as $value) {
+                $callback($value, $bar);
+
+                $bar->advance();
+            }
+        } else {
+            $callback($bar);
+        }
+
+        $bar->finish();
+
+        if (is_iterable($totalSteps)) {
+            return $totalSteps;
+        }
+    }
+
+    /**
      * Write a string as information output.
      *
      * @param  string  $string
@@ -332,7 +365,18 @@ trait InteractsWithIO
         $this->comment('*     '.$string.'     *');
         $this->comment(str_repeat('*', $length));
 
-        $this->output->newLine();
+        $this->newLine();
+    }
+
+    /**
+     * Write a blank line.
+     *
+     * @param  int  $count
+     * @return void
+     */
+    public function newLine($count = 1)
+    {
+        $this->output->newLine($count);
     }
 
     /**

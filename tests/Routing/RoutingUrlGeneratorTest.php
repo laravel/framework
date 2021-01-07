@@ -550,6 +550,61 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com:8080/foo?test=123', $url->route('foo', $parameters));
     }
 
+    public function provideParametersAndExpectedMeaningfulExceptionMessages()
+    {
+        return [
+            'Missing parameters "one", "two" and "three"' => [
+                [],
+                'Missing required parameters for [Route: foo] [URI: foo/{one}/{two}/{three}/{four?}] [Missing parameters: one, two, three].',
+            ],
+            'Missing parameters "two" and "three"' => [
+                ['one' => '123'],
+                'Missing required parameters for [Route: foo] [URI: foo/{one}/{two}/{three}/{four?}] [Missing parameters: two, three].',
+            ],
+            'Missing parameters "one" and "three"' => [
+                ['two' => '123'],
+                'Missing required parameters for [Route: foo] [URI: foo/{one}/{two}/{three}/{four?}] [Missing parameters: one, three].',
+            ],
+            'Missing parameters "one" and "two"' => [
+                ['three' => '123'],
+                'Missing required parameters for [Route: foo] [URI: foo/{one}/{two}/{three}/{four?}] [Missing parameters: one, two].',
+            ],
+            'Missing parameter "three"' => [
+                ['one' => '123', 'two' => '123'],
+                'Missing required parameter for [Route: foo] [URI: foo/{one}/{two}/{three}/{four?}] [Missing parameter: three].',
+            ],
+            'Missing parameter "two"' => [
+                ['one' => '123', 'three' => '123'],
+                'Missing required parameter for [Route: foo] [URI: foo/{one}/{two}/{three}/{four?}] [Missing parameter: two].',
+            ],
+            'Missing parameter "one"' => [
+                ['two' => '123', 'three' => '123'],
+                'Missing required parameter for [Route: foo] [URI: foo/{one}/{two}/{three}/{four?}] [Missing parameter: one].',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideParametersAndExpectedMeaningfulExceptionMessages
+     */
+    public function testUrlGenerationThrowsExceptionForMissingParametersWithMeaningfulMessage($parameters, $expectedMeaningfulExceptionMessage)
+    {
+        $this->expectException(UrlGenerationException::class);
+        $this->expectExceptionMessage($expectedMeaningfulExceptionMessage);
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com:8080/')
+        );
+
+        $route = new Route(['GET'], 'foo/{one}/{two}/{three}/{four?}', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $url->route('foo', $parameters);
+    }
+
     public function testForceRootUrl()
     {
         $url = new UrlGenerator(

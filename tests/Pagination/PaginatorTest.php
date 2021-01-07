@@ -62,4 +62,17 @@ class PaginatorTest extends TestCase
 
         $this->assertSame($p->path(), 'http://website.com/test');
     }
+
+    public function testCanTransformPaginatorItems()
+    {
+        $p = new Paginator($array = ['item1', 'item2', 'item3'], 3, 1,
+                                    ['path' => 'http://website.com/test']);
+
+        $p->through(function ($item) {
+            return substr($item, 4, 1);
+        });
+
+        $this->assertInstanceOf(Paginator::class, $p);
+        $this->assertSame(['1', '2', '3'], $p->items());
+    }
 }

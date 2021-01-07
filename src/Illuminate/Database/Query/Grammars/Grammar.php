@@ -21,7 +21,7 @@ class Grammar extends BaseGrammar
     /**
      * The components that make up a select clause.
      *
-     * @var array
+     * @var string[]
      */
     protected $selectComponents = [
         'aggregate',
@@ -993,6 +993,22 @@ class Grammar extends BaseGrammar
         $joins = $this->compileJoins($query, $query->joins);
 
         return "update {$table} {$joins} set {$columns} {$where}";
+    }
+
+    /**
+     * Compile an "upsert" statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  array  $values
+     * @param  array  $uniqueBy
+     * @param  array  $update
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
+    {
+        throw new RuntimeException('This database engine does not support upserts.');
     }
 
     /**

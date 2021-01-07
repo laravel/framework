@@ -33,10 +33,13 @@ class StubPublishCommand extends Command
         }
 
         $files = [
+            __DIR__.'/stubs/cast.stub' => $stubsPath.'/cast.stub',
             __DIR__.'/stubs/job.queued.stub' => $stubsPath.'/job.queued.stub',
             __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
             __DIR__.'/stubs/model.pivot.stub' => $stubsPath.'/model.pivot.stub',
             __DIR__.'/stubs/model.stub' => $stubsPath.'/model.stub',
+            __DIR__.'/stubs/observer.stub' => $stubsPath.'/observer.stub',
+            __DIR__.'/stubs/observer.plain.stub' => $stubsPath.'/observer.plain.stub',
             __DIR__.'/stubs/request.stub' => $stubsPath.'/request.stub',
             __DIR__.'/stubs/resource.stub' => $stubsPath.'/resource.stub',
             __DIR__.'/stubs/resource-collection.stub' => $stubsPath.'/resource-collection.stub',

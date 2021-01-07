@@ -29,7 +29,7 @@ class AssertableJsonString implements ArrayAccess, Countable
     /**
      * Create a new assertable JSON string instance.
      *
-     * @param  \Illuminate\Contracts\Support\Jsonable|\JsonSerializable|string  $jsonable
+     * @param  \Illuminate\Contracts\Support\Jsonable|\JsonSerializable|array|string  $jsonable
      * @return void
      */
     public function __construct($jsonable)

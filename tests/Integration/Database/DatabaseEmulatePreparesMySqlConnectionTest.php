@@ -4,6 +4,9 @@ namespace Illuminate\Tests\Integration\Database;
 
 use PDO;
 
+/**
+ * @requires extension pdo_mysql
+ */
 class DatabaseEmulatePreparesMySqlConnectionTest extends DatabaseMySqlConnectionTest
 {
     protected function getEnvironmentSetUp($app)

@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use SplFileInfo;
 use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
 
 trait InteractsWithInput
 {
@@ -461,5 +462,35 @@ trait InteractsWithInput
         }
 
         return $this->$source->get($key, $default);
+    }
+
+    /**
+     * Dump the request items and end the script.
+     *
+     * @param  array|mixed  $keys
+     * @return void
+     */
+    public function dd(...$keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        call_user_func_array([$this, 'dump'], $keys);
+
+        exit(1);
+    }
+
+    /**
+     * Dump the items.
+     *
+     * @param  array  $keys
+     * @return $this
+     */
+    public function dump($keys = [])
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+
+        return $this;
     }
 }

@@ -110,7 +110,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo.bar' => []], $array);
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
-        $this->assertEquals($array, ['name' => 'taylor', 'languages.php' => true]);
+        $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
     }
 
     public function testExcept()
@@ -902,5 +902,58 @@ class SupportArrTest extends TestCase
         $obj = unserialize(serialize($obj));
         $this->assertEquals([$obj], Arr::wrap($obj));
         $this->assertSame($obj, Arr::wrap($obj)[0]);
+    }
+
+    public function testSortByMany()
+    {
+        $unsorted = [
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
+            ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
+        ];
+
+        // sort using keys
+        $sorted = array_values(Arr::sort($unsorted, [
+            'name',
+            'age',
+            'meta.key',
+        ]));
+        $this->assertEquals([
+            ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
+        ], $sorted);
+
+        // sort with order
+        $sortedWithOrder = array_values(Arr::sort($unsorted, [
+            'name',
+            ['age', false],
+            ['meta.key', true],
+        ]));
+        $this->assertEquals([
+            ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+        ], $sortedWithOrder);
+
+        // sort using callable
+        $sortedWithCallable = array_values(Arr::sort($unsorted, [
+            function ($a, $b) {
+                return $a['name'] <=> $b['name'];
+            },
+            function ($a, $b) {
+                return $b['age'] <=> $a['age'];
+            },
+            ['meta.key', true],
+        ]));
+        $this->assertEquals([
+            ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+        ], $sortedWithCallable);
     }
 }

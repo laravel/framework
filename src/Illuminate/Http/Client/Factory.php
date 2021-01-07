@@ -225,6 +225,28 @@ class Factory
     }
 
     /**
+     * Assert that the given request were sent in the given order.
+     *
+     * @param  array  $callbacks
+     * @return void
+     */
+    public function assertSentInOrder($callbacks)
+    {
+        $this->assertSentCount(count($callbacks));
+
+        foreach ($callbacks as $index => $url) {
+            $callback = is_callable($url) ? $url : function ($request) use ($url) {
+                return $request->url() == $url;
+            };
+
+            PHPUnit::assertTrue($callback(
+                $this->recorded[$index][0],
+                $this->recorded[$index][1]
+            ), 'An expected request (#'.($index + 1).') was not recorded.');
+        }
+    }
+
+    /**
      * Assert that a request / response pair was not recorded matching a given truth test.
      *
      * @param  callable  $callback
@@ -299,6 +321,16 @@ class Factory
     }
 
     /**
+     * Create a new pending request instance for this factory.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
+    protected function newPendingRequest()
+    {
+        return new PendingRequest($this);
+    }
+
+    /**
      * Execute a method against a new pending request instance.
      *
      * @param  string  $method
@@ -311,7 +343,7 @@ class Factory
             return $this->macroCall($method, $parameters);
         }
 
-        return tap(new PendingRequest($this), function ($request) {
+        return tap($this->newPendingRequest(), function ($request) {
             $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
     }

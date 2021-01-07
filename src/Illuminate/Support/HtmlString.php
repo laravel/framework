@@ -45,6 +45,16 @@ class HtmlString implements Htmlable
     }
 
     /**
+     * Determine if the given HTML string is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
      * Get the HTML string.
      *
      * @return string

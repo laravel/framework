@@ -14,14 +14,14 @@ class SQLiteGrammar extends Grammar
     /**
      * The possible column modifiers.
      *
-     * @var array
+     * @var string[]
      */
     protected $modifiers = ['VirtualAs', 'StoredAs', 'Nullable', 'Default', 'Increment'];
 
     /**
      * The columns available as serials.
      *
-     * @var array
+     * @var string[]
      */
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
@@ -875,7 +875,7 @@ class SQLiteGrammar extends Grammar
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
         if (is_null($column->virtualAs) && is_null($column->storedAs)) {
-            return $column->nullable ? ' null' : ' not null';
+            return $column->nullable ? '' : ' not null';
         }
 
         if ($column->nullable === false) {

@@ -57,7 +57,7 @@ class Kernel implements KernelContract
     /**
      * The bootstrap classes for the application.
      *
-     * @var array
+     * @var string[]
      */
     protected $bootstrappers = [
         \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
@@ -111,7 +111,7 @@ class Kernel implements KernelContract
      */
     protected function scheduleCache()
     {
-        return Env::get('SCHEDULE_CACHE_DRIVER');
+        return $this->app['config']->get('cache.schedule_store', Env::get('SCHEDULE_CACHE_DRIVER'));
     }
 
     /**
@@ -223,7 +223,7 @@ class Kernel implements KernelContract
             $command = $namespace.str_replace(
                 ['/', '.php'],
                 ['\\', ''],
-                Str::after($command->getPathname(), realpath(app_path()).DIRECTORY_SEPARATOR)
+                Str::after($command->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
             );
 
             if (is_subclass_of($command, Command::class) &&

@@ -33,7 +33,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '8.5.0';
+    const VERSION = '8.21.0';
 
     /**
      * The base path for the Laravel installation.
@@ -150,7 +150,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * The prefixes of absolute cache paths for use during normalization.
      *
-     * @var array
+     * @var string[]
      */
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
@@ -1182,6 +1182,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Get the current application locale.
+     *
+     * @return string
+     */
+    public function currentLocale()
+    {
+        return $this->getLocale();
+    }
+
+    /**
      * Get the current application fallback locale.
      *
      * @return string
@@ -1301,8 +1311,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->serviceProviders = [];
         $this->resolvingCallbacks = [];
         $this->terminatingCallbacks = [];
+        $this->beforeResolvingCallbacks = [];
         $this->afterResolvingCallbacks = [];
+        $this->globalBeforeResolvingCallbacks = [];
         $this->globalResolvingCallbacks = [];
+        $this->globalAfterResolvingCallbacks = [];
     }
 
     /**

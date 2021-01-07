@@ -586,11 +586,15 @@ if (! function_exists('report')) {
     /**
      * Report an exception.
      *
-     * @param  \Throwable  $exception
+     * @param  \Throwable|string  $exception
      * @return void
      */
-    function report(Throwable $exception)
+    function report($exception)
     {
+        if (is_string($exception)) {
+            $exception = new Exception($exception);
+        }
+
         app(ExceptionHandler::class)->report($exception);
     }
 }
@@ -601,7 +605,7 @@ if (! function_exists('request')) {
      *
      * @param  array|string|null  $key
      * @param  mixed  $default
-     * @return \Illuminate\Http\Request|string|array
+     * @return \Illuminate\Http\Request|string|array|null
      */
     function request($key = null, $default = null)
     {
@@ -673,7 +677,7 @@ if (! function_exists('response')) {
     /**
      * Return a new response from the application.
      *
-     * @param  \Illuminate\View\View|string|array|null  $content
+     * @param  \Illuminate\Contracts\View\View|string|array|null  $content
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\Response|\Illuminate\Contracts\Routing\ResponseFactory
@@ -884,7 +888,7 @@ if (! function_exists('view')) {
      * @param  string|null  $view
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @param  array  $mergeData
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
     function view($view = null, $data = [], $mergeData = [])
     {

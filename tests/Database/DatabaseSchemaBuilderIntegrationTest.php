@@ -106,4 +106,32 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
         $this->assertArrayHasKey('example_table1_name_index', $this->db->connection()->getDoctrineSchemaManager()->listTableIndexes('example_table1'));
     }
+
+    public function testDropColumnWithTablePrefix()
+    {
+        $this->db->connection()->setTablePrefix('test_');
+
+        $this->schemaBuilder()->create('pandemic_table', function (Blueprint $table) {
+            $table->integer('id');
+            $table->string('stay_home');
+            $table->string('covid19');
+            $table->string('wear_mask');
+        });
+
+        // drop single columns
+        $this->assertTrue($this->schemaBuilder()->hasColumn('pandemic_table', 'stay_home'));
+        $this->schemaBuilder()->dropColumns('pandemic_table', 'stay_home');
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'stay_home'));
+
+        // drop multiple columns
+        $this->assertTrue($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
+        $this->schemaBuilder()->dropColumns('pandemic_table', ['covid19', 'wear_mask']);
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'wear_mask'));
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
+    }
+
+    private function schemaBuilder()
+    {
+        return $this->db->connection()->getSchemaBuilder();
+    }
 }

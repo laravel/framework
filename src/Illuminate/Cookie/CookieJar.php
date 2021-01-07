@@ -143,7 +143,7 @@ class CookieJar implements JarContract
         if (isset($parameters[0]) && $parameters[0] instanceof Cookie) {
             $cookie = $parameters[0];
         } else {
-            $cookie = $this->make(...$parameters);
+            $cookie = $this->make(...array_values($parameters));
         }
 
         if (! isset($this->queued[$cookie->getName()])) {

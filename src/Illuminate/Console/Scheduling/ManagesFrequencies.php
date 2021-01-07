@@ -276,7 +276,7 @@ trait ManagesFrequencies
      */
     public function weekdays()
     {
-        return $this->spliceIntoPosition(5, '1-5');
+        return $this->days(Schedule::MONDAY.'-'.Schedule::FRIDAY);
     }
 
     /**
@@ -286,7 +286,7 @@ trait ManagesFrequencies
      */
     public function weekends()
     {
-        return $this->spliceIntoPosition(5, '0,6');
+        return $this->days(Schedule::SATURDAY.','.Schedule::SUNDAY);
     }
 
     /**
@@ -296,7 +296,7 @@ trait ManagesFrequencies
      */
     public function mondays()
     {
-        return $this->days(1);
+        return $this->days(Schedule::MONDAY);
     }
 
     /**
@@ -306,7 +306,7 @@ trait ManagesFrequencies
      */
     public function tuesdays()
     {
-        return $this->days(2);
+        return $this->days(Schedule::TUESDAY);
     }
 
     /**
@@ -316,7 +316,7 @@ trait ManagesFrequencies
      */
     public function wednesdays()
     {
-        return $this->days(3);
+        return $this->days(Schedule::WEDNESDAY);
     }
 
     /**
@@ -326,7 +326,7 @@ trait ManagesFrequencies
      */
     public function thursdays()
     {
-        return $this->days(4);
+        return $this->days(Schedule::THURSDAY);
     }
 
     /**
@@ -336,7 +336,7 @@ trait ManagesFrequencies
      */
     public function fridays()
     {
-        return $this->days(5);
+        return $this->days(Schedule::FRIDAY);
     }
 
     /**
@@ -346,7 +346,7 @@ trait ManagesFrequencies
      */
     public function saturdays()
     {
-        return $this->days(6);
+        return $this->days(Schedule::SATURDAY);
     }
 
     /**
@@ -356,7 +356,7 @@ trait ManagesFrequencies
      */
     public function sundays()
     {
-        return $this->days(0);
+        return $this->days(Schedule::SUNDAY);
     }
 
     /**
@@ -374,15 +374,15 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run weekly on a given day and time.
      *
-     * @param  int  $day
+     * @param  int  $dayOfWeek
      * @param  string  $time
      * @return $this
      */
-    public function weeklyOn($day, $time = '0:0')
+    public function weeklyOn($dayOfWeek, $time = '0:0')
     {
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(5, $day);
+        return $this->days($dayOfWeek);
     }
 
     /**
@@ -400,15 +400,15 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run monthly on a given day and time.
      *
-     * @param  int  $day
+     * @param  int  $dayOfMonth
      * @param  string  $time
      * @return $this
      */
-    public function monthlyOn($day = 1, $time = '0:0')
+    public function monthlyOn($dayOfMonth = 1, $time = '0:0')
     {
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(3, $day);
+        return $this->spliceIntoPosition(3, $dayOfMonth);
     }
 
     /**
@@ -421,13 +421,11 @@ trait ManagesFrequencies
      */
     public function twiceMonthly($first = 1, $second = 16, $time = '0:0')
     {
-        $days = $first.','.$second;
+        $daysOfMonth = $first.','.$second;
 
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(1, 0)
-            ->spliceIntoPosition(2, 0)
-            ->spliceIntoPosition(3, $days);
+        return $this->spliceIntoPosition(3, $daysOfMonth);
     }
 
     /**
@@ -467,6 +465,22 @@ trait ManagesFrequencies
                     ->spliceIntoPosition(2, 0)
                     ->spliceIntoPosition(3, 1)
                     ->spliceIntoPosition(4, 1);
+    }
+
+    /**
+     * Schedule the event to run yearly on a given month, day, and time.
+     *
+     * @param  int  $month
+     * @param  int|string  $dayOfMonth
+     * @param  string  $time
+     * @return $this
+     */
+    public function yearlyOn($month = 1, $dayOfMonth = 1, $time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, $dayOfMonth)
+                    ->spliceIntoPosition(4, $month);
     }
 
     /**
