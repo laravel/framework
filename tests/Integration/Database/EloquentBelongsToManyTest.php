@@ -39,6 +39,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('type')->nullable();
             $table->timestamps();
         });
 
@@ -451,6 +452,18 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tags()->updateOrCreate(['id' => 'asd'], ['name' => 'dives']);
         $this->assertNotNull($post->tags()->whereName('dives')->first());
+    }
+
+    public function testUpdateOrCreateMethodCreate()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $post->tags()->updateOrCreate(['name' => 'wavez'], ['type' => 'featured']);
+
+        $tag = $post->tags()->whereType('featured')->first();
+
+        $this->assertNotNull($tag);
+        $this->assertSame('wavez', $tag->name);
     }
 
     public function testSyncMethod()
@@ -1030,7 +1043,7 @@ class Tag extends Model
 {
     public $table = 'tags';
     public $timestamps = true;
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'type'];
 
     public function posts()
     {
