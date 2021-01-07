@@ -126,6 +126,10 @@ class RetryCommand extends Command
     {
         $payload = json_decode($payload, true);
 
+        if (! isset($payload['data']['command'])) {
+            return json_encode($payload);
+        }
+
         $instance = unserialize($payload['data']['command']);
 
         if (is_object($instance) && method_exists($instance, 'retryUntil')) {
