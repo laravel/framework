@@ -6,8 +6,8 @@ use Illuminate\Foundation\Testing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Support\Facades\Schema;
 
 trait TemporaryDatabases
 {
@@ -26,7 +26,6 @@ trait TemporaryDatabases
     protected function bootTemporaryDatabases()
     {
         ParallelTesting::setUpTestCase(function ($testCase) {
-
             $uses = array_flip(class_uses_recursive(get_class($testCase)));
 
             if (Arr::hasAny($uses, [
