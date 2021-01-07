@@ -157,12 +157,24 @@ class PendingCommand
      */
     public function expectsTable($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
     {
-        $this->test->expectedTables[] = [
-            'headers' => (array) $headers,
-            'rows' => $rows instanceof Arrayable ? $rows->toArray() : $rows,
-            'tableStyle' => $tableStyle,
-            'columnStyles' => $columnStyles,
-        ];
+        $table = (new Table($output = new BufferedOutput))
+            ->setHeaders((array) $headers)
+            ->setRows($rows instanceof Arrayable ? $rows->toArray() : $rows)
+            ->setStyle($tableStyle);
+
+        foreach ($columnStyles as $columnIndex => $columnStyle) {
+            $table->setColumnStyle($columnIndex, $columnStyle);
+        }
+
+        $table->render();
+
+        $lines = array_filter(
+            explode(PHP_EOL, $output->fetch())
+        );
+
+        foreach ($lines as $line) {
+            $this->expectsOutput($line);
+        }
 
         return $this;
     }
@@ -305,8 +317,6 @@ class PendingCommand
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldIgnoreMissing();
 
-        $this->applyTableOutputExpectations($mock);
-
         foreach ($this->test->expectedOutput as $i => $output) {
             $mock->shouldReceive('doWrite')
                 ->once()
@@ -328,38 +338,6 @@ class PendingCommand
         }
 
         return $mock;
-    }
-
-    /**
-     * Apply the output table expectations to the mock.
-     *
-     * @param  \Mockery\MockInterface  $mock
-     * @return void
-     */
-    private function applyTableOutputExpectations($mock)
-    {
-        foreach ($this->test->expectedTables as $i => $consoleTable) {
-            $table = (new Table($output = new BufferedOutput))
-                ->setHeaders($consoleTable['headers'])
-                ->setRows($consoleTable['rows'])
-                ->setStyle($consoleTable['tableStyle']);
-
-            foreach ($consoleTable['columnStyles'] as $columnIndex => $columnStyle) {
-                $table->setColumnStyle($columnIndex, $columnStyle);
-            }
-
-            $table->render();
-
-            $lines = array_filter(
-                explode(PHP_EOL, $output->fetch())
-            );
-
-            foreach ($lines as $line) {
-                $this->expectsOutput($line);
-            }
-
-            unset($this->test->expectedTables[$i]);
-        }
     }
 
     /**
