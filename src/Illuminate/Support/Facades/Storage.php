@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Testing\ParallelTesting;
 
 /**
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertExists(string|array $path)
@@ -54,7 +55,7 @@ class Storage extends Facade
             $root = storage_path('framework/testing/disks/'.$disk)
         );
 
-        $root = Testing::addTokenIfNeeded($root);
+        $root = static::$app[ParallelTesting::class]->addTokenIfNeeded($root);
 
         static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
             'root' => $root,

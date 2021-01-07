@@ -10,11 +10,4 @@ class RefreshDatabaseState
      * @var bool
      */
     public static $migrated = false;
-
-    /**
-     * The temporary database name, if any.
-     *
-     * @var string|null
-     */
-    public static $temporaryDatabase;
 }
