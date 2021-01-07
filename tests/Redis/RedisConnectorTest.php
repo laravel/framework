@@ -34,13 +34,14 @@ class RedisConnectorTest extends TestCase
 
         $predisClient = $this->redis['predis']->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
-        $this->assertEquals('tcp', $parameters->scheme);
+        $this->assertSame('tcp', $parameters->scheme);
         $this->assertEquals($host, $parameters->host);
         $this->assertEquals($port, $parameters->port);
 
         $phpRedisClient = $this->redis['phpredis']->connection()->client();
         $this->assertEquals($host, $phpRedisClient->getHost());
         $this->assertEquals($port, $phpRedisClient->getPort());
+        $this->assertEquals('default', $phpRedisClient->client('GETNAME'));
     }
 
     public function testUrl()
@@ -61,7 +62,7 @@ class RedisConnectorTest extends TestCase
         ]);
         $predisClient = $predis->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
-        $this->assertEquals('tcp', $parameters->scheme);
+        $this->assertSame('tcp', $parameters->scheme);
         $this->assertEquals($host, $parameters->host);
         $this->assertEquals($port, $parameters->port);
 
@@ -77,7 +78,7 @@ class RedisConnectorTest extends TestCase
             ],
         ]);
         $phpRedisClient = $phpRedis->connection()->client();
-        $this->assertEquals("tcp://{$host}", $phpRedisClient->getHost());
+        $this->assertSame("tcp://{$host}", $phpRedisClient->getHost());
         $this->assertEquals($port, $phpRedisClient->getPort());
     }
 
@@ -99,7 +100,7 @@ class RedisConnectorTest extends TestCase
         ]);
         $predisClient = $predis->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
-        $this->assertEquals('tls', $parameters->scheme);
+        $this->assertSame('tls', $parameters->scheme);
         $this->assertEquals($host, $parameters->host);
         $this->assertEquals($port, $parameters->port);
 
@@ -115,7 +116,7 @@ class RedisConnectorTest extends TestCase
             ],
         ]);
         $phpRedisClient = $phpRedis->connection()->client();
-        $this->assertEquals("tcp://{$host}", $phpRedisClient->getHost());
+        $this->assertSame("tcp://{$host}", $phpRedisClient->getHost());
         $this->assertEquals($port, $phpRedisClient->getPort());
     }
 
@@ -139,7 +140,7 @@ class RedisConnectorTest extends TestCase
         ]);
         $predisClient = $predis->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
-        $this->assertEquals('tls', $parameters->scheme);
+        $this->assertSame('tls', $parameters->scheme);
         $this->assertEquals($host, $parameters->host);
         $this->assertEquals($port, $parameters->port);
 
@@ -157,7 +158,7 @@ class RedisConnectorTest extends TestCase
             ],
         ]);
         $phpRedisClient = $phpRedis->connection()->client();
-        $this->assertEquals("tcp://{$host}", $phpRedisClient->getHost());
+        $this->assertSame("tcp://{$host}", $phpRedisClient->getHost());
         $this->assertEquals($port, $phpRedisClient->getPort());
     }
 }

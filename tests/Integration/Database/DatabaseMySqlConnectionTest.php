@@ -6,6 +6,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * @requires extension pdo_mysql
+ */
 class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
 {
     const TABLE = 'player';
@@ -31,7 +34,7 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
 
     protected function tearDown(): void
     {
-        DB::table(self::TABLE)->truncate();
+        Schema::drop(self::TABLE);
 
         parent::tearDown();
     }

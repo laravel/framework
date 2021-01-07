@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayIterator;
 use Closure;
+use DateTimeInterface;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
@@ -1057,6 +1058,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Split a collection into a certain number of groups, and fill the first groups completely.
+     *
+     * @param  int  $numberOfGroups
+     * @return static
+     */
+    public function splitIn($numberOfGroups)
+    {
+        return $this->chunk(ceil($this->count() / $numberOfGroups));
+    }
+
+    /**
      * Chunk the collection into chunks with a callback.
      *
      * @param  callable  $callback
@@ -1210,6 +1222,21 @@ class LazyCollection implements Enumerable
 
                 yield $key => $item;
             }
+        });
+    }
+
+    /**
+     * Take items in the collection until a given point in time.
+     *
+     * @param  \DateTimeInterface  $timeout
+     * @return static
+     */
+    public function takeUntilTimeout(DateTimeInterface $timeout)
+    {
+        $timeout = $timeout->getTimestamp();
+
+        return $this->takeWhile(function () use ($timeout) {
+            return $this->now() < $timeout;
         });
     }
 
@@ -1384,5 +1411,15 @@ class LazyCollection implements Enumerable
         return new static(function () use ($method, $params) {
             yield from $this->collect()->$method(...$params);
         });
+    }
+
+    /**
+     * Get the current time.
+     *
+     * @return int
+     */
+    protected function now()
+    {
+        return time();
     }
 }

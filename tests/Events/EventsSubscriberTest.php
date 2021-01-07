@@ -41,10 +41,10 @@ class EventsSubscriberTest extends TestCase
         $d->subscribe(DeclarativeSubscriber::class);
 
         $d->dispatch('myEvent1');
-        $this->assertEquals(DeclarativeSubscriber::$string, 'L1_L2_');
+        $this->assertSame('L1_L2_', DeclarativeSubscriber::$string);
 
         $d->dispatch('myEvent2');
-        $this->assertEquals(DeclarativeSubscriber::$string, 'L1_L2_L3');
+        $this->assertSame('L1_L2_L3', DeclarativeSubscriber::$string);
     }
 }
 

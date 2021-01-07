@@ -28,7 +28,7 @@ class RetryBatchCommand extends Command
      */
     public function handle()
     {
-        $batch = $this->laravel[BatchRepository::class]->find($this->argument('id'));
+        $batch = $this->laravel[BatchRepository::class]->find($id = $this->argument('id'));
 
         if (! $batch) {
             $this->error("Unable to find a batch with ID [{$id}].");

@@ -18,6 +18,7 @@ class EloquentModelWithoutEventsTest extends DatabaseTestCase
         Schema::create('auto_filled_models', function (Blueprint $table) {
             $table->increments('id');
             $table->text('project')->nullable();
+            $table->integer('stars')->default(0);
         });
     }
 
@@ -31,7 +32,31 @@ class EloquentModelWithoutEventsTest extends DatabaseTestCase
 
         $model->save();
 
-        $this->assertEquals('Laravel', $model->project);
+        $this->assertSame('Laravel', $model->project);
+    }
+
+    public function testWithoutEventsRegistersBootedListenersForLaterWithName()
+    {
+        AutoFilledModel::flushEventListeners(['saving']);
+        $model = AutoFilledModel::create();
+        $this->assertNull($model->project);
+        $this->assertSame(1, $model->stars);
+    }
+
+    public function testWithoutEventsRegistersBootedListeners()
+    {
+        AutoFilledModel::flushEventListeners();
+        $model = AutoFilledModel::create();
+        $this->assertNull($model->project);
+        $this->assertNull($model->stars);
+    }
+
+    public function testWithoutEventsRegistersBootedListenersWithName()
+    {
+        AutoFilledModel::flushEventListeners(['created']);
+        $model = AutoFilledModel::create();
+        $this->assertSame('Laravel', $model->project);
+        $this->assertNull($model->stars);
     }
 }
 
@@ -47,6 +72,10 @@ class AutoFilledModel extends Model
 
         static::saving(function ($model) {
             $model->project = 'Laravel';
+        });
+
+        static::created(function ($model) {
+            $model->increment('stars');
         });
     }
 }

@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use ReflectionClass;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class ClearCommand extends Command
 {
@@ -16,9 +18,7 @@ class ClearCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:clear
-                            {connection? : The name of the queue connection to clear}
-                            {--queue= : The name of the queue to clear}';
+    protected $name = 'queue:clear';
 
     /**
      * The console command description.
@@ -70,5 +70,31 @@ class ClearCommand extends Command
         return $this->option('queue') ?: $this->laravel['config']->get(
             "queue.connections.{$connection}.queue", 'default'
         );
+    }
+
+    /**
+     *  Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['connection', InputArgument::OPTIONAL, 'The name of the queue connection to clear'],
+        ];
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['queue', null, InputOption::VALUE_OPTIONAL, 'The name of the queue to clear'],
+
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+        ];
     }
 }

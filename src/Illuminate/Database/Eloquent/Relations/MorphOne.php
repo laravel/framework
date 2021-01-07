@@ -4,11 +4,12 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class MorphOne extends MorphOneOrMany
 {
-    use SupportsDefaultModels;
+    use ComparesRelatedModels, SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.
@@ -64,5 +65,16 @@ class MorphOne extends MorphOneOrMany
         return $this->related->newInstance()
                     ->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey})
                     ->setAttribute($this->getMorphType(), $this->morphClass);
+    }
+
+    /**
+     * Get the value of the model's foreign key.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return mixed
+     */
+    protected function getRelatedKeyFrom(Model $model)
+    {
+        return $model->getAttribute($this->getForeignKeyName());
     }
 }

@@ -38,7 +38,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Register a view extension with the finder.
      *
-     * @var array
+     * @var string[]
      */
     protected $extensions = ['blade.php', 'php', 'css', 'html'];
 

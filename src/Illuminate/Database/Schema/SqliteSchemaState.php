@@ -2,20 +2,22 @@
 
 namespace Illuminate\Database\Schema;
 
+use Illuminate\Database\Connection;
+
 class SqliteSchemaState extends SchemaState
 {
     /**
      * Dump the database's schema into a file.
      *
-     * @param string $path
-     *
+     * @param  \Illuminate\Database\Connection
+     * @param  string  $path
      * @return void
      */
-    public function dump($path)
+    public function dump(Connection $connection, $path)
     {
         with($process = $this->makeProcess(
             $this->baseCommand().' .schema'
-        ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+        ))->setTimeout(null)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
 
@@ -32,12 +34,13 @@ class SqliteSchemaState extends SchemaState
     /**
      * Append the migration data to the schema dump.
      *
+     * @param  string  $path
      * @return void
      */
     protected function appendMigrationData(string $path)
     {
         with($process = $this->makeProcess(
-            $this->baseCommand().' ".dump \'migrations\'"'
+            $this->baseCommand().' ".dump \''.$this->migrationTable.'\'"'
         ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
@@ -53,13 +56,12 @@ class SqliteSchemaState extends SchemaState
     /**
      * Load the given schema file into the database.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return void
      */
     public function load($path)
     {
-        $process = $this->makeProcess($this->baseCommand().' < $LARAVEL_LOAD_PATH');
+        $process = $this->makeProcess($this->baseCommand().' < "${:LARAVEL_LOAD_PATH}"');
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
@@ -73,12 +75,13 @@ class SqliteSchemaState extends SchemaState
      */
     protected function baseCommand()
     {
-        return 'sqlite3 $LARAVEL_LOAD_DATABASE';
+        return 'sqlite3 "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
      * Get the base variables for a dump / load command.
      *
+     * @param  array  $config
      * @return array
      */
     protected function baseVariables(array $config)

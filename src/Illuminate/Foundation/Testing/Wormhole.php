@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 
 class Wormhole
 {
@@ -32,7 +32,7 @@ class Wormhole
      */
     public function milliseconds($callback = null)
     {
-        Carbon::setTestNow(Carbon::now()->addMilliseconds($this->value));
+        Date::setTestNow(Date::now()->addMilliseconds($this->value));
 
         return $this->handleCallback($callback);
     }
@@ -45,7 +45,7 @@ class Wormhole
      */
     public function seconds($callback = null)
     {
-        Carbon::setTestNow(Carbon::now()->addSeconds($this->value));
+        Date::setTestNow(Date::now()->addSeconds($this->value));
 
         return $this->handleCallback($callback);
     }
@@ -58,7 +58,7 @@ class Wormhole
      */
     public function minutes($callback = null)
     {
-        Carbon::setTestNow(Carbon::now()->addMinutes($this->value));
+        Date::setTestNow(Date::now()->addMinutes($this->value));
 
         return $this->handleCallback($callback);
     }
@@ -71,7 +71,7 @@ class Wormhole
      */
     public function hours($callback = null)
     {
-        Carbon::setTestNow(Carbon::now()->addHours($this->value));
+        Date::setTestNow(Date::now()->addHours($this->value));
 
         return $this->handleCallback($callback);
     }
@@ -84,7 +84,7 @@ class Wormhole
      */
     public function days($callback = null)
     {
-        Carbon::setTestNow(Carbon::now()->addDays($this->value));
+        Date::setTestNow(Date::now()->addDays($this->value));
 
         return $this->handleCallback($callback);
     }
@@ -97,7 +97,7 @@ class Wormhole
      */
     public function weeks($callback = null)
     {
-        Carbon::setTestNow(Carbon::now()->addWeeks($this->value));
+        Date::setTestNow(Date::now()->addWeeks($this->value));
 
         return $this->handleCallback($callback);
     }
@@ -110,9 +110,21 @@ class Wormhole
      */
     public function years($callback = null)
     {
-        Carbon::setTestNow(Carbon::now()->addYears($this->value));
+        Date::setTestNow(Date::now()->addYears($this->value));
 
         return $this->handleCallback($callback);
+    }
+
+    /**
+     * Travel back to the current time.
+     *
+     * @return \DateTimeInterface
+     */
+    public static function back()
+    {
+        Date::setTestNow();
+
+        return Date::now();
     }
 
     /**
@@ -125,7 +137,7 @@ class Wormhole
     {
         if ($callback) {
             return tap($callback(), function () {
-                Carbon::setTestNow();
+                Date::setTestNow();
             });
         }
     }

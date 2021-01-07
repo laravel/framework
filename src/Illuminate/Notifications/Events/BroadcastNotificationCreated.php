@@ -92,6 +92,10 @@ class BroadcastNotificationCreated implements ShouldBroadcast
      */
     public function broadcastWith()
     {
+        if (method_exists($this->notification, 'broadcastWith')) {
+            return $this->notification->broadcastWith();
+        }
+
         return array_merge($this->data, [
             'id' => $this->notification->id,
             'type' => $this->broadcastType(),

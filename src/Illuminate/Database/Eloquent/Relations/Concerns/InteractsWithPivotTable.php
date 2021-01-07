@@ -124,6 +124,21 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Sync the intermediate tables with a list of IDs or collection of models with the given pivot values.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
+     * @param  array  $values
+     * @param  bool  $detaching
+     * @return array
+     */
+    public function syncWithPivotValues($ids, array $values, bool $detaching = true)
+    {
+        return $this->sync(collect($this->parseIds($ids))->mapWithKeys(function ($id) use ($values) {
+            return [$id => $values];
+        }), $detaching);
+    }
+
+    /**
      * Format the sync / toggle record list so that it is keyed by ID.
      *
      * @param  array  $records
@@ -475,7 +490,7 @@ trait InteractsWithPivotTable
     protected function getCurrentlyAttachedPivots()
     {
         return $this->newPivotQuery()->get()->map(function ($record) {
-            $class = $this->using ? $this->using : Pivot::class;
+            $class = $this->using ?: Pivot::class;
 
             $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
 
@@ -541,15 +556,15 @@ trait InteractsWithPivotTable
         $query = $this->newPivotStatement();
 
         foreach ($this->pivotWheres as $arguments) {
-            call_user_func_array([$query, 'where'], $arguments);
+            $query->where(...$arguments);
         }
 
         foreach ($this->pivotWhereIns as $arguments) {
-            call_user_func_array([$query, 'whereIn'], $arguments);
+            $query->whereIn(...$arguments);
         }
 
         foreach ($this->pivotWhereNulls as $arguments) {
-            call_user_func_array([$query, 'whereNull'], $arguments);
+            $query->whereNull(...$arguments);
         }
 
         return $query->where($this->foreignPivotKey, $this->parent->{$this->parentKey});

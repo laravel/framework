@@ -74,6 +74,64 @@ class EloquentBelongsToTest extends DatabaseTestCase
         $this->assertEquals($child->id, $child->parent_id);
         $this->assertFalse($child->relationLoaded('parent'));
     }
+
+    public function testParentIsNotNull()
+    {
+        $child = User::has('parent')->first();
+        $parent = null;
+
+        $this->assertFalse($child->parent()->is($parent));
+        $this->assertTrue($child->parent()->isNot($parent));
+    }
+
+    public function testParentIsModel()
+    {
+        $child = User::has('parent')->first();
+        $parent = User::doesntHave('parent')->first();
+
+        $this->assertTrue($child->parent()->is($parent));
+        $this->assertFalse($child->parent()->isNot($parent));
+    }
+
+    public function testParentIsNotAnotherModel()
+    {
+        $child = User::has('parent')->first();
+        $parent = new User();
+        $parent->id = 3;
+
+        $this->assertFalse($child->parent()->is($parent));
+        $this->assertTrue($child->parent()->isNot($parent));
+    }
+
+    public function testNullParentIsNotModel()
+    {
+        $child = User::has('parent')->first();
+        $child->parent()->dissociate();
+        $parent = User::doesntHave('parent')->first();
+
+        $this->assertFalse($child->parent()->is($parent));
+        $this->assertTrue($child->parent()->isNot($parent));
+    }
+
+    public function testParentIsNotModelWithAnotherTable()
+    {
+        $child = User::has('parent')->first();
+        $parent = User::doesntHave('parent')->first();
+        $parent->setTable('foo');
+
+        $this->assertFalse($child->parent()->is($parent));
+        $this->assertTrue($child->parent()->isNot($parent));
+    }
+
+    public function testParentIsNotModelWithAnotherConnection()
+    {
+        $child = User::has('parent')->first();
+        $parent = User::doesntHave('parent')->first();
+        $parent->setConnection('foo');
+
+        $this->assertFalse($child->parent()->is($parent));
+        $this->assertTrue($child->parent()->isNot($parent));
+    }
 }
 
 class User extends Model

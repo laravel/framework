@@ -163,7 +163,7 @@ class Validator implements ValidatorContract
     /**
      * The validation rules that may be applied to files.
      *
-     * @var array
+     * @var string[]
      */
     protected $fileRules = [
         'Between',
@@ -180,7 +180,7 @@ class Validator implements ValidatorContract
     /**
      * The validation rules that imply the field is required.
      *
-     * @var array
+     * @var string[]
      */
     protected $implicitRules = [
         'Accepted',
@@ -198,7 +198,7 @@ class Validator implements ValidatorContract
     /**
      * The validation rules which depend on other fields as parameters.
      *
-     * @var array
+     * @var string[]
      */
     protected $dependentRules = [
         'After',
@@ -227,21 +227,21 @@ class Validator implements ValidatorContract
     /**
      * The validation rules that can exclude an attribute.
      *
-     * @var array
+     * @var string[]
      */
     protected $excludeRules = ['ExcludeIf', 'ExcludeUnless', 'ExcludeWithout'];
 
     /**
      * The size related validation rules.
      *
-     * @var array
+     * @var string[]
      */
     protected $sizeRules = ['Size', 'Between', 'Min', 'Max', 'Gt', 'Lt', 'Gte', 'Lte'];
 
     /**
      * The numeric related validation rules.
      *
-     * @var array
+     * @var string[]
      */
     protected $numericRules = ['Numeric', 'Integer'];
 
@@ -346,7 +346,7 @@ class Validator implements ValidatorContract
     public function after($callback)
     {
         $this->after[] = function () use ($callback) {
-            return call_user_func_array($callback, [$this]);
+            return $callback($this);
         };
 
         return $this;
@@ -1355,7 +1355,7 @@ class Validator implements ValidatorContract
         $callback = $this->extensions[$rule];
 
         if (is_callable($callback)) {
-            return call_user_func_array($callback, $parameters);
+            return $callback(...array_values($parameters));
         } elseif (is_string($callback)) {
             return $this->callClassBasedExtension($callback, $parameters);
         }
@@ -1372,7 +1372,7 @@ class Validator implements ValidatorContract
     {
         [$class, $method] = Str::parseCallback($callback, 'validate');
 
-        return call_user_func_array([$this->container->make($class), $method], $parameters);
+        return $this->container->make($class)->{$method}(...array_values($parameters));
     }
 
     /**

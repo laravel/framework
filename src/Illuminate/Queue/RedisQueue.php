@@ -53,15 +53,22 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string|null  $connection
      * @param  int  $retryAfter
      * @param  int|null  $blockFor
+     * @param  bool  $dispatchAfterCommit
      * @return void
      */
-    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60, $blockFor = null)
+    public function __construct(Redis $redis,
+                                $default = 'default',
+                                $connection = null,
+                                $retryAfter = 60,
+                                $blockFor = null,
+                                $dispatchAfterCommit = false)
     {
         $this->redis = $redis;
         $this->default = $default;
         $this->blockFor = $blockFor;
         $this->connection = $connection;
         $this->retryAfter = $retryAfter;
+        $this->dispatchAfterCommit = $dispatchAfterCommit;
     }
 
     /**
@@ -108,7 +115,15 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        return $this->enqueueUsing(
+            $job,
+            $this->createPayload($job, $this->getQueue($queue), $data),
+            $queue,
+            null,
+            function ($payload, $queue) {
+                return $this->pushRaw($payload, $queue);
+            }
+        );
     }
 
     /**
@@ -140,7 +155,15 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->laterRaw($delay, $this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        return $this->enqueueUsing(
+            $job,
+            $this->createPayload($job, $this->getQueue($queue), $data),
+            $queue,
+            $delay,
+            function ($payload, $queue, $delay) {
+                return $this->laterRaw($delay, $payload, $queue);
+            }
+        );
     }
 
     /**
@@ -186,11 +209,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $this->migrate($prefixed = $this->getQueue($queue));
 
-        if (empty($nextJob = $this->retrieveNextJob($prefixed))) {
-            return;
-        }
-
-        [$job, $reserved] = $nextJob;
+        [$job, $reserved] = $this->retrieveNextJob($prefixed);
 
         if ($reserved) {
             return new RedisJob(
@@ -298,7 +317,8 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $queue = $this->getQueue($queue);
 
         return $this->getConnection()->eval(
-            LuaScripts::clear(), 3, $queue, $queue.':delayed', $queue.':reserved'
+            LuaScripts::clear(), 4, $queue, $queue.':delayed',
+            $queue.':reserved', $queue.':notify'
         );
     }
 

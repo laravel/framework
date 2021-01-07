@@ -35,7 +35,11 @@ use Traversable;
  * @property-read HigherOrderCollectionProxy $some
  * @property-read HigherOrderCollectionProxy $sortBy
  * @property-read HigherOrderCollectionProxy $sortByDesc
+ * @property-read HigherOrderCollectionProxy $skipUntil
+ * @property-read HigherOrderCollectionProxy $skipWhile
  * @property-read HigherOrderCollectionProxy $sum
+ * @property-read HigherOrderCollectionProxy $takeUntil
+ * @property-read HigherOrderCollectionProxy $takeWhile
  * @property-read HigherOrderCollectionProxy $unique
  * @property-read HigherOrderCollectionProxy $until
  */
@@ -44,7 +48,7 @@ trait EnumeratesValues
     /**
      * The methods that can be proxied.
      *
-     * @var array
+     * @var string[]
      */
     protected static $proxies = [
         'average',
@@ -197,7 +201,7 @@ trait EnumeratesValues
      */
     public function dd(...$args)
     {
-        call_user_func_array([$this, 'dump'], $args);
+        $this->dump(...$args);
 
         exit(1);
     }
@@ -686,6 +690,17 @@ trait EnumeratesValues
     public function pipe(callable $callback)
     {
         return $callback($this);
+    }
+
+    /**
+     * Pass the collection into a new class.
+     *
+     * @param  string  $class
+     * @return mixed
+     */
+    public function pipeInto($class)
+    {
+        return new $class($this);
     }
 
     /**
