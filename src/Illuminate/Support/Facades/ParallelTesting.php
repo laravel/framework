@@ -4,7 +4,6 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static void beforeProcessDestroyed(callable $callback)
- * @method static void resolveTokenUsing(callable $callback)
  * @method static void setUp(callable $callback)
  * @method static string token()
  *
