@@ -2,8 +2,6 @@
 
 namespace Illuminate\Testing;
 
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Support\Facades\Schema;
 use ParaTest\Runners\PHPUnit\Options;
 use ParaTest\Runners\PHPUnit\RunnerInterface;
 use ParaTest\Runners\PHPUnit\WrapperRunner;
