@@ -5,8 +5,8 @@ namespace Illuminate\Testing;
 use Illuminate\Foundation\Testing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ParallelTesting
 {
@@ -64,7 +64,7 @@ class ParallelTesting
             if (Arr::hasAny($uses, [
                 Testing\DatabaseMigrations::class,
                 Testing\DatabaseTransactions::class,
-                Testing\RefreshDatabase::class
+                Testing\RefreshDatabase::class,
             ])) {
                 $this->switchToTemporaryDatabase();
             }
@@ -135,7 +135,7 @@ class ParallelTesting
     }
 
     /**
-     * Ensure a temporary database exists
+     * Ensure a temporary database exists.
      *
      * @param  string  $database
      *

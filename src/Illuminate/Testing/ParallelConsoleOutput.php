@@ -2,7 +2,6 @@
 
 namespace Illuminate\Testing;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Output\ConsoleOutput;
 

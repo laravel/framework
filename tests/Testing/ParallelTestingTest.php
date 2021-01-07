@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Testing\ParallelTesting;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
