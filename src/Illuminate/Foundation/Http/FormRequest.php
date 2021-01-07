@@ -189,20 +189,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Get the filled validated data from the request.
-     *
-     * @return array
-     */
-    public function validatedFilled()
-    {
-        $validated = $this->validated();
-
-        return array_filter($validated, function ($attribute) {
-            return !empty($attribute);
-        });
-    }
-
-    /**
      * Get custom messages for validator errors.
      *
      * @return array
