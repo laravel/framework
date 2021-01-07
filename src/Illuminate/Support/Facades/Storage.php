@@ -3,7 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\ParallelTesting;
 
 /**
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertExists(string|array $path)
