@@ -55,6 +55,8 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
+        $this->processRowid($blueprint);
+
         return sprintf('%s table %s (%s%s%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
@@ -135,6 +137,8 @@ class SQLiteGrammar extends Grammar
      */
     public function compileAdd(Blueprint $blueprint, Fluent $command)
     {
+        $this->processRowid($blueprint);
+
         $columns = $this->prefixArray('add column', $this->getColumns($blueprint));
 
         return collect($columns)->reject(function ($column) {
@@ -907,7 +911,30 @@ class SQLiteGrammar extends Grammar
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
-            return ' primary key autoincrement';
+            $modifier = ' primary key';
+
+            if (! $column->asRowid) {
+                $modifier .= ' autoincrement';
+            }
+
+            return $modifier;
         }
+    }
+
+    /**
+     * Modify blueprint's columns marked as rowid.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return void
+     */
+    protected function processRowid(Blueprint $blueprint)
+    {
+        collect($blueprint->getAddedColumns())->filter(function ($column) {
+            return $column->asRowid === true;
+        })->each(function ($column) {
+            $column->autoIncrement();
+            $column->nullable();
+            unset($column->unsigned);
+        });
     }
 }

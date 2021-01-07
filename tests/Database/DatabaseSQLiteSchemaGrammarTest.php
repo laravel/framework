@@ -43,6 +43,30 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals($expected, $statements);
     }
 
+    public function testBasicCreateTableWithRowid()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->increments('id')->asRowid();
+        $blueprint->string('email');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "users" ("id" integer primary key, "email" varchar not null)', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->increments('id')->asRowid();
+        $blueprint->string('email');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $expected = [
+            'alter table "users" add column "id" integer primary key',
+            'alter table "users" add column "email" varchar not null',
+        ];
+        $this->assertEquals($expected, $statements);
+    }
+
     public function testCreateTemporaryTable()
     {
         $blueprint = new Blueprint('users');
@@ -54,6 +78,19 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create temporary table "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
+    }
+
+    public function testCreateTemporaryTableWithRowid()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->temporary();
+        $blueprint->increments('id')->asRowid();
+        $blueprint->string('email');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create temporary table "users" ("id" integer primary key, "email" varchar not null)', $statements[0]);
     }
 
     public function testDropTable()
@@ -197,6 +234,17 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create table "users" ("foo" varchar not null, primary key ("foo"))', $statements[0]);
+    }
+
+    public function testAddingPrimaryKeyAsRowid()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('foo')->primary()->asRowid();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "users" ("foo" varchar, primary key ("foo"))', $statements[0]);
     }
 
     public function testAddingForeignKey()
