@@ -100,6 +100,16 @@ class DatabaseEloquentMorphToTest extends TestCase
         $parent->relation();
     }
 
+    public function testMorphToWithEmptyStringMorphType()
+    {
+        $parent = $this->getMockBuilder(EloquentMorphToModelStub::class)->onlyMethods(['getAttributeFromArray', 'morphEagerTo', 'morphInstanceTo'])->getMock();
+        $parent->method('getAttributeFromArray')->with('relation_type')->willReturn('');
+        $parent->expects($this->once())->method('morphEagerTo');
+        $parent->expects($this->never())->method('morphInstanceTo');
+
+        $parent->relation();
+    }
+
     public function testMorphToWithSpecifiedClassDefault()
     {
         $parent = new EloquentMorphToModelStub;
