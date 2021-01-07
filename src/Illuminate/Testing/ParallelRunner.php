@@ -78,8 +78,6 @@ class ParallelRunner implements RunnerInterface
     {
         try {
             $this->runner->run();
-        } catch (Throwable $e) {
-            throw $e;
         } finally {
             $this->forEachProcess(function ($app) {
                 $app[ParallelTesting::class]->beforeProcessDestroyed();
