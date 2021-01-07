@@ -15,21 +15,17 @@ class ParallelTestingTest extends TestCase
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
     }
 
-    public function testAddTokenIfNeeded()
+    public function testToken()
     {
-        $this->assertSame(
-            'my_local_storage',
-            (new ParallelTesting())->addTokenIfNeeded('my_local_storage')
-        );
+        $parallelTesting = new ParallelTesting();
 
-        ParallelTesting::resolveTokenUsing(function () {
+        $this->assertFalse($parallelTesting->token());
+
+        $parallelTesting->resolveTokenUsing(function () {
             return 1;
         });
 
-        $this->assertSame(
-            'my_local_storage_test_1',
-            (new ParallelTesting())->addTokenIfNeeded('my_local_storage')
-        );
+        $this->assertSame(1, $parallelTesting->token());
     }
 
     public function tearDown(): void
@@ -37,7 +33,6 @@ class ParallelTestingTest extends TestCase
         parent::tearDown();
 
         m::close();
-        ParallelTesting::resolveTokenUsing(null);
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
     }
 }

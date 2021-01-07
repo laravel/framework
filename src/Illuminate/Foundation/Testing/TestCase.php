@@ -7,8 +7,8 @@ use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Str;
-use Illuminate\Testing\ParallelTesting;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
@@ -84,7 +84,7 @@ abstract class TestCase extends BaseTestCase
             $this->refreshApplication();
         }
 
-        $this->app[ParallelTesting::class]->setUpIfNeeded($this);
+        ParallelTesting::callSetUpCallbacks($this);
 
         $this->setUpTraits();
 

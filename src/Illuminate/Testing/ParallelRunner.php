@@ -7,6 +7,7 @@ use ParaTest\Runners\PHPUnit\RunnerInterface;
 use ParaTest\Runners\PHPUnit\WrapperRunner;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Illuminate\Support\Facades\ParallelTesting;
 
 class ParallelRunner implements RunnerInterface
 {
@@ -78,7 +79,7 @@ class ParallelRunner implements RunnerInterface
             $this->runner->run();
         } finally {
             $this->forEachProcess(function ($app) {
-                $app[ParallelTesting::class]->beforeProcessDestroyed();
+                ParallelTesting::callBeforeProcessDestroyedCallbacks();
             });
         }
     }

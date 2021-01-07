@@ -15,89 +15,98 @@ class ParallelTesting
      *
      * @var \Closure|null
      */
-    protected static $tokenResolver;
+    protected $tokenResolver;
 
     /**
-     * The temporary database name, if any.
+     * All of the registered "setUp" callbacks.
      *
-     * @var string|null
+     * @var array
      */
-    protected static $temporaryDatabase;
+    protected $setUpCallbacks = [];
 
     /**
-     * Set a callback that should be used when resolving tokens.
+     * All of the registered "beforeProcessDestroyed" callbacks.
+     *
+     * @var array
+     */
+    protected $beforeProcessDestroyedCallbacks = [];
+
+    /**
+     * Set a callback that should be used when resolving the unique process token.
      *
      * @param  \Closure|null  $callback
      * @return void
      */
-    public static function resolveTokenUsing($resolver)
+    public function resolveTokenUsing($resolver)
     {
-        static::$tokenResolver = $resolver;
+        $this->tokenResolver = $resolver;
     }
 
     /**
-     * Runs before the process gets destroyed.
+     * Register a callback to run before process gets destroyed.
      *
-     * @return void
+     * @param  callable  $callback
+     * @return $this
      */
-    public function beforeProcessDestroyed()
+    public function beforeProcessDestroyed($callback)
     {
-        $this->whenNotUsingInMemoryDatabase(function ($database) {
-            Schema::dropDatabaseIfExists(
-                $this->addTokenIfNeeded($database),
-            );
-        });
+        $this->beforeProcessDestroyedCallbacks[] = $callback;
+
+        return $this;
     }
 
     /**
-     * SetUp the given test case for parallel testing, if needed.
+     * Register a callback to run on test setup.
      *
-     * @param  \Illuminate\Foundation\Testing\TestCase $testCase
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function setUp($callback)
+    {
+        $this->setUpCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Call all of the "beforeProcessDestroyed" callbacks.
      *
      * @return void
      */
-    public function setUpIfNeeded($testCase)
+    public function callBeforeProcessDestroyedCallbacks()
     {
-        $this->whenRunningInParallel(function () use ($testCase) {
-            $uses = array_flip(class_uses_recursive(get_class($testCase)));
-
-            if (Arr::hasAny($uses, [
-                Testing\DatabaseMigrations::class,
-                Testing\DatabaseTransactions::class,
-                Testing\RefreshDatabase::class,
-            ])) {
-                $this->switchToTemporaryDatabase();
+        $this->whenRunningInParallel(function () {
+            foreach ($this->beforeProcessDestroyedCallbacks as $callback) {
+                $callback();
             }
         });
     }
 
     /**
-     * Adds an unique test token to the given string, if needed.
+     * Call all of the "setUp" callbacks.
      *
-     * @return string
+     * @param  \Illuminate\Foundation\Testing\TestCase  $testCase
+     * @return void
      */
-    public function addTokenIfNeeded($string)
+    public function callSetUpCallbacks($testCase)
     {
-        if (! $this->inParallel()) {
-            return $string;
-        }
-
-        return "{$string}_test_{$this->token()}";
+        $this->whenRunningInParallel(function () use ($testCase) {
+            foreach ($this->setUpCallbacks as $callback) {
+                $callback($testCase);
+            }
+        });
     }
 
     /**
-     * Apply the callback when tests are not using in memory database.
+     * Gets an unique test token.
      *
-     * @param  callable $callback
-     * @return void
+     * @return int|false
      */
-    protected function whenNotUsingInMemoryDatabase($callback)
+    public function token()
     {
-        $database = DB::getConfig('database');
-
-        if ($database != ':memory:') {
-            $callback($database);
-        }
+        return $token = $this->tokenResolver
+            ? call_user_func($this->tokenResolver)
+            : ($_SERVER['TEST_TOKEN'] ?? false);
     }
 
     /**
@@ -114,50 +123,6 @@ class ParallelTesting
     }
 
     /**
-     * Switch to the temporary database.
-     *
-     * @return void
-     */
-    protected function switchToTemporaryDatabase()
-    {
-        $this->whenNotUsingInMemoryDatabase(function ($database) {
-            $database = $this->ensureTemporaryDatabaseExists($database);
-
-            DB::purge();
-
-            $default = config('database.default');
-
-            config()->set(
-                "database.connections.{$default}.database",
-                $database,
-            );
-        });
-    }
-
-    /**
-     * Ensure a temporary database exists.
-     *
-     * @param  string  $database
-     *
-     * @return string
-     */
-    protected function ensureTemporaryDatabaseExists($database)
-    {
-        if (! static::$temporaryDatabase) {
-            static::$temporaryDatabase = $this->addTokenIfNeeded($database);
-
-            Schema::dropDatabaseIfExists(static::$temporaryDatabase);
-            Schema::createDatabase(static::$temporaryDatabase);
-
-            $this->switchToTemporaryDatabase();
-
-            Artisan::call('migrate:fresh');
-        }
-
-        return static::$temporaryDatabase;
-    }
-
-    /**
      * Indicates if the current tests are been run in Parallel.
      *
      * @return bool
@@ -165,17 +130,5 @@ class ParallelTesting
     protected function inParallel()
     {
         return ! empty($_SERVER['LARAVEL_PARALLEL_TESTING']) && $this->token();
-    }
-
-    /**
-     * Gets an unique test token.
-     *
-     * @return int|false
-     */
-    protected function token()
-    {
-        return static::$tokenResolver
-            ? call_user_func(static::$tokenResolver)
-            : ($_SERVER['TEST_TOKEN'] ?? false);
     }
 }
