@@ -340,9 +340,10 @@ trait HasEvents
     /**
      * Remove all of the event listeners for the model.
      *
+     * @param  string[]  $events
      * @return void
      */
-    public static function flushEventListeners()
+    public static function flushEventListeners(array $events = [])
     {
         if (! isset(static::$dispatcher)) {
             return;
@@ -350,11 +351,13 @@ trait HasEvents
 
         $instance = new static;
 
-        foreach ($instance->getObservableEvents() as $event) {
-            static::$dispatcher->forget("eloquent.{$event}: ".static::class);
-        }
+        $events = $events ?: array_merge(
+            $instance->getObservableEvents(),
+            array_values($instance->dispatchesEvents)
+        );
 
-        foreach (array_values($instance->dispatchesEvents) as $event) {
+        foreach ($events as $event) {
+            static::$dispatcher->forget("eloquent.{$event}: ".static::class);
             static::$dispatcher->forget($event);
         }
     }
