@@ -6,18 +6,12 @@ use Illuminate\Foundation\Testing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Schema;
 
 trait TemporaryDatabases
 {
-    /**
-     * The current temporary database name, if any.
-     *
-     * @var string|null
-     */
-    protected static $temporaryDatabase;
-
     /**
      * Boot temporary databases service.
      *
@@ -25,6 +19,15 @@ trait TemporaryDatabases
      */
     protected function bootTemporaryDatabases()
     {
+        ParallelTesting::setUpProcess(function () {
+            $this->whenNotUsingInMemoryDatabase(function ($database) {
+                [$name, $path] = $this->temporaryDatabase($database);
+
+                File::ensureDirectoryExists(dirname($path));
+                File::delete($path);
+            });
+        });
+
         ParallelTesting::setUpTestCase(function ($testCase) {
             $uses = array_flip(class_uses_recursive(get_class($testCase)));
 
@@ -39,9 +42,12 @@ trait TemporaryDatabases
 
         ParallelTesting::tearDownProcess(function () {
             $this->whenNotUsingInMemoryDatabase(function ($database) {
-                Schema::dropDatabaseIfExists(
-                    $this->temporaryDatabaseName($database)
-                );
+                [$name, $path] = $this->temporaryDatabase($database);
+
+                if (File::exists($path)) {
+                    Schema::dropDatabaseIfExists($name);
+                    File::delete($path);
+                }
             });
         });
     }
@@ -54,7 +60,7 @@ trait TemporaryDatabases
     protected function useTemporaryDatabase()
     {
         $this->whenNotUsingInMemoryDatabase(function ($database) {
-            $database = $this->ensureTemporaryDatabaseExists($database);
+            $name = $this->ensureTemporaryDatabaseExists($database);
 
             DB::purge();
 
@@ -62,13 +68,13 @@ trait TemporaryDatabases
 
             config()->set(
                 "database.connections.{$default}.database",
-                $database,
+                $name,
             );
         });
     }
 
     /**
-     * Ensure a temporary database exists.
+     * Ensure a temporary database exists, and returns it's name.
      *
      * @param  string  $database
      *
@@ -76,18 +82,19 @@ trait TemporaryDatabases
      */
     protected function ensureTemporaryDatabaseExists($database)
     {
-        if (! static::$temporaryDatabase) {
-            static::$temporaryDatabase = $this->temporaryDatabaseName($database);
+        [$name, $path] = $this->temporaryDatabase($database);
 
-            Schema::dropDatabaseIfExists(static::$temporaryDatabase);
-            Schema::createDatabase(static::$temporaryDatabase);
+        if (! File::exists($path)) {
+            Schema::dropDatabaseIfExists($name);
+            File::put($path, '');
+            Schema::createDatabase($name);
 
             $this->useTemporaryDatabase();
 
             Artisan::call('migrate:fresh');
         }
 
-        return static::$temporaryDatabase;
+        return $name;
     }
 
     /**
@@ -106,14 +113,17 @@ trait TemporaryDatabases
     }
 
     /**
-     * Returns the temporary database name.
+     * Returns the temporary database name and path.
      *
-     * @return string
+     * @return array
      */
-    protected function temporaryDatabaseName($database)
+    protected function temporaryDatabase($database)
     {
         $token = ParallelTesting::token();
 
-        return "{$database}_test_{$token}";
+        $name = "{$database}_test_{$token}";
+        $path = storage_path('framework/testing/temporary-databases/' . $name);
+
+        return [$name, $path];
     }
 }
