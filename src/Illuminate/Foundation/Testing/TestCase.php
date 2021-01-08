@@ -155,6 +155,8 @@ abstract class TestCase extends BaseTestCase
         if ($this->app) {
             $this->callBeforeApplicationDestroyedCallbacks();
 
+            ParallelTesting::callTearDownTestCaseCallbacks($this);
+
             $this->app->flush();
 
             $this->app = null;

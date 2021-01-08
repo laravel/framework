@@ -75,6 +75,10 @@ class ParallelRunner implements RunnerInterface
      */
     public function run(): void
     {
+        $this->forEachProcess(function () {
+            ParallelTesting::callSetUpProcessCallbacks();
+        });
+
         try {
             $this->runner->run();
         } finally {
