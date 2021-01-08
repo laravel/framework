@@ -55,7 +55,7 @@ class Storage extends Facade
         );
 
         if ($token = ParallelTesting::token()) {
-            $root = "{$root}_{$token}";
+            $root = "{$root}_test_{$token}";
         }
 
         static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
