@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\ParallelTesting;
 use ParaTest\Runners\PHPUnit\Options;
 use ParaTest\Runners\PHPUnit\RunnerInterface;
 use ParaTest\Runners\PHPUnit\WrapperRunner;
+use PHPUnit\TextUI\XmlConfiguration\PhpHandler;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use PHPUnit\TextUI\XmlConfiguration\PhpHandler;
 
 class ParallelRunner implements RunnerInterface
 {
