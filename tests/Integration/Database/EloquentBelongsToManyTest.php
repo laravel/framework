@@ -660,7 +660,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testWherePivotOnString()
     {
-        $tag = Tag::create(['name' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -676,7 +676,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstWhere()
     {
-        $tag = Tag::create(['name' => 'foo']);
+        $tag = Tag::create(['name' => 'foo'])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -692,7 +692,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testWherePivotOnBoolean()
     {
-        $tag = Tag::create(['name' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -708,7 +708,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testWherePivotInMethod()
     {
-        $tag = Tag::create(['name' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -743,7 +743,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testWherePivotNotInMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
-        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -781,7 +781,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testWherePivotNullMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
-        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -797,7 +797,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testWherePivotNotNullMethod()
     {
-        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag1 = Tag::create(['name' => Str::random()])->fresh();
         $tag2 = Tag::create(['name' => Str::random()]);
         $post = Post::create(['title' => Str::random()]);
 
@@ -922,8 +922,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testOrderByPivotMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
-        $tag2 = Tag::create(['name' => Str::random()]);
-        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()])->fresh();
+        $tag3 = Tag::create(['name' => Str::random()])->fresh();
         $tag4 = Tag::create(['name' => Str::random()]);
         $post = Post::create(['title' => Str::random()]);
 
