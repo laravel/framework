@@ -122,7 +122,7 @@ trait TemporaryDatabases
         $token = ParallelTesting::token();
 
         $name = "{$database}_test_{$token}";
-        $path = storage_path('framework/testing/temporary-databases/' . $name);
+        $path = storage_path('framework/testing/temporary-databases/'.$name);
 
         return [$name, $path];
     }
