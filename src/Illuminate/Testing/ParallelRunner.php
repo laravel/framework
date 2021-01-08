@@ -8,6 +8,7 @@ use ParaTest\Runners\PHPUnit\RunnerInterface;
 use ParaTest\Runners\PHPUnit\WrapperRunner;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use PHPUnit\TextUI\XmlConfiguration\PhpHandler;
 
 class ParallelRunner implements RunnerInterface
 {
@@ -75,6 +76,8 @@ class ParallelRunner implements RunnerInterface
      */
     public function run(): void
     {
+        (new PhpHandler)->handle($this->options->configuration()->php());
+
         $this->forEachProcess(function () {
             ParallelTesting::callSetUpProcessCallbacks();
         });
