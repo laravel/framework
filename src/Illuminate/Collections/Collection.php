@@ -1307,6 +1307,31 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function transformWithKeys(callable $callback)
+    {
+        $result = [];
+
+        foreach ($this->items as $key => $value) {
+            $assoc = $callback($value, $key);
+
+            foreach ($assoc as $mapKey => $mapValue) {
+                $result[$mapKey] = $mapValue;
+            }
+        }
+
+        $this->items = $result;
+
+        return $this;
+    }
+
+    /**
      * Reset the keys on the underlying array.
      *
      * @return static

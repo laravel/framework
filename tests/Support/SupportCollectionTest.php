@@ -2626,6 +2626,15 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testTransformWithKeys()
+    {
+        $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
+        $data->transformWithKeys(function ($item, $key) {
+            return [$item => $key];
+        });
+        $this->assertEquals(['taylor' => 'first', 'otwell' => 'last'], $data->all());
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
