@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use DateTimeInterface;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 
@@ -133,7 +134,11 @@ class RetryCommand extends Command
         $instance = unserialize($payload['data']['command']);
 
         if (is_object($instance) && method_exists($instance, 'retryUntil')) {
-            $payload['retryUntil'] = $instance->retryUntil()->timestamp;
+            $retryUntil = $instance->retryUntil();
+
+            $payload['retryUntil'] = $retryUntil instanceof DateTimeInterface
+                                        ? $retryUntil->getTimestamp()
+                                        : $retryUntil;
         }
 
         return json_encode($payload);
