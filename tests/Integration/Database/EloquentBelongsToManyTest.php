@@ -39,6 +39,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('type')->nullable();
             $table->timestamps();
         });
 
@@ -453,6 +454,18 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertNotNull($post->tags()->whereName('dives')->first());
     }
 
+    public function testUpdateOrCreateMethodCreate()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $post->tags()->updateOrCreate(['name' => 'wavez'], ['type' => 'featured']);
+
+        $tag = $post->tags()->whereType('featured')->first();
+
+        $this->assertNotNull($tag);
+        $this->assertSame('wavez', $tag->name);
+    }
+
     public function testSyncMethod()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -647,7 +660,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testWherePivotOnString()
     {
-        $tag = Tag::create(['name' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -663,7 +676,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstWhere()
     {
-        $tag = Tag::create(['name' => 'foo']);
+        $tag = Tag::create(['name' => 'foo'])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -679,7 +692,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testWherePivotOnBoolean()
     {
-        $tag = Tag::create(['name' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -695,7 +708,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testWherePivotInMethod()
     {
-        $tag = Tag::create(['name' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -730,7 +743,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testWherePivotNotInMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
-        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -768,7 +781,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testWherePivotNullMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
-        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()])->fresh();
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -784,7 +797,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testWherePivotNotNullMethod()
     {
-        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag1 = Tag::create(['name' => Str::random()])->fresh();
         $tag2 = Tag::create(['name' => Str::random()]);
         $post = Post::create(['title' => Str::random()]);
 
@@ -909,8 +922,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testOrderByPivotMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
-        $tag2 = Tag::create(['name' => Str::random()]);
-        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()])->fresh();
+        $tag3 = Tag::create(['name' => Str::random()])->fresh();
         $tag4 = Tag::create(['name' => Str::random()]);
         $post = Post::create(['title' => Str::random()]);
 
@@ -1030,7 +1043,7 @@ class Tag extends Model
 {
     public $table = 'tags';
     public $timestamps = true;
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'type'];
 
     public function posts()
     {
