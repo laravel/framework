@@ -117,9 +117,22 @@ class Command extends SymfonyCommand
             OutputStyle::class, ['input' => $input, 'output' => $output]
         );
 
-        return parent::run(
-            $this->input = $input, $this->output
-        );
+        try {
+            return parent::run(
+                $this->input = $input, $this->output
+            );
+        } catch(\Symfony\Component\Console\Exception\RuntimeException $e) {
+            $message = $e->getMessage();
+            $notEnoughArgumentsMessage = "Not enough arguments";
+            if (substr($message, 0, strlen($notEnoughArgumentsMessage)) == $notEnoughArgumentsMessage) {
+                $this->output->error(sprintf('%s', $e->getMessage()));
+                $this->output->writeln(sprintf('<comment>Usage:</comment>'));
+                $this->output->writeln(sprintf('  <info>%s</info>', sprintf($this->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
+                $this->output->writeln('', OutputInterface::VERBOSITY_QUIET);
+                return;
+            }
+            throw $e;
+        }
     }
 
     /**
