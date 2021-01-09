@@ -210,7 +210,9 @@ class Route
      */
     protected function isControllerAction()
     {
-        return is_string($this->action['uses']) && ! $this->isSerializedClosure();
+        $uses = $this->action['uses'];
+
+        return (is_string($uses) || is_array($uses)) && ! $this->isSerializedClosure();
     }
 
     /**
@@ -285,10 +287,22 @@ class Route
      * Parse the controller.
      *
      * @return array
+     *
+     * @throws \LogicException
      */
     protected function parseControllerCallback()
     {
-        return Str::parseCallback($this->action['uses']);
+        $uses = $this->action['uses'];
+
+        if (is_string($uses)) {
+            return Str::parseCallback($uses);
+        }
+
+        if (is_array($uses) && count($uses) === 2) {
+            return $uses;
+        }
+
+        throw new LogicException('Invalid route definition.');
     }
 
     /**

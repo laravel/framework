@@ -1729,6 +1729,39 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('hello', $router->dispatch(Request::create('foo/bar2', 'GET'))->getContent());
     }
 
+    public function testDispatchingAction()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/bar', [
+            'as' => 'foo.bar',
+            'uses' => [ActionStub::class, '__invoke'],
+        ]);
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $router->get('foo/bar', [
+            'as' => 'foo.bar',
+            'uses' => [ActionStub::class, 'foo'],
+        ]);
+
+        $this->assertSame('bar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
+    public function testDispatchingInvalidAction()
+    {
+        $this->expectException(LogicException::class);
+
+        $router = $this->getRouter();
+
+        $router->get('foo/bar', [
+            'as' => 'foo.bar',
+            'uses' => [ActionStub::class],
+        ]);
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
     public function testResponseIsReturned()
     {
         $router = $this->getRouter();
@@ -2261,6 +2294,11 @@ class ActionStub
     public function __invoke()
     {
         return 'hello';
+    }
+
+    public function foo()
+    {
+        return 'bar';
     }
 }
 
