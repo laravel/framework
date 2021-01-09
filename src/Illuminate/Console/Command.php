@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -123,14 +124,13 @@ class Command extends SymfonyCommand
             );
         } catch (\Symfony\Component\Console\Exception\RuntimeException $e) {
             $message = $e->getMessage();
-            $notEnoughArgumentsMessage = 'Not enough arguments';
-            if (substr($message, 0, strlen($notEnoughArgumentsMessage)) == $notEnoughArgumentsMessage) {
+            if (Str::startsWith($message, 'Not enough arguments')) {
                 $this->output->error(sprintf('%s', $e->getMessage()));
                 $this->output->writeln(sprintf('<comment>Usage:</comment>'));
                 $this->output->writeln(sprintf('  <info>%s</info>', sprintf($this->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
                 $this->output->writeln('', OutputInterface::VERBOSITY_QUIET);
 
-                return;
+                return 1;
             }
             throw $e;
         }
