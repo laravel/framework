@@ -125,12 +125,9 @@ class Command extends SymfonyCommand
         } catch (\Symfony\Component\Console\Exception\RuntimeException $e) {
             $message = $e->getMessage();
             if (Str::startsWith($message, 'Not enough arguments')) {
-                $this->output->error(sprintf('%s', $e->getMessage()));
                 $this->output->writeln(sprintf('<comment>Usage:</comment>'));
                 $this->output->writeln(sprintf('  <info>%s</info>', sprintf($this->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
                 $this->output->writeln('', OutputInterface::VERBOSITY_QUIET);
-
-                return 1;
             }
             throw $e;
         }
