@@ -386,7 +386,7 @@ class Migrator
         );
 
         $callback = function () use ($migration, $method) {
-            $this->usingConnection($migration->getConnection(), function() use ($migration, $method) {
+            $this->usingConnection($migration->getConnection(), function () use ($migration, $method) {
                 if (method_exists($migration, $method)) {
                     $this->fireMigrationEvent(new MigrationStarted($migration, $method));
 
