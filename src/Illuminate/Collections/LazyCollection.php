@@ -856,7 +856,7 @@ class LazyCollection implements Enumerable
     {
         $result = $initial;
 
-        foreach($this as $key => $value) {
+        foreach ($this as $key => $value) {
             $result = $callback($result, $value, $key);
         }
 

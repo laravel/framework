@@ -895,7 +895,7 @@ class Collection implements ArrayAccess, Enumerable
     {
         $result = $initial;
 
-        foreach($this->items as $key => $value) {
+        foreach ($this->items as $key => $value) {
             $result = $callback($result, $value, $key);
         }
 
