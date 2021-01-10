@@ -394,7 +394,7 @@ class Migrator
 
                     $this->fireMigrationEvent(new MigrationEnded($migration, $method));
                 }
-            }
+            });
         };
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
