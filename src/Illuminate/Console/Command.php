@@ -123,12 +123,10 @@ class Command extends SymfonyCommand
                 $this->input = $input, $this->output
             );
         } catch (\Symfony\Component\Console\Exception\RuntimeException $e) {
-            $message = $e->getMessage();
-            if (Str::startsWith($message, 'Not enough arguments')) {
-                $this->output->writeln(sprintf('<comment>Usage:</comment>'));
-                $this->output->writeln(sprintf('  <info>%s</info>', sprintf($this->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
-                $this->output->writeln('', OutputInterface::VERBOSITY_QUIET);
-            }
+            $this->output->writeln(sprintf('<comment>Usage:</comment>'));
+            $this->output->writeln(sprintf('  <info>%s</info>', sprintf($this->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
+            $this->output->writeln('', OutputInterface::VERBOSITY_QUIET);
+
             throw $e;
         }
     }
