@@ -389,9 +389,9 @@ class Migrator
             $this->usingConnection($migration->getConnection(), function () use ($migration, $method) {
                 if (method_exists($migration, $method)) {
                     $this->fireMigrationEvent(new MigrationStarted($migration, $method));
-    
+
                     $migration->{$method}();
-    
+
                     $this->fireMigrationEvent(new MigrationEnded($migration, $method));
                 }
             });
