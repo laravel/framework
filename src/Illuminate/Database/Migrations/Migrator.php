@@ -386,13 +386,15 @@ class Migrator
         );
 
         $callback = function () use ($migration, $method) {
-            if (method_exists($migration, $method)) {
-                $this->fireMigrationEvent(new MigrationStarted($migration, $method));
-
-                $migration->{$method}();
-
-                $this->fireMigrationEvent(new MigrationEnded($migration, $method));
-            }
+            $this->usingConnection($migration->getConnection(), function () use ($migration, $method) {
+                if (method_exists($migration, $method)) {
+                    $this->fireMigrationEvent(new MigrationStarted($migration, $method));
+    
+                    $migration->{$method}();
+    
+                    $this->fireMigrationEvent(new MigrationEnded($migration, $method));
+                }
+            });
         };
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
@@ -523,6 +525,24 @@ class Migrator
     public function getConnection()
     {
         return $this->connection;
+    }
+    
+    /**
+     * Execute the given callback using the given connection as the default connection.
+     *
+     * @param  string  $name
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function usingConnection($name, callable $callback)
+    {
+        $previousConnection = $this->resolver->getDefaultConnection();
+
+        $this->setConnection($name);
+
+        return tap($callback(), function () use ($previousConnection) {
+            $this->setConnection($previousConnection);
+        });
     }
 
     /**
