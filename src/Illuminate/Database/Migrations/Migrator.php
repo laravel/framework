@@ -526,7 +526,7 @@ class Migrator
     {
         return $this->connection;
     }
-    
+
     /**
      * Execute the given callback using the given connection as the default connection.
      *
