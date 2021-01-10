@@ -670,7 +670,7 @@ class Builder
      */
     public function cursor()
     {
-        return $this->applyScopes()->query->cursor()->map(function ($record) {
+        return $this->toBase()->cursor()->map(function ($record) {
             return $this->newModelInstance()->newFromBuilder($record);
         });
     }
