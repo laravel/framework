@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Testing\ParallelTesting;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class ParallelTestingTest extends TestCase
@@ -70,7 +69,6 @@ class ParallelTestingTest extends TestCase
     {
         parent::tearDown();
 
-        m::close();
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
     }
 }
