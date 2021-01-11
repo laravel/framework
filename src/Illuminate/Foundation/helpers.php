@@ -526,11 +526,12 @@ if (! function_exists('old')) {
      *
      * @param  string|null  $key
      * @param  mixed  $default
+     * @param  bool  $transformNullToEmptyString
      * @return mixed
      */
-    function old($key = null, $default = null)
+    function old($key = null, $default = null, $transformNullToEmptyString = false)
     {
-        return app('request')->old($key, $default);
+        return app('request')->old($key, $default, $transformNullToEmptyString);
     }
 }
 
