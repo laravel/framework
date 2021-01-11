@@ -24,7 +24,7 @@ class DatabaseMySqlBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8mb4_unicode_ci');
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('statement')->once()->with(
-            'CREATE DATABASE `my_temporary_database` DEFAULT CHARACTER SET `utf8mb4` DEFAULT COLLATE `utf8mb4_unicode_ci`'
+            'create database `my_temporary_database` default character set `utf8mb4` default collate `utf8mb4_unicode_ci`'
         )->andReturn(true);
 
         $builder = new MySqlBuilder($connection);
@@ -38,7 +38,7 @@ class DatabaseMySqlBuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('statement')->once()->with(
-            'DROP DATABASE IF EXISTS `my_database_a`'
+            'drop database if exists `my_database_a`'
         )->andReturn(true);
 
         $builder = new MySqlBuilder($connection);

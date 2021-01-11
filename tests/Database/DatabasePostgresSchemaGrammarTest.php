@@ -1004,7 +1004,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
 
         $this->assertSame(
-            'CREATE DATABASE "my_database_a" ENCODING "utf8_foo"',
+            'create database "my_database_a" encoding "utf8_foo"',
             $statement
         );
 
@@ -1013,7 +1013,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
 
         $this->assertSame(
-            'CREATE DATABASE "my_database_b" ENCODING "utf8_bar"',
+            'create database "my_database_b" encoding "utf8_bar"',
             $statement
         );
     }
@@ -1023,14 +1023,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_a');
 
         $this->assertSame(
-            'DROP DATABASE IF EXISTS "my_database_a"',
+            'drop database if exists "my_database_a"',
             $statement
         );
 
         $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_b');
 
         $this->assertSame(
-            'DROP DATABASE IF EXISTS "my_database_b"',
+            'drop database if exists "my_database_b"',
             $statement
         );
     }

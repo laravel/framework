@@ -36,7 +36,7 @@ class MySqlGrammar extends Grammar
     public function compileCreateDatabase($name, $connection)
     {
         return sprintf(
-            'CREATE DATABASE %s DEFAULT CHARACTER SET %s DEFAULT COLLATE %s',
+            'create database %s default character set %s default collate %s',
             $this->wrapValue($name),
             $this->wrapValue($connection->getConfig('charset')),
             $this->wrapValue($connection->getConfig('collation')),
@@ -52,7 +52,7 @@ class MySqlGrammar extends Grammar
     public function compileDropDatabaseIfExists($name)
     {
         return sprintf(
-            'DROP DATABASE IF EXISTS %s',
+            'drop database if exists %s',
             $this->wrapValue($name)
         );
     }

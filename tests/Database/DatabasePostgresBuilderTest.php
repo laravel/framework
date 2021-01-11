@@ -24,7 +24,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('statement')->once()->with(
-            'CREATE DATABASE "my_temporary_database" ENCODING "utf8"'
+            'create database "my_temporary_database" encoding "utf8"'
         )->andReturn(true);
 
         $builder = $this->getBuilder($connection);
@@ -38,7 +38,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('statement')->once()->with(
-            'DROP DATABASE IF EXISTS "my_database_a"'
+            'drop database if exists "my_database_a"'
         )->andReturn(true);
 
         $builder = $this->getBuilder($connection);

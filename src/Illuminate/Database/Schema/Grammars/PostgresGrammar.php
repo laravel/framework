@@ -45,7 +45,7 @@ class PostgresGrammar extends Grammar
     public function compileCreateDatabase($name, $connection)
     {
         return sprintf(
-            'CREATE DATABASE %s ENCODING %s',
+            'create database %s encoding %s',
             $this->wrapValue($name),
             $this->wrapValue($connection->getConfig('charset')),
         );
@@ -60,7 +60,7 @@ class PostgresGrammar extends Grammar
     public function compileDropDatabaseIfExists($name)
     {
         return sprintf(
-            'DROP DATABASE IF EXISTS %s',
+            'drop database if exists %s',
             $this->wrapValue($name)
         );
     }
