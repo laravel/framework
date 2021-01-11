@@ -82,9 +82,9 @@ abstract class TestCase extends BaseTestCase
 
         if (! $this->app) {
             $this->refreshApplication();
-        }
 
-        ParallelTesting::callSetUpTestCaseCallbacks($this);
+            ParallelTesting::callSetUpTestCaseCallbacks($this);
+        }
 
         $this->setUpTraits();
 
