@@ -107,7 +107,7 @@ class EventFake implements Dispatcher
     }
 
     /**
-     * Assert if no event was dispatched.
+     * Assert that no events were dispatched.
      *
      * @return void
      */
@@ -117,7 +117,7 @@ class EventFake implements Dispatcher
 
         PHPUnit::assertSame(
             0, $count,
-            "Unexpected {$count} events were dispatched."
+            "{$count} unexpected events were dispatched."
         );
     }
 
