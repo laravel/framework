@@ -84,9 +84,9 @@ class Collection extends BaseCollection implements QueueableCollection
             ->get()
             ->keyBy($this->first()->getKeyName());
 
-        $attributes = Arr::except(
+        $attributes = array_diff(
             array_keys($models->first()->getAttributes()),
-            $models->first()->getKeyName()
+            [$models->first()->getKeyName()]
         );
 
         $this->each(function ($model) use ($models, $attributes) {
