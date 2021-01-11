@@ -5,11 +5,11 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\SQLiteBuilder;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Filesystem\Filesystem;
 
 class DatabaseSQLiteBuilderTest extends TestCase
 {
