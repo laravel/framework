@@ -107,8 +107,6 @@ class ThrottleRequestsTest extends TestCase
             return [
                 new GlobalLimit(2, 1),
                 new GlobalLimit(2, 1),
-                new GlobalLimit(2, 1),
-                new GlobalLimit(2, 1),
             ];
         });
 
