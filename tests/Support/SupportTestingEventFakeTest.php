@@ -130,7 +130,7 @@ class SupportTestingEventFakeTest extends TestCase
             $this->fake->assertNothingDispatched();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('Unexpected 2 events were dispatched.'));
+            $this->assertThat($e, new ExceptionMessage('2 unexpected events were dispatched.'));
         }
     }
 }
