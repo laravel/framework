@@ -20,7 +20,7 @@ class ParallelTestingTest extends TestCase
     public function testCallbacks($callback)
     {
         $parallelTesting = new ParallelTesting();
-        $caller = 'call' . ucfirst($callback) . 'Callbacks';
+        $caller = 'call'.ucfirst($callback).'Callbacks';
 
         $state = false;
         $parallelTesting->{$caller}($this);
@@ -63,7 +63,6 @@ class ParallelTestingTest extends TestCase
             ['tearDownProcess'],
         ];
     }
-
 
     public function tearDown(): void
     {
