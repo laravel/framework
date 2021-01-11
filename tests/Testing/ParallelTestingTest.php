@@ -15,6 +15,33 @@ class ParallelTestingTest extends TestCase
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
     }
 
+    /**
+     * @dataProvider callbacks
+     */
+    public function testCallbacks($callback)
+    {
+        $parallelTesting = new ParallelTesting();
+        $caller = 'call' . ucfirst($callback) . 'Callbacks';
+
+        $state = false;
+        $parallelTesting->{$caller}($this);
+        $this->assertFalse($state);
+
+        $parallelTesting->{$callback}(function () use (&$state) {
+            $state = true;
+        });
+
+        $parallelTesting->{$caller}($this);
+        $this->assertFalse($state);
+
+        $parallelTesting->resolveTokenUsing(function () {
+            return 1;
+        });
+
+        $parallelTesting->{$caller}($this);
+        $this->assertTrue($state);
+    }
+
     public function testToken()
     {
         $parallelTesting = new ParallelTesting();
@@ -27,6 +54,17 @@ class ParallelTestingTest extends TestCase
 
         $this->assertSame(1, $parallelTesting->token());
     }
+
+    public function callbacks()
+    {
+        return [
+            ['setUpProcess'],
+            ['setUpTestCase'],
+            ['tearDownTestCase'],
+            ['tearDownProcess'],
+        ];
+    }
+
 
     public function tearDown(): void
     {
