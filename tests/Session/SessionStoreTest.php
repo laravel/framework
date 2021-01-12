@@ -241,8 +241,6 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->hasOldInput('boom'));
 
         $this->assertSame('default', $session->getOldInput('input', 'default'));
-        $this->assertSame('default', $session->getOldInput('input', 'default', true));
-        $this->assertSame('', $session->getOldInput('name', 'default', true));
         $this->assertSame(null, $session->getOldInput('name', 'default'));
     }
 

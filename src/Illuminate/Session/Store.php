@@ -248,18 +248,11 @@ class Store implements Session
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @param  bool  $transformNullToEmptyString
      * @return mixed
      */
-    public function getOldInput($key = null, $default = null, $transformNullToEmptyString = false)
+    public function getOldInput($key = null, $default = null)
     {
-        $oldInputs = $this->get('_old_input', []);
-        $result = Arr::get($oldInputs, $key, $default);
-
-        if ($transformNullToEmptyString && is_null($result) && Arr::has($oldInputs, $key)) {
-            return '';
-        }
-        return $result;
+        return Arr::get($this->get('_old_input', []), $key, $default);
     }
 
     /**
