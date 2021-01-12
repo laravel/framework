@@ -2,13 +2,13 @@
 
 namespace Illuminate\Testing\Concerns;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\QueryException;
 
 trait TestDatabases
 {
@@ -129,7 +129,6 @@ trait TestDatabases
             $callback($database);
         }
     }
-
 
     /**
      * Switch to the given database.
