@@ -2,8 +2,17 @@
 
 namespace Illuminate\Testing;
 
+use Illuminate\Support\Str;
+
 class ParallelTesting
 {
+    /**
+     * The options resolver callback.
+     *
+     * @var \Closure|null
+     */
+    protected $optionsResolver;
+
     /**
      * The token resolver callback.
      *
@@ -38,6 +47,17 @@ class ParallelTesting
      * @var array
      */
     protected $tearDownTestCaseCallbacks = [];
+
+    /**
+     * Set a callback that should be used when resolving options.
+     *
+     * @param  \Closure|null  $callback
+     * @return void
+     */
+    public function resolveOptionsUsing($resolver)
+    {
+        $this->optionsResolver = $resolver;
+    }
 
     /**
      * Set a callback that should be used when resolving the unique process token.
@@ -150,6 +170,23 @@ class ParallelTesting
                 $callback($testCase);
             }
         });
+    }
+
+    /**
+     * Get an parallel testing option.
+     *
+     * @param  string  $option
+     * @return mixed
+     */
+    public function option($option)
+    {
+        $optionsResolver = $this->optionsResolver ?: function ($option) {
+            $option = 'LARAVEL_PARALLEL_TESTING_' . Str::upper($option);
+
+            return $_SERVER[$option] ?? false;
+        };
+
+        return call_user_func($optionsResolver, $option);
     }
 
     /**
