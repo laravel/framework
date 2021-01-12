@@ -60,7 +60,7 @@ trait TestDatabases
     }
 
     /**
-     * Ensure a test database exists, and returns its name.
+     * Ensure a test database exists and returns its name.
      *
      * @param  string  $database
      *
@@ -83,7 +83,7 @@ trait TestDatabases
     }
 
     /**
-     * Ensure the current the database test schema is up to date.
+     * Ensure the current database test schema is up to date.
      *
      * @return void
      */
@@ -116,7 +116,7 @@ trait TestDatabases
     }
 
     /**
-     * Apply the callback when tests are not using in memory database.
+     * Apply the given callback when tests are not using in memory database.
      *
      * @param  callable $callback
      * @return void
