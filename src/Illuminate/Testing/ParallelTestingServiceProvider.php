@@ -31,7 +31,7 @@ class ParallelTestingServiceProvider extends ServiceProvider implements Deferrab
     {
         if ($this->app->runningInConsole()) {
             $this->app->singleton(ParallelTesting::class, function () {
-                return new ParallelTesting();
+                return new ParallelTesting($this->app);
             });
         }
     }

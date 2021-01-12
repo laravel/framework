@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Container\Container;
 use Illuminate\Testing\ParallelTesting;
 use PHPUnit\Framework\TestCase;
 
@@ -11,6 +12,8 @@ class ParallelTestingTest extends TestCase
     {
         parent::setUp();
 
+        Container::setInstance(new Container);
+
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
     }
 
@@ -19,14 +22,21 @@ class ParallelTestingTest extends TestCase
      */
     public function testCallbacks($callback)
     {
-        $parallelTesting = new ParallelTesting();
+        $parallelTesting = new ParallelTesting(Container::getInstance());
         $caller = 'call'.ucfirst($callback).'Callbacks';
 
         $state = false;
         $parallelTesting->{$caller}($this);
         $this->assertFalse($state);
 
-        $parallelTesting->{$callback}(function () use (&$state) {
+        $parallelTesting->{$callback}(function ($token, $testCase = null) use ($callback, &$state) {
+            if (in_array($callback, ['setUpTestCase', 'tearDownTestCase'])) {
+                $this->assertSame($this, $testCase);
+            } else {
+                $this->assertNull($testCase);
+            }
+
+            $this->assertEquals(1, $token);
             $state = true;
         });
 
@@ -43,7 +53,7 @@ class ParallelTestingTest extends TestCase
 
     public function testOptions()
     {
-        $parallelTesting = new ParallelTesting();
+        $parallelTesting = new ParallelTesting(Container::getInstance());
 
         $this->assertFalse($parallelTesting->option('refresh_databases'));
 
@@ -57,7 +67,7 @@ class ParallelTestingTest extends TestCase
 
     public function testToken()
     {
-        $parallelTesting = new ParallelTesting();
+        $parallelTesting = new ParallelTesting(Container::getInstance());
 
         $this->assertFalse($parallelTesting->token());
 
@@ -81,6 +91,8 @@ class ParallelTestingTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
+
+        Container::setInstance(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
     }

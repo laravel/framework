@@ -2,10 +2,18 @@
 
 namespace Illuminate\Testing;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
 
 class ParallelTesting
 {
+    /**
+     * The container instance.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
     /**
      * The options resolver callback.
      *
@@ -47,6 +55,17 @@ class ParallelTesting
      * @var array
      */
     protected $tearDownTestCaseCallbacks = [];
+
+    /**
+     * Create a new parallel testing instance.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return void
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * Set a callback that should be used when resolving options.
@@ -123,7 +142,9 @@ class ParallelTesting
     {
         $this->whenRunningInParallel(function () {
             foreach ($this->setUpProcessCallbacks as $callback) {
-                $callback();
+                $this->container->call($callback, [
+                    'token' => $this->token(),
+                ]);
             }
         });
     }
@@ -138,7 +159,10 @@ class ParallelTesting
     {
         $this->whenRunningInParallel(function () use ($testCase) {
             foreach ($this->setUpTestCaseCallbacks as $callback) {
-                $callback($testCase);
+                $this->container->call($callback, [
+                    'testCase' => $testCase,
+                    'token' => $this->token(),
+                ]);
             }
         });
     }
@@ -152,7 +176,9 @@ class ParallelTesting
     {
         $this->whenRunningInParallel(function () {
             foreach ($this->tearDownProcessCallbacks as $callback) {
-                $callback();
+                $this->container->call($callback, [
+                    'token' => $this->token(),
+                ]);
             }
         });
     }
@@ -167,7 +193,10 @@ class ParallelTesting
     {
         $this->whenRunningInParallel(function () use ($testCase) {
             foreach ($this->tearDownTestCaseCallbacks as $callback) {
-                $callback($testCase);
+                 $this->container->call($callback, [
+                    'testCase' => $testCase,
+                    'token' => $this->token(),
+                ]);
             }
         });
     }
