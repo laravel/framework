@@ -193,7 +193,7 @@ class ParallelTesting
     {
         $this->whenRunningInParallel(function () use ($testCase) {
             foreach ($this->tearDownTestCaseCallbacks as $callback) {
-                 $this->container->call($callback, [
+                $this->container->call($callback, [
                     'testCase' => $testCase,
                     'token' => $this->token(),
                 ]);
