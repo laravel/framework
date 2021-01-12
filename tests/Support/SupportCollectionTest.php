@@ -3595,6 +3595,20 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testReduceWithKeys($collection)
+    {
+        $data = new $collection([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ]);
+        $this->assertEquals('foobarbazqux', $data->reduceWithKeys(function ($carry, $element, $key) {
+            return $carry .= $key.$element;
+        }));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize($collection)
     {
         $this->expectException(InvalidArgumentException::class);
