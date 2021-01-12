@@ -164,6 +164,15 @@ interface Container extends ContainerInterface
     public function resolved($abstract);
 
     /**
+     * Register a new before resolving callback.
+     *
+     * @param  \Closure|string  $abstract
+     * @param  \Closure|null  $callback
+     * @return void
+     */
+    public function beforeResolving($abstract, Closure $callback = null);
+
+    /**
      * Register a new resolving callback.
      *
      * @param  \Closure|string  $abstract

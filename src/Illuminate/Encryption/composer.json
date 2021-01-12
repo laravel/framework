@@ -18,8 +18,8 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
-        "illuminate/contracts": "^8.0",
-        "illuminate/support": "^8.0"
+        "illuminate/contracts": "^9.0",
+        "illuminate/support": "^9.0"
     },
     "autoload": {
         "psr-4": {
@@ -28,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "8.x-dev"
+            "dev-master": "9.x-dev"
         }
     },
     "config": {

@@ -17,11 +17,11 @@
         "php": "^7.3|^8.0",
         "ext-json": "*",
         "psr/log": "^1.0",
-        "illuminate/bus": "^8.0",
-        "illuminate/collections": "^8.0",
-        "illuminate/contracts": "^8.0",
-        "illuminate/queue": "^8.0",
-        "illuminate/support": "^8.0"
+        "illuminate/bus": "^9.0",
+        "illuminate/collections": "^9.0",
+        "illuminate/contracts": "^9.0",
+        "illuminate/queue": "^9.0",
+        "illuminate/support": "^9.0"
     },
     "autoload": {
         "psr-4": {
@@ -30,7 +30,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "8.x-dev"
+            "dev-master": "9.x-dev"
         }
     },
     "suggest": {
