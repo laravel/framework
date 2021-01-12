@@ -244,7 +244,7 @@ class ParallelTesting
     }
 
     /**
-     * Indicates if the current tests are been run in Parallel.
+     * Indicates if the current tests are been run in parallel.
      *
      * @return bool
      */
