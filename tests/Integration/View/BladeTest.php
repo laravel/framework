@@ -42,7 +42,6 @@ class BladeTest extends TestCase
         $this->assertSame('<span class="text-medium">
     Hello Taylor
 </span>
-  
  <span >
     Hello Samuel
 </span>', trim($view));
