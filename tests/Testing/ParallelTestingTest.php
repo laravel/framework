@@ -55,14 +55,14 @@ class ParallelTestingTest extends TestCase
     {
         $parallelTesting = new ParallelTesting(Container::getInstance());
 
-        $this->assertFalse($parallelTesting->option('refresh_databases'));
+        $this->assertFalse($parallelTesting->option('recreate_databases'));
 
         $parallelTesting->resolveOptionsUsing(function ($option) {
-            return $option == 'refresh_databases';
+            return $option == 'recreate_databases';
         });
 
         $this->assertFalse($parallelTesting->option('recreate_caches'));
-        $this->assertTrue($parallelTesting->option('refresh_databases'));
+        $this->assertTrue($parallelTesting->option('recreate_databases'));
     }
 
     public function testToken()

@@ -28,7 +28,7 @@ trait TestDatabases
     {
         ParallelTesting::setUpProcess(function () {
             $this->whenNotUsingInMemoryDatabase(function ($database) {
-                if (ParallelTesting::option('refresh_databases')) {
+                if (ParallelTesting::option('recreate_databases')) {
                     Schema::dropDatabaseIfExists(
                         $this->testDatabase($database)
                     );
