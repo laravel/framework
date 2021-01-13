@@ -96,7 +96,7 @@ trait CompilesComponents
     public function compileEndComponentClass()
     {
         return $this->compileEndComponent()."\n".implode("\n", [
-            '<?php endif; ?>##END-COMPONENT-CLASS##',
+            '<?php endif; ?>',
         ]);
     }
 

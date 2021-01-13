@@ -42,9 +42,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
 <?php \$component->withAttributes(['type' => 'foo','limit' => '5','@click' => 'foo','wire:click' => 'changePlan(\''.e(\$plan).'\')','required' => true]); ?>\n".
-"@endcomponentClass ##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
+"@endComponentClass##END-COMPONENT-CLASS####BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
 <?php \$component->withAttributes([]); ?>\n".
-'@endcomponentClass </div>', trim($result));
+'@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
     public function testBasicComponentWithEmptyAttributesParsing()
@@ -53,7 +53,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
 <?php \$component->withAttributes(['type' => '','limit' => '','@click' => '','required' => true]); ?>\n".
-'@endcomponentClass </div>', trim($result));
+'@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
     public function testDataCamelCasing()
@@ -61,7 +61,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile user-id="1"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => '1'])
-<?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
+<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testColonData()
@@ -69,7 +69,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :user-id="1"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => 1])
-<?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
+<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testColonAttributesIsEscapedIfStrings()
@@ -77,7 +77,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :src="\'foo\'"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
-<?php \$component->withAttributes(['src' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('foo')]); ?> @endcomponentClass", trim($result));
+<?php \$component->withAttributes(['src' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('foo')]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testColonNestedComponentParsing()
@@ -85,7 +85,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['foo:alert' => TestAlertComponent::class])->compileTags('<x-foo:alert></x-foo:alert>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'foo:alert', [])
-<?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
+<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testColonStartingNestedComponentParsing()
@@ -93,7 +93,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['foo:alert' => TestAlertComponent::class])->compileTags('<x:foo:alert></x-foo:alert>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'foo:alert', [])
-<?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
+<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testSelfClosingComponentsCanBeCompiled()
@@ -102,7 +102,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
 <?php \$component->withAttributes([]); ?>\n".
-'@endcomponentClass </div>', trim($result));
+'@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
     public function testClassNamesCanBeGuessed()
@@ -141,7 +141,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
 <?php \$component->withAttributes(['class' => 'bar','wire:model' => 'foo','x-on:click' => 'bar','@click' => 'baz']); ?>\n".
-'@endcomponentClass', trim($result));
+'@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
     public function testSelfClosingComponentsCanBeCompiledWithDataAndAttributes()
@@ -150,7 +150,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', ['title' => 'foo'])
 <?php \$component->withAttributes(['class' => 'bar','wire:model' => 'foo']); ?>\n".
-'@endcomponentClass', trim($result));
+'@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
     public function testComponentCanReceiveAttributeBag()
@@ -159,7 +159,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile class="bar" {{ $attributes }} wire:model="foo"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
-<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes),'wire:model' => 'foo']); ?> @endcomponentClass", trim($result));
+<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes),'wire:model' => 'foo']); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testSelfClosingComponentCanReceiveAttributeBag()
@@ -170,7 +170,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', ['title' => 'foo'])
 <?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes->merge(['class' => 'test'])),'wire:model' => 'foo']); ?>\n".
-            '@endcomponentClass </div>', trim($result));
+            '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
     public function testComponentsCanHaveAttachedWord()
@@ -178,7 +178,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile></x-profile>Words');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
-<?php \$component->withAttributes([]); ?> @endcomponentClass Words", trim($result));
+<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##Words", trim($result));
     }
 
     public function testSelfClosingComponentsCanHaveAttachedWord()
@@ -187,7 +187,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
 <?php \$component->withAttributes([]); ?>\n".
-'@endcomponentClass Words', trim($result));
+'@endComponentClass##END-COMPONENT-CLASS##Words', trim($result));
     }
 
     public function testSelfClosingComponentsCanBeCompiledWithBoundData()
@@ -196,7 +196,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', ['title' => \$title])
 <?php \$component->withAttributes(['class' => 'bar']); ?>\n".
-'@endcomponentClass', trim($result));
+'@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
     public function testPairedComponentTags()
@@ -206,7 +206,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
 <?php \$component->withAttributes([]); ?>
- @endcomponentClass", trim($result));
+ @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testClasslessComponents()
@@ -222,7 +222,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
 <?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
-'@endcomponentClass', trim($result));
+'@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
     public function testPackagesClasslessComponents()
@@ -238,7 +238,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'package::anonymous-component', ['view' => 'package::components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
 <?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
-'@endcomponentClass', trim($result));
+'@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
     public function testAttributeSanitization()
