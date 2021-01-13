@@ -42,7 +42,7 @@ class BladeTest extends TestCase
         $this->assertSame('<span class="text-medium">
     Hello Taylor
 </span>
- <span >
+<span >
     Hello Samuel
 </span>', trim($view));
     }
@@ -51,7 +51,7 @@ class BladeTest extends TestCase
     {
         $view = View::make('uses-link')->render();
 
-        $this->assertSame('This is a sentence with a  <a href="https://laravel.com">link</a>.', trim($view));
+        $this->assertSame('This is a sentence with a <a href="https://laravel.com">link</a>.', trim($view));
     }
 
     public function test_appendable_attributes()
