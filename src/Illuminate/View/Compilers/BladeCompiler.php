@@ -253,7 +253,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         return str_replace(
             ['##BEGIN-COMPONENT-CLASS##', '##END-COMPONENT-CLASS##'],
-            '', 
+            '',
             $result);
     }
 
