@@ -163,7 +163,7 @@ trait RefreshDatabase
     }
 
     /**
-     * Determine if a specific seeder should be used.
+     * Determine the specific seeder class that should be used when refreshing the database.
      *
      * @return mixed
      */
