@@ -416,11 +416,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         return preg_replace_callback(
             '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', function ($match) {
-                return str_replace(
-                    ['##END-COMPONENT-CLASS## ', '##END-COMPONENT-CLASS##'],
-                    '',
-                    $this->compileStatement($match)
-                );
+                return $this->compileStatement($match);
             }, $value
         );
     }
