@@ -1,6 +1,21 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.8...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.10...6.x)
+
+
+## [v6.20.10 (2021-01-12)](https://github.com/laravel/framework/compare/v6.20.9...v6.20.10)
+
+### Added
+- Added new line to `DetectsLostConnections` ([#35790](https://github.com/laravel/framework/pull/35790))
+
+### Fixed
+- Fixed error from missing null check on PHP 8 in `Illuminate\Validation\Concerns\ValidatesAttributes::validateJson()` ([#35797](https://github.com/laravel/framework/pull/35797))
+
+
+## [v6.20.9 (2021-01-05)](https://github.com/laravel/framework/compare/v6.20.8...v6.20.9)
+
+### Added
+- [Updated Illuminate\Database\DetectsLostConnections with new strings](https://github.com/laravel/framework/compare/v6.20.8...v6.20.9) 
 
 
 ## [v6.20.8 (2020-12-22)](https://github.com/laravel/framework/compare/v6.20.7...v6.20.8)
