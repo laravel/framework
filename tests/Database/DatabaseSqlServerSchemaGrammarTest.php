@@ -914,6 +914,42 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame("N'中文', N'測試'", $this->getGrammar()->quoteString(['中文', '測試']));
     }
 
+    public function testCreateDatabase()
+    {
+        $connection = $this->getConnection();
+
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+
+        $this->assertSame(
+            'create database "my_database_a"',
+            $statement
+        );
+
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+
+        $this->assertSame(
+            'create database "my_database_b"',
+            $statement
+        );
+    }
+
+    public function testDropDatabaseIfExists()
+    {
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_a');
+
+        $this->assertSame(
+            'drop database if exists "my_database_a"',
+            $statement
+        );
+
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_b');
+
+        $this->assertSame(
+            'drop database if exists "my_database_b"',
+            $statement
+        );
+    }
+
     protected function getConnection()
     {
         return m::mock(Connection::class);
