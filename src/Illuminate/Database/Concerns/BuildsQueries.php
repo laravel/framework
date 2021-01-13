@@ -160,7 +160,7 @@ trait BuildsQueries
      */
     public function sole($columns = ['*'])
     {
-        $result = $this->get($columns);
+        $result = $this->take(2)->get($columns);
 
         if ($result->isEmpty()) {
             throw new NoRecordsFoundException();
