@@ -1593,7 +1593,7 @@ class Builder
         $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
         if (! $value instanceof Expression) {
-            $this->addBinding($value);
+            $this->addBinding((int) $value);
         }
 
         return $this;
@@ -1742,7 +1742,7 @@ class Builder
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
         if (! $value instanceof Expression) {
-            $this->addBinding($value, 'having');
+            $this->addBinding(is_array($value) ? head($value) : $value, 'having');
         }
 
         return $this;
