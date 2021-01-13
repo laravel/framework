@@ -1,6 +1,45 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.20.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.22.0...8.x)
+
+
+## [v8.22.0 (2021-01-12)](https://github.com/laravel/framework/compare/v8.21.0...v8.22.0)
+
+### Added
+- Added new lines to `DetectsLostConnections` ([#35752](https://github.com/laravel/framework/pull/35752), [#35790](https://github.com/laravel/framework/pull/35790))
+- Added `Illuminate\Support\Testing\Fakes\EventFake::assertNothingDispatched()` ([#35835](https://github.com/laravel/framework/pull/35835))
+- Added reduce with keys to collections and lazy collections ([#35839](https://github.com/laravel/framework/pull/35839))
+
+### Fixed
+- Fixed error from missing null check on PHP 8 in `Illuminate\Validation\Concerns\ValidatesAttributes::validateJson()` ([#35797](https://github.com/laravel/framework/pull/35797))
+- Fix bug with RetryCommand ([4415b94](https://github.com/laravel/framework/commit/4415b94623358bfd1dc2e8f20e4deab0025d2d03), [#35828](https://github.com/laravel/framework/pull/35828))
+- Fixed `Illuminate\Testing\PendingCommand::expectsTable()` ([#35820](https://github.com/laravel/framework/pull/35820))
+- Fixed `morphTo()` attempting to map an empty string morph type to an instance ([#35824](https://github.com/laravel/framework/pull/35824))
+
+### Changes
+- Update `Illuminate\Http\Resources\CollectsResources::collects()` ([1fa20dd](https://github.com/laravel/framework/commit/1fa20dd356af21af6e38d95e9ff2b1d444344fbe))
+- "null" constraint prevents aliasing SQLite ROWID  ([#35792](https://github.com/laravel/framework/pull/35792))
+- Allow strings to be passed to the `report` function ([#35803](https://github.com/laravel/framework/pull/35803))
+
+
+## [v8.21.0 (2021-01-05)](https://github.com/laravel/framework/compare/v8.20.1...v8.21.0)
+
+### Added
+- Added command to clean batches table ([#35694](https://github.com/laravel/framework/pull/35694), [33f5ac6](https://github.com/laravel/framework/commit/33f5ac695a55d6cdbadcfe1b46e3409e4a66df16))
+- Added item to list of causedByLostConnection errors ([#35744](https://github.com/laravel/framework/pull/35744))
+- Make it possible to set Postmark Message Stream ID ([#35755](https://github.com/laravel/framework/pull/35755))
+
+### Fixed
+- Fixed `php artisan db` command for the Postgres CLI ([#35725](https://github.com/laravel/framework/pull/35725))
+- Fixed OPTIONS method bug with use same path and diff domain when cache route ([#35714](https://github.com/laravel/framework/pull/35714))
+
+### Changed
+- Ensure DBAL custom type doesn't exists in `Illuminate\Database\DatabaseServiceProvider::registerDoctrineTypes()` ([#35704](https://github.com/laravel/framework/pull/35704))
+- Added missing `dispatchAfterCommit` to `DatabaseQueue` ([#35715](https://github.com/laravel/framework/pull/35715))
+- Set chain queue when inside a batch ([#35746](https://github.com/laravel/framework/pull/35746))
+- Give a more meaningul message when route parameters are missing ([#35706](https://github.com/laravel/framework/pull/35706))
+- Added table prefix to `Illuminate\Database\Console\DumpCommand::schemaState()` ([4ffe40f](https://github.com/laravel/framework/commit/4ffe40fb169c6bcce9193ff56958eca41e64294f))
+- Refresh the retryUntil time on job retry ([#35780](https://github.com/laravel/framework/pull/35780), [45eb7a7](https://github.com/laravel/framework/commit/45eb7a7b1706ae175268731a673f369c0e556805))
 
 
 ## [v8.20.1 (2020-12-22)](https://github.com/laravel/framework/compare/v8.20.0...v8.20.1)
