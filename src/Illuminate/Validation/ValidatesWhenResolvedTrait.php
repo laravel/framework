@@ -44,10 +44,7 @@ trait ValidatesWhenResolvedTrait
      *
      * @return \Illuminate\Validation\Validator
      */
-    protected function getValidatorInstance()
-    {
-        return $this->validator();
-    }
+    abstract protected function getValidatorInstance();
 
     /**
      * Handle a passed validation attempt.

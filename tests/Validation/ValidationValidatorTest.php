@@ -12,6 +12,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -20,6 +21,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
@@ -5719,6 +5721,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['data.1.date' => ['validation.date'], 'data.*.date' => ['validation.date']], $validator->messages()->toArray());
     }
 
+    public function testThatCustomValidatedInstanceWork()
+    {
+        $validatedInstance = new CustomValidatedInstance();
+
+        // See that no errors are thrown
+        self::assertNull($validatedInstance->validateResolved());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
@@ -5755,4 +5765,14 @@ class ExplicitTableAndConnectionModel extends Model
 
 class NonEloquentModel
 {
+}
+
+class CustomValidatedInstance implements ValidatesWhenResolved
+{
+    use ValidatesWhenResolvedTrait;
+
+    protected function getValidatorInstance()
+    {
+        return new Validator(new Translator(new ArrayLoader(), 'en'), [], []);
+    }
 }
