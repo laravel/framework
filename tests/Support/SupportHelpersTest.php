@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
+use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -363,9 +364,30 @@ class SupportHelpersTest extends TestCase
 
     public function testThrow()
     {
+        $this->expectException(LogicException::class);
+
+        throw_if(true, new LogicException);
+    }
+
+    public function testThrowDefaultException()
+    {
         $this->expectException(RuntimeException::class);
 
-        throw_if(true, new RuntimeException);
+        throw_if(true);
+    }
+
+    public function testThrowUnless()
+    {
+        $this->expectException(LogicException::class);
+
+        throw_unless(false, new LogicException);
+    }
+
+    public function testThrowUnlessDefaultException()
+    {
+        $this->expectException(RuntimeException::class);
+
+        throw_unless(false);
     }
 
     public function testThrowReturnIfNotThrown()
