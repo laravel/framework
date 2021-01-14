@@ -13,6 +13,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool save()
  * @method static bool start()
  * @method static mixed get(string $key, $default = null)
+ * @method static mixed flash(string $class, string $message)
  * @method static mixed pull(string $key, $default = null)
  * @method static mixed remove(string $key)
  * @method static string getId()
