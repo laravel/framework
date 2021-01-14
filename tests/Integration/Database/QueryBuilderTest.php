@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +30,31 @@ class QueryBuilderTest extends DatabaseTestCase
             ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'created_at' => new Carbon('2017-11-12 13:14:15')],
             ['title' => 'Bar Post', 'content' => 'Lorem Ipsum.', 'created_at' => new Carbon('2018-01-02 03:04:05')],
         ]);
+    }
+
+    public function testSole()
+    {
+        $expected = ['id' => '1', 'title' => 'Foo Post'];
+
+        $this->assertEquals(1, DB::table('posts')->where('title', 'Foo Post')->sole()->id);
+    }
+
+    public function testSoleFailsForMultipleRecords()
+    {
+        DB::table('posts')->insert([
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'created_at' => new Carbon('2017-11-12 13:14:15')],
+        ]);
+
+        $this->expectException(MultipleRecordsFoundException::class);
+
+        DB::table('posts')->where('title', 'Foo Post')->sole();
+    }
+
+    public function testSoleFailsIfNoRecords()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        DB::table('posts')->where('title', 'Baz Post')->sole();
     }
 
     public function testSelect()
