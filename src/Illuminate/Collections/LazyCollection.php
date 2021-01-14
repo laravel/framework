@@ -849,7 +849,7 @@ class LazyCollection implements Enumerable
      * Reduce an associative collection to a single value.
      *
      * @param  callable  $callback
-     * @param  mixed $initial
+     * @param  mixed  $initial
      * @return mixed
      */
     public function reduceWithKeys(callable $callback, $initial = null)
