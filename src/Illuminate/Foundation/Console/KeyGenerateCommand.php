@@ -17,6 +17,7 @@ class KeyGenerateCommand extends Command
      */
     protected $signature = 'key:generate
                     {--show : Display the key instead of modifying files}
+                    {--erase : Erase the current key even if it is already defined}
                     {--force : Force the operation to run when in production}';
 
     /**
@@ -33,6 +34,10 @@ class KeyGenerateCommand extends Command
      */
     public function handle()
     {
+        if (! $this->confirmToProceed()) {
+            return;
+        }
+
         $key = $this->generateRandomKey();
 
         if ($this->option('show')) {
@@ -73,7 +78,8 @@ class KeyGenerateCommand extends Command
     {
         $currentKey = $this->laravel['config']['app.key'];
 
-        if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
+        if ((strlen($currentKey) !== 0) && (! $this->option('erase'))) {
+            $this->warn('Key already defined. Use the --erase option to replace the current key');
             return false;
         }
 
