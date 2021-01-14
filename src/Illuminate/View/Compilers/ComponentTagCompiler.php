@@ -193,7 +193,7 @@ class ComponentTagCompiler
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
-            return $this->componentString($matches[1], $attributes)."\n@endcomponentClass ";
+            return $this->componentString($matches[1], $attributes)."\n@endComponentClass##END-COMPONENT-CLASS##";
         }, $value);
     }
 
@@ -230,7 +230,7 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        return " @component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
+        return "##BEGIN-COMPONENT-CLASS##@component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
 <?php $component->withAttributes(['.$this->attributesToString($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class).']); ?>';
     }
 
@@ -384,7 +384,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endcomponentClass ', $value);
+        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endComponentClass##END-COMPONENT-CLASS##', $value);
     }
 
     /**
