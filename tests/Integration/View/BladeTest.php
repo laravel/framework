@@ -53,7 +53,7 @@ class BladeTest extends TestCase
 
         $this->assertSame('This is a sentence with a <a href="https://laravel.com">link</a>.', trim($view));
     }
-    
+
     public function test_appendable_attributes()
     {
         $view = View::make('uses-appendable-panel', ['name' => 'Taylor', 'withInjectedValue' => true])->render();
