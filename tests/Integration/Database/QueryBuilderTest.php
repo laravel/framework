@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\MultipleRecordsFoundException;
-use Illuminate\Database\NoRecordsFoundException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +52,7 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testSoleFailsIfNoRecords()
     {
-        $this->expectException(NoRecordsFoundException::class);
+        $this->expectException(RecordsNotFoundException::class);
 
         DB::table('posts')->where('title', 'Baz Post')->sole();
     }

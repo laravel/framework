@@ -4,7 +4,7 @@ namespace Illuminate\Database;
 
 use RuntimeException;
 
-class NoRecordsFoundException extends RuntimeException
+class RecordsNotFoundException extends RuntimeException
 {
     //
 }

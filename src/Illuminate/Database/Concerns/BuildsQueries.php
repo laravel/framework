@@ -4,7 +4,7 @@ namespace Illuminate\Database\Concerns;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\MultipleRecordsFoundException;
-use Illuminate\Database\NoRecordsFoundException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 
@@ -150,12 +150,12 @@ trait BuildsQueries
     }
 
     /**
-     * Execute the query and get the first result if it's the sole.
+     * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|object|static|null
      *
-     * @throws \Illuminate\Database\NoRecordsFoundException
+     * @throws \Illuminate\Database\RecordsNotFoundException
      * @throws \Illuminate\Database\MultipleRecordsFoundException
      */
     public function sole($columns = ['*'])
@@ -163,11 +163,11 @@ trait BuildsQueries
         $result = $this->take(2)->get($columns);
 
         if ($result->isEmpty()) {
-            throw new NoRecordsFoundException();
+            throw new RecordsNotFoundException;
         }
 
         if ($result->count() > 1) {
-            throw new MultipleRecordsFoundException();
+            throw new MultipleRecordsFoundException;
         }
 
         return $result->first();
