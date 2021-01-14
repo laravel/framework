@@ -3601,7 +3601,7 @@ class SupportCollectionTest extends TestCase
             'foo' => 'bar',
             'baz' => 'qux',
         ]);
-        $this->assertEquals('foobarbazqux', $data->reduceWithKeys(function ($carry, $element, $key) {
+        $this->assertEquals('foobarbazqux', $data->reduce(function ($carry, $element, $key) {
             return $carry .= $key.$element;
         }));
     }
