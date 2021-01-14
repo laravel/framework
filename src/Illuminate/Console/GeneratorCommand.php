@@ -269,7 +269,10 @@ abstract class GeneratorCommand extends Command
     {
         $stub = $this->files->get($this->getStub());
 
-        return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+        return $this
+            ->replaceNamespace($stub, $name)
+            ->replaceVariables($stub, $name)
+            ->replaceClass($stub, $name);
     }
 
     /**
@@ -321,6 +324,43 @@ abstract class GeneratorCommand extends Command
         $class = str_replace($this->getNamespace($name).'\\', '', $name);
 
         return str_replace(['DummyClass', '{{ class }}', '{{class}}'], $class, $stub);
+    }
+
+    /**
+     * Replace the variables for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $name
+     * @return $this
+     */
+    public function replaceVariables(&$stub, $name)
+    {
+        $name = Str::of($name)
+            ->replace($this->getNamespace($name) . '\\', '')
+            ->snake()
+            ->replace('_', ' ');
+
+        $variables = [
+            '{{ lower }}' => $name,
+            '{{ title }}' => Str::of($name)->title(),
+            '{{ studly }}' => Str::of($name)->studly(),
+            '{{ slug }}' => Str::of($name)->slug(),
+            '{{ snake }}' => Str::of($name)->snake(),
+            '{{ upper }}' => Str::of($name)->upper(),
+            '{{ plural }}' => Str::of($name)->plural(),
+            '{{ titlePlural }}' => Str::of($name)->plural()->title(),
+            '{{ studlyPlural }}' => Str::of($name)->plural()->studly(),
+            '{{ slugPlural }}' => Str::of($name)->plural()->slug(),
+            '{{ snakePlural }}' => Str::of($name)->plural()->snake(),
+            '{{ upperPlural }}' => Str::of($name)->plural()->upper(),
+        ];
+
+        foreach ($variables as $search => $replace) {
+            $stub = str_replace($search, $replace, $stub);
+            $stub = str_replace(str_replace(' ', '', $search), $replace, $stub);
+        }
+
+        return $this;
     }
 
     /**
