@@ -131,6 +131,7 @@
         "ext-posix": "Required to use all features of the queue worker.",
         "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0).",
         "aws/aws-sdk-php": "Required to use the SQS queue driver, DynamoDb failed job storage and SES mail driver (^3.155).",
+        "brianium/paratest": "Required to run tests in parallel (^6.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6|^3.0).",
         "filp/whoops": "Required for friendly error pages in development (^2.8).",
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.9.1).",

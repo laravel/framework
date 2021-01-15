@@ -997,6 +997,44 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "geo" add column "coordinates" geography(multipolygon, 4326) not null', $statements[0]);
     }
 
+    public function testCreateDatabase()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_foo');
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+
+        $this->assertSame(
+            'create database "my_database_a" encoding "utf8_foo"',
+            $statement
+        );
+
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_bar');
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+
+        $this->assertSame(
+            'create database "my_database_b" encoding "utf8_bar"',
+            $statement
+        );
+    }
+
+    public function testDropDatabaseIfExists()
+    {
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_a');
+
+        $this->assertSame(
+            'drop database if exists "my_database_a"',
+            $statement
+        );
+
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_b');
+
+        $this->assertSame(
+            'drop database if exists "my_database_b"',
+            $statement
+        );
+    }
+
     public function testDropAllTablesEscapesTableNames()
     {
         $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);

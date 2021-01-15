@@ -50,9 +50,13 @@ class Storage extends Facade
     {
         $disk = $disk ?: static::$app['config']->get('filesystems.default');
 
-        (new Filesystem)->cleanDirectory(
-            $root = storage_path('framework/testing/disks/'.$disk)
-        );
+        $root = storage_path('framework/testing/disks/'.$disk);
+
+        if ($token = ParallelTesting::token()) {
+            $root = "{$root}_test_{$token}";
+        }
+
+        (new Filesystem)->cleanDirectory($root);
 
         static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
             'root' => $root,

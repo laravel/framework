@@ -16,6 +16,36 @@ class DatabasePostgresBuilderTest extends TestCase
         m::close();
     }
 
+    public function testCreateDatabase()
+    {
+        $grammar = new PostgresGrammar();
+
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $connection->shouldReceive('statement')->once()->with(
+            'create database "my_temporary_database" encoding "utf8"'
+        )->andReturn(true);
+
+        $builder = $this->getBuilder($connection);
+        $builder->createDatabase('my_temporary_database');
+    }
+
+    public function testDropDatabaseIfExists()
+    {
+        $grammar = new PostgresGrammar();
+
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $connection->shouldReceive('statement')->once()->with(
+            'drop database if exists "my_database_a"'
+        )->andReturn(true);
+
+        $builder = $this->getBuilder($connection);
+
+        $builder->dropDatabaseIfExists('my_database_a');
+    }
+
     /**
      * Ensure that when the reference is unqualified (i.e., does not contain a
      * database name or a schema), and the search_path is empty, the database

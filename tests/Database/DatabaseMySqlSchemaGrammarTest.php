@@ -1149,6 +1149,48 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
     }
 
+    public function testCreateDatabase()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_foo');
+        $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
+
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+
+        $this->assertSame(
+            'create database `my_database_a` default character set `utf8mb4_foo` default collate `utf8mb4_unicode_ci_foo`',
+            $statement
+        );
+
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_bar');
+        $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
+
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+
+        $this->assertSame(
+            'create database `my_database_b` default character set `utf8mb4_bar` default collate `utf8mb4_unicode_ci_bar`',
+            $statement
+        );
+    }
+
+    public function testDropDatabaseIfExists()
+    {
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_a');
+
+        $this->assertSame(
+            'drop database if exists `my_database_a`',
+            $statement
+        );
+
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_b');
+
+        $this->assertSame(
+            'drop database if exists `my_database_b`',
+            $statement
+        );
+    }
+
     public function testDropAllTables()
     {
         $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
