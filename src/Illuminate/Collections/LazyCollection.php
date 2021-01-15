@@ -828,24 +828,6 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Reduce the collection to a single value.
-     *
-     * @param  callable  $callback
-     * @param  mixed  $initial
-     * @return mixed
-     */
-    public function reduce(callable $callback, $initial = null)
-    {
-        $result = $initial;
-
-        foreach ($this as $value) {
-            $result = $callback($result, $value);
-        }
-
-        return $result;
-    }
-
-    /**
      * Replace the collection items with the given items.
      *
      * @param  mixed  $items
