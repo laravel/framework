@@ -2276,6 +2276,7 @@ class Builder
                 return is_numeric($value) ? $value : "{$value}";
             }, $this->getBindings()
         );
+
         return Str::replaceArray('?', $bindings, $this->toSql());
     }
 
