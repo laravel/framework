@@ -437,6 +437,8 @@ class Store implements Session
     /**
      * Remove an item from the session, returning its value.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @param  string  $key
      * @return mixed
      */
