@@ -704,6 +704,24 @@ trait EnumeratesValues
     }
 
     /**
+     * Reduce the collection to a single value.
+     *
+     * @param  callable  $callback
+     * @param  mixed  $initial
+     * @return mixed
+     */
+    public function reduce(callable $callback, $initial = null)
+    {
+        $result = $initial;
+
+        foreach ($this as $key => $value) {
+            $result = $callback($result, $value, $key);
+        }
+
+        return $result;
+    }
+
+    /**
      * Pass the collection to the given callback and then return it.
      *
      * @param  callable  $callback
