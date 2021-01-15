@@ -873,18 +873,6 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Reduce the collection to a single value.
-     *
-     * @param  callable  $callback
-     * @param  mixed  $initial
-     * @return mixed
-     */
-    public function reduce(callable $callback, $initial = null)
-    {
-        return array_reduce($this->items, $callback, $initial);
-    }
-
-    /**
      * Replace the collection items with the given items.
      *
      * @param  mixed  $items
