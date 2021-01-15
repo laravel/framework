@@ -722,19 +722,6 @@ trait EnumeratesValues
     }
 
     /**
-     * Pass the collection to the given callback and then return it.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function tap(callable $callback)
-    {
-        $callback(clone $this);
-
-        return $this;
-    }
-
-    /**
      * Create a collection of all elements that do not pass a given truth test.
      *
      * @param  callable|mixed  $callback
@@ -749,6 +736,19 @@ trait EnumeratesValues
                 ? ! $callback($value, $key)
                 : $value != $callback;
         });
+    }
+
+    /**
+     * Pass the collection to the given callback and then return it.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function tap(callable $callback)
+    {
+        $callback(clone $this);
+
+        return $this;
     }
 
     /**
