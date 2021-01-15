@@ -8,6 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -234,6 +236,40 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger->shouldNotReceive('error');
 
         $this->handler->report(new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
+    }
+
+    public function testRecordsNotFoundReturns404WithoutReporting()
+    {
+        $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
+        $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
+
+        $response = $this->handler->render($this->request, new RecordsNotFoundException());
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertStringContainsString('"message": "Not found."', $response->getContent());
+
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $this->handler->report(new RecordsNotFoundException());
+    }
+
+    public function testMultipleRecordsFoundReturns400WithoutReporting()
+    {
+        $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
+        $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
+
+        $response = $this->handler->render($this->request, new MultipleRecordsFoundException());
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertStringContainsString('"message": "Bad request."', $response->getContent());
+
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $this->handler->report(new MultipleRecordsFoundException());
     }
 }
 

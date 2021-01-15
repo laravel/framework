@@ -373,6 +373,10 @@ class Handler implements ExceptionHandlerContract
             $e = new HttpException(419, $e->getMessage(), $e);
         } elseif ($e instanceof SuspiciousOperationException) {
             $e = new NotFoundHttpException('Bad hostname provided.', $e);
+        } elseif ($e instanceof RecordsNotFoundException) {
+            $e = new NotFoundHttpException('Not found.', $e);
+        } elseif ($e instanceof MultipleRecordsFoundException) {
+            $e = new HttpException(400, 'Bad request.', $e);
         }
 
         return $e;
