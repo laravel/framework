@@ -3590,7 +3590,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(6, $data->reduce(function ($carry, $element) {
             return $carry += $element;
         }));
-        
+
         $data = new $collection([
             'foo' => 'bar',
             'baz' => 'qux',
