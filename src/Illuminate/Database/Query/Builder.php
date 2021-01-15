@@ -2273,7 +2273,15 @@ class Builder
     {
         $bindings = array_map(
             function ($value) {
-                return is_numeric($value) ? $value : "{$value}";
+                if (is_numeric($value)) {
+                    return $value;
+                }
+                
+                if (is_bool($value)) {
+                    return $value ? 1 : 0;
+                }
+
+                return "'$value'";
             }, $this->getBindings()
         );
 
