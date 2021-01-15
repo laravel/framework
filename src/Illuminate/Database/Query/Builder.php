@@ -2265,6 +2265,21 @@ class Builder
     }
 
     /**
+     * Get the SQL representation of the query with bindings.
+     *
+     * @return string
+     */
+    public function toSqlWithBindings()
+    {
+        $bindings = array_map(
+            function ($value) {
+                return is_numeric($value) ? $value : "{$value}";
+            }, $this->getBindings()
+        );
+        return Str::replaceArray('?', $bindings, $this->toSql());
+    }
+
+    /**
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id
