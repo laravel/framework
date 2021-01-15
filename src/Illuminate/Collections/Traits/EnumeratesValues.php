@@ -717,6 +717,42 @@ trait EnumeratesValues
     }
 
     /**
+     * Reduce the collection to a single value.
+     *
+     * @param  callable  $callback
+     * @param  mixed $initial
+     * @return mixed
+     */
+    public function reduce(callable $callback, $initial = null)
+    {
+        $result = $initial;
+
+        foreach ($this as $key => $value) {
+            $result = $callback($result, $value, $key);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reduce an associative collection to a single value.
+     *
+     * @param  callable  $callback
+     * @param  mixed $initial
+     * @return mixed
+     */
+    public function reduceWithKeys(callable $callback, $initial = null)
+    {
+        $result = $initial;
+
+        foreach ($this as $key => $value) {
+            $result = $callback($result, $value, $key);
+        }
+
+        return $result;
+    }
+
+    /**
      * Create a collection of all elements that do not pass a given truth test.
      *
      * @param  callable|mixed  $callback
