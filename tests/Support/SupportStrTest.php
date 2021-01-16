@@ -151,11 +151,10 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::contains('taylor', 'taylor'));
         $this->assertTrue(Str::contains('taylor', ['ylo']));
         $this->assertTrue(Str::contains('taylor', ['xxx', 'ylo']));
-        $this->assertTrue(Str::contains(123, '1'));
+        $this->assertTrue(Str::contains(new StringableObjectStub('123'), '1'));
         $this->assertFalse(Str::contains('taylor', 'xxx'));
         $this->assertFalse(Str::contains('taylor', ['xxx']));
         $this->assertFalse(Str::contains('taylor', ''));
-        $this->assertFalse(Str::contains(null, ''));
     }
 
     public function testStrContainsAll()
