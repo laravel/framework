@@ -144,7 +144,7 @@ class RateLimited
     {
         $this->limiter = Container::getInstance()->make(RateLimiter::class);
 
-        $this->limitedName = $data['limiterName'];
+        $this->limiterName = $data['limiterName'];
         $this->shouldRelease = $data['shouldRelease'];
     }
 }
