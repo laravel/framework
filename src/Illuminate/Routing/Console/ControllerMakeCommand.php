@@ -127,7 +127,21 @@ class ControllerMakeCommand extends GeneratorCommand
             }
         }
 
+        $plain = Str::of(class_basename($parentModelClass))->snake()->replace('_', ' ');
+
         return [
+            '{{ parentLower }}' => $plain,
+            '{{ parentTitle }}' => Str::of($plain)->title(),
+            '{{ parentStudly }}' => Str::of($plain)->studly(),
+            '{{ parentCamel }}' => Str::of($plain)->camel(),
+            '{{ parentSlug }}' => Str::of($plain)->slug(),
+            '{{ parentSnake }}' => Str::of($plain)->snake(),
+            '{{ parentPlural }}' => Str::of($plain)->plural(),
+            '{{ parentTitlePlural }}' => Str::of($plain)->plural()->title(),
+            '{{ parentStudlyPlural }}' => Str::of($plain)->plural()->studly(),
+            '{{ parentCamelPlural }}' => Str::of($plain)->plural()->camel(),
+            '{{ parentSlugPlural }}' => Str::of($plain)->plural()->slug(),
+            '{{ parentSnakePlural }}' => Str::of($plain)->plural()->snake(),
             'ParentDummyFullModelClass' => $parentModelClass,
             '{{ namespacedParentModel }}' => $parentModelClass,
             '{{namespacedParentModel}}' => $parentModelClass,
