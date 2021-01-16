@@ -1163,8 +1163,6 @@ class Collection implements ArrayAccess, Enumerable
                 $ascending = Arr::get($comparison, 1, true) === true ||
                              Arr::get($comparison, 1, true) === 'asc';
 
-                $result = 0;
-
                 if (is_callable($prop)) {
                     $result = $prop($a, $b);
                 } else {
