@@ -3,6 +3,7 @@
 namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -105,6 +106,10 @@ class ControllerMakeCommand extends GeneratorCommand
             $replace = $this->buildModelReplacements($replace);
         }
 
+        foreach($replace as $variable => $value) {
+            $replace[str_replace(' ', '', $variable)] = $value;
+        }
+
         $replace["use {$controllerNamespace}\Controller;\n"] = '';
 
         return str_replace(
@@ -144,13 +149,10 @@ class ControllerMakeCommand extends GeneratorCommand
             '{{ parentSnakePlural }}' => Str::of($plain)->plural()->snake(),
             'ParentDummyFullModelClass' => $parentModelClass,
             '{{ namespacedParentModel }}' => $parentModelClass,
-            '{{namespacedParentModel}}' => $parentModelClass,
             'ParentDummyModelClass' => class_basename($parentModelClass),
             '{{ parentModel }}' => class_basename($parentModelClass),
-            '{{parentModel}}' => class_basename($parentModelClass),
             'ParentDummyModelVariable' => lcfirst(class_basename($parentModelClass)),
             '{{ parentModelVariable }}' => lcfirst(class_basename($parentModelClass)),
-            '{{parentModelVariable}}' => lcfirst(class_basename($parentModelClass)),
         ];
     }
 
@@ -187,13 +189,10 @@ class ControllerMakeCommand extends GeneratorCommand
             '{{ snakePlural }}' => Str::of($plain)->plural()->snake(),
             'DummyFullModelClass' => $modelClass,
             '{{ namespacedModel }}' => $modelClass,
-            '{{namespacedModel}}' => $modelClass,
             'DummyModelClass' => class_basename($modelClass),
             '{{ model }}' => class_basename($modelClass),
-            '{{model}}' => class_basename($modelClass),
             'DummyModelVariable' => lcfirst(class_basename($modelClass)),
             '{{ modelVariable }}' => lcfirst(class_basename($modelClass)),
-            '{{modelVariable}}' => lcfirst(class_basename($modelClass)),
         ]);
     }
 
