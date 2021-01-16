@@ -156,7 +156,21 @@ class ControllerMakeCommand extends GeneratorCommand
             }
         }
 
+        $plain = Str::of(class_basename($modelClass))->snake()->replace('_', ' ');
+
         return array_merge($replace, [
+            '{{ lower }}' => $plain,
+            '{{ title }}' => Str::of($plain)->title(),
+            '{{ studly }}' => Str::of($plain)->studly(),
+            '{{ camel }}' => Str::of($plain)->camel(),
+            '{{ slug }}' => Str::of($plain)->slug(),
+            '{{ snake }}' => Str::of($plain)->snake(),
+            '{{ plural }}' => Str::of($plain)->plural(),
+            '{{ titlePlural }}' => Str::of($plain)->plural()->title(),
+            '{{ studlyPlural }}' => Str::of($plain)->plural()->studly(),
+            '{{ camelPlural }}' => Str::of($plain)->plural()->camel(),
+            '{{ slugPlural }}' => Str::of($plain)->plural()->slug(),
+            '{{ snakePlural }}' => Str::of($plain)->plural()->snake(),
             'DummyFullModelClass' => $modelClass,
             '{{ namespacedModel }}' => $modelClass,
             '{{namespacedModel}}' => $modelClass,
