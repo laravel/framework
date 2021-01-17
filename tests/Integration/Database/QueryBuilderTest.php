@@ -34,8 +34,6 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testSole()
     {
-        $expected = ['id' => '1', 'title' => 'Foo Post'];
-
         $this->assertEquals(1, DB::table('posts')->where('title', 'Foo Post')->sole()->id);
     }
 
