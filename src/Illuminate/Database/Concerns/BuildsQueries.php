@@ -174,6 +174,20 @@ trait BuildsQueries
     }
 
     /**
+     * Execute the query and get the first result if it's the sole matching record.
+     *
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     *
+     * @throws \Illuminate\Database\RecordsNotFoundException
+     * @throws \Illuminate\Database\MultipleRecordsFoundException
+     */
+    public function singleOrFail($columns = ['*'])
+    {
+        return $this->sole();
+    }
+
+    /**
      * Apply the callback's query changes if the given "value" is true.
      *
      * @param  mixed  $value

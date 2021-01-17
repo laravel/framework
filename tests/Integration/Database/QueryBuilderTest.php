@@ -39,6 +39,11 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals(1, DB::table('posts')->where('title', 'Foo Post')->sole()->id);
     }
 
+    public function testSoleAlias()
+    {
+        $this->assertEquals(1, DB::table('posts')->where('title', 'Foo Post')->singleOrFail()->id);
+    }
+
     public function testSoleFailsForMultipleRecords()
     {
         DB::table('posts')->insert([
