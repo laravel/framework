@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -157,13 +159,15 @@ abstract class GeneratorCommand extends Command
         $this->makeDirectory($path);
 
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
-        
-        event("console.generated: {$this->type}", [
-            'name' => $name,
-            'path' => $path,
-            'options' => $this->option(),
-            'arguments' => $this->argument(),
-        ]);
+
+        Container::getInstance()
+            ->make(Dispatcher::class)
+            ->dispatch("console.generated: {$this->type}", [
+                'name' => $name,
+                'path' => $path,
+                'options' => $this->option(),
+                'arguments' => $this->argument(),
+            ]);
 
         $this->info($this->type.' created successfully.');
     }
