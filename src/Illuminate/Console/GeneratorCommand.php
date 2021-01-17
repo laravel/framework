@@ -157,6 +157,8 @@ abstract class GeneratorCommand extends Command
         $this->makeDirectory($path);
 
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
+        
+        event("console.generated: {$this->type}", compact('name', 'path'));
 
         $this->info($this->type.' created successfully.');
     }
