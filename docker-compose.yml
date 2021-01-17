@@ -19,3 +19,13 @@ services:
     ports:
       - "6379:6379"
     restart: always
+  php:
+    depends_on:
+      - mysql
+      - redis
+      - memcached
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    volumes:
+      - .:/var/www/html/:consistent
