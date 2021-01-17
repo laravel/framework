@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -16,6 +15,13 @@ abstract class GeneratorCommand extends Command
      * @var \Illuminate\Filesystem\Filesystem
      */
     protected $files;
+
+    /**
+     * The Event Dispatcher.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
 
     /**
      * The type of class being generated.
@@ -106,11 +112,13 @@ abstract class GeneratorCommand extends Command
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */
-    public function __construct(Filesystem $files)
+    public function __construct(Filesystem $files, Dispatcher $events)
     {
         parent::__construct();
 
         $this->files = $files;
+
+        $this->events = $events;
     }
 
     /**
@@ -160,14 +168,12 @@ abstract class GeneratorCommand extends Command
 
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
-        Container::getInstance()
-            ->make(Dispatcher::class)
-            ->dispatch("console.generated: {$this->type}", [
-                'name' => $name,
-                'path' => $path,
-                'options' => $this->option(),
-                'arguments' => $this->argument(),
-            ]);
+        $this->events->dispatch("console.generated: {$this->type}", [
+            'name' => $name,
+            'path' => $path,
+            'options' => $this->option(),
+            'arguments' => $this->argument(),
+        ]);
 
         $this->info($this->type.' created successfully.');
     }
