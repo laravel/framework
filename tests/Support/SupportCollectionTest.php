@@ -1780,6 +1780,16 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMultiPluck($collection)
+    {
+        $data = new $collection([['name' => 'taylor', 'email' => 'foo', 'type' => 'superuser'], ['name' => 'dayle', 'email' => 'bar', 'type' => 'user']]);
+        $this->assertEquals([['name' => 'taylor', 'type' => 'superuser'], ['name' => 'dayle', 'type' => 'user']], $data->multiPluck('name', 'type')->all());
+        $this->assertEquals(['taylor', 'dayle'], $data->multiPluck('name')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testHas($collection)
     {
         $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
