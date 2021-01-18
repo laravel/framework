@@ -1184,6 +1184,9 @@ trait HasAttributes
             }
 
             return abs($this->castAttribute($key, $current) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
+        } elseif ($this->hasCast($key, ['json'])) {
+            return $this->castAttribute($key, $current) ==
+                   $this->castAttribute($key, $original);
         } elseif ($this->hasCast($key)) {
             return $this->castAttribute($key, $current) ===
                    $this->castAttribute($key, $original);
