@@ -618,6 +618,23 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get the values of given keys.
+     *
+     * @param  mixed  ...$values
+     * @return static
+     */
+    public function multiPluck(...$values)
+    {
+        if(func_num_args() > 1) {
+            return new static($this->map(function ($value) use ($values) {
+                return Arr::only($value, $values);
+            }));
+        }
+
+        return $this->pluck($values);
+    }
+
+    /**
      * Run a map over each of the items.
      *
      * @param  callable  $callback
