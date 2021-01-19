@@ -29,7 +29,7 @@ class SupportStrTest extends TestCase
 
     public function testStringWithoutWordsDoesntProduceError()
     {
-        $nbsp = chr(0xC2).chr(0xA0);
+        $nbsp = chr(0xC2) . chr(0xA0);
         $this->assertSame(' ', Str::words(' '));
         $this->assertEquals($nbsp, Str::words($nbsp));
     }
@@ -501,7 +501,7 @@ class SupportStrTest extends TestCase
         return [
             ['not a valid uuid so we can test this'],
             ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66'],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'.PHP_EOL],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1' . PHP_EOL],
             ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1 '],
             [' 145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'],
             ['145a1e72-d11d-11e8-a8d5-f2z01f1b9fd1'],
@@ -510,6 +510,19 @@ class SupportStrTest extends TestCase
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
         ];
+    }
+
+    public function testClean()
+    {
+        $this->assertSame('invoice:AQ12345', Str::clean('invoice: AQ&*(*&(* 12345', ['letters', 'numbers', 'colon']));
+        $this->assertSame('103', Str::clean('Spend 10 hours working on a function to save you 3 minutes per project!', ['numbers']));
+        $this->assertSame('txjNOBlJQD8dVn5M9DM0BpPVksEc', Str::clean('t"xj+N#;OBlJ*QD8dVn5M9>;+-DM0BpP;V:k#sEc', ['letters', 'numbers']));
+    }
+
+    public function testMask()
+    {
+        $this->assertSame('800-800-8000', Str::mask('phone number: (800)!800.8000', "###-###-####"));
+        $this->assertSame('m1b 2c3', Str::mask('my postal code is a1b2c3', "$#$ #$#"));
     }
 }
 
