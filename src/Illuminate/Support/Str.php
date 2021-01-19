@@ -779,4 +779,85 @@ class Str
     {
         static::$uuidFactory = null;
     }
+
+    /**
+     * Clean a string with easy to remember options
+     *
+     * @param $target
+     * @param array $options
+     *
+     * options include letters, numbers, space, comma, period, dash
+     *
+     * @return string
+     */
+    public static function clean($target, $options = null)
+    {
+        if (is_null($options)) {
+            $options = ['letters', 'numbers', 'space', 'comma', 'period', 'dash'];
+        }
+
+        $needles = [];
+
+        if (in_array('letters', $options) || in_array('alpha', $options)) {
+            $needles[] = 'a-zA-Z';
+        }
+
+        if (in_array('numbers', $options) || in_array('nums', $options)) {
+            $needles[] = '0-9';
+        }
+        if (in_array('comma', $options) || in_array(',', $options)) {
+            $needles[] = ',';
+        }
+        if (in_array('dash', $options) || in_array('-', $options) || in_array('hyphen', $options)) {
+            $needles[] = "\-";
+        }
+        if (in_array('dot', $options) || in_array('.', $options) || in_array('period', $options)) {
+            $needles[] = "\.";
+        }
+        if (in_array('colon', $options) || in_array(':', $options)) {
+            $needles[] = ':';
+        }
+        if (in_array('space', $options) || in_array(' ', $options)) {
+            $needles[] = ' ';
+        }
+
+        return preg_replace(sprintf("/[^%s]/", implode('', $needles)), '', $target);
+    }
+
+    /**
+     * Mask a string to a specific format, eg. Phone numbers, postal codes etc.
+     *
+     * @param string $target
+     * @param string $pattern
+     *
+     *  pattern should use the # character for numbers, and the $ character for letters
+     *
+     * @return string
+     */
+    public static function mask($target, $pattern)
+    {
+        $cleaned_target = preg_replace('/[^0-9a-zA-Z]/', '', $target);
+
+        $new_value = str_split($pattern);
+        for ($i = 0; $i < count($new_value); $i++) {
+            if (strlen($cleaned_target) > 0) {
+                if ($new_value[$i] == '#') {
+                    $string_position_of_next_number = strcspn($cleaned_target, '0123456789');
+                    if ($string_position_of_next_number < strlen($cleaned_target)) {
+                        $new_value[$i] = substr($cleaned_target, $string_position_of_next_number, 1);
+                    }
+                    $cleaned_target = substr($cleaned_target, $string_position_of_next_number + 1);
+                } else if ($new_value[$i] == '$') {
+                    $string_position_of_next_alpha = strcspn(strtolower($cleaned_target), 'abcdefghijklmnopqrstuvwxyz');
+                    if ($string_position_of_next_alpha < strlen($cleaned_target)) {
+                        $new_value[$i] = substr($cleaned_target, $string_position_of_next_alpha, 1);
+                    }
+                    $cleaned_target = substr($cleaned_target, $string_position_of_next_alpha + 1);
+                }
+            } else {
+                $new_value = array_slice($new_value, 0, $i);
+            }
+        }
+        return implode('', $new_value);
+    }
 }

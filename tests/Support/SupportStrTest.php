@@ -511,6 +511,19 @@ class SupportStrTest extends TestCase
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
         ];
     }
+
+    public function testClean()
+    {
+        $this->assertSame('invoice:AQ12345', Str::clean('invoice: AQ&*(*&(* 12345', ['letters', 'numbers', 'colon']));
+        $this->assertSame('103', Str::clean('Spend 10 hours working on a function to save you 3 minutes per project!', ['numbers']));
+        $this->assertSame('txjNOBlJQD8dVn5M9DM0BpPVksEc', Str::clean('t"xj+N#;OBlJ*QD8dVn5M9>;+-DM0BpP;V:k#sEc', ['letters', 'numbers']));
+    }
+
+    public function testMask()
+    {
+        $this->assertSame('800-800-8000', Str::mask('phone number: (800)!800.8000', "###-###-####"));
+        $this->assertSame('m1b 2c3', Str::mask('my postal code is a1b2c3', "$#$ #$#"));
+    }
 }
 
 class StringableObjectStub
