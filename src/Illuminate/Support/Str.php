@@ -828,8 +828,6 @@ class Str
      * @param string $target
      * @param string $pattern
      *
-     *  pattern should use the # character for numbers, and the $ character for letters
-     *
      * @return string
      */
     public static function mask($target, $pattern)
