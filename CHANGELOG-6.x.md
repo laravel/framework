@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.10...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.11...6.x)
+
+
+## [v6.20.11 (2021-01-19)](https://github.com/laravel/framework/compare/v6.20.10...v6.20.11)
+
+### Fixed
+- Limit expected bindings ([#35865](https://github.com/laravel/framework/pull/35865))
 
 
 ## [v6.20.10 (2021-01-12)](https://github.com/laravel/framework/compare/v6.20.9...v6.20.10)
