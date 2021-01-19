@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
@@ -28,11 +29,13 @@ class QueueRedisQueueTest extends TestCase
 
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
+        $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]));
 
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
+        $container->shouldHaveReceived('bound')->with('events')->once();
 
         Str::createUuidsNormally();
     }
@@ -47,6 +50,7 @@ class QueueRedisQueueTest extends TestCase
 
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
+        $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0]));
 
@@ -56,6 +60,7 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
+        $container->shouldHaveReceived('bound')->with('events')->once();
 
         Queue::createPayloadUsing(null);
 
@@ -72,6 +77,7 @@ class QueueRedisQueueTest extends TestCase
 
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
+        $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0]));
 
@@ -85,6 +91,7 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
+        $container->shouldHaveReceived('bound')->with('events')->once();
 
         Queue::createPayloadUsing(null);
 
@@ -100,6 +107,7 @@ class QueueRedisQueueTest extends TestCase
         });
 
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
@@ -112,6 +120,7 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->later(1, 'foo', ['data']);
         $this->assertSame('foo', $id);
+        $container->shouldHaveReceived('bound')->with('events')->once();
 
         Str::createUuidsNormally();
     }
@@ -126,6 +135,7 @@ class QueueRedisQueueTest extends TestCase
 
         $date = Carbon::now();
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(2);
 
@@ -137,6 +147,7 @@ class QueueRedisQueueTest extends TestCase
         );
 
         $queue->later($date, 'foo', ['data']);
+        $container->shouldHaveReceived('bound')->with('events')->once();
 
         Str::createUuidsNormally();
     }
