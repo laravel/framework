@@ -858,6 +858,7 @@ class Str
                 $new_value = array_slice($new_value, 0, $i);
             }
         }
+
         return implode('', $new_value);
     }
 }
