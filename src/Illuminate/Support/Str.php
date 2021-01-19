@@ -781,7 +781,7 @@ class Str
     }
 
     /**
-     * Clean a string with easy to remember options
+     * Clean a string with easy to remember options.
      *
      * @param $target
      * @param array $options
@@ -821,7 +821,7 @@ class Str
             $needles[] = ' ';
         }
 
-        return preg_replace(sprintf("/[^%s]/", implode('', $needles)), '', $target);
+        return preg_replace(sprintf('/[^%s]/', implode('', $needles)), '', $target);
     }
 
     /**
@@ -847,7 +847,7 @@ class Str
                         $new_value[$i] = substr($cleaned_target, $string_position_of_next_number, 1);
                     }
                     $cleaned_target = substr($cleaned_target, $string_position_of_next_number + 1);
-                } else if ($new_value[$i] == '$') {
+                } elseif ($new_value[$i] == '$') {
                     $string_position_of_next_alpha = strcspn(strtolower($cleaned_target), 'abcdefghijklmnopqrstuvwxyz');
                     if ($string_position_of_next_alpha < strlen($cleaned_target)) {
                         $new_value[$i] = substr($cleaned_target, $string_position_of_next_alpha, 1);

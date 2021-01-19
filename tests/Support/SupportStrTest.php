@@ -521,8 +521,8 @@ class SupportStrTest extends TestCase
 
     public function testMask()
     {
-        $this->assertSame('800-800-8000', Str::mask('phone number: (800)!800.8000', "###-###-####"));
-        $this->assertSame('m1b 2c3', Str::mask('my postal code is a1b2c3', "$#$ #$#"));
+        $this->assertSame('800-800-8000', Str::mask('phone number: (800)!800.8000', '###-###-####'));
+        $this->assertSame('m1b 2c3', Str::mask('my postal code is a1b2c3', '$#$ #$#'));
     }
 }
 
