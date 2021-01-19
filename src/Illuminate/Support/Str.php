@@ -783,7 +783,7 @@ class Str
     /**
      * Clean a string with easy to remember options.
      *
-     * @param $target
+     * @param string $target
      * @param array|null $options
      *
      * @return string
