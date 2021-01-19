@@ -1,6 +1,9 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.30.2...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.30.3...7.x)
+
+
+## [v7.30.3 (2021-01-15)](https://github.com/laravel/framework/compare/v7.30.2...v7.30.3)
 
 
 ## [v7.30.2 (2021-01-13)](https://github.com/laravel/framework/compare/v7.30.1...v7.30.2)
