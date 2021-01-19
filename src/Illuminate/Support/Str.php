@@ -784,9 +784,7 @@ class Str
      * Clean a string with easy to remember options.
      *
      * @param $target
-     * @param array $options
-     *
-     * options include letters, numbers, space, comma, period, dash
+     * @param array|null $options
      *
      * @return string
      */
