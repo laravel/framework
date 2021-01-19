@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.22.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.22.1...8.x)
+
+
+## [v8.22.1 (2021-01-13)](https://github.com/laravel/framework/compare/v8.22.0...v8.22.1)
+ 
+### Fixed
+- Limit expected bindings ([#35865](https://github.com/laravel/framework/pull/35865))
 
 
 ## [v8.22.0 (2021-01-12)](https://github.com/laravel/framework/compare/v8.21.0...v8.22.0)
