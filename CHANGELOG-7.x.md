@@ -1,6 +1,19 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.30.1...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.30.2...7.x)
+
+
+## [v7.30.2 (2021-01-13)](https://github.com/laravel/framework/compare/v7.30.1...v7.30.2)
+
+### Added
+- Added strings to `DetectsLostConnections` ([#35752](https://github.com/laravel/framework/pull/35752))
+
+### Fixed
+- Fixed error from missing null check on PHP 8 ([#35797](https://github.com/laravel/framework/pull/35797))
+- Limit expected bindings ([#35865](https://github.com/laravel/framework/pull/35865))
+
+### Changed
+- Retry connection if DNS lookup fails ([#35790](https://github.com/laravel/framework/pull/35790))
 
 
 ## [v7.30.1 (2020-12-22)](https://github.com/laravel/framework/compare/v7.30.0...v7.30.1)
