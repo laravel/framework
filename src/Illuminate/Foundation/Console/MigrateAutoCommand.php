@@ -15,6 +15,11 @@ class MigrateAutoCommand extends Command
 
     public function handle()
     {
+        if (!config('database.model_path')) {
+            $this->error('model_path not found in database config file! Aborting...');
+            return;
+        }
+        
         Artisan::call('migrate'.($this->option('fresh') ? ':fresh' : null).($this->option('force') ? ' --force' : null));
 
         $filesystem = new Filesystem;
