@@ -17,7 +17,7 @@ class MigrateAutoCommand extends Command
     {
         $modelNamespace = config('database.model_namespace');
 
-        if (!$modelNamespace) {
+        if (! $modelNamespace) {
             $this->warn('model_namespace not found in database config file! Aborting...');
             return;
         }
