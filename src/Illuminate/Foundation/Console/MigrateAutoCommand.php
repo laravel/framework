@@ -15,20 +15,20 @@ class MigrateAutoCommand extends Command
 
     public function handle()
     {
-        Artisan::call('migrate' . ($this->option('fresh') ? ':fresh' : null) . ($this->option('force') ? ' --force' : null));
+        Artisan::call('migrate'.($this->option('fresh') ? ':fresh' : null).($this->option('force') ? ' --force' : null));
 
         $filesystem = new Filesystem;
         $dir = base_path(config('database.model_path'));
 
         if ($filesystem->exists($dir)) {
-            $namespace = str_replace(['app', '/'], ['App', '\\'], rtrim(config('database.model_path'), '/')) . '\\';
+            $namespace = str_replace(['app', '/'], ['App', '\\'], rtrim(config('database.model_path'), '/')).'\\';
 
             foreach ($filesystem->allFiles($dir) as $file) {
-                $class = app($namespace . str_replace(['/', '.php'], ['\\', null], $file->getRelativePathname()));
+                $class = app($namespace.str_replace(['/', '.php'], ['\\', null], $file->getRelativePathname()));
 
                 if (method_exists($class, 'migration')) {
                     if (Schema::hasTable($class->getTable())) {
-                        $tempTable = 'temp_' . $class->getTable();
+                        $tempTable = 'temp_'.$class->getTable();
 
                         Schema::dropIfExists($tempTable);
                         Schema::create($tempTable, function (Blueprint $table) use ($class) {
@@ -57,7 +57,7 @@ class MigrateAutoCommand extends Command
         $this->info('Migration complete!');
 
         if ($this->option('seed')) {
-            Artisan::call('db:seed' . ($this->option('force') ? ' --force' : null));
+            Artisan::call('db:seed'.($this->option('force') ? ' --force' : null));
 
             $this->info('Seeding complete!');
         }
