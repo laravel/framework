@@ -15,21 +15,21 @@ class MigrateAutoCommand extends Command
 
     public function handle()
     {
-        if (!config('database.model_path')) {
-            $this->error('model_path not found in database config file! Aborting...');
+        $modelNamespace = config('database.model_namespace');
+
+        if (!$modelNamespace) {
+            $this->warn('model_namespace not found in database config file! Aborting...');
             return;
         }
-        
+
         Artisan::call('migrate'.($this->option('fresh') ? ':fresh' : null).($this->option('force') ? ' --force' : null));
 
         $filesystem = new Filesystem;
-        $dir = base_path(config('database.model_path'));
+        $dir = base_path(str_replace(['App', '\\'], ['app', '/'], rtrim($modelNamespace, '\\')));
 
         if ($filesystem->exists($dir)) {
-            $namespace = str_replace(['app', '/'], ['App', '\\'], rtrim(config('database.model_path'), '/')).'\\';
-
             foreach ($filesystem->allFiles($dir) as $file) {
-                $class = app($namespace.str_replace(['/', '.php'], ['\\', null], $file->getRelativePathname()));
+                $class = app($modelNamespace.'\\'.str_replace(['/', '.php'], ['\\', null], $file->getRelativePathname()));
 
                 if (method_exists($class, 'migration')) {
                     if (Schema::hasTable($class->getTable())) {
