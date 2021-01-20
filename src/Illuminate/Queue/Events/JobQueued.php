@@ -5,25 +5,38 @@ namespace Illuminate\Queue\Events;
 class JobQueued
 {
     /**
-     * @var string|int|null
+     * The connection name.
+     *
+     * @var string
      */
-    public $jobId;
+    public $connectionName;
 
     /**
-     * @var string|object
+     * The job ID.
+     *
+     * @var string|int|null
+     */
+    public $id;
+
+    /**
+     * The job instance.
+     *
+     * @var \Closure|string|object
      */
     public $job;
 
     /**
-     * JobQueued constructor.
+     * Create a new event instance.
      *
-     * @param  string|int|null  $jobId
+     * @param  string  $connectionName
+     * @param  string|int|null  $id
      * @param  \Closure|string|object  $job
      * @return void
      */
-    public function __construct($jobId, $job)
+    public function __construct($connectionName, $id, $job)
     {
-        $this->jobId = $jobId;
+        $this->connectionName = $connectionName;
+        $this->id = $id;
         $this->job = $job;
     }
 }

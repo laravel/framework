@@ -318,6 +318,20 @@ abstract class Queue
     }
 
     /**
+     * Raise the job queued event.
+     *
+     * @param  string|int|null  $jobId
+     * @param  \Closure|string|object  $job
+     * @return void
+     */
+    protected function raiseJobQueuedEvent($jobId, $job)
+    {
+        if ($this->container->bound('events')) {
+            $this->container['events']->dispatch(new JobQueued($this->connectionName, $jobId, $job));
+        }
+    }
+
+    /**
      * Get the connection name for the queue.
      *
      * @return string
@@ -349,19 +363,5 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * Raise the job queued event.
-     *
-     * @param  string|int|null  $jobId
-     * @param  \Closure|string|object  $job
-     * @return void
-     */
-    protected function raiseJobQueuedEvent($jobId, $job)
-    {
-        if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new JobQueued($jobId, $job));
-        }
     }
 }
