@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 trait GuardsAttributes
@@ -41,7 +42,7 @@ trait GuardsAttributes
      */
     public function getFillable()
     {
-        return $this->fillable;
+        return !empty($this->fillable) ? $this->fillable : Schema::getColumnListing($this->getTable());
     }
 
     /**
