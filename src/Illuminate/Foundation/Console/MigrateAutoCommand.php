@@ -15,10 +15,10 @@ class MigrateAutoCommand extends Command
 
     public function handle()
     {
-        Artisan::call('migrate' . ($this->option('fresh') ? ':fresh' : null) . ($this->option('force') ? ' --force' : null);
+        Artisan::call('migrate' . ($this->option('fresh') ? ':fresh' : null) . ($this->option('force') ? ' --force' : null));
 
         $filesystem = new Filesystem;
-        $dir = base_path('App/Models');
+        $dir = base_path('app/Models');
 
         if ($filesystem->exists($dir)) {
             foreach ($filesystem->allFiles($dir) as $file) {
