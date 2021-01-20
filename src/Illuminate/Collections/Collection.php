@@ -1168,7 +1168,7 @@ class Collection implements ArrayAccess, Enumerable
                 if (is_callable($prop)) {
                     $result = $prop($a, $b);
                 } else {
-                    $values = [Arr::get($a, $prop), Arr::get($b, $prop)];
+                    $values = [data_get($a, $prop), data_get($b, $prop)];
 
                     if (! $ascending) {
                         $values = array_reverse($values);
