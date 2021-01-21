@@ -2,11 +2,15 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -548,6 +552,102 @@ class RoutingUrlGeneratorTest extends TestCase
         $routes->add($route);
 
         $this->assertSame('http://www.foo.com:8080/foo?test=123', $url->route('foo', $parameters));
+    }
+
+    public function testUrlGenerationForControllersOptionalParameterGroup()
+    {
+        $router = new Router(new Dispatcher, $container = new Container());
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $router->name('Hreflang::')->groupWithOptionalParameter('hreflang', '^[a-z]{2}(?:\-[a-z]{2})?$', function () use ($router) {
+            $router->get('', ['as' => 'home', function () {
+                return 'hello';
+            }]);
+            $router->get('about-us', ['as' => 'about', function () {
+                return 'about';
+            }]);
+        });
+
+        $url = new UrlGenerator(
+            $router->getRoutes(),
+            Request::create('http://www.foo.com:8080/')
+        );
+
+        $this->assertSame('http://www.foo.com:8080', $url->route('Hreflang::home'));
+        $this->assertSame('http://www.foo.com:8080/en-us', $url->route('Hreflang::home', [
+            'hreflang'  =>  'en-us',
+        ]));
+
+        $this->assertSame('http://www.foo.com:8080/about-us', $url->route('Hreflang::about'));
+        $this->assertSame('http://www.foo.com:8080/en-us/about-us', $url->route('Hreflang::about', [
+            'hreflang'  =>  'en-us',
+        ]));
+    }
+
+    public function testUrlGenerationForControllersRequiresPassingOfRequiredParametersOptionalParameterGroup()
+    {
+        $router = new Router(new Dispatcher, $container = new Container());
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $router->name('Language::')->groupWithOptionalParameter('language', '.*', function () use ($router) {
+            $router->name('Country::')->groupWithOptionalParameter('country', '.*', function () use ($router) {
+                $router->get('bar', ['as' => 'bar', function () {
+                    return 'hello';
+                }]);
+            });
+        });
+
+        $url = new UrlGenerator(
+            $router->getRoutes(),
+            Request::create('http://www.foo.com:8080/')
+        );
+
+        $this->assertSame('http://www.foo.com:8080/en/us/bar?test=123', $url->route('Language::Country::bar', [
+            'language'  =>  'en',
+            'country'   =>  'us',
+            'test'      =>  123,
+        ]));
+
+        $this->assertSame('http://www.foo.com:8080/bar?test=456', $url->route('Language::Country::bar', [
+            'test'      =>  456,
+        ]));
+    }
+
+    public function testUrlGenerationForControllersRequiresPassingOfRequiredParametersOptionalParameterGroupWithPrefix()
+    {
+        $router = new Router(new Dispatcher, $container = new Container());
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $router->groupWithOptionalParameter('language', '.*', ['prefix' => 'language', 'as' => 'Language::'], function () use ($router) {
+            $router->groupWithOptionalParameter('country', '.*', ['prefix' => 'country', 'as' => 'Country::'], function () use ($router) {
+                $router->get('bar/{one}/baz/{two?}/{three?}', ['as' => 'bar', function () {
+                    return 'hello';
+                }]);
+            });
+        });
+
+        $url = new UrlGenerator(
+            $router->getRoutes(),
+            Request::create('http://www.foo.com:8080/')
+        );
+
+        $this->assertSame('http://www.foo.com:8080/language/en/country/us/bar/one/baz?test=123', $url->route('Language::Country::bar', [
+            'language'  =>  'en',
+            'country'   =>  'us',
+            'one'       =>  'one',
+            'test'      =>  123,
+        ]));
+
+        $this->assertSame('http://www.foo.com:8080/language/country/bar/one/baz?test=456', $url->route('Language::Country::bar', [
+            'one'       =>  'one',
+            'test'      =>  456,
+        ]));
     }
 
     public function provideParametersAndExpectedMeaningfulExceptionMessages()

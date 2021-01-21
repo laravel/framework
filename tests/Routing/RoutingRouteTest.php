@@ -1080,6 +1080,42 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->currentRouteUses(RouteTestControllerStub::class.'@index'));
     }
 
+    public function testRouteOptionalParameterGrouping()
+    {
+        $router = $this->getRouter();
+        $router->name('Api')->prefix('api')->groupWithOptionalParameter('language', '.*', function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            });
+        });
+
+        $requestWithParam = Request::create('api/en/users', 'GET');
+        $requestWithoutParam = Request::create('api/users', 'GET');
+
+        $route = head($router->getRoutes()->get());
+        $this->assertFalse($route->matches($requestWithParam));
+        $this->assertTrue($route->matches($requestWithoutParam));
+        $this->assertSame('all-users', $route->bind($requestWithoutParam)->run($requestWithoutParam));
+
+        $route = last($router->getRoutes()->get());
+        $this->assertTrue($route->matches($requestWithParam));
+        $this->assertFalse($route->matches($requestWithoutParam));
+        $this->assertSame('all-users', $route->bind($requestWithParam)->run($requestWithParam));
+    }
+
+    public function testNestedRouteOptionalParameterGroupingPrefixing()
+    {
+        $router = $this->getRouter();
+        $router->groupWithOptionalParameter('language', '.*', ['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->prefix('bar')->get('baz', ['as' => 'baz', function () {
+                return 'hello';
+            }]);
+        });
+
+        $route = $router->getRoutes()->getByName('Foo::baz');
+        $this->assertSame('bar/foo/{language?}', $route->getAction('prefix'));
+    }
+
     public function testRouteGroupingFromFile()
     {
         $router = $this->getRouter();

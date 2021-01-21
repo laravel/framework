@@ -136,6 +136,19 @@ class RouteRegistrar
     }
 
     /**
+     * Create a route group with shared attributes.
+     *
+     * @param string $parameter
+     * @param string $pattern
+     * @param \Closure|string $routes
+     * @return void
+     */
+    public function groupWithOptionalParameter(string $parameter, string $pattern, $routes)
+    {
+        $this->router->groupWithOptionalParameter($parameter, $pattern, $this->attributes, $routes);
+    }
+
+    /**
      * Register a new route with the given verbs.
      *
      * @param  array|string  $methods

@@ -384,6 +384,26 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Create a route group with shared attributes.
+     *
+     * @param string $parameter
+     * @param string $pattern
+     * @param array $attributes
+     * @param $routes
+     * @return void
+     */
+    public function groupWithOptionalParameter(string $parameter, string $pattern, array $attributes, $routes)
+    {
+        $this->group($attributes, function ($router) use ($parameter, $pattern, $routes) {
+            $router->group([], $routes);
+            $router->group([
+                'prefix' => '{'.$parameter.'?}',
+                'where' => [$parameter => $pattern],
+            ], $routes);
+        });
+    }
+
+    /**
      * Update the group stack with the given attributes.
      *
      * @param  array  $attributes

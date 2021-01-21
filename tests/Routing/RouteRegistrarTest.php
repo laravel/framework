@@ -190,6 +190,33 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('group-middleware');
     }
 
+    public function testCanRegisterOptionalBindGroupWithMiddleware()
+    {
+        $expectedBindValue = '';
+
+        $this->router->middleware('group-middleware')->groupWithOptionalParameter('language', '^[a-z]{2}$', function ($router) use (&$expectedBindValue) {
+            $router->get('users', function ($language = null) use (&$expectedBindValue) {
+                $this->assertEquals($expectedBindValue, $language);
+
+                return 'all-users';
+            });
+        });
+
+        $expectedBindValue = null;
+        $firstRoute = head($this->router->getRoutes()->get());
+        $request = Request::create('users', 'GET');
+        $this->assertTrue($firstRoute->matches($request));
+        $this->assertEquals('all-users', $firstRoute->bind($request)->run());
+
+        $expectedBindValue = 'en';
+        $lastRoute = last($this->router->getRoutes()->get());
+        $request = Request::create("{$expectedBindValue}/users", 'GET');
+        $this->assertTrue($lastRoute->matches($request));
+        $this->assertEquals('all-users', $lastRoute->bind($request)->run());
+
+        $this->seeMiddleware('group-middleware');
+    }
+
     public function testCanRegisterGroupWithNamespace()
     {
         $this->router->namespace('App\Http\Controllers')->group(function ($router) {
