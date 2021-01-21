@@ -223,7 +223,7 @@ abstract class Relation
     /**
      * Get a relationship join table hash.
      *
-     * @param  bool $incrementJoinCount
+     * @param  bool  $incrementJoinCount
      * @return string
      */
     public function getRelationCountHash($incrementJoinCount = true)

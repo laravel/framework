@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -90,6 +92,43 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertTrue($secondUser->is(
             UserWhereTest::firstWhere(['name' => 'wrong-name', 'email' => 'test-email1'], null, null, 'or'))
         );
+    }
+
+    public function testSole()
+    {
+        $expected = UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        $this->assertTrue($expected->is(UserWhereTest::where('name', 'test-name')->sole()));
+    }
+
+    public function testSoleFailsForMultipleRecords()
+    {
+        UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'other-email',
+            'address' => 'other-address',
+        ]);
+
+        $this->expectException(MultipleRecordsFoundException::class);
+
+        UserWhereTest::where('name', 'test-name')->sole();
+    }
+
+    public function testSoleFailsIfNoRecords()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        UserWhereTest::where('name', 'test-name')->sole();
     }
 }
 
