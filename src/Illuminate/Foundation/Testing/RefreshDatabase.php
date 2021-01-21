@@ -105,7 +105,7 @@ trait RefreshDatabase
 
             $connection->unsetEventDispatcher();
 
-            if(!is_null($name)) {
+            if (! is_null($name)) {
                 $connection->beginTransaction();
             }
 
