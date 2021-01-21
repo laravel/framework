@@ -10,11 +10,7 @@ class PostgresDriver extends AbstractPostgreSQLDriver
     use ConnectsToDatabase;
 
     /**
-     * Gets the name of the driver.
-     *
-     * @deprecated
-     *
-     * @return string The name of the driver.
+     * {@inheritdoc}
      */
     public function getName()
     {

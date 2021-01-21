@@ -14,11 +14,7 @@ class SqlServerDriver extends AbstractSQLServerDriver
     }
 
     /**
-     * Gets the name of the driver.
-     *
-     * @deprecated
-     *
-     * @return string The name of the driver.
+     * {@inheritdoc}
      */
     public function getName()
     {
