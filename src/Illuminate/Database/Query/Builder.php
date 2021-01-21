@@ -1204,7 +1204,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = is_array($value) ? head($value) : $value;
+        $value = $this->scalarValue($value);
 
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('d');
@@ -1294,7 +1294,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = is_array($value) ? head($value) : $value;
+        $value = $this->scalarValue($value);
 
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('Y');
