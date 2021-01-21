@@ -24,9 +24,6 @@
         "illuminate/support": "^9.0",
         "symfony/console": "^5.2"
     },
-    "conflict": {
-        "doctrine/dbal": "<2.12"
-    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Database\\": ""

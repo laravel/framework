@@ -96,7 +96,6 @@
         "psr/container-implementation": "1.0"
     },
     "conflict": {
-        "doctrine/dbal": "<2.12",
         "tightenco/collect": "<5.5.33"
     },
     "autoload": {
