@@ -88,4 +88,17 @@ class RateLimitedWithRedis extends RateLimited
     {
         return ($this->decaysAt[$key] - $this->currentTime()) + 3;
     }
+
+    /**
+     * Prepare the object after unserialization.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    public function __unserialize(array $data)
+    {
+        parent::__unserialize($data);
+
+        $this->redis = Container::getInstance()->make(Redis::class);
+    }
 }
