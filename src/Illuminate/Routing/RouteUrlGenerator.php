@@ -202,8 +202,10 @@ class RouteUrlGenerator
 
             return (! isset($parameters[0]) && ! Str::endsWith($match[0], '?}'))
                         ? $match[0]
-                        : Arr::pull($parameters, 0);
+                        : Arr::pull($parameters, 0, '####NO_PARAMETER_FOUND####');
         }, $path);
+
+        $path = str_replace(['/####NO_PARAMETER_FOUND####/', '####NO_PARAMETER_FOUND####'], ['/', ''], $path);
 
         return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
     }

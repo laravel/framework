@@ -2,11 +2,15 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -548,6 +552,28 @@ class RoutingUrlGeneratorTest extends TestCase
         $routes->add($route);
 
         $this->assertSame('http://www.foo.com:8080/foo?test=123', $url->route('foo', $parameters));
+    }
+
+    public function testUrlGenerationForControllersOptionalParameter()
+    {
+        $router = new Router(new Dispatcher, $container = new Container());
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $router->group(['prefix' => '{locale?}'], function ($router) {
+            $router->get('home', ['as' => 'home']);
+        });
+
+        $url = new UrlGenerator(
+            $router->getRoutes(),
+            Request::create('http://www.foo.com:8080/')
+        );
+
+        $this->assertSame('http://www.foo.com:8080/home', $url->route('home'));
+        $this->assertSame('http://www.foo.com:8080/en-us/home', $url->route('home', [
+            'locale'  =>  'en-us',
+        ]));
     }
 
     public function provideParametersAndExpectedMeaningfulExceptionMessages()
