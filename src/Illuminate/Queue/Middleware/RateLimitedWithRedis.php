@@ -92,12 +92,11 @@ class RateLimitedWithRedis extends RateLimited
     /**
      * Prepare the object after unserialization.
      *
-     * @param  array  $data
      * @return void
      */
-    public function __unserialize(array $data)
+    public function __wakeup()
     {
-        parent::__unserialize($data);
+        parent::__wakeup();
 
         $this->redis = Container::getInstance()->make(Redis::class);
     }
