@@ -104,7 +104,11 @@ trait RefreshDatabase
             $dispatcher = $connection->getEventDispatcher();
 
             $connection->unsetEventDispatcher();
-            $connection->beginTransaction();
+
+            if(!is_null($name)) {
+                $connection->beginTransaction();
+            }
+
             $connection->setEventDispatcher($dispatcher);
         }
 
