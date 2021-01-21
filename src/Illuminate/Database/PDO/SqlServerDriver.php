@@ -6,6 +6,15 @@ use Doctrine\DBAL\Driver\AbstractSQLServerDriver;
 
 class SqlServerDriver extends AbstractSQLServerDriver
 {
+    /**
+     * Create a new database connection.
+     *
+     * @param  mixed[]  $params
+     * @param  string|null  $username
+     * @param  string|null  $password
+     * @param  mixed[]  $driverOptions
+     * @return \Illuminate\Database\PDO\Connection
+     */
     public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
     {
         return new SqlServerConnection(

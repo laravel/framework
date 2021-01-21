@@ -10,7 +10,10 @@ trait ConnectsToDatabase
     /**
      * Create a new database connection.
      *
-     * @param  array  $params
+     * @param  mixed[]  $params
+     * @param  string|null  $username
+     * @param  string|null  $password
+     * @param  mixed[]  $driverOptions
      * @return \Illuminate\Database\PDO\Connection
      */
     public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
