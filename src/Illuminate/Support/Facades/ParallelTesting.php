@@ -7,7 +7,7 @@ namespace Illuminate\Support\Facades;
  * @method static void setUpTestCase(callable $callback)
  * @method static void tearDownProcess(callable $callback)
  * @method static void tearDownTestCase(callable $callback)
- * @method static string token()
+ * @method static int|false token()
  *
  * @see \Illuminate\Testing\ParallelTesting
  */
