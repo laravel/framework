@@ -1043,7 +1043,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
-        $this->addBinding(array_slice($this->cleanBindings($values), 0, 2), 'where');
+        $this->addBinding($this->cleanBindings(Arr::flatten($values)), 'where');
 
         return $this;
     }
@@ -1111,8 +1111,6 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = $this->getExpectValue($value);
-
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('Y-m-d');
         }
@@ -1152,8 +1150,6 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = $this->getExpectValue($value);
-
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('H:i:s');
         }
@@ -1192,8 +1188,6 @@ class Builder
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
-
-        $value = $this->getExpectValue($value);
 
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('d');
@@ -1238,8 +1232,6 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = $this->getExpectValue($value);
-
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('m');
         }
@@ -1283,8 +1275,6 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = $this->getExpectValue($value);
-
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('Y');
         }
@@ -1321,6 +1311,8 @@ class Builder
      */
     protected function addDateBasedWhere($type, $column, $operator, $value, $boolean = 'and')
     {
+        $value = $this->getExpectValue($value);
+
         $this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
 
         if (! $value instanceof Expression) {
@@ -1742,7 +1734,7 @@ class Builder
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
         if (! $value instanceof Expression) {
-            $this->addBinding(is_array($value) ? head($value) : $value, 'having');
+            $this->addBinding($this->getExpectValue($value), 'having');
         }
 
         return $this;
@@ -1780,7 +1772,7 @@ class Builder
 
         $this->havings[] = compact('type', 'column', 'values', 'boolean', 'not');
 
-        $this->addBinding($this->cleanBindings($values), 'having');
+        $this->addBinding($this->cleanBindings(Arr::flatten($values)), 'having');
 
         return $this;
     }
