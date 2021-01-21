@@ -698,7 +698,7 @@ class Builder
         );
 
         if (! $value instanceof Expression) {
-            $this->addBinding(is_array($value) ? head($value) : $value, 'where');
+            $this->addBinding($this->getExpectValue($value), 'where');
         }
 
         return $this;
@@ -1111,7 +1111,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = is_array($value) ? head($value) : $value;
+        $value = $this->getExpectValue($value);
 
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('Y-m-d');
@@ -1152,7 +1152,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = is_array($value) ? head($value) : $value;
+        $value = $this->getExpectValue($value);
 
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('H:i:s');
@@ -1193,7 +1193,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = is_array($value) ? head($value) : $value;
+        $value = $this->getExpectValue($value);
 
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('d');
@@ -1238,7 +1238,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = is_array($value) ? head($value) : $value;
+        $value = $this->getExpectValue($value);
 
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('m');
@@ -1283,7 +1283,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = is_array($value) ? head($value) : $value;
+        $value = $this->getExpectValue($value);
 
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('Y');
@@ -3095,5 +3095,16 @@ class Builder
         }
 
         static::throwBadMethodCallException($method);
+    }
+
+    /**
+     * Get the first element from array.
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private function getExpectValue($value)
+    {
+        return is_array($value) ? $this->getExpectValue(head($value)) : $value;
     }
 }
