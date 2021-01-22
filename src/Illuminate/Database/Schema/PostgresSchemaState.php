@@ -16,12 +16,16 @@ class PostgresSchemaState extends SchemaState
      */
     public function dump(Connection $connection, $path)
     {
+        $schema = $connection->getConfig('schema', 'public');
+
+        $schema = $schema === 'public' ? '' : $schema.'.';
+
         $excludedTables = collect($connection->getSchemaBuilder()->getAllTables())
                         ->map->tablename
                         ->reject(function ($table) {
                             return $table === $this->migrationTable;
-                        })->map(function ($table) {
-                            return '--exclude-table-data='.$table;
+                        })->map(function ($table) use ($schema) {
+                            return '--exclude-table-data='.$schema.$table;
                         })->implode(' ');
 
         $this->makeProcess(
