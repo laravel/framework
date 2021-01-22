@@ -862,7 +862,7 @@ class Route
 
         $action = is_string($action) ? $this->addGroupNamespaceToStringUses($action) : $action;
 
-        return $this->setAction(array_merge($this->action, $this->parseAction([
+        return $this->setAction(array_merge($this->action, $this->parseAction(is_callable($action) ? $action : [
             'uses' => $action,
             'controller' => $action,
         ])));

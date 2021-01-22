@@ -1904,6 +1904,17 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(301, $response->getStatusCode());
     }
 
+    public function testUsesWithCallableActionNotSetAsController()
+    {
+        $router = $this->getRouter();
+        $route = $router->get('test')->uses(function () {
+            return 'Test';
+        });
+
+        $this->assertSame('Test', $router->dispatch(Request::create('test', 'GET'))->getContent());
+        $this->assertFalse(isset($route->action['controller']));
+    }
+
     protected function getRouter()
     {
         $container = new Container;
