@@ -57,6 +57,7 @@ class SqlServerGrammar extends Grammar
         $isChange = $command->get('column')->get('change');
         $column = $command->get('column')->get('name');
         $sp_cmd = $isChange ? 'sp_updateextendedproperty' : 'sp_addextendedproperty';
+
         return sprintf("exec %s 'MS_Description', N'%s', 'Schema', 'dbo', 'Table', '%s', 'Column', '%s'",
             $sp_cmd, $command->get('value'), $blueprint->getTable(), $column
         );
