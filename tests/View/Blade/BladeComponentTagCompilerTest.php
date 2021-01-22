@@ -90,13 +90,13 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testEscapedColonAttribute()
     {
-        $result = $this->compiler([ 'profile' => TestProfileComponent::class ])->compileTags('<x-profile ::title="user.name"></x-profile>');
+        $result = $this->compiler([ 'profile' => TestProfileComponent::class ])->compileTags('<x-profile :user-id="1" ::aria-label="$ariaLabelExpression()" :::title="user.name"></x-profile>');
 
-        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
+        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => 1])
 <?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes([':title' => 'user.name']); ?> @endcomponentClass", trim($result));
+<?php \$component->withAttributes([':aria-label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$ariaLabelExpression()),':title' => 'user.name']); ?> @endcomponentClass", trim($result));
     }
 
     public function testColonAttributesIsEscapedIfStrings()
