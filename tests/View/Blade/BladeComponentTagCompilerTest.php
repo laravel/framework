@@ -88,6 +88,17 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
+    public function testEscapedColonAttribute()
+    {
+        $result = $this->compiler([ 'profile' => TestProfileComponent::class ])->compileTags('<x-profile ::title="user.name"></x-profile>');
+
+        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([':title' => 'user.name']); ?> @endcomponentClass", trim($result));
+    }
+
     public function testColonAttributesIsEscapedIfStrings()
     {
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :src="\'foo\'"></x-profile>');
