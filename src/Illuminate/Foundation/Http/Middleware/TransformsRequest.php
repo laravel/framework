@@ -57,10 +57,12 @@ class TransformsRequest
      * @return array
      */
     protected function cleanArray(array $data, $keyPrefix = '')
-    {
-        return collect($data)->map(function ($value, $key) use ($keyPrefix) {
-            return $this->cleanValue($keyPrefix.$key, $value);
-        })->all();
+    {        
+        foreach ($data as $key => $value) {
+             $data[$key] = $this->cleanValue($keyPrefix.$key, $value);
+        }
+
+        return collect($data)->all();
     }
 
     /**
