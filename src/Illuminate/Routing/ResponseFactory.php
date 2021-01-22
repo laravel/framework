@@ -6,6 +6,7 @@ use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Exceptions\NotImplementedException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -32,13 +33,13 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new response factory instance.
      *
-     * @param  \Illuminate\Contracts\View\Factory  $view
      * @param  \Illuminate\Routing\Redirector  $redirector
      * @return void
      */
-    public function __construct(ViewFactory $view, Redirector $redirector)
+    //public function __construct(ViewFactory $view, Redirector $redirector)
+    public function __construct(Redirector $redirector)
     {
-        $this->view = $view;
+        //$this->view = $view;
         $this->redirector = $redirector;
     }
 
@@ -68,6 +69,16 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Set view factory to render blade errors
+     *
+     * @param ViewFactory $view
+     */
+    public function setView(ViewFactory $view)
+    {
+        $this->view = $view;
+    }
+
+    /**
      * Create a new response for a given view.
      *
      * @param  string|array  $view
@@ -78,6 +89,9 @@ class ResponseFactory implements FactoryContract
      */
     public function view($view, $data = [], $status = 200, array $headers = [])
     {
+        if (!isset($this->view)) {
+            throw NotImplementedException::create();
+        }
         if (is_array($view)) {
             return $this->make($this->view->first($view, $data), $status, $headers);
         }

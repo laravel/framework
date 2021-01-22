@@ -40,6 +40,7 @@
     },
     "suggest": {
         "illuminate/console": "Required to use the make commands (^9.0).",
+        "illuminate/view": "Required to response with blade views",
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
     },
