@@ -16,13 +16,16 @@ class PostgresSchemaState extends SchemaState
      */
     public function dump(Connection $connection, $path)
     {
-        $schema = $connection->getConfig('schema');
+        $schema = $connection->getConfig('schema', 'public');
+
+        $schema = $schema === 'public' ? '' : $schema.'.';
+
         $excludedTables = collect($connection->getSchemaBuilder()->getAllTables())
                         ->map->tablename
                         ->reject(function ($table) {
                             return $table === $this->migrationTable;
                         })->map(function ($table) use ($schema) {
-                            return '--exclude-table-data='.$schema.'.'.$table;
+                            return '--exclude-table-data='.$schema.$table;
                         })->implode(' ');
 
         $this->makeProcess(
@@ -40,7 +43,7 @@ class PostgresSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $command = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD pg_restore --no-owner --no-acl --clean --if-exists --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE $LARAVEL_LOAD_PATH';
+        $command = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD pg_restore --no-owner --no-acl --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE $LARAVEL_LOAD_PATH';
 
         if (Str::endsWith($path, '.sql')) {
             $command = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD psql --file=$LARAVEL_LOAD_PATH --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE';
