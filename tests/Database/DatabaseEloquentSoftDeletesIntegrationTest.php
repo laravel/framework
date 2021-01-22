@@ -307,6 +307,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals($userModel->getOriginal('deleted_at'), SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
     }
 
+
+    public function testToggleTrashed()
+    {
+        $this->createUsers();
+
+        /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
+        $userModel = SoftDeletesTestUser::withTrashed()->find(1);
+        $userModel->toggleTrashed();
+        $this->assertFalse($userModel->trashed());
+        $userModel->toggleTrashed();
+        $this->assertTrue($userModel->trashed());
+    }
+
     public function testModifyingBeforeSoftDeletingAndRestoring()
     {
         $this->createUsers();

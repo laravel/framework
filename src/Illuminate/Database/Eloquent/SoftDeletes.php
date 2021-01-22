@@ -137,6 +137,18 @@ trait SoftDeletes
     }
 
     /**
+     * Toggle between trashed and restored
+     */
+    public function toggleTrashed()
+    {
+        if ($this->trashed()) {
+            $this->restore();
+        } else {
+            $this->delete();
+        }
+    }
+
+    /**
      * Register a "restoring" model event callback with the dispatcher.
      *
      * @param  \Closure|string  $callback
