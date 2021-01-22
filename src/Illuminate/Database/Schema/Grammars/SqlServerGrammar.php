@@ -15,6 +15,13 @@ class SqlServerGrammar extends Grammar
     protected $transactions = true;
 
     /**
+     * The commands to be executed outside of create or alter command.
+     *
+     * @var array
+     */
+    protected $fluentCommands = ['comment'];
+
+    /**
      * The possible column modifiers.
      *
      * @var string[]
@@ -36,6 +43,23 @@ class SqlServerGrammar extends Grammar
     public function compileTableExists()
     {
         return "select * from sysobjects where type = 'U' and name = ?";
+    }
+
+    /**
+     * Compile a column comment command.
+     *
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent $command
+     * @return string
+     */
+    public function compileComment(Blueprint $blueprint, Fluent $command)
+    {
+        $isChange = $command->get('column')->get('change');
+        $column = $command->get('column')->get('name');
+        $sp_cmd = $isChange ? 'sp_updateextendedproperty' : 'sp_addextendedproperty';
+        return sprintf("exec %s 'MS_Description', N'%s', 'Schema', 'dbo', 'Table', '%s', 'Column', '%s'",
+            $sp_cmd, $command->get('value'), $blueprint->getTable(), $column
+        );
     }
 
     /**
