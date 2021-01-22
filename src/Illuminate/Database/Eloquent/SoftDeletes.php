@@ -137,7 +137,7 @@ trait SoftDeletes
     }
 
     /**
-     * Toggle between trashed and restored
+     * Toggle between trashed and restored.
      */
     public function toggleTrashed()
     {
