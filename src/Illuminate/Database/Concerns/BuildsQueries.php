@@ -150,6 +150,17 @@ trait BuildsQueries
     }
 
     /**
+     * Execute the query and get the last result.
+     *
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     */
+    public function last($columns = ['*'])
+    {
+        return $this->get($columns)->last();
+    }
+
+    /**
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns

@@ -180,10 +180,20 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = m::mock(Builder::class.'[get,take]', [$this->getMockQueryBuilder()]);
         $builder->shouldReceive('take')->with(1)->andReturnSelf();
-        $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar']));
+        $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar', 'foo']));
 
         $result = $builder->first();
         $this->assertSame('bar', $result);
+    }
+
+    public function testLastMethod()
+    {
+        $builder = m::mock(Builder::class.'[get,take]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('take')->with(1)->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar', 'foo']));
+
+        $result = $builder->last();
+        $this->assertSame('foo', $result);
     }
 
     public function testQualifyColumn()
