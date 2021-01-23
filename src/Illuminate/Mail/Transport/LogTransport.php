@@ -48,7 +48,7 @@ class LogTransport extends Transport
      */
     protected function getMimeEntityString(Swift_Mime_SimpleMimeEntity $entity)
     {
-        $string = (string) $entity->getHeaders().PHP_EOL.$entity->getBody();
+        $string = $entity->getHeaders()->toString().PHP_EOL.$entity->getBody();
 
         foreach ($entity->getChildren() as $children) {
             $string .= PHP_EOL.PHP_EOL.$this->getMimeEntityString($children);

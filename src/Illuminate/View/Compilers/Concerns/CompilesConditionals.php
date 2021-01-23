@@ -290,7 +290,7 @@ trait CompilesConditionals
      */
     protected function compileOnce($id = null)
     {
-        $id = $id ? $this->stripParentheses($id) : "'".(string) Str::uuid()."'";
+        $id = $id ? $this->stripParentheses($id) : "'".Str::uuid()->toString()."'";
 
         return '<?php if (! $__env->hasRenderedOnce('.$id.')): $__env->markAsRenderedOnce('.$id.'); ?>';
     }
