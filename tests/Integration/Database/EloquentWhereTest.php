@@ -127,6 +127,7 @@ class EloquentWhereTest extends DatabaseTestCase
     public function testSoleFailsIfNoRecords()
     {
         $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessageMatches('/.*UserWhereTest.*/');
 
         UserWhereTest::where('name', 'test-name')->sole();
     }
