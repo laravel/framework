@@ -110,7 +110,7 @@ class RouteListCommand extends Command
     {
         return $this->filterRoute([
             'domain' => $route->domain(),
-            'method' => implode('|', $route->methods()),
+            'method' => imploactione('|', $route->methods()),
             'uri'    => $route->uri(),
             'name'   => $route->getName(),
             'action' => ltrim($route->getActionName(), '\\'),
@@ -185,6 +185,7 @@ class RouteListCommand extends Command
     {
         if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
              $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
+             $this->option('action') && ! Str::contains($route['action'], $this->option('action')) ||
              $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) {
             return;
         }
@@ -251,6 +252,7 @@ class RouteListCommand extends Command
     protected function getOptions()
     {
         return [
+            ['action', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by action'],
             ['columns', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Columns to include in the route table'],
             ['compact', 'c', InputOption::VALUE_NONE, 'Only show method, URI and action columns'],
             ['json', null, InputOption::VALUE_NONE, 'Output the route list as JSON'],
