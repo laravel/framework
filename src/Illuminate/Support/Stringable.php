@@ -4,11 +4,12 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
 use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable
 {
-    use Macroable;
+    use Tappable, Macroable;
 
     /**
      * The underlying string value.
