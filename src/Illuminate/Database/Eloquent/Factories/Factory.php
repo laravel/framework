@@ -425,17 +425,17 @@ abstract class Factory
      * Add a new state transformation to the model definition.
      *
      * @param  callable|array  $state
-     * @return static
+     * @return $this
      */
     public function state($state)
     {
-        return $this->newInstance([
-            'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
-                    return $state;
-                },
-            ]),
+        $this->states = $this->states->concat([
+            is_callable($state) ? $state : function () use ($state) {
+                return $state;
+            },
         ]);
+
+        return $this;
     }
 
     /**
@@ -454,15 +454,17 @@ abstract class Factory
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
      * @param  string|null  $relationship
-     * @return static
+     * @return $this
      */
     public function has(self $factory, $relationship = null)
     {
-        return $this->newInstance([
-            'has' => $this->has->concat([new Relationship(
+        $this->has = $this->has->concat([
+            new Relationship(
                 $factory, $relationship ?: $this->guessRelationship($factory->modelName())
-            )]),
+            ),
         ]);
+
+        return $this;
     }
 
     /**
@@ -484,12 +486,12 @@ abstract class Factory
      * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model  $factory
      * @param  callable|array  $pivot
      * @param  string|null  $relationship
-     * @return static
+     * @return $this
      */
     public function hasAttached($factory, $pivot = [], $relationship = null)
     {
-        return $this->newInstance([
-            'has' => $this->has->concat([new BelongsToManyRelationship(
+        $this->has = $this->has->concat([
+            new BelongsToManyRelationship(
                 $factory,
                 $pivot,
                 $relationship ?: Str::camel(Str::plural(class_basename(
@@ -497,8 +499,10 @@ abstract class Factory
                         ? $factory->modelName()
                         : Collection::wrap($factory)->first()
                 )))
-            )]),
+            ),
         ]);
+
+        return $this;
     }
 
     /**
@@ -506,38 +510,46 @@ abstract class Factory
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\Model  $factory
      * @param  string|null  $relationship
-     * @return static
+     * @return $this
      */
     public function for($factory, $relationship = null)
     {
-        return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
-            $factory,
-            $relationship ?: Str::camel(class_basename(
-                $factory instanceof Factory ? $factory->modelName() : $factory
-            ))
-        )])]);
+        $this->for = $this->for->concat([
+            new BelongsToRelationship(
+                $factory,
+                $relationship ?: Str::camel(class_basename(
+                    $factory instanceof Factory ? $factory->modelName() : $factory
+                ))
+            ),
+        ]);
+
+        return $this;
     }
 
     /**
      * Add a new "after making" callback to the model definition.
      *
      * @param  \Closure  $callback
-     * @return static
+     * @return $this
      */
     public function afterMaking(Closure $callback)
     {
-        return $this->newInstance(['afterMaking' => $this->afterMaking->concat([$callback])]);
+        $this->afterMaking = $this->afterMaking->concat([$callback]);
+
+        return $this;
     }
 
     /**
      * Add a new "after creating" callback to the model definition.
      *
      * @param  \Closure  $callback
-     * @return static
+     * @return $this
      */
     public function afterCreating(Closure $callback)
     {
-        return $this->newInstance(['afterCreating' => $this->afterCreating->concat([$callback])]);
+        $this->afterCreating = $this->afterCreating->concat([$callback]);
+
+        return $this;
     }
 
     /**
@@ -575,22 +587,26 @@ abstract class Factory
      * Specify how many models should be generated.
      *
      * @param  int|null  $count
-     * @return static
+     * @return $this
      */
     public function count(?int $count)
     {
-        return $this->newInstance(['count' => $count]);
+        $this->count = $count;
+
+        return $this;
     }
 
     /**
      * Specify the database connection that should be used to generate models.
      *
      * @param  string  $connection
-     * @return static
+     * @return $this
      */
     public function connection(string $connection)
     {
-        return $this->newInstance(['connection' => $connection]);
+        $this->connection = $connection;
+
+        return $this;
     }
 
     /**
