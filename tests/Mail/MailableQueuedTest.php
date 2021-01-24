@@ -32,7 +32,7 @@ class MailableQueuedTest extends TestCase
             ->onlyMethods(['createMessage', 'to'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub;
+        $mailable = new MailableQueueableStub;
         $queueFake->assertNothingPushed();
         $mailer->send($mailable);
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
@@ -46,7 +46,7 @@ class MailableQueuedTest extends TestCase
             ->onlyMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub;
+        $mailable = new MailableQueueableStub;
         $attachmentOption = ['mime' => 'image/jpeg', 'as' => 'bar.jpg'];
         $mailable->attach('foo.jpg', $attachmentOption);
         $this->assertIsArray($mailable->attachments);
@@ -75,7 +75,7 @@ class MailableQueuedTest extends TestCase
             ->onlyMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub;
+        $mailable = new MailableQueueableStub;
         $attachmentOption = ['mime' => 'image/jpeg', 'as' => 'bar.jpg'];
 
         $mailable->attachFromStorage('/', 'foo.jpg', $attachmentOption);
@@ -95,7 +95,7 @@ class MailableQueuedTest extends TestCase
     }
 }
 
-class MailableQueableStub extends Mailable implements ShouldQueue
+class MailableQueueableStub extends Mailable implements ShouldQueue
 {
     use Queueable;
 
