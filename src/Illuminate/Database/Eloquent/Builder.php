@@ -522,7 +522,7 @@ class Builder
         try {
             return $this->baseSole($columns);
         } catch (RecordsNotFoundException $exception) {
-            throw new ModelNotFoundException($this->model);
+            throw (new ModelNotFoundException)->setModel(get_class($this->model));
         }
     }
 

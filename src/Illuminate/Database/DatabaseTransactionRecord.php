@@ -30,7 +30,7 @@ class DatabaseTransactionRecord
      *
      * @param  string  $connection
      * @param  int  $level
-     * @retunr void
+     * @return void
      */
     public function __construct($connection, $level)
     {

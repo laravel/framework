@@ -39,7 +39,7 @@ class RedisManagerExtensionTest extends TestCase
         ]);
 
         $this->redis->extend('my_custom_driver', function () {
-            return new FakeRedisConnnector();
+            return new FakeRedisConnector();
         });
     }
 
@@ -91,7 +91,7 @@ class RedisManagerExtensionTest extends TestCase
     }
 }
 
-class FakeRedisConnnector implements Connector
+class FakeRedisConnector implements Connector
 {
     /**
      * Create a new clustered Predis connection.
