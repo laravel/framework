@@ -86,7 +86,7 @@
         "mockery/mockery": "^1.4.2",
         "orchestra/testbench-core": "^6.8",
         "pda/pheanstalk": "^4.0",
-        "phpunit/phpunit": "^8.5.8|^9.3.3",
+        "phpunit/phpunit": "^8.5.8|^9.3.3|^10.0",
         "predis/predis": "^1.1.1",
         "symfony/cache": "^5.1.4"
     },
@@ -141,7 +141,7 @@
         "mockery/mockery": "Required to use mocking (^1.4.2).",
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
-        "phpunit/phpunit": "Required to use assertions and run tests (^8.5.8|^9.3.3).",
+        "phpunit/phpunit": "Required to use assertions and run tests (^8.5.8|^9.3.3|^10.0).",
         "predis/predis": "Required to use the predis connector (^1.1.2).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0).",
