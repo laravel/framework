@@ -501,8 +501,8 @@ class HttpRequestTest extends TestCase
             return $route;
         });
 
-        $this->assertFalse(isset($request['non-existant']));
-        $this->assertNull($request['non-existant']);
+        $this->assertFalse(isset($request['non-existent']));
+        $this->assertNull($request['non-existent']);
 
         $this->assertTrue(isset($request['name']));
         $this->assertNull($request['name']);
