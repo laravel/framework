@@ -891,14 +891,14 @@ class Blueprint
     }
 
     /**
-     * Create a new unsigned int integer (3-byte) column on the table.
+     * Create a new unsigned integer (4-byte) column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
     public function intForeignId($column)
     {
-        return $this->typedForeignId($column, 'intInteger');
+        return $this->typedForeignId($column, 'integer');
     }
 
     /**
