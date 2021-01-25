@@ -928,6 +928,7 @@ class Blueprint
         if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
             try {
                 $foreignColumnType = resolve(Builder::class)->getColumnType($model->getTable(), $model->getKeyName());
+
                 return $this->typedForeignId($column ?: $model->getForeignKey(), $foreignColumnType);
             } catch (\Exception $ex) {
                 // PDO does not exist here or getting column type fails
