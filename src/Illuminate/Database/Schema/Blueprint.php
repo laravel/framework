@@ -834,16 +834,82 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignId($column)
+    public function typedForeignId($column, $type = 'bigInteger')
     {
         $this->columns[] = $column = new ForeignIdColumnDefinition($this, [
-            'type' => 'bigInteger',
+            'type' => $type,
             'name' => $column,
             'autoIncrement' => false,
             'unsigned' => true,
         ]);
 
         return $column;
+    }
+
+    /**
+     * Create a new unsigned big integer (8-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignId($column)
+    {
+        return $this->typedForeignId($column);
+    }
+
+    /**
+     * Create a new unsigned tiny integer (1-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function tinyForeignId($column)
+    {
+        return $this->typedForeignId($column, 'tinyInteger');
+    }
+
+    /**
+     * Create a new unsigned small integer (2-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function smallForeignId($column)
+    {
+        return $this->typedForeignId($column, 'smallInteger');
+    }
+
+    /**
+     * Create a new unsigned medium integer (3-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function mediumForeignId($column)
+    {
+        return $this->typedForeignId($column, 'mediumInteger');
+    }
+
+    /**
+     * Create a new unsigned int integer (3-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function intForeignId($column)
+    {
+        return $this->typedForeignId($column, 'intInteger');
+    }
+
+    /**
+     * Create a new unsigned big integer (8-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function bigForeignId($column)
+    {
+        return $this->typedForeignId($column);
     }
 
     /**
@@ -859,9 +925,12 @@ class Blueprint
             $model = new $model;
         }
 
-        return $model->getKeyType() === 'int' && $model->getIncrementing()
-                    ? $this->foreignId($column ?: $model->getForeignKey())
-                    : $this->foreignUuid($column ?: $model->getForeignKey());
+        if($model->getKeyType() === 'int' && $model->getIncrementing()) {
+            $foreignColumnType = resolve(Builder::class)->getColumnType($model->getTable(), $model->getKeyName());
+            return $this->typedForeignId($column ?: $model->getForeignKey(), $foreignColumnType);
+        }
+
+        return $this->foreignUuid($column ?: $model->getForeignKey());
     }
 
     /**
