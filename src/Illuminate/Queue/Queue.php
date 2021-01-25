@@ -152,7 +152,7 @@ abstract class Queue
             ],
         ]);
 
-        $command = $job instanceof ShouldBeEncrypted && $this->container->bound(Encrypter::class)
+        $command = $this->jobShouldBeEncrypted($job) && $this->container->bound(Encrypter::class)
                     ? $this->container[Encrypter::class]->encrypt(serialize(clone $job))
                     : serialize(clone $job);
 
@@ -174,6 +174,21 @@ abstract class Queue
     {
         return method_exists($job, 'displayName')
                         ? $job->displayName() : get_class($job);
+    }
+
+    /**
+     * Determine if the job should be encrypted.
+     *
+     * @param  object  $job
+     * @return bool
+     */
+    protected function jobShouldBeEncrypted($job)
+    {
+        if ($job instanceof ShouldBeEncrypted) {
+            return true;
+        }
+
+        return isset($job->shouldBeEncrypted) && $job->shouldBeEncrypted;
     }
 
     /**
