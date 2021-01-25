@@ -487,7 +487,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        foreach($foreignIds as $type => $foreignId) {
+        foreach ($foreignIds as $type => $foreignId) {
             $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
             $this->assertEquals($type, $foreignId->get('type'));
         }

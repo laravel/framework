@@ -925,7 +925,7 @@ class Blueprint
             $model = new $model;
         }
 
-        if($model->getKeyType() === 'int' && $model->getIncrementing()) {
+        if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
             try {
                 $foreignColumnType = resolve(Builder::class)->getColumnType($model->getTable(), $model->getKeyName());
                 return $this->typedForeignId($column ?: $model->getForeignKey(), $foreignColumnType);
