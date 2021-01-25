@@ -40,7 +40,7 @@ class SubstituteBindings
 
             $this->router->substituteImplicitBindings($route);
         } catch (ModelNotFoundException $exception) {
-            if($route->getMissing()) {
+            if ($route->getMissing()) {
                 return $route->getMissing()($request);
             }
 
