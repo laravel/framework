@@ -934,6 +934,29 @@ class Route
     }
 
     /**
+     * Get the value of the else redirect.
+     *
+     * @return \Illuminate\Http\RedirectResponse|null
+     */
+    public function getElse()
+    {
+        return $this->action['else'] ?? null;
+    }
+
+    /**
+     * Add or change the else redirect.
+     *
+     * @param  \Illuminate\Http\RedirectResponse  $else
+     * @return $this
+     */
+    public function else($else)
+    {
+        $this->action['else'] = $else;
+
+        return $this;
+    }
+
+    /**
      * Get all middleware, including the ones from the controller.
      *
      * @return array

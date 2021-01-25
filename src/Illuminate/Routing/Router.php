@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -665,9 +666,17 @@ class Router implements BindingRegistrar, RegistrarContract
 
         $this->events->dispatch(new RouteMatched($route, $request));
 
-        return $this->prepareResponse($request,
-            $this->runRouteWithinStack($route, $request)
-        );
+        try {
+            return $this->prepareResponse($request,
+                $this->runRouteWithinStack($route, $request)
+            );
+        } catch (ModelNotFoundException $exception) {
+            if($route->getElse()) {
+                return $route->getElse();
+            }
+
+            throw $exception;
+        }
     }
 
     /**
