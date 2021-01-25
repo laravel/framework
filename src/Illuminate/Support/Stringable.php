@@ -5,9 +5,10 @@ namespace Illuminate\Support;
 use Closure;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 
-class Stringable
+class Stringable implements JsonSerializable
 {
     use Macroable, Tappable;
 
@@ -732,6 +733,16 @@ class Stringable
         $this->dump();
 
         exit(1);
+    }
+
+    /**
+     * Convert the object to a string when JSON encoded.
+     *
+     * @return string
+     */
+    public function jsonSerialize()
+    {
+        return $this->__toString();
     }
 
     /**
