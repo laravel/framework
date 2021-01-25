@@ -2919,12 +2919,13 @@ class Builder
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  bool   $merge
      * @return bool
      */
-    public function updateOrInsert(array $attributes, array $values = [])
+    public function updateOrInsert(array $attributes, array $values = [], bool $merge = true)
     {
         if (! $this->where($attributes)->exists()) {
-            return $this->insert(array_merge($attributes, $values));
+            return ($merge) ? $this->insert(array_merge($attributes, $values)) : $this->insert($values);
         }
 
         if (empty($values)) {
