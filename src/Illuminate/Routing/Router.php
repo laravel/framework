@@ -666,17 +666,9 @@ class Router implements BindingRegistrar, RegistrarContract
 
         $this->events->dispatch(new RouteMatched($route, $request));
 
-        try {
-            return $this->prepareResponse($request,
-                $this->runRouteWithinStack($route, $request)
-            );
-        } catch (ModelNotFoundException $exception) {
-            if ($route->getMissing()) {
-                return $route->getMissing()($request);
-            }
-
-            throw $exception;
-        }
+        return $this->prepareResponse($request,
+            $this->runRouteWithinStack($route, $request)
+        );
     }
 
     /**

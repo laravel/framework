@@ -940,7 +940,12 @@ class Route
      */
     public function getMissing()
     {
-        return $this->action['missing'] ?? null;
+        $missing = $this->action['missing'] ?? null;
+
+        return is_string($missing) &&
+            Str::startsWith($missing, 'C:32:"Opis\\Closure\\SerializableClosure')
+                ? unserialize($missing)
+                : $missing;
     }
 
     /**
@@ -1192,6 +1197,10 @@ class Route
             $this->action['uses'] = serialize(new SerializableClosure($this->action['uses']));
 
             // throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
+        }
+
+        if (isset($this->action['missing']) && $this->action['missing'] instanceof Closure) {
+            $this->action['missing'] = serialize(new SerializableClosure($this->action['missing']));
         }
 
         $this->compileRoute();
