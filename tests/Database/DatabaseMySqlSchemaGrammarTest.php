@@ -474,6 +474,28 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingDifferentlyTypedForeignIDs()
+    {
+        $blueprint = new Blueprint('users');
+        $foreignIds = [
+            'tinyInteger' => $blueprint->tinyForeignId('foo1'),
+            'smallInteger' => $blueprint->smallForeignId('foo2'),
+            'mediumInteger' => $blueprint->mediumForeignId('foo3'),
+            'integer' => $blueprint->intForeignId('foo4'),
+            'bigInteger' => $blueprint->bigForeignId('foo5'),
+        ];
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        foreach($foreignIds as $type => $foreignId) {
+            $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
+            $this->assertEquals($type, $foreignId->get('type'));
+        }
+        $this->assertSame([
+            'alter table `users` add `foo1` tinyint unsigned not null, add `foo2` smallint unsigned not null, add `foo3` mediumint unsigned not null, add `foo4` int unsigned not null, add `foo5` bigint unsigned not null',
+        ], $statements);
+    }
+
     public function testAddingBigIncrementingID()
     {
         $blueprint = new Blueprint('users');
