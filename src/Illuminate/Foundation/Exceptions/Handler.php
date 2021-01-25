@@ -18,7 +18,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
