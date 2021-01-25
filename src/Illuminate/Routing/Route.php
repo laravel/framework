@@ -934,24 +934,24 @@ class Route
     }
 
     /**
-     * Get the value of the else redirect.
+     * Get the value of the missing redirect.
      *
-     * @return \Illuminate\Http\RedirectResponse|null
+     * @return \Closure|null
      */
-    public function getElse()
+    public function getMissing()
     {
-        return $this->action['else'] ?? null;
+        return $this->action['missing'] ?? null;
     }
 
     /**
-     * Add or change the else redirect.
+     * Add or change the missing redirect.
      *
-     * @param  \Illuminate\Http\RedirectResponse  $else
+     * @param  \Closure  $missing
      * @return $this
      */
-    public function else($else)
+    public function missing($missing)
     {
-        $this->action['else'] = $else;
+        $this->action['missing'] = $missing;
 
         return $this;
     }

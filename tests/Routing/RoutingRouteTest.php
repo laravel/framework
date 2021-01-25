@@ -1672,10 +1672,8 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    public function testImplicitBindingsWithMissingModelHandledByElse()
+    public function testImplicitBindingsWithMissingModelHandledByMissing()
     {
-        $redirect = new RedirectResponse('/', 302);
-
         $router = $this->getRouter();
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
@@ -1684,7 +1682,9 @@ class RoutingRouteTest extends TestCase
 
                 return $bar->first();
             },
-        ])->else($redirect);
+        ])->missing(function() {
+            return new RedirectResponse('/', 302);
+        });
 
         $request = Request::create('foo/taylor', 'GET');
 
