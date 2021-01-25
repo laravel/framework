@@ -108,7 +108,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             ->andReturn('{"key1":"value1"}');
 
         $subject = new EncryptedCast;
-        $subject->setAttribute('secret_json->key1','value1');
+        $subject->setAttribute('secret_json->key1', 'value1');
         $subject->save();
 
         $this->assertSame(['key1' => 'value1'], $subject->secret_json);
