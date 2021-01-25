@@ -671,7 +671,7 @@ class Router implements BindingRegistrar, RegistrarContract
                 $this->runRouteWithinStack($route, $request)
             );
         } catch (ModelNotFoundException $exception) {
-            if($route->getElse()) {
+            if ($route->getElse()) {
                 return $route->getElse();
             }
 
