@@ -177,21 +177,6 @@ abstract class Queue
     }
 
     /**
-     * Determine if the job should be encrypted.
-     *
-     * @param  object  $job
-     * @return bool
-     */
-    protected function jobShouldBeEncrypted($job)
-    {
-        if ($job instanceof ShouldBeEncrypted) {
-            return true;
-        }
-
-        return isset($job->shouldBeEncrypted) && $job->shouldBeEncrypted;
-    }
-
-    /**
      * Get the backoff for an object-based queue handler.
      *
      * @param  mixed  $job
@@ -226,6 +211,21 @@ abstract class Queue
 
         return $expiration instanceof DateTimeInterface
                         ? $expiration->getTimestamp() : $expiration;
+    }
+
+    /**
+     * Determine if the job should be encrypted.
+     *
+     * @param  object  $job
+     * @return bool
+     */
+    protected function jobShouldBeEncrypted($job)
+    {
+        if ($job instanceof ShouldBeEncrypted) {
+            return true;
+        }
+
+        return isset($job->shouldBeEncrypted) && $job->shouldBeEncrypted;
     }
 
     /**
