@@ -850,8 +850,17 @@ trait HasAttributes
      */
     protected function getArrayAttributeByKey($key)
     {
-        return isset($this->attributes[$key]) ?
-                    $this->fromJson($this->attributes[$key]) : [];
+        if(!isset($this->attributes[$key])){
+            return [];
+        }
+
+        $value = $this->attributes[$key];
+
+        if ($this->isEncryptedCastable($key)) {
+            $value = $this->fromEncryptedString($value);
+        }
+
+        return $this->fromJson($value);
     }
 
     /**
