@@ -9,7 +9,7 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable
 {
-    use Tappable, Macroable;
+    use Macroable, Tappable;
 
     /**
      * The underlying string value.
