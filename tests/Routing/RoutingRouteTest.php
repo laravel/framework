@@ -1682,7 +1682,7 @@ class RoutingRouteTest extends TestCase
 
                 return $bar->first();
             },
-        ])->missing(function() {
+        ])->missing(function () {
             return new RedirectResponse('/', 302);
         });
 
