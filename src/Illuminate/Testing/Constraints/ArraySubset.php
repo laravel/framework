@@ -8,7 +8,7 @@ use PHPUnit\Runner\Version;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use Traversable;
 
-if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
+if (class_exists(Version::class) && ((int) Version::series()[0] >= 9) || (int) Version::series() >= 10) {
     /**
      * @internal This class is not meant to be used or overwritten outside the framework itself.
      */
