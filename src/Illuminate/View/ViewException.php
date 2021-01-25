@@ -15,7 +15,7 @@ class ViewException extends ErrorException
     {
         $exception = $this->getPrevious();
 
-        if ($exception && method_exists('report', $exception)) {
+        if ($exception && method_exists($exception, 'report')) {
             $exception->report();
         }
     }
