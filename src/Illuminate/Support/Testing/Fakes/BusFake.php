@@ -200,6 +200,8 @@ class BusFake implements QueueingDispatcher
 
         if ($command instanceof Closure) {
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        } elseif (! is_string($command)) {
+            $command = get_class($command);
         }
 
         PHPUnit::assertTrue(
