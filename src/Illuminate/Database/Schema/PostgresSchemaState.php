@@ -21,7 +21,7 @@ class PostgresSchemaState extends SchemaState
                         ->reject(function ($table) {
                             return $table === $this->migrationTable;
                         })->map(function ($table) {
-                            return "--exclude-table-data=*.$table";
+                            return '--exclude-table-data="*.'.$table.'"';
                         })->implode(' ');
 
         $this->makeProcess(
