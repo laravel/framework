@@ -199,7 +199,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             'secret_json' => ['key1' => 'value1'],
         ]);
         $subject->fill([
-            'secret_json->key2' => 'value2'
+            'secret_json->key2' => 'value2',
         ]);
         $subject->save();
 
