@@ -397,6 +397,33 @@ trait HasAttributes
     }
 
     /**
+     * Checks if an attribute exists. This mirrors getAttribute() but returns a bool,
+     * not calling the attribute method which might have side effects.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasAttribute($key)
+    {
+        if (! $key) {
+            return false;
+        }
+
+        if (array_key_exists($key, $this->attributes) ||
+            array_key_exists($key, $this->casts) ||
+            $this->hasGetMutator($key) ||
+            $this->isClassCastable($key)) {
+            return true;
+        }
+
+        if (method_exists(self::class, $key)) {
+            return false;
+        }
+
+        return $this->hasRelationValue($key);
+    }
+
+    /**
      * Get a plain attribute (not a relationship).
      *
      * @param  string  $key
@@ -440,6 +467,28 @@ trait HasAttributes
             (static::$relationResolvers[get_class($this)][$key] ?? null)) {
             return $this->getRelationshipFromMethod($key);
         }
+    }
+
+    /**
+     * Checks if a relationship has a value. This mirrors getRelationValue() but
+     * returns a bool, not actually fetching the relationship and therefore with
+     * no side effects.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasRelationValue($key)
+    {
+        if ($this->relationLoaded($key)) {
+            return true;
+        }
+
+        if (method_exists($this, $key) ||
+            (static::$relationResolvers[get_class($this)][$key] ?? null)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
