@@ -934,6 +934,34 @@ class Route
     }
 
     /**
+     * Get the value of the action that should be taken on a missing model exception.
+     *
+     * @return \Closure|null
+     */
+    public function getMissing()
+    {
+        $missing = $this->action['missing'] ?? null;
+
+        return is_string($missing) &&
+            Str::startsWith($missing, 'C:32:"Opis\\Closure\\SerializableClosure')
+                ? unserialize($missing)
+                : $missing;
+    }
+
+    /**
+     * Define the callable that should be invoked on a missing model exception.
+     *
+     * @param  \Closure  $missing
+     * @return $this
+     */
+    public function missing($missing)
+    {
+        $this->action['missing'] = $missing;
+
+        return $this;
+    }
+
+    /**
      * Get all middleware, including the ones from the controller.
      *
      * @return array
@@ -1167,8 +1195,10 @@ class Route
     {
         if ($this->action['uses'] instanceof Closure) {
             $this->action['uses'] = serialize(new SerializableClosure($this->action['uses']));
+        }
 
-            // throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
+        if (isset($this->action['missing']) && $this->action['missing'] instanceof Closure) {
+            $this->action['missing'] = serialize(new SerializableClosure($this->action['missing']));
         }
 
         $this->compileRoute();
