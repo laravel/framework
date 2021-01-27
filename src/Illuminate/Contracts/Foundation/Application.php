@@ -54,6 +54,13 @@ interface Application extends Container
     public function resourcePath($path = '');
 
     /**
+     * Get the path to the public / web directory.
+     *
+     * @return string
+     */
+    public function publicPath();
+
+    /**
      * Get the path to the storage directory.
      *
      * @return string
