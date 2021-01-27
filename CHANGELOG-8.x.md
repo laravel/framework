@@ -1,6 +1,29 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.24.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.25.0...8.x)
+
+
+## [v8.25.0 (2021-01-26)](https://github.com/laravel/framework/compare/v8.24.0...v8.25.0)
+
+### Added
+- Added `Stringable::pipe` & make Stringable tappable ([#36017](https://github.com/laravel/framework/pull/36017))
+- Accept a command in object form in Bus::assertChained ([#36031](https://github.com/laravel/framework/pull/36031))
+- Adds parallel testing ([#36034](https://github.com/laravel/framework/pull/36034))
+- Make Listeners, Mailables, and Notifications accept ShouldBeEncrypted ([#36036](https://github.com/laravel/framework/pull/36036))
+- Support JSON encoding Stringable ([#36012](https://github.com/laravel/framework/pull/36012))
+- Support for escaping bound attributes ([#36042](https://github.com/laravel/framework/pull/36042))
+- Added `Illuminate\Foundation\Application::useLangPath()` ([#36044](https://github.com/laravel/framework/pull/36044))
+
+### Changed
+- Pipe through new render and report exception methods ([#36032](https://github.com/laravel/framework/pull/36032))
+
+### Fixed
+- Fixed issue with dumping schema from a postgres database using no default schema  ([#35966](https://github.com/laravel/framework/pull/35966), [7be50a5](https://github.com/laravel/framework/commit/7be50a511955dea2bf4d6e30208b6fbf07eaa36e))
+- Fixed worker --delay option ([#35991](https://github.com/laravel/framework/pull/35991))
+- Added support of PHP 7.3 to RateLimiter middleware(queue) serialization ([#35986](https://github.com/laravel/framework/pull/35986))
+- Fixed `Illuminate\Foundation\Http\Middleware\TransformsRequest::cleanArray()` ([#36002](https://github.com/laravel/framework/pull/36002))
+- ModelNotFoundException: ensure that the model class name is properly set ([#36011](https://github.com/laravel/framework/pull/36011))
+- Fixed bus fake ([e720279](https://github.com/laravel/framework/commit/e72027960fd4d8ff281938edb4632e13e391b8fd))
 
 
 ## [v8.24.0 (2021-01-21)](https://github.com/laravel/framework/compare/v8.23.1...v8.24.0)
