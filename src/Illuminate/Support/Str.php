@@ -794,6 +794,4 @@ class Str
     {
         static::$uuidFactory = null;
     }
-
-
 }
