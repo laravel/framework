@@ -1,6 +1,14 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.30.3...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.30.4...7.x)
+
+
+## [v7.30.4 (2021-01-21)](https://github.com/laravel/framework/compare/v7.30.3...v7.30.4)
+
+### Fixed
+- Fixed empty html mail ([#35941](https://github.com/laravel/framework/pull/35941))
+- Fixed type error in `Illuminate\Http\Concerns\InteractsWithContentTypes::isJson()` ([#35956](https://github.com/laravel/framework/pull/35956))
+- Limit expected bindings ([#35972](https://github.com/laravel/framework/pull/35972), [006873d](https://github.com/laravel/framework/commit/006873df411d28bfd03fea5e7f91a2afe3918498))
 
 
 ## [v7.30.3 (2021-01-15)](https://github.com/laravel/framework/compare/v7.30.2...v7.30.3)
