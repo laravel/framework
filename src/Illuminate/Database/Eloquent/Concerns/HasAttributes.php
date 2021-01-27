@@ -783,8 +783,9 @@ trait HasAttributes
             $path, $key, $value
         ));
 
-        $this->attributes[$key] = $this->isEncryptedCastable($key) ?
-            $this->castAttributeAsEncryptedString($key, $value) : $value;
+        $this->attributes[$key] = $this->isEncryptedCastable($key)
+                    ? $this->castAttributeAsEncryptedString($key, $value)
+                    : $value;
 
         return $this;
     }
@@ -851,8 +852,10 @@ trait HasAttributes
             return [];
         }
 
-        return $this->fromJson($this->isEncryptedCastable($key) ?
-            $this->fromEncryptedString($this->attributes[$key]) : $this->attributes[$key]
+        return $this->fromJson(
+            $this->isEncryptedCastable($key)
+                    ? $this->fromEncryptedString($this->attributes[$key])
+                    : $this->attributes[$key]
         );
     }
 
