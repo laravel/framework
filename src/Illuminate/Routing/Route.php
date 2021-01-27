@@ -934,7 +934,7 @@ class Route
     }
 
     /**
-     * Get the value of the missing redirect.
+     * Get the value of the action that should be taken on a missing model exception.
      *
      * @return \Closure|null
      */
@@ -949,7 +949,7 @@ class Route
     }
 
     /**
-     * Add or change the missing redirect.
+     * Define the callable that should be invoked on a missing model exception.
      *
      * @param  \Closure  $missing
      * @return $this
@@ -1195,8 +1195,6 @@ class Route
     {
         if ($this->action['uses'] instanceof Closure) {
             $this->action['uses'] = serialize(new SerializableClosure($this->action['uses']));
-
-            // throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
         }
 
         if (isset($this->action['missing']) && $this->action['missing'] instanceof Closure) {
