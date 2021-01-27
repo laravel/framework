@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
-use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable implements JsonSerializable
