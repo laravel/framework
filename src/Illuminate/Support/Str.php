@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
@@ -723,6 +724,20 @@ class Str
     }
 
     /**
+     * Converts markdown to html.
+     *
+     * @param  string  $string
+     * @param  array  $options
+     * @return string
+     */
+    public static function markdown($string, $options = [])
+    {
+        $converter = new GithubFlavoredMarkdownConverter($options);
+
+        return $converter->convertToHtml($string);
+    }
+
+    /**
      * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface
@@ -779,4 +794,6 @@ class Str
     {
         static::$uuidFactory = null;
     }
+
+
 }

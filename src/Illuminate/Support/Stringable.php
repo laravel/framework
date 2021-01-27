@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable implements JsonSerializable
@@ -661,6 +662,17 @@ class Stringable implements JsonSerializable
     public function ucfirst()
     {
         return new static(Str::ucfirst($this->value));
+    }
+
+    /**
+     * Converts markdown to html.
+     *
+     * @param  array  $options
+     * @return string
+     */
+    public function markdown($options = [])
+    {
+        return new static(Str::markdown($this->value, $options));
     }
 
     /**
