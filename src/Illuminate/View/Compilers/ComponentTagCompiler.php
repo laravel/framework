@@ -463,6 +463,10 @@ class ComponentTagCompiler
                 $value = "'".$this->compileAttributeEchos($value)."'";
             }
 
+            if (Str::startsWith($attribute, '::')) {
+                $attribute = substr($attribute, 1);
+            }
+
             return [$attribute => $value];
         })->toArray();
     }
@@ -493,7 +497,7 @@ class ComponentTagCompiler
     {
         $pattern = "/
             (?:^|\s+)     # start of the string or whitespace between attributes
-            :             # attribute needs to start with a semicolon
+            :(?!:)        # attribute needs to start with a single colon
             ([\w\-:.@]+)  # match the actual attribute name
             =             # only match attributes that have a value
         /xm";

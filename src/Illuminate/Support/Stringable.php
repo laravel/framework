@@ -736,7 +736,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Convert the object into something JSON serializable.
+     * Convert the object to a string when JSON encoded.
      *
      * @return string
      */
