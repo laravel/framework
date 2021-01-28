@@ -13,13 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ParallelRunner implements RunnerInterface
 {
     /**
-     * The application resolver callback.
-     *
-     * @var \Closure|null
-     */
-    protected static $applicationResolver;
-
-    /**
      * The original test runner options.
      *
      * @var \ParaTest\Runners\PHPUnit\Options
@@ -56,17 +49,6 @@ class ParallelRunner implements RunnerInterface
         }
 
         $this->runner = new WrapperRunner($options, $output);
-    }
-
-    /**
-     * Set the application resolver callback.
-     *
-     * @param  \Closure|null  $resolver
-     * @return void
-     */
-    public static function resolveApplicationUsing($resolver)
-    {
-        static::$applicationResolver = $resolver;
     }
 
     /**
@@ -127,14 +109,10 @@ class ParallelRunner implements RunnerInterface
      */
     protected function createApplication()
     {
-        $applicationResolver = static::$applicationResolver ?: function () {
-            $applicationCreator = new class {
-                use \Tests\CreatesApplication;
-            };
-
-            return $applicationCreator->createApplication();
+        $applicationCreator = new class {
+            use \Tests\CreatesApplication;
         };
 
-        return call_user_func($applicationResolver);
+        return $applicationCreator->createApplication();
     }
 }
