@@ -379,7 +379,7 @@ class BusBatchTest extends TestCase
                 'failed_jobs' => '',
                 'failed_job_ids' => '[]',
                 'options' => base64_encode(serialize($options)),
-                'created_at' => now(),
+                'created_at' => null,
                 'cancelled_at' => null,
                 'finished_at' => null,
             ]);
@@ -387,7 +387,7 @@ class BusBatchTest extends TestCase
         $batch = (new DatabaseBatchRepository($factory, $connection, 'job_batches'));
 
         $factory->shouldReceive('make')
-            ->withSomeOfArgs($batch, '', '', '', '', '', '', [1, 2]);
+            ->withSomeOfArgs($batch, '', '', '', '', '', '', $options);
 
         $batch->find(1);
     }
