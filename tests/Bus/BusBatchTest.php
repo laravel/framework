@@ -14,6 +14,7 @@ use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedClosure;
 use Mockery as m;
@@ -337,6 +338,58 @@ class BusBatchTest extends TestCase
         $this->assertTrue(is_string($secondJob->batchId));
         $this->assertTrue(is_string($thirdJob->batchId));
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
+    }
+
+    public function test_options_serialization_on_postgres()
+    {
+        $pendingBatch = (new PendingBatch(new Container, collect()))
+            ->onQueue('test-queue');
+
+        $connection = m::spy(PostgresConnection::class);
+
+        $connection->shouldReceive('table')->andReturnSelf()
+            ->shouldReceive('where')->andReturnSelf();
+
+        $repository = new DatabaseBatchRepository(
+            new BatchFactory(m::mock(Factory::class)), $connection, 'job_batches'
+        );
+
+        $repository->store($pendingBatch);
+
+        $connection->shouldHaveReceived('insert')
+            ->withArgs(function ($argument) use ($pendingBatch) {
+                return unserialize(base64_decode($argument['options'])) === $pendingBatch->options;
+            });
+    }
+
+    public function test_options_unserialize_on_postgres()
+    {
+        $factory = m::mock(BatchFactory::class);
+
+        $connection = m::spy(PostgresConnection::class);
+
+        $options = [1, 2];
+
+        $connection->shouldReceive('table->where->first')
+            ->andReturn($m = (object) [
+                'id' => '',
+                'name' => '',
+                'total_jobs' => '',
+                'pending_jobs' => '',
+                'failed_jobs' => '',
+                'failed_job_ids' => '[]',
+                'options' => base64_encode(serialize($options)),
+                'created_at' => now(),
+                'cancelled_at' => null,
+                'finished_at' => null,
+            ]);
+
+        $batch = (new DatabaseBatchRepository($factory, $connection, 'job_batches'));
+
+        $factory->shouldReceive('make')
+            ->withSomeOfArgs($batch, '', '', '', '', '', '', [1, 2]);
+
+        $batch->find(1);
     }
 
     protected function createTestBatch($queue, $allowFailures = false)
