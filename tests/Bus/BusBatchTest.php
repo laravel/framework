@@ -362,13 +362,14 @@ class BusBatchTest extends TestCase
             });
     }
 
-    public function test_options_unserialize_on_postgres()
+    /**
+     * @dataProvider serializedOptions
+     */
+    public function test_options_unserialize_on_postgres($serialize, $options)
     {
         $factory = m::mock(BatchFactory::class);
 
         $connection = m::spy(PostgresConnection::class);
-
-        $options = [1, 2];
 
         $connection->shouldReceive('table->where->first')
             ->andReturn($m = (object) [
@@ -378,7 +379,7 @@ class BusBatchTest extends TestCase
                 'pending_jobs' => '',
                 'failed_jobs' => '',
                 'failed_job_ids' => '[]',
-                'options' => base64_encode(serialize($options)),
+                'options' => $serialize,
                 'created_at' => null,
                 'cancelled_at' => null,
                 'finished_at' => null,
@@ -390,6 +391,19 @@ class BusBatchTest extends TestCase
             ->withSomeOfArgs($batch, '', '', '', '', '', '', $options);
 
         $batch->find(1);
+    }
+
+    /**
+     * @return array
+     */
+    public function serializedOptions()
+    {
+        $options = [1, 2];
+
+        return [
+            [serialize($options), $options],
+            [base64_encode(serialize($options)), $options],
+        ];
     }
 
     protected function createTestBatch($queue, $allowFailures = false)

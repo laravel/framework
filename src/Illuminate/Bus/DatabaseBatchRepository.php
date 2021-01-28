@@ -314,9 +314,9 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     protected function unserialize($serialized)
     {
-        $serialized = $this->connection instanceof PostgresConnection && ! Str::contains($serialized, [':', ';'])
-            ? base64_decode($serialized)
-            : $serialized;
+        if ($this->connection instanceof PostgresConnection) {
+            $serialized = base64_decode($serialized, true) ?: $serialized;
+        }
 
         return unserialize($serialized);
     }
