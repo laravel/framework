@@ -31,6 +31,13 @@ class MigrationCreator
     protected $postCreate = [];
 
     /**
+     * Register custom stub populator.
+     *
+     * @var array
+     */
+    protected $customStubPopulator = [];
+
+    /**
      * Create a new migration creator instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -50,11 +57,12 @@ class MigrationCreator
      * @param  string  $path
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  array  $customPopulate
      * @return string
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $customPopulate = [])
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
@@ -68,7 +76,7 @@ class MigrationCreator
         $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put(
-            $path, $this->populateStub($name, $stub, $table)
+            $path, $this->populateStub($name, $stub, $table, $customPopulate)
         );
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
@@ -135,9 +143,10 @@ class MigrationCreator
      * @param  string  $name
      * @param  string  $stub
      * @param  string|null  $table
+     * @param  array  $customPopulate
      * @return string
      */
-    protected function populateStub($name, $stub, $table)
+    protected function populateStub($name, $stub, $table, $customPopulate)
     {
         $stub = str_replace(
             ['DummyClass', '{{ class }}', '{{class}}'],
@@ -151,6 +160,17 @@ class MigrationCreator
             $stub = str_replace(
                 ['DummyTable', '{{ table }}', '{{table}}'],
                 $table, $stub
+            );
+        }
+
+        // When custom created stubs allow for some custom keys to be replaced
+        // within the custom stubs. In case the 'create' method was called
+        // manually it allows to local custom stubs to be replaced.
+        $customPopulator = array_merge($this->customStubPopulator, $customPopulate);
+        foreach($customPopulator as $key => $values) {
+            $stub = str_replace(
+                ['{{ '.$key.' }}', '{{'.$key.'}}'],
+                $values, $stub
             );
         }
 
@@ -232,5 +252,16 @@ class MigrationCreator
     public function getFilesystem()
     {
         return $this->files;
+    }
+
+    /**
+     * Add custom populator replacement value.
+     *
+     * @param string  $key
+     * @param string  $value
+     */
+    public function addCustomPopulator($key, $value)
+    {
+        $this->customStubPopulator[$key] = $value;
     }
 }
