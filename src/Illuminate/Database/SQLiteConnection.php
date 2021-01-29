@@ -28,6 +28,11 @@ class SQLiteConnection extends Connection
         // check that if sqlite file currently not exists, create it
         if (! is_file($database) && $database !== ':memory:') {
             touch($database);
+
+            // log
+            if (app()->runningInConsole()) {
+                echo "Sqlite file {$database} not found, creating it as an empty sqlite file..." . PHP_EOL;
+            }
         }
 
         parent::__construct($pdo, $database, $tablePrefix, $config);
