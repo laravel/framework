@@ -61,11 +61,22 @@ class FreshCommand extends Command
             );
         }
 
+        $this->prepareBeforeSeeding();
+
         if ($this->needsSeeding()) {
             $this->runSeeder($database);
         }
 
         return 0;
+    }
+
+    protected function prepareBeforeSeeding()
+    {
+        if ($this->hasOption('seed-before')) {
+            $this->call('migrate:rollback', [
+                '--step' => $this->option('seed-before'),
+            ]);
+        }
     }
 
     /**
