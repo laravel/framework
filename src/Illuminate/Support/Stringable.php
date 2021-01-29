@@ -321,6 +321,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert GitHub flavored Markdown into HTML.
+     *
+     * @param  array  $options
+     * @return string
+     */
+    public function markdown(array $options = [])
+    {
+        return new static(Str::markdown($this->value, $options));
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern
@@ -661,17 +672,6 @@ class Stringable implements JsonSerializable
     public function ucfirst()
     {
         return new static(Str::ucfirst($this->value));
-    }
-
-    /**
-     * Converts markdown to html.
-     *
-     * @param  array  $options
-     * @return string
-     */
-    public function markdown($options = [])
-    {
-        return new static(Str::markdown($this->value, $options));
     }
 
     /**

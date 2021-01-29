@@ -378,6 +378,20 @@ class Str
     }
 
     /**
+     * Converts GitHub flavored Markdown into HTML.
+     *
+     * @param  string  $string
+     * @param  array  $options
+     * @return string
+     */
+    public static function markdown($string, array $options = [])
+    {
+        $converter = new GithubFlavoredMarkdownConverter($options);
+
+        return $converter->convertToHtml($string);
+    }
+
+    /**
      * Pad both sides of a string with another.
      *
      * @param  string  $value
@@ -721,20 +735,6 @@ class Str
     public static function ucfirst($string)
     {
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
-    }
-
-    /**
-     * Converts markdown to html.
-     *
-     * @param  string  $string
-     * @param  array  $options
-     * @return string
-     */
-    public static function markdown($string, $options = [])
-    {
-        $converter = new GithubFlavoredMarkdownConverter($options);
-
-        return $converter->convertToHtml($string);
     }
 
     /**
