@@ -269,29 +269,6 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     }
 
     /**
-     * Convert the given raw batch to a Batch object.
-     *
-     * @param  object  $batch
-     * @return \Illuminate\Bus\Batch
-     */
-    protected function toBatch($batch)
-    {
-        return $this->factory->make(
-            $this,
-            $batch->id,
-            $batch->name,
-            (int) $batch->total_jobs,
-            (int) $batch->pending_jobs,
-            (int) $batch->failed_jobs,
-            json_decode($batch->failed_job_ids, true),
-            $this->unserialize($batch->options),
-            CarbonImmutable::createFromTimestamp($batch->created_at),
-            $batch->cancelled_at ? CarbonImmutable::createFromTimestamp($batch->cancelled_at) : $batch->cancelled_at,
-            $batch->finished_at ? CarbonImmutable::createFromTimestamp($batch->finished_at) : $batch->finished_at
-        );
-    }
-
-    /**
      * Serialize the given value.
      *
      * @param  mixed  $value
@@ -314,10 +291,34 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     protected function unserialize($serialized)
     {
-        if ($this->connection instanceof PostgresConnection && ! Str::contains($serialized, [':', ';'])) {
+        if ($this->connection instanceof PostgresConnection &&
+            ! Str::contains($serialized, [':', ';'])) {
             $serialized = base64_decode($serialized);
         }
 
         return unserialize($serialized);
+    }
+
+    /**
+     * Convert the given raw batch to a Batch object.
+     *
+     * @param  object  $batch
+     * @return \Illuminate\Bus\Batch
+     */
+    protected function toBatch($batch)
+    {
+        return $this->factory->make(
+            $this,
+            $batch->id,
+            $batch->name,
+            (int) $batch->total_jobs,
+            (int) $batch->pending_jobs,
+            (int) $batch->failed_jobs,
+            json_decode($batch->failed_job_ids, true),
+            $this->unserialize($batch->options),
+            CarbonImmutable::createFromTimestamp($batch->created_at),
+            $batch->cancelled_at ? CarbonImmutable::createFromTimestamp($batch->cancelled_at) : $batch->cancelled_at,
+            $batch->finished_at ? CarbonImmutable::createFromTimestamp($batch->finished_at) : $batch->finished_at
+        );
     }
 }
