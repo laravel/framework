@@ -195,7 +195,7 @@ class Builder
     ];
 
     /**
-     * Whether use write pdo for select.
+     * Whether to use write pdo for the select.
      *
      * @var bool
      */

@@ -234,7 +234,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Asserts that the response does not contains the given header.
+     * Asserts that the response does not contain the given header.
      *
      * @param  string  $headerName
      * @return $this
@@ -358,7 +358,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Asserts that the response does not contains the given cookie.
+     * Asserts that the response does not contain the given cookie.
      *
      * @param  string  $cookieName
      * @return $this

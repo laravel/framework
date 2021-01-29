@@ -53,7 +53,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Create and return an un-saved instances of the related models.
+     * Create and return an un-saved instance of the related models.
      *
      * @param  iterable  $records
      * @return \Illuminate\Database\Eloquent\Collection

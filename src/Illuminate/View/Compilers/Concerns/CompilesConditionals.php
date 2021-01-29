@@ -283,7 +283,7 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile an once block into valid PHP.
+     * Compile a once block into valid PHP.
      *
      * @param  string|null  $id
      * @return string

@@ -219,7 +219,7 @@ class ParallelTesting
     }
 
     /**
-     * Gets an unique test token.
+     * Gets a unique test token.
      *
      * @return int|false
      */

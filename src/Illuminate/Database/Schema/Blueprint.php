@@ -1607,7 +1607,7 @@ class Blueprint
     }
 
     /**
-     * Determine if the blueprint has auto increment columns.
+     * Determine if the blueprint has auto-increment columns.
      *
      * @return bool
      */
@@ -1619,7 +1619,7 @@ class Blueprint
     }
 
     /**
-     * Get the auto increment column starting values.
+     * Get the auto-increment column starting values.
      *
      * @return array
      */
