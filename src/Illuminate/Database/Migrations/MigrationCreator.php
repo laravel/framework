@@ -167,7 +167,7 @@ class MigrationCreator
         // within the custom stubs. In case the 'create' method was called
         // manually it allows to local custom stubs to be replaced.
         $customPopulator = array_merge($this->customStubPopulator, $customPopulate);
-        foreach($customPopulator as $key => $values) {
+        foreach ($customPopulator as $key => $values) {
             $stub = str_replace(
                 ['{{ '.$key.' }}', '{{'.$key.'}}'],
                 $values, $stub
