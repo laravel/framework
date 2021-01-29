@@ -26,7 +26,7 @@ class SQLiteConnection extends Connection
     public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
     {
         // check that if sqlite file currently not exists, create it
-        if (! is_file($database) && $database !== ':memory:') {
+        if ($database !== ':memory:' && ! is_file($database)) {
             touch($database);
             // log
             // if (app()->runningInConsole()) {
