@@ -574,4 +574,10 @@ class SupportStringableTest extends TestCase
         $this->assertInstanceOf(Stringable::class, $this->stringable('foo')->pipe($callback));
         $this->assertSame('bar', (string) $this->stringable('foo')->pipe($callback));
     }
+
+    public function testMarkdown()
+    {
+        $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
+        $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
+    }
 }
