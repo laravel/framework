@@ -469,7 +469,7 @@ class ComponentTagCompiler
     }
 
     /**
-     * Parse the attribute bag in a given attribute string into it's fully-qualified syntax.
+     * Parse the attribute bag in a given attribute string into its fully-qualified syntax.
      *
      * @param  string  $attributeString
      * @return string

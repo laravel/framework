@@ -320,7 +320,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Get the credential array for a HTTP Basic request.
+     * Get the credential array for an HTTP Basic request.
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @param  string  $field
