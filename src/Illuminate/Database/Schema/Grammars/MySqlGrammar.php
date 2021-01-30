@@ -191,7 +191,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile the auto incrementing column starting values.
+     * Compile the auto-incrementing column starting values.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @return array

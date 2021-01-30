@@ -225,7 +225,7 @@ class Factory
     }
 
     /**
-     * Assert that the given request were sent in the given order.
+     * Assert that the given request was sent in the given order.
      *
      * @param  array  $callbacks
      * @return void

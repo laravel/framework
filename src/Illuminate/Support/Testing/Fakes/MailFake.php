@@ -322,7 +322,7 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Send a new message using a view.
      *
-     * @param  string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return void

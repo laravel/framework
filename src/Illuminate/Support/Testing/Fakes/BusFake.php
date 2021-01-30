@@ -544,7 +544,7 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
-     * Determine if an command should be faked or actually dispatched.
+     * Determine if a command should be faked or actually dispatched.
      *
      * @param  mixed  $command
      * @return bool
