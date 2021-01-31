@@ -79,6 +79,7 @@ class PaginatedResourceResponse extends ResourceResponse
             'last_page_url',
             'prev_page_url',
             'next_page_url',
+            'links',
         ]);
     }
 }
