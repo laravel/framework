@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use BadMethodCallException;
 use Closure;
+use Countable;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
@@ -441,7 +442,7 @@ class Builder
 
         $model = $this->find($ids, $columns);
 
-        if (! empty($model)) {
+        if (! is_null($model) || ($model instanceof Countable && count($model))) {
             return $model;
         }
 
