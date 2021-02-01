@@ -201,6 +201,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         if ($count !== null) {
             $parameters[] = $count;
         }
+
         return $this->command('sPop', $parameters);
     }
 
