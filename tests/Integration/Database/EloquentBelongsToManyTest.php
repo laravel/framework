@@ -392,8 +392,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             return 'foo';
         }));
 
-        $this->assertEquals('foo', $post->tags()->findOr([0, -1], function () {
-            return 'foo';
+        $this->assertEquals('bar', $post->tags()->findOr([0, -1], function () {
+            return 'bar';
         }));
     }
 

@@ -531,8 +531,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
 
         $this->assertNotInstanceOf(EloquentTestUser::class, $single);
-        $this->assertSame('foo', $single);
-        $this->assertSame('bar', $multiple);
+        $this->assertEquals('foo', $single);
+        $this->assertEquals('bar', $multiple);
         $this->assertNotInstanceOf(Collection::class, $multiple);
         $this->assertNotInstanceOf(EloquentTestUser::class, $multiple[0]);
         $this->assertNotInstanceOf(EloquentTestUser::class, $multiple[1]);
