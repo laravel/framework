@@ -3,21 +3,25 @@
 namespace Illuminate\View;
 
 use ErrorException;
+use Illuminate\Container\Container;
+use Illuminate\Support\Reflector;
 
 class ViewException extends ErrorException
 {
     /**
      * Report the exception.
      *
-     * @return void
+     * @return bool|null
      */
     public function report()
     {
         $exception = $this->getPrevious();
 
-        if ($exception && method_exists($exception, 'report')) {
-            $exception->report();
+        if (Reflector::isCallable($reportCallable = [$exception, 'report'])) {
+            return Container::getInstance()->call($reportCallable);
         }
+
+        return false;
     }
 
     /**
