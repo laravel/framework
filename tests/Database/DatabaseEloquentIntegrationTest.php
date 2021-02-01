@@ -451,10 +451,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestNonIncrementingSecond::query()->eachById(
             function (EloquentTestNonIncrementingSecond $user, $i) use (&$users) {
                 $users[] = [$user->name, $i];
-            },
-            2,
-            'name'
-        );
+            }, 2, 'name');
         $this->assertSame([[' First', 0], [' Second', 1], [' Third', 2]], $users);
     }
 

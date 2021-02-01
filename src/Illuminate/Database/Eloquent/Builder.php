@@ -274,9 +274,7 @@ class Builder
     public function orWhere($column, $operator = null, $value = null)
     {
         [$value, $operator] = $this->query->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->where($column, $operator, $value, 'or');
@@ -403,8 +401,7 @@ class Builder
         }
 
         throw (new ModelNotFoundException)->setModel(
-            get_class($this->model),
-            $id
+            get_class($this->model), $id
         );
     }
 
