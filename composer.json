@@ -78,8 +78,8 @@
         "illuminate/view": "self.version"
     },
     "require-dev": {
-        "doctrine/dbal": "^2.6|^3.0",
         "aws/aws-sdk-php": "^3.155",
+        "doctrine/dbal": "^2.6|^3.0",
         "filp/whoops": "^2.8",
         "guzzlehttp/guzzle": "^6.5.5|^7.0.1",
         "league/flysystem-cached-adapter": "^1.0",
