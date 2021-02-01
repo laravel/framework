@@ -28,7 +28,7 @@ trait FindOr
             return $model;
         }
 
-        if ($model && !$model instanceof Collection) {
+        if ($model && ! $model instanceof Collection) {
             return $model;
         }
 
