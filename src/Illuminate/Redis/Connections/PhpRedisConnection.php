@@ -197,7 +197,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function spop($key, $count = 1)
     {
-        // use func_get_args() instead of [$key, $count] to fix the return type when called without the count argument.
         return $this->command('spop', func_get_args());
     }
 
