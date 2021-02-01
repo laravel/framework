@@ -23,7 +23,7 @@ trait FindOr
 
         $model = $this->find($ids, $columns);
 
-        if (! is_null($model) || count($model)) {
+        if (! empty($model)) {
             return $model;
         }
 
