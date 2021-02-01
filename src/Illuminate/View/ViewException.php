@@ -20,6 +20,8 @@ class ViewException extends ErrorException
         if (Reflector::isCallable($reportCallable = [$exception, 'report'])) {
             return Container::getInstance()->call($reportCallable);
         }
+        
+        return false;
     }
 
     /**
