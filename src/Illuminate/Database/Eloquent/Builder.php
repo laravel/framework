@@ -445,11 +445,15 @@ class Builder
             return $model;
         }
 
-        if ($model) {
+        if ($model && !$model instanceof Collection) {
             return $model;
         }
 
-        return $callback();
+        if ($callback) {
+            return $callback();
+        }
+
+        return null;
     }
 
     /**

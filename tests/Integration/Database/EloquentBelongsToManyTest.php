@@ -353,7 +353,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertCount(2, $post->tags()->findMany(new Collection([$tag->id, $tag2->id])));
     }
 
-    public function testFindOr()
+    public function testFindOrMethod()
     {
         $post = Post::create(['title' => Str::random()]);
 
@@ -367,7 +367,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             return 'foo';
         })->name);
 
-        $this->assertCount(0, $post->tags()->findOr([]));
+        $this->assertCount(0, $post->tags()->findOr([], function () {
+            return [];
+        }));
 
         $this->assertCount(2, $post->tags()->findOr([$tag->id, $tag2->id], function () {
             return [];
