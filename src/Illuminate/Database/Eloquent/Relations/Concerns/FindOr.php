@@ -21,7 +21,9 @@ trait FindOr
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->find($ids, $columns))) {
+        $model = $this->find($ids, $columns);
+
+        if (! is_null($model) || count($model)) {
             return $model;
         }
 
