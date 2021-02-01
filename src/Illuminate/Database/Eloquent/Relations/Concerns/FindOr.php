@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Closure;
-use Countable;
+use Illuminate\Database\Eloquent\Collection;
 
 trait FindOr
 {
@@ -24,7 +24,7 @@ trait FindOr
 
         $model = $this->find($ids, $columns);
 
-        if (! is_null($model) || ($model instanceof Countable && count($model))) {
+        if (! is_null($model) || ($model instanceof Collection && $model->count())) {
             return $model;
         }
 
