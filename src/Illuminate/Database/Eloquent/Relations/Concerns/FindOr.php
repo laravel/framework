@@ -24,7 +24,11 @@ trait FindOr
 
         $model = $this->find($ids, $columns);
 
-        if (! is_null($model) || ! ($model instanceof Collection && $model->isEmpty())) {
+        if ($model instanceof Collection && $model->isNotEmpty()) {
+            return $model;
+        }
+
+        if ($model) {
             return $model;
         }
 
