@@ -137,6 +137,18 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         HasOneThroughTestPosition::first()->contract()->findOrFail(1);
     }
 
+    public function testFindOrCallsACallback()
+    {
+        HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
+            ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
+
+        $contract = HasOneThroughTestPosition::first()->contract()->findOr(0, function () {
+            return 'foo';
+        });
+
+        $this->assertSame('foo', $contract);
+    }
+
     public function testFirstRetrievesFirstRecord()
     {
         $this->seedData();

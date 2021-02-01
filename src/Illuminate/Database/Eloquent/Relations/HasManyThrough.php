@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HasManyThrough extends Relation
 {
+    use Concerns\FindOr;
+
     /**
      * The "through" parent model instance.
      *

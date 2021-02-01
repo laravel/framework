@@ -451,7 +451,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestNonIncrementingSecond::query()->eachById(
             function (EloquentTestNonIncrementingSecond $user, $i) use (&$users) {
                 $users[] = [$user->name, $i];
-            }, 2, 'name');
+            },
+            2,
+            'name'
+        );
         $this->assertSame([[' First', 0], [' Second', 1], [' Third', 2]], $users);
     }
 
@@ -492,6 +495,47 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
         $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
+    }
+
+    public function testFindOr()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $single = EloquentTestUser::findOr(1, function () {
+            return 'foo';
+        });
+
+        $multiple = EloquentTestUser::findOr([1, 2], function () {
+            return 'bar';
+        });
+
+        $this->assertInstanceOf(EloquentTestUser::class, $single);
+        $this->assertSame('taylorotwell@gmail.com', $single->email);
+        $this->assertInstanceOf(Collection::class, $multiple);
+        $this->assertInstanceOf(EloquentTestUser::class, $multiple[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $multiple[1]);
+    }
+
+    public function testFindOrCallsACallback()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $single = EloquentTestUser::findOr(3, function () {
+            return 'foo';
+        });
+
+        $multiple = EloquentTestUser::findOr([3, 4], function () {
+            return 'bar';
+        });
+
+        $this->assertNotInstanceOf(EloquentTestUser::class, $single);
+        $this->assertSame('foo', $single);
+        $this->assertSame('bar', $multiple);
+        $this->assertNotInstanceOf(Collection::class, $multiple);
+        $this->assertNotInstanceOf(EloquentTestUser::class, $multiple[0]);
+        $this->assertNotInstanceOf(EloquentTestUser::class, $multiple[1]);
     }
 
     public function testFindOrFail()

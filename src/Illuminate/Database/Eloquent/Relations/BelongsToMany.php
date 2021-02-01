@@ -14,6 +14,7 @@ use InvalidArgumentException;
 class BelongsToMany extends Relation
 {
     use Concerns\InteractsWithPivotTable;
+    use Concerns\FindOr;
 
     /**
      * The intermediate table for the relation.

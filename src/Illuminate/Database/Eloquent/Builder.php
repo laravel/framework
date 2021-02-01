@@ -422,6 +422,28 @@ class Builder
     }
 
     /**
+     * Find multiple models by their primary keys or call a callback.
+     *
+     * @param  int|array  $ids
+     * @param  \Closure|array  $columns
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Model|static|mixed
+     */
+    public function findOr($ids, $columns = ['*'], Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->find($ids, $columns))) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    /**
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes

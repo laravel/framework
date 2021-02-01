@@ -353,6 +353,50 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertCount(2, $post->tags()->findMany(new Collection([$tag->id, $tag2->id])));
     }
 
+    public function testFindOr()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $tag2 = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach(Tag::all());
+
+        $this->assertEquals($tag2->name, $post->tags()->findOr($tag2->id, function () {
+            return 'foo';
+        })->name);
+
+        $this->assertCount(0, $post->tags()->findOr([]));
+
+        $this->assertCount(2, $post->tags()->findOr([$tag->id, $tag2->id], function () {
+            return [];
+        }));
+
+        $this->assertCount(0, $post->tags()->findOr(new Collection(), function () {
+            return [];
+        }));
+
+        $this->assertCount(2, $post->tags()->findOr(new Collection([$tag->id, $tag2->id]), function () {
+            return [];
+        }));
+    }
+
+    public function testFindOrCallsACallback()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $post->tags()->attach(Tag::all());
+
+        $this->assertEquals('foo', $post->tags()->findOr(0, function () {
+            return 'foo';
+        }));
+
+        $this->assertEquals('foo', $post->tags()->findOr([0, 10], function () {
+            return 'foo';
+        }));
+    }
+
     public function testFindOrFailMethod()
     {
         $this->expectException(ModelNotFoundException::class);
