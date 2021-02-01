@@ -526,7 +526,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             return 'foo';
         });
 
-        $multiple = EloquentTestUser::findOr([3, 4], function () {
+        $multiple = EloquentTestUser::findOr([0, -1], function () {
             return 'bar';
         });
 
