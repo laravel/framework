@@ -286,7 +286,7 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * Check if event should be broadcasted by condition.
+     * Check if the event should be broadcasted by the condition.
      *
      * @param  mixed  $event
      * @return bool
