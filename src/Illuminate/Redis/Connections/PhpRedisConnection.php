@@ -198,7 +198,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function spop($key, $count = 1)
     {
-        return $this->command('spop', [$key, $count]);
+        return $this->command('spop', func_get_args());
     }
 
     /**
