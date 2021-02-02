@@ -49,7 +49,7 @@ abstract class Relation
     protected static $constraints = true;
 
     /**
-     * An array to map class names to their morph names in database.
+     * An array to map class names to their morph names in the database.
      *
      * @var array
      */

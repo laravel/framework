@@ -48,7 +48,7 @@ class ComponentTagCompiler
     protected $boundAttributes = [];
 
     /**
-     * Create new component tag compiler.
+     * Create a new component tag compiler.
      *
      * @param  array  $aliases
      * @param  array  $namespaces

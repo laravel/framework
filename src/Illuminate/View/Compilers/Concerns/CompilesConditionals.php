@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 trait CompilesConditionals
 {
     /**
-     * Identifier for the first case in switch statement.
+     * Identifier for the first case in the switch statement.
      *
      * @var bool
      */

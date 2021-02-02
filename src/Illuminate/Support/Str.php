@@ -696,7 +696,7 @@ class Str
     }
 
     /**
-     * Returns the portion of string specified by the start and length parameters.
+     * Returns the portion of the string specified by the start and length parameters.
      *
      * @param  string  $string
      * @param  int  $start

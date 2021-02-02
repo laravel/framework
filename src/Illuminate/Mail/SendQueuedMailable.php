@@ -89,7 +89,7 @@ class SendQueuedMailable
     }
 
     /**
-     * Get number of seconds before a released mailable will be available.
+     * Get the number of seconds before a released mailable will be available.
      *
      * @return mixed
      */

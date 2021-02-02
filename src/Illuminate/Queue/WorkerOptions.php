@@ -54,7 +54,7 @@ class WorkerOptions
     public $force;
 
     /**
-     * Indicates if the worker should stop when queue is empty.
+     * Indicates if the worker should stop when the queue is empty.
      *
      * @var bool
      */

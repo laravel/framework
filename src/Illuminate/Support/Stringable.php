@@ -607,7 +607,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Returns the portion of string specified by the start and length parameters.
+     * Returns the portion of the string specified by the start and length parameters.
      *
      * @param  int  $start
      * @param  int|null  $length

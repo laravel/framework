@@ -50,7 +50,7 @@ class PhpRedisConnector implements Connector
     }
 
     /**
-     * Build a single cluster seed string from array.
+     * Build a single cluster seed string from an array.
      *
      * @param  array  $server
      * @return string
