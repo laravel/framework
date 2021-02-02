@@ -112,9 +112,7 @@ class SupportCarbonTest extends TestCase
 
     public function testSetTestNowWillPersistBetweenImmutableAndMutableInstance()
     {
-        $now = new Carbon('2017-06-27 13:14:15.000000');
-
-        Carbon::setTestNow($now);
+        Carbon::setTestNow(new Carbon('2017-06-27 13:14:15.000000'));
 
         $this->assertSame('2017-06-27 13:14:15', Carbon::now()->toDateTimeString());
         $this->assertSame('2017-06-27 13:14:15', BaseCarbon::now()->toDateTimeString());
