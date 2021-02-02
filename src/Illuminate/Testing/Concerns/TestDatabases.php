@@ -100,7 +100,7 @@ trait TestDatabases
      * Runs the given callable using the given database.
      *
      * @param  string $database
-     * @param  callable $database
+     * @param  callable $callable
      * @return void
      */
     protected function usingDatabase($database, $callable)
