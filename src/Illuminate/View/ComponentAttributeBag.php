@@ -236,6 +236,31 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
+     * Conditionally merge classes into the attribute bag.
+     *
+     * @param  mixed|array  $classList
+     * @return static
+     */
+    public function class($classList)
+    {
+        $classList = Arr::wrap($classList);
+
+        $classes = [];
+
+        foreach ($classList as $class => $constraint) {
+            // If the "class" value is a numeric key, we can assume
+            // that no constraint has been specified.
+            if (is_numeric($class)) {
+                $classes[] = $constraint;
+            } elseif ($constraint) {
+                $classes[] = $class;
+            }
+        }
+
+        return $this->merge(['class' => implode(' ', $classes)]);
+    }
+
+    /**
      * Resolve an appendable attribute value default value.
      *
      * @param  array  $attributeDefaults
