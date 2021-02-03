@@ -195,7 +195,7 @@ class Builder
     ];
 
     /**
-     * Whether to use write pdo for the select.
+     * Whether to use the write connection for the PDO select.
      *
      * @var bool
      */
@@ -3230,7 +3230,7 @@ class Builder
     }
 
     /**
-     * Use the write pdo for query.
+     * Use the write connection for the PDO query.
      *
      * @return $this
      */

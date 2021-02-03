@@ -86,7 +86,7 @@ class UrlWindow
             return $this->getSliderTooCloseToBeginning($window, $onEachSide);
         }
 
-        // If the current page is close to the ending of the page range we will just get
+        // If the current page is close to the end of the page range we will just get
         // this first couple pages, followed by a larger window of these ending pages
         // since we're too close to the end of the list to create a full on slider.
         elseif ($this->currentPage() > ($this->lastPage() - $window)) {
@@ -116,7 +116,7 @@ class UrlWindow
     }
 
     /**
-     * Get the slider of URLs when too close to the ending of the window.
+     * Get the slider of URLs when too close to the end of the window.
      *
      * @param  int  $window
      * @param  int  $onEachSide
