@@ -880,7 +880,7 @@ class Grammar extends BaseGrammar
         $columns = $this->columnize(array_keys(reset($values)));
 
         // We need to build a list of parameter place-holders of values that are bound
-        // to the query. Each insert should have the same amount of parameter bindings
+        // to the query. Each insert should have the same number of parameter bindings
         // so we will loop through the record and parameterize them all.
         $parameters = collect($values)->map(function ($record) {
             return '('.$this->parameterize($record).')';

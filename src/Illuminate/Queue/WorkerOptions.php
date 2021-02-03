@@ -40,7 +40,7 @@ class WorkerOptions
     public $sleep;
 
     /**
-     * The maximum amount of times a job may be attempted.
+     * The maximum number of times a job may be attempted.
      *
      * @var int
      */
