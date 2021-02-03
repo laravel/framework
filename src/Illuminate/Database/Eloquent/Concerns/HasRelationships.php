@@ -210,7 +210,7 @@ trait HasRelationships
 
         // Once we have the foreign key names, we'll just create a new Eloquent query
         // for the related models and returns the relationship instance which will
-        // actually be responsible for retrieving and hydrating every relations.
+        // actually be responsible for retrieving and hydrating every relation.
         $ownerKey = $ownerKey ?: $instance->getKeyName();
 
         return $this->newBelongsTo(
@@ -254,7 +254,7 @@ trait HasRelationships
         );
 
         // If the type value is null it is probably safe to assume we're eager loading
-        // the relationship. In this case we'll just pass in a dummy query where we
+        // the relationship. In this case, we'll just pass in a dummy query where we
         // need to remove any eager loads that may already be defined on a model.
         return is_null($class = $this->getAttributeFromArray($type)) || $class === ''
                     ? $this->morphEagerTo($name, $type, $id, $ownerKey)
@@ -553,8 +553,8 @@ trait HasRelationships
         $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
 
         // Now we're ready to create a new query builder for this related model and
-        // the relationship instances for this relation. This relations will set
-        // appropriate query constraints then entirely manages the hydrations.
+        // the relationship instances for this relation. These relations will set
+        // appropriate query constraints then entirely manage the hydrations.
         if (! $table) {
             $words = preg_split('/(_)/u', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
 

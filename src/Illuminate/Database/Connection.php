@@ -333,7 +333,7 @@ class Connection implements ConnectionInterface
 
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
-            // row from the database table, and will either be an array or objects.
+            // row from the database table, and will either be an array or object.
             $statement = $this->prepared(
                 $this->getPdoForSelect($useReadPdo)->prepare($query)
             );
@@ -633,7 +633,7 @@ class Connection implements ConnectionInterface
 
         // Here we will run this query. If an exception occurs we'll determine if it was
         // caused by a connection that has been lost. If that is the cause, we'll try
-        // to re-establish connection and re-run the query with a fresh connection.
+        // to re-establish a connection and re-run the query with a fresh connection.
         try {
             $result = $this->runQueryCallback($query, $bindings, $callback);
         } catch (QueryException $e) {

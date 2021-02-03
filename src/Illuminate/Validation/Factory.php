@@ -166,7 +166,7 @@ class Factory implements FactoryContract
 
         // Next, we will add the implicit extensions, which are similar to the required
         // and accepted rule in that they are run even if the attributes is not in a
-        // array of data that is given to a validator instances via instantiation.
+        // array of data that is given to a validator instance via instantiation.
         $validator->addImplicitExtensions($this->implicitExtensions);
 
         $validator->addDependentExtensions($this->dependentExtensions);

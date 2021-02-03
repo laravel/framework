@@ -297,7 +297,7 @@ class BelongsToMany extends Relation
     {
         // First we will build a dictionary of child models keyed by the foreign key
         // of the relation so that we will easily and quickly match them to their
-        // parents without having a possibly slow inner loops for every models.
+        // parents without having a possibly slow inner loop for every model.
         $dictionary = [];
 
         foreach ($results as $result) {
@@ -767,7 +767,7 @@ class BelongsToMany extends Relation
     public function get($columns = ['*'])
     {
         // First we'll add the proper select columns onto the query so it is run with
-        // the proper columns. Then, we will get the results and hydrate out pivot
+        // the proper columns. Then, we will get the results and hydrate out the pivot
         // models with the result of those columns as a separate model relation.
         $builder = $this->query->applyScopes();
 
@@ -1092,9 +1092,9 @@ class BelongsToMany extends Relation
     {
         $instance = $this->related->newInstance($attributes);
 
-        // Once we save the related model, we need to attach it to the base model via
-        // through intermediate table so we'll use the existing "attach" method to
-        // accomplish this which will insert the record and any more attributes.
+        // Once we save the related model, we need to attach it to the base model
+        // through the intermediate table so we'll use the existing "attach" method
+        // to accomplish this which will insert the record and any more attributes.
         $instance->save(['touch' => false]);
 
         $this->attach($instance, $joining, $touch);

@@ -34,7 +34,7 @@ class Manager
 
         // Once we have the container setup, we will setup the default configuration
         // options in the container "config" bindings. This just makes this queue
-        // manager behave correctly since all the correct binding are in place.
+        // manager behave correctly since all the correct bindings are in place.
         $this->setupDefaultConfiguration();
 
         $this->setupManager();

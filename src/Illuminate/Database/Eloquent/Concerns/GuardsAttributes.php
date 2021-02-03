@@ -172,7 +172,7 @@ trait GuardsAttributes
             return true;
         }
 
-        // If the key is in the "fillable" array, we can of course assume that it's
+        // If the key is in the "fillable" array, we can, of course, assume that it's
         // a fillable attribute. Otherwise, we will check the guarded array when
         // we need to determine if the attribute is black-listed on the model.
         if (in_array($key, $this->getFillable())) {

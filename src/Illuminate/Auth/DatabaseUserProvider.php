@@ -122,7 +122,7 @@ class DatabaseUserProvider implements UserProvider
             }
         }
 
-        // Now we are ready to execute the query to see if we have an user matching
+        // Now we are ready to execute the query to see if we have a user matching
         // the given credentials. If not, we will just return nulls and indicate
         // that there are no matching users for these given credential arrays.
         $user = $query->first();
