@@ -685,6 +685,11 @@ class RoutingRouteTest extends TestCase
             return 'hello';
         });
         $this->assertSame('hello', $router->dispatch(Request::create('http://api.foo.bar/foo/bar', 'GET'))->getContent());
+
+        $router->get('/foo/baz')->domain('localhost:8000')->uses(function () {
+            return 'hi';
+        });
+        $this->assertSame('hi', $router->dispatch(Request::create('http://localhost:8000/foo/baz', 'GET'))->getContent());
     }
 
     public function testMatchesMethodAgainstRequests()
