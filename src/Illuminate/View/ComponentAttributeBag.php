@@ -546,7 +546,6 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         $this->attributesBag[$key] = $mergeValues ? implode($mergeSeparator, $result) : $result;
 
         return $this;
-
     }
 
     /**
