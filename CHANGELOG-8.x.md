@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.26.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.26.1...8.x)
+
+
+## [v8.26.1 (2021-02-02)](https://github.com/laravel/framework/compare/v8.26.0...v8.26.1)
+
+### Fixed
+- Fixed merge conflict in `src/Illuminate/Foundation/Console/stubs/exception-render-report.stub` ([#36123](https://github.com/laravel/framework/pull/36123))
 
 
 ## [v8.26.0 (2021-02-02)](https://github.com/laravel/framework/compare/v8.25.0...v8.26.0)
