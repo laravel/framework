@@ -68,7 +68,7 @@ class SupportPluralizerTest extends TestCase
         $this->assertPluralStudly('RealHumans', 'RealHuman', -2);
     }
 
-    public function testPluralNotAppliedForStringEndingWithNoneAlphanumericCharacter()
+    public function testPluralNotAppliedForStringEndingWithNonAlphanumericCharacter()
     {
         $this->assertSame('Alien.', Str::plural('Alien.'));
         $this->assertSame('Alien!', Str::plural('Alien!'));
