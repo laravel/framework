@@ -168,7 +168,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     protected $attributes = [];
 
     /**
-     * List of magic attribute methods
+     * List of magic attribute methods.
      *
      * @var array
      */
@@ -314,7 +314,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         'usemap',
         'value',
         'width',
-        'wrap'
+        'wrap',
     ];
 
     /**
@@ -492,7 +492,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         if (count($arguments) === 1) {
             $list = Arr::first($arguments);
         } else {
-            list($key, $list) = $arguments;
+            [$key, $list] = $arguments;
         }
 
         $list = Arr::wrap($list);
@@ -506,7 +506,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
                 $mergeValues = true;
                 break;
             case 'dataAttr':
-                $key = 'data-' . $key;
+                $key = 'data-'.$key;
                 $strKebab = false;
                 break;
             case 'style':
@@ -519,7 +519,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             $key = Str::kebab($key);
         }
 
-        if (!$mergeValues && Arr::exists($this->attributesBag, $key)) {
+        if (! $mergeValues && Arr::exists($this->attributesBag, $key)) {
             return $this;
         }
 
@@ -771,7 +771,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function __call($method, $parameters)
     {
-        if (!in_array($method, $this->attributeMethods)) {
+        if (! in_array($method, $this->attributeMethods)) {
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));
