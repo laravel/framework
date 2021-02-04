@@ -1441,11 +1441,13 @@ class Blueprint
     }
 
     /**
+     * Add the columns from the callback after the given column.
+     *
      * @param  string  $column
      * @param  \Closure  $callback
      * @return void
      */
-    public function after($column, Closure $callback )
+    public function after($column, Closure $callback)
     {
         $this->after = $column;
 
