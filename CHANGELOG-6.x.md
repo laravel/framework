@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.20.16...6.x)
 
 
-## [v6.20.15 (2021-02-02)](https://github.com/laravel/framework/compare/v6.20.15...v6.20.16)
+## [v6.20.16 (2021-02-02)](https://github.com/laravel/framework/compare/v6.20.15...v6.20.16)
 
 ### Fixed
 - Fixed `Illuminate\View\ViewException::report()` ([#36110](https://github.com/laravel/framework/pull/36110))
