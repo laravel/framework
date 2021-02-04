@@ -1441,41 +1441,6 @@ class Blueprint
     }
 
     /**
-     * Add the columns from the callback after the given column.
-     *
-     * @param  string  $column
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function after($column, Closure $callback)
-    {
-        $this->after = $column;
-
-        $callback($this);
-
-        $this->after = null;
-    }
-
-    /**
-     * Add a new column definition to the blueprint.
-     *
-     * @param  \Illuminate\Database\Schema\ColumnDefinition  $definition
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    protected function addColumnDefinition($definition)
-    {
-        $this->columns[] = $definition;
-
-        if ($this->after) {
-            $definition->after($this->after);
-
-            $this->after = $definition->name;
-        }
-
-        return $definition;
-    }
-
-    /**
      * Add a new index command to the blueprint.
      *
      * @param  string  $type
@@ -1547,6 +1512,41 @@ class Blueprint
         return $this->addColumnDefinition(new ColumnDefinition(
             array_merge(compact('type', 'name'), $parameters)
         ));
+    }
+
+    /**
+     * Add a new column definition to the blueprint.
+     *
+     * @param  \Illuminate\Database\Schema\ColumnDefinition  $definition
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    protected function addColumnDefinition($definition)
+    {
+        $this->columns[] = $definition;
+
+        if ($this->after) {
+            $definition->after($this->after);
+
+            $this->after = $definition->name;
+        }
+
+        return $definition;
+    }
+
+    /**
+     * Add the columns from the callback after the given column.
+     *
+     * @param  string  $column
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function after($column, Closure $callback)
+    {
+        $this->after = $column;
+
+        $callback($this);
+
+        $this->after = null;
     }
 
     /**
