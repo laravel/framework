@@ -16,6 +16,8 @@ class SupportPluralizerTest extends TestCase
     {
         $this->assertSame('children', Str::plural('child'));
         $this->assertSame('cod', Str::plural('cod'));
+        $this->assertSame('The words', Str::plural('The word'));
+        $this->assertSame('Bouquetés', Str::plural('Bouqueté'));
     }
 
     public function testCaseSensitiveSingularUsage()
@@ -74,13 +76,13 @@ class SupportPluralizerTest extends TestCase
         $this->assertSame('Alien!', Str::plural('Alien!'));
         $this->assertSame('Alien ', Str::plural('Alien '));
         $this->assertSame('50%', Str::plural('50%'));
-
+    }
+    
+    public function testPluralAppliedForStringEndingWithNumericCharacter()
+    {
         $this->assertSame('User1s', Str::plural('User1'));
         $this->assertSame('User2s', Str::plural('User2'));
         $this->assertSame('User3s', Str::plural('User3'));
-
-        $this->assertSame('The words', Str::plural('The word'));
-        $this->assertSame('Bouquetés', Str::plural('Bouqueté'));
     }
 
     private function assertPluralStudly($expected, $value, $count = 2)
