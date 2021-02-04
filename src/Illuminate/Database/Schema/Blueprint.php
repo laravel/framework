@@ -72,6 +72,13 @@ class Blueprint
     public $temporary = false;
 
     /**
+     * The column to add new columns after.
+     *
+     * @var string
+     */
+    public $after;
+
+    /**
      * Create a new schema blueprint.
      *
      * @param  string  $table
@@ -836,14 +843,12 @@ class Blueprint
      */
     public function foreignId($column)
     {
-        $this->columns[] = $column = new ForeignIdColumnDefinition($this, [
+        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'bigInteger',
             'name' => $column,
             'autoIncrement' => false,
             'unsigned' => true,
-        ]);
-
-        return $column;
+        ]));
     }
 
     /**
@@ -1189,10 +1194,10 @@ class Blueprint
      */
     public function foreignUuid($column)
     {
-        return $this->columns[] = new ForeignIdColumnDefinition($this, [
+        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'uuid',
             'name' => $column,
-        ]);
+        ]));
     }
 
     /**
@@ -1436,6 +1441,39 @@ class Blueprint
     }
 
     /**
+     * @param  string  $column
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function after($column, Closure $callback )
+    {
+        $this->after = $column;
+
+        $callback($this);
+
+        $this->after = null;
+    }
+
+    /**
+     * Add a new column definition to the blueprint.
+     *
+     * @param  \Illuminate\Database\Schema\ColumnDefinition  $definition
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    protected function addColumnDefinition($definition)
+    {
+        $this->columns[] = $definition;
+
+        if ($this->after) {
+            $definition->after($this->after);
+
+            $this->after = $definition->name;
+        }
+
+        return $definition;
+    }
+
+    /**
      * Add a new index command to the blueprint.
      *
      * @param  string  $type
@@ -1504,11 +1542,9 @@ class Blueprint
      */
     public function addColumn($type, $name, array $parameters = [])
     {
-        $this->columns[] = $column = new ColumnDefinition(
+        return $this->addColumnDefinition(new ColumnDefinition(
             array_merge(compact('type', 'name'), $parameters)
-        );
-
-        return $column;
+        ));
     }
 
     /**
