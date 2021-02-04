@@ -69,7 +69,7 @@ class Pluralizer
      */
     public static function plural($value, $count = 2)
     {
-        if ((int) abs($count) === 1 || static::uncountable($value)) {
+        if ((int) abs($count) === 1 || static::uncountable($value) || preg_match('/^(.*)[A-Za-z0-9]$/', $value) == 0) {
             return $value;
         }
 
