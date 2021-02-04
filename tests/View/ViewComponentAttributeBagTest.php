@@ -27,9 +27,16 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('font-bold', $bag->get('class'));
         $this->assertSame('bar', $bag->get('foo', 'bar'));
         $this->assertSame('font-bold', $bag['class']);
-        $this->assertSame('class="mt-4 font-bold" name="test"', (string) $bag->class('mt-4'));
-        $this->assertSame('class="mt-4 font-bold" name="test"', (string) $bag->class(['mt-4']));
-        $this->assertSame('class="mt-4 ml-2 font-bold" name="test"', (string) $bag->class(['mt-4', 'ml-2' => true, 'mr-2' => false]));
+        $this->assertSame('href="/login" class="font-bold" name="test"', (string) $bag->href(['/login' => true, '/logout' => false])->merge());
+        $this->assertSame('href="/login" class="mt-4 font-bold" name="test"', (string) $bag->class('mt-4')->merge());
+        $this->assertSame('href="/login" class="mt-4 font-bold" name="test"', (string) $bag->class(['mt-4'])->merge());
+        $this->assertSame('href="/login" class="mt-4 font-bold" accept-charset="ISO-8859-1" name="test"', (string) $bag->acceptCharset('ISO-8859-1')->merge());
+        $this->assertSame('href="/login" class="mt-4 font-bold" accept-charset="ISO-8859-1" name="test"', (string) $bag->acceptCharset(['ISO-8859-1'])->merge());
+        $this->assertSame('href="/login" class="mt-4 font-bold" accept-charset="ISO-8859-1" name="test"', (string) $bag->acceptCharset(['ISO-8859-1' => true, 'UTF-8' => false])->merge());
+        $this->assertSame('href="/login" class="mt-4 ml-2 font-bold" accept-charset="ISO-8859-1" name="test"', (string) $bag->class(['mt-4', 'ml-2' => true, 'mr-2' => false])->merge());
+        $this->assertSame('href="/login" class="mt-4 font-bold" accept-charset="ISO-8859-1" style="display:block" name="test"', (string) $bag->class('mt-4')->style('display:block')->merge());
+        $this->assertSame('href="/login" class="mt-4 font-bold" accept-charset="ISO-8859-1" style="display:block;position:relative" name="test"', (string) $bag->class('mt-4')->style(['display:block', 'position:relative'])->merge());
+        $this->assertSame('href="/login" class="mt-4 font-bold" accept-charset="ISO-8859-1" style="display:block;position:relative" name="test"', (string) $bag->class('mt-4')->style(['display:block', 'position:relative' => true])->merge());
 
         $bag = new ComponentAttributeBag([]);
 
