@@ -77,7 +77,7 @@ class SupportPluralizerTest extends TestCase
         $this->assertSame('Alien ', Str::plural('Alien '));
         $this->assertSame('50%', Str::plural('50%'));
     }
-    
+
     public function testPluralAppliedForStringEndingWithNumericCharacter()
     {
         $this->assertSame('User1s', Str::plural('User1'));
