@@ -448,7 +448,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('http://www.foo.com:8080/')
         );
 
-        $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
+        $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com:8080']);
         $routes->add($route);
 
         /*
