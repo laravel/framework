@@ -130,9 +130,7 @@ class RouteUrlGenerator
      */
     protected function formatDomain($route, &$parameters)
     {
-        return $this->addPortToDomain(
-            $this->getRouteScheme($route).$route->getDomain()
-        );
+        return $this->getRouteScheme($route).$route->getDomain();
     }
 
     /**
@@ -150,22 +148,6 @@ class RouteUrlGenerator
         }
 
         return $this->url->formatScheme();
-    }
-
-    /**
-     * Add the port to the domain if necessary.
-     *
-     * @param  string  $domain
-     * @return string
-     */
-    protected function addPortToDomain($domain)
-    {
-        $secure = $this->request->isSecure();
-
-        $port = (int) $this->request->getPort();
-
-        return ($secure && $port === 443) || (! $secure && $port === 80)
-                    ? $domain : $domain.':'.$port;
     }
 
     /**
