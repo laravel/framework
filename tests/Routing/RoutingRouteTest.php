@@ -678,6 +678,28 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('hello', $router->dispatch(Request::create('http://api.baz.boom/foo/bar', 'GET'))->getContent());
     }
 
+    public function testRoutesDontMatchNonMatchingDomainWithPort()
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['domain' => 'localhost:8080', function () {
+            return 'hello';
+        }]);
+        $this->assertSame('hello', $router->dispatch(Request::create('http://localhost/foo/bar', 'GET'))->getContent());
+    }
+
+    public function testRoutesDontMatchNonMatchingDomainWhenWildcardPortDisabled()
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['domain' => 'localhost', 'wildcard_port' => false, function () {
+            return 'hello';
+        }]);
+        $this->assertSame('hello', $router->dispatch(Request::create('http://localhost:8080/foo/bar', 'GET'))->getContent());
+    }
+
     public function testRouteDomainRegistration()
     {
         $router = $this->getRouter();
