@@ -144,7 +144,7 @@ trait TestDatabases
 
         config()->set(
             "database.connections.{$default}.database",
-            $database,
+            $database
         );
     }
 
