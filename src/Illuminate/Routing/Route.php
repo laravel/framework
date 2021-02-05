@@ -695,6 +695,16 @@ class Route
     }
 
     /**
+     * Determine if the route allows wildcard port.
+     *
+     * @return bool
+     */
+    public function wildcardPort()
+    {
+        return $this->action['wildcard_port'] ?? true;
+    }
+
+    /**
      * Get or set the domain for the route.
      *
      * @param  string|null  $domain
