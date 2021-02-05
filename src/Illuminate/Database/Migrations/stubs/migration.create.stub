@@ -26,6 +26,6 @@ class {{ class }} extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('{{ table }}');
+        Schema::drop('{{ table }}');
     }
 }
