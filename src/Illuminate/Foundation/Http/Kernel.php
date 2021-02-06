@@ -139,7 +139,7 @@ class Kernel implements KernelContract
         return (new Pipeline($this->app))
                     ->send($request)
                     ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
-                    ->afterEach(function($pipe) {
+                    ->afterEach(function ($pipe) {
                         $this->app['events']->dispatch(new MiddlewareFinished($pipe));
                     })
                     ->then($this->dispatchToRouter());

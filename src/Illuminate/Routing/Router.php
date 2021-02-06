@@ -689,7 +689,7 @@ class Router implements BindingRegistrar, RegistrarContract
         return (new Pipeline($this->container))
                         ->send($request)
                         ->through($middleware)
-                        ->afterEach(function($pipe) {
+                        ->afterEach(function ($pipe) {
                             $this->container['events']->dispatch(new MiddlewareFinished($pipe));
                         })
                         ->then(function ($request) use ($route) {
