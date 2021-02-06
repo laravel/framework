@@ -3,7 +3,7 @@
 namespace Illuminate\Queue;
 
 use Closure;
-use Exception;
+use Throwable;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Container\Container;
@@ -90,7 +90,7 @@ class CallQueuedClosure implements ShouldQueue
      * @param  \Exception  $e
      * @return void
      */
-    public function failed(Exception $e)
+    public function failed(Throwable $e)
     {
         foreach ($this->failureCallbacks as $callback) {
             call_user_func($callback instanceof SerializableClosure ? $callback->getClosure() : $callback, $e);
