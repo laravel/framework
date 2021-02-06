@@ -39,6 +39,11 @@ class Pipeline implements PipelineContract
     protected $method = 'handle';
 
     /**
+     * @var Closure
+     */
+    protected $afterEach;
+
+    /**
      * Create a new class instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -71,6 +76,20 @@ class Pipeline implements PipelineContract
     public function through($pipes)
     {
         $this->pipes = is_array($pipes) ? $pipes : func_get_args();
+
+        return $this;
+    }
+
+    /**
+     * Set the closure that should be run after running
+     * through each pipe.
+     *
+     * @param  Closure  $afterEach
+     * @return $this
+     */
+    public function afterEach(Closure $afterEach)
+    {
+        $this->afterEach = $afterEach;
 
         return $this;
     }
@@ -166,6 +185,10 @@ class Pipeline implements PipelineContract
                     $carry = method_exists($pipe, $this->method)
                                     ? $pipe->{$this->method}(...$parameters)
                                     : $pipe(...$parameters);
+
+                    if ($this->afterEach) {
+                        call_user_func($this->afterEach, $pipe);
+                    }
 
                     return $this->handleCarry($carry);
                 } catch (Throwable $e) {
