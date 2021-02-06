@@ -152,6 +152,13 @@ class PendingMail
      */
     protected function fill(MailableContract $mailable)
     {
+        // Before populating mailable with the addresses
+        // remove any previous addresses and reset locale.
+        $mailable->to = [];
+        $mailable->cc = [];
+        $mailable->bcc = [];
+        $mailable->locale = null;
+
         return tap($mailable->to($this->to)
             ->cc($this->cc)
             ->bcc($this->bcc), function (MailableContract $mailable) {
