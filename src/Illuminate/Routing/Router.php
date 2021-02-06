@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Events\MiddlewareFinished;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -688,6 +689,9 @@ class Router implements BindingRegistrar, RegistrarContract
         return (new Pipeline($this->container))
                         ->send($request)
                         ->through($middleware)
+                        ->afterEach(function($pipe) {
+                            $this->container['events']->dispatch(new MiddlewareFinished($pipe));
+                        })
                         ->then(function ($request) use ($route) {
                             return $this->prepareResponse(
                                 $request, $route->run()
