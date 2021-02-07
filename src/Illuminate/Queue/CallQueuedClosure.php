@@ -9,7 +9,6 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use ReflectionFunction;
-use Throwable;
 
 class CallQueuedClosure implements ShouldQueue
 {
@@ -87,10 +86,10 @@ class CallQueuedClosure implements ShouldQueue
     /**
      * Handle a job failure.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    public function failed(Throwable $e)
+    public function failed($e)
     {
         foreach ($this->failureCallbacks as $callback) {
             call_user_func($callback instanceof SerializableClosure ? $callback->getClosure() : $callback, $e);
