@@ -16,7 +16,7 @@ trait HasTimestamps
     /**
      * Update the model's update timestamp.
      *
-     * @param  string  $attribute
+     * @param  string|null  $attribute
      * @return bool
      */
     public function touch($attribute = null)
