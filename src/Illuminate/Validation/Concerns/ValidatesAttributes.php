@@ -1749,9 +1749,9 @@ trait ValidatesAttributes
     /**
      * Validate that an attribute is a valid timezone.
      *
-     * @param string $attribute
-     * @param mixed $value
-     * @param array $parameters
+     * @param  string $attribute
+     * @param  mixed $value
+     * @param  array $parameters
      * @return bool
      */
     public function validateTimezone($attribute, $value, $parameters)
