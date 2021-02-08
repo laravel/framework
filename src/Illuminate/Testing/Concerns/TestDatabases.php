@@ -146,6 +146,19 @@ trait TestDatabases
             "database.connections.{$default}.database",
             $database,
         );
+
+        if ($databaseConnectionUrl = config("database.connections.{$default}.url")) {
+            $testDatabaseConnectionUrl = preg_replace(
+                '/^(.*)(\/[\w-]*)(\??.*)$/',
+                "$1/{$database}$3",
+                $databaseConnectionUrl
+            );
+
+            config()->set(
+                "database.connections.{$default}.url",
+                $testDatabaseConnectionUrl
+            );
+        }
     }
 
     /**
