@@ -1756,7 +1756,7 @@ trait ValidatesAttributes
      */
     public function validateTimezone($attribute, $value, $parameters)
     {
-        $timezoneGroup = DateTimeZone::class . '::' . Str::upper(Arr::get($parameters, '0', 'ALL'));
+        $timezoneGroup = DateTimeZone::class.'::'.Str::upper(Arr::get($parameters, '0', 'ALL'));
 
         if (! defined($timezoneGroup)) {
             throw new InvalidArgumentException("Invalid timezone group: '{$parameters[0]}' provided.");
