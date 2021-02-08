@@ -3232,6 +3232,20 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => ['this_is_not_a_timezone']], ['foo' => 'Timezone']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'Etc/UTC'], ['foo' => 'Timezone:all_with_bc']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'Africa/Windhoek'], ['foo' => 'Timezone:asia']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'Asia/Dhaka'], ['foo' => 'Timezone:asia']);
+        $this->assertTrue($v->passes());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid timezone group: 'invalid_group' provided.");
+        $v = new Validator($trans, ['foo' => 'Asia/Dhaka'], ['foo' => 'Timezone:invalid_group']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateRegex()
