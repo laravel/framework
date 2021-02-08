@@ -274,7 +274,7 @@ abstract class Component
     }
 
     /**
-     * Get a new attribute bag.
+     * Get a new attribute bag instance.
      *
      * @param  array  $attributes
      * @return \Illuminate\View\ComponentAttributeBag
