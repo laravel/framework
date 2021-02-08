@@ -5,6 +5,7 @@ namespace Illuminate\Validation\Concerns;
 use Countable;
 use DateTime;
 use DateTimeInterface;
+use DateTimeZone;
 use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
@@ -1750,11 +1751,18 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array  $parameters
      * @return bool
      */
-    public function validateTimezone($attribute, $value)
+    public function validateTimezone($attribute, $value, $parameters)
     {
-        return in_array($value, timezone_identifiers_list(), true);
+        $timezoneGroup = DateTimeZone::class.'::'.Str::upper(Arr::get($parameters, '0', 'ALL'));
+
+        if (! defined($timezoneGroup)) {
+            throw new InvalidArgumentException("Invalid timezone group: '{$parameters[0]}' provided.");
+        }
+
+        return in_array($value, timezone_identifiers_list(constant($timezoneGroup)), true);
     }
 
     /**
