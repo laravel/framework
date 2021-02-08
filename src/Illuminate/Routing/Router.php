@@ -465,6 +465,14 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function createRoute($methods, $uri, $action)
     {
+        // If we declared controller_class group before, then we parse action in
+        // specific way: if it is a method name, then create a callback using the
+        // controller_class in group and action.
+        $group = end($this->groupStack);
+        if (isset($group['controller_class']) && is_string($action)) {
+            $action = [ $this->prependGroupNamespace($group['controller_class']), $action ];
+        }
+
         // If the route is routing to a controller we will parse the route action into
         // an acceptable array format before registering it and creating this route
         // instance itself. We need to build the Closure that will call this out.

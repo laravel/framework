@@ -55,7 +55,7 @@ class RouteRegistrar
      * @var string[]
      */
     protected $allowedAttributes = [
-        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix', 'where',
+        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix', 'where', 'controller',
     ];
 
     /**
@@ -65,6 +65,7 @@ class RouteRegistrar
      */
     protected $aliases = [
         'name' => 'as',
+        'controller' => 'controller_class',
     ];
 
     /**
