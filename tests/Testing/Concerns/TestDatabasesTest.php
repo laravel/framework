@@ -100,6 +100,8 @@ class TestDatabasesTest extends TestCase
         parent::tearDown();
 
         Container::setInstance(null);
+        DB::clearResolvedInstances();
+        DB::setFacadeApplication(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
 
