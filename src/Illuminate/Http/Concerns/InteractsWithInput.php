@@ -64,7 +64,7 @@ trait InteractsWithInput
      * Determine if the request contains a given input item key.
      *
      * @param  string|array  $key
-     * @return boo
+     * @return bool
      */
     public function exists($key)
     {
