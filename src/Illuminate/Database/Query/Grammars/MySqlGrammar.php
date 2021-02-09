@@ -133,8 +133,7 @@ class MySqlGrammar extends Grammar
 
         return parent::compileInsert($query, $values);
     }
-    
-    
+
     /**
      * Compile an replace statement into SQL. (Only MySQL 8)
      *
