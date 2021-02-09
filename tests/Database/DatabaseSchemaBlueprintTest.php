@@ -323,4 +323,19 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table `posts` add constraint `posts_eloquent_model_uuid_stub_id_foreign` foreign key (`eloquent_model_uuid_stub_id`) references `model` (`id`)'
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
+
+    public function testGenerateReferenceColumnWithOverrides()
+    {
+        $base = new Blueprint('posts', function($table) {
+            $table->foreignReferenceFor('Illuminate\Foundation\Auth\User', 'forum_user_id', 'forum_users', 'uid');
+        });
+
+        $connection = m::mock(Connection::class);
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `forum_user_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_forum_user_id_foreign` foreign key (`forum_user_id`) references `forum_users` (`uid`)'
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
 }

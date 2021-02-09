@@ -873,18 +873,20 @@ class Blueprint
      * Creates a foreign ID column and key for the given model.
      *
      * @param \Illuminate\Database\Eloquent\Model|string $model
-     * @param string|null null $column
+     * @param string|null $column
+     * @param string|null $table
+     * @param string|null $keyName
      * @return ForeignKeyDefinition
      */
-    public function foreignReferenceFor($model, $column = null)
+    public function foreignReferenceFor($model, $column = null, $table = null, $keyName = null)
     {
         if (is_string($model)) {
             $model = new $model;
         }
 
         return $this->foreignIdFor($model, $column)
-            ->references($model->getKeyName())
-            ->on($model->getTable());
+            ->references($keyName ?: $model->getKeyName())
+            ->on($table ?: $model->getTable());
     }
 
 
