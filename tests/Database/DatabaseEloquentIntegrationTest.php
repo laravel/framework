@@ -805,6 +805,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(1, $photos->count());
     }
 
+    public function testBelongsToManyRelationshipModelsAreProperlyHydratedWithSoleQuery()
+    {
+        $user = EloquentTestUserWithCustomFriendPivot::create(['email' => 'taylorotwell@gmail.com']);
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+
+        $user->friends()->get()->each(function ($friend) {
+            $this->assertTrue($friend->pivot instanceof EloquentTestFriendPivot);
+        });
+
+        $soleFriend = $user->friends()->where('email', 'abigailotwell@gmail.com')->sole();
+
+        $this->assertTrue($soleFriend->pivot instanceof EloquentTestFriendPivot);
+    }
+
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
