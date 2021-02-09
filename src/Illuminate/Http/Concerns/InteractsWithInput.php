@@ -286,11 +286,10 @@ trait InteractsWithInput
     /**
      * Decode input from JSON to array/object. Useful when only parts are json encoded.
      *
-     * Returns decoded JSON as array or object
-     *
-     * @param string $key
-     * @param bool $assoc
-     * @param int $options
+     * @param  string  $key
+     * @param  bool  $assoc
+     * @param  int  $options
+     * @return mixed
      */
     public function json($key, $assoc = false, $options = 0)
     {
