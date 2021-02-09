@@ -2898,7 +2898,7 @@ class Builder
             $this->cleanBindings($bindings)
         );
     }
-    
+
     /**
      * Replace records in the database.
      *
