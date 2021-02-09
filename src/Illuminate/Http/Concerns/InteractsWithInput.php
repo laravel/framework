@@ -64,7 +64,7 @@ trait InteractsWithInput
      * Determine if the request contains a given input item key.
      *
      * @param  string|array  $key
-     * @return bool
+     * @return boo
      */
     public function exists($key)
     {
@@ -283,6 +283,19 @@ trait InteractsWithInput
         return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
     }
 
+    /**
+     * Decode input from JSON to array/object. Useful when only parts are json encoded.
+     * 
+     * Returns decoded JSON as array or object
+     *
+     * @param string $key
+     * @param bool $assoc
+     * @param int $options
+     */
+    public function json($key, $assoc = false, $options = 0) {
+        return json_decode($this->input($key), $assoc, $options);
+    }
+    
     /**
      * Get a subset containing the provided keys with values from the input data.
      *
