@@ -54,6 +54,17 @@ class QueryException extends PDOException
      */
     protected function formatMessage($sql, $bindings, Throwable $previous)
     {
+        // This handles error when binding is not a scalar value
+        if (Arr::where($bindings, function ($item) {
+            return !is_scalar($item);
+        })) {
+            $bindings = array_map(function ($item) {
+                return is_scalar($item) ? $item : json_encode($item);
+            }, $bindings);
+
+            return $previous->getMessage().' (Bindings not scalar - SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+        }
+
         return $previous->getMessage().' (SQL: '.Str::replaceArray('?', $bindings, $sql).')';
     }
 
