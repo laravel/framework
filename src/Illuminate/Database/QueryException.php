@@ -58,6 +58,7 @@ class QueryException extends PDOException
         // This handles error when binding is not a scalar value
         if (Arr::where($bindings, function ($item) {
             return !is_scalar($item);
+            return ! is_scalar($item);
         })) {
             $bindings = array_map(function ($item) {
                 return is_scalar($item) ? $item : json_encode($item);
