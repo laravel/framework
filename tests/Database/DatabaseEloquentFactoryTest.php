@@ -211,6 +211,7 @@ class DatabaseEloquentFactoryTest extends TestCase
                                     ->state(function ($attributes, $user) {
                                         // Test parent is passed to child state mutations...
                                         $_SERVER['__test.post.state-user'] = $user;
+                                        $_SERVER['__test.post.state-faker'] = $this->faker;
 
                                         return [];
                                     })
@@ -230,10 +231,12 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.creating-post']);
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.creating-user']);
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.state-user']);
+        $this->assertInstanceOf(\Faker\Generator::class, $_SERVER['__test.post.state-faker']);
 
         unset($_SERVER['__test.post.creating-post']);
         unset($_SERVER['__test.post.creating-user']);
         unset($_SERVER['__test.post.state-user']);
+        unset($_SERVER['__test.post.state-faker']);
     }
 
     public function test_belongs_to_relationship()
