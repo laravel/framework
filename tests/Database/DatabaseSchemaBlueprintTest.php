@@ -294,7 +294,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testGenerateReferenceColumnWithIncrementalModel()
     {
-        $base = new Blueprint('posts', function($table) {
+        $base = new Blueprint('posts', function ($table) {
             $table->foreignReferenceFor('Illuminate\Foundation\Auth\User');
         });
 
@@ -303,15 +303,15 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `posts` add `user_id` bigint unsigned not null',
-            'alter table `posts` add constraint `posts_user_id_foreign` foreign key (`user_id`) references `users` (`id`)'
+            'alter table `posts` add constraint `posts_user_id_foreign` foreign key (`user_id`) references `users` (`id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
     public function testGenerateReferenceColumnWithUuidModel()
     {
-        require_once __DIR__ . '/stubs/EloquentModelUuidStub.php';
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
 
-        $base = new Blueprint('posts', function($table) {
+        $base = new Blueprint('posts', function ($table) {
             $table->foreignReferenceFor('EloquentModelUuidStub');
         });
 
@@ -320,13 +320,13 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
-            'alter table `posts` add constraint `posts_eloquent_model_uuid_stub_id_foreign` foreign key (`eloquent_model_uuid_stub_id`) references `model` (`id`)'
+            'alter table `posts` add constraint `posts_eloquent_model_uuid_stub_id_foreign` foreign key (`eloquent_model_uuid_stub_id`) references `model` (`id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
     public function testGenerateReferenceColumnWithOverrides()
     {
-        $base = new Blueprint('posts', function($table) {
+        $base = new Blueprint('posts', function ($table) {
             $table->foreignReferenceFor('Illuminate\Foundation\Auth\User', 'forum_user_id', 'forum_users', 'uid');
         });
 
@@ -335,7 +335,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `posts` add `forum_user_id` bigint unsigned not null',
-            'alter table `posts` add constraint `posts_forum_user_id_foreign` foreign key (`forum_user_id`) references `forum_users` (`uid`)'
+            'alter table `posts` add constraint `posts_forum_user_id_foreign` foreign key (`forum_user_id`) references `forum_users` (`uid`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 }

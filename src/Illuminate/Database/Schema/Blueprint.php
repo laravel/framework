@@ -889,7 +889,6 @@ class Blueprint
             ->on($table ?: $model->getTable());
     }
 
-
     /**
      * Create a new float column on the table.
      *
