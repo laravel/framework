@@ -147,12 +147,12 @@ trait TestDatabases
         if ($url) {
             config()->set(
                 "database.connections.{$default}.url",
-                preg_replace('/^(.*)(\/[\w-]*)(\??.*)$/', "$1/{$database}$3", $url),
+                preg_replace('/^(.*)(\/[\w-]*)(\??.*)$/', "$1/{$database}$3", $url)
             );
         } else {
             config()->set(
                 "database.connections.{$default}.database",
-                $database,
+                $database
             );
         }
     }
