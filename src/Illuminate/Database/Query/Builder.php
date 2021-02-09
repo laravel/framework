@@ -2938,7 +2938,6 @@ class Builder
         );
     }
 
-
     /**
      * Update records in the database.
      *
