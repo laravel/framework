@@ -135,7 +135,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile an replace statement into SQL. (Only MySQL 8)
+     * Compile an replace statement into SQL. (Only MySQL 8).
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
