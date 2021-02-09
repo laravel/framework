@@ -52,6 +52,26 @@ trait BuildsQueries
     }
 
     /**
+     * Run a map over each item while chunking.
+     *
+     * @param  callable  $callback
+     * @param  int  $count
+     * @return \Illuminate\Support\Collection
+     */
+    public function chunkMap(callable $callback, $count = 1000)
+    {
+        $collection = Collection::make();
+
+        $this->chunk($count, function ($items) use ($collection, $callback) {
+            $items->each(function ($item) use ($collection, $callback) {
+                $collection->push($callback($item));
+            });
+        });
+
+        return $collection;
+    }
+
+    /**
      * Execute a callback over each item while chunking.
      *
      * @param  callable  $callback
@@ -148,26 +168,6 @@ trait BuildsQueries
     public function first($columns = ['*'])
     {
         return $this->take(1)->get($columns)->first();
-    }
-
-    /**
-     * Run a map over each item while chunking.
-     *
-     * @param  callable  $callback
-     * @param  int  $count
-     * @return \Illuminate\Support\Collection
-     */
-    public function map(callable $callback, $count = 1000)
-    {
-        $collection = Collection::make();
-
-        $this->chunk($count, function ($items) use ($collection, $callback) {
-            $items->each(function ($item) use ($collection, $callback) {
-                $collection->push($callback($item));
-            });
-        });
-
-        return $collection;
     }
 
     /**

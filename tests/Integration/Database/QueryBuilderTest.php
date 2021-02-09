@@ -214,11 +214,11 @@ class QueryBuilderTest extends DatabaseTestCase
         ]);
     }
 
-    public function testMap()
+    public function testChunkMap()
     {
         DB::enableQueryLog();
 
-        $results = DB::table('posts')->orderBy('id')->map(function ($post) {
+        $results = DB::table('posts')->orderBy('id')->chunkMap(function ($post) {
             return $post->title;
         }, 1);
 

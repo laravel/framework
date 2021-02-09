@@ -136,7 +136,7 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertSame(UserWhereTest::class, $exception->getModel());
     }
 
-    public function testMap()
+    public function testChunkMap()
     {
         UserWhereTest::create([
             'name' => 'first-name',
@@ -152,7 +152,7 @@ class EloquentWhereTest extends DatabaseTestCase
 
         DB::enableQueryLog();
 
-        $results = UserWhereTest::orderBy('id')->map(function ($user) {
+        $results = UserWhereTest::orderBy('id')->chunkMap(function ($user) {
             return $user->name;
         }, 1);
 
