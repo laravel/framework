@@ -375,7 +375,7 @@ abstract class Factory
             }], $states->all()));
         })->reduce(function ($carry, $state) use ($parent) {
             if ($state instanceof Closure) {
-                $state = $state->bindTo($this);
+                $state = $state->bindTo($this, $this);
             }
 
             return array_merge($carry, $state($carry, $parent));
