@@ -291,4 +291,36 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
+
+    public function testGenerateReferenceColumnWithIncrementalModel()
+    {
+        $base = new Blueprint('posts', function($table) {
+            $table->foreignReferenceFor('Illuminate\Foundation\Auth\User');
+        });
+
+        $connection = m::mock(Connection::class);
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `user_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_user_id_foreign` foreign key (`user_id`) references `users` (`id`)'
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateReferenceColumnWithUuidModel()
+    {
+        require_once __DIR__ . '/stubs/EloquentModelUuidStub.php';
+
+        $base = new Blueprint('posts', function($table) {
+            $table->foreignReferenceFor('EloquentModelUuidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
+            'alter table `posts` add constraint `posts_eloquent_model_uuid_stub_id_foreign` foreign key (`eloquent_model_uuid_stub_id`) references `model` (`id`)'
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
 }
