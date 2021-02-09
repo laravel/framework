@@ -693,7 +693,7 @@ class TestResponse implements ArrayAccess
         $json = $this->json();
 
         if (! Arr::has($json, $responseKey)) {
-            PHPUnit::assertFalse(Arr::has($json, $responseKey), 'Response has unexpected ' .$responseKey.' key.');
+            PHPUnit::assertFalse(Arr::has($json, $responseKey), 'Response has unexpected '.$responseKey.' key.');
 
             return $this;
         }
