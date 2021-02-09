@@ -133,6 +133,19 @@ class MySqlGrammar extends Grammar
 
         return parent::compileInsert($query, $values);
     }
+    
+    
+    /**
+     * Compile an replace statement into SQL. (Only MySQL 8)
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileReplace(Builder $query, array $values)
+    {
+        return Str::replaceFirst('insert', 'replace', $this->compileInsert($query, $values));
+    }
 
     /**
      * Compile the columns for an update statement.
