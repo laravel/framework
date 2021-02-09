@@ -1048,6 +1048,27 @@ class TestResponseTest extends TestCase
         $response->assertJsonMissingValidationErrors('bar');
     }
 
+    public function testAssertJsonMissingValidationErrorsCanFail3()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(
+                json_encode([
+                    'data' => [
+                        'errors' => [
+                            'foo' => ['one'],
+                        ],
+                    ],
+                ]),
+            );
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertJsonMissingValidationErrors('foo', 'data.errors');
+    }
+
     public function testAssertJsonMissingValidationErrorsWithoutArgument()
     {
         $data = ['status' => 'ok'];
@@ -1107,6 +1128,31 @@ class TestResponseTest extends TestCase
         );
 
         $testResponse->assertJsonMissingValidationErrors('bar', 'data');
+    }
+
+    public function testAssertJsonMissingValidationErrorsNestedCustomErrorsName1()
+    {
+        $data = [
+            'status' => 'ok',
+            'data' => [
+                'errors' => ['foo' => 'oops'],
+            ],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonMissingValidationErrors('bar', 'data.errors');
+    }
+
+    public function testAssertJsonMissingValidationErrorsNestedCustomErrorsName2()
+    {
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode([]))
+        );
+
+        $testResponse->assertJsonMissingValidationErrors('bar', 'data.errors');
     }
 
     public function testMacroable()
