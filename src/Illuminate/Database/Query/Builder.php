@@ -2898,6 +2898,46 @@ class Builder
             $this->cleanBindings($bindings)
         );
     }
+    
+    /**
+     * Replace records in the database.
+     *
+     * @param  array  $values
+     * @return int
+     */
+    public function replace(array $values)
+    {
+        // Since every replace gets treated like a batch replace, we will make sure the
+        // bindings are structured in a way that is convenient when building these
+        // replaces statements by verifying these elements are actually an array.
+        if (empty($values)) {
+            return 0;
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        // Here, we will sort the replace keys for every record so that each replace is
+        // in the same order for the record. We need to make sure this is the case
+        // so there are not any errors or problems when replacing these records.
+        else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+
+                $values[$key] = $value;
+            }
+        }
+
+        // Finally, we will run this query against the database connection and return
+        // the results. We will need to also flatten these bindings before running
+        // the query so they are all in one huge, flattened array for execution.
+        return $this->connection->update(
+            $this->grammar->compileReplace($this, $values),
+            $this->cleanBindings(Arr::flatten($values, 1))
+        );
+    }
+
 
     /**
      * Update records in the database.
