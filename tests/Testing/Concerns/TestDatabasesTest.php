@@ -29,7 +29,7 @@ class TestDatabasesTest extends TestCase
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
     }
 
-    public function testSwitchToDatabaseWithoutUrls()
+    public function testSwitchToDatabaseWithoutUrl()
     {
         DB::shouldReceive('purge')->once();
 
@@ -46,9 +46,9 @@ class TestDatabasesTest extends TestCase
     }
 
     /**
-     * @dataProvider urlConnections
+     * @dataProvider databaseUrls
      */
-    public function testSwitchToDatabaseWithUrls($testDatabase, $url, $testUrl)
+    public function testSwitchToDatabaseWithUrl($testDatabase, $url, $testUrl)
     {
         DB::shouldReceive('purge')->once();
 
@@ -74,7 +74,7 @@ class TestDatabasesTest extends TestCase
         tap($method)->setAccessible(true)->invoke($instance, $database);
     }
 
-    public function urlConnections()
+    public function databaseUrls()
     {
         return [
             [
