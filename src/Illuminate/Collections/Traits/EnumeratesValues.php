@@ -764,7 +764,7 @@ trait EnumeratesValues
      */
     public function tap(callable $callback)
     {
-        $callback(clone $this);
+        $callback($this);
 
         return $this;
     }
