@@ -986,11 +986,13 @@ class Container implements ArrayAccess, ContainerContract
         catch (BindingResolutionException $e) {
             if ($parameter->isDefaultValueAvailable()) {
                 array_pop($this->with);
+
                 return $parameter->getDefaultValue();
             }
 
             if ($parameter->isVariadic()) {
                 array_pop($this->with);
+
                 return [];
             }
 
