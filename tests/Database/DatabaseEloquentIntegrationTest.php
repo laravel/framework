@@ -819,6 +819,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($soleFriend->pivot instanceof EloquentTestFriendPivot);
     }
 
+    public function testBelongsToManyRelationshipMissingModelExceptionWithSoleQueryWorks()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $user = EloquentTestUserWithCustomFriendPivot::create(['email' => 'taylorotwell@gmail.com']);
+        $user->friends()->where('email', 'abigailotwell@gmail.com')->sole();
+    }
+
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
