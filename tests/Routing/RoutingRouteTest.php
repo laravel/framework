@@ -1084,7 +1084,7 @@ class RoutingRouteTest extends TestCase
 
         $router->group(
             ['namespace' => 'App\Http\Controllers',
-            'controller_class' => 'UsersController'],
+                'controller_class' => 'UsersController'],
             function ($router) {
                 $router->get('users', 'index');
             });
@@ -1134,8 +1134,8 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
             $router->get('bar', ['as' => 'bar', function () {
-                return 'hello';
-            }]);
+            return 'hello';
+        }]);
         });
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::bar');
@@ -1151,8 +1151,8 @@ class RoutingRouteTest extends TestCase
         $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
             $router->group(['prefix' => 'bar', 'as' => 'Bar::'], function () use ($router) {
                 $router->get('baz', ['as' => 'baz', function () {
-                    return 'hello';
-                }]);
+                return 'hello';
+            }]);
             });
         });
         $routes = $router->getRoutes();
@@ -1166,8 +1166,8 @@ class RoutingRouteTest extends TestCase
         $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
             $router->group(['prefix' => 'bar'], function () use ($router) {
                 $router->prefix('foz')->get('baz', ['as' => 'baz', function () {
-                    return 'hello';
-                }]);
+                return 'hello';
+            }]);
             });
         });
         $routes = $router->getRoutes();
@@ -1183,8 +1183,8 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
             $router->prefix('bar')->get('baz', ['as' => 'baz', function () {
-                return 'hello';
-            }]);
+            return 'hello';
+        }]);
         });
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::baz');
