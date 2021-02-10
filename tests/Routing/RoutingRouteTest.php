@@ -1082,9 +1082,9 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
 
-        $router->group([
-                'namespace' => 'App\Http\Controllers',
-                'controller_class' => 'UsersController'],
+        $router->group(
+            ['namespace' => 'App\Http\Controllers',
+            'controller_class' => 'UsersController'],
             function ($router) {
                 $router->get('users', 'index');
             });

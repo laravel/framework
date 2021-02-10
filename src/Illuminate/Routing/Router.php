@@ -470,7 +470,7 @@ class Router implements BindingRegistrar, RegistrarContract
         // controller_class in group and action.
         $group = end($this->groupStack);
         if (isset($group['controller_class']) && is_string($action)) {
-            $action = [ $this->prependGroupNamespace($group['controller_class']), $action ];
+            $action = [$this->prependGroupNamespace($group['controller_class']), $action];
         }
 
         // If the route is routing to a controller we will parse the route action into
