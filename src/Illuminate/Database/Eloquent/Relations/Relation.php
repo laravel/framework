@@ -167,7 +167,7 @@ abstract class Relation
         $result = $this->take(2)->get($columns);
 
         if ($result->isEmpty()) {
-            throw (new ModelNotFoundException)->setModel(get_class($this->model));
+            throw (new ModelNotFoundException)->setModel(get_class($this->related));
         }
 
         if ($result->count() > 1) {
