@@ -468,9 +468,9 @@ trait EnumeratesValues
         }
 
         if ($value) {
-            return $callback($this, $value);
+            return $callback($this, $value) ?: $this;
         } elseif ($default) {
-            return $default($this, $value);
+            return $default($this, $value) ?: $this;
         }
 
         return $this;
