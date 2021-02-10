@@ -1062,6 +1062,42 @@ class RoutingRouteTest extends TestCase
         );
     }
 
+    public function testCanRegisterControllerGroupRouteWithAction()
+    {
+        $router = $this->getRouter();
+        $router->group(['controller_class' => 'App\Http\Controllers\UsersController'], function ($router) {
+            $router->get('users', 'index');
+        });
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame(
+            'App\Http\Controllers\UsersController@index',
+            $routes[0]->getAction()['uses']
+        );
+    }
+
+    public function testCanRegisterControllerAndNamespaceGroupWithAction()
+    {
+        $router = $this->getRouter();
+
+        $router->group([
+                'namespace' => 'App\Http\Controllers',
+                'controller_class' => 'UsersController'],
+            function ($router) {
+                $router->get('users', 'index');
+            });
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame(
+            'App\Http\Controllers\UsersController@index',
+            $routes[0]->getAction()['uses']
+        );
+    }
+
     public function testCurrentRouteUses()
     {
         $router = $this->getRouter();
