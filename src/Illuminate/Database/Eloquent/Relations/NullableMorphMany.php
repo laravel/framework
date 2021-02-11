@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Collection;
-
 class NullableMorphMany extends MorphMany
 {
     /**
