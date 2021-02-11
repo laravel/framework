@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\NullableMorphMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -458,6 +459,47 @@ trait HasRelationships
     protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
     {
         return new MorphMany($query, $parent, $type, $id, $localKey);
+    }
+
+    /**
+     * Define a polymorphic one-to-many relationship.
+     *
+     * @param  string  $related
+     * @param  string  $name
+     * @param  string|null  $type
+     * @param  string|null  $id
+     * @param  string|null  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\NullableMorphMany
+     */
+    public function nullableMorphMany($related, $name, $type = null, $id = null, $localKey = null)
+    {
+        $instance = $this->newRelatedInstance($related);
+
+        // Here we will gather up the morph type and ID for the relationship so that we
+        // can properly query the intermediate table of a relation. Finally, we will
+        // get the table and create the relationship instances for the developers.
+        [$type, $id] = $this->getMorphs($name, $type, $id);
+
+        $table = $instance->getTable();
+
+        $localKey = $localKey ?: $this->getKeyName();
+
+        return $this->newNullableMorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+    }
+
+    /**
+     * Instantiate a new NullableMorphMany relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $type
+     * @param  string  $id
+     * @param  string  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\NullableMorphMany
+     */
+    protected function newNullableMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
+    {
+        return new NullableMorphMany($query, $parent, $type, $id, $localKey);
     }
 
     /**
