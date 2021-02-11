@@ -1,0 +1,12 @@
+{
+    "extra": {
+        "laravel": {
+            "providers": [
+                "bat"
+            ],
+            "aliases": {
+                "Bat": "Bat\\Facade"
+            }
+        }
+    }
+}

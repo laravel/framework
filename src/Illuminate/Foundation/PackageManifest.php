@@ -125,6 +125,16 @@ class PackageManifest
             $packages = $installed['packages'] ?? $installed;
         }
 
+        if ($this->files->exists($path = $this->basePath.'/composer.json')) {
+            $rootPackage = json_decode($this->files->get($path), true);
+
+            if (! isset($rootPackage['name'])) {
+                $rootPackage['name'] = 'laravel/laravel';
+            }
+
+            $packages[] = $rootPackage;
+        }
+
         $ignoreAll = in_array('*', $ignore = $this->packagesToIgnore());
 
         $this->write(collect($packages)->mapWithKeys(function ($package) {
