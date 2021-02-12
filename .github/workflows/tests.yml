@@ -48,9 +48,6 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Setup problem matchers
-        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
       - name: Set Minimum Guzzle Version
         uses: nick-invision/retry@v1
         with:
@@ -99,9 +96,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached
           tools: composer:v2
           coverage: none
-
-      - name: Setup problem matchers
-        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
       - name: Set Minimum Guzzle Version
         uses: nick-invision/retry@v1
