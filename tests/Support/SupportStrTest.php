@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
-use Stringable;
 
 class SupportStrTest extends TestCase
 {
