@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
+use Stringable;
 
 class SupportStrTest extends TestCase
 {
@@ -516,6 +518,34 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
         $this->assertEquals("<h1>hello world</h1>\n", Str::markdown('# hello world'));
+    }
+
+    public function testCanSplitString()
+    {
+        $this->assertInstanceOf(Collection::class, Str::split('foo,bar,baz', ','));
+        $this->assertEquals(['foo', 'bar', 'baz'], Str::split('foo,bar,baz', ',')->toArray());
+        $this->assertEquals(['foo', 'bar', 'baz'], Str::split('foo_bar_baz', '_')->toArray());
+    }
+
+    public function testCanSplitStringable()
+    {
+        $this->assertInstanceOf(Collection::class, Str::split('foo,bar,baz', ','));
+        $this->assertEquals(['foo', 'bar', 'baz'], Str::split(new Stringable('foo,bar,baz'), ',')->toArray());
+        $this->assertEquals(['foo', 'bar', 'baz'], Str::split(new Stringable('foo_bar_baz'), '_')->toArray());
+    }
+
+    public function testCanJoinArray()
+    {
+        $this->assertInstanceOf(Stringable::class, Str::join(['foo', 'bar', 'baz'], ','));
+        $this->assertEquals('foo,bar,baz', (string) Str::join(['foo', 'bar', 'baz'], ','));
+        $this->assertEquals('foo_bar_baz', (string) Str::join(['foo', 'bar', 'baz'], '_'));
+    }
+
+    public function testCanJoinArrayable()
+    {
+        $this->assertInstanceOf(Stringable::class, Str::join(Collection::make(['foo', 'bar', 'baz']), ','));
+        $this->assertEquals('foo,bar,baz', (string) Str::join(Collection::make(['foo', 'bar', 'baz']), ','));
+        $this->assertEquals('foo_bar_baz', (string) Str::join(Collection::make(['foo', 'bar', 'baz']), '_'));
     }
 }
 
