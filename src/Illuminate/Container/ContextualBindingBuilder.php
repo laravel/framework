@@ -81,4 +81,20 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
             return is_array($taggedServices) ? $taggedServices : iterator_to_array($taggedServices);
         });
     }
+
+    /**
+     * Define configuration key to be used to look up in configuration to bind as a primitive.
+     *
+     * @param string  $key
+     * @param ?string $default
+     * @return void
+     */
+    public function giveConfig($key, $default = null)
+    {
+        $this->give(function ($container) use ($key, $default) {
+            $config = $container->get('config');
+
+            return $config->get($key, $default);
+        });
+    }
 }
