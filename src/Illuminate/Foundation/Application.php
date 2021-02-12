@@ -12,6 +12,7 @@ use Illuminate\Events\EventServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Foundation\Events\DirectionUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
@@ -1210,6 +1211,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         return $this['config']->get('app.locale');
     }
+    
+    /**
+     * Get the current application direction.
+     *
+     * @return string
+     */
+    public function getDirection()
+    {
+        return $this['config']->get('app.direction');
+    }
 
     /**
      * Get the current application locale.
@@ -1220,6 +1231,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         return $this->getLocale();
     }
+    
+    /**
+     * Get the current application direction.
+     *
+     * @return string
+     */
+    public function currentDirection()
+    {
+        return $this->getDirection();
+    }
 
     /**
      * Get the current application fallback locale.
@@ -1229,6 +1250,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function getFallbackLocale()
     {
         return $this['config']->get('app.fallback_locale');
+    }
+    
+    /**
+     * Get the current application fallback direction.
+     *
+     * @return string
+     */
+    public function getFallbackDirection()
+    {
+        return $this['config']->get('app.fallback_direction');
     }
 
     /**
@@ -1245,6 +1276,19 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this['events']->dispatch(new LocaleUpdated($locale));
     }
+    
+    /**
+     * Set the current application direction.
+     *
+     * @param  string  $direction
+     * @return void
+     */
+    public function setDirection($direction)
+    {
+        $this['config']->set('app.direction', $direction);
+
+        $this['events']->dispatch(new DirectionUpdated($direction));
+    }
 
     /**
      * Set the current application fallback locale.
@@ -1258,6 +1302,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this['translator']->setFallback($fallbackLocale);
     }
+    
+    /**
+     * Set the current application fallback direction.
+     *
+     * @param  string  $fallbackDirection
+     * @return void
+     */
+    public function setFallbackDirection($fallbackDirection)
+    {
+        $this['config']->set('app.fallback_direction', $fallbackDirection);
+    }
 
     /**
      * Determine if the application locale is the given locale.
@@ -1268,6 +1323,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function isLocale($locale)
     {
         return $this->getLocale() == $locale;
+    }
+    
+    /**
+     * Determine if the application direction is the given direction.
+     *
+     * @param  string  $direction
+     * @return bool
+     */
+    public function isDirection($direction)
+    {
+        return $this->getDirection() == $direction;
     }
 
     /**
