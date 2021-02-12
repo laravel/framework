@@ -83,18 +83,16 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     }
 
     /**
-     * Define configuration key to be used to look up in configuration to bind as a primitive.
+     * Specify the configuration item to bind as a primitive.
      *
-     * @param string  $key
-     * @param ?string $default
+     * @param  string  $key
+     * @param  ?string  $default
      * @return void
      */
     public function giveConfig($key, $default = null)
     {
         $this->give(function ($container) use ($key, $default) {
-            $config = $container->get('config');
-
-            return $config->get($key, $default);
+            return $container->get('config')->get($key, $default);
         });
     }
 }
