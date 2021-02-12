@@ -797,7 +797,7 @@ class Str
     }
 
     /**
-     * Splits the string by delimiter into a collection of stringable objects
+     * Splits the string by delimiter into a collection of stringable objects.
      *
      * @param  string  $string
      * @param  string  $delimiter
