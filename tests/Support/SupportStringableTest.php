@@ -580,4 +580,10 @@ class SupportStringableTest extends TestCase
         $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
         $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
     }
+
+    public function testMake()
+    {
+        $this->assertInstanceOf(Stringable::class, Stringable::make('foo'));
+        $this->assertEquals('foo', (string) Stringable::make('foo'));
+    }
 }
