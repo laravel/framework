@@ -100,6 +100,30 @@ class PendingDispatch
     }
 
     /**
+     * Indicate that the job should be dispatched after all database transactions have committed.
+     *
+     * @return $this
+     */
+    public function afterCommit()
+    {
+        $this->job->afterCommit();
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the job should not wait until database transactions have been committed before dispatching.
+     *
+     * @return $this
+     */
+    public function beforeCommit()
+    {
+        $this->job->beforeCommit();
+
+        return $this;
+    }
+
+    /**
      * Set the jobs that should run if this job is successful.
      *
      * @param  array  $chain

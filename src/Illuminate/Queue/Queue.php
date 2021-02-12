@@ -5,6 +5,10 @@ namespace Illuminate\Queue;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
@@ -25,6 +29,13 @@ abstract class Queue
      * @var string
      */
     protected $connectionName;
+
+    /**
+     * Indicates that jobs should be dispatched after all database transactions have committed.
+     *
+     * @return $this
+     */
+    protected $dispatchAfterCommit;
 
     /**
      * The create payload callbacks.
@@ -141,10 +152,14 @@ abstract class Queue
             ],
         ]);
 
+        $command = $this->jobShouldBeEncrypted($job) && $this->container->bound(Encrypter::class)
+                    ? $this->container[Encrypter::class]->encrypt(serialize(clone $job))
+                    : serialize(clone $job);
+
         return array_merge($payload, [
             'data' => [
                 'commandName' => get_class($job),
-                'command' => serialize(clone $job),
+                'command' => $command,
             ],
         ]);
     }
@@ -173,7 +188,7 @@ abstract class Queue
             return;
         }
 
-        return collect($job->backoff ?? $job->backoff())
+        return collect(Arr::wrap($job->backoff ?? $job->backoff()))
             ->map(function ($backoff) {
                 return $backoff instanceof DateTimeInterface
                                 ? $this->secondsUntil($backoff) : $backoff;
@@ -196,6 +211,21 @@ abstract class Queue
 
         return $expiration instanceof DateTimeInterface
                         ? $expiration->getTimestamp() : $expiration;
+    }
+
+    /**
+     * Determine if the job should be encrypted.
+     *
+     * @param  object  $job
+     * @return bool
+     */
+    protected function jobShouldBeEncrypted($job)
+    {
+        if ($job instanceof ShouldBeEncrypted) {
+            return true;
+        }
+
+        return isset($job->shouldBeEncrypted) && $job->shouldBeEncrypted;
     }
 
     /**
@@ -253,6 +283,67 @@ abstract class Queue
         }
 
         return $payload;
+    }
+
+    /**
+     * Enqueue a job using the given callback.
+     *
+     * @param  \Closure|string|object  $job
+     * @param  string  $payload
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param  callable  $callback
+     * @return mixed
+     */
+    protected function enqueueUsing($job, $payload, $queue, $delay, $callback)
+    {
+        if ($this->shouldDispatchAfterCommit($job) &&
+            $this->container->bound('db.transactions')) {
+            return $this->container->make('db.transactions')->addCallback(
+                function () use ($payload, $queue, $delay, $callback, $job) {
+                    return tap($callback($payload, $queue, $delay), function ($jobId) use ($job) {
+                        $this->raiseJobQueuedEvent($jobId, $job);
+                    });
+                }
+            );
+        }
+
+        return tap($callback($payload, $queue, $delay), function ($jobId) use ($job) {
+            $this->raiseJobQueuedEvent($jobId, $job);
+        });
+    }
+
+    /**
+     * Determine if the job should be dispatched after all database transactions have committed.
+     *
+     * @param  \Closure|string|object  $job
+     * @return bool
+     */
+    protected function shouldDispatchAfterCommit($job)
+    {
+        if (is_object($job) && isset($job->afterCommit)) {
+            return $job->afterCommit;
+        }
+
+        if (isset($this->dispatchAfterCommit)) {
+            return $this->dispatchAfterCommit;
+        }
+
+        return false;
+    }
+
+    /**
+     * Raise the job queued event.
+     *
+     * @param  string|int|null  $jobId
+     * @param  \Closure|string|object  $job
+     * @return void
+     */
+    protected function raiseJobQueuedEvent($jobId, $job)
+    {
+        if ($this->container->bound('events')) {
+            $this->container['events']->dispatch(new JobQueued($this->connectionName, $jobId, $job));
+        }
     }
 
     /**

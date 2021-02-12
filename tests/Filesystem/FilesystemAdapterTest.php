@@ -262,6 +262,11 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter->assertExists($storagePath);
 
         $this->assertSame('uploaded file content', $filesystemAdapter->read($storagePath));
+
+        $filesystemAdapter->assertExists(
+            $storagePath,
+            'uploaded file content'
+        );
     }
 
     public function testPutFileAsWithAbsoluteFilePath()
@@ -290,6 +295,11 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFileExists($filePath);
 
         $filesystemAdapter->assertExists($storagePath);
+
+        $filesystemAdapter->assertExists(
+            $storagePath,
+            'uploaded file content'
+        );
     }
 
     public function testPutFileWithAbsoluteFilePath()
@@ -303,5 +313,10 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
 
         $filesystemAdapter->assertExists($storagePath);
+
+        $filesystemAdapter->assertExists(
+            $storagePath,
+            'uploaded file content'
+        );
     }
 }

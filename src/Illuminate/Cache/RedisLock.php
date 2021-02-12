@@ -70,4 +70,14 @@ class RedisLock extends Lock
     {
         return $this->redis->get($this->name);
     }
+
+    /**
+     * Get the name of the Redis connection being used to manage the lock.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->redis->getName();
+    }
 }

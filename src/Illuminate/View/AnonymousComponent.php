@@ -48,7 +48,7 @@ class AnonymousComponent extends Component
      */
     public function data()
     {
-        $this->attributes = $this->attributes ?: new ComponentAttributeBag;
+        $this->attributes = $this->attributes ?: $this->newAttributeBag();
 
         return $this->data + ['attributes' => $this->attributes];
     }

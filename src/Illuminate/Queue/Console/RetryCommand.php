@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use DateTimeInterface;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 
@@ -93,14 +94,14 @@ class RetryCommand extends Command
     protected function retryJob($job)
     {
         $this->laravel['queue']->connection($job->connection)->pushRaw(
-            $this->resetAttempts($job->payload), $job->queue
+            $this->refreshRetryUntil($this->resetAttempts($job->payload)), $job->queue
         );
     }
 
     /**
      * Reset the payload attempts.
      *
-     * Applicable to Redis jobs which store attempts in their payload.
+     * Applicable to Redis and other jobs which store attempts in their payload.
      *
      * @param  string  $payload
      * @return string
@@ -111,6 +112,33 @@ class RetryCommand extends Command
 
         if (isset($payload['attempts'])) {
             $payload['attempts'] = 0;
+        }
+
+        return json_encode($payload);
+    }
+
+    /**
+     * Refresh the "retry until" timestamp for the job.
+     *
+     * @param  string  $payload
+     * @return string
+     */
+    protected function refreshRetryUntil($payload)
+    {
+        $payload = json_decode($payload, true);
+
+        if (! isset($payload['data']['command'])) {
+            return json_encode($payload);
+        }
+
+        $instance = unserialize($payload['data']['command']);
+
+        if (is_object($instance) && method_exists($instance, 'retryUntil')) {
+            $retryUntil = $instance->retryUntil();
+
+            $payload['retryUntil'] = $retryUntil instanceof DateTimeInterface
+                                        ? $retryUntil->getTimestamp()
+                                        : $retryUntil;
         }
 
         return json_encode($payload);

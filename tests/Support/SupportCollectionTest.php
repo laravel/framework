@@ -78,8 +78,8 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame('book', $data->firstWhere('material', 'paper')['type']);
         $this->assertSame('gasket', $data->firstWhere('material', 'rubber')['type']);
-        $this->assertNull($data->firstWhere('material', 'nonexistant'));
-        $this->assertNull($data->firstWhere('nonexistant', 'key'));
+        $this->assertNull($data->firstWhere('material', 'nonexistent'));
+        $this->assertNull($data->firstWhere('nonexistent', 'key'));
     }
 
     /**
@@ -1643,6 +1643,22 @@ class SupportCollectionTest extends TestCase
             [],
             $data->chunk(-1)->toArray()
         );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSplitIn($collection)
+    {
+        $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = $data->splitIn(3);
+
+        $this->assertInstanceOf($collection, $data);
+        $this->assertInstanceOf($collection, $data->first());
+        $this->assertCount(3, $data);
+        $this->assertEquals([1, 2, 3, 4], $data->get(0)->values()->toArray());
+        $this->assertEquals([5, 6, 7, 8], $data->get(1)->values()->toArray());
+        $this->assertEquals([9, 10], $data->get(2)->values()->toArray());
     }
 
     /**
@@ -3573,6 +3589,28 @@ class SupportCollectionTest extends TestCase
         $data = new $collection([1, 2, 3]);
         $this->assertEquals(6, $data->reduce(function ($carry, $element) {
             return $carry += $element;
+        }));
+
+        $data = new $collection([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ]);
+        $this->assertEquals('foobarbazqux', $data->reduce(function ($carry, $element, $key) {
+            return $carry .= $key.$element;
+        }));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testReduceWithKeys($collection)
+    {
+        $data = new $collection([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ]);
+        $this->assertEquals('foobarbazqux', $data->reduceWithKeys(function ($carry, $element, $key) {
+            return $carry .= $key.$element;
         }));
     }
 

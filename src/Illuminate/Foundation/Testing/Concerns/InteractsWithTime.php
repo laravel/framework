@@ -44,8 +44,6 @@ trait InteractsWithTime
      */
     public function travelBack()
     {
-        Carbon::setTestNow();
-
-        return Carbon::now();
+        return Wormhole::back();
     }
 }

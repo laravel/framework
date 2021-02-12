@@ -47,7 +47,8 @@ trait CollectsResources
         }
 
         if (Str::endsWith(class_basename($this), 'Collection') &&
-            class_exists($class = Str::replaceLast('Collection', '', get_class($this)))) {
+            (class_exists($class = Str::replaceLast('Collection', '', get_class($this))) ||
+             class_exists($class = Str::replaceLast('Collection', 'Resource', get_class($this))))) {
             return $class;
         }
     }

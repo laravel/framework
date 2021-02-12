@@ -237,6 +237,10 @@ class LogManager implements LoggerInterface
      */
     protected function createStackDriver(array $config)
     {
+        if (is_string($config['channels'])) {
+            $config['channels'] = explode(',', $config['channels']);
+        }
+
         $handlers = collect($config['channels'])->flatMap(function ($channel) {
             return $this->channel($channel)->getHandlers();
         })->all();

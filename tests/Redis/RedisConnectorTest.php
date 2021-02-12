@@ -41,6 +41,7 @@ class RedisConnectorTest extends TestCase
         $phpRedisClient = $this->redis['phpredis']->connection()->client();
         $this->assertEquals($host, $phpRedisClient->getHost());
         $this->assertEquals($port, $phpRedisClient->getPort());
+        $this->assertEquals('default', $phpRedisClient->client('GETNAME'));
     }
 
     public function testUrl()

@@ -24,7 +24,7 @@ LUA;
      * Get the Lua script for pushing jobs onto the queue.
      *
      * KEYS[1] - The queue to push the job onto, for example: queues:foo
-     * KEYS[2] - The notification list fot the queue we are pushing jobs onto, for example: queues:foo:notify
+     * KEYS[2] - The notification list for the queue we are pushing jobs onto, for example: queues:foo:notify
      * ARGV[1] - The job payload
      *
      * @return string

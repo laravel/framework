@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -1671,6 +1672,27 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitBindingsWithMissingModelHandledByMissing()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RouteModelBindingNullStub $bar = null) {
+                $this->assertInstanceOf(RouteModelBindingNullStub::class, $bar);
+
+                return $bar->first();
+            },
+        ])->missing(function () {
+            return new RedirectResponse('/', 302);
+        });
+
+        $request = Request::create('foo/taylor', 'GET');
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('/'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
     public function testImplicitBindingsWithOptionalParameterWithNoKeyInUri()
     {
         $router = $this->getRouter();
@@ -1831,7 +1853,7 @@ class RoutingRouteTest extends TestCase
     public function testRouteRedirectExceptionWhenMissingExpectedParameters()
     {
         $this->expectException(UrlGenerationException::class);
-        $this->expectExceptionMessage('Missing required parameters for [Route: laravel_route_redirect_destination] [URI: users/{user}].');
+        $this->expectExceptionMessage('Missing required parameter for [Route: laravel_route_redirect_destination] [URI: users/{user}] [Missing parameter: user].');
 
         $container = new Container;
         $router = new Router(new Dispatcher, $container);

@@ -116,6 +116,18 @@ class Wormhole
     }
 
     /**
+     * Travel back to the current time.
+     *
+     * @return \DateTimeInterface
+     */
+    public static function back()
+    {
+        Carbon::setTestNow();
+
+        return Carbon::now();
+    }
+
+    /**
      * Handle the given optional execution callback.
      *
      * @param  callable|null  $callback

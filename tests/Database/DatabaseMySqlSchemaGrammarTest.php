@@ -504,6 +504,19 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `name` varchar(255) not null after `foo`', $statements[0]);
     }
 
+    public function testAddingMultipleColumnsAfterAnotherColumn()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->after('foo', function ($blueprint) {
+            $blueprint->string('one');
+            $blueprint->string('two');
+        });
+        $blueprint->string('three');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `one` varchar(255) not null after `foo`, add `two` varchar(255) not null after `one`, add `three` varchar(255) not null', $statements[0]);
+    }
+
     public function testAddingGeneratedColumn()
     {
         $blueprint = new Blueprint('products');
@@ -1153,6 +1166,48 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $c = $this->getGrammar()::compileReplace();
 
         $this->assertTrue($c);
+    }
+
+    public function testCreateDatabase()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_foo');
+        $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
+
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+
+        $this->assertSame(
+            'create database `my_database_a` default character set `utf8mb4_foo` default collate `utf8mb4_unicode_ci_foo`',
+            $statement
+        );
+
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_bar');
+        $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
+
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+
+        $this->assertSame(
+            'create database `my_database_b` default character set `utf8mb4_bar` default collate `utf8mb4_unicode_ci_bar`',
+            $statement
+        );
+    }
+
+    public function testDropDatabaseIfExists()
+    {
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_a');
+
+        $this->assertSame(
+            'drop database if exists `my_database_a`',
+            $statement
+        );
+
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_b');
+
+        $this->assertSame(
+            'drop database if exists `my_database_b`',
+            $statement
+        );
     }
 
     protected function getConnection()

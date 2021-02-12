@@ -98,6 +98,36 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         ]);
     }
 
+    public function testJsonAttributeIsCastable()
+    {
+        $this->encrypter->expects('encrypt')
+            ->with('{"key1":"value1"}', false)
+            ->andReturn('encrypted-secret-json-string');
+        $this->encrypter->expects('decrypt')
+            ->with('encrypted-secret-json-string', false)
+            ->andReturn('{"key1":"value1"}');
+        $this->encrypter->expects('encrypt')
+            ->with('{"key1":"value1","key2":"value2"}', false)
+            ->andReturn('encrypted-secret-json-string2');
+        $this->encrypter->expects('decrypt')
+            ->with('encrypted-secret-json-string2', false)
+            ->andReturn('{"key1":"value1","key2":"value2"}');
+
+        $subject = new EncryptedCast([
+            'secret_json' => ['key1' => 'value1'],
+        ]);
+        $subject->fill([
+            'secret_json->key2' => 'value2',
+        ]);
+        $subject->save();
+
+        $this->assertSame(['key1' => 'value1', 'key2' => 'value2'], $subject->secret_json);
+        $this->assertDatabaseHas('encrypted_casts', [
+            'id' => $subject->id,
+            'secret_json' => 'encrypted-secret-json-string2',
+        ]);
+    }
+
     public function testObjectIsCastable()
     {
         $object = new \stdClass();

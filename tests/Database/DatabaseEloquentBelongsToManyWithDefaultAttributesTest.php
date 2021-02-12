@@ -50,6 +50,7 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 
         $related->shouldReceive('getTable')->andReturn('users');
         $related->shouldReceive('getKeyName')->andReturn('id');
+        $related->shouldReceive('qualifyColumn')->with('id')->andReturn('users.id');
 
         $builder->shouldReceive('join')->once()->with('club_user', 'users.id', '=', 'club_user.user_id');
         $builder->shouldReceive('where')->once()->with('club_user.club_id', '=', 1);

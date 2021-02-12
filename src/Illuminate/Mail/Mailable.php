@@ -7,12 +7,14 @@ use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\Factory as Queue;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
+use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -145,6 +147,13 @@ class Mailable implements MailableContract, Renderable
      * @var string
      */
     public $mailer;
+
+    /**
+     * The rendered mailable views for testing / assertions.
+     *
+     * @var array
+     */
+    protected $assertionableRenderStrings;
 
     /**
      * The callback that should be invoked while building the view data.
@@ -842,6 +851,106 @@ class Mailable implements MailableContract, Renderable
                 })->all();
 
         return $this;
+    }
+
+    /**
+     * Assert that the given text is present in the HTML email body.
+     *
+     * @param  string  $string
+     * @return void
+     */
+    public function assertSeeInHtml($string)
+    {
+        [$html, $text] = $this->renderForAssertions();
+
+        PHPUnit::assertTrue(
+            Str::contains($html, $string),
+            "Did not see expected text [{$string}] within email body."
+        );
+    }
+
+    /**
+     * Assert that the given text is not present in the HTML email body.
+     *
+     * @param  string  $string
+     * @return void
+     */
+    public function assertDontSeeInHtml($string)
+    {
+        [$html, $text] = $this->renderForAssertions();
+
+        PHPUnit::assertFalse(
+            Str::contains($html, $string),
+            "Saw unexpected text [{$string}] within email body."
+        );
+    }
+
+    /**
+     * Assert that the given text is present in the plain-text email body.
+     *
+     * @param  string  $string
+     * @return void
+     */
+    public function assertSeeInText($string)
+    {
+        [$html, $text] = $this->renderForAssertions();
+
+        PHPUnit::assertTrue(
+            Str::contains($text, $string),
+            "Did not see expected text [{$string}] within text email body."
+        );
+    }
+
+    /**
+     * Assert that the given text is not present in the plain-text email body.
+     *
+     * @param  string  $string
+     * @return void
+     */
+    public function assertDontSeeInText($string)
+    {
+        [$html, $text] = $this->renderForAssertions();
+
+        PHPUnit::assertFalse(
+            Str::contains($text, $string),
+            "Saw unexpected text [{$string}] within text email body."
+        );
+    }
+
+    /**
+     * Render the HTML and plain-text version of the mailable into views for assertions.
+     *
+     * @return array
+     *
+     * @throws \ReflectionException
+     */
+    protected function renderForAssertions()
+    {
+        if ($this->assertionableRenderStrings) {
+            return $this->assertionableRenderStrings;
+        }
+
+        return $this->assertionableRenderStrings = $this->withLocale($this->locale, function () {
+            Container::getInstance()->call([$this, 'build']);
+
+            $html = Container::getInstance()->make('mailer')->render(
+                $view = $this->buildView(), $this->buildViewData()
+            );
+
+            if (is_array($view) && isset($view[1])) {
+                $text = $view[1];
+            }
+
+            $text = $text ?? $view['text'] ?? '';
+
+            if (! empty($text) && ! $text instanceof Htmlable) {
+                $text = Container::getInstance()->make('mailer')->render(
+                    $text, $this->buildViewData()
+                );
+            }
+
+            return [(string) $html, (string) $text];
+        });
     }
 
     /**

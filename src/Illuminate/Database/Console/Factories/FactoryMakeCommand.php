@@ -68,8 +68,8 @@ class FactoryMakeCommand extends GeneratorCommand
 
         $model = class_basename($namespaceModel);
 
-        if (Str::startsWith($namespaceModel, 'App\\Models')) {
-            $namespace = Str::beforeLast('Database\\Factories\\'.Str::after($namespaceModel, 'App\\Models\\'), '\\');
+        if (Str::startsWith($namespaceModel, $this->rootNamespace().'Models')) {
+            $namespace = Str::beforeLast('Database\\Factories\\'.Str::after($namespaceModel, $this->rootNamespace().'Models\\'), '\\');
         } else {
             $namespace = 'Database\\Factories';
         }
@@ -99,7 +99,7 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        $name = (string) Str::of($name)->replaceFirst('App\\', '')->finish('Factory');
+        $name = (string) Str::of($name)->replaceFirst($this->rootNamespace(), '')->finish('Factory');
 
         return $this->laravel->databasePath().'/factories/'.str_replace('\\', '/', $name).'.php';
     }
@@ -116,17 +116,17 @@ class FactoryMakeCommand extends GeneratorCommand
             $name = substr($name, 0, -7);
         }
 
-        $modelName = $this->qualifyModel(Str::after($name, 'App\\'));
+        $modelName = $this->qualifyModel(Str::after($name, $this->rootNamespace()));
 
         if (class_exists($modelName)) {
             return $modelName;
         }
 
         if (is_dir(app_path('Models/'))) {
-            return 'App\Models\Model';
+            return $this->rootNamespace().'Models\Model';
         }
 
-        return 'App\Model';
+        return $this->rootNamespace().'Model';
     }
 
     /**

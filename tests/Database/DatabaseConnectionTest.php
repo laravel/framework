@@ -62,7 +62,7 @@ class DatabaseConnectionTest extends TestCase
         $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare'])->getMock();
         $writePdo->expects($this->never())->method('prepare');
         $statement = $this->getMockBuilder('PDOStatement')
-            ->setMethods(['setFetchMode', 'execute', 'fetchAll', 'bindValue'])
+            ->onlyMethods(['setFetchMode', 'execute', 'fetchAll', 'bindValue'])
             ->getMock();
         $statement->expects($this->once())->method('setFetchMode');
         $statement->expects($this->once())->method('bindValue')->with('foo', 'bar', 2);
@@ -154,9 +154,8 @@ class DatabaseConnectionTest extends TestCase
     public function testBeginTransactionMethodRetriesOnFailure()
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
-        $pdo->expects($this->at(0))
-            ->method('beginTransaction')
-            ->will($this->throwException(new ErrorException('server has gone away')));
+        $pdo->method('beginTransaction')
+            ->willReturnOnConsecutiveCalls($this->throwException(new ErrorException('server has gone away')));
         $connection = $this->getMockConnection(['reconnect'], $pdo);
         $connection->expects($this->once())->method('reconnect');
         $connection->beginTransaction();

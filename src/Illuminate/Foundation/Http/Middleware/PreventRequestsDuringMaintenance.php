@@ -42,7 +42,6 @@ class PreventRequestsDuringMaintenance
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Illuminate\Foundation\Http\Exceptions\MaintenanceModeException
      */
     public function handle($request, Closure $next)
     {

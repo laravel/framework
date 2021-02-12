@@ -107,6 +107,21 @@ class EventFake implements Dispatcher
     }
 
     /**
+     * Assert that no events were dispatched.
+     *
+     * @return void
+     */
+    public function assertNothingDispatched()
+    {
+        $count = count(Arr::flatten($this->events));
+
+        PHPUnit::assertSame(
+            0, $count,
+            "{$count} unexpected events were dispatched."
+        );
+    }
+
+    /**
      * Get all of the events matching a truth-test callback.
      *
      * @param  string  $event

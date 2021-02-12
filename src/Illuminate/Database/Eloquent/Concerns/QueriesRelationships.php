@@ -383,8 +383,12 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             if ($function) {
+                $hashedColumn = $this->getQuery()->from === $relation->getQuery()->getQuery()->from
+                                            ? "{$relation->getRelationCountHash(false)}.$column"
+                                            : $column;
+
                 $expression = sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap(
-                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($column)
+                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($hashedColumn)
                 ));
             } else {
                 $expression = $column;
@@ -442,7 +446,7 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the max of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relation
      * @param  string  $column
      * @return $this
      */
@@ -454,7 +458,7 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the min of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relation
      * @param  string  $column
      * @return $this
      */
@@ -466,7 +470,7 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the sum of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relation
      * @param  string  $column
      * @return $this
      */
@@ -478,7 +482,7 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the average of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relation
      * @param  string  $column
      * @return $this
      */

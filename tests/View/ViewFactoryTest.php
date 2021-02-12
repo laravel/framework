@@ -7,6 +7,7 @@ use ErrorException;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\View\Engine;
+use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\HtmlString;
@@ -87,6 +88,7 @@ class ViewFactoryTest extends TestCase
         $factory->addExtension('php', 'php');
         $view = $factory->first(['bar', 'view'], ['foo' => 'bar'], ['baz' => 'boom']);
 
+        $this->assertInstanceOf(ViewContract::class, $view);
         $this->assertSame($engine, $view->getEngine());
         $this->assertSame($_SERVER['__test.view'], $view);
 
