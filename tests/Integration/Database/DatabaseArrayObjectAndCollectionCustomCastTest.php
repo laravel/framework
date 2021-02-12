@@ -17,7 +17,7 @@ class DatabaseArrayObjectAndCollectionCustomCastTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('test_eloquent_model_with_custom_casts', function (Blueprint $table) {
+        Schema::create('test_eloquent_model_with_custom_array_object_casts', function (Blueprint $table) {
             $table->increments('id');
             $table->text('array_object');
             $table->text('collection');
@@ -27,7 +27,7 @@ class DatabaseArrayObjectAndCollectionCustomCastTest extends DatabaseTestCase
 
     public function test_array_object_and_collection_casting()
     {
-        $model = new TestEloquentModelWithCustomCast;
+        $model = new TestEloquentModelWithCustomArrayObjectCast;
 
         $model->array_object = ['name' => 'Taylor'];
         $model->collection = collect(['name' => 'Taylor']);
@@ -54,7 +54,7 @@ class DatabaseArrayObjectAndCollectionCustomCastTest extends DatabaseTestCase
     }
 }
 
-class TestEloquentModelWithCustomCast extends Model
+class TestEloquentModelWithCustomArrayObjectCast extends Model
 {
     /**
      * The attributes that aren't mass assignable.
