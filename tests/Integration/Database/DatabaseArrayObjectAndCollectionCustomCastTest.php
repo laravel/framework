@@ -49,7 +49,7 @@ class DatabaseArrayObjectAndCollectionCustomCastTest extends DatabaseTestCase
         $this->assertEquals([
             'name' => 'Taylor',
             'age' => 34,
-            'meta' => ['title' => 'Developer']
+            'meta' => ['title' => 'Developer'],
         ], $model->array_object->toArray());
     }
 }
