@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
@@ -793,5 +794,40 @@ class Str
     public static function createUuidsNormally()
     {
         static::$uuidFactory = null;
+    }
+
+    /**
+     * Splits the string by delimiter into a collection of stringable objects
+     *
+     * @param  string  $string
+     * @param  string  $delimiter
+     * @param  int  $limit
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function split($string, $delimiter = ',', $limit = null)
+    {
+        $parameters = array_filter([$delimiter, $string, $limit]);
+        $pieces = call_user_func_array('explode', $parameters);
+
+        return Collection::make($pieces)
+            ->map([Stringable::class, 'make']);
+    }
+
+    /**
+     * Get a new stringable object by joining the given pieces with the glue.
+     *
+     * @param  string[]|\Illuminate\Contracts\Support\Arrayable  $pieces
+     * @param  string  $glue
+     *
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function join($pieces, $glue = ',')
+    {
+        if ($pieces instanceof Arrayable) {
+            return new Stringable(implode($glue, $pieces->toArray()));
+        }
+
+        return new Stringable(implode($glue, $pieces));
     }
 }
