@@ -801,17 +801,16 @@ class Str
      *
      * @param  string  $string
      * @param  string  $delimiter
-     * @param  int  $limit
+     * @param  int|null  $limit
      *
      * @return \Illuminate\Support\Collection
      */
     public static function split($string, $delimiter = ',', $limit = null)
     {
-        $parameters = array_filter([$delimiter, $string, $limit]);
-        $pieces = call_user_func_array('explode', $parameters);
+        $pieces = explode(...array_filter([$delimiter, $string, $limit]));
 
         return Collection::make($pieces)
-            ->map([Stringable::class, 'make']);
+            ->mapInto(Stringable::class);
     }
 
     /**
