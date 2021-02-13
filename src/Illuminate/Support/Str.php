@@ -807,7 +807,7 @@ class Str
      */
     public static function split($string, $delimiter = ',', $limit = PHP_INT_MAX)
     {
-        $pieces = array_filter(explode($delimiter, $string, $limit));
+        $pieces = array_filter(explode($delimiter, $string, $limit), 'strlen');
 
         return Collection::make($pieces)
             ->mapInto(Stringable::class);
