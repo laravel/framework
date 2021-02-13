@@ -537,6 +537,7 @@ class SupportStrTest extends TestCase
     public function testSplitEmptyString()
     {
         $this->assertEquals([], Str::split('', ',')->toArray());
+        $this->assertEquals(['0', '0'], Str::split('0,0', ',')->toArray());
         $this->assertEquals([], Str::split(new Stringable(''), ',')->toArray());
     }
 
