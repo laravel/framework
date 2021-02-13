@@ -31,18 +31,6 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Create a new stringable instance.
-     *
-     * @param  string  $items
-     *
-     * @return static
-     */
-    public static function make($value = '')
-    {
-        return new static($value);
-    }
-
-    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $search
