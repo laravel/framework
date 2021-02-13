@@ -741,7 +741,7 @@ class Route
     /**
      * Add a prefix to the route URI.
      *
-     * @param  string|null  $prefix
+     * @param  string  $prefix
      * @return $this
      */
     public function prefix($prefix)
