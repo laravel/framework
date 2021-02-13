@@ -801,13 +801,13 @@ class Str
      *
      * @param  string  $string
      * @param  string  $delimiter
-     * @param  int|null  $limit
+     * @param  int  $limit
      *
      * @return \Illuminate\Support\Collection
      */
-    public static function split($string, $delimiter = ',', $limit = null)
+    public static function split($string, $delimiter = ',', $limit = PHP_INT_MAX)
     {
-        $pieces = explode(...array_filter([$delimiter, $string, $limit]));
+        $pieces = array_filter(explode($delimiter, $string, $limit));
 
         return Collection::make($pieces)
             ->mapInto(Stringable::class);

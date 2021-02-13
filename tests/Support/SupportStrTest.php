@@ -534,6 +534,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'baz'], Str::split(new Stringable('foo_bar_baz'), '_')->toArray());
     }
 
+    public function testSplitEmptyString()
+    {
+        $this->assertEquals([], Str::split('', ',')->toArray());
+        $this->assertEquals([], Str::split(new Stringable(''), ',')->toArray());
+    }
+
     public function testCanJoinArray()
     {
         $this->assertInstanceOf(Stringable::class, Str::join(['foo', 'bar', 'baz'], ','));
