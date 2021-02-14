@@ -34,7 +34,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Streaming chunked output size.
      *
-     * @var string
+     * @var int Bytes
      */
     private const DOWNLOAD_CHUNK_SIZE = 1024 * 128;
 
@@ -188,7 +188,7 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         $response->setCallback(function () use ($path) {
             $stream = $this->readStream($path);
-            while (feof($stream) === true) {
+            while (feof($stream) === false) {
                 echo fread($stream, static::DOWNLOAD_CHUNK_SIZE);
             }
 
