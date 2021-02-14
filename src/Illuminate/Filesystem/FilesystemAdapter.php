@@ -32,6 +32,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class FilesystemAdapter implements CloudFilesystemContract
 {
     /**
+     * Streaming chunked output size.
+     *
+     * @var string
+     */
+    private const DOWNLOAD_CHUNK_SIZE = 1024 * 128;
+
+    /**
      * The Flysystem filesystem implementation.
      *
      * @var \League\Flysystem\FilesystemInterface
@@ -181,7 +188,10 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         $response->setCallback(function () use ($path) {
             $stream = $this->readStream($path);
-            fpassthru($stream);
+            while (feof($stream) === true) {
+                echo fread($stream, static::DOWNLOAD_CHUNK_SIZE);
+            }
+
             fclose($stream);
         });
 
