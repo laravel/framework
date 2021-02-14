@@ -212,7 +212,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Determine if the current request URL and query string matches a pattern.
+     * Determine if the current request URL and query string match a pattern.
      *
      * @param  mixed  ...$patterns
      * @return bool
@@ -241,7 +241,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Determine if the request is the result of an PJAX call.
+     * Determine if the request is the result of a PJAX call.
      *
      * @return bool
      */
@@ -251,7 +251,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Determine if the request is the result of an prefetch call.
+     * Determine if the request is the result of a prefetch call.
      *
      * @return bool
      */

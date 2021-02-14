@@ -200,6 +200,14 @@ class BusFake implements QueueingDispatcher
 
         if ($command instanceof Closure) {
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        } elseif (! is_string($command)) {
+            $instance = $command;
+
+            $command = get_class($instance);
+
+            $callback = function ($job) use ($instance) {
+                return serialize($this->resetChainPropertiesToDefaults($job)) === serialize($instance);
+            };
         }
 
         PHPUnit::assertTrue(
@@ -215,6 +223,22 @@ class BusFake implements QueueingDispatcher
         $this->isChainOfObjects($expectedChain)
             ? $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
             : $this->assertDispatchedWithChainOfClasses($command, $expectedChain, $callback);
+    }
+
+    /**
+     * Reset the chain properties to their default values on the job.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    protected function resetChainPropertiesToDefaults($job)
+    {
+        return tap(clone $job, function ($job) {
+            $job->chainConnection = null;
+            $job->chainQueue = null;
+            $job->chainCatchCallbacks = null;
+            $job->chained = [];
+        });
     }
 
     /**
@@ -520,7 +544,7 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
-     * Determine if an command should be faked or actually dispatched.
+     * Determine if a command should be faked or actually dispatched.
      *
      * @param  mixed  $command
      * @return bool

@@ -96,7 +96,7 @@ class RouteAction
     }
 
     /**
-     * Determine if the given array actions contains a serialized Closure.
+     * Determine if the given array actions contain a serialized Closure.
      *
      * @param  array  $action
      * @return bool

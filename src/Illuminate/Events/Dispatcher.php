@@ -9,6 +9,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -285,7 +286,7 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * Check if event should be broadcasted by condition.
+     * Check if the event should be broadcasted by the condition.
      *
      * @param  mixed  $event
      * @return bool
@@ -600,6 +601,8 @@ class Dispatcher implements DispatcherContract
 
             $job->retryUntil = method_exists($listener, 'retryUntil')
                                 ? $listener->retryUntil() : null;
+
+            $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
         });
     }
 

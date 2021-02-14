@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Container;
 
+use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use PHPUnit\Framework\TestCase;
 
@@ -359,6 +360,127 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $resolvedInstance->stubs[0]);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->stubs[1]);
     }
+
+    public function testContextualBindingGivesValuesFromConfigOptionalValueNull()
+    {
+        $container = new Container;
+
+        $container->singleton('config', function () {
+            return new Repository([
+                'test' => [
+                    'username' => 'laravel',
+                    'password' => 'hunter42',
+                ],
+            ]);
+        });
+
+        $container
+            ->when(ContainerTestContextInjectFromConfigIndividualValues::class)
+            ->needs('$username')
+            ->giveConfig('test.username');
+
+        $container
+            ->when(ContainerTestContextInjectFromConfigIndividualValues::class)
+            ->needs('$password')
+            ->giveConfig('test.password');
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectFromConfigIndividualValues::class);
+
+        $this->assertEquals('laravel', $resolvedInstance->username);
+        $this->assertEquals('hunter42', $resolvedInstance->password);
+        $this->assertNull($resolvedInstance->alias);
+    }
+
+    public function testContextualBindingGivesValuesFromConfigOptionalValueSet()
+    {
+        $container = new Container;
+
+        $container->singleton('config', function () {
+            return new Repository([
+                'test' => [
+                    'username' => 'laravel',
+                    'password' => 'hunter42',
+                    'alias' => 'lumen',
+                ],
+            ]);
+        });
+
+        $container
+            ->when(ContainerTestContextInjectFromConfigIndividualValues::class)
+            ->needs('$username')
+            ->giveConfig('test.username');
+
+        $container
+            ->when(ContainerTestContextInjectFromConfigIndividualValues::class)
+            ->needs('$password')
+            ->giveConfig('test.password');
+
+        $container
+            ->when(ContainerTestContextInjectFromConfigIndividualValues::class)
+            ->needs('$alias')
+            ->giveConfig('test.alias');
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectFromConfigIndividualValues::class);
+
+        $this->assertEquals('laravel', $resolvedInstance->username);
+        $this->assertEquals('hunter42', $resolvedInstance->password);
+        $this->assertEquals('lumen', $resolvedInstance->alias);
+    }
+
+    public function testContextualBindingGivesValuesFromConfigWithDefault()
+    {
+        $container = new Container;
+
+        $container->singleton('config', function () {
+            return new Repository([
+                'test' => [
+                    'password' => 'hunter42',
+                ],
+            ]);
+        });
+
+        $container
+            ->when(ContainerTestContextInjectFromConfigIndividualValues::class)
+            ->needs('$username')
+            ->giveConfig('test.username', 'DEFAULT_USERNAME');
+
+        $container
+            ->when(ContainerTestContextInjectFromConfigIndividualValues::class)
+            ->needs('$password')
+            ->giveConfig('test.password');
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectFromConfigIndividualValues::class);
+
+        $this->assertEquals('DEFAULT_USERNAME', $resolvedInstance->username);
+        $this->assertEquals('hunter42', $resolvedInstance->password);
+        $this->assertNull($resolvedInstance->alias);
+    }
+
+    public function testContextualBindingGivesValuesFromConfigArray()
+    {
+        $container = new Container;
+
+        $container->singleton('config', function () {
+            return new Repository([
+                'test' => [
+                    'username' => 'laravel',
+                    'password' => 'hunter42',
+                    'alias' => 'lumen',
+                ],
+            ]);
+        });
+
+        $container
+            ->when(ContainerTestContextInjectFromConfigArray::class)
+            ->needs('$settings')
+            ->giveConfig('test');
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectFromConfigArray::class);
+
+        $this->assertEquals('laravel', $resolvedInstance->settings['username']);
+        $this->assertEquals('hunter42', $resolvedInstance->settings['password']);
+        $this->assertEquals('lumen', $resolvedInstance->settings['alias']);
+    }
 }
 
 interface IContainerContextContractStub
@@ -472,5 +594,29 @@ class ContainerTestContextInjectVariadicAfterNonVariadic
     {
         $this->other = $other;
         $this->stubs = $stubs;
+    }
+}
+
+class ContainerTestContextInjectFromConfigIndividualValues
+{
+    public $username;
+    public $password;
+    public $alias = null;
+
+    public function __construct($username, $password, $alias = null)
+    {
+        $this->username = $username;
+        $this->password = $password;
+        $this->alias = $alias;
+    }
+}
+
+class ContainerTestContextInjectFromConfigArray
+{
+    public $settings;
+
+    public function __construct($settings)
+    {
+        $this->settings = $settings;
     }
 }

@@ -1,6 +1,93 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.22.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.26.1...8.x)
+
+
+## [v8.26.1 (2021-02-02)](https://github.com/laravel/framework/compare/v8.26.0...v8.26.1)
+
+### Fixed
+- Fixed merge conflict in `src/Illuminate/Foundation/Console/stubs/exception-render-report.stub` ([#36123](https://github.com/laravel/framework/pull/36123))
+
+
+## [v8.26.0 (2021-02-02)](https://github.com/laravel/framework/compare/v8.25.0...v8.26.0)
+
+### Added
+- Allow to fillJsonAttribute with encrypted field ([#36063](https://github.com/laravel/framework/pull/36063))
+- Added `Route::missing()` ([#36035](https://github.com/laravel/framework/pull/36035))
+- Added `Illuminate\Support\Str::markdown()` and `Illuminate\Support\Stringable::markdown()` ([#36071](https://github.com/laravel/framework/pull/36071))
+- Support retrieving URL for Sftp adapter ([#36120](https://github.com/laravel/framework/pull/36120))
+
+### Fixed
+- Fixed issues with dumping PostgreSQL databases that contain multiple schemata ([#36046](https://github.com/laravel/framework/pull/36046))
+- Fixes job batch serialization for PostgreSQL ([#36081](https://github.com/laravel/framework/pull/36081))
+- Fixed `Illuminate\View\ViewException::report()` ([#36110](https://github.com/laravel/framework/pull/36110))
+
+### Changed
+- Typecast page number as integer in `Illuminate\Pagination\AbstractPaginator::resolveCurrentPage()` ([#36055](https://github.com/laravel/framework/pull/36055))
+- Changed `Illuminate\Testing\ParallelRunner::createApplication()` ([1c11b78](https://github.com/laravel/framework/commit/1c11b7893fa3e9c592f6e85b2b1b0028ddd55645))
+
+
+## [v8.25.0 (2021-01-26)](https://github.com/laravel/framework/compare/v8.24.0...v8.25.0)
+
+### Added
+- Added `Stringable::pipe` & make Stringable tappable ([#36017](https://github.com/laravel/framework/pull/36017))
+- Accept a command in object form in Bus::assertChained ([#36031](https://github.com/laravel/framework/pull/36031))
+- Adds parallel testing ([#36034](https://github.com/laravel/framework/pull/36034))
+- Make Listeners, Mailables, and Notifications accept ShouldBeEncrypted ([#36036](https://github.com/laravel/framework/pull/36036))
+- Support JSON encoding Stringable ([#36012](https://github.com/laravel/framework/pull/36012))
+- Support for escaping bound attributes ([#36042](https://github.com/laravel/framework/pull/36042))
+- Added `Illuminate\Foundation\Application::useLangPath()` ([#36044](https://github.com/laravel/framework/pull/36044))
+
+### Changed
+- Pipe through new render and report exception methods ([#36032](https://github.com/laravel/framework/pull/36032))
+
+### Fixed
+- Fixed issue with dumping schema from a postgres database using no default schema  ([#35966](https://github.com/laravel/framework/pull/35966), [7be50a5](https://github.com/laravel/framework/commit/7be50a511955dea2bf4d6e30208b6fbf07eaa36e))
+- Fixed worker --delay option ([#35991](https://github.com/laravel/framework/pull/35991))
+- Added support of PHP 7.3 to RateLimiter middleware(queue) serialization ([#35986](https://github.com/laravel/framework/pull/35986))
+- Fixed `Illuminate\Foundation\Http\Middleware\TransformsRequest::cleanArray()` ([#36002](https://github.com/laravel/framework/pull/36002))
+- ModelNotFoundException: ensure that the model class name is properly set ([#36011](https://github.com/laravel/framework/pull/36011))
+- Fixed bus fake ([e720279](https://github.com/laravel/framework/commit/e72027960fd4d8ff281938edb4632e13e391b8fd))
+
+
+## [v8.24.0 (2021-01-21)](https://github.com/laravel/framework/compare/v8.23.1...v8.24.0)
+
+### Added
+- Added `JobQueued` event ([8eaec03](https://github.com/laravel/framework/commit/8eaec037421aa9f3860da9d339986448b4c884eb), [5d572e7](https://github.com/laravel/framework/commit/5d572e7a6d479ef68ee92c9d67e2e9465174fb4c))
+
+### Fixed
+- Fixed type error in `Illuminate\Http\Concerns\InteractsWithContentTypes::isJson()` ([#35956](https://github.com/laravel/framework/pull/35956))
+- Fixed `Illuminate\Collections\Collection::sortByMany()` ([#35950](https://github.com/laravel/framework/pull/35950))
+- Fixed Limit expected bindings ([#35972](https://github.com/laravel/framework/pull/35972), [006873d](https://github.com/laravel/framework/commit/006873df411d28bfd03fea5e7f91a2afe3918498))
+- Fixed serialization of rate limited with redis middleware ([#35971](https://github.com/laravel/framework/pull/35971))
+
+
+## [v8.23.1 (2021-01-19)](https://github.com/laravel/framework/compare/v8.23.0...v8.23.1)
+
+### Fixed
+- Fixed empty html mail ([#35941](https://github.com/laravel/framework/pull/35941))
+
+
+## [v8.23.0 (2021-01-19)](https://github.com/laravel/framework/compare/v8.22.1...v8.23.0)
+
+### Added
+- Added `Illuminate\Database\Concerns\BuildsQueries::sole()` ([#35869](https://github.com/laravel/framework/pull/35869), [29c7dae](https://github.com/laravel/framework/commit/29c7dae9b32af2abffa7489f4758fd67905683c3), [#35908](https://github.com/laravel/framework/pull/35908), [#35902](https://github.com/laravel/framework/pull/35902), [#35912](https://github.com/laravel/framework/pull/35912))
+- Added default parameter to throw_if / throw_unless ([#35890](https://github.com/laravel/framework/pull/35890))
+- Added validation support for TeamSpeak3 URI scheme ([#35933](https://github.com/laravel/framework/pull/35933))
+
+### Fixed
+- Fixed extra space on blade class components that are inline ([#35874](https://github.com/laravel/framework/pull/35874))
+- Fixed serialization of rate limited middleware ([f3d4dcb](https://github.com/laravel/framework/commit/f3d4dcb21dc66824611fdde95c8075b694825bf5), [#35916](https://github.com/laravel/framework/pull/35916))
+
+### Changed
+- Allow a specific seeder to be used in tests in `Illuminate\Foundation\Testing\RefreshDatabase::migrateFreshUsing()` ([#35864](https://github.com/laravel/framework/pull/35864))
+- Pass $key to closure in Collection and LazyCollection's reduce method as well ([#35878](https://github.com/laravel/framework/pull/35878))
+
+
+## [v8.22.1 (2021-01-13)](https://github.com/laravel/framework/compare/v8.22.0...v8.22.1)
+ 
+### Fixed
+- Limit expected bindings ([#35865](https://github.com/laravel/framework/pull/35865))
 
 
 ## [v8.22.0 (2021-01-12)](https://github.com/laravel/framework/compare/v8.21.0...v8.22.0)

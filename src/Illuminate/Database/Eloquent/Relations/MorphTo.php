@@ -164,7 +164,7 @@ class MorphTo extends BelongsTo
                     ? array_keys($this->dictionary[$type])
                     : array_map(function ($modelId) {
                         return (string) $modelId;
-                    }, array_keys($this->dictionary[$type]));
+                    }, array_filter(array_keys($this->dictionary[$type])));
     }
 
     /**
@@ -324,7 +324,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Specify constraints on the query for a given morph types.
+     * Specify constraints on the query for a given morph type.
      *
      * @param  array  $callbacks
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo

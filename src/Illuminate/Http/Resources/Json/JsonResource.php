@@ -69,7 +69,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Create new anonymous resource collection.
+     * Create a new anonymous resource collection.
      *
      * @param  mixed  $resource
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection

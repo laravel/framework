@@ -27,6 +27,37 @@ class MySqlGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
+     * Compile a create database command.
+     *
+     * @param  string $name
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    public function compileCreateDatabase($name, $connection)
+    {
+        return sprintf(
+            'create database %s default character set %s default collate %s',
+            $this->wrapValue($name),
+            $this->wrapValue($connection->getConfig('charset')),
+            $this->wrapValue($connection->getConfig('collation')),
+        );
+    }
+
+    /**
+     * Compile a drop database if exists command.
+     *
+     * @param  string $name
+     * @return string
+     */
+    public function compileDropDatabaseIfExists($name)
+    {
+        return sprintf(
+            'drop database if exists %s',
+            $this->wrapValue($name)
+        );
+    }
+
+    /**
      * Compile the query to determine the list of tables.
      *
      * @return string
@@ -160,7 +191,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile the auto incrementing column starting values.
+     * Compile the auto-incrementing column starting values.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @return array

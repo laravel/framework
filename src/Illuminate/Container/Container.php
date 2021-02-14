@@ -985,10 +985,14 @@ class Container implements ArrayAccess, ContainerContract
         // the value of the dependency, similarly to how we do this with scalars.
         catch (BindingResolutionException $e) {
             if ($parameter->isDefaultValueAvailable()) {
+                array_pop($this->with);
+
                 return $parameter->getDefaultValue();
             }
 
             if ($parameter->isVariadic()) {
+                array_pop($this->with);
+
                 return [];
             }
 

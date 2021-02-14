@@ -21,7 +21,7 @@ class PostgresSchemaState extends SchemaState
                         ->reject(function ($table) {
                             return $table === $this->migrationTable;
                         })->map(function ($table) {
-                            return '--exclude-table-data='.$table;
+                            return '--exclude-table-data="*.'.$table.'"';
                         })->implode(' ');
 
         $this->makeProcess(
@@ -39,7 +39,7 @@ class PostgresSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $command = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD pg_restore --no-owner --no-acl --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE $LARAVEL_LOAD_PATH';
+        $command = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD pg_restore --no-owner --no-acl --clean --if-exists --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE $LARAVEL_LOAD_PATH';
 
         if (Str::endsWith($path, '.sql')) {
             $command = 'PGPASSWORD=$LARAVEL_LOAD_PASSWORD psql --file=$LARAVEL_LOAD_PATH --host=$LARAVEL_LOAD_HOST --port=$LARAVEL_LOAD_PORT --username=$LARAVEL_LOAD_USER --dbname=$LARAVEL_LOAD_DATABASE';

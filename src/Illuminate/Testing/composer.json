@@ -31,6 +31,7 @@
         }
     },
     "suggest": {
+        "brianium/paratest": "Required to run tests in parallel (^6.0).",
         "illuminate/console": "Required to assert console commands (^8.0).",
         "illuminate/database": "Required to assert databases (^8.0).",
         "illuminate/http": "Required to assert responses (^8.0).",

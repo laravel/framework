@@ -1,6 +1,44 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.10...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.16...6.x)
+
+
+## [v6.20.16 (2021-02-02)](https://github.com/laravel/framework/compare/v6.20.15...v6.20.16)
+
+### Fixed
+- Fixed `Illuminate\View\ViewException::report()` ([#36110](https://github.com/laravel/framework/pull/36110))
+- Fixed `Illuminate\Redis\Connections\PhpRedisConnection::spop()` ([#36106](https://github.com/laravel/framework/pull/36106))
+
+### Changed
+- Typecast page number as integer in `Illuminate\Pagination\AbstractPaginator::resolveCurrentPage()` ([#36055](https://github.com/laravel/framework/pull/36055))
+
+
+## [v6.20.15 (2021-01-26)](https://github.com/laravel/framework/compare/v6.20.14...v6.20.15)
+
+### Changed
+- Pipe new through render and report exception methods ([#36037](https://github.com/laravel/framework/pull/36037))
+
+
+## [v6.20.14 (2021-01-21)](https://github.com/laravel/framework/compare/v6.20.13...v6.20.14)
+
+### Fixed
+- Fixed type error in `Illuminate\Http\Concerns\InteractsWithContentTypes::isJson()` ([#35956](https://github.com/laravel/framework/pull/35956))
+- Limit expected bindings ([#35972](https://github.com/laravel/framework/pull/35972), [006873d](https://github.com/laravel/framework/commit/006873df411d28bfd03fea5e7f91a2afe3918498))
+
+
+## [v6.20.13 (2021-01-19)](https://github.com/laravel/framework/compare/v6.20.12...v6.20.13)
+
+### Fixed
+- Fixed empty html mail ([#35941](https://github.com/laravel/framework/pull/35941))
+
+
+## [v6.20.12 (2021-01-13)](https://github.com/laravel/framework/compare/v6.20.11...v6.20.12)
+
+
+## [v6.20.11 (2021-01-13)](https://github.com/laravel/framework/compare/v6.20.10...v6.20.11)
+
+### Fixed
+- Limit expected bindings ([#35865](https://github.com/laravel/framework/pull/35865))
 
 
 ## [v6.20.10 (2021-01-12)](https://github.com/laravel/framework/compare/v6.20.9...v6.20.10)

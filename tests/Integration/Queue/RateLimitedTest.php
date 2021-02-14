@@ -80,6 +80,22 @@ class RateLimitedTest extends TestCase
         $this->assertJobWasReleased(NonAdminTestJob::class);
     }
 
+    public function testMiddlewareSerialization()
+    {
+        $rateLimited = new RateLimited('limiterName');
+        $rateLimited->shouldRelease = false;
+
+        $restoredRateLimited = unserialize(serialize($rateLimited));
+
+        $fetch = (function (string $name) {
+            return $this->{$name};
+        })->bindTo($restoredRateLimited, RateLimited::class);
+
+        $this->assertFalse($restoredRateLimited->shouldRelease);
+        $this->assertEquals('limiterName', $fetch('limiterName'));
+        $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
+    }
+
     protected function assertJobRanSuccessfully($class)
     {
         $class::$handled = false;
