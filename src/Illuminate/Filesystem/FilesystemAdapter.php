@@ -32,9 +32,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class FilesystemAdapter implements CloudFilesystemContract
 {
     /**
-     * Streaming chunked output size.
+     * Streaming output chunk size.
      *
-     * @var int Bytes
+     * @var int
      */
     private const DOWNLOAD_CHUNK_SIZE = 1024 * 128;
 
