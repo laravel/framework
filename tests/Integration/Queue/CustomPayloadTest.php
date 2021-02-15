@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\Queue;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\ServiceProvider;
 use Orchestra\Testbench\TestCase;
 
@@ -58,6 +57,5 @@ class MyJob implements ShouldQueue
 
     public function handle()
     {
-
     }
 }
