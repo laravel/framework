@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation;
+namespace Illuminate\Tests\Testing;
 
 use Illuminate\Testing\ParallelConsoleOutput;
 use PHPUnit\Framework\TestCase;

@@ -52,7 +52,7 @@ class PendingCommand
     protected $expectedExitCode;
 
     /**
-     * Determine if command has executed.
+     * Determine if the command has executed.
      *
      * @var bool
      */

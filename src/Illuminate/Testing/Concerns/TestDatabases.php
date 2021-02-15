@@ -100,7 +100,7 @@ trait TestDatabases
      * Runs the given callable using the given database.
      *
      * @param  string $database
-     * @param  callable $database
+     * @param  callable $callable
      * @return void
      */
     protected function usingDatabase($database, $callable)
@@ -142,10 +142,19 @@ trait TestDatabases
 
         $default = config('database.default');
 
-        config()->set(
-            "database.connections.{$default}.database",
-            $database,
-        );
+        $url = config("database.connections.{$default}.url");
+
+        if ($url) {
+            config()->set(
+                "database.connections.{$default}.url",
+                preg_replace('/^(.*)(\/[\w-]*)(\??.*)$/', "$1/{$database}$3", $url),
+            );
+        } else {
+            config()->set(
+                "database.connections.{$default}.database",
+                $database,
+            );
+        }
     }
 
     /**

@@ -213,4 +213,18 @@ class QueryBuilderTest extends DatabaseTestCase
             (object) ['title' => 'Bar Post', 'content' => 'Lorem Ipsum.'],
         ]);
     }
+
+    public function testChunkMap()
+    {
+        DB::enableQueryLog();
+
+        $results = DB::table('posts')->orderBy('id')->chunkMap(function ($post) {
+            return $post->title;
+        }, 1);
+
+        $this->assertCount(2, $results);
+        $this->assertSame('Foo Post', $results[0]);
+        $this->assertSame('Bar Post', $results[1]);
+        $this->assertCount(3, DB::getQueryLog());
+    }
 }

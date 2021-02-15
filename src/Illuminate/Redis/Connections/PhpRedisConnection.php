@@ -71,7 +71,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Set the string value in argument as value of the key.
+     * Set the string value in the argument as the value of the key.
      *
      * @param  string  $key
      * @param  mixed  $value
@@ -198,7 +198,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function spop($key, $count = 1)
     {
-        return $this->command('spop', [$key, $count]);
+        return $this->command('spop', func_get_args());
     }
 
     /**
@@ -556,7 +556,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Apply prefix to the given key if necessary.
+     * Apply a prefix to the given key if necessary.
      *
      * @param  string  $key
      * @return string

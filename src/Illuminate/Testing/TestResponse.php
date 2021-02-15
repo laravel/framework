@@ -709,13 +709,13 @@ class TestResponse implements ArrayAccess
 
         $json = $this->json();
 
-        if (! array_key_exists($responseKey, $json)) {
-            PHPUnit::assertArrayNotHasKey($responseKey, $json);
+        if (! Arr::has($json, $responseKey)) {
+            PHPUnit::assertTrue(true);
 
             return $this;
         }
 
-        $errors = $json[$responseKey];
+        $errors = Arr::get($json, $responseKey, []);
 
         if (is_null($keys) && count($errors) > 0) {
             PHPUnit::fail(

@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 class ValidationData
 {
     /**
-     * Initialize and gather data for given attribute.
+     * Initialize and gather data for the given attribute.
      *
      * @param  string  $attribute
      * @param  array  $masterData

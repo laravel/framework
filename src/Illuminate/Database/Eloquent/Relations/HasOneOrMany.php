@@ -182,7 +182,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Find a model by its primary key or return new instance of the related model.
+     * Find a model by its primary key or return a new instance of the related model.
      *
      * @param  mixed  $id
      * @param  array  $columns

@@ -128,7 +128,7 @@ class SendQueuedNotifications implements ShouldQueue
     }
 
     /**
-     * Get number of seconds before a released notification will be available.
+     * Get the number of seconds before a released notification will be available.
      *
      * @return mixed
      */

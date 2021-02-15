@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation;
+namespace Illuminate\Tests\Testing;
 
 use Illuminate\Container\Container;
 use Illuminate\Testing\ParallelTesting;

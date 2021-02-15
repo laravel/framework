@@ -746,6 +746,8 @@ class Route
      */
     public function prefix($prefix)
     {
+        $prefix = $prefix ?? '';
+
         $this->updatePrefixOnAction($prefix);
 
         $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');

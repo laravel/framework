@@ -504,6 +504,19 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `name` varchar(255) not null after `foo`', $statements[0]);
     }
 
+    public function testAddingMultipleColumnsAfterAnotherColumn()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->after('foo', function ($blueprint) {
+            $blueprint->string('one');
+            $blueprint->string('two');
+        });
+        $blueprint->string('three');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `one` varchar(255) not null after `foo`, add `two` varchar(255) not null after `one`, add `three` varchar(255) not null', $statements[0]);
+    }
+
     public function testAddingGeneratedColumn()
     {
         $blueprint = new Blueprint('products');
