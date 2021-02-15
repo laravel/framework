@@ -37,15 +37,14 @@ class FoundationApplicationTest extends TestCase
         $app['translator'] = $trans = m::mock(stdClass::class);
         $trans->shouldReceive('setLocale')->times(3);
 
-        $app['config'] = new class
-        {
+        $app['config'] = new class {
             private $values = [];
-            
+
             public function set($name, $value)
             {
                 $this->values[$name] = $value;
             }
-            
+
             public function get($name)
             {
                 return $this->values[$name];
