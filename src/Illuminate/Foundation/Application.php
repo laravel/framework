@@ -1247,6 +1247,25 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Set the current application locale temporarily, execute the given closure,
+     * then reset the locale.
+     *
+     * @param  string  $locale
+     * @param  \Closure  $withDifferentLocale
+     * @return void
+     */
+    public function withLocale($locale, Closure $withDifferentLocale)
+    {
+        $currentLocale = $this->getLocale();
+        
+        $this->setLocale($locale);
+
+        $withDifferentLocale();
+
+        $this->setLocale($currentLocale);
+    }
+
+    /**
      * Set the current application fallback locale.
      *
      * @param  string  $fallbackLocale

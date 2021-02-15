@@ -31,6 +31,41 @@ class FoundationApplicationTest extends TestCase
         $app->setLocale('foo');
     }
 
+    public function testWithLocaleTemporarilySetsLocale()
+    {
+        $app = new Application;
+        $app['translator'] = $trans = m::mock(stdClass::class);
+        $trans->shouldReceive('setLocale')->times(3);
+
+        $app['config'] = new class
+        {
+            private $values = [];
+            
+            public function set($name, $value)
+            {
+                $this->values[$name] = $value;
+            }
+            
+            public function get($name)
+            {
+                return $this->values[$name];
+            }
+        };
+
+        $called = m::mock(stdClass::class);
+        $called->shouldReceive('testLocaleCalled')->once();
+
+        $app->setLocale('foo');
+
+        $app->withLocale('bar', function () use ($called, $app) {
+            $called->testLocaleCalled();
+
+            $this->assertEquals('bar', $app->getLocale());
+        });
+
+        $this->assertEquals('foo', $app->getLocale());
+    }
+
     public function testServiceProvidersAreCorrectlyRegistered()
     {
         $provider = m::mock(ApplicationBasicServiceProviderStub::class);

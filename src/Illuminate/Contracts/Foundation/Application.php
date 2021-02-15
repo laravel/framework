@@ -2,6 +2,7 @@
 
 namespace Illuminate\Contracts\Foundation;
 
+use Closure;
 use Illuminate\Contracts\Container\Container;
 
 interface Application extends Container
@@ -198,6 +199,16 @@ interface Application extends Container
      * @return void
      */
     public function setLocale($locale);
+
+    /**
+     * Set the current application locale temporarily, execute the given closure,
+     * then reset the locale.
+     *
+     * @param  string  $locale
+     * @param  \Closure  $withDifferentLocale
+     * @return void
+     */
+    public function withLocale($locale, Closure $withDifferentLocale);
 
     /**
      * Determine if middleware has been disabled for the application.
