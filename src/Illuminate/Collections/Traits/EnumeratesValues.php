@@ -248,9 +248,7 @@ trait EnumeratesValues
     public function eachSpread(callable $callback)
     {
         return $this->each(function ($chunk, $key) use ($callback) {
-            $chunk[] = $key;
-
-            return $callback(...$chunk);
+            return $callback(...$chunk, $key);
         });
     }
 
@@ -311,9 +309,7 @@ trait EnumeratesValues
     public function mapSpread(callable $callback)
     {
         return $this->map(function ($chunk, $key) use ($callback) {
-            $chunk[] = $key;
-
-            return $callback(...$chunk);
+            return $callback(...$chunk, $key);
         });
     }
 
