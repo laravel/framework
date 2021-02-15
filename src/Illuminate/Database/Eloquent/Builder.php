@@ -79,8 +79,25 @@ class Builder
      * @var string[]
      */
     protected $passthru = [
-        'insert', 'insertOrIgnore', 'insertGetId', 'insertUsing', 'getBindings', 'toSql', 'dump', 'dd',
-        'exists', 'doesntExist', 'count', 'min', 'max', 'avg', 'average', 'sum', 'getConnection', 'raw', 'getGrammar',
+        'average',
+        'avg',
+        'count',
+        'dd',
+        'doesntExist',
+        'dump',
+        'exists',
+        'getBindings',
+        'getConnection',
+        'getGrammar',
+        'insert',
+        'insertGetId',
+        'insertOrIgnore',
+        'insertUsing',
+        'max',
+        'min',
+        'raw',
+        'sum',
+        'toSql',
     ];
 
     /**
