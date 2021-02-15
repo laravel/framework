@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\Matching\MediaTypeValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
@@ -739,6 +740,65 @@ class Route
     }
 
     /**
+     * Sets the vendor, personal or x tree
+     *
+     * @param string $tree
+     *
+     * @return $this
+     */
+    public function tree($tree)
+    {
+        $this->action['tree'] = $tree;
+
+        return $this;
+    }
+
+    /**
+     * Sets version for content negotiation
+     *
+     * @param mixed $version
+     *
+     * @return $this
+     */
+    public function version($version)
+    {
+        $this->action['version'] = $version;
+
+        return $version;
+    }
+
+    /**
+     * Sets subtype suffix such as json, xml
+     * for content negotiation
+     *
+     * @param string $subtypeSuffix
+     *
+     * @return $this
+     */
+    public function subtypeSuffix($subtypeSuffix)
+    {
+        $this->action['subtypeSuffix'] = $subtypeSuffix;
+
+        return $this;
+    }
+
+    /**
+     * Returns true if the route has a content negotiation constraint
+     *
+     * @return bool
+     */
+    public function hasMediaTypeConstraint()
+    {
+        foreach (['tree', 'version', 'subtypeSuffix'] as $condition) {
+            if (array_key_exists($condition, $this->action)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Add a prefix to the route URI.
      *
      * @param  string  $prefix
@@ -1120,7 +1180,7 @@ class Route
         // passes and then we will know if the route as a whole matches request.
         return static::$validators = [
             new UriValidator, new MethodValidator,
-            new SchemeValidator, new HostValidator,
+            new SchemeValidator, new HostValidator, new MediaTypeValidator
         ];
     }
 

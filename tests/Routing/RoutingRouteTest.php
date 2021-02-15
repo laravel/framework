@@ -1926,6 +1926,105 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(301, $response->getStatusCode());
     }
 
+    /**
+     * @dataProvider contentNegotiationProvider
+     */
+    public function testContentNegotiationConstraints($action, $acceptHeader, $success)
+    {
+        $action['uses'] = function () {
+            return 'bar';
+        };
+
+        ($router = $this->getRouter())->get('foo', $action);
+
+        $server = ['HTTP_ACCEPT' => $acceptHeader];
+
+        if (!$success) {
+            $this->expectException(NotFoundHttpException::class);
+        }
+
+        $response = $router->dispatch(Request::create('foo', 'GET', [], [], [], $server));
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('bar', $response->getContent());
+    }
+
+    public function contentNegotiationProvider()
+    {
+        return [
+            'no content negotiation constraint' => [
+                [],
+                'application/json',
+                true
+            ],
+            'no content negotiation with no header' => [
+                [],
+                null,
+                true
+            ],
+            'valid constraint but not application' => [
+                ['tree' => 'vnd.foo'],
+                'text/vnd.foo+json;version=1',
+                false
+            ],
+            'invalid tree constraint' => [
+                ['tree' => 'vnd.foo.bar'],
+                'application/x.foo.bar+json;version=1',
+                false
+            ],
+            'valid tree constraint' => [
+                ['tree' => 'vnd.foo.bar'],
+                'application/vnd.foo.bar+json;version=1',
+                true
+            ],
+            'invalid version constraint' => [
+                ['version' => 1],
+                'application/vnd.foo.app+json;version=2',
+                false
+            ],
+            'valid version constraint' => [
+                ['version' => 2],
+                'application/vnd.foo.app+json;version=2',
+                true
+            ],
+            'valid array version constraint' => [
+                ['version' => [1, 2]],
+                'application/vnd.foo.app+json;version=2',
+                true
+            ],
+            'invalid array version constraint' => [
+                ['version' => [3, 4]],
+                'application/vnd.foo.app+json;version=2',
+                false
+            ],
+            'invalid sub type suffix constraint' => [
+                ['subtypeSuffix' => 'json'],
+                'application/vnd.foo.app+xml;version=2',
+                false
+            ],
+            'valid sub type suffix constraint' => [
+                ['subtypeSuffix' => 'json'],
+                'application/vnd.foo.app+json;version=2',
+                true
+            ],
+            'valid negotiation with multiple headers' => [
+                ['subtypeSuffix' => 'json', 'version' => 2, 'tree' => 'vnd.foo.app'],
+                'application/vnd.foo.app+json;version=2,text/html',
+                true
+            ],
+            'valid negotiation with multiple headers with spaces' => [
+                ['subtypeSuffix' => 'json', 'version' => 2, 'tree' => 'vnd.foo.app'],
+                'application/vnd.foo.app+json ;version=2 , text/html',
+                true
+            ],
+            'invalid negotiation with multiple headers' => [
+                ['subtypeSuffix' => 'json', 'version' => 2, 'tree' => 'vnd.foo.app'],
+                'image/png,text/html',
+                false
+            ]
+        ];
+    }
+
     protected function getRouter()
     {
         $container = new Container;
