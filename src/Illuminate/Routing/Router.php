@@ -948,6 +948,18 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Flush the router's middleware groups.
+     *
+     * @return $this
+     */
+    public function flushMiddlewareGroups()
+    {
+        $this->middlewareGroups = [];
+
+        return $this;
+    }
+
+    /**
      * Add a new route parameter binder.
      *
      * @param  string  $key
