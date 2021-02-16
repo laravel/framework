@@ -3,8 +3,10 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Carbon\CarbonInterface;
+use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\InvalidCastException;
@@ -129,6 +131,25 @@ trait HasAttributes
      * @var \Illuminate\Contracts\Encryption\Encrypter
      */
     public static $encrypter;
+
+    /**
+     * The type casting resolver callbacks.
+     *
+     * @var array
+     */
+    private static $casterResolvers = [];
+
+    /**
+     * Define a dynamic type casting resolver.
+     *
+     * @param  string  $class
+     * @param  Closure|CastsAttributes|CastsInboundAttributes  $caster
+     * @return void
+     */
+    public static function castUsing($class, $caster)
+    {
+        self::$casterResolvers[$class] = $caster;
+    }
 
     /**
      * Convert the model's attributes to an array.
@@ -1257,6 +1278,8 @@ trait HasAttributes
 
         if (is_subclass_of($castType, Castable::class)) {
             $castType = $castType::castUsing($arguments);
+        } elseif ($caster = self::$casterResolvers[$castType] ?? null) {
+            $castType = $caster instanceof Closure ? $caster($arguments) : $caster;
         }
 
         if (is_object($castType)) {
