@@ -279,7 +279,7 @@ class TestEloquentModelWithCustomCast extends Model
      */
     protected $casts = [
         'address' => AddressCaster::class,
-        'price' => DecimalCaster::class,
+        'price' => Decimal::class,
         'password' => HashCaster::class,
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
@@ -463,7 +463,7 @@ class Address
     }
 }
 
-final class Decimal
+final class Decimal implements Castable
 {
     private $value;
     private $scale;
@@ -484,6 +484,11 @@ final class Decimal
     public function __toString()
     {
         return substr_replace($this->value, '.', -$this->scale, 0);
+    }
+
+    public static function castUsing(array $arguments)
+    {
+        return new DecimalCaster();
     }
 }
 
