@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentModelDateCastingTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use ArrayObject;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
@@ -8,14 +8,13 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
  * @group integration
  */
-class EloquentModelCustomCastingTest extends DatabaseTestCase
+class EloquentModelGlobalCustomCastingTest extends DatabaseTestCase
 {
     protected function setUp(): void
     {
@@ -27,7 +26,7 @@ class EloquentModelCustomCastingTest extends DatabaseTestCase
             $table->json('data')->nullable();
         });
 
-        Model::castUsing(Uuid::class, new class() implements CastsAttributes {
+        Model::castUsing('uuid', new class() implements CastsAttributes {
             public function get($model, string $key, $value, array $attributes)
             {
                 return $value === null ? null : Uuid::fromString((string) $value);
@@ -73,7 +72,7 @@ class TestCastModel extends Model
     protected $guarded = [];
 
     public $casts = [
-        'uuid' => Uuid::class,
+        'uuid' => 'uuid',
         'data' => ArrayObject::class,
     ];
 }

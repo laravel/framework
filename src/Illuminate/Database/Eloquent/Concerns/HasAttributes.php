@@ -1221,6 +1221,10 @@ trait HasAttributes
             return false;
         }
 
+        if (array_key_exists($castType, self::$casterResolvers)) {
+            return true;
+        }
+
         if (class_exists($castType)) {
             return true;
         }
