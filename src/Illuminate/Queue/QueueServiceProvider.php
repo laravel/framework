@@ -27,8 +27,6 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register()
     {
-        Queue::createPayloadUsing(null);
-
         $this->registerManager();
         $this->registerConnection();
         $this->registerWorker();
