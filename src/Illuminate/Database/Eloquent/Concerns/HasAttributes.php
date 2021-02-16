@@ -1261,7 +1261,7 @@ trait HasAttributes
      * Resolve the custom caster class for a given key.
      *
      * @param  string  $key
-     * @return mixed
+     * @return object
      */
     protected function resolveCasterClass($key)
     {
