@@ -796,7 +796,7 @@ class Str
     }
 
     /**
-     * Sanitizing word to be only letter and space for word
+     * Sanitizing word to be only letter and space for word.
      *
      * @param  string  $word
      * @return string
