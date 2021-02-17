@@ -427,11 +427,7 @@ trait InteractsWithPivotTable
      */
     public function detach($ids = null, $touch = true)
     {
-        if ($this->using &&
-            ! empty($ids) &&
-            empty($this->pivotWheres) &&
-            empty($this->pivotWhereIns) &&
-            empty($this->pivotWhereNulls)) {
+        if ($this->using && ! empty($ids)) {
             $results = $this->detachUsingCustomClass($ids);
         } else {
             $query = $this->newPivotQuery();
@@ -472,10 +468,22 @@ trait InteractsWithPivotTable
     {
         $results = 0;
 
-        foreach ($this->parseIds($ids) as $id) {
+        $query = $this->newPivotQuery();
+
+        if (! is_null($ids)) {
+            $ids = $this->parseIds($ids);
+
+            if (empty($ids)) {
+                return 0;
+            }
+
+            $query->whereIn($this->relatedPivotKey, (array) $ids);
+        }
+
+        foreach ($query->get() as $model) {
             $results += $this->newPivot([
                 $this->foreignPivotKey => $this->parent->{$this->parentKey},
-                $this->relatedPivotKey => $id,
+                $this->relatedPivotKey => $model->{$this->relatedPivotKey},
             ], true)->delete();
         }
 
@@ -555,17 +563,19 @@ trait InteractsWithPivotTable
     {
         $query = $this->newPivotStatement();
 
-        foreach ($this->pivotWheres as $arguments) {
-            $query->where(...$arguments);
-        }
+        $query->where(function ($query) {
+            foreach ($this->pivotWheres as $arguments) {
+                $query->where(...$arguments);
+            }
 
-        foreach ($this->pivotWhereIns as $arguments) {
-            $query->whereIn(...$arguments);
-        }
+            foreach ($this->pivotWhereIns as $arguments) {
+                $query->whereIn(...$arguments);
+            }
 
-        foreach ($this->pivotWhereNulls as $arguments) {
-            $query->whereNull(...$arguments);
-        }
+            foreach ($this->pivotWhereNulls as $arguments) {
+                $query->whereNull(...$arguments);
+            }
+        });
 
         return $query->where($this->foreignPivotKey, $this->parent->{$this->parentKey});
     }

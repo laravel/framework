@@ -61,18 +61,18 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
     }
 
-    public function testPivotWithPivotCriteriaTriggerEventsToBeFiredOnCreateUpdateNoneOnDetach()
+    public function testPivotWithPivotCriteriaTriggerEventsToBeFiredOnCreateUpdateAndOnDetach()
     {
         $user = PivotEventsTestUser::forceCreate(['email' => 'taylor@laravel.com']);
         $user2 = PivotEventsTestUser::forceCreate(['email' => 'ralph@ralphschindler.com']);
         $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
 
-        $project->contributors()->sync([$user->id, $user2->id]);
+        $project->contributors()->sync([$user->id => ['role' => 'contributor'], $user2->id => ['role' => 'contributor']]);
         $this->assertEquals(['saving', 'creating', 'created', 'saved', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->contributors()->detach($user->id);
-        $this->assertEquals([], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
     }
 
     public function testCustomPivotUpdateEventHasExistingAttributes()
