@@ -47,12 +47,16 @@ trait TestDatabases
 
             if (Arr::hasAny($uses, $databaseTraits)) {
                 $this->whenNotUsingInMemoryDatabase(function ($database) use ($uses) {
-                    $testDatabase = $this->ensureTestDatabaseExists($database);
+                    [$testDatabase, $created] = $this->ensureTestDatabaseExists($database);
 
                     $this->switchToDatabase($testDatabase);
 
                     if (isset($uses[Testing\DatabaseTransactions::class])) {
                         $this->ensureSchemaIsUpToDate();
+                    }
+
+                    if ($created) {
+                        ParallelTesting::callSetUpTestDatabaseCallbacks($testDatabase);
                     }
                 });
             }
@@ -64,22 +68,26 @@ trait TestDatabases
      *
      * @param  string  $database
      *
-     * @return string
+     * @return array
      */
     protected function ensureTestDatabaseExists($database)
     {
-        return tap($this->testDatabase($database), function ($testDatabase) use ($database) {
-            try {
-                $this->usingDatabase($testDatabase, function () {
-                    Schema::hasTable('dummy');
-                });
-            } catch (QueryException $e) {
-                $this->usingDatabase($database, function () use ($testDatabase) {
-                    Schema::dropDatabaseIfExists($testDatabase);
-                    Schema::createDatabase($testDatabase);
-                });
-            }
-        });
+        $testDatabase = $this->testDatabase($database);
+
+        try {
+            $this->usingDatabase($testDatabase, function () {
+                Schema::hasTable('dummy');
+            });
+        } catch (QueryException $e) {
+            $this->usingDatabase($database, function () use ($testDatabase) {
+                Schema::dropDatabaseIfExists($testDatabase);
+                Schema::createDatabase($testDatabase);
+            });
+
+            return [$testDatabase, true];
+        }
+
+        return [$testDatabase, false];
     }
 
     /**
