@@ -4,12 +4,15 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\ServiceProvider;
-use Orchestra\Testbench\TestCase;
+use Orchestra\Testbench\Concerns\CreatesApplication;
 
 class CustomPayloadTest extends TestCase
 {
+    use CreatesApplication;
+
     protected function getPackageProviders($app)
     {
         return [QueueServiceProvider::class];
