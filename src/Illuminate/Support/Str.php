@@ -794,4 +794,20 @@ class Str
     {
         static::$uuidFactory = null;
     }
+
+    /**
+     * Sanitizing word to be only letter and space for word
+     *
+     * @param  string  $word
+     * @return string
+     */
+    public static function sanitize($word)
+    {
+        if(!is_string($word)){
+            return $word;
+        }
+
+        $only_letter = preg_replace("/[^A-Za-z ]/", '', $word);
+        return preg_replace('/\s+/', ' ',$only_letter);
+    }
 }

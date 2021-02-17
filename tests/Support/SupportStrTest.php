@@ -517,6 +517,15 @@ class SupportStrTest extends TestCase
         $this->assertEquals("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
         $this->assertEquals("<h1>hello world</h1>\n", Str::markdown('# hello world'));
     }
+
+    public function testSanitize()
+    {
+        $this->assertEquals("Foo Bar", Str::sanitize('Foo 1 Bar 1'));
+        $this->assertEquals("Foo Bar", Str::sanitize('Foo (Bar)'));
+        $this->assertEquals("Foo Bar Buz", Str::sanitize('Foo (Bar) /Buz'));
+        $this->assertEquals("Foo Bar Buz", Str::sanitize('Foo (Bar) __Buz__'));
+        $this->assertEquals("Foo Bar Buz", Str::sanitize('Foo      Bar     Buz'));
+    }
 }
 
 class StringableObjectStub
