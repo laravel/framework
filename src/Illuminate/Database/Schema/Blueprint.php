@@ -1138,7 +1138,7 @@ class Blueprint
      */
     public function softDeletes($column = 'deleted_at', $precision = 0)
     {
-        return $this->timestamp($column, $precision)->nullable();
+        return $this->timestamp($column, $precision)->nullable()->index();
     }
 
     /**
@@ -1150,7 +1150,7 @@ class Blueprint
      */
     public function softDeletesTz($column = 'deleted_at', $precision = 0)
     {
-        return $this->timestampTz($column, $precision)->nullable();
+        return $this->timestampTz($column, $precision)->nullable()->index();
     }
 
     /**
