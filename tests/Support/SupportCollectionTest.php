@@ -3603,20 +3603,6 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testReduceWithKeys($collection)
-    {
-        $data = new $collection([
-            'foo' => 'bar',
-            'baz' => 'qux',
-        ]);
-        $this->assertEquals('foobarbazqux', $data->reduceWithKeys(function ($carry, $element, $key) {
-            return $carry .= $key.$element;
-        }));
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
     public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize($collection)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -4140,10 +4126,13 @@ class SupportCollectionTest extends TestCase
         $data = new $collection([1, 2, 3]);
 
         $fromTap = [];
-        $data = $data->tap(function ($data) use (&$fromTap) {
+        $tappedInstance = null;
+        $data = $data->tap(function ($data) use (&$fromTap, &$tappedInstance) {
             $fromTap = $data->slice(0, 1)->toArray();
+            $tappedInstance = $data;
         });
 
+        $this->assertSame($data, $tappedInstance);
         $this->assertSame([1], $fromTap);
         $this->assertSame([1, 2, 3], $data->toArray());
     }

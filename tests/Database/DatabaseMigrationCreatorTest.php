@@ -35,9 +35,11 @@ class DatabaseMigrationCreatorTest extends TestCase
         $table = 'baz';
 
         $creator = $this->getCreator();
-        unset($_SERVER['__migration.creator']);
-        $creator->afterCreate(function ($table) {
-            $_SERVER['__migration.creator'] = $table;
+        unset($_SERVER['__migration.creator.table']);
+        unset($_SERVER['__migration.creator.path']);
+        $creator->afterCreate(function ($table, $path) {
+            $_SERVER['__migration.creator.table'] = $table;
+            $_SERVER['__migration.creator.path'] = $path;
         });
 
         $creator->expects($this->any())->method('getDatePrefix')->willReturn('foo');
@@ -50,9 +52,11 @@ class DatabaseMigrationCreatorTest extends TestCase
 
         $creator->create('create_bar', 'foo', $table);
 
-        $this->assertEquals($_SERVER['__migration.creator'], $table);
+        $this->assertEquals($_SERVER['__migration.creator.table'], $table);
+        $this->assertEquals($_SERVER['__migration.creator.path'], 'foo/foo_create_bar.php');
 
-        unset($_SERVER['__migration.creator']);
+        unset($_SERVER['__migration.creator.table']);
+        unset($_SERVER['__migration.creator.path']);
     }
 
     public function testTableUpdateMigrationStoresMigrationFile()

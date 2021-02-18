@@ -991,6 +991,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` char(36) not null', $statements[0]);
     }
 
+    public function testAddingUuidDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uuid();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `uuid` char(36) not null', $statements[0]);
+    }
+
     public function testAddingForeignUuid()
     {
         $blueprint = new Blueprint('users');
@@ -1022,6 +1032,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` varchar(45) not null', $statements[0]);
     }
 
+    public function testAddingIpAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `ip_address` varchar(45) not null', $statements[0]);
+    }
+
     public function testAddingMacAddress()
     {
         $blueprint = new Blueprint('users');
@@ -1030,6 +1050,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `foo` varchar(17) not null', $statements[0]);
+    }
+
+    public function testAddingMacAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `mac_address` varchar(17) not null', $statements[0]);
     }
 
     public function testAddingGeometry()
@@ -1142,32 +1172,6 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
     }
 
-    public function testDropAllTables()
-    {
-        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
-
-        $this->assertSame('drop table `alpha`,`beta`,`gamma`', $statement);
-    }
-
-    public function testDropAllViews()
-    {
-        $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
-
-        $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
-    }
-
-    public function testGrammarsAreMacroable()
-    {
-        // compileReplace macro.
-        $this->getGrammar()::macro('compileReplace', function () {
-            return true;
-        });
-
-        $c = $this->getGrammar()::compileReplace();
-
-        $this->assertTrue($c);
-    }
-
     public function testCreateDatabase()
     {
         $connection = $this->getConnection();
@@ -1208,6 +1212,32 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
             'drop database if exists `my_database_b`',
             $statement
         );
+    }
+
+    public function testDropAllTables()
+    {
+        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
+
+        $this->assertSame('drop table `alpha`,`beta`,`gamma`', $statement);
+    }
+
+    public function testDropAllViews()
+    {
+        $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
+
+        $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
+    }
+
+    public function testGrammarsAreMacroable()
+    {
+        // compileReplace macro.
+        $this->getGrammar()::macro('compileReplace', function () {
+            return true;
+        });
+
+        $c = $this->getGrammar()::compileReplace();
+
+        $this->assertTrue($c);
     }
 
     protected function getConnection()

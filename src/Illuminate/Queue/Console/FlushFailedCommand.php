@@ -14,6 +14,15 @@ class FlushFailedCommand extends Command
     protected $name = 'queue:flush';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'queue:flush';
+
+    /**
      * The console command description.
      *
      * @var string

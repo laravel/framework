@@ -4,8 +4,6 @@ namespace Illuminate\Tests\Filesystem;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Filesystem\FilesystemManager;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
 use Mockery as m;
@@ -566,27 +564,6 @@ class FilesystemTest extends TestCase
         file_put_contents(self::$tempDir.'/bar.txt', 'bar');
         $files = new Filesystem;
         $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->allFiles(self::$tempDir));
-    }
-
-    /**
-     * @requires extension ftp
-     */
-    public function testCreateFtpDriver()
-    {
-        $filesystem = new FilesystemManager(new Application);
-
-        $driver = $filesystem->createFtpDriver([
-            'host' => 'ftp.example.com',
-            'username' => 'admin',
-            'permPublic' => 0700,
-            'unsupportedParam' => true,
-        ]);
-
-        /** @var \League\Flysystem\Adapter\Ftp $adapter */
-        $adapter = $driver->getAdapter();
-        $this->assertEquals(0700, $adapter->getPermPublic());
-        $this->assertSame('ftp.example.com', $adapter->getHost());
-        $this->assertSame('admin', $adapter->getUsername());
     }
 
     public function testHash()

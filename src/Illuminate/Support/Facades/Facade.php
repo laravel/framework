@@ -91,6 +91,22 @@ abstract class Facade
     }
 
     /**
+     * Initiate a mock expectation on the facade.
+     *
+     * @return \Mockery\Expectation
+     */
+    public static function expects()
+    {
+        $name = static::getFacadeAccessor();
+
+        $mock = static::isMock()
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
+
+        return $mock->expects(...func_get_args());
+    }
+
+    /**
      * Create a fresh mock instance for the given class.
      *
      * @return \Mockery\MockInterface

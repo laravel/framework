@@ -79,6 +79,7 @@ class Builder
      * @var string[]
      */
     protected $passthru = [
+        'aggregate',
         'average',
         'avg',
         'count',
@@ -89,12 +90,16 @@ class Builder
         'getBindings',
         'getConnection',
         'getGrammar',
+        'getProcessor',
+        'implode',
         'insert',
         'insertGetId',
         'insertOrIgnore',
         'insertUsing',
         'max',
         'min',
+        'newQuery',
+        'numericAggregate',
         'raw',
         'sum',
         'toSql',

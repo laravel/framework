@@ -704,23 +704,10 @@ trait EnumeratesValues
     }
 
     /**
-     * Pass the collection to the given callback and then return it.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function tap(callable $callback)
-    {
-        $callback(clone $this);
-
-        return $this;
-    }
-
-    /**
      * Reduce the collection to a single value.
      *
      * @param  callable  $callback
-     * @param  mixed $initial
+     * @param  mixed  $initial
      * @return mixed
      */
     public function reduce(callable $callback, $initial = null)
@@ -767,6 +754,19 @@ trait EnumeratesValues
                 ? ! $callback($value, $key)
                 : $value != $callback;
         });
+    }
+
+    /**
+     * Pass the collection to the given callback and then return it.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function tap(callable $callback)
+    {
+        $callback($this);
+
+        return $this;
     }
 
     /**

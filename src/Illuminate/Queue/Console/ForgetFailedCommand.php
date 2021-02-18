@@ -14,6 +14,15 @@ class ForgetFailedCommand extends Command
     protected $signature = 'queue:forget {id : The ID of the failed job}';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'queue:forget';
+
+    /**
      * The console command description.
      *
      * @var string
