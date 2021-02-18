@@ -477,6 +477,28 @@ class FoundationApplicationTest extends TestCase
             $_SERVER['APP_EVENTS_CACHE']
         );
     }
+
+    public function testGeneratedPaths()
+    {
+        $app = new Application();
+
+        $this->assertSame('/bootstrap', $app->bootstrapPath());
+        $this->assertSame('/bootstrap/foo', $app->bootstrapPath('foo'));
+
+        $this->assertSame('/config', $app->configPath());
+        $this->assertSame('/config/foo', $app->configPath('foo'));
+
+        $this->assertSame('/database', $app->databasePath());
+        $this->assertSame('/database/foo', $app->databasePath('foo'));
+
+        $this->assertSame('/resources', $app->resourcePath());
+        $this->assertSame('/resources/foo', $app->resourcePath('foo'));
+
+        $this->assertSame('/public', $app->publicPath());
+        $this->assertSame('/public/foo', $app->publicPath('foo'));
+
+        $this->assertSame('/storage', $app->storagePath());
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
