@@ -68,6 +68,14 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('instance-Adam', $instance->methodOne('Adam'));
     }
 
+    public function testArrayBasedMacros()
+    {
+        TestMacroable::mixin([new TestMixin, TestMixinTwo::class]);
+        $instance = new TestMacroable;
+        $this->assertSame('instance-Adam', $instance->methodOne('Adam'));
+        $this->assertSame('bar', $instance->methodFour());
+    }
+
     public function testClassBasedMacrosNoReplace()
     {
         TestMacroable::macro('methodThree', function () {
@@ -91,6 +99,19 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('bar', $instance->methodThree());
 
         TestMacroable::mixin(TestMixin::class);
+        $this->assertSame('foo', $instance->methodThree());
+    }
+
+    public function testArrayBasedMacrosNoReplace()
+    {
+        TestMacroable::macro('methodThree', function () {
+            return 'bar';
+        });
+        TestMacroable::mixin([new TestMixin], false);
+        $instance = new TestMacroable;
+        $this->assertSame('bar', $instance->methodThree());
+
+        TestMacroable::mixin([new TestMixin]);
         $this->assertSame('foo', $instance->methodThree());
     }
 }
@@ -132,6 +153,17 @@ class TestMixin
     {
         return function () {
             return 'foo';
+        };
+    }
+}
+
+
+class TestMixinTwo
+{
+    public function methodFour()
+    {
+        return function () {
+            return 'bar';
         };
     }
 }

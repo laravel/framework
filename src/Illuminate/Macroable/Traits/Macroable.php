@@ -39,6 +39,14 @@ trait Macroable
      */
     public static function mixin($mixin, $replace = true)
     {
+        if (is_iterable($mixin)) {
+            foreach ($mixin as $macro) {
+                static::mixin($macro, $replace);
+            }
+
+            return;
+        }
+
         $methods = (new ReflectionClass($mixin))->getMethods(
             ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
         );
