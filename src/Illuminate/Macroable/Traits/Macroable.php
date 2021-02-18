@@ -31,7 +31,7 @@ trait Macroable
     /**
      * Mix another object into the class.
      *
-     * @param  object  $mixin
+     * @param  mixed  $mixin
      * @param  bool  $replace
      * @return void
      *
@@ -42,6 +42,8 @@ trait Macroable
         $methods = (new ReflectionClass($mixin))->getMethods(
             ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
         );
+
+        $mixin = (new ReflectionClass($mixin))->newInstance();
 
         foreach ($methods as $method) {
             if ($replace || ! static::hasMacro($method->name)) {
