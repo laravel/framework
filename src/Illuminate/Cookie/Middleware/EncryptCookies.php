@@ -27,11 +27,11 @@ class EncryptCookies
     protected $except = [];
 
     /**
-     * Indicates if cookies should be serialized.
+     * The names of the cookies that should be serialized.
      *
-     * @var bool
+     * @var array
      */
-    protected static $serialize = false;
+    protected static $serialize = [];
 
     /**
      * Create a new CookieGuard instance.
@@ -189,6 +189,6 @@ class EncryptCookies
      */
     public static function serialized($name)
     {
-        return static::$serialize;
+        return in_array($name, static::$serialize);
     }
 }
