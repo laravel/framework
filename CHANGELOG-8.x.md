@@ -1,6 +1,59 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.26.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.28.1...8.x)
+
+
+## [v8.28.1 (2021-02-16)](https://github.com/laravel/framework/compare/v8.28.0...v8.28.1)
+
+### Fixed
+- Revert "[8.x] Clean up custom Queue payload between tests" ([#36287](https://github.com/laravel/framework/pull/36287))
+
+
+## [v8.28.0 (2021-02-16)](https://github.com/laravel/framework/compare/v8.27.0...v8.28.0)
+
+### Added
+- Allow users to specify configuration keys to be used for primitive binding ([#36241](https://github.com/laravel/framework/pull/36241))
+- ArrayObject + Collection Custom Casts ([#36245](https://github.com/laravel/framework/pull/36245))
+- Add view path method ([af3a651](https://github.com/laravel/framework/commit/af3a651ad6ae3e90bd673fe7a6bfc1ce9e569d25))
+
+### Changed
+- Allow using dot syntax for `$responseKey` ([#36196](https://github.com/laravel/framework/pull/36196))
+- Full trace for http errors ([#36219](https://github.com/laravel/framework/pull/36219))
+
+### Fixed
+- Fix undefined property with sole query ([#36216](https://github.com/laravel/framework/pull/36216))
+- Resolving non-instantiables corrupts `Container::$with` ([#36212](https://github.com/laravel/framework/pull/36212))
+- Fix attribute nesting on anonymous components ([#36240](https://github.com/laravel/framework/pull/36240))
+- Ensure `$prefix` is a string ([#36254](https://github.com/laravel/framework/pull/36254))
+- Add missing import ([#34569](https://github.com/laravel/framework/pull/34569))
+- Align PHP 8.1 behavior of `e()` ([#36262](https://github.com/laravel/framework/pull/36262))
+- Ensure null values won't break on PHP 8.1 ([#36264](https://github.com/laravel/framework/pull/36264))
+- Handle directive `$value` as a string ([#36260](https://github.com/laravel/framework/pull/36260))
+- Use explicit flag as default sorting ([#36261](https://github.com/laravel/framework/pull/36261))
+- Fix middleware group display ([d9e28dc](https://github.com/laravel/framework/commit/d9e28dcb1f4a5638b33829d919bd7417321ab39e))
+
+
+## [v8.27.0 (2021-02-09)](https://github.com/laravel/framework/compare/v8.26.1...v8.27.0)
+
+### Added
+- Conditionally merge classes into a Blade Component attribute bag ([#36131](https://github.com/laravel/framework/pull/36131))
+- Allow adding multiple columns after a column ([#36145](https://github.com/laravel/framework/pull/36145))
+- Add query builder `chunkMap` method ([#36193](https://github.com/laravel/framework/pull/36193), [048ac6d](https://github.com/laravel/framework/commit/048ac6d49f2f7b2d64eb1695848df4590c38be98))
+
+### Changed
+- Update CallQueuedClosure to catch Throwable/Error ([#36159](https://github.com/laravel/framework/pull/36159))
+- Allow components to use custom attribute bag ([#36186](https://github.com/laravel/framework/pull/36186))
+
+### Fixed
+- Set process timeout to null for load mysql schema into database ([#36126](https://github.com/laravel/framework/pull/36126))
+- Don't pluralise string if string ends with none alphanumeric character ([#36137](https://github.com/laravel/framework/pull/36137))
+- Add query log methods to the DB facade ([#36177](https://github.com/laravel/framework/pull/36177))
+- Add commonmark as recommended package for `Illuminate\Support` ([#36171](https://github.com/laravel/framework/pull/36171))
+- Fix Eager loading partially nullable morphTo relations ([#36129](https://github.com/laravel/framework/pull/36129))
+- Make height of image working with yahoo ([#36201](https://github.com/laravel/framework/pull/36201))
+- Make `sole()` relationship friendly ([#36200](https://github.com/laravel/framework/pull/36200))
+- Make layout in mail responsive in Gmail app ([#36198](https://github.com/laravel/framework/pull/36198))
+- Fixes parallel testing when a database is configured using URLs ([#36204](https://github.com/laravel/framework/pull/36204))
 
 
 ## [v8.26.1 (2021-02-02)](https://github.com/laravel/framework/compare/v8.26.0...v8.26.1)
