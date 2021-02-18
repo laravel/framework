@@ -31,7 +31,7 @@ trait Macroable
     /**
      * Mix another object into the class.
      *
-     * @param  mixed  $mixin
+     * @param  object|iterable  $mixin
      * @param  bool  $replace
      * @return void
      *
