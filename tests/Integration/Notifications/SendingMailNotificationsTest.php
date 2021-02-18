@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Notifications;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Mail\Markdown;
@@ -281,6 +282,19 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
+    public function testMailIsQueuedUsingShouldQueueMailable()
+    {
+        $notification = new TestMailNotificationWithShouldQueueMailable;
+
+        $this->mailer->shouldReceive('queue')->once();
+
+        $user = NotifiableUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $user->notify($notification);
+    }
+
     public function testMailIsSentUsingMailMessageWithHtmlOnly()
     {
         $notification = new TestMailNotificationWithHtmlOnly;
@@ -425,6 +439,19 @@ class TestMailNotificationWithMailable extends Notification
         $mailable->shouldReceive('send')->once();
 
         return $mailable;
+    }
+}
+
+class TestMailNotificationWithShouldQueueMailable extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return m::mock(Mailable::class, ShouldQueue::class);
     }
 }
 

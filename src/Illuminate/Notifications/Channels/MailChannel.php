@@ -56,6 +56,10 @@ class MailChannel
         }
 
         if ($message instanceof Mailable) {
+            if ($message instanceof ShouldQueue) {
+                return $this->mailer->mailer($message->mailer ?? null)->queue($message);
+            }
+
             return $message->send($this->mailer);
         }
 
