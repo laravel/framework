@@ -157,7 +157,6 @@ class TestMixin
     }
 }
 
-
 class TestMixinTwo
 {
     public function methodFour()
