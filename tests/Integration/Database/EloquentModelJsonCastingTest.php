@@ -74,6 +74,23 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $this->assertInstanceOf(Collection::class, $user->collection_as_json_field);
         $this->assertSame('value1', $user->collection_as_json_field->get('key1'));
     }
+
+    public function testObjectsChangedIsDirty()
+    {
+        $object = new stdClass();
+        $object->key1 = null;
+
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */
+        $user = JsonCast::create([
+            'object_as_json_field' => $object,
+        ]);
+
+        $changedObject = new stdClass();
+        $changedObject->key1 = false;
+        $user->object_as_json_field = $changedObject;
+
+        $this->assertTrue($user->isDirty());
+    }
 }
 
 /**
