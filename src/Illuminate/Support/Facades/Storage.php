@@ -21,6 +21,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static \Illuminate\Filesystem\FilesystemManager extend(string $driver, \Closure $callback)
  * @method static bool makeDirectory(string $path)
  * @method static bool move(string $from, string $to)
+ * @method static string path(string $path)
  * @method static bool prepend(string $path, string $data)
  * @method static bool put(string $path, string|resource $contents, mixed $options = [])
  * @method static string|false putFile(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, mixed $options = [])
