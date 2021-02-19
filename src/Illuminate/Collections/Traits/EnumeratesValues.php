@@ -682,6 +682,26 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter the items, removing any items that don't match any of the
+     * given types.
+     *
+     * @param  string[]  $types
+     * @return static
+     */
+    public function whereInstanceOfAny(array $types)
+    {
+        return $this->filter(function ($value) use ($types) {
+            foreach ($types as $type) {
+                if ($value instanceof $type) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @param  callable  $callback
