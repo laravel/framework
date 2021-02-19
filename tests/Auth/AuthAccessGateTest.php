@@ -323,6 +323,23 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->denies('deny'));
     }
 
+    public function testFinallyIsExecutedLastly()
+    {
+        $gate = new Gate(new Container, function () {
+            //
+        });
+
+        $gate->after(function (?stdClass $user) {
+            //
+        });
+
+        $gate->finally(function (?stdClass $user) {
+            return true;
+        });
+
+        $this->assertTrue($gate->check('anything'));
+    }
+
     public function testCurrentUserThatIsOnGateAlwaysInjectedIntoClosureCallbacks()
     {
         $gate = $this->getBasicGate();

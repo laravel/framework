@@ -73,6 +73,15 @@ class Gate implements GateContract
     protected $guessPolicyNamesUsingCallback;
 
     /**
+     * The registered final callback.
+     *
+     * @var callable|null
+     *
+     * @internal This property is only meant for internal purposes and does not fall under our BC policy.
+     */
+    protected $finalCallback;
+
+    /**
      * Create a new gate instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -82,16 +91,18 @@ class Gate implements GateContract
      * @param  array  $beforeCallbacks
      * @param  array  $afterCallbacks
      * @param  callable|null  $guessPolicyNamesUsingCallback
+     * @param  callable|null  $finalCallback
      * @return void
      */
     public function __construct(Container $container, callable $userResolver, array $abilities = [],
                                 array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [],
-                                callable $guessPolicyNamesUsingCallback = null)
+                                callable $guessPolicyNamesUsingCallback = null, callable $finalCallback = null)
     {
         $this->policies = $policies;
         $this->container = $container;
         $this->abilities = $abilities;
         $this->userResolver = $userResolver;
+        $this->finalCallback = $finalCallback;
         $this->afterCallbacks = $afterCallbacks;
         $this->beforeCallbacks = $beforeCallbacks;
         $this->guessPolicyNamesUsingCallback = $guessPolicyNamesUsingCallback;
@@ -246,6 +257,21 @@ class Gate implements GateContract
     }
 
     /**
+     * Register the final callback to run after all other Gate checks.
+     *
+     * @param  callable  $callback
+     * @return $this
+     *
+     * @internal This method is only meant for internal purposes and does not fall under our BC policy.
+     */
+    public function finally(callable $callback)
+    {
+        $this->finalCallback = $callback;
+
+        return $this;
+    }
+
+    /**
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
@@ -374,9 +400,11 @@ class Gate implements GateContract
         // After calling the authorization callback, we will call the "after" callbacks
         // that are registered with the Gate, which allows a developer to do logging
         // if that is required for this application. Then we'll return the result.
-        return $this->callAfterCallbacks(
+        $result = $this->callAfterCallbacks(
             $user, $ability, $arguments, $result
         );
+
+        return $this->callFinalCallback($user, $ability, $arguments, $result);
     }
 
     /**
@@ -514,6 +542,32 @@ class Gate implements GateContract
             $afterResult = $after($user, $ability, $result, $arguments);
 
             $result = $result ?? $afterResult;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Call the final callback with check result.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @param  bool  $result
+     * @return bool|null
+     */
+    protected function callFinalCallback($user, $ability, array $arguments, $result)
+    {
+        if ($this->finalCallback) {
+            $finalCallback = $this->finalCallback;
+
+            if (! $this->canBeCalledWithUser($user, $finalCallback)) {
+                return $result;
+            }
+
+            $finalResult = $finalCallback($user, $ability, $result, $arguments);
+
+            $result = $result ?? $finalResult;
         }
 
         return $result;
@@ -746,7 +800,7 @@ class Gate implements GateContract
         return new static(
             $this->container, $callback, $this->abilities,
             $this->policies, $this->beforeCallbacks, $this->afterCallbacks,
-            $this->guessPolicyNamesUsingCallback
+            $this->guessPolicyNamesUsingCallback, $this->finalCallback
         );
     }
 
