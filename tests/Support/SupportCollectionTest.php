@@ -766,8 +766,10 @@ class SupportCollectionTest extends TestCase
      */
     public function testWhereInstanceOf($collection)
     {
-        $c = new $collection([new stdClass, new stdClass, new $collection, new stdClass]);
+        $c = new $collection([new stdClass, new stdClass, new $collection, new stdClass, new Str]);
         $this->assertCount(3, $c->whereInstanceOf(stdClass::class));
+
+        $this->assertCount(4, $c->whereInstanceOf([stdClass::class, Str::class]));
     }
 
     /**
