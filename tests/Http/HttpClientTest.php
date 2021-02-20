@@ -65,6 +65,9 @@ class HttpClientTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $response->collect());
         $this->assertEquals(collect(['result' => ['foo' => 'bar']]), $response->collect());
+        $this->assertEquals(collect(['foo' => 'bar']), $response->collect('result'));
+        $this->assertEquals(collect(['bar']), $response->collect('result.foo'));
+        $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
     public function testUrlsCanBeStubbedByPath()

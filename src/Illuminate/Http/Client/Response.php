@@ -83,9 +83,9 @@ class Response implements ArrayAccess
      *
      * @return Collection
      */
-    public function collect()
+    public function collect($key = null)
     {
-        return Collection::make($this->json());
+        return Collection::make($this->json($key));
     }
 
     /**
