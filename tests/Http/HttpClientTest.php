@@ -7,6 +7,7 @@ use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
@@ -17,13 +18,6 @@ class HttpClientTest extends TestCase
      * @var \Illuminate\Http\Client\Factory
      */
     protected $factory;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->factory = new Factory;
-    }
 
     public function testStubbedResponsesAreReturnedAfterFaking()
     {
@@ -36,14 +30,16 @@ class HttpClientTest extends TestCase
 
     public function testResponseBodyCasting()
     {
-        $this->factory->fake([
-            '*' => ['result' => ['foo' => 'bar']],
-        ]);
+        $this->factory->fake(
+            [
+                '*' => ['result' => ['foo' => 'bar']],
+            ]
+        );
 
         $response = $this->factory->get('http://foo.com/api');
 
         $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
-        $this->assertSame('{"result":{"foo":"bar"}}', (string) $response);
+        $this->assertSame('{"result":{"foo":"bar"}}', (string)$response);
         $this->assertIsArray($response->json());
         $this->assertSame(['foo' => 'bar'], $response->json()['result']);
         $this->assertSame(['foo' => 'bar'], $response->json('result'));
@@ -54,13 +50,29 @@ class HttpClientTest extends TestCase
         $this->assertSame('bar', $response->object()->result->foo);
     }
 
+    public function testResponseCanBeReturnedAsCollection()
+    {
+        $this->factory->fake(
+            [
+                '*' => ['result' => ['foo' => 'bar']],
+            ]
+        );
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertInstanceOf(Collection::class, $response->collect());
+        $this->assertEquals(collect(['result' => ['foo' => 'bar']]), $response->collect());
+    }
+
     public function testUrlsCanBeStubbedByPath()
     {
-        $this->factory->fake([
-            'foo.com/*' => ['page' => 'foo'],
-            'bar.com/*' => ['page' => 'bar'],
-            '*' => ['page' => 'fallback'],
-        ]);
+        $this->factory->fake(
+            [
+                'foo.com/*' => ['page' => 'foo'],
+                'bar.com/*' => ['page' => 'bar'],
+                '*' => ['page' => 'fallback'],
+            ]
+        );
 
         $fooResponse = $this->factory->post('http://foo.com/test');
         $barResponse = $this->factory->post('http://bar.com/test');
@@ -70,60 +82,79 @@ class HttpClientTest extends TestCase
         $this->assertSame('bar', $barResponse['page']);
         $this->assertSame('fallback', $fallbackResponse['page']);
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/test' &&
-                   $request->hasHeader('Content-Type', 'application/json');
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/test' &&
+                    $request->hasHeader('Content-Type', 'application/json');
+            }
+        );
     }
 
     public function testCanSendJsonData()
     {
         $this->factory->fake();
 
-        $this->factory->withHeaders([
-            'X-Test-Header' => 'foo',
-            'X-Test-ArrayHeader' => ['bar', 'baz'],
-        ])->post('http://foo.com/json', [
-            'name' => 'Taylor',
-        ]);
+        $this->factory->withHeaders(
+            [
+                'X-Test-Header' => 'foo',
+                'X-Test-ArrayHeader' => ['bar', 'baz'],
+            ]
+        )->post(
+            'http://foo.com/json',
+            [
+                'name' => 'Taylor',
+            ]
+        );
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/json' &&
-                   $request->hasHeader('Content-Type', 'application/json') &&
-                   $request->hasHeader('X-Test-Header', 'foo') &&
-                   $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
-                   $request['name'] === 'Taylor';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/json' &&
+                    $request->hasHeader('Content-Type', 'application/json') &&
+                    $request->hasHeader('X-Test-Header', 'foo') &&
+                    $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                    $request['name'] === 'Taylor';
+            }
+        );
     }
 
     public function testCanSendFormData()
     {
         $this->factory->fake();
 
-        $this->factory->asForm()->post('http://foo.com/form', [
-            'name' => 'Taylor',
-            'title' => 'Laravel Developer',
-        ]);
+        $this->factory->asForm()->post(
+            'http://foo.com/form',
+            [
+                'name' => 'Taylor',
+                'title' => 'Laravel Developer',
+            ]
+        );
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/form' &&
-                   $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
-                   $request['name'] === 'Taylor';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/form' &&
+                    $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
+                    $request['name'] === 'Taylor';
+            }
+        );
     }
 
     public function testSpecificRequestIsNotBeingSent()
     {
         $this->factory->fake();
 
-        $this->factory->post('http://foo.com/form', [
-            'name' => 'Taylor',
-        ]);
+        $this->factory->post(
+            'http://foo.com/form',
+            [
+                'name' => 'Taylor',
+            ]
+        );
 
-        $this->factory->assertNotSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/form' &&
-                $request['name'] === 'Peter';
-        });
+        $this->factory->assertNotSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/form' &&
+                    $request['name'] === 'Peter';
+            }
+        );
     }
 
     public function testNoRequestIsNotBeingSent()
@@ -138,15 +169,21 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
         $this->factory->assertSentCount(0);
 
-        $this->factory->post('http://foo.com/form', [
-            'name' => 'Taylor',
-        ]);
+        $this->factory->post(
+            'http://foo.com/form',
+            [
+                'name' => 'Taylor',
+            ]
+        );
 
         $this->factory->assertSentCount(1);
 
-        $this->factory->post('http://foo.com/form', [
-            'name' => 'Jim',
-        ]);
+        $this->factory->post(
+            'http://foo.com/form',
+            [
+                'name' => 'Jim',
+            ]
+        );
 
         $this->factory->assertSentCount(2);
     }
@@ -155,19 +192,24 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+        $this->factory->asMultipart()->post(
+            'http://foo.com/multipart',
             [
-                'name' => 'foo',
-                'contents' => 'data',
-                'headers' => ['X-Test-Header' => 'foo'],
-            ],
-        ]);
+                [
+                    'name' => 'foo',
+                    'contents' => 'data',
+                    'headers' => ['X-Test-Header' => 'foo'],
+                ],
+            ]
+        );
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/multipart' &&
-                   Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
-                   $request[0]['name'] === 'foo';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/multipart' &&
+                    Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                    $request[0]['name'] === 'foo';
+            }
+        );
     }
 
     public function testFilesCanBeAttached()
@@ -175,54 +217,66 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->attach('foo', 'data', 'file.txt', ['X-Test-Header' => 'foo'])
-                ->post('http://foo.com/file');
+            ->post('http://foo.com/file');
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/file' &&
-                   Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
-                   $request[0]['name'] === 'foo' &&
-                   $request->hasFile('foo', 'data', 'file.txt');
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/file' &&
+                    Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                    $request[0]['name'] === 'foo' &&
+                    $request->hasFile('foo', 'data', 'file.txt');
+            }
+        );
     }
 
     public function testCanSendMultipartDataWithSimplifiedParameters()
     {
         $this->factory->fake();
 
-        $this->factory->asMultipart()->post('http://foo.com/multipart', [
-            'foo' => 'bar',
-        ]);
+        $this->factory->asMultipart()->post(
+            'http://foo.com/multipart',
+            [
+                'foo' => 'bar',
+            ]
+        );
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/multipart' &&
-                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
-                $request[0]['name'] === 'foo' &&
-                $request[0]['contents'] === 'bar';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/multipart' &&
+                    Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                    $request[0]['name'] === 'foo' &&
+                    $request[0]['contents'] === 'bar';
+            }
+        );
     }
 
     public function testCanSendMultipartDataWithBothSimplifiedAndExtendedParameters()
     {
         $this->factory->fake();
 
-        $this->factory->asMultipart()->post('http://foo.com/multipart', [
-            'foo' => 'bar',
+        $this->factory->asMultipart()->post(
+            'http://foo.com/multipart',
             [
-                'name' => 'foobar',
-                'contents' => 'data',
-                'headers' => ['X-Test-Header' => 'foo'],
-            ],
-        ]);
+                'foo' => 'bar',
+                [
+                    'name' => 'foobar',
+                    'contents' => 'data',
+                    'headers' => ['X-Test-Header' => 'foo'],
+                ],
+            ]
+        );
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/multipart' &&
-                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
-                $request[0]['name'] === 'foo' &&
-                $request[0]['contents'] === 'bar' &&
-                $request[1]['name'] === 'foobar' &&
-                $request[1]['contents'] === 'data' &&
-                $request[1]['headers']['X-Test-Header'] === 'foo';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/multipart' &&
+                    Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                    $request[0]['name'] === 'foo' &&
+                    $request[0]['contents'] === 'bar' &&
+                    $request[1]['name'] === 'foobar' &&
+                    $request[1]['contents'] === 'data' &&
+                    $request[1]['headers']['X-Test-Header'] === 'foo';
+            }
+        );
     }
 
     public function testItCanSendToken()
@@ -231,10 +285,12 @@ class HttpClientTest extends TestCase
 
         $this->factory->withToken('token')->post('http://foo.com/json');
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/json' &&
-                $request->hasHeader('Authorization', 'Bearer token');
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/json' &&
+                    $request->hasHeader('Authorization', 'Bearer token');
+            }
+        );
     }
 
     public function testItCanSendUserAgent()
@@ -243,21 +299,25 @@ class HttpClientTest extends TestCase
 
         $this->factory->withUserAgent('Laravel')->post('http://foo.com/json');
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/json' &&
-                $request->hasHeader('User-Agent', 'Laravel');
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/json' &&
+                    $request->hasHeader('User-Agent', 'Laravel');
+            }
+        );
     }
 
     public function testSequenceBuilder()
     {
-        $this->factory->fake([
-            '*' => $this->factory->sequence()
-                ->push('Ok', 201)
-                ->push(['fact' => 'Cats are great!'])
-                ->pushFile(__DIR__.'/fixtures/test.txt')
-                ->pushStatus(403),
-        ]);
+        $this->factory->fake(
+            [
+                '*' => $this->factory->sequence()
+                    ->push('Ok', 201)
+                    ->push(['fact' => 'Cats are great!'])
+                    ->pushFile(__DIR__ . '/fixtures/test.txt')
+                    ->pushStatus(403),
+            ]
+        );
 
         $response = $this->factory->get('https://example.com');
         $this->assertSame('Ok', $response->body());
@@ -268,7 +328,10 @@ class HttpClientTest extends TestCase
         $this->assertSame(200, $response->status());
 
         $response = $this->factory->get('https://example.com');
-        $this->assertSame("This is a story about something that happened long ago when your grandfather was a child.\n", $response->body());
+        $this->assertSame(
+            "This is a story about something that happened long ago when your grandfather was a child.\n",
+            $response->body()
+        );
         $this->assertSame(200, $response->status());
 
         $response = $this->factory->get('https://example.com');
@@ -283,11 +346,13 @@ class HttpClientTest extends TestCase
 
     public function testSequenceBuilderCanKeepGoingWhenEmpty()
     {
-        $this->factory->fake([
-            '*' => $this->factory->sequence()
-                ->dontFailWhenEmpty()
-                ->push('Ok'),
-        ]);
+        $this->factory->fake(
+            [
+                '*' => $this->factory->sequence()
+                    ->dontFailWhenEmpty()
+                    ->push('Ok'),
+            ]
+        );
 
         $response = $this->factory->get('https://laravel.com');
         $this->assertSame('Ok', $response->body());
@@ -298,11 +363,13 @@ class HttpClientTest extends TestCase
 
     public function testAssertSequencesAreEmpty()
     {
-        $this->factory->fake([
-            '*' => $this->factory->sequence()
-                ->push('1')
-                ->push('2'),
-        ]);
+        $this->factory->fake(
+            [
+                '*' => $this->factory->sequence()
+                    ->push('1')
+                    ->push('2'),
+            ]
+        );
 
         $this->factory->get('https://example.com');
         $this->factory->get('https://example.com');
@@ -325,7 +392,8 @@ class HttpClientTest extends TestCase
         $this->factory->fakeSequence()->pushStatus(200);
 
         $response = $this->factory->withCookies(
-            ['foo' => 'bar'], 'https://laravel.com'
+            ['foo' => 'bar'],
+            'https://laravel.com'
         )->get('https://laravel.com');
 
         $this->assertCount(1, $response->cookies()->toArray());
@@ -344,10 +412,12 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get', ['foo' => 'bar']);
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo=bar'
-                && $request['foo'] === 'bar';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/get?foo=bar'
+                    && $request['foo'] === 'bar';
+            }
+        );
     }
 
     public function testGetWithStringQueryParam()
@@ -356,10 +426,12 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get', 'foo=bar');
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo=bar'
-                && $request['foo'] === 'bar';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/get?foo=bar'
+                    && $request['foo'] === 'bar';
+            }
+        );
     }
 
     public function testGetWithQuery()
@@ -368,11 +440,13 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get?foo=bar&page=1');
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo=bar&page=1'
-                && $request['foo'] === 'bar'
-                && $request['page'] === '1';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/get?foo=bar&page=1'
+                    && $request['foo'] === 'bar'
+                    && $request['page'] === '1';
+            }
+        );
     }
 
     public function testGetWithQueryWontEncode()
@@ -381,12 +455,14 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get?foo;bar;1;5;10&page=1');
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo;bar;1;5;10&page=1'
-                && ! isset($request['foo'])
-                && ! isset($request['bar'])
-                && $request['page'] === '1';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/get?foo;bar;1;5;10&page=1'
+                    && !isset($request['foo'])
+                    && !isset($request['bar'])
+                    && $request['page'] === '1';
+            }
+        );
     }
 
     public function testGetWithArrayQueryParamOverwrites()
@@ -395,10 +471,12 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get?foo=bar&page=1', ['hello' => 'world']);
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?hello=world'
-                && $request['hello'] === 'world';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/get?hello=world'
+                    && $request['hello'] === 'world';
+            }
+        );
     }
 
     public function testGetWithArrayQueryParamEncodes()
@@ -407,43 +485,55 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://foo.com/get', ['foo;bar; space test' => 'laravel']);
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo%3Bbar%3B%20space%20test=laravel'
-                && $request['foo;bar; space test'] === 'laravel';
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/get?foo%3Bbar%3B%20space%20test=laravel'
+                    && $request['foo;bar; space test'] === 'laravel';
+            }
+        );
     }
 
     public function testCanConfirmManyHeaders()
     {
         $this->factory->fake();
 
-        $this->factory->withHeaders([
-            'X-Test-Header' => 'foo',
-            'X-Test-ArrayHeader' => ['bar', 'baz'],
-        ])->post('http://foo.com/json');
+        $this->factory->withHeaders(
+            [
+                'X-Test-Header' => 'foo',
+                'X-Test-ArrayHeader' => ['bar', 'baz'],
+            ]
+        )->post('http://foo.com/json');
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/json' &&
-                   $request->hasHeaders([
-                       'X-Test-Header' => 'foo',
-                       'X-Test-ArrayHeader' => ['bar', 'baz'],
-                   ]);
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/json' &&
+                    $request->hasHeaders(
+                        [
+                            'X-Test-Header' => 'foo',
+                            'X-Test-ArrayHeader' => ['bar', 'baz'],
+                        ]
+                    );
+            }
+        );
     }
 
     public function testCanConfirmManyHeadersUsingAString()
     {
         $this->factory->fake();
 
-        $this->factory->withHeaders([
-            'X-Test-Header' => 'foo',
-            'X-Test-ArrayHeader' => ['bar', 'baz'],
-        ])->post('http://foo.com/json');
+        $this->factory->withHeaders(
+            [
+                'X-Test-Header' => 'foo',
+                'X-Test-ArrayHeader' => ['bar', 'baz'],
+            ]
+        )->post('http://foo.com/json');
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/json' &&
-                   $request->hasHeaders('X-Test-Header');
-        });
+        $this->factory->assertSent(
+            function (Request $request) {
+                return $request->url() === 'http://foo.com/json' &&
+                    $request->hasHeaders('X-Test-Header');
+            }
+        );
     }
 
     public function testRequestExceptionSummary()
@@ -465,7 +555,9 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionTruncatedSummary()
     {
         $this->expectException(RequestException::class);
-        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our sup (truncated...)');
+        $this->expectExceptionMessage(
+            '{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our sup (truncated...)'
+        );
 
         $error = [
             'error' => [
@@ -491,14 +583,18 @@ class HttpClientTest extends TestCase
     public function testOnErrorDoesntCallClosureOnInformational()
     {
         $status = 0;
-        $client = $this->factory->fake([
-            'laravel.com' => $this->factory::response('', 101),
-        ]);
+        $client = $this->factory->fake(
+            [
+                'laravel.com' => $this->factory::response('', 101),
+            ]
+        );
 
         $response = $client->get('laravel.com')
-            ->onError(function ($response) use (&$status) {
-                $status = $response->status();
-            });
+            ->onError(
+                function ($response) use (&$status) {
+                    $status = $response->status();
+                }
+            );
 
         $this->assertSame(0, $status);
         $this->assertSame(101, $response->status());
@@ -507,14 +603,18 @@ class HttpClientTest extends TestCase
     public function testOnErrorDoesntCallClosureOnSuccess()
     {
         $status = 0;
-        $client = $this->factory->fake([
-            'laravel.com' => $this->factory::response('', 201),
-        ]);
+        $client = $this->factory->fake(
+            [
+                'laravel.com' => $this->factory::response('', 201),
+            ]
+        );
 
         $response = $client->get('laravel.com')
-            ->onError(function ($response) use (&$status) {
-                $status = $response->status();
-            });
+            ->onError(
+                function ($response) use (&$status) {
+                    $status = $response->status();
+                }
+            );
 
         $this->assertSame(0, $status);
         $this->assertSame(201, $response->status());
@@ -523,14 +623,18 @@ class HttpClientTest extends TestCase
     public function testOnErrorDoesntCallClosureOnRedirection()
     {
         $status = 0;
-        $client = $this->factory->fake([
-            'laravel.com' => $this->factory::response('', 301),
-        ]);
+        $client = $this->factory->fake(
+            [
+                'laravel.com' => $this->factory::response('', 301),
+            ]
+        );
 
         $response = $client->get('laravel.com')
-            ->onError(function ($response) use (&$status) {
-                $status = $response->status();
-            });
+            ->onError(
+                function ($response) use (&$status) {
+                    $status = $response->status();
+                }
+            );
 
         $this->assertSame(0, $status);
         $this->assertSame(301, $response->status());
@@ -539,14 +643,18 @@ class HttpClientTest extends TestCase
     public function testOnErrorCallsClosureOnClientError()
     {
         $status = 0;
-        $client = $this->factory->fake([
-            'laravel.com' => $this->factory::response('', 401),
-        ]);
+        $client = $this->factory->fake(
+            [
+                'laravel.com' => $this->factory::response('', 401),
+            ]
+        );
 
         $response = $client->get('laravel.com')
-            ->onError(function ($response) use (&$status) {
-                $status = $response->status();
-            });
+            ->onError(
+                function ($response) use (&$status) {
+                    $status = $response->status();
+                }
+            );
 
         $this->assertSame(401, $status);
         $this->assertSame(401, $response->status());
@@ -555,14 +663,18 @@ class HttpClientTest extends TestCase
     public function testOnErrorCallsClosureOnServerError()
     {
         $status = 0;
-        $client = $this->factory->fake([
-            'laravel.com' => $this->factory::response('', 501),
-        ]);
+        $client = $this->factory->fake(
+            [
+                'laravel.com' => $this->factory::response('', 501),
+            ]
+        );
 
         $response = $client->get('laravel.com')
-            ->onError(function ($response) use (&$status) {
-                $status = $response->status();
-            });
+            ->onError(
+                function ($response) use (&$status) {
+                    $status = $response->status();
+                }
+            );
 
         $this->assertSame(501, $status);
         $this->assertSame(501, $response->status());
@@ -572,7 +684,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fakeSequence()->push('abc123');
 
-        $destination = __DIR__.'/fixtures/sunk.txt';
+        $destination = __DIR__ . '/fixtures/sunk.txt';
 
         if (file_exists($destination)) {
             unlink($destination);
@@ -600,9 +712,11 @@ class HttpClientTest extends TestCase
 
     public function testSinkWhenStubbedByPath()
     {
-        $this->factory->fake([
-            'foo.com/*' => ['page' => 'foo'],
-        ]);
+        $this->factory->fake(
+            [
+                'foo.com/*' => ['page' => 'foo'],
+            ]
+        );
 
         $resource = fopen('php://temp', 'w');
 
@@ -695,33 +809,43 @@ class HttpClientTest extends TestCase
         $executionOrder = [
             function (Request $request) {
                 return $request->url() === 'http://foo.com/json' &&
-                       $request->hasHeader('Content-Type', 'application/json') &&
-                       $request->hasHeader('X-Test-Header', 'foo') &&
-                       $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
-                       $request['name'] === 'Taylor';
+                    $request->hasHeader('Content-Type', 'application/json') &&
+                    $request->hasHeader('X-Test-Header', 'foo') &&
+                    $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                    $request['name'] === 'Taylor';
             },
             function (Request $request) {
                 return $request->url() === 'http://bar.com/json' &&
-                       $request->hasHeader('Content-Type', 'application/json') &&
-                       $request->hasHeader('X-Test-Header', 'bar') &&
-                       $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
-                       $request['name'] === 'Taylor';
+                    $request->hasHeader('Content-Type', 'application/json') &&
+                    $request->hasHeader('X-Test-Header', 'bar') &&
+                    $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                    $request['name'] === 'Taylor';
             },
         ];
 
-        $this->factory->withHeaders([
-            'X-Test-Header' => 'foo',
-            'X-Test-ArrayHeader' => ['bar', 'baz'],
-        ])->post('http://foo.com/json', [
-            'name' => 'Taylor',
-        ]);
+        $this->factory->withHeaders(
+            [
+                'X-Test-Header' => 'foo',
+                'X-Test-ArrayHeader' => ['bar', 'baz'],
+            ]
+        )->post(
+            'http://foo.com/json',
+            [
+                'name' => 'Taylor',
+            ]
+        );
 
-        $this->factory->withHeaders([
-            'X-Test-Header' => 'bar',
-            'X-Test-ArrayHeader' => ['bar', 'baz'],
-        ])->post('http://bar.com/json', [
-            'name' => 'Taylor',
-        ]);
+        $this->factory->withHeaders(
+            [
+                'X-Test-Header' => 'bar',
+                'X-Test-ArrayHeader' => ['bar', 'baz'],
+            ]
+        )->post(
+            'http://bar.com/json',
+            [
+                'name' => 'Taylor',
+            ]
+        );
 
         $this->factory->assertSentInOrder($executionOrder);
     }
@@ -733,36 +857,53 @@ class HttpClientTest extends TestCase
         $executionOrder = [
             function (Request $request) {
                 return $request->url() === 'http://bar.com/json' &&
-                       $request->hasHeader('Content-Type', 'application/json') &&
-                       $request->hasHeader('X-Test-Header', 'bar') &&
-                       $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
-                       $request['name'] === 'Taylor';
+                    $request->hasHeader('Content-Type', 'application/json') &&
+                    $request->hasHeader('X-Test-Header', 'bar') &&
+                    $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                    $request['name'] === 'Taylor';
             },
             function (Request $request) {
                 return $request->url() === 'http://foo.com/json' &&
-                       $request->hasHeader('Content-Type', 'application/json') &&
-                       $request->hasHeader('X-Test-Header', 'foo') &&
-                       $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
-                       $request['name'] === 'Taylor';
+                    $request->hasHeader('Content-Type', 'application/json') &&
+                    $request->hasHeader('X-Test-Header', 'foo') &&
+                    $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                    $request['name'] === 'Taylor';
             },
         ];
 
-        $this->factory->withHeaders([
-            'X-Test-Header' => 'foo',
-            'X-Test-ArrayHeader' => ['bar', 'baz'],
-        ])->post('http://foo.com/json', [
-            'name' => 'Taylor',
-        ]);
+        $this->factory->withHeaders(
+            [
+                'X-Test-Header' => 'foo',
+                'X-Test-ArrayHeader' => ['bar', 'baz'],
+            ]
+        )->post(
+            'http://foo.com/json',
+            [
+                'name' => 'Taylor',
+            ]
+        );
 
-        $this->factory->withHeaders([
-            'X-Test-Header' => 'bar',
-            'X-Test-ArrayHeader' => ['bar', 'baz'],
-        ])->post('http://bar.com/json', [
-            'name' => 'Taylor',
-        ]);
+        $this->factory->withHeaders(
+            [
+                'X-Test-Header' => 'bar',
+                'X-Test-ArrayHeader' => ['bar', 'baz'],
+            ]
+        )->post(
+            'http://bar.com/json',
+            [
+                'name' => 'Taylor',
+            ]
+        );
 
         $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($executionOrder);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->factory = new Factory;
     }
 }
