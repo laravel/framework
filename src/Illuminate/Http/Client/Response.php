@@ -79,9 +79,9 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Get the JSON decoded body of the response as a Collection.
+     * Get the JSON decoded body of the response as a collection.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function collect($key = null)
     {
