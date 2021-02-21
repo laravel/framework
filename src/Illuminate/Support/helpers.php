@@ -326,6 +326,7 @@ if (! function_exists('trait_uses_recursive')) {
     function trait_uses_recursive($trait)
     {
         $traits = class_uses($trait);
+        $traits = $trait ? $trait : [];
 
         foreach ($traits as $trait) {
             $traits += trait_uses_recursive($trait);
