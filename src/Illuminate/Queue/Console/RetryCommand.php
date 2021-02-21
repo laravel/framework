@@ -136,8 +136,8 @@ class RetryCommand extends Command
 
         if (Str::startsWith($payload['data']['command'], 'O:')) {
             $instance = unserialize($payload['data']['command']);
-        } elseif (app()->bound(Encrypter::class)) {
-            $instance = unserialize(app()->make(Encrypter::class)->decrypt($payload['data']['command']));
+        } elseif ($this->laravel->bound(Encrypter::class)) {
+            $instance = unserialize($this->laravel->make(Encrypter::class)->decrypt($payload['data']['command']));
         }
 
         if (! isset($instance)) {
