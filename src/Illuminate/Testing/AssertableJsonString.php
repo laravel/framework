@@ -358,7 +358,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function offsetGet($offset)
     {
-        return $this->decoded[$offset];
+        return new self($this->decoded[$offset]);
     }
 
     /**
