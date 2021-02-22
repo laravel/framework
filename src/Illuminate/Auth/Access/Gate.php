@@ -87,7 +87,7 @@ class Gate implements GateContract
      */
     public function __construct(Container $container, callable $userResolver, array $abilities = [],
                                 array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [],
-                            callable $guessPolicyNamesUsingCallback = null)
+                                callable $guessPolicyNamesUsingCallback = null)
     {
         $this->policies = $policies;
         $this->container = $container;
@@ -525,10 +525,10 @@ class Gate implements GateContract
     /**
      * Dispatch a gate evaluation event.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
      * @param  array  $arguments
-     * @param  bool  $result
+     * @param  bool|null  $result
      * @return void
      */
     protected function dispatchGateEvaluatedEvent($user, $ability, array $arguments, $result)
