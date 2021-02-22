@@ -5,6 +5,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Pusher\ApiErrorException;
 use Pusher\Pusher;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -108,22 +109,22 @@ class PusherBroadcaster extends Broadcaster
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
+        $params = [];
         $socket = Arr::pull($payload, 'socket');
 
-        $response = $this->pusher->trigger(
-            $this->formatChannels($channels), $event, $payload, $socket, true
-        );
-
-        if ((is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)
-            || $response === true) {
-            return;
+        if ($socket !== null) {
+            $params['socket_id'] = $socket;
         }
 
-        throw new BroadcastException(
-            ! empty($response['body'])
-                ? sprintf('Pusher error: %s.', $response['body'])
-                : 'Failed to connect to Pusher.'
-        );
+        try {
+            $this->pusher->trigger(
+                $this->formatChannels($channels), $event, $payload, $params
+            );
+        } catch (ApiErrorException $e) {
+            throw new BroadcastException(
+                sprintf('Pusher error: %s.', $e->getMessage())
+            );
+        }
     }
 
     /**
