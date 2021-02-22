@@ -48,7 +48,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     public function constrainedByModel($class)
     {
         $model = with(new $class);
-        return $this->constrained($model->getTable(),$model->getKeyName());
+        return $this->constrained($model->getTable(), $model->getKeyName());
     }
     
     /**
