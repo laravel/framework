@@ -40,6 +40,18 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     }
 
     /**
+     * Create a foreign key constraint on this column referencing the "id" and "table" columns from Model.
+     *
+     * @param  string  $abstract
+     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
+     */
+    public function constrainedByModel($class)
+    {
+        $model = with(new $class);
+        return $this->constrained($model->getTable(),$model->getKeyName());
+    }
+    
+    /**
      * Specify which column this foreign ID references on another table.
      *
      * @param  string  $column
