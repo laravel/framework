@@ -106,6 +106,14 @@ class PhpRedisConnector implements Connector
             if (! empty($config['name'])) {
                 $client->client('SETNAME', $config['name']);
             }
+
+            if (! empty($config['serializer'])) {
+                $client->setOption(Redis::OPT_SERIALIZER, $config['serializer']);
+            }
+
+            if (! empty($config['compression'])) {
+                $client->setOption(Redis::OPT_COMPRESSION, $config['compression']);
+            }
         });
     }
 
@@ -183,6 +191,14 @@ class PhpRedisConnector implements Connector
 
             if (! empty($options['name'])) {
                 $client->client('SETNAME', $options['name']);
+            }
+
+            if (! empty($config['serializer'])) {
+                $client->setOption(Redis::OPT_SERIALIZER, $config['serializer']);
+            }
+
+            if (! empty($config['compression'])) {
+                $client->setOption(Redis::OPT_COMPRESSION, $config['compression']);
             }
         });
     }
