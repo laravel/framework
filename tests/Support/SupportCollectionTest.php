@@ -2575,6 +2575,9 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame('first', $data->get(0)->value);
         $this->assertSame('second', $data->get(1)->value);
+
+        // Make sure that default values of other params are respected during mapping
+        $this->assertContainsEquals('default', $data->pluck('otherParam'));
     }
 
     /**
@@ -4647,10 +4650,12 @@ class TestJsonSerializeWithScalarValueObject implements JsonSerializable
 class TestCollectionMapIntoObject
 {
     public $value;
+    public $otherParam;
 
-    public function __construct($value)
+    public function __construct($value, $otherParam = 'default')
     {
         $this->value = $value;
+        $this->otherParam = $otherParam;
     }
 }
 
