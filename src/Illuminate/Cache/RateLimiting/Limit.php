@@ -53,9 +53,9 @@ class Limit
      * @param  int  $maxAttempts
      * @return static
      */
-    public static function perMinute($maxAttempts)
+    public static function perMinute($maxAttempts, $decayMinutes = 1)
     {
-        return new static('', $maxAttempts);
+        return new static('', $maxAttempts, $decayMinutes);
     }
 
     /**
