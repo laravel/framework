@@ -1,6 +1,29 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.28.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.29.0...8.x)
+
+
+## [v8.29.0 (2021-02-23)](https://github.com/laravel/framework/compare/v8.28.1...v8.29.0)
+
+### Added
+- Support username parameter for predis ([#36299](https://github.com/laravel/framework/pull/36299))
+- Adds "setUpTestDatabase" support to Parallel Testing ([#36301](https://github.com/laravel/framework/pull/36301))
+- Added support closures in sequences ([3c66f6c](https://github.com/laravel/framework/commit/3c66f6cda2ac4ee2844a67fc98e676cb170ff4b1))
+- Added gate evaluation event ([0c6f5f7](https://github.com/laravel/framework/commit/0c6f5f75bf0ba4d3307145c9d92ae022f60414be))
+- Added a `collect` method to the HTTP Client response ([#36331](https://github.com/laravel/framework/pull/36331))  
+- Allow Blade's service injection to inject services typed using class name resolution ([#36356](https://github.com/laravel/framework/pull/36356))  
+  
+### Fixed
+- Fixed: Using withoutMiddleware() and a closure-based middleware on PHP8 throws an exception ([#36293](https://github.com/laravel/framework/pull/36293))
+- Fixed: The label for page number in pagination links should always be a string ([#36292](https://github.com/laravel/framework/pull/36292))
+- Clean up custom Queue payload between tests ([#36295](https://github.com/laravel/framework/pull/36295))
+- Fixed flushDb (cache:clear) for redis clusters ([#36281](https://github.com/laravel/framework/pull/36281))
+- Fixed retry command for encrypted jobs ([#36334](https://github.com/laravel/framework/pull/36334), [2fb5e44](https://github.com/laravel/framework/commit/2fb5e444ef55a764ba2363a10320e75f3c830504))
+- Make sure `trait_uses_recursive` returns an array ([#36335](https://github.com/laravel/framework/pull/36335))
+
+### Changed
+- Make use of specified ownerKey in MorphTo::associate() ([#36303](https://github.com/laravel/framework/pull/36303))
+- Update pusher deps and update broadcasting ([3404185](https://github.com/laravel/framework/commit/3404185fbe36139dfbe6d0d9595811b41ee53068))
 
 
 ## [v8.28.1 (2021-02-16)](https://github.com/laravel/framework/compare/v8.28.0...v8.28.1)
