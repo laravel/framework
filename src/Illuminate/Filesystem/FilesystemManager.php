@@ -128,7 +128,7 @@ class FilesystemManager implements FactoryContract
         if (! method_exists($this, $driverMethod)) {
             throw new InvalidArgumentException("Driver [{$name}] is not supported.");
         }
-        
+
         return $this->{$driverMethod}($config);
     }
 
