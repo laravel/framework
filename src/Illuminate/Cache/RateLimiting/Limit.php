@@ -51,6 +51,7 @@ class Limit
      * Create a new rate limit.
      *
      * @param  int  $maxAttempts
+     * @param  int  $decayMinutes
      * @return static
      */
     public static function perMinute($maxAttempts, $decayMinutes = 1)
