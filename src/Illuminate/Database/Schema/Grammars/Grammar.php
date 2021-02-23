@@ -242,6 +242,37 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Split the given JSON selector into the field and the optional path and wrap them separately.
+     *
+     * @param  string  $column
+     * @return array
+     */
+    protected function wrapJsonFieldAndPath($column)
+    {
+        $parts = explode('->', $column, 2);
+
+        $field = $this->wrap($parts[0]);
+
+        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1], '->') : '';
+
+        return [$field, $path];
+    }
+
+    /**
+     * Wrap the given JSON path.
+     *
+     * @param  string  $value
+     * @param  string  $delimiter
+     * @return string
+     */
+    protected function wrapJsonPath($value, $delimiter = '->')
+    {
+        $value = preg_replace("/([\\\\]+)?\\'/", "''", $value);
+
+        return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
+    }
+
+    /**
      * Wrap a value in keyword identifiers.
      *
      * @param  \Illuminate\Database\Query\Expression|string  $value
