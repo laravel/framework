@@ -18,6 +18,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)
  * @method static \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0)
+ * @method static \Illuminate\Http\Client\PendingRequest sink($to)
  * @method static \Illuminate\Http\Client\PendingRequest stub(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
  * @method static \Illuminate\Http\Client\PendingRequest withBasicAuth(string $username, string $password)
