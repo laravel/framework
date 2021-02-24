@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Routing;
 
 use Closure;
-use Mockery;
 use DateTime;
 use Exception;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -30,6 +29,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use LogicException;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
