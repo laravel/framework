@@ -473,6 +473,16 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(2, $post->comments);
     }
 
+    public function test_can_be_macroable()
+    {
+        $factory = FactoryTestUserFactory::new();
+        $factory->macro('getFoo', function () {
+            return 'Hello World';
+        });
+
+        $this->assertEquals('Hello World', $factory->getFoo());
+    }
+
     /**
      * Get a database connection instance.
      *
