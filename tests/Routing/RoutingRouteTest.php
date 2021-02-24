@@ -961,9 +961,12 @@ class RoutingRouteTest extends TestCase
 
         $mock->shouldReceive('resolveRouteBinding')
             ->with('taylor', 'custom')
+            ->once()
             ->andReturn('TAYLOR');
 
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+
+        Mockery::close();
     }
 
     public function testModelBindingWithNullReturn()
