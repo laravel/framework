@@ -718,6 +718,16 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Die and dump the HTTP response.
+     *
+     * @return void
+     */
+    public function dd()
+    {
+        dd($this);
+    }
+
+    /**
      * Validate and return the decoded response JSON.
      *
      * @return \Illuminate\Testing\AssertableJsonString
