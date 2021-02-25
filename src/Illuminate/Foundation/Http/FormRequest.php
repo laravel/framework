@@ -66,7 +66,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $validator;
 
     /**
-     * In case of first error, stop the validation process
+     * In case of first error, stop the validation process.
      *
      * @var bool
      */
@@ -76,7 +76,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
 
-        if (!isset($this->failOnFirstError)) {
+        if (! isset($this->failOnFirstError)) {
             $this->failOnFirstError = false;
         }
     }

@@ -253,7 +253,7 @@ class Validator implements ValidatorContract
     protected $dotPlaceholder;
 
     /**
-     * In case of first error, stop the validation process
+     * In case of first error, stop the validation process.
      *
      * @var bool
      */

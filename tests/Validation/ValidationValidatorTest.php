@@ -145,21 +145,21 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $data = [
-            "foo" => "bar",
-            "age" => 30
+            'foo' => 'bar',
+            'age' => 30,
         ];
         $rules = [
-            "foo" => ["required", "string"],
-            "baz" => ["required"],
-            "age" => ["required", "min:31"]
+            'foo' => ['required', 'string'],
+            'baz' => ['required'],
+            'age' => ['required', 'min:31'],
         ];
 
         $expectedFailOnFirstErrorDisableResult = [
-            "baz" => [
-                "validation.required"
+            'baz' => [
+                'validation.required',
             ],
-            "age" => [
-                "validation.min.string"
+            'age' => [
+                'validation.min.string',
             ]
         ];
         $failOnFirstErrorDisable = new Validator($trans, $data, $rules, [], [], false);
@@ -167,8 +167,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals($expectedFailOnFirstErrorDisableResult, $failOnFirstErrorDisable->getMessageBag()->getMessages());
 
         $expectedFailOnFirstErrorEnableResult = [
-            "baz" => [
-                "validation.required"
+            'baz' => [
+                'validation.required',
             ]
         ];
         $failOnFirstErrorEnable = new Validator($trans, $data, $rules, [], [], true);
