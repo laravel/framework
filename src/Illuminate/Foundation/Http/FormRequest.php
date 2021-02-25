@@ -66,6 +66,22 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $validator;
 
     /**
+     * In case of first error, stop the validation process
+     *
+     * @var bool
+     */
+    protected $failOnFirstError;
+
+    public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
+    {
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+
+        if (!isset($this->failOnFirstError)) {
+            $this->failOnFirstError = config("validation.fail_on_first_error", false);
+        }
+    }
+
+    /**
      * Get the validator instance for the request.
      *
      * @return \Illuminate\Contracts\Validation\Validator
@@ -103,7 +119,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         return $factory->make(
             $this->validationData(), $this->container->call([$this, 'rules']),
-            $this->messages(), $this->attributes()
+            $this->messages(), $this->attributes(), $this->failOnFirstError
         );
     }
 
