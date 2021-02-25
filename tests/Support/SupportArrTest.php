@@ -88,6 +88,43 @@ class SupportArrTest extends TestCase
         $this->assertSame([[]], Arr::crossJoin());
     }
 
+    public function testDeconstruct()
+    {
+        $post = [
+            'title' => 'Article 1',
+            'slug' => 'article-1',
+            'description' => 'Lorem ipsum',
+            'tags' => ['foo', 'bar'],
+            'gallery' => [
+                ['image' => 'image.jpg'],
+                ['image' => 'image2.jpg'],
+            ],
+        ];
+
+        [$tags, $article] = Arr::deconstruct($post, 'tags');
+        $this->assertEquals(['foo', 'bar'], $tags);
+        $this->assertEquals(Arr::except($post, 'tags'), $article);
+
+        [$notFoundKey, $article] = Arr::deconstruct($post, 'notFoundKey');
+        $this->assertNull($notFoundKey);
+        $this->assertEquals($post, $article);
+
+        [$tags, $gallery, $article] = Arr::deconstruct($post, ['tags', 'gallery']);
+        $this->assertEquals(['foo', 'bar'], $tags);
+        $this->assertEquals([['image' => 'image.jpg'], ['image' => 'image2.jpg']], $gallery);
+        $this->assertEquals(Arr::except($post, ['tags', 'gallery']), $article);
+
+        [$slug, $meta, $article] = Arr::deconstruct($post, ['slug', ['tags', 'gallery']]);
+        $this->assertEquals('article-1', $slug);
+        $this->assertEquals(Arr::only($post, ['tags', 'gallery']), $meta);
+        $this->assertEquals(Arr::except($post, ['slug', 'tags', 'gallery']), $article);
+
+        [$slug, $notFoundMeta, $article] = Arr::deconstruct($post, ['slug', ['notFoundKey', 'notFoundKey2']]);
+        $this->assertEquals('article-1', $slug);
+        $this->assertEquals([], $notFoundMeta);
+        $this->assertEquals(Arr::except($post, 'slug'), $article);
+    }
+
     public function testDivide()
     {
         [$keys, $values] = Arr::divide(['name' => 'Desk']);

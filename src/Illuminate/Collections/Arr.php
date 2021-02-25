@@ -89,6 +89,31 @@ class Arr
     }
 
     /**
+     * Deconstruct an array from the given keys.
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * @return array
+     */
+    public static function deconstruct($array, $keys)
+    {
+        $keys = self::wrap($keys);
+        $results = [];
+
+        foreach ($keys as $key) {
+            if (is_array($key)) {
+                $results[] = self::only($array, $key);
+            } else {
+                $results[] = array_key_exists($key, $array) ? $array[$key] : null;
+            }
+        }
+
+        $results[] = self::except($array, self::flatten($keys));
+
+        return $results;
+    }
+
+    /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
      * @param  array  $array
