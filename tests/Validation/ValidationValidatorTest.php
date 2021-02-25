@@ -160,7 +160,7 @@ class ValidationValidatorTest extends TestCase
             ],
             'age' => [
                 'validation.min.string',
-            ]
+            ],
         ];
         $failOnFirstErrorDisable = new Validator($trans, $data, $rules, [], [], false);
         $this->assertFalse($failOnFirstErrorDisable->passes());
@@ -169,7 +169,7 @@ class ValidationValidatorTest extends TestCase
         $expectedFailOnFirstErrorEnableResult = [
             'baz' => [
                 'validation.required',
-            ]
+            ],
         ];
         $failOnFirstErrorEnable = new Validator($trans, $data, $rules, [], [], true);
         $this->assertFalse($failOnFirstErrorEnable->passes());
