@@ -141,6 +141,41 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
     }
 
+    public function testFailOnFirstError()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $data = [
+            "foo" => "bar",
+            "age" => 30
+        ];
+        $rules = [
+            "foo" => ["required", "string"],
+            "baz" => ["required"],
+            "age" => ["required", "min:31"]
+        ];
+
+        $expectedFailOnFirstErrorDisableResult = [
+            "baz" => [
+                "validation.required"
+            ],
+            "age" => [
+                "validation.min.string"
+            ]
+        ];
+        $failOnFirstErrorDisable = new Validator($trans, $data, $rules, [], [], false);
+        $this->assertFalse($failOnFirstErrorDisable->passes());
+        $this->assertEquals($expectedFailOnFirstErrorDisableResult, $failOnFirstErrorDisable->getMessageBag()->getMessages());
+
+        $expectedFailOnFirstErrorEnableResult = [
+            "baz" => [
+                "validation.required"
+            ]
+        ];
+        $failOnFirstErrorEnable = new Validator($trans, $data, $rules, [], [], true);
+        $this->assertFalse($failOnFirstErrorEnable->passes());
+        $this->assertEquals($expectedFailOnFirstErrorEnableResult, $failOnFirstErrorEnable->getMessageBag()->getMessages());
+    }
+
     public function testHasNotFailedValidationRules()
     {
         $trans = $this->getTranslator();

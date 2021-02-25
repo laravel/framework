@@ -93,12 +93,13 @@ class Factory implements FactoryContract
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
+     * @param  bool  $failOnFirstError
      * @return \Illuminate\Validation\Validator
      */
-    public function make(array $data, array $rules, array $messages = [], array $customAttributes = [])
+    public function make(array $data, array $rules, array $messages = [], array $customAttributes = [], bool $failOnFirstError = false)
     {
         $validator = $this->resolve(
-            $data, $rules, $messages, $customAttributes
+            $data, $rules, $messages, $customAttributes, $failOnFirstError
         );
 
         // The presence verifier is responsible for checking the unique and exists data
@@ -143,15 +144,16 @@ class Factory implements FactoryContract
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
+     * @param  bool  $failOnFirstError
      * @return \Illuminate\Validation\Validator
      */
-    protected function resolve(array $data, array $rules, array $messages, array $customAttributes)
+    protected function resolve(array $data, array $rules, array $messages, array $customAttributes, bool $failOnFirstError)
     {
         if (is_null($this->resolver)) {
-            return new Validator($this->translator, $data, $rules, $messages, $customAttributes);
+            return new Validator($this->translator, $data, $rules, $messages, $customAttributes, $failOnFirstError);
         }
 
-        return call_user_func($this->resolver, $this->translator, $data, $rules, $messages, $customAttributes);
+        return call_user_func($this->resolver, $this->translator, $data, $rules, $messages, $customAttributes, $failOnFirstError);
     }
 
     /**

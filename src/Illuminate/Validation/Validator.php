@@ -253,6 +253,13 @@ class Validator implements ValidatorContract
     protected $dotPlaceholder;
 
     /**
+     * In case of first error, stop the validation process
+     *
+     * @var bool
+     */
+    protected $failOnFirstError;
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
@@ -260,10 +267,11 @@ class Validator implements ValidatorContract
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
+     * @param  bool  $failOnFirstError
      * @return void
      */
     public function __construct(Translator $translator, array $data, array $rules,
-                                array $messages = [], array $customAttributes = [])
+                                array $messages = [], array $customAttributes = [], bool $failOnFirstError = false)
     {
         $this->dotPlaceholder = Str::random();
 
@@ -272,6 +280,7 @@ class Validator implements ValidatorContract
         $this->customMessages = $messages;
         $this->data = $this->parseData($data);
         $this->customAttributes = $customAttributes;
+        $this->failOnFirstError = $failOnFirstError;
 
         $this->setRules($rules);
     }
@@ -371,6 +380,10 @@ class Validator implements ValidatorContract
                 $this->removeAttribute($attribute);
 
                 continue;
+            }
+
+            if ($this->failOnFirstError and $this->messages->isNotEmpty()) {
+                break;
             }
 
             foreach ($rules as $rule) {
