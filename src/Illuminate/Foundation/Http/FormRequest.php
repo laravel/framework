@@ -77,7 +77,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
         parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
 
         if (!isset($this->failOnFirstError)) {
-            $this->failOnFirstError = config("validation.fail_on_first_error", false);
+            $this->failOnFirstError = function_exists("config") ? config("validation.fail_on_first_error", false) : false;
         }
     }
 
