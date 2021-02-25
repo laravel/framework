@@ -26,7 +26,7 @@ trait TestDatabases
      */
     protected function bootTestDatabase()
     {
-        ParallelTesting::setUpProcess(function () {
+        ParallelTesting::setupProcess(function () {
             $this->whenNotUsingInMemoryDatabase(function ($database) {
                 if (ParallelTesting::option('recreate_databases')) {
                     Schema::dropDatabaseIfExists(
@@ -36,7 +36,7 @@ trait TestDatabases
             });
         });
 
-        ParallelTesting::setUpTestCase(function ($testCase) {
+        ParallelTesting::setupTestCase(function ($testCase) {
             $uses = array_flip(class_uses_recursive(get_class($testCase)));
 
             $databaseTraits = [
@@ -56,7 +56,7 @@ trait TestDatabases
                     }
 
                     if ($created) {
-                        ParallelTesting::callSetUpTestDatabaseCallbacks($testDatabase);
+                        ParallelTesting::callSetupTestDatabaseCallbacks($testDatabase);
                     }
                 });
             }

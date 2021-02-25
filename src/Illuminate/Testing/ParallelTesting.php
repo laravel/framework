@@ -29,25 +29,25 @@ class ParallelTesting
     protected $tokenResolver;
 
     /**
-     * All of the registered "setUp" process callbacks.
+     * All of the registered "setup" process callbacks.
      *
      * @var array
      */
-    protected $setUpProcessCallbacks = [];
+    protected $setupProcessCallbacks = [];
 
     /**
-     * All of the registered "setUp" test case callbacks.
+     * All of the registered "setup" test case callbacks.
      *
      * @var array
      */
-    protected $setUpTestCaseCallbacks = [];
+    protected $setupTestCaseCallbacks = [];
 
     /**
-     * All of the registered "setUp" test database callbacks.
+     * All of the registered "setup" test database callbacks.
      *
      * @var array
      */
-    protected $setUpTestDatabaseCallbacks = [];
+    protected $setupTestDatabaseCallbacks = [];
 
     /**
      * All of the registered "tearDown" process callbacks.
@@ -97,36 +97,36 @@ class ParallelTesting
     }
 
     /**
-     * Register a "setUp" process callback.
+     * Register a "setup" process callback.
      *
      * @param  callable  $callback
      * @return void
      */
-    public function setUpProcess($callback)
+    public function setupProcess($callback)
     {
-        $this->setUpProcessCallbacks[] = $callback;
+        $this->setupProcessCallbacks[] = $callback;
     }
 
     /**
-     * Register a "setUp" test case callback.
+     * Register a "setup" test case callback.
      *
      * @param  callable  $callback
      * @return void
      */
-    public function setUpTestCase($callback)
+    public function setupTestCase($callback)
     {
-        $this->setUpTestCaseCallbacks[] = $callback;
+        $this->setupTestCaseCallbacks[] = $callback;
     }
 
     /**
-     * Register a "setUp" test database callback.
+     * Register a "setup" test database callback.
      *
      * @param  callable  $callback
      * @return void
      */
-    public function setUpTestDatabase($callback)
+    public function setupTestDatabase($callback)
     {
-        $this->setUpTestDatabaseCallbacks[] = $callback;
+        $this->setupTestDatabaseCallbacks[] = $callback;
     }
 
     /**
@@ -152,14 +152,14 @@ class ParallelTesting
     }
 
     /**
-     * Call all of the "setUp" process callbacks.
+     * Call all of the "setup" process callbacks.
      *
      * @return void
      */
     public function callSetUpProcessCallbacks()
     {
         $this->whenRunningInParallel(function () {
-            foreach ($this->setUpProcessCallbacks as $callback) {
+            foreach ($this->setupProcessCallbacks as $callback) {
                 $this->container->call($callback, [
                     'token' => $this->token(),
                 ]);
@@ -168,7 +168,7 @@ class ParallelTesting
     }
 
     /**
-     * Call all of the "setUp" test case callbacks.
+     * Call all of the "setup" test case callbacks.
      *
      * @param  \Illuminate\Foundation\Testing\TestCase  $testCase
      * @return void
@@ -176,7 +176,7 @@ class ParallelTesting
     public function callSetUpTestCaseCallbacks($testCase)
     {
         $this->whenRunningInParallel(function () use ($testCase) {
-            foreach ($this->setUpTestCaseCallbacks as $callback) {
+            foreach ($this->setupTestCaseCallbacks as $callback) {
                 $this->container->call($callback, [
                     'testCase' => $testCase,
                     'token' => $this->token(),
@@ -186,7 +186,7 @@ class ParallelTesting
     }
 
     /**
-     * Call all of the "setUp" test database callbacks.
+     * Call all of the "setup" test database callbacks.
      *
      * @param  string  $database
      * @return void
@@ -194,7 +194,7 @@ class ParallelTesting
     public function callSetUpTestDatabaseCallbacks($database)
     {
         $this->whenRunningInParallel(function () use ($database) {
-            foreach ($this->setUpTestDatabaseCallbacks as $callback) {
+            foreach ($this->setupTestDatabaseCallbacks as $callback) {
                 $this->container->call($callback, [
                     'database' => $database,
                     'token' => $this->token(),

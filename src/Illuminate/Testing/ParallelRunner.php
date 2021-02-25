@@ -81,7 +81,7 @@ class ParallelRunner implements RunnerInterface
         (new PhpHandler)->handle($this->options->configuration()->php());
 
         $this->forEachProcess(function () {
-            ParallelTesting::callSetUpProcessCallbacks();
+            ParallelTesting::callSetupProcessCallbacks();
         });
 
         try {

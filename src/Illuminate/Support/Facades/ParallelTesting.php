@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static void setUpProcess(callable $callback)
- * @method static void setUpTestCase(callable $callback)
+ * @method static void setupProcess(callable $callback)
+ * @method static void setupTestCase(callable $callback)
  * @method static void setupTestDatabase(callable $callback)
  * @method static void tearDownProcess(callable $callback)
  * @method static void tearDownTestCase(callable $callback)
