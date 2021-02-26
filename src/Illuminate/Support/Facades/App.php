@@ -7,6 +7,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Support\ServiceProvider register(\Illuminate\Support\ServiceProvider|string $provider, bool $force = false)
  * @method static \Illuminate\Support\ServiceProvider resolveProvider(string $provider)
  * @method static array getProviders(\Illuminate\Support\ServiceProvider|string $provider)
+ * @method static mixed make($abstract, array $parameters = [])
  * @method static bool configurationIsCached()
  * @method static bool hasBeenBootstrapped()
  * @method static bool isDownForMaintenance()
