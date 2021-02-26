@@ -11,7 +11,7 @@ class BufferedConsoleOutput extends ConsoleOutput
      *
      * @var string
      */
-    private $buffer = '';
+    protected $buffer = '';
 
     /**
      * Empties the buffer and returns its content.
