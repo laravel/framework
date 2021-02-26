@@ -33,7 +33,7 @@ class RouteBinding
      */
     protected static function createClassBinding($container, $binding)
     {
-        return function ($value, $route) use ($container, $binding) {
+        return function ($value, $route, $key) use ($container, $binding) {
             // If the binding has an @ sign, we will assume it's being used to delimit
             // the class name from the bind method name. This allows for bindings
             // to run multiple bind methods in a single class for convenience.
@@ -41,7 +41,7 @@ class RouteBinding
 
             $callable = [$container->make($class), $method];
 
-            return $callable($value, $route);
+            return $callable($value, $route, $key);
         };
     }
 
@@ -57,7 +57,7 @@ class RouteBinding
      */
     public static function forModel($container, $class, $callback = null)
     {
-        return function ($value) use ($container, $class, $callback) {
+        return function ($value, $route, $key) use ($container, $class, $callback) {
             if (is_null($value)) {
                 return;
             }
@@ -67,7 +67,7 @@ class RouteBinding
             // throw a not found exception otherwise we will return the instance.
             $instance = $container->make($class);
 
-            if ($model = $instance->resolveRouteBinding($value)) {
+            if ($model = $instance->resolveRouteBinding($value, $route->bindingFieldFor($key))) {
                 return $model;
             }
 

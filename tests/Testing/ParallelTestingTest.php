@@ -83,6 +83,7 @@ class ParallelTestingTest extends TestCase
         return [
             ['setUpProcess'],
             ['setUpTestCase'],
+            ['setUpTestDatabase'],
             ['tearDownTestCase'],
             ['tearDownProcess'],
         ];
