@@ -6,8 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
-use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\Filesystem as Flysystem;
+use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\MountManager;
 
 class VendorPublishCommand extends Command
