@@ -70,16 +70,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @var bool
      */
-    protected $failOnFirstError;
-
-    public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
-    {
-        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
-
-        if (! isset($this->failOnFirstError)) {
-            $this->failOnFirstError = false;
-        }
-    }
+    protected $failOnFirstError = false;
 
     /**
      * Get the validator instance for the request.
