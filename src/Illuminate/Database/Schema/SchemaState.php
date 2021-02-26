@@ -84,6 +84,12 @@ abstract class SchemaState
     abstract public function load($path);
 
     /**
+     * Verify that the environment has the required dependencies for restoring a schema.
+     * @return bool
+     */
+    abstract public function hasRequiredDependencies();
+
+    /**
      * Create a new process instance.
      *
      * @param  array  $arguments
@@ -118,5 +124,21 @@ abstract class SchemaState
         $this->output = $output;
 
         return $this;
+    }
+
+    /**
+     * Check if a command is available and executable in the user PATH.
+     * @param string $command
+     * @return bool
+     */
+    protected function hasCommand(string $command)
+    {
+        $isWindows = strpos(PHP_OS, 'WIN') === 0;
+        $process = $this->makeProcess(sprintf('%s %s',
+            $isWindows ? 'where' : 'command -v',
+            $command,
+        ));
+
+        return is_executable($process->getOutput());
     }
 }

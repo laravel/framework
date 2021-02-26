@@ -154,4 +154,12 @@ class MySqlSchemaState extends SchemaState
 
         return $process;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasRequiredDependencies()
+    {
+        return $this->hasCommand('mysql');
+    }
 }

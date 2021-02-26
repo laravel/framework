@@ -90,4 +90,9 @@ class SqliteSchemaState extends SchemaState
             'LARAVEL_LOAD_DATABASE' => $config['database'],
         ];
     }
+
+    public function hasRequiredDependencies()
+    {
+        return $this->hasCommand('sqlite3');
+    }
 }

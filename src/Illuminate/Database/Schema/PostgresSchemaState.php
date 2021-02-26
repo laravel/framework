@@ -78,4 +78,12 @@ class PostgresSchemaState extends SchemaState
             'LARAVEL_LOAD_DATABASE' => $config['database'],
         ];
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasRequiredDependencies()
+    {
+        return $this->hasCommand('pg_restore');
+    }
 }

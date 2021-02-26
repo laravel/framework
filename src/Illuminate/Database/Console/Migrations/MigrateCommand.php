@@ -131,6 +131,13 @@ class MigrateCommand extends BaseCommand
             return;
         }
 
+        /** @var \Illuminate\Database\Schema\SchemaState $schemaState */
+        $schemaState = $connection->getSchemaState();
+
+        if (! $schemaState->hasRequiredDependencies()) {
+            return;
+        }
+
         $this->line('<info>Loading stored database schema:</info> '.$path);
 
         $startTime = microtime(true);
@@ -140,7 +147,7 @@ class MigrateCommand extends BaseCommand
         // table already exists when the stored database schema file gets executed.
         $this->migrator->deleteRepository();
 
-        $connection->getSchemaState()->handleOutputUsing(function ($type, $buffer) {
+        $schemaState->handleOutputUsing(function ($type, $buffer) {
             $this->output->write($buffer);
         })->load($path);
 

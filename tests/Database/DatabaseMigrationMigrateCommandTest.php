@@ -51,11 +51,35 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
-        $migrator->shouldReceive('deleteRepository')->once();
         $connection->shouldReceive('getSchemaState')->andReturn($schemaState = m::mock(stdClass::class));
+        $schemaState->shouldReceive('hasRequiredDependencies')->andReturn(true);
+        $migrator->shouldReceive('deleteRepository')->once();
         $schemaState->shouldReceive('handleOutputUsing')->andReturnSelf();
         $schemaState->shouldReceive('load')->once()->with(__DIR__.'/stubs/schema.sql');
         $dispatcher->shouldReceive('dispatch')->once()->with(m::type(SchemaLoaded::class));
+        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+
+        $this->runCommand($command, ['--schema-path' => __DIR__.'/stubs/schema.sql']);
+    }
+
+    public function testMigrationsDontUseStoredSchemaWhenMissingDependencies()
+    {
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class));
+        $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(false);
+        $migrator->shouldReceive('resolveConnection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getName')->andReturn('mysql');
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+            return $callback();
+        });
+        $connection->shouldReceive('getSchemaState')->andReturn($schemaState = m::mock(stdClass::class));
+        $schemaState->shouldReceive('hasRequiredDependencies')->andReturn(false);
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
