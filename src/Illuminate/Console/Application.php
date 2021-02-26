@@ -86,7 +86,7 @@ class Application extends SymfonyApplication implements ApplicationContract
 
         $this->events->dispatch(
             new CommandStarting(
-                $commandName, $input, $output = $output ?: new ConsoleOutput
+                $commandName, $input, $output = $output ?: new BufferedConsoleOutput
             )
         );
 
