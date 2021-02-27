@@ -98,7 +98,7 @@ class ConcurrencyLimiter
      * @param  string  $id  A unique identifier for this lock
      * @return mixed
      */
-    protected function acquire($id)
+    public function acquire($id)
     {
         $slots = array_map(function ($i) {
             return $this->name.$i;
@@ -139,7 +139,7 @@ LUA;
      * @param  string  $id
      * @return void
      */
-    protected function release($key, $id)
+    public function release($key, $id)
     {
         $this->redis->eval($this->releaseScript(), 1, $key, $id);
     }
