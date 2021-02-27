@@ -170,7 +170,7 @@ class ConcurrentLimiterTest extends TestCase
 
 class ConcurrencyLimiterMockThatDoesntRelease extends ConcurrencyLimiter
 {
-    protected function release($key, $id)
+    public function release($key, $id)
     {
         //
     }
