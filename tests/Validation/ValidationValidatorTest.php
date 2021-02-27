@@ -5779,7 +5779,6 @@ class NonEloquentModel
 
 class FailRule implements Rule
 {
-
     public function passes($attribute, $value)
     {
         return false;
