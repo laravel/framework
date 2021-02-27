@@ -381,8 +381,8 @@ class Validator implements ValidatorContract
             }
 
             if ($this->stopOnFirstFailure && $this->messages->isNotEmpty()) {
-                 break;
-             }
+                break;
+            }
 
             foreach ($rules as $rule) {
                 $this->validateAttribute($attribute, $rule);
