@@ -5719,6 +5719,26 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['data.1.date' => ['validation.date'], 'data.*.date' => ['validation.date']], $validator->messages()->toArray());
     }
 
+    public function testCustomMessagesCanOverrideRuleMessages()
+    {
+        $data = ['foo' => true];
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            $data,
+            ['foo' => [new FailRule()]],
+            ['foo' => 'bar']
+        );
+        $this->assertFalse($validator->passes());
+        $this->assertSame($validator->errors()->all(), ['bar']);
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            $data,
+            ['foo' => [new FailRule()]]
+        );
+        $this->assertFalse($validator->passes());
+        $this->assertSame($validator->errors()->all(), ['foo']);
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
@@ -5755,4 +5775,18 @@ class ExplicitTableAndConnectionModel extends Model
 
 class NonEloquentModel
 {
+}
+
+class FailRule implements Rule
+{
+
+    public function passes($attribute, $value)
+    {
+        return false;
+    }
+
+    public function message()
+    {
+        return 'foo';
+    }
 }
