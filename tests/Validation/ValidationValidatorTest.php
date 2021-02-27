@@ -5719,6 +5719,42 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['data.1.date' => ['validation.date'], 'data.*.date' => ['validation.date']], $validator->messages()->toArray());
     }
 
+    public function testFailOnFirstError()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $data = [
+            'foo' => 'bar',
+            'age' => 30,
+        ];
+        $rules = [
+            'foo' => ['required', 'string'],
+            'baz' => ['required'],
+            'age' => ['required', 'min:31'],
+        ];
+
+        $expectedFailOnFirstErrorDisableResult = [
+            'baz' => [
+                'validation.required',
+            ],
+            'age' => [
+                'validation.min.string',
+            ],
+        ];
+        $failOnFirstErrorDisable = new Validator($trans, $data, $rules);
+        $this->assertFalse($failOnFirstErrorDisable->passes());
+        $this->assertEquals($expectedFailOnFirstErrorDisableResult, $failOnFirstErrorDisable->getMessageBag()->getMessages());
+
+        $expectedFailOnFirstErrorEnableResult = [
+            'baz' => [
+                'validation.required',
+            ],
+        ];
+        $failOnFirstErrorEnable = new Validator($trans, $data, $rules, [], []);
+        $failOnFirstErrorEnable->stopOnFirstFailure();
+        $this->assertFalse($failOnFirstErrorEnable->passes());
+        $this->assertEquals($expectedFailOnFirstErrorEnableResult, $failOnFirstErrorEnable->getMessageBag()->getMessages());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
