@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use ReflectionObject;
 use ReflectionMethod;
 use ReflectionProperty;
 
@@ -136,7 +137,7 @@ abstract class Component
         $class = get_class($this);
 
         if (! isset(static::$propertyCache[$class])) {
-            $reflection = new ReflectionClass($this);
+            $reflection = new ReflectionObject($this);
 
             static::$propertyCache[$class] = collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
                 ->reject(function (ReflectionProperty $property) {
