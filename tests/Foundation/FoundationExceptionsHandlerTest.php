@@ -98,6 +98,27 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new ReportableException('Exception message'));
     }
 
+    public function testHandlerCallsReportableInsteadOfReportMethod()
+    {
+        $reporter = m::mock(ReportingService::class);
+        $this->container->instance(ReportingService::class, $reporter);
+        $reporter->shouldReceive('send')->withArgs(['Called from reportable'])->once();
+
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $this->handler->ignoreReportMethod(ReportableException::class);
+
+        $this->handler->reportable(function (ReportableException $e) {
+            $reportingService = $this->container->make(ReportingService::class);
+            $reportingService->send('Called from reportable');
+            return false;
+        });
+
+        $this->handler->report(new ReportableException('Exception message'));
+    }
+
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
@@ -130,6 +151,21 @@ class FoundationExceptionsHandlerTest extends TestCase
         $response = $this->handler->render($this->request, new ResponsableException)->getContent();
 
         $this->assertSame('{"response":"My responsable exception response"}', $response);
+    }
+
+    public function testReturnsCustomResponseFromRenderableCallbackInsteadOfExceptionRenderMethod()
+    {
+        $this->handler->ignoreRenderMethod(RenderableException::class);
+
+        $this->handler->renderable(function (RenderableException $e, $request) {
+            $this->assertSame($this->request, $request);
+
+            return response()->json(['response' => 'My custom exception response instead of responsable']);
+        });
+
+        $response = $this->handler->render($this->request, new RenderableException)->getContent();
+
+        $this->assertSame('{"response":"My custom exception response instead of responsable"}', $response);
     }
 
     public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndExceptionMessageIsMasked()
@@ -272,6 +308,14 @@ class ReportableException extends Exception
     public function report(ReportingService $reportingService)
     {
         $reportingService->send($this->getMessage());
+    }
+}
+
+class RenderableException extends Exception
+{
+    public function render($request)
+    {
+        return response()->json(['response' => 'My renderable exception response']);
     }
 }
 

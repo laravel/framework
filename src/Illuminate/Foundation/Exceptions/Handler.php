@@ -59,6 +59,20 @@ class Handler implements ExceptionHandlerContract
     protected $dontReport = [];
 
     /**
+     * A list of the exception types that are their render method should be ignored.
+     *
+     * @var array
+     */
+    protected $ignoreReportMethod = [];
+
+    /**
+     * A list of the exception types that are their render method should be ignored.
+     *
+     * @var array
+     */
+    protected $ignoreRenderMethod = [];
+
+    /**
      * The callbacks that should be used during reporting.
      *
      * @var array
@@ -198,6 +212,32 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Indicate that the given exception type, its report method should be ignored.
+     *
+     * @param  string  $class
+     * @return $this
+     */
+    public function ignoreReportMethod(string $class)
+    {
+        $this->ignoreReportMethod[] = $class;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the given exception type, its render method should be ignored.
+     *
+     * @param  string  $class
+     * @return $this
+     */
+    public function ignoreRenderMethod(string $class)
+    {
+        $this->ignoreRenderMethod[] = $class;
+
+        return $this;
+    }
+
+    /**
      * Report or log an exception.
      *
      * @param  \Throwable  $e
@@ -213,7 +253,8 @@ class Handler implements ExceptionHandlerContract
             return;
         }
 
-        if (Reflector::isCallable($reportCallable = [$e, 'report'])) {
+        if ($this->canCallReportMethod($e) &&
+            Reflector::isCallable($reportCallable = [$e, 'report'])) {
             if ($this->container->call($reportCallable) !== false) {
                 return;
             }
@@ -270,6 +311,19 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Check if the exception can call its report method when available.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function canCallReportMethod(Throwable $e)
+    {
+        return is_null(Arr::first($this->ignoreReportMethod, function ($type) use ($e) {
+            return $e instanceof $type;
+        }));
+    }
+
+    /**
      * Get the default exception context variables for logging.
      *
      * @param  \Throwable  $e
@@ -308,7 +362,8 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Throwable $e)
     {
-        if (method_exists($e, 'render') && $response = $e->render($request)) {
+        if ($this->canCallRenderMethod($e) &&
+            method_exists($e, 'render') && $response = $e->render($request)) {
             return Router::toResponse($request, $response);
         } elseif ($e instanceof Responsable) {
             return $e->toResponse($request);
@@ -337,6 +392,19 @@ class Handler implements ExceptionHandlerContract
         return $request->expectsJson()
                     ? $this->prepareJsonResponse($request, $e)
                     : $this->prepareResponse($request, $e);
+    }
+
+    /**
+     * Check if the exception can call its render method when available.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function canCallRenderMethod(Throwable $e)
+    {
+        return is_null(Arr::first($this->ignoreRenderMethod, function ($type) use ($e) {
+            return $e instanceof $type;
+        }));
     }
 
     /**
