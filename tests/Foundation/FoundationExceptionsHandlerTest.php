@@ -113,6 +113,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->reportable(function (ReportableException $e) {
             $reportingService = $this->container->make(ReportingService::class);
             $reportingService->send('Called from reportable');
+
             return false;
         });
 
