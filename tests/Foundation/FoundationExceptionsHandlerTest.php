@@ -76,6 +76,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new RuntimeException('Exception message'));
     }
 
+    public function testHandlerCallsContextMethodIfPresent()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::subset(['foo' => 'bar'])])->once();
+
+        $this->handler->report(new ContextProvidingException('Exception message'));
+    }
+
     public function testHandlerReportsExceptionWhenUnReportable()
     {
         $logger = m::mock(LoggerInterface::class);
@@ -280,6 +289,16 @@ class UnReportableException extends Exception
     public function report()
     {
         return false;
+    }
+}
+
+class ContextProvidingException extends Exception
+{
+    public function context()
+    {
+        return [
+            'foo' => 'bar',
+        ];
     }
 }
 
