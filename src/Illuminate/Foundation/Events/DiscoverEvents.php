@@ -32,18 +32,18 @@ class DiscoverEvents
      * Get all of the listeners and their corresponding events.
      *
      * @param  iterable  $listeners
-     * @param  string  $path
+     * @param  string  $basePath
      * @param  string  $namespace
      * @return array
      */
-    protected static function getListenerEvents($listeners, $path, $namespace)
+    protected static function getListenerEvents($listeners, $basePath, $namespace)
     {
         $listenerEvents = [];
 
         foreach ($listeners as $listener) {
             try {
                 $listener = new ReflectionClass(
-                    static::classFromFile($listener, $path, $namespace)
+                    static::classFromFile($listener, $basePath, $namespace)
                 );
             } catch (ReflectionException $e) {
                 continue;
@@ -71,14 +71,14 @@ class DiscoverEvents
      * Extract the class name from the given file path.
      *
      * @param  \SplFileInfo  $file
-     * @param  string  $path
+     * @param  string  $basePath
      * @param  string  $namespace
      * @return string
      */
-    protected static function classFromFile(SplFileInfo $file, $path, $namespace)
+    protected static function classFromFile(SplFileInfo $file, $basePath, $namespace)
     {
         return str_replace(
-            [$path, DIRECTORY_SEPARATOR],
+            [$basePath, DIRECTORY_SEPARATOR],
             [$namespace, '\\'],
             ucfirst(Str::replaceLast('.php', '', $file->getRealPath()))
         );
