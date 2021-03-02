@@ -181,19 +181,128 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function class($classList)
     {
-        $classList = Arr::wrap($classList);
+        return $this->attributeConstraints('class', $classList, true);
+    }
 
-        $classes = [];
+    /**
+     * Conditionally make element-specific custom attribute.
+     *
+     * @param mixed|string|array $attributes
+     * @param array|bool|null    $constraints
+     * @param bool               $escape
+     * @return static
+     */
+    public function make($attributes, $constraints = null, $escape = true)
+    {
+        if (!is_array($attributes)) {
+            $attributes = [$attributes => $constraints];
+        }
 
-        foreach ($classList as $class => $constraint) {
-            if (is_numeric($class)) {
-                $classes[] = $constraint;
+        [$numericList, $assocList] = collect($attributes)->partition(fn($value, $key) => is_int($key) && is_string($value));
+
+        $attributes = $assocList->merge($numericList->mapWithKeys(function ($value) {
+            return [$value => true];
+        }));
+
+        $attributes = $attributes->map(function ($value, $key) {
+
+            $filterAttribute = $this->filterCustomAttribute($key, $value);
+
+            if (!$filterAttribute) return false;
+
+            [$key, $value] = $this->filterCustomAttribute($key, $value);
+
+            if (blank($value)) return false;
+
+            return $this->attributeConstraints($key, $value, false);
+
+        })->reject(function ($value) {
+            return $value === false || blank($value);
+        })->all();
+
+        return $this->mergeConditionallyAttributes($attributes, $escape);
+    }
+
+
+    /**
+     * Conditionally merge element-specific custom attributes.
+     *
+     * @param string      $attribute
+     * @param mixed|array $attributeList
+     * @param bool        $merge
+     * @return static|string
+     */
+    private function attributeConstraints(string $attribute, $attributeList, bool $merge = false)
+    {
+        $attributeList = Arr::wrap($attributeList);
+
+        $attributes = [];
+
+        foreach ($attributeList as $key => $constraint) {
+            if (is_numeric($key)) {
+                $attributes[] = $constraint;
+
+                if ($attribute !== 'class') break;
+
             } elseif ($constraint) {
-                $classes[] = $class;
+                $attributes[] = $key;
+
+                if ($attribute !== 'class') break;
+
             }
         }
 
-        return $this->merge(['class' => implode(' ', $classes)]);
+        return $merge ? $this->merge([$attribute => implode(' ', $attributes)])
+            : implode(' ', $attributes);
+    }
+
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     * @return mixed
+     */
+    private function filterCustomAttribute($key, $value)
+    {
+        if ($value === false
+            || (is_string($key) && blank($value))
+            || blank($value)) return false;
+
+        if (is_bool($value) && $value) return [$key, $key];
+        if (is_int($key) && !blank($value)) return [$value, $value];
+
+        return [$key, $value];
+    }
+
+    /**
+     * Merge additional element-specific attributes / values.
+     *
+     * @param  array  $attributes
+     * @param  bool  $escape
+     * @return static
+     */
+    private function mergeConditionallyAttributes(array $attributes = [], $escape = true)
+    {
+        $attributes = array_map(function ($value) use ($escape) {
+            return $this->shouldEscapeAttributeValue($escape, $value)
+                        ? e($value)
+                        : $value;
+        }, $attributes);
+
+        [$appendableAttributes, $nonAppendableAttributes] = collect($attributes)
+            ->partition(function ($value, $key) {
+                return $key === 'class' || $value instanceof AppendableAttributeValue;
+            });
+
+        $newAttributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributes, $escape) {
+            $defaultsValue = $value instanceof AppendableAttributeValue
+                ? $this->resolveAppendableAttributeDefault($attributes, $key, $escape)
+                : ($value ?? '');
+
+
+            return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
+        })->merge($nonAppendableAttributes)->all();
+
+        return new static(array_merge($attributes, $newAttributes));
     }
 
     /**

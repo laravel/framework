@@ -33,6 +33,27 @@ class ViewComponentAttributeBagTest extends TestCase
 
         $bag = new ComponentAttributeBag([]);
 
+        $this->assertSame('class="flex"', (string) $bag->make('class', 'flex'));
+        $this->assertSame('class="flex mt-2 mx-4"', (string) $bag->make('class', ['flex', 'mt-2', 'mx-4' => true, 'mx-2' => false]));
+        $this->assertSame('disabled="disabled"', (string) $bag->make('disabled', true));
+        $this->assertSame('class="flex"', (string) $bag->make('class', ['flex' => true, 'grid' => false]));
+        $this->assertSame('class="grid"', (string) $bag->make('class', ['flex' => false, 'grid' => true]));
+        $this->assertSame('class="flex" disabled="disabled"', (string) $bag->make(['class' => ['flex' => true], 'disabled' => true]));
+        $this->assertSame('class="flex" disabled="disabled"', (string) $bag->make(['class' => ['flex' => true], 'disabled']));
+        $this->assertSame('class="flex disabled" disabled="disabled"', (string) $bag->make(['class' => ['flex' => true, 'disabled' => true], 'disabled' => true]));
+        $this->assertSame('class="flex selected" selected="selected"', (string) $bag->make(['class' => ['flex' => true, 'disabled' => false, 'selected' => true], 'disabled' => false, 'selected' => true]));
+        $this->assertSame('class="flex p-4" method="POST"', (string) $bag->make(['class' => ['flex' => true, 'grid' => false, 'p-4'], 'method' => ['GET' => false, 'POST' => true]]));
+        $this->assertSame('type="button"', (string) $bag->make('type', 'button'));
+        $this->assertSame('type="submit"', (string) $bag->make('type', ['button' => false, 'submit' => true]));
+        $this->assertSame('', (string) $bag->make('type', ['button' => false]));
+        $this->assertSame('class="edit create"', (string) $bag->make('class', ['edit' => true, 'create' => true]));
+        $this->assertSame('id="edit"', (string) $bag->make('id', ['edit' => true, 'create' => true]));
+        $this->assertSame('id="create"', (string) $bag->make('id', ['edit' => false, 'create' => true, 'delete' => true]));
+        $this->assertSame('id="create"', (string) $bag->make('id', ['edit' => false, 'create']));
+        $this->assertSame('id="create" class="edit create"', (string) $bag->make(['id' => ['edit' => false, 'create'], 'class' => ['edit' => true, 'create' => true]]));
+
+        $bag = new ComponentAttributeBag([]);
+
         $this->assertSame('class="mt-4"', (string) $bag->merge(['class' => 'mt-4']));
 
         $bag = new ComponentAttributeBag([
