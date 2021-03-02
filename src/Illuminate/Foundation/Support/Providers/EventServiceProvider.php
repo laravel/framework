@@ -132,7 +132,7 @@ class EventServiceProvider extends ServiceProvider
     protected function discoverEventsWithin()
     {
         return [
-            $this->app->path('Listeners') => $this->app->getNamespace().'\Listeners',
+            $this->app->path('Listeners') => $this->app->getNamespace().'Listeners',
         ];
     }
 }

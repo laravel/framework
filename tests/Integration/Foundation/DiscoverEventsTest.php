@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Foundation\Events\DiscoverEvents;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventOne;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventTwo;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener;
@@ -29,5 +30,17 @@ class DiscoverEventsTest extends TestCase
                 Listener::class.'@handleEventTwo',
             ],
         ], $events);
+    }
+
+    public function testListenerNamespace()
+    {
+        $eventServiceProvider = new EventServiceProvider($this->app);
+        $listenerWithIn = tap(new \ReflectionMethod($eventServiceProvider, 'discoverEventsWithin'))
+            ->setAccessible(true)
+            ->invoke($eventServiceProvider);
+
+        $this->assertEquals([
+            $this->app->path('Listeners') => 'App\Listeners',
+        ], $listenerWithIn);
     }
 }
