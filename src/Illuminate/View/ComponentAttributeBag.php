@@ -194,11 +194,11 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function make($attributes, $constraints = null, $escape = true)
     {
-        if (!is_array($attributes)) {
+        if (! is_array($attributes)) {
             $attributes = [$attributes => $constraints];
         }
 
-        [$numericList, $assocList] = collect($attributes)->partition(fn($value, $key) => is_int($key) && is_string($value));
+        [$numericList, $assocList] = collect($attributes)->partition(fn ($value, $key) => is_int($key) && is_string($value));
 
         $attributes = $assocList->merge($numericList->mapWithKeys(function ($value) {
             return [$value => true];
@@ -208,11 +208,13 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 
             $filterAttribute = $this->filterCustomAttribute($key, $value);
 
-            if (!$filterAttribute) return false;
+            if (! $filterAttribute) return false;
 
             [$key, $value] = $this->filterCustomAttribute($key, $value);
 
-            if (blank($value)) return false;
+            if (blank($value)) {
+                return false;
+            }
 
             return $this->attributeConstraints($key, $value, false);
 
@@ -242,12 +244,16 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             if (is_numeric($key)) {
                 $attributes[] = $constraint;
 
-                if ($attribute !== 'class') break;
+                if ($attribute !== 'class') {
+                    break;
+                }
 
             } elseif ($constraint) {
                 $attributes[] = $key;
 
-                if ($attribute !== 'class') break;
+                if ($attribute !== 'class') {
+                    break;
+                }
 
             }
         }
@@ -265,10 +271,16 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         if ($value === false
             || (is_string($key) && blank($value))
-            || blank($value)) return false;
+            || blank($value)) {
+            return false;
+        }
 
-        if (is_bool($value) && $value) return [$key, $key];
-        if (is_int($key) && !blank($value)) return [$value, $value];
+        if (is_bool($value) && $value) {
+            return [$key, $key];
+        }
+        if (is_int($key) && !blank($value)) {
+            return [$value, $value];
+        }
 
         return [$key, $value];
     }

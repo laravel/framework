@@ -51,6 +51,7 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('id="create"', (string) $bag->make('id', ['edit' => false, 'create' => true, 'delete' => true]));
         $this->assertSame('id="create"', (string) $bag->make('id', ['edit' => false, 'create']));
         $this->assertSame('id="create" class="edit create"', (string) $bag->make(['id' => ['edit' => false, 'create'], 'class' => ['edit' => true, 'create' => true]]));
+        $this->assertSame('id="create" class="edit create"', (string) $bag->make(['id' => ['edit' => false, 'create'], 'class' => ['edit' => true, 'create' => true], 'wire:model' => ['foo' => false]]));
 
         $bag = new ComponentAttributeBag([]);
 
