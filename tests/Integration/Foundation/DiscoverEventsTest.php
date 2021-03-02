@@ -18,7 +18,7 @@ class DiscoverEventsTest extends TestCase
         class_alias(AbstractListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener');
         class_alias(ListenerInterface::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface');
 
-        $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/Listeners', getcwd());
+        $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/Listeners', 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners');
 
         $this->assertEquals([
             EventOne::class => [

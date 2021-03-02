@@ -113,13 +113,13 @@ class EventServiceProvider extends ServiceProvider
     public function discoverEvents()
     {
         return collect($this->discoverEventsWithin())
-                    ->reject(function ($directory) {
+                    ->reject(function ($namespace, $directory) {
                         return ! is_dir($directory);
                     })
-                    ->reduce(function ($discovered, $directory) {
+                    ->reduce(function ($discovered, $namespace, $directory) {
                         return array_merge_recursive(
                             $discovered,
-                            DiscoverEvents::within($directory, base_path())
+                            DiscoverEvents::within($directory, $namespace)
                         );
                     }, []);
     }
@@ -132,7 +132,7 @@ class EventServiceProvider extends ServiceProvider
     protected function discoverEventsWithin()
     {
         return [
-            $this->app->path('Listeners'),
+            $this->app->path('Listeners') => $this->app->getNamespace().'\Listeners',
         ];
     }
 }

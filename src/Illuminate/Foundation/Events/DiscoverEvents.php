@@ -16,13 +16,14 @@ class DiscoverEvents
      * Get all of the events and listeners by searching the given listener directory.
      *
      * @param  string  $listenerPath
-     * @param  string  $basePath
+     * @param  string  $path
+     * @param  string  $namespace
      * @return array
      */
-    public static function within($listenerPath, $basePath)
+    public static function within($listenerPath, $namespace)
     {
         return collect(static::getListenerEvents(
-            (new Finder)->files()->in($listenerPath), $basePath
+            (new Finder)->files()->in($listenerPath), $listenerPath, $namespace
         ))->mapToDictionary(function ($event, $listener) {
             return [$event => $listener];
         })->all();
@@ -32,17 +33,18 @@ class DiscoverEvents
      * Get all of the listeners and their corresponding events.
      *
      * @param  iterable  $listeners
-     * @param  string  $basePath
+     * @param  string  $path
+     * @param  string  $namespace
      * @return array
      */
-    protected static function getListenerEvents($listeners, $basePath)
+    protected static function getListenerEvents($listeners, $path, $namespace)
     {
         $listenerEvents = [];
 
         foreach ($listeners as $listener) {
             try {
                 $listener = new ReflectionClass(
-                    static::classFromFile($listener, $basePath)
+                    static::classFromFile($listener, $path, $namespace)
                 );
             } catch (ReflectionException $e) {
                 continue;
@@ -70,17 +72,16 @@ class DiscoverEvents
      * Extract the class name from the given file path.
      *
      * @param  \SplFileInfo  $file
-     * @param  string  $basePath
+     * @param  string  $path
+     * @param  string  $namespace
      * @return string
      */
-    protected static function classFromFile(SplFileInfo $file, $basePath)
+    protected static function classFromFile(SplFileInfo $file, $path, $namespace)
     {
-        $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
-
         return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
-            ['\\', app()->getNamespace()],
-            ucfirst(Str::replaceLast('.php', '', $class))
+            [$path, DIRECTORY_SEPARATOR],
+            [$namespace, '\\'],
+            ucfirst(Str::replaceLast('.php', '', $file->getRealPath()))
         );
     }
 }
