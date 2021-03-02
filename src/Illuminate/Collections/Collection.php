@@ -554,6 +554,16 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Determine if the collection contains a single element.
+     *
+     * @return bool
+     */
+    public function isSingle()
+    {
+        return $this->count() === 1;
+    }
+
+    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue

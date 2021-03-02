@@ -541,6 +541,16 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIsSingle($collection)
+    {
+        $this->assertFalse((new $collection([]))->isSingle());
+        $this->assertTrue((new $collection([1]))->isSingle());
+        $this->assertFalse((new $collection([1, 2]))->isSingle());
+    }
+
     public function testIterable()
     {
         $c = new Collection(['foo']);

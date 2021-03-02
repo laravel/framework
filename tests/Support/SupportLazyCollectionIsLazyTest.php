@@ -484,6 +484,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testIsSingleIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->isSingle();
+        });
+    }
+
     public function testJoinIsLazy()
     {
         $this->assertEnumeratesOnce(function ($collection) {
