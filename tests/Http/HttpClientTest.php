@@ -7,6 +7,7 @@ use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
@@ -52,6 +53,21 @@ class HttpClientTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $response['result']);
         $this->assertIsObject($response->object());
         $this->assertSame('bar', $response->object()->result->foo);
+    }
+
+    public function testResponseCanBeReturnedAsCollection()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertInstanceOf(Collection::class, $response->collect());
+        $this->assertEquals(collect(['result' => ['foo' => 'bar']]), $response->collect());
+        $this->assertEquals(collect(['foo' => 'bar']), $response->collect('result'));
+        $this->assertEquals(collect(['bar']), $response->collect('result.foo'));
+        $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
     public function testUrlsCanBeStubbedByPath()

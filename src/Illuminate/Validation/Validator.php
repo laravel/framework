@@ -147,6 +147,13 @@ class Validator implements ValidatorContract
     public $customValues = [];
 
     /**
+     * Indicates if the validator should stop on the first rule failure.
+     *
+     * @var bool
+     */
+    protected $stopOnFirstFailure = false;
+
+    /**
      * All of the custom validator extensions.
      *
      * @var array
@@ -371,6 +378,10 @@ class Validator implements ValidatorContract
                 $this->removeAttribute($attribute);
 
                 continue;
+            }
+
+            if ($this->stopOnFirstFailure && $this->messages->isNotEmpty()) {
+                break;
             }
 
             foreach ($rules as $rule) {
@@ -1070,6 +1081,19 @@ class Validator implements ValidatorContract
                 $this->addRules([$key => $rules]);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Instruct the validator to stop validating after the first rule failure.
+     *
+     * @param  bool  $stopOnFirstFailure
+     * @return $this
+     */
+    public function stopOnFirstFailure($stopOnFirstFailure = true)
+    {
+        $this->stopOnFirstFailure = $stopOnFirstFailure;
 
         return $this;
     }

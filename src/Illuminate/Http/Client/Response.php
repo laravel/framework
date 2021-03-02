@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 
@@ -75,6 +76,17 @@ class Response implements ArrayAccess
     public function object()
     {
         return json_decode($this->body(), false);
+    }
+
+    /**
+     * Get the JSON decoded body of the response as a collection.
+     *
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($key = null)
+    {
+        return Collection::make($this->json($key));
     }
 
     /**

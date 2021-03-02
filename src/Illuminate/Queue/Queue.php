@@ -253,7 +253,7 @@ abstract class Queue
     /**
      * Register a callback to be executed when creating job payloads.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return void
      */
     public static function createPayloadUsing($callback)

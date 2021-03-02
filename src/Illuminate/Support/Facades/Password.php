@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\PasswordBroker;
 
 /**
  * @method static mixed reset(array $credentials, \Closure $callback)
- * @method static string sendResetLink(array $credentials)
+ * @method static string sendResetLink(array $credentials, \Closure $callback = null)
  * @method static \Illuminate\Contracts\Auth\CanResetPassword getUser(array $credentials)
  * @method static string createToken(\Illuminate\Contracts\Auth\CanResetPassword $user)
  * @method static void deleteToken(\Illuminate\Contracts\Auth\CanResetPassword $user)

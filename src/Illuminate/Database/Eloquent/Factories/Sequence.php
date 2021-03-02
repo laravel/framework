@@ -48,7 +48,7 @@ class Sequence
             $this->index = 0;
         }
 
-        return tap($this->sequence[$this->index], function () {
+        return tap(value($this->sequence[$this->index]), function () {
             $this->index = $this->index + 1;
         });
     }

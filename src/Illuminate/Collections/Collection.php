@@ -1086,7 +1086,7 @@ class Collection implements ArrayAccess, Enumerable
 
         $callback && is_callable($callback)
             ? uasort($items, $callback)
-            : asort($items, $callback);
+            : asort($items, $callback ?? SORT_REGULAR);
 
         return new static($items);
     }

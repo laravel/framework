@@ -487,6 +487,21 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Get the path to the views directory.
+     *
+     * This method returns the first configured path in the array of view paths.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function viewPath($path = '')
+    {
+        $basePath = $this['config']->get('view.paths')[0];
+
+        return rtrim($basePath, DIRECTORY_SEPARATOR).($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+
+    /**
      * Get the path to the environment file directory.
      *
      * @return string
