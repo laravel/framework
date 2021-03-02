@@ -205,7 +205,6 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         }));
 
         $attributes = $attributes->map(function ($value, $key) {
-
             $filterAttribute = $this->filterCustomAttribute($key, $value);
 
             if (! $filterAttribute) {
@@ -219,14 +218,12 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             }
 
             return $this->attributeConstraints($key, $value, false);
-
         })->reject(function ($value) {
             return $value === false || blank($value);
         })->all();
 
         return $this->mergeConditionallyAttributes($attributes, $escape);
     }
-
 
     /**
      * Conditionally merge element-specific custom attributes.
@@ -249,14 +246,12 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
                 if ($attribute !== 'class') {
                     break;
                 }
-
             } elseif ($constraint) {
                 $attributes[] = $key;
 
                 if ($attribute !== 'class') {
                     break;
                 }
-
             }
         }
 
@@ -311,8 +306,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             $defaultsValue = $value instanceof AppendableAttributeValue
                 ? $this->resolveAppendableAttributeDefault($attributes, $key, $escape)
                 : ($value ?? '');
-
-
+            
             return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
         })->merge($nonAppendableAttributes)->all();
 
