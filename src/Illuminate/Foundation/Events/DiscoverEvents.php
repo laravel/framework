@@ -16,7 +16,6 @@ class DiscoverEvents
      * Get all of the events and listeners by searching the given listener directory.
      *
      * @param  string  $listenerPath
-     * @param  string  $path
      * @param  string  $namespace
      * @return array
      */
