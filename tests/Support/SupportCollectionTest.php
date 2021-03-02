@@ -544,11 +544,11 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testIsSingle($collection)
+    public function testContainsOneItem($collection)
     {
-        $this->assertFalse((new $collection([]))->isSingle());
-        $this->assertTrue((new $collection([1]))->isSingle());
-        $this->assertFalse((new $collection([1, 2]))->isSingle());
+        $this->assertFalse((new $collection([]))->containsOneItem());
+        $this->assertTrue((new $collection([1]))->containsOneItem());
+        $this->assertFalse((new $collection([1, 2]))->containsOneItem());
     }
 
     public function testIterable()

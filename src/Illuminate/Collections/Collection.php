@@ -554,11 +554,11 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Determine if the collection contains a single element.
+     * Determine if the collection contains a single item.
      *
      * @return bool
      */
-    public function isSingle()
+    public function containsOneItem()
     {
         return $this->count() === 1;
     }

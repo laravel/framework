@@ -557,11 +557,11 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Determine if the collection contains a single element.
+     * Determine if the collection contains a single item.
      *
      * @return bool
      */
-    public function isSingle()
+    public function containsOneItem()
     {
         return $this->take(2)->count() === 1;
     }
