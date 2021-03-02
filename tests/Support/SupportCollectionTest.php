@@ -541,6 +541,16 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testContainsOneItem($collection)
+    {
+        $this->assertFalse((new $collection([]))->containsOneItem());
+        $this->assertTrue((new $collection([1]))->containsOneItem());
+        $this->assertFalse((new $collection([1, 2]))->containsOneItem());
+    }
+
     public function testIterable()
     {
         $c = new Collection(['foo']);
