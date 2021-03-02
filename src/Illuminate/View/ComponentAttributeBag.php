@@ -208,7 +208,9 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 
             $filterAttribute = $this->filterCustomAttribute($key, $value);
 
-            if (! $filterAttribute) return false;
+            if (! $filterAttribute) {
+                return false;
+            }
 
             [$key, $value] = $this->filterCustomAttribute($key, $value);
 
@@ -278,7 +280,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         if (is_bool($value) && $value) {
             return [$key, $key];
         }
-        if (is_int($key) && !blank($value)) {
+        if (is_int($key) && ! blank($value)) {
             return [$value, $value];
         }
 
