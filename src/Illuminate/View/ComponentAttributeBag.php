@@ -198,7 +198,10 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             $attributes = [$attributes => $constraints];
         }
 
-        [$numericList, $assocList] = collect($attributes)->partition(fn ($value, $key) => is_int($key) && is_string($value));
+        [$numericList, $assocList] = collect($attributes)
+            ->partition(function ($value, $key) {
+                return is_int($key) && is_string($value);
+            });
 
         $attributes = $assocList->merge($numericList->mapWithKeys(function ($value) {
             return [$value => true];
@@ -306,7 +309,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             $defaultsValue = $value instanceof AppendableAttributeValue
                 ? $this->resolveAppendableAttributeDefault($attributes, $key, $escape)
                 : ($value ?? '');
-            
+
             return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
         })->merge($nonAppendableAttributes)->all();
 
