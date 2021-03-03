@@ -1,6 +1,22 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.29.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.30.0...8.x)
+
+
+## [v8.30.0 (2021-03-02)](https://github.com/laravel/framework/compare/v8.29.0...v8.30.0)
+
+### Added
+- Added new line to `DetectsLostConnections` ([#36373](https://github.com/laravel/framework/pull/36373))
+- Added `Illuminate\Cache\RateLimiting\Limit::perMinutes()` ([#36352](https://github.com/laravel/framework/pull/36352), [86d0a5c](https://github.com/laravel/framework/commit/86d0a5c733b3f22ae2353df538e07605963c3052))
+- Make Database Factory macroable ([#36380](https://github.com/laravel/framework/pull/36380))
+- Added stop on first failure for Validators ([39e1f84](https://github.com/laravel/framework/commit/39e1f84a48fec024859d4e80948aca9bd7878658))
+- Added `containsOneItem()` method to Collections ([#36428](https://github.com/laravel/framework/pull/36428), [5b7ffc2](https://github.com/laravel/framework/commit/5b7ffc2b54dec803bd12541ab9c3d6bf3d4666ca))
+  
+### Changed
+- Respect custom route key with explicit route model binding ([#36375](https://github.com/laravel/framework/pull/36375))
+- Add Buffered Console Output ([#36404](https://github.com/laravel/framework/pull/36404))
+- Don't flash 'current_password' input ([#36415](https://github.com/laravel/framework/pull/36415))
+- Check for context method in Exception Handler ([#36424](https://github.com/laravel/framework/pull/36424))
 
 
 ## [v8.29.0 (2021-02-23)](https://github.com/laravel/framework/compare/v8.28.1...v8.29.0)
