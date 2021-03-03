@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -117,6 +118,7 @@ class RouteListCommand extends Command
             'name'   => $route->getName(),
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
+            'route'  => $route,
         ]);
     }
 
@@ -181,13 +183,16 @@ class RouteListCommand extends Command
      * Filter the route by URI and / or name.
      *
      * @param  array  $route
-     * @return array|null
+     * @return array|void
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
-             $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) {
+        if (
+            ($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
+            ($this->option('path') && ! Str::contains($route['uri'], $this->option('path'))) ||
+            ($this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) ||
+            ($this->option('uri') && ! $route['route']->matches(Request::create($this->option('uri'))))
+        ) {
             return;
         }
 
@@ -259,6 +264,7 @@ class RouteListCommand extends Command
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
+            ['uri', null, InputOption::VALUE_OPTIONAL, 'Evaluate a URI against routing rules'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
         ];
