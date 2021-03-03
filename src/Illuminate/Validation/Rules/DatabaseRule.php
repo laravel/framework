@@ -195,7 +195,7 @@ trait DatabaseRule
      */
     protected function formatWheres()
     {
-        return collect($this->wheres)->map( function ($where) {
+        return collect($this->wheres)->map(function ($where) {
             if (is_bool($where['value'])) {
                 return $where['column'].','.'true';
             } else {
