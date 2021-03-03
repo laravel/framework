@@ -104,15 +104,16 @@ class Arr
      *
      * @param  iterable  $array
      * @param  string  $prepend
+     * @param  string  $separator
      * @return array
      */
-    public static function dot($array, $prepend = '')
+    public static function dot($array, $prepend = '', $separator = '.')
     {
         $results = [];
 
         foreach ($array as $key => $value) {
             if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+                $results = array_merge($results, static::dot($value, $prepend.$key.$separator, $separator));
             } else {
                 $results[$prepend.$key] = $value;
             }
