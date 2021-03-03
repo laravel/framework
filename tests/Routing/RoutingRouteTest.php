@@ -29,7 +29,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use LogicException;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -937,36 +936,6 @@ class RoutingRouteTest extends TestCase
         }]);
         $router->model('bar', RouteModelBindingStub::class);
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
-    }
-
-    public function testModelBindingWithCustomKey()
-    {
-        // Create the router.
-        $container = new Container();
-        $router = new Router(new Dispatcher(), $container);
-        $container->singleton(Registrar::class, function () use ($router) {
-            return $router;
-        });
-
-        $router->get('foo/{bar:custom}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
-            return $name;
-        }]);
-        $router->model('bar', RouteModelBindingStub::class);
-
-        // Mock the stub so we can verify that the method is called with custom key.
-        $mock = $container->instance(
-            RouteModelBindingStub::class,
-            Mockery::mock(RouteModelBindingStub::class),
-        );
-
-        $mock->shouldReceive('resolveRouteBinding')
-            ->with('taylor', 'custom')
-            ->once()
-            ->andReturn('TAYLOR');
-
-        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
-
-        Mockery::close();
     }
 
     public function testModelBindingWithNullReturn()
