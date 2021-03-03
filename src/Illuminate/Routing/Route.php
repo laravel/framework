@@ -12,6 +12,7 @@ use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
@@ -857,7 +858,11 @@ class Route
      * @return $this
      */
     public function uses($action)
-    {
+    {        
+        if (Reflector::isCallable($action, true)) {
+            return $this->setAction(array_merge($this->action, $this->parseAction($action)));
+        }
+
         if (is_array($action)) {
             $action = $action[0].'@'.$action[1];
         }
