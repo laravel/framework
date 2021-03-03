@@ -528,7 +528,6 @@ class TestResponse implements ArrayAccess
             }
         }
 
-
         return $this;
     }
 
