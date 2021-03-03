@@ -191,7 +191,9 @@ class RouteListCommand extends Command
             ($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
             ($this->option('path') && ! Str::contains($route['uri'], $this->option('path'))) ||
             ($this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) ||
-            ($this->option('uri') && ! $route['route']->matches(Request::create($this->option('uri'))))
+            ($this->option('uri') && ! $route['route']->matches(
+                Request::create($this->option('uri'), $this->option('method') ?: 'GET'))
+            )
         ) {
             return;
         }
