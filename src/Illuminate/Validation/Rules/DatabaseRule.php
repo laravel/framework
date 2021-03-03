@@ -197,7 +197,7 @@ trait DatabaseRule
     {
         return collect($this->wheres)->map(function ($where) {
             if (is_bool($where['value'])) {
-                return $where['column'].','.'true';
+                return $where['column'].','.($where['value']?'true':'false');
             } else {
                 return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
             }
