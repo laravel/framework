@@ -111,6 +111,10 @@ class SupportArrTest extends TestCase
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
         $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
+
+        // Custom separator
+        $array = Arr::dot(['resources' => ['views' => ['index.blade.php' => '<h1>Hello world</h1>']]], '', '/');
+        $this->assertEquals(['resources/views/index.blade.php' => '<h1>Hello world</h1>'], $array);
     }
 
     public function testExcept()
