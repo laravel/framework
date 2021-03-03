@@ -131,8 +131,9 @@ class PolicyMakeCommand extends GeneratorCommand
             array_keys($replace), array_values($replace), $stub
         );
 
+        $eol = PHP_EOL;
         return str_replace(
-            "use {$namespacedModel};\nuse {$namespacedModel};", "use {$namespacedModel};", $stub
+            "use {$namespacedModel};{$eol}use {$namespacedModel};", "use {$namespacedModel};", $stub
         );
     }
 
