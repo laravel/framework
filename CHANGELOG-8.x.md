@@ -1,6 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.30.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.30.1...8.x)
+
+
+## [v8.30.1 (2021-03-03)](https://github.com/laravel/framework/compare/v8.30.0...v8.30.1)
+
+### Reverted
+- Reverted [Respect custom route key with explicit route model binding](https://github.com/laravel/framework/pull/36375) ([#36449](https://github.com/laravel/framework/pull/36449))
+
+### Fixed
+- Fixed `formatWheres()` methods in `DatabaseRule` ([#36441](https://github.com/laravel/framework/pull/36441))
 
 
 ## [v8.30.0 (2021-03-02)](https://github.com/laravel/framework/compare/v8.29.0...v8.30.0)
