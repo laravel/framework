@@ -3,8 +3,8 @@
 namespace Illuminate\View\Engines;
 
 use Illuminate\View\Compilers\CompilerInterface;
-use Throwable;
 use Illuminate\View\ViewException;
+use Throwable;
 
 class CompilerEngine extends PhpEngine
 {
