@@ -159,6 +159,7 @@ class VendorPublishCommand extends Command
     protected function publishTag($tag)
     {
         $published = false;
+
         $pathsToPublish = $this->pathsToPublish($tag);
 
         foreach ($pathsToPublish as $from => $to) {
