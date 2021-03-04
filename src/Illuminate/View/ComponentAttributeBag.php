@@ -182,6 +182,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     public function class($classList)
     {
         $attributes = new HtmlAttributes('class', $classList, true);
+
         return $this->merge($attributes->make());
     }
 
@@ -196,6 +197,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     public function make($attributes, $constraints = null, $escape = true)
     {
         $attributes = new HtmlAttributes($attributes, $constraints, $escape);
+
         return $attributes->toHtml();
     }
 

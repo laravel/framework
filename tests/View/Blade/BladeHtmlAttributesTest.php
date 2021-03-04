@@ -4,7 +4,6 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeHtmlAttributesTest extends AbstractBladeTestCase
 {
-
     public function testHtmlAttributesAreCompiled()
     {
         $this->assertSame('<?php echo \'class="flex"\'; ?>', (string) $this->compiler->compileString("@attributes(['class' => 'flex'])"));
