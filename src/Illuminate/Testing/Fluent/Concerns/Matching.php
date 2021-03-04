@@ -13,7 +13,7 @@ trait Matching
      * Asserts that the property matches the expected value.
      *
      * @param  string  $key
-     * @param  mixed|callable  $expected
+     * @param  mixed|\Closure  $expected
      * @return $this
      */
     public function where(string $key, $expected): self
@@ -94,7 +94,7 @@ trait Matching
      *
      * @param  string  $key
      * @param  null  $value
-     * @param  Closure|null  $scope
+     * @param  \Closure|null  $scope
      * @return $this
      */
     abstract public function has(string $key, $value = null, Closure $scope = null);

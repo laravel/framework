@@ -75,7 +75,7 @@ class Assert implements Arrayable
      * Instantiate a new "scope" at the path of the given key.
      *
      * @param  string  $key
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return $this
      */
     protected function scope(string $key, Closure $callback): self
@@ -106,7 +106,7 @@ class Assert implements Arrayable
     /**
      * Create a new instance from a AssertableJsonString.
      *
-     * @param  AssertableJsonString  $json
+     * @param  \Illuminate\Testing\AssertableJsonString  $json
      * @return static
      */
     public static function fromAssertableJsonString(AssertableJsonString $json): self

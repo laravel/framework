@@ -31,7 +31,7 @@ trait Has
      *
      * @param  string  $key
      * @param  null  $value
-     * @param  Closure|null  $scope
+     * @param  \Closure|null  $scope
      * @return $this
      */
     public function has(string $key, $value = null, Closure $scope = null): self
@@ -151,7 +151,7 @@ trait Has
      * Instantiate a new "scope" at the path of the given key.
      *
      * @param  string  $key
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return $this
      */
     abstract protected function scope(string $key, Closure $callback);
