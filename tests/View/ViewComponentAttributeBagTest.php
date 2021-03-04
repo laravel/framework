@@ -33,6 +33,7 @@ class ViewComponentAttributeBagTest extends TestCase
 
         $bag = new ComponentAttributeBag([]);
 
+        $this->assertSame('class="flex"', (string) $bag->make(['class' => 'flex']));
         $this->assertSame('class="flex"', (string) $bag->make('class', 'flex'));
         $this->assertSame('class="flex mt-2 mx-4"', (string) $bag->make('class', ['flex', 'mt-2', 'mx-4' => true, 'mx-2' => false]));
         $this->assertSame('disabled="disabled"', (string) $bag->make('disabled', true));
