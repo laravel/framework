@@ -22,6 +22,7 @@ class VendorTagPublished
      * Create a new event instance.
      *
      * @param  string  $tag
+     * @param  array  $paths
      * @return void
      */
     public function __construct($tag, $paths)
