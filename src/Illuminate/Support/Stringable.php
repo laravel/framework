@@ -373,7 +373,7 @@ class Stringable implements JsonSerializable
      */
     public function matches($pattern)
     {
-        return $this->matchAll($pattern)->isNotEmpty();
+        return $this->match($pattern)->isNotEmpty();
     }
 
     /**
