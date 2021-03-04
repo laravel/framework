@@ -1857,8 +1857,9 @@ class ValidationValidatorTest extends TestCase
      * @param bool $passes
      *
      * @dataProvider multipleOfDataProvider
+     * @requires extension bcmath
      */
-    public function testValidateMutlpleOf($input, $allowed, $passes)
+    public function testValidateMultipleOf($input, $allowed, $passes)
     {
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.multiple_of' => 'The :attribute must be a multiple of :value'], 'en');

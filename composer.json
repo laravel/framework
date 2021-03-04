@@ -122,6 +122,7 @@
         }
     },
     "suggest": {
+        "ext-bcmath": "Required to use the validation rule 'multiple_of'.",
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-memcached": "Required to use the memcache cache driver.",
