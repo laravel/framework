@@ -40,6 +40,13 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('foo', value(function () {
             return 'foo';
         }));
+
+        $this->assertSame('Hello John Doe', value(function ($firstName, $lastName) {
+            return sprintf('Hello %s %s', $firstName, $lastName);
+        }, 'John', 'Doe'));
+        $this->assertSame('Hello John Doe', value(function ($firstName, $lastName) {
+            return sprintf('Hello %s %s', $firstName, $lastName);
+        }, ...['John', 'Doe']));
     }
 
     public function testObjectGet()
