@@ -12,7 +12,7 @@ class VendorTagPublished
     public $tag;
 
     /**
-     * The paths that were published.
+     * The publish paths registered by the tag.
      *
      * @var array
      */
