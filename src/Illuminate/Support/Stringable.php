@@ -371,7 +371,7 @@ class Stringable implements JsonSerializable
      * @param  string  $pattern
      * @return bool
      */
-    public function matches($pattern)
+    public function test($pattern)
     {
         return $this->match($pattern)->isNotEmpty();
     }
