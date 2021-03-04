@@ -167,10 +167,10 @@ class VendorPublishCommand extends Command
             $published = true;
         }
 
+        $this->laravel['events']->dispatch(new VendorTagPublished($tag, $pathsToPublish));
+
         if ($published === false) {
             $this->error('Unable to locate publishable resources.');
-        } else {
-            $this->laravel['events']->dispatch(new VendorTagPublished($tag, $pathsToPublish));
         }
     }
 
