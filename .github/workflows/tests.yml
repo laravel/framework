@@ -8,7 +8,7 @@ on:
 
 jobs:
   linux_tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       memcached:
@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [7.2, 7.3, 7.4, 8.0]
+        php: ['7.2', '7.3', '7.4', '8.0']
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -47,9 +47,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, memcached
           tools: composer:v2
           coverage: none
-
-      - name: Setup problem matchers
-        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
       - name: Set Minimum Guzzle Version
         uses: nick-invision/retry@v1
@@ -78,7 +75,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [7.2, 7.3, 7.4, 8.0]
+        php: ['7.2', '7.3', '7.4', '8.0']
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
@@ -99,9 +96,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached
           tools: composer:v2
           coverage: none
-
-      - name: Setup problem matchers
-        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
       - name: Set Minimum Guzzle Version
         uses: nick-invision/retry@v1
