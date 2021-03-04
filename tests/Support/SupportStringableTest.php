@@ -60,6 +60,11 @@ class SupportStringableTest extends TestCase
 
         $this->assertEquals(['un', 'ly'], $stringable->matchAll('/f(\w*)/')->all());
         $this->assertTrue($stringable->matchAll('/nothing/')->isEmpty());
+
+        $stringable = $this->stringable('foo bar');
+
+        $this->assertTrue($stringable->matches('/bar/'));
+        $this->assertTrue($stringable->matches('/foo (.*)/'));
     }
 
     public function testTrim()
