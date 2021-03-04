@@ -40,6 +40,13 @@ trait ManagesComponents
     protected $slotStack = [];
 
     /**
+     * The child components being rendered.
+     *
+     * @var array
+     */
+    protected $childComponents = [];
+
+    /**
      * Start a component rendering process.
      *
      * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
@@ -54,6 +61,20 @@ trait ManagesComponents
             $this->componentData[$this->currentComponent()] = $data;
 
             $this->slots[$this->currentComponent()] = [];
+        }
+    }
+
+    public function startComponentClass($component)
+    {
+        $this->startComponent($component->resolveView(), $component->data());
+
+        $componentDepth = $this->currentComponent() > 0 ? $this->currentComponent() - 1 : $this->currentComponent();
+
+        if (array_key_exists($componentDepth, $this->childComponents)) {
+            $this->childComponents[$componentDepth][] = $component;
+        }
+        if (! array_key_exists($this->currentComponent(), $this->childComponents)) {
+            $this->childComponents[$this->currentComponent()] = [];
         }
     }
 
@@ -84,6 +105,8 @@ trait ManagesComponents
 
         $data = $this->componentData();
 
+        unset($this->childComponents[count($this->componentStack)]);
+
         if ($view instanceof Closure) {
             $view = $view($data);
         }
@@ -113,6 +136,7 @@ trait ManagesComponents
         return array_merge(
             $this->componentData[count($this->componentStack)],
             ['slot' => $defaultSlot],
+            ['__children' => $this->childComponents[count($this->componentStack)] ?? []],
             $this->slots[count($this->componentStack)],
             ['__laravel_slots' => $slots]
         );

@@ -16,7 +16,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
 <?php $component = $__env->getContainer()->make(Test::class, ["foo" => "bar"]); ?>
 <?php $component->withName(\'test\'); ?>
 <?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])'));
+<?php $__env->startComponentClass($component); ?>', $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])'));
     }
 
     public function testEndComponentsAreCompiled()

@@ -66,7 +66,7 @@ trait CompilesComponents
             '<?php $component = $__env->getContainer()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
             '<?php $component->withName('.$alias.'); ?>',
             '<?php if ($component->shouldRender()): ?>',
-            '<?php $__env->startComponent($component->resolveView(), $component->data()); ?>',
+            '<?php $__env->startComponentClass($component); ?>',
         ]);
     }
 
