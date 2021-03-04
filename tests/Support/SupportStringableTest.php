@@ -62,6 +62,14 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($stringable->matchAll('/nothing/')->isEmpty());
     }
 
+    public function testTest()
+    {
+        $stringable = $this->stringable('foo bar');
+
+        $this->assertTrue($stringable->test('/bar/'));
+        $this->assertTrue($stringable->test('/foo (.*)/'));
+    }
+
     public function testTrim()
     {
         $this->assertSame('foo', (string) $this->stringable(' foo ')->trim());
