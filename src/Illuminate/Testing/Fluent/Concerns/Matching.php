@@ -9,16 +9,14 @@ use PHPUnit\Framework\Assert as PHPUnit;
 
 trait Matching
 {
-    public function whereAll(array $bindings): self
-    {
-        foreach ($bindings as $key => $value) {
-            $this->where($key, $value);
-        }
-
-        return $this;
-    }
-
-    public function where($key, $expected): self
+    /**
+     * Asserts that the property matches the expected value.
+     *
+     * @param  string  $key
+     * @param  mixed|callable  $expected
+     * @return $this
+     */
+    public function where(string $key, $expected): self
     {
         $this->has($key);
 
@@ -49,6 +47,27 @@ trait Matching
         return $this;
     }
 
+    /**
+     * Asserts that all properties match their expected values.
+     *
+     * @param  array  $bindings
+     * @return $this
+     */
+    public function whereAll(array $bindings): self
+    {
+        foreach ($bindings as $key => $value) {
+            $this->where($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Ensures that all properties are sorted the same way, recursively.
+     *
+     * @param  mixed  $value
+     * @return void
+     */
     protected function ensureSorted(&$value): void
     {
         if (! is_array($value)) {
@@ -62,9 +81,29 @@ trait Matching
         ksort($value);
     }
 
-    abstract protected function dotPath($key): string;
+    /**
+     * Compose the absolute "dot" path to the given key.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    abstract protected function dotPath(string $key): string;
 
-    abstract protected function prop(string $key = null);
-
+    /**
+     * Ensure that the given prop exists.
+     *
+     * @param  string  $key
+     * @param  null  $value
+     * @param  Closure|null  $scope
+     * @return $this
+     */
     abstract public function has(string $key, $value = null, Closure $scope = null);
+
+    /**
+     * Retrieve a prop within the current scope using "dot" notation.
+     *
+     * @param  string|null  $key
+     * @return mixed
+     */
+    abstract protected function prop(string $key = null);
 }

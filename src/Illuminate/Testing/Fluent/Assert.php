@@ -19,19 +19,39 @@ class Assert implements Arrayable
         Macroable,
         Tappable;
 
-    /** @var array */
+    /**
+     * The properties in the current scope.
+     *
+     * @var array
+     */
     private $props;
 
-    /** @var string */
+    /**
+     * The "dot" path to the current scope.
+     *
+     * @var string|null
+     */
     private $path;
 
+    /**
+     * Create a new Assert instance.
+     *
+     * @param  array  $props
+     * @param  string|null  $path
+     */
     protected function __construct(array $props, string $path = null)
     {
         $this->path = $path;
         $this->props = $props;
     }
 
-    protected function dotPath($key): string
+    /**
+     * Compose the absolute "dot" path to the given key.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function dotPath(string $key): string
     {
         if (is_null($this->path)) {
             return $key;
@@ -40,12 +60,25 @@ class Assert implements Arrayable
         return implode('.', [$this->path, $key]);
     }
 
+    /**
+     * Retrieve a prop within the current scope using "dot" notation.
+     *
+     * @param  string|null  $key
+     * @return mixed
+     */
     protected function prop(string $key = null)
     {
         return Arr::get($this->props, $key);
     }
 
-    protected function scope($key, Closure $callback): self
+    /**
+     * Instantiate a new "scope" at the path of the given key.
+     *
+     * @param  string  $key
+     * @param  Closure  $callback
+     * @return $this
+     */
+    protected function scope(string $key, Closure $callback): self
     {
         $props = $this->prop($key);
         $path = $this->dotPath($key);
@@ -59,16 +92,33 @@ class Assert implements Arrayable
         return $this;
     }
 
+    /**
+     * Create a new instance from an array.
+     *
+     * @param  array  $data
+     * @return static
+     */
     public static function fromArray(array $data): self
     {
         return new self($data);
     }
 
+    /**
+     * Create a new instance from a AssertableJsonString.
+     *
+     * @param  AssertableJsonString  $json
+     * @return static
+     */
     public static function fromAssertableJsonString(AssertableJsonString $json): self
     {
         return self::fromArray($json->json());
     }
 
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
     public function toArray()
     {
         return $this->props;

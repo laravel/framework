@@ -8,7 +8,14 @@ use PHPUnit\Framework\Assert as PHPUnit;
 
 trait Has
 {
-    protected function count(string $key, $length): self
+    /**
+     * Assert that the prop is of the expected size.
+     *
+     * @param  string  $key
+     * @param  int  $length
+     * @return $this
+     */
+    protected function count(string $key, int $length): self
     {
         PHPUnit::assertCount(
             $length,
@@ -19,21 +26,14 @@ trait Has
         return $this;
     }
 
-    public function hasAll($key): self
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        foreach ($keys as $prop => $count) {
-            if (is_int($prop)) {
-                $this->has($count);
-            } else {
-                $this->has($prop, $count);
-            }
-        }
-
-        return $this;
-    }
-
+    /**
+     * Ensure that the given prop exists.
+     *
+     * @param  string  $key
+     * @param  null  $value
+     * @param  Closure|null  $scope
+     * @return $this
+     */
     public function has(string $key, $value = null, Closure $scope = null): self
     {
         $prop = $this->prop();
@@ -69,6 +69,33 @@ trait Has
         return $this;
     }
 
+    /**
+     * Assert that all of the given props exist.
+     *
+     * @param  array|string $key
+     * @return $this
+     */
+    public function hasAll($key): self
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $prop => $count) {
+            if (is_int($prop)) {
+                $this->has($count);
+            } else {
+                $this->has($prop, $count);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that none of the given props exist.
+     *
+     * @param  array|string $key
+     * @return $this
+     */
     public function missingAll($key): self
     {
         $keys = is_array($key) ? $key : func_get_args();
@@ -80,6 +107,12 @@ trait Has
         return $this;
     }
 
+    /**
+     * Assert that the given prop does not exist.
+     *
+     * @param  string  $key
+     * @return $this
+     */
     public function missing(string $key): self
     {
         PHPUnit::assertNotTrue(
@@ -90,11 +123,36 @@ trait Has
         return $this;
     }
 
-    abstract protected function prop(string $key = null);
+    /**
+     * Compose the absolute "dot" path to the given key.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    abstract protected function dotPath(string $key): string;
 
-    abstract protected function dotPath($key): string;
-
+    /**
+     * Marks the property as interacted.
+     *
+     * @param  string  $key
+     * @return void
+     */
     abstract protected function interactsWith(string $key): void;
 
-    abstract protected function scope($key, Closure $callback);
+    /**
+     * Retrieve a prop within the current scope using "dot" notation.
+     *
+     * @param  string|null  $key
+     * @return mixed
+     */
+    abstract protected function prop(string $key = null);
+
+    /**
+     * Instantiate a new "scope" at the path of the given key.
+     *
+     * @param  string  $key
+     * @param  Closure  $callback
+     * @return $this
+     */
+    abstract protected function scope(string $key, Closure $callback);
 }
