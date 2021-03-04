@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Events;
 class VendorTagPublished
 {
     /**
-     * The vendor tag published.
+     * The vendor tag that was published.
      *
      * @var string
      */
