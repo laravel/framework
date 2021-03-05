@@ -46,7 +46,7 @@ class PhpRedisLock extends RedisLock
 
         $owner = $client->_serialize($this->owner);
 
-         // https://github.com/phpredis/phpredis/issues/1938
+        // https://github.com/phpredis/phpredis/issues/1938
         if ($this->compressed()) {
             if ($this->lzfCompressed()) {
                 $owner = \lzf_compress($owner);
