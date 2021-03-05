@@ -6,10 +6,10 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Container\Container;
 use Throwable;
 
-class CircuitBreaker
+class ThrottlesExceptions
 {
     /**
-     * The maximum number of attempts allowed before the circuit is opened.
+     * The maximum number of attempts allowed before rate limiting applies.
      *
      * @var int
      */
@@ -35,6 +35,13 @@ class CircuitBreaker
      * @var string
      */
     protected $key;
+
+    /**
+     * The callback that determines if rate limiting should apply.
+     *
+     * @var callable
+     */
+    protected $whenCallback;
 
     /**
      * The prefix of the rate limiter key.
@@ -86,10 +93,27 @@ class CircuitBreaker
 
             $this->limiter->clear($jobKey);
         } catch (Throwable $throwable) {
+            if ($this->whenCallback && ! call_user_func($this->whenCallback, $throwable)) {
+                throw $throwable;
+            }
+
             $this->limiter->hit($jobKey, $this->decayMinutes * 60);
 
             return $job->release($this->retryAfterMinutes * 60);
         }
+    }
+
+    /**
+     * Specify a callback that should determine if rate limiting behavior should apply.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function when(callable $callback)
+    {
+        $this->whenCallback = $callback;
+
+        return $this;
     }
 
     /**
@@ -106,6 +130,17 @@ class CircuitBreaker
     }
 
     /**
+     * Get the cache key associated for the rate limiter.
+     *
+     * @param  mixed  $job
+     * @return string
+     */
+    protected function getKey($job)
+    {
+        return $this->prefix.md5(empty($this->key) ? get_class($job) : $this->key);
+    }
+
+    /**
      * Get the number of seconds that should elapse before the job is retried.
      *
      * @param  string  $key
@@ -114,16 +149,5 @@ class CircuitBreaker
     protected function getTimeUntilNextRetry($key)
     {
         return $this->limiter->availableIn($key) + 3;
-    }
-
-    /**
-     * Get the cache key associated for the rate limiter.
-     *
-     * @param  mixed  $job
-     * @return string
-     */
-    protected function getKey($job)
-    {
-        return md5($this->prefix.(empty($this->key) ? get_class($job) : $this->key));
     }
 }

@@ -8,14 +8,14 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\CircuitBreaker;
+use Illuminate\Queue\Middleware\ThrottlesExceptions;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
-class CircuitBreakerTest extends TestCase
+class ThrottlesExceptionsTest extends TestCase
 {
     protected function tearDown(): void
     {
@@ -122,7 +122,7 @@ class CircuitBreakerTestJob
 
     public function middleware()
     {
-        return [new CircuitBreaker(2, 10, 0, 'test')];
+        return [new ThrottlesExceptions(2, 10, 0, 'test')];
     }
 }
 
@@ -139,6 +139,6 @@ class CircuitBreakerSuccessfulJob
 
     public function middleware()
     {
-        return [new CircuitBreaker(2, 10, 0, 'test')];
+        return [new ThrottlesExceptions(2, 10, 0, 'test')];
     }
 }
