@@ -8,6 +8,15 @@ use UnexpectedValueException;
 
 class PhpRedisLock extends RedisLock
 {
+    /**
+     * Create a new phpredis lock instance.
+     *
+     * @param  \Illuminate\Redis\Connections\PhpRedisConnection  $redis
+     * @param  string  $name
+     * @param  int  $seconds
+     * @param  string|null  $owner
+     * @return void
+     */
     public function __construct(PhpRedisConnection $redis, string $name, int $seconds, ?string $owner = null)
     {
         parent::__construct($redis, $name, $seconds, $owner);
@@ -26,26 +35,18 @@ class PhpRedisLock extends RedisLock
         );
     }
 
+    /**
+     * Get the owner key, serialized and compressed.
+     *
+     * @return string
+     */
     protected function serializedAndCompressedOwner(): string
     {
         $client = $this->redis->client();
 
-        /* If a serialization mode such as "php" or "igbinary" and/or a
-         * compression mode such as "lzf" or "zstd" is enabled, the owner
-         * must be serialized and/or compressed by us, because phpredis does
-         * not do this for the eval command.
-         *
-         * Name must not be modified!
-         */
         $owner = $client->_serialize($this->owner);
 
-        /* Once the phpredis extension exposes a compress function like the
-         * above `_serialize()` function, we should switch to it to guarantee
-         * consistency in the way the extension serializes and compresses to
-         * avoid the need to check each compression option ourselves.
-         *
-         * @see https://github.com/phpredis/phpredis/issues/1938
-         */
+         // https://github.com/phpredis/phpredis/issues/1938
         if ($this->compressed()) {
             if ($this->lzfCompressed()) {
                 $owner = \lzf_compress($owner);
@@ -55,7 +56,7 @@ class PhpRedisLock extends RedisLock
                 $owner = \lz4_compress($owner, $client->getOption(Redis::OPT_COMPRESSION_LEVEL));
             } else {
                 throw new UnexpectedValueException(sprintf(
-                    'Unknown phpredis compression in use (%d). Unable to release lock.',
+                    'Unknown phpredis compression in use [%d]. Unable to release lock.',
                     $client->getOption(Redis::OPT_COMPRESSION)
                 ));
             }
@@ -64,26 +65,46 @@ class PhpRedisLock extends RedisLock
         return $owner;
     }
 
+    /**
+     * Determine if compression is enabled.
+     *
+     * @return bool
+     */
     protected function compressed(): bool
     {
         return $this->redis->client()->getOption(Redis::OPT_COMPRESSION) !== Redis::COMPRESSION_NONE;
     }
 
+    /**
+     * Determine if LZF compression is enabled.
+     *
+     * @return bool
+     */
     protected function lzfCompressed(): bool
     {
         return defined('Redis::COMPRESSION_LZF') &&
-            $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZF;
+               $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZF;
     }
 
+    /**
+     * Determine if ZSTD compression is enabled.
+     *
+     * @return bool
+     */
     protected function zstdCompressed(): bool
     {
         return defined('Redis::COMPRESSION_ZSTD') &&
-            $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_ZSTD;
+               $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_ZSTD;
     }
 
+    /**
+     * Determine if LZ4 compression is enabled.
+     *
+     * @return bool
+     */
     protected function lz4Compressed(): bool
     {
         return defined('Redis::COMPRESSION_LZ4') &&
-            $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZ4;
+               $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZ4;
     }
 }

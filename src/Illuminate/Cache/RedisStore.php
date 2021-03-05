@@ -190,6 +190,7 @@ class RedisStore extends TaggableStore implements LockProvider
     public function lock($name, $seconds = 0, $owner = null)
     {
         $lockName = $this->prefix.$name;
+
         $lockConnection = $this->lockConnection();
 
         if ($lockConnection instanceof PhpRedisConnection) {
