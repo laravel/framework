@@ -30,6 +30,8 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withToken(string $token, string $type = 'Bearer')
  * @method static \Illuminate\Http\Client\PendingRequest withoutRedirecting()
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
+ * @method static \Illuminate\Http\Client\PendingRequest dump()
+ * @method static \Illuminate\Http\Client\PendingRequest dd()
  * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response get(string $url, array $query = [])
  * @method static \Illuminate\Http\Client\Response head(string $url, array $query = [])
