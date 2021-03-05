@@ -454,7 +454,7 @@ class PendingRequest
     }
 
     /**
-     * Dump the request.
+     * Dump the request before sending.
      *
      * @return $this
      */
@@ -470,7 +470,7 @@ class PendingRequest
     }
 
     /**
-     * Dump the request and end the script.
+     * Dump the request before sending and end the script.
      *
      * @return $this
      */
