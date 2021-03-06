@@ -115,16 +115,16 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'Adam'], $request->all());
     }
 
-    public function testValidatedMethodReturnsASpecificValidatedData()
+    public function testGetValidatedMethodReturnsASpecificValidatedData()
     {
         $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
 
         $request->validateResolved();
 
-        $this->assertEquals('specified', $request->validated('name', 'default'));
+        $this->assertEquals('specified', $request->getValidated('name', 'default'));
     }
 
-    public function testValidatedMethodReturnsASpecificNestedValidatedData()
+    public function testGetValidatedMethodReturnsASpecificNestedValidatedData()
     {
         $request = $this->createRequest([
             'name' => ['nested' => 'values'],
@@ -133,10 +133,10 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals('values', $request->validated('name.nested', 'default'));
+        $this->assertEquals('values', $request->getValidated('name.nested', 'default'));
     }
 
-    public function testValidatedMethodReturnsASpecificNestedValidatedArray()
+    public function testGetValidatedMethodReturnsASpecificNestedValidatedArray()
     {
         $request = $this->createRequest([
             'name' => ['nested' => ['key' => 'value']],
@@ -145,16 +145,16 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['key' => 'value'], $request->validated('name.nested', 'default'));
+        $this->assertEquals(['key' => 'value'], $request->getValidated('name.nested', 'default'));
     }
 
-    public function testValidatedMethodReturnsDefaultValueIfMissingSpecificValidatedData()
+    public function testGetValidatedMethodReturnsDefaultValueIfMissingSpecificValidatedData()
     {
         $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
 
         $request->validateResolved();
 
-        $this->assertEquals('default', $request->validated('missing_key', 'default'));
+        $this->assertEquals('default', $request->getValidated('missing_key', 'default'));
     }
 
     /**
