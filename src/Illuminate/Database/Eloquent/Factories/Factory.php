@@ -719,6 +719,10 @@ abstract class Factory
                 ? Str::after($modelName, $appNamespace.'Models\\')
                 : Str::after($modelName, $appNamespace);
 
+            if (Str::endsWith($modelName, 'Model')) {
+                $modelName = Str::beforeLast($modelName, 'Model');
+            }
+
             return static::$namespace.$modelName.'Factory';
         };
 
