@@ -190,7 +190,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return array
+     * @return mixed
      */
     public function validated(string $key = null, $default = null)
     {

@@ -124,6 +124,30 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals('specified', $request->validated('name', 'default'));
     }
 
+    public function testValidatedMethodReturnsASpecificNestedValidatedData()
+    {
+        $request = $this->createRequest([
+            'name' => ['nested' => 'values'],
+            'with' => 'extras',
+        ]);
+
+        $request->validateResolved();
+
+        $this->assertEquals('values', $request->validated('name.nested', 'default'));
+    }
+
+    public function testValidatedMethodReturnsASpecificNestedValidatedArray()
+    {
+        $request = $this->createRequest([
+            'name' => ['nested' => ['key' => 'value']],
+            'with' => 'extras',
+        ]);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['key' => 'value'], $request->validated('name.nested', 'default'));
+    }
+
     public function testValidatedMethodReturnsDefaultValueIfMissingSpecificValidatedData()
     {
         $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
