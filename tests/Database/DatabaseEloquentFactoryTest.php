@@ -415,9 +415,13 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $resolves = [
             'App\\Foo' => 'Factories\\FooFactory',
+            'App\\FooModel' => 'Factories\\FooFactory',
             'App\\Models\\Foo' => 'Factories\\FooFactory',
+            'App\\Models\\FooModel' => 'Factories\\FooFactory',
             'App\\Models\\Nested\\Foo' => 'Factories\\Nested\\FooFactory',
+            'App\\Models\\Nested\\FooModel' => 'Factories\\Nested\\FooFactory',
             'App\\Models\\Really\\Nested\\Foo' => 'Factories\\Really\\Nested\\FooFactory',
+            'App\\Models\\Really\\Nested\\FooModel' => 'Factories\\Really\\Nested\\FooFactory',
         ];
 
         foreach ($resolves as $model => $factory) {
@@ -434,9 +438,13 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $resolves = [
             'Foo\\Bar' => 'Factories\\BarFactory',
+            'Foo\\BarModel' => 'Factories\\BarFactory',
             'Foo\\Models\\Bar' => 'Factories\\BarFactory',
+            'Foo\\Models\\BarModel' => 'Factories\\BarFactory',
             'Foo\\Models\\Nested\\Bar' => 'Factories\\Nested\\BarFactory',
+            'Foo\\Models\\Nested\\BarModel' => 'Factories\\Nested\\BarFactory',
             'Foo\\Models\\Really\\Nested\\Bar' => 'Factories\\Really\\Nested\\BarFactory',
+            'Foo\\Models\\Really\\Nested\\BarModel' => 'Factories\\Really\\Nested\\BarFactory',
         ];
 
         foreach ($resolves as $model => $factory) {
