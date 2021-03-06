@@ -336,7 +336,7 @@ trait FormatsMessages
             return $value ? 'true' : 'false';
         }
 
-        return $value;
+        return (string) $value;
     }
 
     /**
