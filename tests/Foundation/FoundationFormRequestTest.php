@@ -115,6 +115,24 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'Adam'], $request->all());
     }
 
+    public function testValidatedMethodReturnsASpecificValidatedData()
+    {
+        $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
+
+        $request->validateResolved();
+
+        $this->assertEquals('specified', $request->validated('name', 'default'));
+    }
+
+    public function testValidatedMethodReturnsDefaultValueIfMissingSpecificValidatedData()
+    {
+        $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
+
+        $request->validateResolved();
+
+        $this->assertEquals('default', $request->validated('missing_key', 'default'));
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
