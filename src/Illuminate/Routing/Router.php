@@ -446,12 +446,20 @@ class Router implements BindingRegistrar, RegistrarContract
      * Add a route to the underlying route collection.
      *
      * @param  array|string  $methods
-     * @param  string  $uri
+     * @param  array|string  $uri
      * @param  array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function addRoute($methods, $uri, $action)
     {
+        if (is_array($uri)) {
+            foreach ($uri as $item) {
+                $this->addRoute($methods, $item, $action);
+            }
+
+            return;
+        }
+
         return $this->routes->add($this->createRoute($methods, $uri, $action));
     }
 
