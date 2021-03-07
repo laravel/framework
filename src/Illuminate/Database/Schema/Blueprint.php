@@ -836,15 +836,16 @@ class Blueprint
     }
 
     /**
-     * Create a new unsigned big integer (8-byte) column on the table.
+     * Create a new foreign id column on the table with a specific type.
      *
      * @param  string  $column
+     * @param  string  $type
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignId($column)
+    public function foreignId($column, $type = 'bigInteger')
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
-            'type' => 'bigInteger',
+            'type' => $type,
             'name' => $column,
             'autoIncrement' => false,
             'unsigned' => true,
