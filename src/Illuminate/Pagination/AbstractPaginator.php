@@ -355,7 +355,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function perPage()
     {
-        return $this->perPage;
+        return (int) $this->perPage;
     }
 
     /**
