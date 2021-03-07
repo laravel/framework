@@ -259,6 +259,8 @@
 ### Changed
 - Improve cookie encryption ([#33662](https://github.com/laravel/framework/pull/33662))
 
+This change will invalidate all existing cookies. Please see [this security bulletin](https://blog.laravel.com/laravel-cookie-security-releases) for more information.
+
 
 ## [v6.18.26 (2020-07-21)](https://github.com/laravel/framework/compare/v6.18.25...v6.18.26)
 
