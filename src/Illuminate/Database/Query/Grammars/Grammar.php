@@ -6,7 +6,6 @@ use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class Grammar extends BaseGrammar
@@ -1145,49 +1144,6 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Wrap a value in keyword identifiers.
-     *
-     * @param  \Illuminate\Database\Query\Expression|string  $value
-     * @param  bool  $prefixAlias
-     * @return string
-     */
-    public function wrap($value, $prefixAlias = false)
-    {
-        if ($this->isExpression($value)) {
-            return $this->getValue($value);
-        }
-
-        // If the value being wrapped has a column alias we will need to separate out
-        // the pieces so we can wrap each of the segments of the expression on its
-        // own, and then join these both back together using the "as" connector.
-        if (stripos($value, ' as ') !== false) {
-            return $this->wrapAliasedValue($value, $prefixAlias);
-        }
-
-        // If the given value is a JSON selector we will wrap it differently than a
-        // traditional value. We will need to split this path and wrap each part
-        // wrapped, etc. Otherwise, we will simply wrap the value as a string.
-        if ($this->isJsonSelector($value)) {
-            return $this->wrapJsonSelector($value);
-        }
-
-        return $this->wrapSegments(explode('.', $value));
-    }
-
-    /**
-     * Wrap the given JSON selector.
-     *
-     * @param  string  $value
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    protected function wrapJsonSelector($value)
-    {
-        throw new RuntimeException('This database engine does not support JSON operations.');
-    }
-
-    /**
      * Wrap the given JSON selector for boolean values.
      *
      * @param  string  $value
@@ -1238,17 +1194,6 @@ class Grammar extends BaseGrammar
         $value = preg_replace("/([\\\\]+)?\\'/", "''", $value);
 
         return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
-    }
-
-    /**
-     * Determine if the given string is a JSON selector.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    protected function isJsonSelector($value)
-    {
-        return Str::contains($value, '->');
     }
 
     /**
