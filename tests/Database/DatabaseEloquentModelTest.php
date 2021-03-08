@@ -290,7 +290,16 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDestroyMethodCallsQueryBuilderCorrectlyWithCollection()
     {
-        EloquentModelDestroyStub::destroy(new Collection([1, 2, 3]));
+        EloquentModelDestroyStub::destroy(new BaseCollection([1, 2, 3]));
+    }
+
+    public function testDestroyMethodCallsQueryBuilderCorrectlyWithEloquentCollection()
+    {
+        EloquentModelDestroyStub::destroy(new Collection([
+            new EloquentModelDestroyStub(['id' => 1]),
+            new EloquentModelDestroyStub(['id' => 2]),
+            new EloquentModelDestroyStub(['id' => 3]),
+        ]));
     }
 
     public function testDestroyMethodCallsQueryBuilderCorrectlyWithMultipleArgs()
@@ -2383,6 +2392,10 @@ class EloquentModelFindWithWritePdoStub extends Model
 
 class EloquentModelDestroyStub extends Model
 {
+    protected $fillable = [
+        'id',
+    ];
+
     public function newQuery()
     {
         $mock = m::mock(Builder::class);
