@@ -5466,6 +5466,14 @@ class ValidationValidatorTest extends TestCase
         );
         $this->assertTrue($validator->fails());
         $this->assertSame(['mouse' => ['validation.required']], $validator->messages()->toArray());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['foo' => true, 'bar' => 'baz'],
+            ['foo' => 'nullable', 'bar' => 'exclude_unless:foo,null']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['foo' => true], $validator->validated());
     }
 
     public function testExcludeValuesAreReallyRemoved()
