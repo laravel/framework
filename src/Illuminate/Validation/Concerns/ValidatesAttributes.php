@@ -1425,7 +1425,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'required_if');
 
-        [$values, $other] = $this->prepareValuesAndOther($parameters);
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         if (in_array($other, $values)) {
             return $this->validateRequired($attribute, $value);
@@ -1446,7 +1446,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'exclude_if');
 
-        [$values, $other] = $this->prepareValuesAndOther($parameters);
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         return ! in_array($other, $values);
     }
@@ -1463,7 +1463,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'exclude_unless');
 
-        [$values, $other] = $this->prepareValuesAndOther($parameters);
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         return in_array($other, $values);
     }
@@ -1493,7 +1493,7 @@ trait ValidatesAttributes
      * @param  array  $parameters
      * @return array
      */
-    protected function prepareValuesAndOther($parameters)
+    public function parseDependentRuleParameters($parameters)
     {
         $other = Arr::get($this->data, $parameters[0]);
 
@@ -1552,7 +1552,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'required_unless');
 
-        [$values, $other] = $this->prepareValuesAndOther($parameters);
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         if (! in_array($other, $values)) {
             return $this->validateRequired($attribute, $value);
