@@ -102,7 +102,6 @@ trait ManagesComponents
         }
     }
 
-
     /**
      * Get the current component stack.
      *

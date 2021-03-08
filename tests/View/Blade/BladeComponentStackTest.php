@@ -23,7 +23,6 @@ class BladeComponentStackTest extends AbstractBladeTestCase
         Mockery::close();
     }
 
-
     public function testComponentStackOrder()
     {
         $factory = $this->getFactory();
@@ -48,7 +47,7 @@ class BladeComponentStackTest extends AbstractBladeTestCase
         $factory->startComponent($child, $child->data());
 
         $this->assertEquals($parent, $child->getParent());
-        
+
         $this->assertCount(3, $factory->getComponentStack());
         $this->assertEquals($parent, $factory->getComponentStack()[0]);
         $this->assertEquals($intermediate, $factory->getComponentStack()[1]);
@@ -70,10 +69,9 @@ class BladeComponentStackTest extends AbstractBladeTestCase
         $this->assertCount(0, $factory->getComponentStack());
     }
 
-
     protected function getFactory()
     {
-        if (!$this->factory) {
+        if (! $this->factory) {
             $this->factory = new Factory(
                 m::mock(EngineResolver::class),
                 m::mock(ViewFinderInterface::class),
@@ -98,7 +96,6 @@ class BladeComponentStackTest extends AbstractBladeTestCase
 
 class TestParentComponent extends Component
 {
-
     public function render()
     {
         return 'parent';
@@ -107,7 +104,6 @@ class TestParentComponent extends Component
 
 class TestIntermediateComponent extends Component
 {
-
     public function render()
     {
         return 'intermediate';
@@ -116,12 +112,11 @@ class TestIntermediateComponent extends Component
 
 class TestChildComponent extends Component
 {
-
     public function getParent()
     {
         return Collection::make(Container::getInstance()->make('view')->getComponentStack())
             ->reverse()
-            ->first(function($component) {
+            ->first(function ($component) {
                 return $component instanceof TestParentComponent;
             });
     }
