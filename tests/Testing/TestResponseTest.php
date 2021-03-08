@@ -10,6 +10,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Response;
 use Illuminate\Testing\Fluent\Assert;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
 use JsonSerializable;
 use Mockery as m;
@@ -582,7 +583,7 @@ class TestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
-        $response->assertJson(function (Assert $json) {
+        $response->assertJson(function (AssertableJson $json) {
             $json->where('0.foo', 'foo 0');
         });
     }
@@ -594,7 +595,7 @@ class TestResponseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Unexpected properties were found on the root level.');
 
-        $response->assertJson(function (Assert $json) {
+        $response->assertJson(function (AssertableJson $json) {
             $json->where('0.foo', 'foo 0');
         }, true);
     }

@@ -15,6 +15,8 @@ use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\Assert as FluentAssert;
+use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Testing\Fluent\FluentAssertableJson;
 use LogicException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -519,7 +521,7 @@ class TestResponse implements ArrayAccess
         if (is_array($value)) {
             $json->assertSubset($value, $strict);
         } else {
-            $assert = FluentAssert::fromAssertableJsonString($json);
+            $assert = AssertableJson::fromAssertableJsonString($json);
 
             $value($assert);
 

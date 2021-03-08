@@ -10,7 +10,7 @@ use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\AssertableJsonString;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class Assert implements Arrayable
+class AssertableJson implements Arrayable
 {
     use Concerns\Has,
         Concerns\Matching,
@@ -34,10 +34,11 @@ class Assert implements Arrayable
     private $path;
 
     /**
-     * Create a new Assert instance.
+     * Create a new fluent, assertable JSON data instance.
      *
      * @param  array  $props
      * @param  string|null  $path
+     * @return void
      */
     protected function __construct(array $props, string $path = null)
     {

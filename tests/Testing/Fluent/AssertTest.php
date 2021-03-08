@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Testing\Fluent;
 
 use Illuminate\Support\Collection;
-use Illuminate\Testing\Fluent\Assert;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Tests\Testing\Stubs\ArrayableStubObject;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +14,7 @@ class AssertTest extends TestCase
 {
     public function testAssertHas()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'prop' => 'value',
         ]);
 
@@ -23,7 +23,7 @@ class AssertTest extends TestCase
 
     public function testAssertHasFailsWhenPropMissing()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => 'value',
         ]);
 
@@ -35,7 +35,7 @@ class AssertTest extends TestCase
 
     public function testAssertHasNestedProp()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'example' => [
                 'nested' => 'nested-value',
             ],
@@ -46,7 +46,7 @@ class AssertTest extends TestCase
 
     public function testAssertHasFailsWhenNestedPropMissing()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'example' => [
                 'nested' => 'nested-value',
             ],
@@ -60,7 +60,7 @@ class AssertTest extends TestCase
 
     public function testAssertCountItemsInProp()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'example',
                 'prop' => 'value',
@@ -72,7 +72,7 @@ class AssertTest extends TestCase
 
     public function testAssertCountFailsWhenAmountOfItemsDoesNotMatch()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'example',
                 'prop' => 'value',
@@ -87,7 +87,7 @@ class AssertTest extends TestCase
 
     public function testAssertCountFailsWhenPropMissing()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'example',
                 'prop' => 'value',
@@ -102,7 +102,7 @@ class AssertTest extends TestCase
 
     public function testAssertHasFailsWhenSecondArgumentUnsupportedType()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => 'baz',
         ]);
 
@@ -113,7 +113,7 @@ class AssertTest extends TestCase
 
     public function testAssertMissing()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'foo' => [
                 'bar' => true,
             ],
@@ -124,7 +124,7 @@ class AssertTest extends TestCase
 
     public function testAssertMissingFailsWhenPropExists()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'prop' => 'value',
             'foo' => [
                 'bar' => true,
@@ -139,7 +139,7 @@ class AssertTest extends TestCase
 
     public function testAssertMissingAll()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'baz' => 'foo',
         ]);
 
@@ -151,7 +151,7 @@ class AssertTest extends TestCase
 
     public function testAssertMissingAllFailsWhenAtLeastOnePropExists()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'baz' => 'foo',
         ]);
 
@@ -166,7 +166,7 @@ class AssertTest extends TestCase
 
     public function testAssertMissingAllAcceptsMultipleArgumentsInsteadOfArray()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'baz' => 'foo',
         ]);
 
@@ -180,7 +180,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereMatchesValue()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => 'value',
         ]);
 
@@ -189,7 +189,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereFailsWhenDoesNotMatchValue()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => 'value',
         ]);
 
@@ -201,7 +201,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereFailsWhenMissing()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => 'value',
         ]);
 
@@ -213,7 +213,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereFailsWhenMachingLoosely()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => 1,
         ]);
 
@@ -225,7 +225,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereUsingClosure()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => 'baz',
         ]);
 
@@ -236,7 +236,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereFailsWhenDoesNotMatchValueUsingClosure()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => 'baz',
         ]);
 
@@ -250,7 +250,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereClosureArrayValuesAreAutomaticallyCastedToCollections()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'foo',
                 'example' => 'value',
@@ -268,7 +268,7 @@ class AssertTest extends TestCase
     {
         $stub = ArrayableStubObject::make(['foo' => 'bar']);
 
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => $stub->toArray(),
         ]);
 
@@ -277,7 +277,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereMatchesValueUsingArrayableWhenSortedDifferently()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'foo',
                 'example' => 'value',
@@ -293,7 +293,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereFailsWhenDoesNotMatchValueUsingArrayable()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => ['id' => 1, 'name' => 'Example'],
             'baz' => [
                 'id' => 1,
@@ -319,7 +319,7 @@ class AssertTest extends TestCase
 
     public function testAssertNestedWhereMatchesValue()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'example' => [
                 'nested' => 'nested-value',
             ],
@@ -330,7 +330,7 @@ class AssertTest extends TestCase
 
     public function testAssertNestedWhereFailsWhenDoesNotMatchValue()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'example' => [
                 'nested' => 'nested-value',
             ],
@@ -344,7 +344,7 @@ class AssertTest extends TestCase
 
     public function testScope()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'example',
                 'prop' => 'value',
@@ -352,7 +352,7 @@ class AssertTest extends TestCase
         ]);
 
         $called = false;
-        $assert->has('bar', function (Assert $assert) use (&$called) {
+        $assert->has('bar', function (AssertableJson $assert) use (&$called) {
             $called = true;
             $assert
                 ->where('baz', 'example')
@@ -364,7 +364,7 @@ class AssertTest extends TestCase
 
     public function testScopeFailsWhenPropMissing()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'example',
                 'prop' => 'value',
@@ -374,28 +374,28 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [baz] does not exist.');
 
-        $assert->has('baz', function (Assert $item) {
+        $assert->has('baz', function (AssertableJson $item) {
             $item->where('baz', 'example');
         });
     }
 
     public function testScopeFailsWhenPropSingleValue()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => 'value',
         ]);
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [bar] is not scopeable.');
 
-        $assert->has('bar', function (Assert $item) {
+        $assert->has('bar', function (AssertableJson $item) {
             //
         });
     }
 
     public function testScopeShorthand()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 ['key' => 'first'],
                 ['key' => 'second'],
@@ -403,7 +403,7 @@ class AssertTest extends TestCase
         ]);
 
         $called = false;
-        $assert->has('bar', 2, function (Assert $item) use (&$called) {
+        $assert->has('bar', 2, function (AssertableJson $item) use (&$called) {
             $item->where('key', 'first');
             $called = true;
         });
@@ -413,7 +413,7 @@ class AssertTest extends TestCase
 
     public function testScopeShorthandFailsWhenAssertingZeroItems()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 ['key' => 'first'],
                 ['key' => 'second'],
@@ -423,14 +423,14 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Cannot scope directly onto the first entry of property [bar] when asserting that it has a size of 0.');
 
-        $assert->has('bar', 0, function (Assert $item) {
+        $assert->has('bar', 0, function (AssertableJson $item) {
             $item->where('key', 'first');
         });
     }
 
     public function testScopeShorthandFailsWhenAmountOfItemsDoesNotMatch()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 ['key' => 'first'],
                 ['key' => 'second'],
@@ -440,14 +440,14 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [bar] does not have the expected size.');
 
-        $assert->has('bar', 1, function (Assert $item) {
+        $assert->has('bar', 1, function (AssertableJson $item) {
             $item->where('key', 'first');
         });
     }
 
     public function testFailsWhenNotInteractingWithAllPropsInScope()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'example',
                 'prop' => 'value',
@@ -457,28 +457,28 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Unexpected properties were found in scope [bar].');
 
-        $assert->has('bar', function (Assert $item) {
+        $assert->has('bar', function (AssertableJson $item) {
             $item->where('baz', 'example');
         });
     }
 
     public function testDisableInteractionCheckForCurrentScope()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'example',
                 'prop' => 'value',
             ],
         ]);
 
-        $assert->has('bar', function (Assert $item) {
+        $assert->has('bar', function (AssertableJson $item) {
             $item->etc();
         });
     }
 
     public function testCannotDisableInteractionCheckForDifferentScopes()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => [
                     'foo' => 'bar',
@@ -491,10 +491,10 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Unexpected properties were found in scope [bar.baz].');
 
-        $assert->has('bar', function (Assert $item) {
+        $assert->has('bar', function (AssertableJson $item) {
             $item
                 ->etc()
-                ->has('baz', function (Assert $item) {
+                ->has('baz', function (AssertableJson $item) {
                     //
                 });
         });
@@ -502,7 +502,7 @@ class AssertTest extends TestCase
 
     public function testTopLevelPropInteractionDisabledByDefault()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'foo' => 'bar',
             'bar' => 'baz',
         ]);
@@ -512,7 +512,7 @@ class AssertTest extends TestCase
 
     public function testTopLevelInteractionEnabledWhenInteractedFlagSet()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'foo' => 'bar',
             'bar' => 'baz',
         ]);
@@ -527,7 +527,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereAllMatchesValues()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'foo' => [
                 'bar' => 'value',
                 'example' => ['hello' => 'world'],
@@ -546,7 +546,7 @@ class AssertTest extends TestCase
 
     public function testAssertWhereAllFailsWhenAtLeastOnePropDoesNotMatchValue()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'foo' => 'bar',
             'baz' => 'example',
         ]);
@@ -564,7 +564,7 @@ class AssertTest extends TestCase
 
     public function testAssertHasAll()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'foo' => [
                 'bar' => 'value',
                 'example' => ['hello' => 'world'],
@@ -581,7 +581,7 @@ class AssertTest extends TestCase
 
     public function testAssertHasAllFailsWhenAtLeastOnePropMissing()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'foo' => [
                 'bar' => 'value',
                 'example' => ['hello' => 'world'],
@@ -601,7 +601,7 @@ class AssertTest extends TestCase
 
     public function testAssertHasAllAcceptsMultipleArgumentsInsteadOfArray()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'foo' => [
                 'bar' => 'value',
                 'example' => ['hello' => 'world'],
@@ -619,7 +619,7 @@ class AssertTest extends TestCase
 
     public function testAssertCountMultipleProps()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'key' => 'value',
                 'prop' => 'example',
@@ -637,7 +637,7 @@ class AssertTest extends TestCase
 
     public function testAssertCountMultiplePropsFailsWhenPropMissing()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'key' => 'value',
                 'prop' => 'example',
@@ -655,20 +655,20 @@ class AssertTest extends TestCase
 
     public function testMacroable()
     {
-        Assert::macro('myCustomMacro', function () {
+        AssertableJson::macro('myCustomMacro', function () {
             throw new RuntimeException('My Custom Macro was called!');
         });
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('My Custom Macro was called!');
 
-        $assert = Assert::fromArray(['foo' => 'bar']);
+        $assert = AssertableJson::fromArray(['foo' => 'bar']);
         $assert->myCustomMacro();
     }
 
     public function testTappable()
     {
-        $assert = Assert::fromArray([
+        $assert = AssertableJson::fromArray([
             'bar' => [
                 'baz' => 'example',
                 'prop' => 'value',
@@ -676,9 +676,9 @@ class AssertTest extends TestCase
         ]);
 
         $called = false;
-        $assert->has('bar', function (Assert $assert) use (&$called) {
+        $assert->has('bar', function (AssertableJson $assert) use (&$called) {
             $assert->etc();
-            $assert->tap(function (Assert $assert) use (&$called) {
+            $assert->tap(function (AssertableJson $assert) use (&$called) {
                 $called = true;
             });
         });

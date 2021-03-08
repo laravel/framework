@@ -45,9 +45,9 @@ trait Has
 
         $this->interactsWith($key);
 
-        // When all three arguments are provided, this indicates a short-hand
-        // expression that combines both a `count`-assertion, followed by
-        // directly creating a `scope` on the first element.
+        // When all three arguments are provided this indicates a short-hand expression
+        // that combines both a `count`-assertion, followed by directly creating the
+        // `scope` on the first element. We can simply handle this correctly here.
         if (is_int($value) && ! is_null($scope)) {
             $prop = $this->prop($key);
             $path = $this->dotPath($key);
