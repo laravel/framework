@@ -5120,6 +5120,20 @@ class ValidationValidatorTest extends TestCase
             ],
             [
                 [
+                    'has_appointment' => ['nullable', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,null', 'required', 'date'],
+                ],
+                [
+                    'has_appointment' => true,
+                    'appointment_date' => '2021-03-08',
+                ],
+                [
+                    'has_appointment' => true,
+                    'appointment_date' => '2021-03-08',
+                ],
+            ],
+            [
+                [
                     'has_appointment' => ['required', 'bool'],
                     'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
                 ], [
