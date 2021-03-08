@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use Illuminate\View\Component;
 use InvalidArgumentException;
 
 trait ManagesComponents
@@ -42,7 +43,7 @@ trait ManagesComponents
     /**
      * Start a component rendering process.
      *
-     * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
+     * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Illuminate\View\Component|\Closure|string  $view
      * @param  array  $data
      * @return void
      */
@@ -84,6 +85,10 @@ trait ManagesComponents
 
         $data = $this->componentData();
 
+        if ($view instanceof Component) {
+            $view = $view->resolveView();
+        }
+
         if ($view instanceof Closure) {
             $view = $view($data);
         }
@@ -95,6 +100,17 @@ trait ManagesComponents
         } else {
             return $this->make($view, $data)->render();
         }
+    }
+
+
+    /**
+     * Get the current component stack.
+     *
+     * @return array
+     */
+    public function getComponentStack()
+    {
+        return $this->componentStack;
     }
 
     /**
