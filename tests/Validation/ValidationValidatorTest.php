@@ -1162,6 +1162,26 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,true']);
         $this->assertTrue($v->fails());
 
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => true], ['bar' => 'required_unless:foo,null']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '0'], ['bar' => 'required_unless:foo,0']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 0], ['bar' => 'required_unless:foo,0']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '1'], ['bar' => 'required_unless:foo,1']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 1], ['bar' => 'required_unless:foo,1']);
+        $this->assertTrue($v->passes());
+
         // error message when passed multiple values (required_unless:foo,bar,baz)
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_unless' => 'The :attribute field is required unless :other is in :values.'], 'en');
