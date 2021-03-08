@@ -1511,6 +1511,38 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['bar', 'foo'], $builder->getBindings());
     }
 
+    public function testBasicJoinsWithPaginate()
+    {
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processSelect');
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertSame('select count(*) as aggregate from "users" inner join "contacts" on "users"."id" = "contacts"."id"', $sql);
+        });
+        $builder->select('*')->from('users')->join('contacts', 'users.id', 'contacts.id')->paginate();
+    }
+
+    public function testBasicJoinsWithPaginateGroupingAndSelectingAsterisk()
+    {
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processSelect');
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertSame('select count(*) as aggregate from (select "users".* from "users" inner join "contacts" on "users"."id" = "contacts"."id" group by "user_id") as "aggregate_table"', $sql);
+        });
+        $builder->getConnection()->shouldReceive('select')->times(3)->andReturnUsing(function ($sql) {
+            $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" group by "user_id"', $sql);
+        });
+        $builder->select('*')->from('users')->join('contacts', 'users.id', 'contacts.id')->groupBy('user_id');
+
+        $builder->paginate();
+        $this->assertEquals(['*'], $builder->columns);
+        $builder->get();
+        $this->assertEquals(['*'], $builder->columns);
+        $builder->get(['foo', 'bar']);
+        $this->assertEquals(['*'], $builder->columns);
+        $builder->get(['baz']);
+        $this->assertEquals(['*'], $builder->columns);
+    }
+
     public function testCrossJoins()
     {
         $builder = $this->getBuilder();

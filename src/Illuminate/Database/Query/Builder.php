@@ -2393,7 +2393,7 @@ class Builder
         if ($this->groups || $this->havings) {
             $clone = $this->cloneForPaginationCount();
 
-            if (is_null($clone->columns) && ! empty($this->joins)) {
+            if (! empty($this->joins)) {
                 $clone->select($this->from.'.*');
             }
 
