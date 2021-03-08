@@ -14,9 +14,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
-use Illuminate\Testing\Fluent\Assert as FluentAssert;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Illuminate\Testing\Fluent\FluentAssertableJson;
 use LogicException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 

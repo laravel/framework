@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Response;
-use Illuminate\Testing\Fluent\Assert;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
 use JsonSerializable;
