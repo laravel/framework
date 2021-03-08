@@ -1493,7 +1493,7 @@ trait ValidatesAttributes
      * @param  array  $parameters
      * @return array
      */
-    protected function prepareValuesAndOther($parameters)
+    public function prepareValuesAndOther($parameters)
     {
         $other = Arr::get($this->data, $parameters[0]);
 
