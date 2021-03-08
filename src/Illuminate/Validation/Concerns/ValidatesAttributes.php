@@ -1465,7 +1465,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->prepareValuesAndOther($parameters);
 
-        return in_array($other, $values);
+        return in_array($other, $values, is_bool($other));
     }
 
     /**
