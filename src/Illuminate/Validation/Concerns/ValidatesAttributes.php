@@ -1422,7 +1422,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->prepareValuesAndOther($parameters);
 
-        if (in_array($other, $values)) {
+        if (in_array($other, $values, is_bool($other))) {
             return $this->validateRequired($attribute, $value);
         }
 
