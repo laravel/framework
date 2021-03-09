@@ -119,7 +119,7 @@ class DurationLimiter
     public function tooManyAttempts()
     {
         [$this->decaysAt, $this->remaining] = $this->redis->eval(
-            $this->tooManyAttemptsScript(), 1, $this->name, microtime(true), time(), $this->decay, $this->maxLocks
+            $this->tooManyAttemptsLuaScript(), 1, $this->name, microtime(true), time(), $this->decay, $this->maxLocks
         );
 
         return $this->remaining <= 0;
@@ -181,7 +181,7 @@ LUA;
      *
      * @return string
      */
-    protected function tooManyAttemptsScript()
+    protected function tooManyAttemptsLuaScript()
     {
         return <<<'LUA'
 
