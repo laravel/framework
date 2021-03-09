@@ -824,7 +824,7 @@ class Str
                 $replacementCharacter,
                 static::substr($string, $charsToKeep, 0 - $charsToKeep)
             ),
-            static::substr($string, 0 - $charsToKeep)
+            static::substr($string, 0 - $charsToKeep),
         ]);
     }
 }
