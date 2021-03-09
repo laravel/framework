@@ -646,6 +646,8 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $this->current = $route = $this->routes->match($request);
 
+        $route->setContainer($this->container);
+
         $this->container->instance(Route::class, $route);
 
         return $route;
