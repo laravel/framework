@@ -752,6 +752,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($result, $builder);
     }
 
+    public function testSimpleWhereNot()
+    {
+        $model = new EloquentBuilderTestStub();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->whereNot('name', 'foo')->whereNot('name', '<>', 'bar');
+        $this->assertEquals('select * from "table" where not "name" = ? and not "name" <> ?', $query->toSql());
+        $this->assertEquals(['foo', 'bar'], $query->getBindings());
+    }
+
+    public function testSimpleOrWhereNot()
+    {
+        $model = new EloquentBuilderTestStub();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->orWhereNot('name', 'foo')->orWhereNot('name', '<>', 'bar');
+        $this->assertEquals('select * from "table" where not "name" = ? or not "name" <> ?', $query->toSql());
+        $this->assertEquals(['foo', 'bar'], $query->getBindings());
+    }
+
     public function testPostgresOperatorsWhere()
     {
         $builder = $this->getBuilder();

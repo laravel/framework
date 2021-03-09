@@ -759,6 +759,19 @@ class Builder
     }
 
     /**
+     * Add a basic "where not" clause to the query.
+     *
+     * @param  \Closure|string|array  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereNot($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'and not');
+    }
+
+    /**
      * Add an array of where clauses to the query.
      *
      * @param  array  $column
@@ -842,6 +855,19 @@ class Builder
         );
 
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add an "or where not" clause to the query.
+     *
+     * @param  \Closure|string|array  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereNot($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'or not');
     }
 
     /**

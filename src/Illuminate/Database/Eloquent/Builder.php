@@ -267,6 +267,19 @@ class Builder
     }
 
     /**
+     * Add a basic "where not" clause to the query.
+     *
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereNot($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'and not');
+    }
+
+    /**
      * Add a basic where clause to the query, and return the first result.
      *
      * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
@@ -295,6 +308,19 @@ class Builder
         );
 
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add an "or where not" clause to the query.
+     *
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereNot($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'or not');
     }
 
     /**
