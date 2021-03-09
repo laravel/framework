@@ -17,8 +17,8 @@ class AsArrayObject implements Castable
     {
         return new class implements CastsAttributes {
             public function get($model, $key, $value, $attributes)
-            {
-                return new ArrayObject(isset($attributes[$key]) ? json_decode($attributes[$key], true) : []);
+            {                  
+                return isset($attributes[$key]) ? new ArrayObject(json_decode($attributes[$key], true)) : null;
             }
 
             public function set($model, $key, $value, $attributes)
