@@ -517,6 +517,18 @@ class SupportStrTest extends TestCase
         $this->assertEquals("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
         $this->assertEquals("<h1>hello world</h1>\n", Str::markdown('# hello world'));
     }
+
+    public function testCover(){
+        $this->assertEquals('**',Str::cover('ab'));
+        $this->assertEquals('***',Str::cover('abc'));
+        $this->assertEquals('a**d',Str::cover('abcd'));
+        $this->assertEquals('a***e',Str::cover('abcde'));
+        $this->assertEquals('a****f',Str::cover('abcdef'));
+        $this->assertEquals('a*****g',Str::cover('abcdefg'));
+        $this->assertEquals('ab****gh',Str::cover('abcdefgh'));
+        $this->assertEquals('ab*****hi',Str::cover('abcdefghi'));
+        $this->assertEquals('ab?????hi',Str::cover('abcdefghi','?'));
+    }
 }
 
 class StringableObjectStub
