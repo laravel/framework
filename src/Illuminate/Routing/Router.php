@@ -1294,6 +1294,19 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Set the container instance used by the router.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @return $this
+     */
+    public function setContainer(Container $container)
+    {
+        $this->container = $container;
+
+        return $this;
+    }
+
+    /**
      * Dynamically handle calls into the router instance.
      *
      * @param  string  $method
