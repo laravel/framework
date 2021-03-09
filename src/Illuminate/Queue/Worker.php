@@ -157,7 +157,9 @@ class Worker
 
                 $this->runJob($job, $connectionName, $options);
 
-                $this->sleep($options->rest);
+                if ($options->rest > 0) {
+                    $this->sleep($options->rest);
+                }
             } else {
                 $this->sleep($options->sleep);
             }

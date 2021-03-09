@@ -40,6 +40,13 @@ class WorkerOptions
     public $sleep;
 
     /**
+     * The number of seconds to rest between jobs.
+     *
+     * @var int
+     */
+    public $rest;
+
+    /**
      * The maximum amount of times a job may be attempted.
      *
      * @var int
@@ -75,13 +82,6 @@ class WorkerOptions
     public $maxTime;
 
     /**
-     * The number of seconds to rest between jobs.
-     *
-     * @var int
-     */
-    public $rest;
-
-    /**
      * Create a new worker options instance.
      *
      * @param  string  $name
@@ -103,6 +103,7 @@ class WorkerOptions
         $this->name = $name;
         $this->backoff = $backoff;
         $this->sleep = $sleep;
+        $this->rest = $rest;
         $this->force = $force;
         $this->memory = $memory;
         $this->timeout = $timeout;
@@ -110,6 +111,5 @@ class WorkerOptions
         $this->stopWhenEmpty = $stopWhenEmpty;
         $this->maxJobs = $maxJobs;
         $this->maxTime = $maxTime;
-        $this->rest = $rest;
     }
 }
