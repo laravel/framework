@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Response;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
 use JsonSerializable;
 use Mockery as m;
@@ -575,6 +576,27 @@ class TestResponseTest extends TestCase
         $resource = new JsonSerializableSingleResourceStub;
 
         $response->assertJson($resource->jsonSerialize());
+    }
+
+    public function testAssertJsonWithFluent()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJson(function (AssertableJson $json) {
+            $json->where('0.foo', 'foo 0');
+        });
+    }
+
+    public function testAssertJsonWithFluentStrict()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Unexpected properties were found on the root level.');
+
+        $response->assertJson(function (AssertableJson $json) {
+            $json->where('0.foo', 'foo 0');
+        }, true);
     }
 
     public function testAssertSimilarJsonWithMixed()

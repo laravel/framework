@@ -599,6 +599,20 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Replace the scheme and host of the given UriInterface with values from the given URL.
+     *
+     * @param  \Psr\Http\Message\UriInterface  $uri
+     * @param  string  $url
+     * @return \Psr\Http\Message\UriInterface
+     */
+    protected function replaceBaseUrl($uri, $url)
+    {
+        $parsed = parse_url($url);
+
+        return $uri->withScheme($parsed['scheme'])->withHost($parsed['host']);
+    }
+
+    /**
      * Get an array of all files in a directory.
      *
      * @param  string|null  $directory
