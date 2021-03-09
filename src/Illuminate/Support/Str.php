@@ -803,7 +803,8 @@ class Str
      * @param  string|null  $replacementCharacter
      * @return string
      */
-    public static function cover($string, $replacementCharacter = '*') {
+    public static function cover($string, $replacementCharacter = '*')
+    {
         $stringLength = static::length($string);
 
         if ($stringLength < 4) {
