@@ -1,6 +1,19 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.30.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.31.0...8.x)
+
+
+## [v8.31.0 (2021-03-04)](https://github.com/laravel/framework/compare/v8.30.1...v8.31.0)
+
+### Added
+- Added new `VendorTagPublished` event ([#36458](https://github.com/laravel/framework/pull/36458))
+- Added new `Stringable::test()` method ([#36462](https://github.com/laravel/framework/pull/36462))
+
+### Reverted
+- Reverted [Fixed `formatWheres()` methods in `DatabaseRule`](https://github.com/laravel/framework/pull/36441) ([#36452](https://github.com/laravel/framework/pull/36452))
+
+### Changed
+- Make user policy command fix (Windows) ([#36464](https://github.com/laravel/framework/pull/36464))
 
 
 ## [v8.30.1 (2021-03-03)](https://github.com/laravel/framework/compare/v8.30.0...v8.30.1)
