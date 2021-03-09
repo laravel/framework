@@ -43,7 +43,7 @@ class FilterEmailValidation implements EmailValidation
      * @param  \Egulias\EmailValidator\EmailLexer  $emailLexer
      * @return bool
      */
-    public function isValid(string $email, EmailLexer $emailLexer) : bool
+    public function isValid(string $email, EmailLexer $emailLexer): bool
     {
         return is_null($this->flags)
                     ? filter_var($email, FILTER_VALIDATE_EMAIL) !== false
@@ -57,7 +57,7 @@ class FilterEmailValidation implements EmailValidation
      */
     public function getError(): ?InvalidEmail
     {
-        //
+        return null;
     }
 
     /**
