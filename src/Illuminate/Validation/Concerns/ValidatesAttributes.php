@@ -1435,6 +1435,48 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute does not exist when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibitedIf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'prohibited_if');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other))) {
+            return ! $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute does not exist unless another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibitedUnless($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'prohibited_unless');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (! in_array($other, $values, is_bool($other))) {
+            return ! $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
      * Indicate that an attribute should be excluded when another attribute has a given value.
      *
      * @param  string  $attribute

@@ -58,6 +58,7 @@ class ThrottlesExceptionsTest extends TestCase
         $job->shouldReceive('release')->with(0)->once();
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -79,6 +80,7 @@ class ThrottlesExceptionsTest extends TestCase
         })->once();
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -98,6 +100,7 @@ class ThrottlesExceptionsTest extends TestCase
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
         $job->shouldReceive('delete')->once();
+        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -122,7 +125,7 @@ class CircuitBreakerTestJob
 
     public function middleware()
     {
-        return [new ThrottlesExceptions(2, 10, 0, 'test')];
+        return [(new ThrottlesExceptions(2, 10))->by('test')];
     }
 }
 
@@ -139,6 +142,6 @@ class CircuitBreakerSuccessfulJob
 
     public function middleware()
     {
-        return [new ThrottlesExceptions(2, 10, 0, 'test')];
+        return [(new ThrottlesExceptions(2, 10))->by('test')];
     }
 }
