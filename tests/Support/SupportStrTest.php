@@ -518,13 +518,14 @@ class SupportStrTest extends TestCase
         $this->assertEquals("<h1>hello world</h1>\n", Str::markdown('# hello world'));
     }
 
-    public function testCover() {
-        $this->assertEquals( '**', Str::cover( 'ab' ) );
-        $this->assertEquals( '***', Str::cover( 'abc' ) );
-        $this->assertEquals( 'a**d', Str::cover( 'abcd' ) );
-        $this->assertEquals( 'a*****g', Str::cover( 'abcdefg' ) );
-        $this->assertEquals( 'ab****gh', Str::cover( 'abcdefgh' ) );
-        $this->assertEquals( 'ab????gh', Str::cover( 'abcdefgh', '?' ) );
+    public function testCover()
+    {
+        $this->assertEquals('**', Str::cover('ab'));
+        $this->assertEquals('***', Str::cover('abc'));
+        $this->assertEquals('a**d', Str::cover('abcd'));
+        $this->assertEquals('a*****g', Str::cover('abcdefg'));
+        $this->assertEquals('ab****gh', Str::cover('abcdefgh'));
+        $this->assertEquals('ab????gh', Str::cover('abcdefgh', '?'));
     }
 }
 

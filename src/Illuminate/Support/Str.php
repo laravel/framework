@@ -803,27 +803,27 @@ class Str
      * @param  string|null  $replacementCharacter
      * @return string
      */
-    public static function cover( $string, $replacementCharacter = '*' ) {
-        $stringLength = static::length( $string );
+    public static function cover($string, $replacementCharacter = '*') {
+        $stringLength = static::length($string);
 
-        if ( $stringLength < 4 ) {
-            return preg_replace( '/./', $replacementCharacter, $string );
+        if ($stringLength < 4) {
+            return preg_replace('/./', $replacementCharacter, $string);
         }
 
-        if ( $stringLength < 8 ) {
+        if ($stringLength < 8) {
             $charsToKeep = 1;
         } else {
             $charsToKeep = 2;
         }
 
         return join([
-            static::substr( $string, 0, $charsToKeep ),
+            static::substr($string, 0, $charsToKeep),
             preg_replace(
                 '/./',
                 $replacementCharacter,
-                static::substr( $string, $charsToKeep, 0 - $charsToKeep )
+                static::substr($string, $charsToKeep, 0 - $charsToKeep)
             ),
-            static::substr( $string, 0 - $charsToKeep )
+            static::substr($string, 0 - $charsToKeep)
         ]);
     }
 }
