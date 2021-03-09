@@ -816,7 +816,7 @@ class Str
             $charsToKeep = 2;
         }
 
-        return join( [
+        return join([
             static::substr( $string, 0, $charsToKeep ),
             preg_replace(
                 '/./',
@@ -824,6 +824,6 @@ class Str
                 static::substr( $string, $charsToKeep, 0 - $charsToKeep )
             ),
             static::substr( $string, 0 - $charsToKeep )
-        ] );
+        ]);
     }
 }
