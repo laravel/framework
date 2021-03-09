@@ -19,8 +19,8 @@
         "illuminate/contracts": "^9.0",
         "illuminate/macroable": "^9.0",
         "illuminate/support": "^9.0",
-        "symfony/http-foundation": "^5.2",
-        "symfony/http-kernel": "^5.2"
+        "symfony/http-foundation": "^5.3",
+        "symfony/http-kernel": "^5.3"
     },
     "autoload": {
         "psr-4": {
