@@ -16,6 +16,13 @@ class ThrottlesExceptions
     protected $key;
 
     /**
+     * Indicates whether the throttle key should use the job's UUID.
+     *
+     * @var bool
+     */
+    protected $byJob = false;
+
+    /**
      * The maximum number of attempts allowed before rate limiting applies.
      *
      * @var int
@@ -148,7 +155,13 @@ class ThrottlesExceptions
      */
     protected function getKey($job)
     {
-        return $this->key ? $this->prefix.$this->key : $this->prefix.$job->job->uuid();
+        if ($this->key) {
+            return $this->prefix.$this->key;
+        } elseif ($this->byJob) {
+            return $this->prefix.$job->job->uuid();
+        }
+
+        return $this->prefix.md5(get_class($job));
     }
 
     /**
@@ -160,6 +173,18 @@ class ThrottlesExceptions
     public function by($key)
     {
         $this->key = $key;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the throttle key should use the job's UUID.
+     *
+     * @return $this
+     */
+    public function byJob()
+    {
+        $this->byJob = true;
 
         return $this;
     }
