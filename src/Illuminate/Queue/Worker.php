@@ -156,6 +156,8 @@ class Worker
                 $jobsProcessed++;
 
                 $this->runJob($job, $connectionName, $options);
+
+                $this->sleep($options->rest);
             } else {
                 $this->sleep($options->sleep);
             }
