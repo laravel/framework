@@ -9,6 +9,20 @@ use Throwable;
 class ThrottlesExceptions
 {
     /**
+     * The developer specified key that the rate limiter should use.
+     *
+     * @var string
+     */
+    protected $key;
+
+    /**
+     * Indicates whether the throttle key should use the job's UUID.
+     *
+     * @var bool
+     */
+    protected $byJob = false;
+
+    /**
      * The maximum number of attempts allowed before rate limiting applies.
      *
      * @var int
@@ -27,14 +41,7 @@ class ThrottlesExceptions
      *
      * @var int
      */
-    protected $retryAfterMinutes;
-
-    /**
-     * The rate limiter key.
-     *
-     * @var string
-     */
-    protected $key;
+    protected $retryAfterMinutes = 0;
 
     /**
      * The callback that determines if rate limiting should apply.
@@ -48,7 +55,7 @@ class ThrottlesExceptions
      *
      * @var string
      */
-    protected $prefix = 'circuit_breaker:';
+    protected $prefix = 'laravel_throttles_exceptions:';
 
     /**
      * The rate limiter instance.
@@ -62,15 +69,13 @@ class ThrottlesExceptions
      *
      * @param  int  $maxAttempts
      * @param  int  $decayMinutes
-     * @param  int  $retryAfterMinutes
      * @param  string  $key
+     * @return void
      */
-    public function __construct($maxAttempts = 10, $decayMinutes = 10, $retryAfterMinutes = 0, string $key = '')
+    public function __construct($maxAttempts = 10, $decayMinutes = 10)
     {
         $this->maxAttempts = $maxAttempts;
         $this->decayMinutes = $decayMinutes;
-        $this->retryAfterMinutes = $retryAfterMinutes;
-        $this->key = $key;
     }
 
     /**
@@ -130,6 +135,19 @@ class ThrottlesExceptions
     }
 
     /**
+     * Specify the number of seconds a job should be delayed when it is released (before it has reached its max exceptions).
+     *
+     * @param  int  $backoff
+     * @return $this
+     */
+    public function backoff($backoff)
+    {
+        $this->retryAfterMinutes = $backoff;
+
+        return $this;
+    }
+
+    /**
      * Get the cache key associated for the rate limiter.
      *
      * @param  mixed  $job
@@ -137,7 +155,38 @@ class ThrottlesExceptions
      */
     protected function getKey($job)
     {
-        return $this->prefix.md5(empty($this->key) ? get_class($job) : $this->key);
+        if ($this->key) {
+            return $this->prefix.$this->key;
+        } elseif ($this->byJob) {
+            return $this->prefix.$job->job->uuid();
+        }
+
+        return $this->prefix.md5(get_class($job));
+    }
+
+    /**
+     * Set the value that the rate limiter should be keyed by.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function by($key)
+    {
+        $this->key = $key;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the throttle key should use the job's UUID.
+     *
+     * @return $this
+     */
+    public function byJob()
+    {
+        $this->byJob = true;
+
+        return $this;
     }
 
     /**

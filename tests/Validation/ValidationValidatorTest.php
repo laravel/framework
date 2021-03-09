@@ -1097,7 +1097,31 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => true], ['bar' => 'required_if:foo,null']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 0], ['bar' => 'required_if:foo,0']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '0'], ['bar' => 'required_if:foo,0']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 1], ['bar' => 'required_if:foo,1']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '1'], ['bar' => 'required_if:foo,1']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => true], ['bar' => 'required_if:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => false], ['bar' => 'required_if:foo,false']);
         $this->assertTrue($v->fails());
 
         // error message when passed multiple values (required_if:foo,bar,baz)
@@ -1138,12 +1162,104 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,true']);
         $this->assertTrue($v->fails());
 
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => true], ['bar' => 'required_unless:foo,null']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '0'], ['bar' => 'required_unless:foo,0']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 0], ['bar' => 'required_unless:foo,0']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '1'], ['bar' => 'required_unless:foo,1']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 1], ['bar' => 'required_unless:foo,1']);
+        $this->assertTrue($v->passes());
+
         // error message when passed multiple values (required_unless:foo,bar,baz)
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_unless' => 'The :attribute field is required unless :other is in :values.'], 'en');
         $v = new Validator($trans, ['first' => 'dayle', 'last' => ''], ['last' => 'RequiredUnless:first,taylor,sven']);
         $this->assertFalse($v->passes());
         $this->assertSame('The last field is required unless first is in taylor, sven.', $v->messages()->first('last'));
+    }
+
+    public function testProhibitedIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor', 'last' => 'otwell'], ['last' => 'prohibited_if:first,taylor']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor'], ['last' => 'prohibited_if:first,taylor']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor', 'last' => 'otwell'], ['last' => 'prohibited_if:first,taylor,jess']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor'], ['last' => 'prohibited_if:first,taylor,jess']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => true, 'bar' => 'baz'], ['bar' => 'prohibited_if:foo,false']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => true, 'bar' => 'baz'], ['bar' => 'prohibited_if:foo,true']);
+        $this->assertTrue($v->fails());
+
+        // error message when passed multiple values (prohibited_if:foo,bar,baz)
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.prohibited_if' => 'The :attribute field is prohibited when :other is :value.'], 'en');
+        $v = new Validator($trans, ['first' => 'jess', 'last' => 'archer'], ['last' => 'prohibited_if:first,taylor,jess']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The last field is prohibited when first is jess.', $v->messages()->first('last'));
+    }
+
+    public function testProhibitedUnless()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'jess', 'last' => 'archer'], ['last' => 'prohibited_unless:first,taylor']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor', 'last' => 'otwell'], ['last' => 'prohibited_unless:first,taylor']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'jess'], ['last' => 'prohibited_unless:first,taylor']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor', 'last' => 'otwell'], ['last' => 'prohibited_unless:first,taylor,jess']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'jess', 'last' => 'archer'], ['last' => 'prohibited_unless:first,taylor,jess']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => false, 'bar' => 'baz'], ['bar' => 'prohibited_unless:foo,false']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => false, 'bar' => 'baz'], ['bar' => 'prohibited_unless:foo,true']);
+        $this->assertTrue($v->fails());
+
+        // error message when passed multiple values (prohibited_unless:foo,bar,baz)
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.prohibited_unless' => 'The :attribute field is prohibited unless :other is in :values.'], 'en');
+        $v = new Validator($trans, ['first' => 'tim', 'last' => 'macdonald'], ['last' => 'prohibitedUnless:first,taylor,jess']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The last field is prohibited unless first is in taylor, jess.', $v->messages()->first('last'));
     }
 
     public function testFailedFileUploads()
@@ -5336,6 +5452,20 @@ class ValidationValidatorTest extends TestCase
             ],
             [
                 [
+                    'has_appointment' => ['nullable', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,null', 'required', 'date'],
+                ],
+                [
+                    'has_appointment' => true,
+                    'appointment_date' => '2021-03-08',
+                ],
+                [
+                    'has_appointment' => true,
+                    'appointment_date' => '2021-03-08',
+                ],
+            ],
+            [
+                [
                     'has_appointment' => ['required', 'bool'],
                     'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
                 ], [
@@ -5668,6 +5798,14 @@ class ValidationValidatorTest extends TestCase
         );
         $this->assertTrue($validator->fails());
         $this->assertSame(['mouse' => ['validation.required']], $validator->messages()->toArray());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['foo' => true, 'bar' => 'baz'],
+            ['foo' => 'nullable', 'bar' => 'exclude_unless:foo,null']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['foo' => true], $validator->validated());
     }
 
     public function testExcludeWithout()
