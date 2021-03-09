@@ -1,6 +1,27 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.31.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.32.0...8.x)
+
+
+## [v8.32.0 (2021-03-09)](https://github.com/laravel/framework/compare/v8.31.0...v8.32.0)
+
+Added
+- Phpredis lock serialization and compression support ([#36412](https://github.com/laravel/framework/pull/36412), [10f1a93](https://github.com/laravel/framework/commit/10f1a935205340ba8954e7075c1d9b67943db27d))
+- Added Fluent JSON Assertions ([#36454](https://github.com/laravel/framework/pull/36454))
+- Added methods to dump requests of the Laravel HTTP client ([#36466](https://github.com/laravel/framework/pull/36466))
+- Added `ThrottlesExceptions` and `ThrottlesExceptionsWithRedis` job middlewares for unstable services ([#36473](https://github.com/laravel/framework/pull/36473), [21fee76](https://github.com/laravel/framework/commit/21fee7649e1b48a7701b8ba860218741c2c3bcef), [36518](https://github.com/laravel/framework/pull/36518), [37e48ba](https://github.com/laravel/framework/commit/37e48ba864e2f463517429d41cefd94e88136c1c))
+- Added support to Eloquent Collection on `Model::destroy()` ([#36497](https://github.com/laravel/framework/pull/36497))
+- Added `rest` option to `php artisan queue:work` command ([#36521](https://github.com/laravel/framework/pull/36521), [c6ea49c](https://github.com/laravel/framework/commit/c6ea49c80a2ac93aebb8fdf2360161b73cec26af))
+- Added `prohibited_if` and `prohibited_unless` validation rules ([#36516](https://github.com/laravel/framework/pull/36516))
+- Added class `argument` to `Illuminate\Database\Console\Seeds\SeedCommand` ([#36513](https://github.com/laravel/framework/pull/36513))
+
+### Fixed
+- Fix validator treating null as true for (required|exclude)_(if|unless) due to loose `in_array()` check ([#36504](https://github.com/laravel/framework/pull/36504))
+
+### Changed
+- Delete existing links that are broken in `Illuminate\Foundation\Console\StorageLinkCommand` ([#36470](https://github.com/laravel/framework/pull/36470))
+- Use user provided url in AwsTemporaryUrl method ([#36480](https://github.com/laravel/framework/pull/36480))
+- Allow to override discover events base path ([#36515](https://github.com/laravel/framework/pull/36515))
 
 
 ## [v8.31.0 (2021-03-04)](https://github.com/laravel/framework/compare/v8.30.1...v8.31.0)
