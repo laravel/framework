@@ -17,6 +17,7 @@ class PaginatorTest extends TestCase
         $this->assertEquals(['item3', 'item4'], $p->items());
 
         $pageInfo = [
+            'page_name' => 'page',            
             'per_page' => 2,
             'current_page' => 2,
             'first_page_url' => '/?page=1',
