@@ -671,12 +671,13 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve the given type from the container.
      *
-     * @param  string|callable  $abstract
-     * @param  array  $parameters
-     * @param  bool  $raiseEvents
+     * @param string|callable $abstract
+     * @param array $parameters
+     * @param bool $raiseEvents
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\CircularDependencyFoundException
      */
     protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
@@ -813,10 +814,11 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Instantiate a concrete instance of the given type.
      *
-     * @param  \Closure|string  $concrete
+     * @param \Closure|string $concrete
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\CircularDependencyFoundException
      */
     public function build($concrete)
     {
