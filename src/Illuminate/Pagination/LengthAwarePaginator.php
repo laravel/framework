@@ -200,7 +200,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
             'last_page_url' => $this->url($this->lastPage()),
             'links' => $this->linkCollection()->toArray(),
             'next_page_url' => $this->nextPageUrl(),
-            'page_name' => $this->getPageName(),            
+            'page_name' => $this->getPageName(),
             'path' => $this->path(),
             'per_page' => $this->perPage(),
             'prev_page_url' => $this->previousPageUrl(),
