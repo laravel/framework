@@ -6,6 +6,7 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\CircularDependencyFoundException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use LogicException;
 use ReflectionClass;
@@ -659,7 +660,7 @@ class Container implements ArrayAccess, ContainerContract
         try {
             return $this->resolve($id);
         } catch (Exception $e) {
-            if ($this->has($id)) {
+            if ($this->has($id) || $e instanceof CircularDependencyFoundException) {
                 throw $e;
             }
 
@@ -837,6 +838,11 @@ class Container implements ArrayAccess, ContainerContract
         // no binding registered for the abstractions so we need to bail out.
         if (! $reflector->isInstantiable()) {
             return $this->notInstantiable($concrete);
+        }
+
+        // Check for circular dependencies
+        if(in_array($concrete, $this->buildStack)) {
+            throw new CircularDependencyFoundException("Circular dependency while initiating [{$concrete}]");
         }
 
         $this->buildStack[] = $concrete;
