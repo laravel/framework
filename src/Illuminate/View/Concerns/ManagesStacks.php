@@ -84,6 +84,19 @@ trait ManagesStacks
     }
 
     /**
+     * Reset content to a given push section.
+     *
+     * @param  string  $section
+     * @return void
+     */
+    public function resetPush($section)
+    {
+        if (isset($this->pushes[$section][$this->renderCount])) {
+            $this->pushes[$section][$this->renderCount] = '';
+        }
+    }
+
+    /**
      * Start prepending content into a push section.
      *
      * @param  string  $section
@@ -136,6 +149,19 @@ trait ManagesStacks
             $this->prepends[$section][$this->renderCount] = $content;
         } else {
             $this->prepends[$section][$this->renderCount] = $content.$this->prepends[$section][$this->renderCount];
+        }
+    }
+
+    /**
+     * Reset content to a given stack.
+     *
+     * @param  string  $section
+     * @return void
+     */
+    public function resetPrepend($section)
+    {
+        if (isset($this->prepends[$section][$this->renderCount])) {
+            $this->prepends[$section][$this->renderCount] = '';
         }
     }
 

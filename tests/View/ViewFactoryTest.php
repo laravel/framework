@@ -431,6 +431,16 @@ class ViewFactoryTest extends TestCase
         $this->assertSame('hi', $factory->yieldPushContent('foo'));
     }
 
+    public function testSingleStackPushReset()
+    {
+        $factory = $this->getFactory();
+        $factory->startPush('foo');
+        echo 'hi';
+        $factory->stopPush();
+        $factory->resetPush('foo');
+        $this->assertSame('', $factory->yieldPushContent('foo'));
+    }
+
     public function testMultipleStackPush()
     {
         $factory = $this->getFactory();
@@ -441,6 +451,19 @@ class ViewFactoryTest extends TestCase
         echo ', Hello!';
         $factory->stopPush();
         $this->assertSame('hi, Hello!', $factory->yieldPushContent('foo'));
+    }
+
+    public function testMultipleStackPushReset()
+    {
+        $factory = $this->getFactory();
+        $factory->startPush('foo');
+        echo 'hi';
+        $factory->stopPush();
+        $factory->resetPush('foo');
+        $factory->startPush('foo');
+        echo ', Hello!';
+        $factory->stopPush();
+        $this->assertSame(', Hello!', $factory->yieldPushContent('foo'));
     }
 
     public function testSessionAppending()
