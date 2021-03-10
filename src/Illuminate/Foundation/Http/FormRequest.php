@@ -111,7 +111,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
         return $factory->make(
             $this->validationData(), $this->container->call([$this, 'rules']),
             $this->messages(), $this->attributes()
-        )->stopOnFirstFailure($this->stopOnFirstFailure);
+        )->stopOnFirstFailure($this->stopOnFirstFailure)
+            ->addCustomValues($this->valuesNames());
     }
 
     /**
@@ -211,6 +212,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @return array
      */
     public function attributes()
+    {
+        return [];
+    }
+
+    /**
+     * Get custom values for validator errors.
+     *
+     * @return array
+     */
+    public function valuesNames()
     {
         return [];
     }

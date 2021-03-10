@@ -115,6 +115,23 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'Adam'], $request->all());
     }
 
+    public function testAddCustomValuesNames()
+    {
+        $payload = ['foo' => null, 'bar' => 'baz'];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestCustomValues::class);
+
+        $validator = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        })->validator;
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame(
+            'The foo field is required when bar is Localized baz value.',
+            $validator->messages()->first('foo')
+        );
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -320,5 +337,34 @@ class FoundationTestFormRequestHooks extends FormRequest
     public function passedValidation()
     {
         $this->replace(['name' => 'Adam']);
+    }
+}
+
+class FoundationTestFormRequestCustomValues extends FormRequest
+{
+    public function rules()
+    {
+        return ['foo' => 'required_if:bar,baz'];
+    }
+
+    public function valuesNames()
+    {
+        return [
+            'bar' => [
+                'baz' => 'Localized baz value',
+            ],
+        ];
+    }
+
+    public function withValidator(Validator $validator)
+    {
+        $validator->setCustomMessages([
+            'required_if' => 'The :attribute field is required when :other is :value.'
+        ]);
+    }
+
+    public function authorize()
+    {
+        return true;
     }
 }
