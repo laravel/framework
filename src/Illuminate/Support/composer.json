@@ -44,9 +44,9 @@
         "illuminate/filesystem": "Required to use the composer class (^9.0).",
         "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^1.3).",
         "ramsey/uuid": "Required to use Str::uuid() (^4.0).",
-        "symfony/process": "Required to use the composer class (^5.2).",
-        "symfony/var-dumper": "Required to use the dd function (^5.2).",
-        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.2)."
+        "symfony/process": "Required to use the composer class (^5.3).",
+        "symfony/var-dumper": "Required to use the dd function (^5.3).",
+        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.3)."
     },
     "config": {
         "sort-packages": true

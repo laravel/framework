@@ -31,17 +31,17 @@
         "psr/simple-cache": "^1.0",
         "ramsey/uuid": "^4.0",
         "swiftmailer/swiftmailer": "^6.2.7",
-        "symfony/console": "^5.2",
-        "symfony/error-handler": "^5.2",
-        "symfony/finder": "^5.2",
-        "symfony/http-foundation": "^5.2",
-        "symfony/http-kernel": "^5.2",
-        "symfony/mime": "^5.2",
-        "symfony/process": "^5.2",
-        "symfony/routing": "^5.2",
-        "symfony/var-dumper": "^5.2",
+        "symfony/console": "^5.3",
+        "symfony/error-handler": "^5.3",
+        "symfony/finder": "^5.3",
+        "symfony/http-foundation": "^5.3",
+        "symfony/http-kernel": "^5.3",
+        "symfony/mime": "^5.3",
+        "symfony/process": "^5.3",
+        "symfony/routing": "^5.3",
+        "symfony/var-dumper": "^5.3",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2",
-        "vlucas/phpdotenv": "^5.2",
+        "vlucas/phpdotenv": "^5.3",
         "voku/portable-ascii": "^1.4.8"
     },
     "replace": {
@@ -90,7 +90,7 @@
         "pda/pheanstalk": "^4.0",
         "phpunit/phpunit": "^9.4",
         "predis/predis": "^1.1.1",
-        "symfony/cache": "^5.2"
+        "symfony/cache": "^5.3"
     },
     "provide": {
         "psr/container-implementation": "1.0"
@@ -147,8 +147,8 @@
         "predis/predis": "Required to use the predis connector (^1.1.2).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0|^5.0).",
-        "symfony/cache": "Required to PSR-6 cache bridge (^5.2).",
-        "symfony/filesystem": "Required to enable support for relative symbolic links (^5.2).",
+        "symfony/cache": "Required to PSR-6 cache bridge (^5.3).",
+        "symfony/filesystem": "Required to enable support for relative symbolic links (^5.3).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
         "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
     },
