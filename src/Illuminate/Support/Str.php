@@ -645,12 +645,12 @@ class Str
     {
         $key = $value;
 
-        if (isset(static::$snakeCache[$key][$delimiter])){
+        if (isset(static::$snakeCache[$key][$delimiter])) {
             return static::$snakeCache[$key][$delimiter];
         }
 
         if (static::upper($value) !== $value){
-            $value = static::of($value)->split(1)->map(function($char, $key) use ($delimiter){
+            $value = static::of($value)->split(1)->map(function($char, $key) use ($delimiter) {
                 return $key > 0 && static::upper($char) === $char ? "{$delimiter}{$char}" : $char;
             })->join('');
 
