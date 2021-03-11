@@ -370,6 +370,16 @@ abstract class Queue
     }
 
     /**
+     * Get the container instance being used by the connection.
+     *
+     * @return \Illuminate\Container\Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
      * Set the IoC container instance.
      *
      * @param  \Illuminate\Container\Container  $container
