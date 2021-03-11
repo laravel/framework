@@ -191,7 +191,7 @@ class Handler implements ExceptionHandlerContract
      * @param  string  $class
      * @return $this
      */
-    protected function ignore(string $class)
+    public function ignore(string $class)
     {
         $this->dontReport[] = $class;
 
