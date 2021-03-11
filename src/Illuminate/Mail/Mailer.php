@@ -197,7 +197,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function html($html, $callback)
     {
-        return $this->send(['html' => new HtmlString($html)], [], $callback);
+        $this->send(['html' => new HtmlString($html)], [], $callback);
     }
 
     /**
@@ -209,7 +209,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function raw($text, $callback)
     {
-        return $this->send(['raw' => $text], [], $callback);
+        $this->send(['raw' => $text], [], $callback);
     }
 
     /**
@@ -222,7 +222,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function plain($view, array $data, $callback)
     {
-        return $this->send(['text' => $view], $data, $callback);
+        $this->send(['text' => $view], $data, $callback);
     }
 
     /**
