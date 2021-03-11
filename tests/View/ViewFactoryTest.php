@@ -443,6 +443,27 @@ class ViewFactoryTest extends TestCase
         $this->assertSame('hi, Hello!', $factory->yieldPushContent('foo'));
     }
 
+    public function testSingleStackPrepend()
+    {
+        $factory = $this->getFactory();
+        $factory->startPrepend('foo');
+        echo 'hi';
+        $factory->stopPrepend();
+        $this->assertSame('hi', $factory->yieldPushContent('foo'));
+    }
+
+    public function testMultipleStackPrepend()
+    {
+        $factory = $this->getFactory();
+        $factory->startPrepend('foo');
+        echo ', Hello!';
+        $factory->stopPrepend();
+        $factory->startPrepend('foo');
+        echo 'hi';
+        $factory->stopPrepend();
+        $this->assertSame('hi, Hello!', $factory->yieldPushContent('foo'));
+    }
+
     public function testSessionAppending()
     {
         $factory = $this->getFactory();
