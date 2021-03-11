@@ -577,6 +577,7 @@ class CircularAStub
 {
     public function __construct(CircularBStub $b)
     {
+        //
     }
 }
 
@@ -584,6 +585,7 @@ class CircularBStub
 {
     public function __construct(CircularCStub $c)
     {
+        //
     }
 }
 
@@ -591,6 +593,7 @@ class CircularCStub
 {
     public function __construct(CircularAStub $a)
     {
+        //
     }
 }
 
