@@ -6,7 +6,7 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Container\CircularDependencyFoundException;
+use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use LogicException;
 use ReflectionClass;
@@ -660,7 +660,7 @@ class Container implements ArrayAccess, ContainerContract
         try {
             return $this->resolve($id);
         } catch (Exception $e) {
-            if ($this->has($id) || $e instanceof CircularDependencyFoundException) {
+            if ($this->has($id) || $e instanceof CircularDependencyException) {
                 throw $e;
             }
 
@@ -671,13 +671,13 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve the given type from the container.
      *
-     * @param string|callable $abstract
-     * @param array $parameters
-     * @param bool $raiseEvents
+     * @param  string|callable  $abstract
+     * @param  array  $parameters
+     * @param  bool  $raiseEvents
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @throws \Illuminate\Contracts\Container\CircularDependencyFoundException
+     * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
     protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
@@ -814,11 +814,11 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Instantiate a concrete instance of the given type.
      *
-     * @param \Closure|string $concrete
+     * @param  \Closure|string  $concrete
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @throws \Illuminate\Contracts\Container\CircularDependencyFoundException
+     * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
     public function build($concrete)
     {
@@ -842,9 +842,8 @@ class Container implements ArrayAccess, ContainerContract
             return $this->notInstantiable($concrete);
         }
 
-        // Check for circular dependencies
-        if(in_array($concrete, $this->buildStack)) {
-            throw new CircularDependencyFoundException("Circular dependency while initiating [{$concrete}]");
+        if (in_array($concrete, $this->buildStack)) {
+            throw new CircularDependencyException("Circular dependency detected while resolving [{$concrete}].");
         }
 
         $this->buildStack[] = $concrete;

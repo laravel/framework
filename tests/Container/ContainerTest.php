@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Container;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Container\CircularDependencyFoundException;
+use Illuminate\Contracts\Container\CircularDependencyException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -565,7 +565,7 @@ class ContainerTest extends TestCase
     }
 
     public function testContainerCanCatchCircularDependency() {
-        $this->expectException(CircularDependencyFoundException::class);
+        $this->expectException(CircularDependencyException::class);
 
         $container = new Container;
         $container->get(CircularAStub::class);
