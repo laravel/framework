@@ -1422,7 +1422,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->prepareValuesAndOther($parameters);
 
-        if (in_array($other, $values, is_bool($other))) {
+        if (in_array($other, $values)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -1443,7 +1443,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->prepareValuesAndOther($parameters);
 
-        return ! in_array($other, $values, is_bool($other));
+        return ! in_array($other, $values);
     }
 
     /**
@@ -1460,7 +1460,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->prepareValuesAndOther($parameters);
 
-        return in_array($other, $values, is_bool($other));
+        return in_array($other, $values);
     }
 
     /**
@@ -1515,7 +1515,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->prepareValuesAndOther($parameters);
 
-        if (! in_array($other, $values, is_bool($other))) {
+        if (! in_array($other, $values)) {
             return $this->validateRequired($attribute, $value);
         }
 
