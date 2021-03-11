@@ -21,13 +21,6 @@ class ResourceRegistrar
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
-     * Actions that use model binding.
-     *
-     * @var string[]
-     */
-    protected $modelBoundMethods = ['show', 'edit', 'update', 'destroy'];
-
-    /**
      * The parameters set for this resource instance.
      *
      * @var array|string
@@ -191,6 +184,8 @@ class ResourceRegistrar
     {
         $uri = $this->getResourceUri($name);
 
+        unset($options['missing']);
+
         $action = $this->getResourceAction($name, $controller, 'index', $options);
 
         return $this->router->get($uri, $action);
@@ -209,6 +204,8 @@ class ResourceRegistrar
     {
         $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
 
+        unset($options['missing']);
+
         $action = $this->getResourceAction($name, $controller, 'create', $options);
 
         return $this->router->get($uri, $action);
@@ -226,6 +223,8 @@ class ResourceRegistrar
     protected function addResourceStore($name, $base, $controller, $options)
     {
         $uri = $this->getResourceUri($name);
+
+        unset($options['missing']);
 
         $action = $this->getResourceAction($name, $controller, 'store', $options);
 
@@ -428,7 +427,7 @@ class ResourceRegistrar
             $action['where'] = $options['wheres'];
         }
 
-        if (isset($options['missing']) && in_array($method, $this->modelBoundMethods)) {
+        if (isset($options['missing'])) {
             $action['missing'] = $options['missing'];
         }
 
