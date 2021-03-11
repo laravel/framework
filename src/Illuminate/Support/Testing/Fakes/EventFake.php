@@ -278,7 +278,7 @@ class EventFake implements Dispatcher
      *
      * @param  string|object  $event
      * @param  mixed  $payload
-     * @return void
+     * @return array|null
      */
     public function until($event, $payload = [])
     {
