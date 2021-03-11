@@ -645,17 +645,19 @@ class Str
     {
         $key = $value;
 
-        if (isset(static::$snakeCache[$key][$delimiter])) {
+        if(isset(static::$snakeCache[$key][$delimiter])){
             return static::$snakeCache[$key][$delimiter];
         }
 
-        if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
+        if(static::upper($value) !== $value){
+            $value = static::of($value)->split(1)->map(function($char, $key) use ($delimiter){
+                return $key > 0 && static::upper($char) === $char ? "{$delimiter}{$char}" : $char;
+            })->join('');
 
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
+            $value = preg_replace('/\s+/u', '', static::title($value));
         }
 
-        return static::$snakeCache[$key][$delimiter] = $value;
+        return static::$snakeCache[$key][$delimiter] = static::lower($value);
     }
 
     /**
