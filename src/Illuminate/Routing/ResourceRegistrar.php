@@ -21,6 +21,13 @@ class ResourceRegistrar
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
+     * Actions that use model binding.
+     *
+     * @var string[]
+     */
+    protected $modelBoundMethods = ['show', 'edit', 'update', 'destroy'];
+
+    /**
      * The parameters set for this resource instance.
      *
      * @var array|string
@@ -419,6 +426,10 @@ class ResourceRegistrar
 
         if (isset($options['wheres'])) {
             $action['where'] = $options['wheres'];
+        }
+
+        if (isset($options['missing']) && in_array($method, $this->modelBoundMethods)) {
+            $action['missing'] = $options['missing'];
         }
 
         return $action;
