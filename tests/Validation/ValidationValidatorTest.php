@@ -413,6 +413,13 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['names' => [null, 'name']], ['names.*' => 'Required']);
         $v->messages()->setFormat(':message');
         $this->assertSame('First name is required!', $v->messages()->first('names.0'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required' => ':attribute is required!'], 'en');
+        $trans->addLines(['validation.attributes' => ['name' => 'Name']], 'en');
+        $v = new Validator($trans, ['items' => [['name' => 'John'], []]], ['items.*.name' => 'Required']);
+        $v->messages()->setFormat(':message');
+        $this->assertSame('Name is required!', $v->messages()->first('items.1.name'));
     }
 
     public function testInputIsReplaced()

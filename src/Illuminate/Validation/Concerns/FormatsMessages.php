@@ -276,7 +276,23 @@ trait FormatsMessages
      */
     protected function getAttributeFromTranslations($name)
     {
-        return Arr::get($this->translator->get('validation.attributes'), $name);
+        $attributes = $this->translator->get('validation.attributes');
+        $mostSpecific = Arr::get($attributes, $name);
+        if ($mostSpecific !== null) {
+            return $mostSpecific;
+        }
+
+        $tokens = array_reverse(explode('.', $name));
+        while (!empty($tokens)) {
+            $key = implode('.', array_reverse($tokens));
+            $translation = Arr::get($attributes, $key);
+            if ($translation !== null) {
+                return $translation;
+            }
+            array_pop($tokens);
+        }
+
+        return null;
     }
 
     /**
