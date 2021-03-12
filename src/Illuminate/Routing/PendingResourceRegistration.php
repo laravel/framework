@@ -198,7 +198,7 @@ class PendingResourceRegistration
     /**
      * Define the callable that should be invoked on a missing model exception.
      *
-     * @param $callback
+     * @param  callable  $callback
      * @return $this
      */
     public function missing($callback)
