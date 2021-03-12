@@ -78,6 +78,7 @@ trait ManagesTransactions
         // retry the query. We have to throw this exception all the way out and
         // let the developer handle it in another way. We will decrement too.
         if ($this->causedByConcurrencyError($e) &&
+            $this->queryGrammar->supportsSavepoints() &&
             $this->transactions > 1) {
             $this->transactions--;
 
