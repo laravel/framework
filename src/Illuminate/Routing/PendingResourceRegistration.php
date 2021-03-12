@@ -196,6 +196,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Define the callable that should be invoked on a missing model exception.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function missing($callback)
+    {
+        $this->options['missing'] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Indicate that the resource routes should be scoped using the given binding fields.
      *
      * @param  array  $fields
