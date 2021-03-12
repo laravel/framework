@@ -526,7 +526,8 @@ class SupportStrTest extends TestCase
     public function testText()
     {
         $this->assertEquals('this is studly case', Str::text('ThisIsStudlyCase'));
-        $this->assertEquals('this is camel case', Str::text('this_is_camel_case'));
+        $this->assertEquals('this is camel case', Str::text('thisIsCamelCase'));
+        $this->assertEquals('this is snake case', Str::text('this_is_snake_case'));
         $this->assertEquals('this is kebab case', Str::text('this-is-kebab-case'));
         $this->assertEquals('this is mixed case', Str::text('thisIs-mixed_case'));
     }

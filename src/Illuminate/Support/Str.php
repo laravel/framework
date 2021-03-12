@@ -729,7 +729,7 @@ class Str
     }
 
     /**
-     * Convert studly, camel or kebab case back to text
+     * Convert studly, camel, snake or kebab case back to text
      *
      * @param string $string
      * @return string
