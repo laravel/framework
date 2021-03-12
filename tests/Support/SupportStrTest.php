@@ -522,6 +522,14 @@ class SupportStrTest extends TestCase
         $this->assertEquals("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
         $this->assertEquals("<h1>hello world</h1>\n", Str::markdown('# hello world'));
     }
+
+    public function testText()
+    {
+        $this->assertEquals('this is studly case', Str::text('ThisIsStudlyCase'));
+        $this->assertEquals('this is camel case', Str::text('this_is_camel_case'));
+        $this->assertEquals('this is kebab case', Str::text('this-is-kebab-case'));
+        $this->assertEquals('this is mixed case', Str::text('thisIs-mixed_case'));
+    }
 }
 
 class StringableObjectStub

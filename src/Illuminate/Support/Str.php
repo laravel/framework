@@ -729,6 +729,17 @@ class Str
     }
 
     /**
+     * Convert studly, camel or kebab case back to text
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function text($string)
+    {
+        return preg_replace('/[^a-z0-9 ]/i', ' ', static::snake($string));
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string
