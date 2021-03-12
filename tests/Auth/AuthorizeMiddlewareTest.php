@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
@@ -55,6 +56,10 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
+
+        $app = new Application;
+        $app['translator'] = $trans = m::mock(stdClass::class);
+        $trans->shouldReceive('get')->once()->with('This action is unauthorized.', [], null)->andReturn('This action is unauthorized.');
 
         $this->gate()->define('view-dashboard', function ($user, $additional = null) {
             $this->assertNull($additional);
@@ -183,6 +188,10 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
 
+        $app = new Application;
+        $app['translator'] = $trans = m::mock(stdClass::class);
+        $trans->shouldReceive('get')->once()->with('This action is unauthorized.', [], null)->andReturn('This action is unauthorized.');
+
         $this->gate()->define('create', function ($user, $model) {
             $this->assertSame('App\User', $model);
 
@@ -223,6 +232,10 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
+
+        $app = new Application;
+        $app['translator'] = $trans = m::mock(stdClass::class);
+        $trans->shouldReceive('get')->once()->with('This action is unauthorized.', [], null)->andReturn('This action is unauthorized.');
 
         $post = new stdClass;
 

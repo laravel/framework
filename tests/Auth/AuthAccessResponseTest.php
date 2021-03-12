@@ -4,10 +4,18 @@ namespace Illuminate\Tests\Auth;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Foundation\Application;
 use PHPUnit\Framework\TestCase;
+use stdClass;
+use Mockery as m;
 
 class AuthAccessResponseTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        m::close();
+    }
+
     public function testAllowMethod()
     {
         $response = Response::allow('some message', 'some_code');
@@ -51,6 +59,10 @@ class AuthAccessResponseTest extends TestCase
     public function testAuthorizeMethodThrowsAuthorizationExceptionWithDefaultMessage()
     {
         $response = Response::deny();
+
+        $app = new Application;
+        $app['translator'] = $trans = m::mock(stdClass::class);
+        $trans->shouldReceive('get')->once()->with('This action is unauthorized.', [], null)->andReturn('This action is unauthorized.');
 
         try {
             $response->authorize();

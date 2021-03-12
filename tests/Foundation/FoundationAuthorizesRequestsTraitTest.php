@@ -7,14 +7,19 @@ use Illuminate\Auth\Access\Gate;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use PHPUnit\Framework\TestCase;
+use stdClass;
+use Mockery as m;
 
 class FoundationAuthorizesRequestsTraitTest extends TestCase
 {
     protected function tearDown(): void
     {
         Container::setInstance(null);
+
+        m::close();
     }
 
     public function testBasicGateCheck()
@@ -41,6 +46,9 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         $this->expectExceptionMessage('This action is unauthorized.');
 
         $gate = $this->getBasicGate();
+
+        Container::getInstance()->instance('translator', $trans = m::mock(stdClass::class));
+        $trans->shouldReceive('get')->once()->with('This action is unauthorized.', [], null)->andReturn('This action is unauthorized.');
 
         $gate->define('baz', function () {
             return false;

@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -16,6 +17,7 @@ use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class FoundationFormRequestTest extends TestCase
 {
@@ -97,6 +99,10 @@ class FoundationFormRequestTest extends TestCase
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
+
+        $app = new Application;
+        $app['translator'] = $trans = m::mock(stdClass::class);
+        $trans->shouldReceive('get')->once()->with('This action is unauthorized.', [], null)->andReturn('This action is unauthorized.');
 
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
     }
