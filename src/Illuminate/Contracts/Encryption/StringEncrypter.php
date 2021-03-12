@@ -4,7 +4,6 @@ namespace Illuminate\Contracts\Encryption;
 
 interface StringEncrypter
 {
-
     /**
      * Encrypt a string without serialization.
      *
