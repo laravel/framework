@@ -203,7 +203,10 @@ class SQLiteGrammar extends Grammar
                 : $this->wrap($key).' = '.$this->parameter($value);
         })->implode(', ');
 
-        return $sql.$columns;
+        $where = $this->compileWheres($query);
+        $where = (empty($where) ? '' : ' ') . $where;
+
+        return $sql.$columns.$where;
     }
 
     /**

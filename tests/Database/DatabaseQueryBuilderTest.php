@@ -2234,6 +2234,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
         $this->assertEquals(2, $result);
 
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") values (?, ?), (?, ?) on conflict ("email") do update set "email" = "excluded"."email", "name" = "excluded"."name" where "users"."email" < "excluded"."email"', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
+        $result = $builder->from('users')->whereRaw('"users"."email" < "excluded"."email"')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
+        $this->assertEquals(2, $result);
+
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('merge [users] using (values (?, ?), (?, ?)) [laravel_source] ([email], [name]) on [laravel_source].[email] = [users].[email] when matched then update set [email] = [laravel_source].[email], [name] = [laravel_source].[name] when not matched then insert ([email], [name]) values ([email], [name]);', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
