@@ -8,7 +8,7 @@ use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\StringEncrypter;
 use RuntimeException;
 
-class Encrypter implements StringEncrypter, EncrypterContract
+class Encrypter implements EncrypterContract, StringEncrypter
 {
     /**
      * The encryption key.
