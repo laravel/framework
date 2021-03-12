@@ -283,7 +283,7 @@ trait FormatsMessages
         }
 
         $tokens = array_reverse(explode('.', $name));
-        while (!empty($tokens)) {
+        while (! empty($tokens)) {
             $key = implode('.', array_reverse($tokens));
             $translation = Arr::get($attributes, $key);
             if ($translation !== null) {
