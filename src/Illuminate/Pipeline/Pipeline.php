@@ -91,15 +91,33 @@ class Pipeline implements PipelineContract
     /**
      * Run the pipeline with a final destination callback.
      *
-     * @param  \Closure  $destination
+     * @param  \Closure  $finalDestination
      * @return mixed
      */
-    public function then(Closure $destination)
+    public function then(Closure $finalDestination)
     {
-        $pipeline = array_reduce(
-            array_reverse($this->pipes()), $this->carry(), $this->prepareDestination($destination)
-        );
+        $pipeline = $this->buildNestedClosures($finalDestination);
 
+        return $this->executePipeline($pipeline);
+    }
+
+    /**
+     * build Pipeline as nested closures with finalDestinationClosure as its final Closure
+     * @param  \Closure  $finalDestination
+     * @return \Closure 
+     */
+    protected function buildNestedClosures($finalDestination)
+    {
+        return array_reduce(
+                    array_reverse($this->pipes()), $this->carry(), $this->wrapFinalDestinationInClosure($finalDestination)
+                );
+    }
+
+    /**
+     * execute nested closures including the final Destination closure
+     */
+    protected function executePipeline($pipeline)
+    {
         return $pipeline($this->passable);
     }
 
@@ -121,7 +139,7 @@ class Pipeline implements PipelineContract
      * @param  \Closure  $destination
      * @return \Closure
      */
-    protected function prepareDestination(Closure $destination)
+    protected function wrapFinalDestinationInClosure(Closure $destination)
     {
         return function ($passable) use ($destination) {
             try {
