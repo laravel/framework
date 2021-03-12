@@ -2212,6 +2212,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testMySqlInvalidUpsertMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $builder = $this->getMySqlBuilder();
+        $builder->from('users')->where('"users"."email" < "excluded"."email"')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
+    }
+
     public function testUpsertMethod()
     {
         $builder = $this->getMySqlBuilder();

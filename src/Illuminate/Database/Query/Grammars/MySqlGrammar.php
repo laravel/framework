@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class MySqlGrammar extends Grammar
 {
@@ -170,6 +171,11 @@ class MySqlGrammar extends Grammar
                 ? $this->wrap($value).' = values('.$this->wrap($value).')'
                 : $this->wrap($key).' = '.$this->parameter($value);
         })->implode(', ');
+
+        $where = $this->compileWheres($query);
+        if (!empty($where)) {
+          throw new RuntimeException('MySQL does not support filtering when doing ON DUPLICATE KEY UPDATE.');
+        }
 
         return $sql.$columns;
     }
