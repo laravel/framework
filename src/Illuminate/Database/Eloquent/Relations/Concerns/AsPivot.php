@@ -88,7 +88,7 @@ trait AsPivot
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function setKeysForSelectQuery($query)
+    protected function setKeysForSelectQuery(Builder $query)
     {
         if (isset($this->attributes[$this->getKeyName()])) {
             return parent::setKeysForSelectQuery($query);
@@ -109,7 +109,7 @@ trait AsPivot
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function setKeysForSaveQuery($query)
+    protected function setKeysForSaveQuery(Builder $query)
     {
         return $this->setKeysForSelectQuery($query);
     }

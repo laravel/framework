@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class MorphPivot extends Pivot
@@ -30,7 +31,7 @@ class MorphPivot extends Pivot
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function setKeysForSaveQuery($query)
+    protected function setKeysForSaveQuery(Builder $query)
     {
         $query->where($this->morphType, $this->morphClass);
 
@@ -43,7 +44,7 @@ class MorphPivot extends Pivot
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function setKeysForSelectQuery($query)
+    protected function setKeysForSelectQuery(Builder $query)
     {
         $query->where($this->morphType, $this->morphClass);
 
