@@ -6,26 +6,6 @@ use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Support\Testing\Fakes\BusFake;
 
-/**
- * @method static \Illuminate\Bus\Batch|null findBatch(string $batchId)
- * @method static \Illuminate\Bus\PendingBatch batch(array|mixed $jobs)
- * @method static \Illuminate\Contracts\Bus\Dispatcher map(array $map)
- * @method static \Illuminate\Contracts\Bus\Dispatcher pipeThrough(array $pipes)
- * @method static \Illuminate\Foundation\Bus\PendingChain chain(array $jobs)
- * @method static bool hasCommandHandler($command)
- * @method static bool|mixed getCommandHandler($command)
- * @method static mixed dispatch($command)
- * @method static mixed dispatchNow($command, $handler = null)
- * @method static void assertDispatched(string|\Closure $command, callable|int $callback = null)
- * @method static void assertDispatchedTimes(string $command, int $times = 1)
- * @method static void assertNotDispatched(string|\Closure $command, callable|int $callback = null)
- * @method static void assertDispatchedAfterResponse(string|\Closure $command, callable|int $callback = null)
- * @method static void assertDispatchedAfterResponseTimes(string $command, int $times = 1)
- * @method static void assertNotDispatchedAfterResponse(string|\Closure $command, callable $callback = null)
- * @method static void assertBatched(callable $callback)
- *
- * @see \Illuminate\Contracts\Bus\Dispatcher
- */
 class Bus extends Facade
 {
     /**
