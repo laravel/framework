@@ -338,7 +338,9 @@ class RouteRegistrarTest extends TestCase
     {
         $this->router->middleware('resource-middleware')
             ->resource('users', RouteRegistrarControllerStub::class)
-            ->missing(function () { return 'missing'; });
+            ->missing(function () {
+                return 'missing';
+            });
 
         $this->assertIsCallable($this->router->getRoutes()->getByName('users.show')->getMissing());
         $this->assertIsCallable($this->router->getRoutes()->getByName('users.edit')->getMissing());
