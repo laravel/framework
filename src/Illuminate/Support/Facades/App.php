@@ -10,7 +10,7 @@ namespace Illuminate\Support\Facades;
  * @method static string databasePath(string $path = '')
  * @method static string environmentPath()
  * @method static string resourcePath(string $path = '')
- * @method static string storagePath(string $path = '')
+ * @method static string storagePath()
  * @method static string|bool environment(string|array ...$environments)
  * @method static bool runningInConsole()
  * @method static bool runningUnitTests()
@@ -41,6 +41,26 @@ namespace Illuminate\Support\Facades;
  * @method static void setLocale(string $locale)
  * @method static bool shouldSkipMiddleware()
  * @method static void terminate()
+ *
+ * @method static bool bound(string $abstract)
+ * @method static void alias(string $abstract, string $alias);
+ * @method static void tag(array|string $abstracts, array|mixed $tags);
+ * @method static iterable tagged(string $tag);
+ * @method static void bind(string $abstract, \Closure|string|null $concrete = null, bool $shared = false);
+ * @method static void bindIf($string abstract, \Closure|string|null $concrete = null, bool $shared = false);
+ * @method static void singleton(string $abstract, \Closure|string|null$concrete = null);
+ * @method static void singletonIf(string $abstract, \Closure|string|null $concrete = null);
+ * @method static void extend(string $abstract, Closure $closure);
+ * @method static mixed instance(string $abstract, mixed $instance);
+ * @method static void addContextualBinding(string $concrete, string $abstract, \Closure|string $implementation);
+ * @method static \Illuminate\Contracts\Container\ContextualBindingBuilder when(string|array $concrete);
+ * @method \Closure static factory(string $abstract);
+ * @method static void flush();
+ * @method static mixed make(string $abstract, array $parameters = []);
+ * @method static mixed call(callable|string $callback, array $parameters = [], string|null $defaultMethod = null);
+ * @method static bool resolved(string $abstract);
+ * @method static void resolving(\Closure|string $abstract, Closure|null $callback = null);
+ * @method static void afterResolving(\Closure|string $abstract, Closure|null $callback = null);
  *
  * @see \Illuminate\Contracts\Foundation\Application
  */
