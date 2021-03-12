@@ -2,13 +2,6 @@
 
 namespace Illuminate\Support\Facades;
 
-/**
- * @method static array getQueuedCookies()
- * @method static unqueue($name)
- * @method static void queue(...$parameters)
- *
- * @see \Illuminate\Cookie\CookieJar
- */
 class Cookie extends Facade
 {
     /**
