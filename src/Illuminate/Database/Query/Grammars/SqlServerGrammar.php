@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class SqlServerGrammar extends Grammar
 {
@@ -376,6 +377,23 @@ class SqlServerGrammar extends Grammar
             })->implode(', ');
 
             $sql .= 'when matched then update set '.$update.' ';
+
+            $where = $this->compileWheres($query);
+            if (!empty($where)) {
+              // Remove the "where" at the start of this string.
+              $where = 'and' . substr($where, 5) . ' ';
+            }
+
+            /*
+             * It may be possible to include this by replacing the $sql .= above with
+             *
+             *     $sql .= 'when matched ' . $where . 'then update set '.$update.' ';
+             *
+             * However, I'm unable to test this and do not want to commit it.
+             */
+            if (!empty($where)) {
+              throw new RuntimeException('This version of the SQL Server Grammar does not support filtering when doing a MERGE');
+            }
         }
 
         $sql .= 'when not matched then insert ('.$columns.') values ('.$columns.');';

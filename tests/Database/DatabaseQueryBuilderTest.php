@@ -2219,6 +2219,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->where('"users"."email" < "excluded"."email"')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
     }
 
+    public function testSqlServerInvalidUpsertMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('users')->where('"users"."email" < "excluded"."email"')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
+    }
+
     public function testUpsertMethod()
     {
         $builder = $this->getMySqlBuilder();
