@@ -12,7 +12,7 @@ trait HasFactory
      */
     public static function factory(...$parameters)
     {
-        $factory = static::newFactory() ?: Factory::factoryForModel(get_called_class());
+        $factory = self::getNewFactory() ?: Factory::factoryForModel(get_called_class());
 
         return $factory
                     ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : null)
@@ -20,12 +20,29 @@ trait HasFactory
     }
 
     /**
-     * Create a new factory instance for the model.
+     * Get factory instance or namespace
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     * @return \Illuminate\Database\Eloquent\Factories\Factory|string
      */
     protected static function newFactory()
     {
         //
+    }
+    
+    /**
+     * Return Factory instance
+     * @return mixed
+     */
+    private static function getNewFactory()
+    {
+        $newFactory = static::newFactory();
+
+        if(!$newFactory){
+            return;
+        }
+
+        return ($newFactory instanceof Factory)
+            ? $newFactory
+            : app()->make($newFactory);
     }
 }
