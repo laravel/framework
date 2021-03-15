@@ -1,6 +1,15 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.17...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.18...6.x)
+
+
+## [v6.20.18 (2021-03-09)](https://github.com/laravel/framework/compare/v6.20.17...v6.20.18)
+
+### Fixed
+- Fix validator treating null as true for (required|exclude)_(if|unless) due to loose `in_array()` check ([#36504](https://github.com/laravel/framework/pull/36504))
+
+### Changed
+- Delete existing links that are broken in `Illuminate\Foundation\Console\StorageLinkCommand` ([#36470](https://github.com/laravel/framework/pull/36470))
 
 
 ## [v6.20.17 (2021-03-02)](https://github.com/laravel/framework/compare/v6.20.16...v6.20.17)

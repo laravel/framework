@@ -334,6 +334,24 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testCanRegisterResourceWithMissingOption()
+    {
+        $this->router->middleware('resource-middleware')
+            ->resource('users', RouteRegistrarControllerStub::class)
+            ->missing(function () {
+                return 'missing';
+            });
+
+        $this->assertIsCallable($this->router->getRoutes()->getByName('users.show')->getMissing());
+        $this->assertIsCallable($this->router->getRoutes()->getByName('users.edit')->getMissing());
+        $this->assertIsCallable($this->router->getRoutes()->getByName('users.update')->getMissing());
+        $this->assertIsCallable($this->router->getRoutes()->getByName('users.destroy')->getMissing());
+
+        $this->assertNull($this->router->getRoutes()->getByName('users.index')->getMissing());
+        $this->assertNull($this->router->getRoutes()->getByName('users.create')->getMissing());
+        $this->assertNull($this->router->getRoutes()->getByName('users.store')->getMissing());
+    }
+
     public function testCanAccessRegisteredResourceRoutesAsRouteCollection()
     {
         $resource = $this->router->middleware('resource-middleware')

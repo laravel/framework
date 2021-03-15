@@ -517,6 +517,7 @@ class BusFake implements QueueingDispatcher
      */
     public function findBatch(string $batchId)
     {
+        //
     }
 
     /**
