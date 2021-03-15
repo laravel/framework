@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ListCommand extends BaseListCommand
 {
     /**
-     * Configure the command
+     * Configure the command.
      *
      * @return void
      */
@@ -54,7 +54,7 @@ EOF
     }
 
     /**
-     * Retrieve the native definition
+     * Retrieve the native definition.
      *
      * @return void
      */
@@ -64,7 +64,7 @@ EOF
     }
 
     /**
-     * Execute the command
+     * Execute the command.
      *
      * @param  InputInterface  $input
      * @param  OutputInterface  $output
@@ -85,7 +85,7 @@ EOF
     }
 
     /**
-     * Retrieve the application with commands strictly belonging to it
+     * Retrieve the application with commands strictly belonging to it.
      *
      * @return \Symfony\Component\Console\Application
      */
@@ -109,7 +109,7 @@ EOF
     }
 
     /**
-     * Create the command definition
+     * Create the command definition.
      *
      * @return \Symfony\Component\Console\Input\InputDefinition
      */
