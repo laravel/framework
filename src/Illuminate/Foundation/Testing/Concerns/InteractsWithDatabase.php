@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Constraints\CountInDatabase;
+use Illuminate\Testing\Constraints\HasCountInDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
@@ -26,6 +27,24 @@ trait InteractsWithDatabase
     {
         $this->assertThat(
             $table, new HasInDatabase($this->getConnection($connection), $data)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given where condition has the expected count.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  int  $count
+     * @param  string|null  $connection
+     * @return $this
+     */
+    protected function assertDatabaseHasCount($table, array $data, int $count, $connection = null)
+    {
+        $this->assertThat(
+            $table, new HasCountInDatabase($this->getConnection($connection), $data, $count)
         );
 
         return $this;

@@ -119,6 +119,35 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseCount($this->table, 3);
     }
 
+    public function testSeeInDatabaseAndAssertTableEntriesCountFindsResults()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHasCount($this->table, $this->data, 1);
+    }
+
+    public function testSeeInDatabaseAndAssertTableEntriesCountDoesNotFindResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage("Failed asserting that table [products] with attributes\n".json_encode($this->data, JSON_PRETTY_PRINT)."\nmatches expected entries count of 1. Matching entries found: 0.");
+
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertDatabaseHasCount($this->table, $this->data, 1);
+    }
+
+    public function testSeeInDatabaseAndAssertTableEntriesCountWrong()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage("Failed asserting that table [products] with attributes\n".json_encode($this->data, JSON_PRETTY_PRINT)."\nmatches expected entries count of 3. Matching entries found: 1.");
+
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHasCount($this->table, $this->data, 3);
+    }
+
     public function testAssertDeletedPassesWhenDoesNotFindResults()
     {
         $this->mockCountBuilder(0);
