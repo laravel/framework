@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
@@ -211,7 +212,7 @@ class AuthenticationTest extends TestCase
 
         $this->assertEquals(1, $user->id);
 
-        $this->app['auth']->logoutOtherDevices('adifferentpassword');
+        $this->app['auth']->logoutOtherDevices('password');
         $this->assertEquals(1, $user->id);
 
         Event::assertDispatched(OtherDeviceLogout::class, function ($event) {
@@ -220,6 +221,20 @@ class AuthenticationTest extends TestCase
 
             return true;
         });
+    }
+
+    public function testPasswordMustBeValidToLogOutOtherDevices()
+    {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Password mismatch.');
+
+        $this->app['auth']->loginUsingId(1);
+
+        $user = $this->app['auth']->user();
+
+        $this->assertEquals(1, $user->id);
+
+        $this->app['auth']->logoutOtherDevices('adifferentpassword');
     }
 
     public function testLoggingInOutViaAttemptRemembering()

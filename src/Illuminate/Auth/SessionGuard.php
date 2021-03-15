@@ -574,6 +574,26 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Rehash the user's password.
+     *
+     * @param  string  $password
+     * @param  string  $attribute
+     * @return bool|null
+     *
+     * @throws AuthenticationException If the password is invalid.
+     */
+    protected function rehashUserPassword($password, $attribute)
+    {
+        if (! Hash::check($password, $this->user()->$attribute)) {
+            throw new AuthenticationException('Password mismatch.');
+        }
+
+        return tap($this->user()->forceFill([
+            $attribute => Hash::make($password),
+        ]))->save();
+    }
+
+    /**
      * Invalidate other sessions for the current user.
      *
      * The application must be using the AuthenticateSession middleware.
@@ -588,9 +608,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return;
         }
 
-        $result = tap($this->user()->forceFill([
-            $attribute => Hash::make($password),
-        ]))->save();
+        $result = $this->rehashUserPassword($password, $attribute);
 
         if ($this->recaller() ||
             $this->getCookieJar()->hasQueued($this->getRecallerName())) {
