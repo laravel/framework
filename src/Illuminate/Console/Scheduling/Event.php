@@ -191,14 +191,16 @@ class Event
      */
     public function run(Container $container)
     {
-        if ($this->withoutOverlapping &&
-            ! $this->mutex->create($this)) {
+        if (
+            $this->withoutOverlapping &&
+            !$this->mutex->create($this)
+        ) {
             return;
         }
 
         $this->runInBackground
-                    ? $this->runCommandInBackground($container)
-                    : $this->runCommandInForeground($container);
+            ? $this->runCommandInBackground($container)
+            : $this->runCommandInForeground($container);
     }
 
     /**
@@ -208,7 +210,7 @@ class Event
      */
     public function mutexName()
     {
-        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
+        return 'framework' . DIRECTORY_SEPARATOR . 'schedule-' . sha1($this->expression . $this->command);
     }
 
     /**
@@ -297,12 +299,12 @@ class Event
      */
     public function isDue($app)
     {
-        if (! $this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
+        if (!$this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
             return false;
         }
 
         return $this->expressionPasses() &&
-               $this->runsInEnvironment($app->environment());
+            $this->runsInEnvironment($app->environment());
     }
 
     /**
@@ -328,7 +330,7 @@ class Event
             $date->setTimezone($this->timezone);
         }
 
-        return CronExpression::factory($this->expression)->isDue($date->toDateTimeString());
+        return (new CronExpression($this->expression))->isDue($date->toDateTimeString());
     }
 
     /**
@@ -351,7 +353,7 @@ class Event
     public function filtersPass($app)
     {
         foreach ($this->filters as $callback) {
-            if (! $app->call($callback)) {
+            if (!$app->call($callback)) {
                 return false;
             }
         }
@@ -462,7 +464,7 @@ class Event
     protected function ensureOutputIsBeingCaptured()
     {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
-            $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
+            $this->sendOutputTo(storage_path('logs/schedule-' . sha1($this->mutexName()) . '.log'));
         }
     }
 
@@ -837,8 +839,8 @@ class Event
             $output = $this->output && is_file($this->output) ? file_get_contents($this->output) : '';
 
             return $onlyIfOutputExists && empty($output)
-                            ? null
-                            : $container->call($callback, ['output' => new Stringable($output)]);
+                ? null
+                : $container->call($callback, ['output' => new Stringable($output)]);
         };
     }
 
@@ -890,9 +892,8 @@ class Event
      */
     public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
     {
-        return Date::instance(CronExpression::factory(
-            $this->getExpression()
-        )->getNextRunDate($currentTime, $nth, $allowCurrentDate, $this->timezone));
+        return Date::instance((new CronExpression($this->getExpression()))
+            ->getNextRunDate($currentTime, $nth, $allowCurrentDate, $this->timezone));
     }
 
     /**
