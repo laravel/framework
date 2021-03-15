@@ -51,6 +51,17 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Determine if a key exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return $this->files->exists($this->path($key));
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string|array  $key

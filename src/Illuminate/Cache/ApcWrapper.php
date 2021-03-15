@@ -22,6 +22,17 @@ class ApcWrapper
     }
 
     /**
+     * Determine if a item exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function exists($key)
+    {
+        return $this->apcu ? apcu_exists($key) : apc_exists($key);
+    }
+
+    /**
      * Get an item from the cache.
      *
      * @param  string  $key

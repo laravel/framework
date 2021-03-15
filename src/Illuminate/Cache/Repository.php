@@ -67,7 +67,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function has($key)
     {
-        return ! is_null($this->get($key));
+        return $this->store->has($this->itemKey($key));
     }
 
     /**
@@ -96,18 +96,18 @@ class Repository implements ArrayAccess, CacheContract
 
         $value = $this->store->get($this->itemKey($key));
 
+        if ($this->has($key)) {
+            $this->event(new CacheHit($key, $value));
+
+            return $this->store->get($this->itemKey($key));
+        }
+
         // If we could not find the cache value, we will fire the missed event and get
         // the default value for this cache value. This default could be a callback
         // so we will execute the value function which will resolve it if needed.
-        if (is_null($value)) {
-            $this->event(new CacheMissed($key));
+        $this->event(new CacheMissed($key));
 
-            $value = value($default);
-        } else {
-            $this->event(new CacheHit($key, $value));
-        }
-
-        return $value;
+        return value($default);
     }
 
     /**
@@ -373,13 +373,11 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function remember($key, $ttl, Closure $callback)
     {
-        $value = $this->get($key);
-
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
         // given number of seconds so it's available for all subsequent requests.
-        if (! is_null($value)) {
-            return $value;
+        if ($this->has($key)) {
+            return $this->get($key);
         }
 
         $this->put($key, $value = $callback(), $ttl);
@@ -408,13 +406,11 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function rememberForever($key, Closure $callback)
     {
-        $value = $this->get($key);
-
         // If the item exists in the cache we will just return this immediately
         // and if not we will execute the given Closure and cache the result
         // of that forever so it is available for all subsequent requests.
-        if (! is_null($value)) {
-            return $value;
+        if ($this->has($key)) {
+            return $this->get($key);
         }
 
         $this->forever($key, $value = $callback());

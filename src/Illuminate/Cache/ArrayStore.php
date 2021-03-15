@@ -42,6 +42,17 @@ class ArrayStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Determine if a key exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return isset($this->storage[$key]);
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string|array  $key
@@ -49,7 +60,7 @@ class ArrayStore extends TaggableStore implements LockProvider
      */
     public function get($key)
     {
-        if (! isset($this->storage[$key])) {
+        if (!$this->has($key)) {
             return;
         }
 

@@ -52,6 +52,17 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Determine if a key exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        $this->connection()->exists($this->prefix.$key);
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string|array  $key
@@ -59,9 +70,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function get($key)
     {
-        $value = $this->connection()->get($this->prefix.$key);
-
-        return ! is_null($value) ? $this->unserialize($value) : null;
+        return $this->unserialize($this->connection()->get($this->prefix.$key));
     }
 
     /**

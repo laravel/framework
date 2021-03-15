@@ -49,6 +49,17 @@ class MemcachedStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Determine if a key exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key

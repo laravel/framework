@@ -45,6 +45,17 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Determine if a key exists in the cache.
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return $this->command('exists', [$key]) === 1;
+    }
+
+    /**
      * Returns the value of the given key.
      *
      * @param  string  $key

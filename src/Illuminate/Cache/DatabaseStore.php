@@ -82,6 +82,17 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Determine if a key exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return $this->table()->where('key', '=', $this->prefix.$key)->exists();
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string|array  $key

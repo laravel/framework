@@ -9,6 +9,17 @@ class NullStore extends TaggableStore implements LockProvider
     use RetrievesMultipleKeys;
 
     /**
+     * Check if a key exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return false;
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
