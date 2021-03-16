@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
@@ -20,6 +19,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -225,8 +225,8 @@ class AuthenticationTest extends TestCase
 
     public function testPasswordMustBeValidToLogOutOtherDevices()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Password mismatch.');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('current password');
 
         $this->app['auth']->loginUsingId(1);
 
