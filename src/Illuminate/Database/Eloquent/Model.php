@@ -103,6 +103,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public $wasRecentlyCreated = false;
 
     /**
+     * Indicates if the model was updated during the current request lifecycle.
+     *
+     * @var bool
+     */
+    public $wasRecentlyUpdated = false;
+
+    /**
      * The connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
@@ -936,6 +943,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             $this->setKeysForSaveQuery($query)->update($dirty);
 
             $this->syncChanges();
+
+            $this->wasRecentlyUpdated = true;
 
             $this->fireModelEvent('updated', false);
         }
