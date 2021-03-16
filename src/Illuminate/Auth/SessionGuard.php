@@ -580,7 +580,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  string  $attribute
      * @return bool|null
      *
-     * @throws AuthenticationException If the password is invalid.
+     * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function rehashUserPassword($password, $attribute)
     {
@@ -602,7 +602,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  string  $attribute
      * @return bool|null
      *
-     * @throws AuthenticationException If the password is invalid.
+     * @throws \Illuminate\Auth\AuthenticationException
      */
     public function logoutOtherDevices($password, $attribute = 'password')
     {
