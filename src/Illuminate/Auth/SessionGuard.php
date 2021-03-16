@@ -20,6 +20,7 @@ use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -581,6 +582,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  string  $password
      * @param  string  $attribute
      * @return bool|null
+     *
+     * @throws \Illuminate\Auth\AuthenticationException
      */
     public function logoutOtherDevices($password, $attribute = 'password')
     {
@@ -588,9 +591,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return;
         }
 
-        $result = tap($this->user()->forceFill([
-            $attribute => Hash::make($password),
-        ]))->save();
+        $result = $this->rehashUserPassword($password, $attribute);
 
         if ($this->recaller() ||
             $this->getCookieJar()->hasQueued($this->getRecallerName())) {
@@ -600,6 +601,26 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->fireOtherDeviceLogoutEvent($this->user());
 
         return $result;
+    }
+
+    /**
+     * Rehash the current user's password.
+     *
+     * @param  string  $password
+     * @param  string  $attribute
+     * @return bool|null
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function rehashUserPassword($password, $attribute)
+    {
+        if (! Hash::check($password, $this->user()->{$attribute})) {
+            throw new InvalidArgumentException("The given password does not match the current password.");
+        }
+
+        return tap($this->user()->forceFill([
+            $attribute => Hash::make($password),
+        ]))->save();
     }
 
     /**
