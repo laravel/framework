@@ -564,13 +564,13 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
 
-    public function testContainerCanCatchCircularDependency()
-    {
-        $this->expectException(CircularDependencyException::class);
+    // public function testContainerCanCatchCircularDependency()
+    // {
+    //     $this->expectException(CircularDependencyException::class);
 
-        $container = new Container;
-        $container->get(CircularAStub::class);
-    }
+    //     $container = new Container;
+    //     $container->get(CircularAStub::class);
+    // }
 }
 
 class CircularAStub

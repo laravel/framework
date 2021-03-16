@@ -587,16 +587,28 @@ class TestResponseTest extends TestCase
         });
     }
 
-    public function testAssertJsonWithFluentStrict()
+    public function testAssertJsonWithFluentFailsWhenNotInteractingWithAllProps()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Unexpected properties were found on the root level.');
 
         $response->assertJson(function (AssertableJson $json) {
-            $json->where('0.foo', 'foo 0');
-        }, true);
+            $json->where('foo', 'bar');
+        });
+    }
+
+    public function testAssertJsonWithFluentSkipsInteractionWhenTopLevelKeysNonAssociative()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            ['foo' => 'bar'],
+            ['foo' => 'baz'],
+        ]));
+
+        $response->assertJson(function (AssertableJson $json) {
+            //
+        });
     }
 
     public function testAssertSimilarJsonWithMixed()
