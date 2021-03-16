@@ -601,7 +601,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         // If an explicit base URL has been set on the disk configuration then we will use
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
-        if (! is_null($url = $this->driver->getConfig()->get('url'))) {
+        if (! is_null($url = $this->driver->getConfig()->get('temporary_url'))) {
             $uri = $this->replaceBaseUrl($uri, $url);
         }
 
