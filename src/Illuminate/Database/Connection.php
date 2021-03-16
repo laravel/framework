@@ -868,11 +868,11 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Resets the records modifications property.
+     * Reset the record modification state.
      *
      * @return void
      */
-    public function resetRecordsModifications()
+    public function forgetRecordModificationState()
     {
         $this->recordsModified = false;
     }
