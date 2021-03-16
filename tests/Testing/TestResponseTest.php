@@ -583,11 +583,11 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
         $response->assertJson(function (AssertableJson $json) {
-            $json->where('0.foo', 'foo 0');
+            $json->where('0.foo', 'foo 0')->etc();
         });
     }
 
-    public function testAssertJsonWithFluentStrict()
+    public function testAssertJsonWithFluentFailsWhenNotInteractingWithAllProps()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
@@ -596,7 +596,7 @@ class TestResponseTest extends TestCase
 
         $response->assertJson(function (AssertableJson $json) {
             $json->where('0.foo', 'foo 0');
-        }, true);
+        });
     }
 
     public function testAssertSimilarJsonWithMixed()

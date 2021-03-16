@@ -87,7 +87,7 @@ trait Matching
      * @param  string  $key
      * @return string
      */
-    abstract protected function dotPath(string $key): string;
+    abstract protected function dotPath(string $key = ''): string;
 
     /**
      * Ensure that the given prop exists.

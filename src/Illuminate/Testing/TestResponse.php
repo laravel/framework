@@ -523,9 +523,7 @@ class TestResponse implements ArrayAccess
 
             $value($assert);
 
-            if ($strict) {
-                $assert->interacted();
-            }
+            $assert->interacted();
         }
 
         return $this;
