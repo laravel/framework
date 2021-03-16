@@ -187,6 +187,7 @@ class RouteListCommand extends Command
     {
         if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
              $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
+             $this->option('exclude-path') && Str::contains($route['uri'], $this->option('exclude-path')) ||
              $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) {
             return;
         }
@@ -259,6 +260,7 @@ class RouteListCommand extends Command
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
+            ['exclude-path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by exclude path'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
         ];
