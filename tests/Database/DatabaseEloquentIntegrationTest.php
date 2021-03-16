@@ -422,6 +422,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse($model->wasRecentlyCreated);
     }
 
+    public function testWasRecentlyCreated()
+    {
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $this->assertTrue($user->wasRecentlyCreated);
+        // Note: new instances fetched from the database will not be marked.
+        $this->assertFalse($user->fresh()->wasRecentlyCreated);
+    }
+
     public function testChunkByIdWithNonIncrementingKey()
     {
         EloquentTestNonIncrementingSecond::create(['name' => ' First']);
