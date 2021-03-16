@@ -110,6 +110,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public $wasRecentlyUpdated = false;
 
     /**
+     * Indicates if the model was deleted during the current request lifecycle.
+     *
+     * @var bool
+     */
+    public $wasRecentlyDeleted = false;
+
+    /**
      * The connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
@@ -1133,6 +1140,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         $this->touchOwners();
 
         $this->performDeleteOnModel();
+
+        $this->wasRecentlyDeleted = true;
 
         // Once the model has been deleted, we will fire off the deleted event so that
         // the developers may hook into post-delete operations. We will then return
