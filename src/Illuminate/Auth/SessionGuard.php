@@ -615,7 +615,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function rehashUserPassword($password, $attribute)
     {
         if (! Hash::check($password, $this->user()->{$attribute})) {
-            throw new InvalidArgumentException("The given password does not match the current password.");
+            throw new InvalidArgumentException('The given password does not match the current password.');
         }
 
         return tap($this->user()->forceFill([
