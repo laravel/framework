@@ -273,6 +273,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals($now->toDateTimeString(), $userModel->getOriginal('deleted_at'));
         $this->assertNull(SoftDeletesTestUser::find(2));
 
+        $this->assertTrue($userModel->is(SoftDeletesTestUser::withTrashed()->find(2)));
+
         // Comparing a model that was recently deleted with a fresh instance of itself,
         // even though it's a trashed instance, would not work due to the different
         // values for the $wasRecentlyDeleted property on these model instances.
