@@ -574,7 +574,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Rehash the user's password.
+     * Rehash the current user's password.
      *
      * @param  string  $password
      * @param  string  $attribute
