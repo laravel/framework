@@ -1,6 +1,26 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.32.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.33.0...8.x)
+
+
+## [v8.33.0 (2021-03-16)](https://github.com/laravel/framework/compare/v8.32.1...v8.33.0)
+
+### Added
+- Added broken pipe exception as lost connection error ([#36601](https://github.com/laravel/framework/pull/36601))
+- Added missing option to resource ([#36562](https://github.com/laravel/framework/pull/36562))
+- Introduce StringEncrypter interface ([#36578](https://github.com/laravel/framework/pull/36578))
+
+### Fixed
+- Fixed returns with Mail & Notification components ([#36559](https://github.com/laravel/framework/pull/36559))
+- Stack driver fix: respect the defined processors in LogManager ([#36591](https://github.com/laravel/framework/pull/36591))
+- Require the correct password to rehash it when logging out other devices ([#36608](https://github.com/laravel/framework/pull/36608), [1e61612](https://github.com/laravel/framework/commit/1e6161250074b8106c1fcf153eeaef7c0bf74c6c))
+
+### Changed
+- Allow nullable columns for `AsArrayObject/AsCollection` casts ([#36526](https://github.com/laravel/framework/pull/36526))
+- Accept callable class for reportable and renderable in exception handler ([#36551](https://github.com/laravel/framework/pull/36551))
+- Container - detect circular dependencies ([dd7274d](https://github.com/laravel/framework/commit/dd7274d23a9ee58cc1abdf7107403169a3994b68), [a712f72](https://github.com/laravel/framework/commit/a712f72ca88f709335576530b31635738abd4c89), [6f9bb4c](https://github.com/laravel/framework/commit/6f9bb4cdd84295cbcf7908cc4b4684f47f38b8cf))
+- Initialize CronExpression class using new keyword ([#36600](https://github.com/laravel/framework/pull/36600))
+- Use different config key for overriding temporary url host in AwsTemporaryUrl method ([#36612](https://github.com/laravel/framework/pull/36612))
 
 
 ## [v8.32.1 (2021-03-09)](https://github.com/laravel/framework/compare/v8.32.0...v8.32.1)
