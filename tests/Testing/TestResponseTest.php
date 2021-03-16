@@ -599,6 +599,18 @@ class TestResponseTest extends TestCase
         });
     }
 
+    public function testAssertJsonWithFluentSkipsInteractionWhenTopLevelKeysNonAssociative()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            ['foo' => 'bar'],
+            ['foo' => 'baz'],
+        ]));
+
+        $response->assertJson(function (AssertableJson $json) {
+            //
+        });
+    }
+
     public function testAssertSimilarJsonWithMixed()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));

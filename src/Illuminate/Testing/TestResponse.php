@@ -523,7 +523,9 @@ class TestResponse implements ArrayAccess
 
             $value($assert);
 
-            $assert->interacted();
+            if (Arr::isAssoc($assert->toArray())) {
+                $assert->interacted();
+            }
         }
 
         return $this;

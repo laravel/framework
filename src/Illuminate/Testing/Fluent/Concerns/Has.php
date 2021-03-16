@@ -24,7 +24,7 @@ trait Has
                 $key,
                 $this->prop(),
                 $path
-                    ? sprintf('Scope [%s] does not have the expected size.', $path)
+                    ? sprintf('Property [%s] does not have the expected size.', $path)
                     : sprintf('Root level does not have the expected size.')
             );
 

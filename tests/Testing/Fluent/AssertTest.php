@@ -146,7 +146,7 @@ class AssertTest extends TestCase
         ]);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Scope [bar] does not have the expected size.');
+        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
 
         $assert->has('bar', function ($bar) {
             $bar->has(3);
@@ -188,7 +188,7 @@ class AssertTest extends TestCase
         ]);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Scope [bar] does not have the expected size.');
+        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
 
         $assert->has('bar', function ($bar) {
             $bar->count(3);
@@ -505,7 +505,7 @@ class AssertTest extends TestCase
         ]);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Scope [bar] does not have the expected size.');
+        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
 
         $assert->has('bar', 0, function (AssertableJson $item) {
             $item->where('key', 'first');
@@ -522,7 +522,7 @@ class AssertTest extends TestCase
         ]);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Scope [bar] does not have the expected size.');
+        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
 
         $assert->has('bar', 1, function (AssertableJson $item) {
             $item->where('key', 'first');
