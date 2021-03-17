@@ -459,6 +459,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame("Foo", (string) $this->stringable('Foobar')->remove('bar'));
         $this->assertSame("oobar", (string) $this->stringable('Foobar')->remove('F'));
         $this->assertSame("Foobar", (string) $this->stringable('Foobar')->remove('f'));
+        $this->assertSame("oobar", (string) $this->stringable('Foobar')->remove('f', false));
+
+        $this->assertSame("Fbr", (string) $this->stringable('Foobar')->remove(["o", "a"]));
+        $this->assertSame("Fooar", (string) $this->stringable('Foobar')->remove(["f", "b"]));
+        $this->assertSame("ooar", (string) $this->stringable('Foobar')->remove(["f", "b"], false));
     }
 
     public function testSnake()

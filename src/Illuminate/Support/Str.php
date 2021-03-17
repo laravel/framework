@@ -494,13 +494,16 @@ class Str
     /**
      * Remove any occurrence of the given string in the subject.
      *
-     * @param string $search
+     * @param string|array<string> $search
      * @param string $subject
+     * @param bool $caseSensitive
      * @return string
      */
-    public static function remove($search, $subject)
+    public static function remove($search, $subject, $caseSensitive = true)
     {
-        return str_replace($search, "", $subject);
+        $search = is_array($search) ? implode("|", $search) : $search;
+        $regex = $caseSensitive ? "/$search/" : "/$search/i";
+        return preg_replace($regex, "", $subject);
     }
 
     /**
