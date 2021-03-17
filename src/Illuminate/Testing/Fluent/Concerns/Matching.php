@@ -63,6 +63,43 @@ trait Matching
     }
 
     /**
+     * Asserts that the property is of the expected type.
+     *
+     * @param  string $key
+     * @param  string $expected
+     * @return $this
+     */
+    public function whereType(string $key, string $expected): self
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertSame(
+            $expected,
+            strtolower(gettype($actual)),
+            sprintf('Property [%s] is not of expected type [%s].', $this->dotPath($key), $expected)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Asserts that all properties are of their expected types.
+     *
+     * @param  array  $bindings
+     * @return $this
+     */
+    public function whereAllType(array $bindings): self
+    {
+        foreach ($bindings as $key => $value) {
+            $this->whereType($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Ensures that all properties are sorted the same way, recursively.
      *
      * @param  mixed  $value
