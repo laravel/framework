@@ -4,7 +4,6 @@ namespace Illuminate\Testing\Fluent\Concerns;
 
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 

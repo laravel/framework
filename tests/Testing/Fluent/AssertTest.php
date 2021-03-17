@@ -824,7 +824,7 @@ class AssertTest extends TestCase
     public function testAssertWhereTypeWithPipeInUnionType()
     {
         $assert = AssertableJson::fromArray([
-             'foo' => 'bar',
+            'foo' => 'bar',
         ]);
 
         $assert->whereType('foo', 'string|null');
