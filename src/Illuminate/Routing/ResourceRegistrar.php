@@ -80,9 +80,7 @@ class ResourceRegistrar
         // register these resource routes with a prefix so we will set that up out of
         // the box so they don't have to mess with it. Otherwise, we will continue.
         if (Str::contains($name, '/')) {
-            $this->prefixedResource($name, $controller, $options);
-
-            return;
+            return $this->prefixedResource($name, $controller, $options);
         }
 
         // We need to extract the base resource from the resource name. Nested resources
@@ -115,7 +113,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
+     * @return \Illuminate\Routing\RouteCollection
      */
     protected function prefixedResource($name, $controller, array $options)
     {
@@ -124,11 +122,15 @@ class ResourceRegistrar
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
         // place-holder on the route parameters, which should be the base resources.
-        $callback = function ($me) use ($name, $controller, $options) {
-            $me->resource($name, $controller, $options);
+        /** @var PendingResourceRegistration $registration */
+        $registration = null;
+        $callback = function ($me) use ($name, $controller, $options, &$registration) {
+            $registration = $me->resource($name, $controller, $options);
         };
 
-        return $this->router->group(compact('prefix'), $callback);
+        $this->router->group(compact('prefix'), $callback);
+
+        return $registration->register();
     }
 
     /**
