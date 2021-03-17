@@ -365,6 +365,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('Malmö Jönköping', Str::replaceLast('', 'yyy', 'Malmö Jönköping'));
     }
 
+    public function testRemove()
+    {
+        $this->assertSame("Fbar", Str::remove('o', 'Foobar'));
+        $this->assertSame("Foo", Str::remove('bar', 'Foobar'));
+        $this->assertSame("oobar", Str::remove('F', 'Foobar'));
+        $this->assertSame("Foobar", Str::remove('f', 'Foobar'));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));

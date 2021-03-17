@@ -492,6 +492,18 @@ class Str
     }
 
     /**
+     * Remove any occurrence of the given string in the subject.
+     *
+     * @param string $search
+     * @param string $subject
+     * @return string
+     */
+    public static function remove($search, $subject)
+    {
+        return str_replace($search, "", $subject);
+    }
+
+    /**
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
