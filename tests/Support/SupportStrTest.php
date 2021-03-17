@@ -376,6 +376,7 @@ class SupportStrTest extends TestCase
         $this->assertSame("Fbr", Str::remove(["o", "a"], 'Foobar'));
         $this->assertSame("Fooar", Str::remove(["f", "b"], 'Foobar'));
         $this->assertSame("ooar", Str::remove(["f", "b"], 'Foobar', false));
+        $this->assertSame("Foobar", Str::remove(["f", "|"], 'Foo|bar'));
     }
 
     public function testSnake()
