@@ -4,6 +4,7 @@ namespace Illuminate\Testing\Fluent\Concerns;
 
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -65,20 +66,24 @@ trait Matching
     /**
      * Asserts that the property is of the expected type.
      *
-     * @param  string $key
-     * @param  string $expected
+     * @param  string       $key
+     * @param  string|array $expected
      * @return $this
      */
-    public function whereType(string $key, string $expected): self
+    public function whereType(string $key, $expected): self
     {
         $this->has($key);
 
         $actual = $this->prop($key);
 
-        PHPUnit::assertSame(
-            $expected,
+        if (! is_array($expected)) {
+            $expected = explode('|', $expected);
+        }
+
+        PHPUnit::assertContains(
             strtolower(gettype($actual)),
-            sprintf('Property [%s] is not of expected type [%s].', $this->dotPath($key), $expected)
+            $expected,
+            sprintf('Property [%s] is not of expected type [%s].', $this->dotPath($key), implode('|', $expected))
         );
 
         return $this;

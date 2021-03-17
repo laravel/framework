@@ -783,6 +783,65 @@ class AssertTest extends TestCase
         ]);
     }
 
+    public function testAssertWhereTypeWhenWrongTypeIsGiven()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not of expected type [integer].');
+
+        $assert->whereType('foo', 'integer');
+    }
+
+    public function testAssertWhereTypeWithUnionTypes()
+    {
+        $firstAssert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $secondAssert = AssertableJson::fromArray([
+            'foo' => null,
+        ]);
+
+        $firstAssert->whereType('foo', ['string', 'null']);
+        $secondAssert->whereType('foo', ['string', 'null']);
+    }
+
+    public function testAssertWhereTypeWhenWrongUnionTypeIsGiven()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 123,
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not of expected type [string|null].');
+
+        $assert->whereType('foo', ['string', 'null']);
+    }
+
+    public function testAssertWhereTypeWithPipeInUnionType()
+    {
+        $assert = AssertableJson::fromArray([
+             'foo' => 'bar',
+        ]);
+
+        $assert->whereType('foo', 'string|null');
+    }
+
+    public function testAssertWhereTypeWithPipeInWrongUnionType()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not of expected type [integer|null].');
+
+        $assert->whereType('foo', 'integer|null');
+    }
+
     public function testAssertHasAll()
     {
         $assert = AssertableJson::fromArray([
