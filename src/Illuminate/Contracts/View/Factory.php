@@ -76,4 +76,11 @@ interface Factory
      * @return $this
      */
     public function replaceNamespace($namespace, $hints);
+    
+     /**
+     * Flush the cache of views located by the finder.
+     *
+     * @return void
+     */
+    public function flushFinderCache();
 }
