@@ -151,6 +151,8 @@ class MorphToMany extends BelongsToMany
     {
         $using = $this->using;
 
+        $attributes = Arr::add($attributes, $this->morphType, $this->morphClass);
+
         $pivot = $using ? $using::fromRawAttributes($this->parent, $attributes, $this->table, $exists)
                         : MorphPivot::fromAttributes($this->parent, $attributes, $this->table, $exists);
 
