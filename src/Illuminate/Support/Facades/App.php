@@ -15,7 +15,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool runningInConsole()
  * @method static bool runningUnitTests()
  * @method static bool shouldSkipMiddleware()
- * @method static string basePath()
+ * @method static string basePath(string $path = '')
  * @method static string bootstrapPath(string $path = '')
  * @method static string configPath(string $path = '')
  * @method static string databasePath(string $path = '')
