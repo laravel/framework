@@ -879,6 +879,19 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testSingleRouteBinding()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }])->bindParameter('bar', function ($value) {
+            return strtoupper($value);
+        });
+
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     public function testRouteClassBinding()
     {
         $router = $this->getRouter();
@@ -889,6 +902,16 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testSingleRouteClassBinding()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }])->bindParameter('bar', RouteBindingStub::class);
+
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     public function testRouteClassMethodBinding()
     {
         $router = $this->getRouter();
@@ -896,6 +919,16 @@ class RoutingRouteTest extends TestCase
             return $name;
         }]);
         $router->bind('bar', RouteBindingStub::class.'@find');
+        $this->assertSame('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
+    }
+
+    public function testSingleRouteClassMethodBinding()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }])->bindParameter('bar', RouteBindingStub::class.'@find');
+
         $this->assertSame('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
     }
 

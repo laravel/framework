@@ -670,6 +670,21 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame('users.index', $this->getRoute()->getName());
     }
 
+    public function testCanSetParameterBindings()
+    {
+        $closure = function ($value) {
+            return "resolved-value-$value";
+        };
+
+        $this->router->get('users/{user}', function ($resolved) {
+            return $resolved;
+        })->bindParameter('user', $closure);
+
+        $this->assertSame($closure, $this->getRoute()->parameterBinding('user'));
+        $this->assertSame(['user' => $closure], $this->getRoute()->parameterBindings());
+        $this->assertSame('resolved-value-1', $this->getRoute()->parameterBinding('user')(1));
+    }
+
     /**
      * Get the last route registered with the router.
      *
