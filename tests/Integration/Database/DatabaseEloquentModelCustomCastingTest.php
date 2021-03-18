@@ -106,7 +106,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model = new TestEloquentModelWithCustomCast;
         $model->birthday_at = now();
-        $this->assertTrue(is_string($model->toArray()['birthday_at']));
+        $this->assertIsString($model->toArray()['birthday_at']);
     }
 
     public function testGetOriginalWithCastValueObjects()
