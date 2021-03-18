@@ -77,20 +77,19 @@ class DatabaseTransactionsManagerTest extends TestCase
 
     public function testCallbacksAreAddedToTheCurrentTransaction()
     {
-        $callbacks = [];
 
         $manager = (new DatabaseTransactionsManager());
 
         $manager->begin('default', 1);
 
-        $manager->addCallback(function () use (&$callbacks) {
+        $manager->addCallback(function () {
         });
 
         $manager->begin('default', 2);
 
         $manager->begin('admin', 1);
 
-        $manager->addCallback(function () use (&$callbacks) {
+        $manager->addCallback(function () {
         });
 
         $this->assertCount(1, $manager->getTransactions()[0]->getCallbacks());
