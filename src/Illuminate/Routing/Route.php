@@ -143,6 +143,13 @@ class Route
     protected $bindingFields = [];
 
     /**
+     * The bindings for the url parameters.
+     *
+     * @var array
+     */
+    protected $parameterBindings = [];
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -479,6 +486,44 @@ class Route
         }
 
         return $this->parameterNames = $this->compileParameterNames();
+    }
+
+    /**
+     * Get all of the parameter bindings for the route.
+     *
+     * @return array
+     */
+    public function parameterBindings()
+    {
+        return $this->parameterBindings;
+    }
+
+    /**
+     * Get all of the parameter bindings for the route.
+     *
+     * @param  string $name
+     * @return callable|null
+     */
+    public function parameterBinding($name)
+    {
+        return $this->parameterBindings[$name] ?? null;
+    }
+
+    /**
+     * Add a new route parameter binder.
+     *
+     * @param  string  $key
+     * @param  string|callable  $binder
+     * @return void
+     */
+    public function bindParameter($key, $binder)
+    {
+        $this->parameterBindings[str_replace('-', '_', $key)] = RouteBinding::forCallback(
+            $this->container,
+            $binder
+        );
+
+        return $this;
     }
 
     /**

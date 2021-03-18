@@ -807,7 +807,9 @@ class Router implements BindingRegistrar, RegistrarContract
     public function substituteBindings($route)
     {
         foreach ($route->parameters() as $key => $value) {
-            if (isset($this->binders[$key])) {
+            if ($binding = $route->parameterBinding($key)) {
+                $route->setParameter($key, call_user_func($binding, $value, $route));
+            } else if (isset($this->binders[$key])) {
                 $route->setParameter($key, $this->performBinding($key, $value, $route));
             }
         }
