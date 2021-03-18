@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
