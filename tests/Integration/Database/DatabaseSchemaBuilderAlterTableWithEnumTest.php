@@ -30,7 +30,7 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
         $tables = Schema::getAllTables();
 
         $this->assertCount(1, $tables);
-        $this->assertEquals('stdClass', get_class($tables[0]));
+        $this->assertSame('stdClass', get_class($tables[0]));
 
         $tableProperties = array_values((array) $tables[0]);
         $this->assertEquals(['users', 'BASE TABLE'], $tableProperties);

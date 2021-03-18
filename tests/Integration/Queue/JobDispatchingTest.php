@@ -27,7 +27,7 @@ class JobDispatchingTest extends TestCase
         Job::dispatch('test')->replaceValue('new-test');
 
         $this->assertTrue(Job::$ran);
-        $this->assertEquals('new-test', Job::$value);
+        $this->assertSame('new-test', Job::$value);
     }
 }
 

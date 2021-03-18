@@ -124,7 +124,7 @@ class RateLimitedWithRedisTest extends TestCase
         })->bindTo($restoredRateLimited, RateLimitedWithRedis::class);
 
         $this->assertFalse($restoredRateLimited->shouldRelease);
-        $this->assertEquals('limiterName', $fetch('limiterName'));
+        $this->assertSame('limiterName', $fetch('limiterName'));
         $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
         $this->assertInstanceOf(Redis::class, $fetch('redis'));
     }

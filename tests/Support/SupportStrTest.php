@@ -528,8 +528,8 @@ class SupportStrTest extends TestCase
 
     public function testMarkdown()
     {
-        $this->assertEquals("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
-        $this->assertEquals("<h1>hello world</h1>\n", Str::markdown('# hello world'));
+        $this->assertSame("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
+        $this->assertSame("<h1>hello world</h1>\n", Str::markdown('# hello world'));
     }
 }
 
