@@ -568,16 +568,13 @@ class Str
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
-        $regexSafeSearches = array_map(
-            function ($search) {
-                return preg_quote($search);
-            },
-            is_array($search) ? $search : [$search]
-        );
+        $regexSafeSearches = array_map(function ($search) {
+            return preg_quote($search);
+        }, is_array($search) ? $search : [$search]);
 
-        $regex = "/" . implode("|", $regexSafeSearches) . "/";
+        $regex = "/".implode("|", $regexSafeSearches)."/";
 
-        if (!$caseSensitive) {
+        if (! $caseSensitive) {
             $regex .= "i";
         }
 
