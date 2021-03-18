@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
@@ -568,17 +569,13 @@ class Str
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
-        $regexSafeSearches = array_map(function ($search) {
-            return preg_quote($search);
-        }, is_array($search) ? $search : [$search]);
-
-        $regex = "/".implode("|", $regexSafeSearches)."/";
-
-        if (! $caseSensitive) {
-            $regex .= "i";
+        foreach (Arr::wrap($search) as $s) {
+            $subject = $caseSensitive
+                        ? str_replace($search, '', $subject)
+                        : str_ireplace($search, '', $subject);
         }
 
-        return preg_replace($regex, "", $subject);
+        return $subject;
     }
 
     /**
