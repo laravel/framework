@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use Throwable;
 
 /**
  * @group integration
@@ -52,7 +53,7 @@ class QueueConnectionTest extends TestCase
 
         try {
             Bus::dispatch((new QueueConnectionTestJob)->beforeCommit());
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // This job was dispatched
         }
     }

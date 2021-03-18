@@ -9,6 +9,7 @@ use Illuminate\Contracts\Container\CircularDependencyException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
+use TypeError;
 
 class ContainerTest extends TestCase
 {
@@ -123,7 +124,7 @@ class ContainerTest extends TestCase
 
     public function testBindFailsLoudlyWithInvalidArgument()
     {
-        $this->expectException(\TypeError::class);
+        $this->expectException(TypeError::class);
         $container = new Container;
 
         $concrete = new ContainerConcreteStub();
