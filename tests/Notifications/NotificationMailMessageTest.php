@@ -172,7 +172,7 @@ class NotificationMailMessageTest extends TestCase
     public function testWhenCallbackWithDefault()
     {
         $callback = function (MailMessage $mailMessage, $condition) {
-            $this->assertEquals('truthy', $condition);
+            $this->assertSame('truthy', $condition);
 
             $mailMessage->cc('truthy@example.com');
         };
@@ -237,7 +237,7 @@ class NotificationMailMessageTest extends TestCase
         };
 
         $default = function (MailMessage $mailMessage, $condition) {
-            $this->assertEquals('truthy', $condition);
+            $this->assertSame('truthy', $condition);
 
             $mailMessage->cc('truthy@example.com');
         };

@@ -467,7 +467,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
 
         $this->assertTrue(Builder::hasGlobalMacro('foo'));
-        $this->assertEquals('bar', $builder->foo('bar'));
+        $this->assertSame('bar', $builder->foo('bar'));
         $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 

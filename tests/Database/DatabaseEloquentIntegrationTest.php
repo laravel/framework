@@ -1377,14 +1377,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::find(2)->update(['email' => 'dev@mathieutu.ovh']);
 
         $this->assertCount(3, $users);
-        $this->assertNotEquals('Mathieu TUDISCO', $users[0]->name);
-        $this->assertNotEquals('dev@mathieutu.ovh', $users[1]->email);
+        $this->assertNotSame('Mathieu TUDISCO', $users[0]->name);
+        $this->assertNotSame('dev@mathieutu.ovh', $users[1]->email);
 
         $refreshedUsers = $users->fresh();
 
         $this->assertCount(2, $refreshedUsers);
-        $this->assertEquals('Mathieu TUDISCO', $refreshedUsers[0]->name);
-        $this->assertEquals('dev@mathieutu.ovh', $refreshedUsers[1]->email);
+        $this->assertSame('Mathieu TUDISCO', $refreshedUsers[0]->name);
+        $this->assertSame('dev@mathieutu.ovh', $refreshedUsers[1]->email);
     }
 
     public function testTimestampsUsingDefaultDateFormat()
@@ -1817,10 +1817,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
             ]);
 
         $this->assertInstanceOf(MorphPivot::class, $freshPivot = $pivot->fresh());
-        $this->assertEquals('primary', $freshPivot->taxonomy);
+        $this->assertSame('primary', $freshPivot->taxonomy);
 
         $this->assertSame($pivot, $pivot->refresh());
-        $this->assertEquals('primary', $pivot->taxonomy);
+        $this->assertSame('primary', $pivot->taxonomy);
     }
 
     /**

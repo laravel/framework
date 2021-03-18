@@ -16,11 +16,11 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('admin', 1);
 
         $this->assertCount(3, $manager->getTransactions());
-        $this->assertEquals('default', $manager->getTransactions()[0]->connection);
+        $this->assertSame('default', $manager->getTransactions()[0]->connection);
         $this->assertEquals(1, $manager->getTransactions()[0]->level);
-        $this->assertEquals('default', $manager->getTransactions()[1]->connection);
+        $this->assertSame('default', $manager->getTransactions()[1]->connection);
         $this->assertEquals(2, $manager->getTransactions()[1]->level);
-        $this->assertEquals('admin', $manager->getTransactions()[2]->connection);
+        $this->assertSame('admin', $manager->getTransactions()[2]->connection);
         $this->assertEquals(1, $manager->getTransactions()[2]->level);
     }
 
@@ -36,10 +36,10 @@ class DatabaseTransactionsManagerTest extends TestCase
 
         $this->assertCount(2, $manager->getTransactions());
 
-        $this->assertEquals('default', $manager->getTransactions()[0]->connection);
+        $this->assertSame('default', $manager->getTransactions()[0]->connection);
         $this->assertEquals(1, $manager->getTransactions()[0]->level);
 
-        $this->assertEquals('admin', $manager->getTransactions()[1]->connection);
+        $this->assertSame('admin', $manager->getTransactions()[1]->connection);
         $this->assertEquals(1, $manager->getTransactions()[1]->level);
     }
 
@@ -55,7 +55,7 @@ class DatabaseTransactionsManagerTest extends TestCase
 
         $this->assertCount(1, $manager->getTransactions());
 
-        $this->assertEquals('admin', $manager->getTransactions()[0]->connection);
+        $this->assertSame('admin', $manager->getTransactions()[0]->connection);
         $this->assertEquals(1, $manager->getTransactions()[0]->level);
     }
 
@@ -71,7 +71,7 @@ class DatabaseTransactionsManagerTest extends TestCase
 
         $this->assertCount(1, $manager->getTransactions());
 
-        $this->assertEquals('admin', $manager->getTransactions()[0]->connection);
+        $this->assertSame('admin', $manager->getTransactions()[0]->connection);
         $this->assertEquals(1, $manager->getTransactions()[0]->level);
     }
 

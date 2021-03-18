@@ -262,9 +262,9 @@ class AuthAccessGateTest extends TestCase
         });
 
         $gate->after(function ($user, $ability, $result) {
-            if ($ability == 'foo') {
+            if ($ability === 'foo') {
                 $this->assertTrue($result, 'After callback on `foo` should receive true as result');
-            } elseif ($ability == 'bar') {
+            } elseif ($ability === 'bar') {
                 $this->assertFalse($result, 'After callback on `bar` should receive false as result');
             } else {
                 $this->assertNull($result, 'After callback on `missing` should receive null as result');
@@ -312,7 +312,7 @@ class AuthAccessGateTest extends TestCase
         $gate = $this->getBasicGate();
 
         $gate->after(function ($user, $ability, $result) {
-            return $ability == 'allow';
+            return $ability === 'allow';
         });
 
         $gate->after(function ($user, $ability, $result) {

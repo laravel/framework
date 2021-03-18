@@ -324,7 +324,7 @@ class Stringable implements JsonSerializable
      * Convert GitHub flavored Markdown into HTML.
      *
      * @param  array  $options
-     * @return string
+     * @return static
      */
     public function markdown(array $options = [])
     {

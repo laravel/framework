@@ -333,7 +333,7 @@ class BusBatchTest extends TestCase
 
         $this->assertEquals(3, $batch->totalJobs);
         $this->assertEquals(3, $batch->pendingJobs);
-        $this->assertEquals('test-queue', $chainHeadJob->chainQueue);
+        $this->assertSame('test-queue', $chainHeadJob->chainQueue);
         $this->assertIsString($chainHeadJob->batchId);
         $this->assertIsString($secondJob->batchId);
         $this->assertIsString($thirdJob->batchId);

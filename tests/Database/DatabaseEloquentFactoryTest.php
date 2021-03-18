@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -18,7 +19,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     protected function setUp(): void
     {
         $container = Container::getInstance();
-        $container->singleton(\Faker\Generator::class, function ($app, $parameters) {
+        $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
         $container->instance(Application::class, $app = Mockery::mock(Application::class));
@@ -243,7 +244,7 @@ class DatabaseEloquentFactoryTest extends TestCase
                         ->create();
 
         $this->assertCount(3, $posts->filter(function ($post) {
-            return $post->user->name == 'Taylor Otwell';
+            return $post->user->name === 'Taylor Otwell';
         }));
 
         $this->assertCount(1, FactoryTestUser::all());
@@ -401,11 +402,11 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(4, $user->roles);
 
         $this->assertCount(2, $user->roles->filter(function ($role) {
-            return $role->pivot->admin == 'Y';
+            return $role->pivot->admin === 'Y';
         }));
 
         $this->assertCount(2, $user->roles->filter(function ($role) {
-            return $role->pivot->admin == 'N';
+            return $role->pivot->admin === 'N';
         }));
     }
 
@@ -480,7 +481,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             return 'Hello World';
         });
 
-        $this->assertEquals('Hello World', $factory->getFoo());
+        $this->assertSame('Hello World', $factory->getFoo());
     }
 
     /**

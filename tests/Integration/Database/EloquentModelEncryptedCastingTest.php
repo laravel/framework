@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Schema;
+use stdClass;
 
 /**
  * @group integration
@@ -130,7 +131,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testObjectIsCastable()
     {
-        $object = new \stdClass();
+        $object = new stdClass();
         $object->key1 = 'value1';
 
         $this->encrypter->expects('encrypt')
@@ -146,7 +147,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             'secret_object' => $object,
         ]);
 
-        $this->assertInstanceOf(\stdClass::class, $object->secret_object);
+        $this->assertInstanceOf(stdClass::class, $object->secret_object);
         $this->assertSame('value1', $object->secret_object->key1);
         $this->assertDatabaseHas('encrypted_casts', [
             'id' => $object->id,
