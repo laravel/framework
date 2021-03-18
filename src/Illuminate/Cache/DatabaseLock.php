@@ -56,7 +56,6 @@ class DatabaseLock extends Lock
      */
     public function acquire()
     {
-
         try {
             $this->connection->table($this->table)->insert([
                 'key' => $this->name,

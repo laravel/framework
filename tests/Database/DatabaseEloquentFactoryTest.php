@@ -205,7 +205,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_has_many_relationship()
     {
-         FactoryTestUserFactory::times(10)
+        FactoryTestUserFactory::times(10)
                         ->has(
                             FactoryTestPostFactory::times(3)
                                     ->state(function ($attributes, $user) {
@@ -282,7 +282,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_morph_to_relationship()
     {
-         FactoryTestCommentFactory::times(3)
+        FactoryTestCommentFactory::times(3)
                         ->for(FactoryTestPostFactory::new(['title' => 'Test Title']), 'commentable')
                         ->create();
 
@@ -296,7 +296,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_morph_to_relationship_with_existing_model_instance()
     {
         $post = FactoryTestPostFactory::new(['title' => 'Test Title'])->create();
-         FactoryTestCommentFactory::times(3)
+        FactoryTestCommentFactory::times(3)
                         ->for($post, 'commentable')
                         ->create();
 
@@ -309,7 +309,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_belongs_to_many_relationship()
     {
-         FactoryTestUserFactory::times(3)
+        FactoryTestUserFactory::times(3)
                         ->hasAttached(
                             FactoryTestRoleFactory::times(3)->afterCreating(function ($role, $user) {
                                 $_SERVER['__test.role.creating-role'] = $role;

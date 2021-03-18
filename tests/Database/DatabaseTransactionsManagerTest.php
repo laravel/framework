@@ -77,7 +77,6 @@ class DatabaseTransactionsManagerTest extends TestCase
 
     public function testCallbacksAreAddedToTheCurrentTransaction()
     {
-
         $manager = (new DatabaseTransactionsManager());
 
         $manager->begin('default', 1);
