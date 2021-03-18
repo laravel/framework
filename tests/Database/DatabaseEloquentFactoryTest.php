@@ -243,7 +243,7 @@ class DatabaseEloquentFactoryTest extends TestCase
                         ->create();
 
         $this->assertCount(3, $posts->filter(function ($post) {
-            return $post->user->name == 'Taylor Otwell';
+            return $post->user->name === 'Taylor Otwell';
         }));
 
         $this->assertCount(1, FactoryTestUser::all());
@@ -401,11 +401,11 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(4, $user->roles);
 
         $this->assertCount(2, $user->roles->filter(function ($role) {
-            return $role->pivot->admin == 'Y';
+            return $role->pivot->admin === 'Y';
         }));
 
         $this->assertCount(2, $user->roles->filter(function ($role) {
-            return $role->pivot->admin == 'N';
+            return $role->pivot->admin === 'N';
         }));
     }
 
