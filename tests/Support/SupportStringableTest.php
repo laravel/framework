@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -450,6 +451,20 @@ class SupportStringableTest extends TestCase
         // Test for multibyte string support
         $this->assertSame('Malmö Jönkxxxping', (string) $this->stringable('Malmö Jönköping')->replaceLast('ö', 'xxx'));
         $this->assertSame('Malmö Jönköping', (string) $this->stringable('Malmö Jönköping')->replaceLast('', 'yyy'));
+    }
+
+    public function testRemove()
+    {
+        $this->assertSame("Fbar", (string) $this->stringable('Foobar')->remove('o'));
+        $this->assertSame("Foo", (string) $this->stringable('Foobar')->remove('bar'));
+        $this->assertSame("oobar", (string) $this->stringable('Foobar')->remove('F'));
+        $this->assertSame("Foobar", (string) $this->stringable('Foobar')->remove('f'));
+        $this->assertSame("oobar", (string) $this->stringable('Foobar')->remove('f', false));
+
+        $this->assertSame("Fbr", (string) $this->stringable('Foobar')->remove(["o", "a"]));
+        $this->assertSame("Fooar", (string) $this->stringable('Foobar')->remove(["f", "b"]));
+        $this->assertSame("ooar", (string) $this->stringable('Foobar')->remove(["f", "b"], false));
+        $this->assertSame("Foobar", (string) $this->stringable('Foo|bar')->remove(["f", "|"]));
     }
 
     public function testSnake()

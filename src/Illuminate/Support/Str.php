@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
@@ -553,6 +554,25 @@ class Str
 
         if ($position !== false) {
             return substr_replace($subject, $replace, $position, strlen($search));
+        }
+
+        return $subject;
+    }
+
+    /**
+     * Remove any occurrence of the given string in the subject.
+     *
+     * @param string|array<string> $search
+     * @param string $subject
+     * @param bool $caseSensitive
+     * @return string
+     */
+    public static function remove($search, $subject, $caseSensitive = true)
+    {
+        foreach (Arr::wrap($search) as $s) {
+            $subject = $caseSensitive
+                        ? str_replace($search, '', $subject)
+                        : str_ireplace($search, '', $subject);
         }
 
         return $subject;

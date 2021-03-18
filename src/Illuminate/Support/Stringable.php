@@ -468,6 +468,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Remove any occurrence of the given string in the subject.
+     *
+     * @param string|array<string> $search
+     * @param bool $caseSensitive
+     * @return static
+     */
+    public function remove($search, $caseSensitive = true)
+    {
+        return new static(Str::remove($search, $this->value, $caseSensitive));
+    }
+
+    /**
      * Replace the given value in the given string.
      *
      * @param  string|string[]  $search
