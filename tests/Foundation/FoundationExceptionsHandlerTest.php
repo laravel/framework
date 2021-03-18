@@ -150,7 +150,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testReturnsCustomResponseFromCallableClass()
     {
-        $this->handler->renderable(new CustomRenderer());
+        $this->handler->renderable(new CustomRenderer);
 
         $response = $this->handler->render($this->request, new CustomException)->getContent();
 
@@ -274,7 +274,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
         $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
 
-        $response = $this->handler->render($this->request, new RecordsNotFoundException());
+        $response = $this->handler->render($this->request, new RecordsNotFoundException);
 
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertStringContainsString('"message": "Not found."', $response->getContent());
@@ -283,7 +283,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->container->instance(LoggerInterface::class, $logger);
         $logger->shouldNotReceive('error');
 
-        $this->handler->report(new RecordsNotFoundException());
+        $this->handler->report(new RecordsNotFoundException);
     }
 }
 

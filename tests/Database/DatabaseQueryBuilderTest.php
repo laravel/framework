@@ -1976,7 +1976,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 0]]);
         $results = $builder->from('users')->doesntExistOr(function () {
-            throw new RuntimeException();
+            throw new RuntimeException;
         });
         $this->assertTrue($results);
     }
@@ -1992,7 +1992,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 1]]);
         $results = $builder->from('users')->existsOr(function () {
-            throw new RuntimeException();
+            throw new RuntimeException;
         });
         $this->assertTrue($results);
     }

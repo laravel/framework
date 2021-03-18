@@ -18,7 +18,7 @@ class InteractsWithContainerTest extends TestCase
 
     public function testWithMixRestoresOriginalHandlerAndReturnsInstance()
     {
-        $handler = new stdClass();
+        $handler = new stdClass;
         $this->app->instance(Mix::class, $handler);
 
         $this->withoutMix();

@@ -3580,7 +3580,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testDump($collection)
     {
-        $log = new Collection();
+        $log = new Collection;
 
         VarDumper::setHandler(function ($value) use ($log) {
             $log->add($value);

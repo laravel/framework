@@ -24,7 +24,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
     public function testRefreshCommandCallsCommandsWithProperArguments()
     {
-        $command = new RefreshCommand();
+        $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
         $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
@@ -49,7 +49,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
     public function testRefreshCommandCallsCommandsWithStep()
     {
-        $command = new RefreshCommand();
+        $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
         $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());

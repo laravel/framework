@@ -447,7 +447,7 @@ class ValueObjectWithCasterInstance extends ValueObject
 {
     public static function castUsing(array $arguments)
     {
-        return new ValueObjectCaster();
+        return new ValueObjectCaster;
     }
 }
 

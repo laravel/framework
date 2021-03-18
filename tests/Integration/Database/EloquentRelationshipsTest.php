@@ -56,11 +56,11 @@ class EloquentRelationshipsTest extends TestCase
     public function testAlwaysUnsetBelongsToRelationWhenReceivedModelId()
     {
         // create users
-        $user1 = (new FakeRelationship())->forceFill(['id' => 1]);
-        $user2 = (new FakeRelationship())->forceFill(['id' => 2]);
+        $user1 = (new FakeRelationship)->forceFill(['id' => 1]);
+        $user2 = (new FakeRelationship)->forceFill(['id' => 2]);
 
         // sync user 1 using Model
-        $post = new Post();
+        $post = new Post;
         $post->author()->associate($user1);
         $post->syncOriginal();
 
