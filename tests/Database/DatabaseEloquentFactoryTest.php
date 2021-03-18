@@ -480,7 +480,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             return 'Hello World';
         });
 
-        $this->assertEquals('Hello World', $factory->getFoo());
+        $this->assertSame('Hello World', $factory->getFoo());
     }
 
     /**
