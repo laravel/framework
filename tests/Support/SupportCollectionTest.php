@@ -582,7 +582,7 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
         $this->assertEquals(['first' => 'Hello', 'second' => 'World'], $c->filter(function ($item, $key) {
-            return $key != 'id';
+            return $key !== 'id';
         })->all());
     }
 
@@ -3126,7 +3126,7 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection(['foo', 'bar']);
         $this->assertEquals(['foo'], $c->reject(function ($v) {
-            return $v == 'bar';
+            return $v === 'bar';
         })->values()->all());
 
         $c = new $collection(['foo', null]);
@@ -3137,12 +3137,12 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection(['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], $c->reject(function ($v) {
-            return $v == 'baz';
+            return $v === 'baz';
         })->values()->all());
 
         $c = new $collection(['id' => 1, 'primary' => 'foo', 'secondary' => 'bar']);
         $this->assertEquals(['primary' => 'foo', 'secondary' => 'bar'], $c->reject(function ($item, $key) {
-            return $key == 'id';
+            return $key === 'id';
         })->all());
     }
 
@@ -3215,7 +3215,7 @@ class SupportCollectionTest extends TestCase
             return $value < 1 && is_numeric($value);
         }));
         $this->assertFalse($c->search(function ($value) {
-            return $value == 'nope';
+            return $value === 'nope';
         }));
     }
 

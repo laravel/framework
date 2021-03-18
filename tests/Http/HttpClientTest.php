@@ -688,13 +688,13 @@ class HttpClientTest extends TestCase
 
         $exampleUrls = [
             function ($request) {
-                return $request->url() == 'http://example.com/1';
+                return $request->url() === 'http://example.com/1';
             },
             function ($request) {
-                return $request->url() == 'http://example.com/2';
+                return $request->url() === 'http://example.com/2';
             },
             function ($request) {
-                return $request->url() == 'http://example.com/3';
+                return $request->url() === 'http://example.com/3';
             },
         ];
 

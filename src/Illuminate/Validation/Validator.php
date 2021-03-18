@@ -528,7 +528,7 @@ class Validator implements ValidatorContract
 
         [$rule, $parameters] = ValidationRuleParser::parse($rule);
 
-        if ($rule == '') {
+        if ($rule === '') {
             return;
         }
 
