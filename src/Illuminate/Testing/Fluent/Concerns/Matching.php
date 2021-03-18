@@ -65,7 +65,7 @@ trait Matching
     /**
      * Asserts that the property is of the expected type.
      *
-     * @param  string       $key
+     * @param  string  $key
      * @param  string|array $expected
      * @return $this
      */
