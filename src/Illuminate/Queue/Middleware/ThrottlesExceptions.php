@@ -72,10 +72,11 @@ class ThrottlesExceptions
      * @param  string  $key
      * @return void
      */
-    public function __construct($maxAttempts = 10, $decayMinutes = 10)
+    public function __construct($maxAttempts = 10, $decayMinutes = 10, $key = null)
     {
         $this->maxAttempts = $maxAttempts;
         $this->decayMinutes = $decayMinutes;
+        $this->key = $key;
     }
 
     /**
