@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
+use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class DatabaseTransactionsTest extends TestCase
 {
@@ -176,9 +178,9 @@ class DatabaseTransactionsTest extends TestCase
                     'value' => 2,
                 ]);
 
-                throw new \Exception;
+                throw new Exception;
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
     }
 
@@ -230,10 +232,10 @@ class DatabaseTransactionsTest extends TestCase
                         'value' => 2,
                     ]);
 
-                    throw new \Exception;
+                    throw new Exception;
                 });
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
     }
 

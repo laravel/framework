@@ -10,6 +10,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -659,7 +660,7 @@ class HttpClientTest extends TestCase
         $this->factory->get($exampleUrls[2]);
         $this->factory->get($exampleUrls[1]);
 
-        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($exampleUrls);
     }
@@ -677,7 +678,7 @@ class HttpClientTest extends TestCase
         $this->factory->get($exampleUrls[0]);
         $this->factory->get($exampleUrls[1]);
 
-        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($exampleUrls);
     }
@@ -778,7 +779,7 @@ class HttpClientTest extends TestCase
             'name' => 'Taylor',
         ]);
 
-        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($executionOrder);
     }

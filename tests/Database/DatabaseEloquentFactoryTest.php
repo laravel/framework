@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -18,7 +19,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     protected function setUp(): void
     {
         $container = Container::getInstance();
-        $container->singleton(\Faker\Generator::class, function ($app, $parameters) {
+        $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
         $container->instance(Application::class, $app = Mockery::mock(Application::class));

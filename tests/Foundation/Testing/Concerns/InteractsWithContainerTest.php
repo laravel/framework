@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
 use Illuminate\Foundation\Mix;
 use Orchestra\Testbench\TestCase;
+use stdClass;
 
 class InteractsWithContainerTest extends TestCase
 {
@@ -17,7 +18,7 @@ class InteractsWithContainerTest extends TestCase
 
     public function testWithMixRestoresOriginalHandlerAndReturnsInstance()
     {
-        $handler = new \stdClass();
+        $handler = new stdClass();
         $this->app->instance(Mix::class, $handler);
 
         $this->withoutMix();
