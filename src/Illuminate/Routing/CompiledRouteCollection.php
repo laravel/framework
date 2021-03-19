@@ -302,7 +302,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
             ->setBindingFields($attributes['bindingFields'])
-            ->bindParameters($attributes['parameterBindings'])
+            ->bindParameter($attributes['parameterBindings'])
             ->block($attributes['lockSeconds'] ?? null, $attributes['waitSeconds'] ?? null);
     }
 

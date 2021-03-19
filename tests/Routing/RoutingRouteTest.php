@@ -913,13 +913,13 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    public function testPerRouteBindings()
+    public function testPerRouteBindingsArray()
     {
         $router = $this->getRouter();
 
         $route = $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
-        }])->bindParameters(['bar' => function ($value) {
+        }])->bindParameter(['bar' => function ($value) {
             return strtoupper($value);
         }]);
 
@@ -936,12 +936,12 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    public function testPerRouteClassBindings()
+    public function testPerRouteClassBindingsArray()
     {
         $router = $this->getRouter();
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
-        }])->bindParameters(['bar' => RouteBindingStub::class]);
+        }])->bindParameter(['bar' => RouteBindingStub::class]);
 
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
@@ -956,12 +956,12 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
     }
 
-    public function testPerRouteClassMethodBindings()
+    public function testPerRouteClassMethodBindingsArray()
     {
         $router = $this->getRouter();
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
-        }])->bindParameters(['bar' => RouteBindingStub::class.'@find']);
+        }])->bindParameter(['bar' => RouteBindingStub::class.'@find']);
 
         $this->assertSame('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
     }
@@ -1658,9 +1658,15 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
 
-        $uses = function () { return 'uses'; };
-        $missing = function () { return 'missing'; };
-        $binding = function () { return 'binding'; };
+        $uses = function () {
+            return 'uses';
+        };
+        $missing = function () {
+            return 'missing';
+        };
+        $binding = function () {
+            return 'binding';
+        };
 
         $route = $router->get('foo/{bar}', ['uses' => $uses, 'missing' => $missing])
             ->bindParameter('bar', $binding);

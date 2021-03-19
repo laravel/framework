@@ -510,36 +510,27 @@ class Route
     }
 
     /**
-     * Add a new route parameter binding.
+     * Set the bound parameters for the route.
      *
-     * @param  string|array  $key
+     * @param  string|array  $bindings
      * @param  string|callable|null  $binder
      * @return $this
      */
-    public function bindParameter($key, $binder = null)
+    public function bindParameter($bindings, $closure = null)
     {
-        if (is_string($binder) && RouteClosureSerializer::isSerializedClosure($binder)) {
-            $binder = unserialize($binder)->getClosure();
+        if (! is_array($bindings)) {
+            $bindings = [$bindings => $closure];
         }
 
-        $this->parameterBindings[str_replace('-', '_', $key)] = RouteBinding::forCallback(
-            $this->container,
-            $binder
-        );
+        foreach ($bindings as $key => $binder) {
+            if (is_string($binder) && RouteClosureSerializer::isSerializedClosure($binder)) {
+                $binder = unserialize($binder)->getClosure();
+            }
 
-        return $this;
-    }
-
-    /**
-     * Set all the parameter bindings fields for the route.
-     *
-     * @param  array  $bindings
-     * @return $this
-     */
-    public function bindParameters(array $bindings)
-    {
-        foreach ($bindings as $key => $value) {
-            $this->bindParameter($key, $value);
+            $this->parameterBindings[str_replace('-', '_', $key)] = RouteBinding::forCallback(
+                $this->container,
+                $binder
+            );
         }
 
         return $this;
