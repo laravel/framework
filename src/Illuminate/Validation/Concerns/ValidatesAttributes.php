@@ -556,7 +556,7 @@ trait ValidatesAttributes
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
-        return ! in_array($value, array_values($data));
+        return ! in_array($value, array_values($data), in_array('strict', $parameters));
     }
 
     /**
