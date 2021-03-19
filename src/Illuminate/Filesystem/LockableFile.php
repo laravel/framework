@@ -67,7 +67,7 @@ class LockableFile
     {
         $this->handle = @fopen($path, $mode);
 
-        if (!$this->handle) {
+        if (! $this->handle) {
             throw new Exception('Could not create file: '.$path.'; please check your permissions.');
         }
     }
