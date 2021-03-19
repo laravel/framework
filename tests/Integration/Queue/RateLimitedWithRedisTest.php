@@ -67,6 +67,20 @@ class RateLimitedWithRedisTest extends TestCase
         $this->assertJobWasReleased($testJob);
     }
 
+    public function testRateLimitedJobsAcceptFractionalMinutes()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $testJob = new RedisRateLimitedTestJob;
+
+        $rateLimiter->for($testJob->key, function ($job) {
+            return Limit::perSecond(1);
+        });
+
+        $this->assertJobRanSuccessfully($testJob);
+        $this->assertJobWasReleased($testJob);
+    }
+
     public function testRateLimitedJobsCanBeSkippedOnLimitReached()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);

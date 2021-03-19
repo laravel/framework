@@ -40,11 +40,34 @@ class Limit
      * @param  int  $decayMinutes
      * @return void
      */
-    public function __construct($key = '', int $maxAttempts = 60, int $decayMinutes = 1)
+    public function __construct($key = '', int $maxAttempts = 60, float $decayMinutes = 1)
     {
         $this->key = $key;
         $this->maxAttempts = $maxAttempts;
         $this->decayMinutes = $decayMinutes;
+    }
+
+    /**
+     * Create a new rate limit using a second.
+     *
+     * @param  int  $maxAttempts
+     * @return static
+     */
+    public static function perSecond($maxAttempts)
+    {
+        return new static('', $maxAttempts, 1 / 60);
+    }
+
+    /**
+     * Create a new rate limit using seconds as decay time.
+     *
+     * @param  int  $decaySeconds
+     * @param  int  $maxAttempts
+     * @return static
+     */
+    public static function perSeconds($decaySeconds, $maxAttempts)
+    {
+        return new static('', $maxAttempts, $decaySeconds / 60);
     }
 
     /**
