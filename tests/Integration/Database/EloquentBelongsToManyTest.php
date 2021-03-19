@@ -417,10 +417,15 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tags()->attach(Tag::all());
 
-        $this->assertEquals($tag->id, $post->tags()->firstOrNew(['id' => $tag->id])->id);
+        $newTag1 = $post->tags()->firstOrNew(['id' => $tag->id], ['name' => 'blablabla']);
+        $this->assertInstanceOf(Tag::class, $newTag1);
+        $this->assertEquals($tag->id, $newTag1->id);
+        $this->assertEquals($tag->name, $newTag1->name);
 
-        $this->assertNull($post->tags()->firstOrNew(['id' => 'asd'])->id);
-        $this->assertInstanceOf(Tag::class, $post->tags()->firstOrNew(['id' => 'asd']));
+        $newTag2 = $post->tags()->firstOrNew(['id' => 'asd'], ['name' => 'blablabla']);
+        $this->assertNull($newTag2->id);
+        $this->assertEquals('blablabla', $newTag2->name);
+        $this->assertInstanceOf(Tag::class, $newTag2);
     }
 
     public function testFirstOrCreateMethod()
