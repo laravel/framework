@@ -5238,7 +5238,7 @@ class ValidationValidatorTest extends TestCase
         );
 
         $this->assertFalse($v->passes());
-        $this->assertTrue(is_array($v->failed()['foo.foo.bar']));
+        $this->assertIsArray($v->failed()['foo.foo.bar']);
     }
 
     public function testImplicitCustomValidationObjects()

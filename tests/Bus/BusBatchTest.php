@@ -113,7 +113,7 @@ class BusBatchTest extends TestCase
 
         $this->assertEquals(3, $batch->totalJobs);
         $this->assertEquals(3, $batch->pendingJobs);
-        $this->assertTrue(is_string($job->batchId));
+        $this->assertIsString($job->batchId);
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
 
@@ -301,7 +301,7 @@ class BusBatchTest extends TestCase
         $batch->cancelledAt = now();
         $this->assertTrue($batch->cancelled());
 
-        $this->assertTrue(is_string(json_encode($batch)));
+        $this->assertIsString(json_encode($batch));
     }
 
     public function test_chain_can_be_added_to_batch()
@@ -334,9 +334,9 @@ class BusBatchTest extends TestCase
         $this->assertEquals(3, $batch->totalJobs);
         $this->assertEquals(3, $batch->pendingJobs);
         $this->assertSame('test-queue', $chainHeadJob->chainQueue);
-        $this->assertTrue(is_string($chainHeadJob->batchId));
-        $this->assertTrue(is_string($secondJob->batchId));
-        $this->assertTrue(is_string($thirdJob->batchId));
+        $this->assertIsString($chainHeadJob->batchId);
+        $this->assertIsString($secondJob->batchId);
+        $this->assertIsString($thirdJob->batchId);
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
 

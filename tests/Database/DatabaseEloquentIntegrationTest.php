@@ -811,12 +811,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
 
         $user->friends()->get()->each(function ($friend) {
-            $this->assertTrue($friend->pivot instanceof EloquentTestFriendPivot);
+            $this->assertInstanceOf(EloquentTestFriendPivot::class, $friend->pivot);
         });
 
         $soleFriend = $user->friends()->where('email', 'abigailotwell@gmail.com')->sole();
 
-        $this->assertTrue($soleFriend->pivot instanceof EloquentTestFriendPivot);
+        $this->assertInstanceOf(EloquentTestFriendPivot::class, $soleFriend->pivot);
     }
 
     public function testBelongsToManyRelationshipMissingModelExceptionWithSoleQueryWorks()
