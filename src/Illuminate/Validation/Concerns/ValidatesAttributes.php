@@ -1435,6 +1435,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute does not exist.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibited($attribute, $value)
+    {
+        return false;
+    }
+
+    /**
      * Validate that an attribute does not exist when another attribute has a given value.
      *
      * @param  string  $attribute

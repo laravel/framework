@@ -1190,6 +1190,36 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The last field is required unless first is in taylor, sven.', $v->messages()->first('last'));
     }
 
+    public function testProhibited()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [], ['name' => 'prohibited']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['last' => 'bar'], ['name' => 'prohibited']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'prohibited']);
+        $this->assertTrue($v->fails());
+
+        $file = new File('', false);
+        $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
+        $this->assertTrue($v->fails());
+
+        $file = new File(__FILE__, false);
+        $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
+        $this->assertTrue($v->fails());
+
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['files' => [$file, $file2]], ['files.0' => 'prohibited', 'files.1' => 'prohibited']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['files' => [$file, $file2]], ['files' => 'prohibited']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testProhibitedIf()
     {
         $trans = $this->getIlluminateArrayTranslator();
