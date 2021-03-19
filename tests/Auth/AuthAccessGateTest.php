@@ -184,10 +184,12 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($_SERVER['__laravel.gateAfter']);
         $this->assertFalse($_SERVER['__laravel.gateAfter2']);
 
-        unset($_SERVER['__laravel.gateBefore']);
-        unset($_SERVER['__laravel.gateBefore2']);
-        unset($_SERVER['__laravel.gateAfter']);
-        unset($_SERVER['__laravel.gateAfter2']);
+        unset(
+            $_SERVER['__laravel.gateBefore'],
+            $_SERVER['__laravel.gateBefore2'],
+            $_SERVER['__laravel.gateAfter'],
+            $_SERVER['__laravel.gateAfter2']
+        );
     }
 
     public function testResourceGatesCanBeDefined()

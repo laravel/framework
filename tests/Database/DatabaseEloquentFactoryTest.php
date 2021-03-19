@@ -200,8 +200,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame($user, $_SERVER['__test.user.making']);
         $this->assertSame($user, $_SERVER['__test.user.creating']);
 
-        unset($_SERVER['__test.user.making']);
-        unset($_SERVER['__test.user.creating']);
+        unset($_SERVER['__test.user.making'], $_SERVER['__test.user.creating']);
     }
 
     public function test_has_many_relationship()
@@ -232,9 +231,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.creating-user']);
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.state-user']);
 
-        unset($_SERVER['__test.post.creating-post']);
-        unset($_SERVER['__test.post.creating-user']);
-        unset($_SERVER['__test.post.state-user']);
+        unset($_SERVER['__test.post.creating-post'], $_SERVER['__test.post.creating-user'], $_SERVER['__test.post.state-user']);
     }
 
     public function test_belongs_to_relationship()
@@ -331,8 +328,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-role']);
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-user']);
 
-        unset($_SERVER['__test.role.creating-role']);
-        unset($_SERVER['__test.role.creating-user']);
+        unset($_SERVER['__test.role.creating-role'], $_SERVER['__test.role.creating-user']);
     }
 
     public function test_belongs_to_many_relationship_with_existing_model_instances()

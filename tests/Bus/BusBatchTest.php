@@ -70,10 +70,7 @@ class BusBatchTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($_SERVER['__finally.batch']);
-        unset($_SERVER['__then.batch']);
-        unset($_SERVER['__catch.batch']);
-        unset($_SERVER['__catch.exception']);
+        unset($_SERVER['__finally.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 
         $this->schema()->drop('job_batches');
 
