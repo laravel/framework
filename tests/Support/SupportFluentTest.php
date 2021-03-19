@@ -113,6 +113,35 @@ class SupportFluentTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
     }
+
+    public function testConditionalAttributeSetter()
+    {
+        $fluent = new Fluent;
+
+        $fluent->when(false, function (Fluent $values) {
+            $values->name('Taylor');
+        });
+        $this->assertFalse(isset($fluent->name));
+
+        $fluent->when(true, function (Fluent $values) {
+            $values->name('Taylor');
+        });
+        $this->assertTrue(isset($fluent->name));
+    }
+
+    public function testConditionalAttributeSetterWithDefault()
+    {
+        $fluent = new Fluent;
+
+        $fluent->when(false, function (Fluent $values) {
+            $values->name('Taylor');
+        }, function (Fluent $values) {
+            $values->age(25);
+        });
+
+        $this->assertFalse(isset($fluent->name));
+        $this->assertTrue(isset($fluent->age));
+    }
 }
 
 class FluentArrayIteratorStub implements IteratorAggregate
