@@ -527,6 +527,23 @@ class Route
     }
 
     /**
+     * Set the parameter bindings fields for the route.
+     *
+     * @param  array  $bindingFields
+     * @return $this
+     */
+    public function setParameterBindings(array $parameterBindings)
+    {
+        foreach ($parameterBindings as $key => $value) {
+            $this->parameterBindings[$key] = RouteClosureSerializer::isSerializedClosure($value)
+                ? unserialize($value)->getClosure()
+                : $value;
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the parameter names for the route.
      *
      * @return array
@@ -990,7 +1007,7 @@ class Route
         $missing = $this->action['missing'] ?? null;
 
         return is_string($missing) &&
-            Str::startsWith($missing, 'C:32:"Opis\\Closure\\SerializableClosure')
+            RouteClosureSerializer::isSerializedClosure($missing)
                 ? unserialize($missing)
                 : $missing;
     }
