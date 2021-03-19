@@ -244,7 +244,7 @@ class Worker
      */
     protected function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
     {
-        return ! ((($this->isDownForMaintenance)() && ! $options->force) ||
+        return ! (($this->isDownForMaintenance)() && ! $options->force ||
             $this->paused ||
             $this->events->until(new Looping($connectionName, $queue)) === false);
     }
@@ -673,7 +673,7 @@ class Worker
      */
     public function memoryExceeded($memoryLimit)
     {
-        return (memory_get_usage(true) / 1024 / 1024) >= $memoryLimit;
+        return memory_get_usage(true) / 1024 / 1024 >= $memoryLimit;
     }
 
     /**

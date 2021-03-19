@@ -140,7 +140,7 @@ class MorphTo extends BelongsTo
                                 (array) ($this->morphableEagerLoadCounts[get_class($instance)] ?? [])
                             );
 
-        if ($callback = ($this->morphableConstraints[get_class($instance)] ?? null)) {
+        if ($callback = $this->morphableConstraints[get_class($instance)] ?? null) {
             $callback($query);
         }
 

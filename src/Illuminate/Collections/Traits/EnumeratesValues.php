@@ -965,7 +965,7 @@ trait EnumeratesValues
             $retrieved = data_get($item, $key);
 
             $strings = array_filter([$retrieved, $value], function ($value) {
-                return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
+                return is_string($value) || is_object($value) && method_exists($value, '__toString');
             });
 
             if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {

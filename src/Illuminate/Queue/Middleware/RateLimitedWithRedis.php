@@ -86,7 +86,7 @@ class RateLimitedWithRedis extends RateLimited
      */
     protected function getTimeUntilNextRetry($key)
     {
-        return ($this->decaysAt[$key] - $this->currentTime()) + 3;
+        return $this->decaysAt[$key] - $this->currentTime() + 3;
     }
 
     /**

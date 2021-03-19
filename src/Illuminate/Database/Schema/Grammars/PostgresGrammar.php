@@ -991,7 +991,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if ((in_array($column->type, $this->serials) || ($column->generatedAs !== null)) && $column->autoIncrement) {
+        if ((in_array($column->type, $this->serials) || $column->generatedAs !== null) && $column->autoIncrement) {
             return ' primary key';
         }
     }

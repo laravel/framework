@@ -263,7 +263,7 @@ class ParallelTesting
     {
         return $token = $this->tokenResolver
             ? call_user_func($this->tokenResolver)
-            : ($_SERVER['TEST_TOKEN'] ?? false);
+            : $_SERVER['TEST_TOKEN'] ?? false;
     }
 
     /**

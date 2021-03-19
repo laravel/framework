@@ -161,7 +161,7 @@ class PendingDispatch
 
         $uniqueId = method_exists($this->job, 'uniqueId')
                     ? $this->job->uniqueId()
-                    : ($this->job->uniqueId ?? '');
+                    : $this->job->uniqueId ?? '';
 
         $cache = method_exists($this->job, 'uniqueVia')
                     ? $this->job->uniqueVia()

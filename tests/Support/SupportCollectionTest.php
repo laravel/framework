@@ -1509,7 +1509,7 @@ class SupportCollectionTest extends TestCase
                 return 0;
             }
 
-            return ($a < $b) ? -1 : 1;
+            return $a < $b ? -1 : 1;
         });
 
         $this->assertEquals(range(1, 5), array_values($data->all()));

@@ -1394,7 +1394,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
         $this->load(collect($this->relations)->reject(function ($relation) {
             return $relation instanceof Pivot
-                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
+                || is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true);
         })->keys()->all());
 
         $this->syncOriginal();
@@ -1883,7 +1883,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return $this->$method(...$parameters);
         }
 
-        if ($resolver = (static::$relationResolvers[get_class($this)][$method] ?? null)) {
+        if ($resolver = static::$relationResolvers[get_class($this)][$method] ?? null) {
             return $resolver($this);
         }
 

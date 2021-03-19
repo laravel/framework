@@ -233,7 +233,7 @@ if (! function_exists('retry')) {
         try {
             return $callback($attempts);
         } catch (Exception $e) {
-            if ($times < 1 || ($when && ! $when($e))) {
+            if ($times < 1 || $when && ! $when($e)) {
                 throw $e;
             }
 

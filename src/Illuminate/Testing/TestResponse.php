@@ -400,7 +400,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         foreach ($values as $value) {
             PHPUnit::assertStringContainsString((string) $value, $this->getContent());
@@ -418,7 +418,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertSeeInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map('e', $values) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder($this->getContent()));
 
@@ -436,7 +436,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         tap(strip_tags($this->getContent()), function ($content) use ($values) {
             foreach ($values as $value) {
@@ -456,7 +456,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertSeeTextInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map('e', $values) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
 
@@ -474,7 +474,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         foreach ($values as $value) {
             PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
@@ -494,7 +494,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         tap(strip_tags($this->getContent()), function ($content) use ($values) {
             foreach ($values as $value) {
@@ -661,7 +661,7 @@ class TestResponse implements ArrayAccess
 
         foreach ($errors as $key => $value) {
             PHPUnit::assertArrayHasKey(
-                (is_int($key)) ? $value : $key,
+                is_int($key) ? $value : $key,
                 $jsonErrors,
                 "Failed to find a validation error in the response for key: '{$value}'".PHP_EOL.PHP_EOL.$errorMessage
             );

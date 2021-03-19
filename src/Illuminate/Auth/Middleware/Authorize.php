@@ -76,7 +76,7 @@ class Authorize
             return trim($model);
         } else {
             return $request->route($model, null) ?:
-                ((preg_match("/^['\"](.*)['\"]$/", trim($model), $matches)) ? $matches[1] : null);
+                (preg_match("/^['\"](.*)['\"]$/", trim($model), $matches) ? $matches[1] : null);
         }
     }
 

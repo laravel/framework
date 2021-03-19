@@ -56,8 +56,7 @@ class StartSession
 
         $session = $this->getSession($request);
 
-        if ($this->manager->shouldBlock() ||
-            ($request->route() instanceof Route && $request->route()->locksFor())) {
+        if ($this->manager->shouldBlock() || $request->route() instanceof Route && $request->route()->locksFor()) {
             return $this->handleRequestWhileBlocking($request, $session, $next);
         }
 

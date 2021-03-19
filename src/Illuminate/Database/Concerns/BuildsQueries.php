@@ -152,7 +152,7 @@ trait BuildsQueries
     {
         return $this->chunkById($count, function ($results, $page) use ($callback, $count) {
             foreach ($results as $key => $value) {
-                if ($callback($value, (($page - 1) * $count) + $key) === false) {
+                if ($callback($value, ($page - 1) * $count + $key) === false) {
                     return false;
                 }
             }

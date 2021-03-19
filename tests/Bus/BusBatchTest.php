@@ -385,7 +385,7 @@ class BusBatchTest extends TestCase
                 'finished_at' => null,
             ]);
 
-        $batch = (new DatabaseBatchRepository($factory, $connection, 'job_batches'));
+        $batch = new DatabaseBatchRepository($factory, $connection, 'job_batches');
 
         $factory->shouldReceive('make')
             ->withSomeOfArgs($batch, '', '', '', '', '', '', $options);

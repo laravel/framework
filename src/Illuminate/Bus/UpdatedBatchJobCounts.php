@@ -38,6 +38,6 @@ class UpdatedBatchJobCounts
      */
     public function allJobsHaveRanExactlyOnce()
     {
-        return ($this->pendingJobs - $this->failedJobs) === 0;
+        return $this->pendingJobs - $this->failedJobs === 0;
     }
 }

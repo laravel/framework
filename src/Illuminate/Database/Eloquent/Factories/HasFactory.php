@@ -16,7 +16,7 @@ trait HasFactory
 
         return $factory
                     ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : null)
-                    ->state(is_array($parameters[0] ?? null) ? $parameters[0] : ($parameters[1] ?? []));
+                    ->state(is_array($parameters[0] ?? null) ? $parameters[0] : $parameters[1] ?? []);
     }
 
     /**

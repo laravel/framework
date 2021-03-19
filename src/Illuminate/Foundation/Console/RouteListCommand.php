@@ -185,7 +185,7 @@ class RouteListCommand extends Command
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
+        if ($this->option('name') && ! Str::contains($route['name'], $this->option('name')) ||
              $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
              $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) {
             return;

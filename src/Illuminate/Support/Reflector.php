@@ -21,7 +21,7 @@ class Reflector
             return is_callable($var, $syntaxOnly);
         }
 
-        if ((! isset($var[0]) || ! isset($var[1])) ||
+        if (! isset($var[0]) || ! isset($var[1]) ||
             ! is_string($var[1] ?? null)) {
             return false;
         }
@@ -95,7 +95,7 @@ class Reflector
     {
         $paramClassName = static::getParameterClassName($parameter);
 
-        return ($paramClassName && class_exists($paramClassName))
+        return $paramClassName && class_exists($paramClassName)
             ? (new ReflectionClass($paramClassName))->isSubclassOf($className)
             : false;
     }

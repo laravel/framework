@@ -206,7 +206,7 @@ trait ValidatesAttributes
             $secondDate = $this->getDateTimeWithOptionalFormat($format, $this->getValue($second));
         }
 
-        return ($firstDate && $secondDate) && ($this->compare($firstDate, $secondDate, $operator));
+        return $firstDate && $secondDate && $this->compare($firstDate, $secondDate, $operator);
     }
 
     /**
@@ -361,7 +361,7 @@ trait ValidatesAttributes
             return true;
         }
 
-        if ((! is_string($value) && ! is_numeric($value)) || strtotime($value) === false) {
+        if (! is_string($value) && ! is_numeric($value) || strtotime($value) === false) {
             return false;
         }
 
@@ -509,12 +509,7 @@ trait ValidatesAttributes
      */
     protected function failsBasicDimensionChecks($parameters, $width, $height)
     {
-        return (isset($parameters['width']) && $parameters['width'] != $width) ||
-               (isset($parameters['min_width']) && $parameters['min_width'] > $width) ||
-               (isset($parameters['max_width']) && $parameters['max_width'] < $width) ||
-               (isset($parameters['height']) && $parameters['height'] != $height) ||
-               (isset($parameters['min_height']) && $parameters['min_height'] > $height) ||
-               (isset($parameters['max_height']) && $parameters['max_height'] < $height);
+        return isset($parameters['width']) && $parameters['width'] != $width || isset($parameters['min_width']) && $parameters['min_width'] > $width || isset($parameters['max_width']) && $parameters['max_width'] < $width || isset($parameters['height']) && $parameters['height'] != $height || isset($parameters['min_height']) && $parameters['min_height'] > $height || isset($parameters['max_height']) && $parameters['max_height'] < $height;
     }
 
     /**
@@ -903,7 +898,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gt');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (is_null($comparedToValue) && is_numeric($value) && is_numeric($parameters[0])) {
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
@@ -938,7 +933,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lt');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (is_null($comparedToValue) && is_numeric($value) && is_numeric($parameters[0])) {
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
@@ -973,7 +968,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gte');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (is_null($comparedToValue) && is_numeric($value) && is_numeric($parameters[0])) {
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
@@ -1008,7 +1003,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lte');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (is_null($comparedToValue) && is_numeric($value) && is_numeric($parameters[0])) {
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
@@ -1239,7 +1234,7 @@ trait ValidatesAttributes
             'php', 'php3', 'php4', 'php5', 'phtml',
         ];
 
-        return ($value instanceof UploadedFile)
+        return $value instanceof UploadedFile
            ? in_array(trim(strtolower($value->getClientOriginalExtension())), $phpExtensions)
            : in_array(trim(strtolower($value->getExtension())), $phpExtensions);
     }

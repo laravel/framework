@@ -592,7 +592,7 @@ class Dispatcher implements DispatcherContract
             $job->tries = $listener->tries ?? null;
 
             $job->backoff = method_exists($listener, 'backoff')
-                                ? $listener->backoff() : ($listener->backoff ?? null);
+                                ? $listener->backoff() : $listener->backoff ?? null;
 
             $job->timeout = $listener->timeout ?? null;
 

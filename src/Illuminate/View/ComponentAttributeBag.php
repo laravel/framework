@@ -213,15 +213,14 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 
         [$appendableAttributes, $nonAppendableAttributes] = collect($this->attributes)
                     ->partition(function ($value, $key) use ($attributeDefaults) {
-                        return $key === 'class' ||
-                               (isset($attributeDefaults[$key]) &&
-                                $attributeDefaults[$key] instanceof AppendableAttributeValue);
+                        return $key === 'class' || isset($attributeDefaults[$key]) &&
+                         $attributeDefaults[$key] instanceof AppendableAttributeValue;
                     });
 
         $attributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributeDefaults, $escape) {
             $defaultsValue = isset($attributeDefaults[$key]) && $attributeDefaults[$key] instanceof AppendableAttributeValue
                         ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape)
-                        : ($attributeDefaults[$key] ?? '');
+                        : $attributeDefaults[$key] ?? '';
 
             return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
         })->merge($nonAppendableAttributes)->all();

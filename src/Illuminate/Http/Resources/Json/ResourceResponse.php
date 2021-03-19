@@ -65,7 +65,7 @@ class ResourceResponse implements Responsable
         if ($this->haveDefaultWrapperAndDataIsUnwrapped($data)) {
             $data = [$this->wrapper() => $data];
         } elseif ($this->haveAdditionalInformationAndDataIsUnwrapped($data, $with, $additional)) {
-            $data = [($this->wrapper() ?? 'data') => $data];
+            $data = [$this->wrapper() ?? 'data' => $data];
         }
 
         return array_merge_recursive($data, $with, $additional);

@@ -43,9 +43,8 @@ class PusherBroadcaster extends Broadcaster
     {
         $channelName = $this->normalizeChannelName($request->channel_name);
 
-        if (empty($request->channel_name) ||
-            ($this->isGuardedChannel($request->channel_name) &&
-            ! $this->retrieveUser($request, $channelName))) {
+        if (empty($request->channel_name) || $this->isGuardedChannel($request->channel_name) &&
+        ! $this->retrieveUser($request, $channelName)) {
             throw new AccessDeniedHttpException;
         }
 
@@ -128,7 +127,7 @@ class PusherBroadcaster extends Broadcaster
                 $this->formatChannels($channels), $event, $payload, $socket, true
             );
 
-            if ((is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)
+            if (is_array($response) && $response['status'] >= 200 && $response['status'] <= 299
                 || $response === true) {
                 return;
             }

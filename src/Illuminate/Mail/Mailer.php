@@ -362,7 +362,7 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         if (isset($raw)) {
-            $method = (isset($view) || isset($plain)) ? 'addPart' : 'setBody';
+            $method = isset($view) || isset($plain) ? 'addPart' : 'setBody';
 
             $message->$method($raw, 'text/plain');
         }
