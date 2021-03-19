@@ -15,7 +15,7 @@ class DatabaseSQLiteBuilderTest extends TestCase
 {
     protected function setUp(): void
     {
-        $app = new Container();
+        $app = new Container;
 
         Container::setInstance($app)
             ->singleton('files', Filesystem::class);

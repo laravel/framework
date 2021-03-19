@@ -617,15 +617,15 @@ trait ValidatesAttributes
             ->unique()
             ->map(function ($validation) {
                 if ($validation === 'rfc') {
-                    return new RFCValidation();
+                    return new RFCValidation;
                 } elseif ($validation === 'strict') {
-                    return new NoRFCWarningsValidation();
+                    return new NoRFCWarningsValidation;
                 } elseif ($validation === 'dns') {
-                    return new DNSCheckValidation();
+                    return new DNSCheckValidation;
                 } elseif ($validation === 'spoof') {
-                    return new SpoofCheckValidation();
+                    return new SpoofCheckValidation;
                 } elseif ($validation === 'filter') {
-                    return new FilterEmailValidation();
+                    return new FilterEmailValidation;
                 } elseif ($validation === 'filter_unicode') {
                     return FilterEmailValidation::unicode();
                 } elseif (is_string($validation) && class_exists($validation)) {
@@ -633,7 +633,7 @@ trait ValidatesAttributes
                 }
             })
             ->values()
-            ->all() ?: [new RFCValidation()];
+            ->all() ?: [new RFCValidation];
 
         return (new EmailValidator)->isValid($value, new MultipleValidationWithAnd($validations));
     }

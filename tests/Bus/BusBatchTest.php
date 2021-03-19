@@ -310,11 +310,11 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue);
 
-        $chainHeadJob = new ChainHeadJob();
+        $chainHeadJob = new ChainHeadJob;
 
-        $secondJob = new SecondTestJob();
+        $secondJob = new SecondTestJob;
 
-        $thirdJob = new ThirdTestJob();
+        $thirdJob = new ThirdTestJob;
 
         $queue->shouldReceive('connection')->once()
             ->with('test-connection')

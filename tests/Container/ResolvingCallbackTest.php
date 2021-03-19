@@ -303,7 +303,7 @@ class ResolvingCallbackTest extends TestCase
         $this->assertEquals(3, $callCounter);
 
         $container->bind(ResolvingContractStub::class, function () {
-            return new ResolvingImplementationStubTwo();
+            return new ResolvingImplementationStubTwo;
         });
         $this->assertEquals(4, $callCounter);
 

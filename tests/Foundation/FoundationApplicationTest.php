@@ -430,7 +430,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testEnvPathsAreUsedAndMadeAbsoluteForCachePathsWhenSpecifiedAsRelativeWithNullBasePath()
     {
-        $app = new Application();
+        $app = new Application;
         $_SERVER['APP_SERVICES_CACHE'] = 'relative/path/services.php';
         $_SERVER['APP_PACKAGES_CACHE'] = 'relative/path/packages.php';
         $_SERVER['APP_CONFIG_CACHE'] = 'relative/path/config.php';

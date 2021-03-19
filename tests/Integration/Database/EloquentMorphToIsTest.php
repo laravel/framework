@@ -52,7 +52,7 @@ class EloquentMorphToIsTest extends DatabaseTestCase
     public function testParentIsNotAnotherModel()
     {
         $child = Comment::first();
-        $parent = new Post();
+        $parent = new Post;
         $parent->id = 2;
 
         $this->assertFalse($child->commentable()->is($parent));

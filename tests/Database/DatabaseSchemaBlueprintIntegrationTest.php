@@ -169,7 +169,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->string('name')->nullable()->unique()->change();
         });
 
-        $queries = $blueprintMySql->toSql($this->db->connection(), new MySqlGrammar());
+        $queries = $blueprintMySql->toSql($this->db->connection(), new MySqlGrammar);
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
@@ -186,7 +186,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->string('name')->nullable()->unique()->change();
         });
 
-        $queries = $blueprintPostgres->toSql($this->db->connection(), new PostgresGrammar());
+        $queries = $blueprintPostgres->toSql($this->db->connection(), new PostgresGrammar);
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
@@ -203,7 +203,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->string('name')->nullable()->unique()->change();
         });
 
-        $queries = $blueprintSQLite->toSql($this->db->connection(), new SQLiteGrammar());
+        $queries = $blueprintSQLite->toSql($this->db->connection(), new SQLiteGrammar);
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
@@ -220,7 +220,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->string('name')->nullable()->unique()->change();
         });
 
-        $queries = $blueprintSqlServer->toSql($this->db->connection(), new SqlServerGrammar());
+        $queries = $blueprintSqlServer->toSql($this->db->connection(), new SqlServerGrammar);
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
@@ -244,7 +244,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->string('name')->nullable()->unique('index1')->change();
         });
 
-        $queries = $blueprintMySql->toSql($this->db->connection(), new MySqlGrammar());
+        $queries = $blueprintMySql->toSql($this->db->connection(), new MySqlGrammar);
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
@@ -261,7 +261,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->unsignedInteger('name')->nullable()->unique('index1')->change();
         });
 
-        $queries = $blueprintPostgres->toSql($this->db->connection(), new PostgresGrammar());
+        $queries = $blueprintPostgres->toSql($this->db->connection(), new PostgresGrammar);
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
@@ -278,7 +278,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->unsignedInteger('name')->nullable()->unique('index1')->change();
         });
 
-        $queries = $blueprintSQLite->toSql($this->db->connection(), new SQLiteGrammar());
+        $queries = $blueprintSQLite->toSql($this->db->connection(), new SQLiteGrammar);
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
@@ -295,7 +295,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->unsignedInteger('name')->nullable()->unique('index1')->change();
         });
 
-        $queries = $blueprintSqlServer->toSql($this->db->connection(), new SqlServerGrammar());
+        $queries = $blueprintSqlServer->toSql($this->db->connection(), new SqlServerGrammar);
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',

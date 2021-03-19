@@ -127,7 +127,7 @@ class ContainerTest extends TestCase
         $this->expectException(TypeError::class);
         $container = new Container;
 
-        $concrete = new ContainerConcreteStub();
+        $concrete = new ContainerConcreteStub;
         $container->bind(ContainerConcreteStub::class, $concrete);
     }
 

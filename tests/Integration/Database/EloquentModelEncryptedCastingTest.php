@@ -131,7 +131,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testObjectIsCastable()
     {
-        $object = new stdClass();
+        $object = new stdClass;
         $object->key1 = 'value1';
 
         $this->encrypter->expects('encrypt')

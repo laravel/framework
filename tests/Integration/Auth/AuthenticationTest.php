@@ -313,7 +313,7 @@ class AuthenticationTest extends TestCase
         ];
 
         Auth::extend('myCustomDriver', function () {
-            return new MyCustomGuardStub();
+            return new MyCustomGuardStub;
         });
 
         $this->assertInstanceOf(MyCustomGuardStub::class, $this->app['auth']->guard('myGuard'));
@@ -333,7 +333,7 @@ class AuthenticationTest extends TestCase
         ];
 
         Auth::extend('myCustomDriver', function () {
-            return new MyDispatcherLessCustomGuardStub();
+            return new MyDispatcherLessCustomGuardStub;
         });
 
         $this->assertInstanceOf(MyDispatcherLessCustomGuardStub::class, $this->app['auth']->guard('myGuard'));
@@ -350,7 +350,7 @@ class MyCustomGuardStub
 
     public function __construct()
     {
-        $this->setDispatcher(new Dispatcher());
+        $this->setDispatcher(new Dispatcher);
     }
 
     public function setDispatcher(Dispatcher $events)

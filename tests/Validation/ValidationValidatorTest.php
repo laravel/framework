@@ -2634,7 +2634,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateEmailWithCustomClassCheck()
     {
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation());
+        $container->shouldReceive('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation);
 
         $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar '], ['x' => 'email:'.NoRFCWarningsValidation::class]);
         $v->setContainer($container);

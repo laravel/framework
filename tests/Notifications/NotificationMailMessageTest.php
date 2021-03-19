@@ -141,11 +141,11 @@ class NotificationMailMessageTest extends TestCase
             $mailMessage->cc('cc@example.com');
         };
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->when(true, $callback);
         $this->assertSame([['cc@example.com', null]], $message->cc);
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->when(false, $callback);
         $this->assertSame([], $message->cc);
     }
@@ -158,12 +158,12 @@ class NotificationMailMessageTest extends TestCase
             return $mailMessage->cc('cc@example.com');
         };
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->when(true, $callback)->bcc('bcc@example.com');
         $this->assertSame([['cc@example.com', null]], $message->cc);
         $this->assertSame([['bcc@example.com', null]], $message->bcc);
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->when(false, $callback)->bcc('bcc@example.com');
         $this->assertSame([], $message->cc);
         $this->assertSame([['bcc@example.com', null]], $message->bcc);
@@ -183,11 +183,11 @@ class NotificationMailMessageTest extends TestCase
             $mailMessage->cc('zero@example.com');
         };
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->when('truthy', $callback, $default);
         $this->assertSame([['truthy@example.com', null]], $message->cc);
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->when(0, $callback, $default);
         $this->assertSame([['zero@example.com', null]], $message->cc);
     }
@@ -200,11 +200,11 @@ class NotificationMailMessageTest extends TestCase
             $mailMessage->cc('test@example.com');
         };
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->unless(false, $callback);
         $this->assertSame([['test@example.com', null]], $message->cc);
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->unless(true, $callback);
         $this->assertSame([], $message->cc);
     }
@@ -217,12 +217,12 @@ class NotificationMailMessageTest extends TestCase
             return $mailMessage->cc('cc@example.com');
         };
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->unless(false, $callback)->bcc('bcc@example.com');
         $this->assertSame([['cc@example.com', null]], $message->cc);
         $this->assertSame([['bcc@example.com', null]], $message->bcc);
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->unless(true, $callback)->bcc('bcc@example.com');
         $this->assertSame([], $message->cc);
         $this->assertSame([['bcc@example.com', null]], $message->bcc);
@@ -242,11 +242,11 @@ class NotificationMailMessageTest extends TestCase
             $mailMessage->cc('truthy@example.com');
         };
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->unless(0, $callback, $default);
         $this->assertSame([['zero@example.com', null]], $message->cc);
 
-        $message = new MailMessage();
+        $message = new MailMessage;
         $message->unless('truthy', $callback, $default);
         $this->assertSame([['truthy@example.com', null]], $message->cc);
     }

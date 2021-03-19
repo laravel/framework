@@ -62,7 +62,7 @@ class ViewComponentTest extends TestCase
 
     public function testItIgnoresExceptedMethodsAndProperties()
     {
-        $component = new TestExceptedViewComponent();
+        $component = new TestExceptedViewComponent;
         $variables = $component->data();
 
         // Ignored methods (with no args) are not invoked behind the scenes.
@@ -75,7 +75,7 @@ class ViewComponentTest extends TestCase
 
     public function testMethodsOverridePropertyValues()
     {
-        $component = new TestHelloPropertyHelloMethodComponent();
+        $component = new TestHelloPropertyHelloMethodComponent;
         $variables = $component->data();
         $this->assertArrayHasKey('hello', $variables);
         $this->assertSame('world', $variables['hello']());
