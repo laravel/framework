@@ -23,6 +23,7 @@ use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteClosureSerializer;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
@@ -879,19 +880,6 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    public function testSingleRouteBinding()
-    {
-        $router = $this->getRouter();
-
-        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
-            return $name;
-        }])->bindParameter('bar', function ($value) {
-            return strtoupper($value);
-        });
-
-        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
-    }
-
     public function testRouteClassBinding()
     {
         $router = $this->getRouter();
@@ -899,16 +887,6 @@ class RoutingRouteTest extends TestCase
             return $name;
         }]);
         $router->bind('bar', RouteBindingStub::class);
-        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
-    }
-
-    public function testSingleRouteClassBinding()
-    {
-        $router = $this->getRouter();
-        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
-            return $name;
-        }])->bindParameter('bar', RouteBindingStub::class);
-
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
@@ -922,12 +900,68 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
     }
 
-    public function testSingleRouteClassMethodBinding()
+    public function testPerRouteBinding()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }])->bindParameter('bar', function ($value) {
+            return strtoupper($value);
+        });
+
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testPerRouteBindings()
+    {
+        $router = $this->getRouter();
+
+        $route = $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }])->bindParameters(['bar' => function ($value) {
+            return strtoupper($value);
+        }]);
+
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testPerRouteClassBinding()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }])->bindParameter('bar', RouteBindingStub::class);
+
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testPerRouteClassBindings()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }])->bindParameters(['bar' => RouteBindingStub::class]);
+
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testPerRouteClassMethodBinding()
     {
         $router = $this->getRouter();
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
         }])->bindParameter('bar', RouteBindingStub::class.'@find');
+
+        $this->assertSame('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
+    }
+
+    public function testPerRouteClassMethodBindings()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }])->bindParameters(['bar' => RouteBindingStub::class.'@find']);
 
         $this->assertSame('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
     }
@@ -1618,6 +1652,28 @@ class RoutingRouteTest extends TestCase
 
         $this->assertSame('bar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
         $this->assertSame('baz', $router->dispatch(Request::create('foo/baz', 'GET'))->getContent());
+    }
+
+    public function testClosuresAreSerializedCorrectly()
+    {
+        $router = $this->getRouter();
+
+        $uses = function () { return 'uses'; };
+        $missing = function () { return 'missing'; };
+        $binding = function () { return 'binding'; };
+
+        $route = $router->get('foo/{bar}', ['uses' => $uses, 'missing' => $missing])
+            ->bindParameter('bar', $binding);
+
+        $route->prepareForSerialization();
+
+        $this->assertTrue(RouteClosureSerializer::isSerializedClosure($usesBis = $route->action['uses']));
+        $this->assertTrue(RouteClosureSerializer::isSerializedClosure($missingBis = $route->action['missing']));
+        $this->assertTrue(RouteClosureSerializer::isSerializedClosure($bindingBis = $route->parameterBindings['bar']));
+
+        $this->assertSame($uses(), unserialize($usesBis)->getClosure()());
+        $this->assertSame($missing(), unserialize($missingBis)->getClosure()());
+        $this->assertSame($binding(), unserialize($bindingBis)->getClosure()());
     }
 
     public function testControllerMiddlewareGroups()

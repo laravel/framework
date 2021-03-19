@@ -147,7 +147,7 @@ class Route
      *
      * @var array
      */
-    protected $parameterBindings = [];
+    public $parameterBindings = [];
 
     /**
      * The validators used by the routes.
@@ -499,7 +499,7 @@ class Route
     }
 
     /**
-     * Get all of the parameter bindings for the route.
+     * Get a specific parameter binding for the route.
      *
      * @param  string $name
      * @return callable|null
@@ -510,14 +510,18 @@ class Route
     }
 
     /**
-     * Add a new route parameter binder.
+     * Add a new route parameter binding.
      *
-     * @param  string  $key
-     * @param  string|callable  $binder
-     * @return void
+     * @param  string|array  $key
+     * @param  string|callable|null  $binder
+     * @return $this
      */
-    public function bindParameter($key, $binder)
+    public function bindParameter($key, $binder = null)
     {
+        if (is_string($binder) && RouteClosureSerializer::isSerializedClosure($binder)) {
+            $binder = unserialize($binder)->getClosure();
+        }
+
         $this->parameterBindings[str_replace('-', '_', $key)] = RouteBinding::forCallback(
             $this->container,
             $binder
@@ -527,17 +531,15 @@ class Route
     }
 
     /**
-     * Set the parameter bindings fields for the route.
+     * Set all the parameter bindings fields for the route.
      *
-     * @param  array  $bindingFields
+     * @param  array  $bindings
      * @return $this
      */
-    public function setParameterBindings(array $parameterBindings)
+    public function bindParameters(array $bindings)
     {
-        foreach ($parameterBindings as $key => $value) {
-            $this->parameterBindings[$key] = RouteClosureSerializer::isSerializedClosure($value)
-                ? unserialize($value)->getClosure()
-                : $value;
+        foreach ($bindings as $key => $value) {
+            $this->bindParameter($key, $value);
         }
 
         return $this;
@@ -1263,6 +1265,12 @@ class Route
 
         if (isset($this->action['missing']) && $this->action['missing'] instanceof Closure) {
             $this->action['missing'] = serialize(new SerializableClosure($this->action['missing']));
+        }
+
+        foreach ($this->parameterBindings as $key => $binding) {
+            $this->parameterBindings[$key] = $binding instanceof Closure
+                ? serialize(new SerializableClosure($binding))
+                : $binding;
         }
 
         $this->compileRoute();
