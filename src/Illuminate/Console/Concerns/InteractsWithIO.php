@@ -101,7 +101,7 @@ trait InteractsWithIO
      * Get the value of a command option.
      *
      * @param  string|null  $key
-     * @param mixed
+     * @param mixed $default
      * @return string|array|bool|null
      */
     public function option($key = null, $default = null)
