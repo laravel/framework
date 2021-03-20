@@ -191,6 +191,10 @@ abstract class Facade
      */
     protected static function getFacadeAccessor()
     {
+        if (static::$app->bound(static::class)) {
+            return static::class;
+        }
+
         throw new RuntimeException('Facade does not implement getFacadeAccessor method.');
     }
 
