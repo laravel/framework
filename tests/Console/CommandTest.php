@@ -63,6 +63,7 @@ class CommandTest extends TestCase
                 return [
                     new InputArgument('argument-one', InputArgument::REQUIRED, 'first test argument'),
                     ['argument-two', InputArgument::OPTIONAL, 'a second test argument'],
+                    ['argument-three', InputArgument::OPTIONAL, 'a third test argument'],
                 ];
             }
 
@@ -71,6 +72,7 @@ class CommandTest extends TestCase
                 return [
                     new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
                     ['option-two', 't', InputOption::VALUE_REQUIRED, 'second test option'],
+                    ['option-three', 'tr', InputOption::VALUE_REQUIRED, 'third test option'],
                 ];
             }
         };
@@ -90,8 +92,10 @@ class CommandTest extends TestCase
 
         $this->assertSame('test-first-argument', $command->argument('argument-one'));
         $this->assertSame('test-second-argument', $command->argument('argument-two'));
+        $this->assertSame('test-default-argument', $command->argument('argument-three', 'test-default-argument'));
         $this->assertSame('test-first-option', $command->option('option-one'));
         $this->assertSame('test-second-option', $command->option('option-two'));
+        $this->assertSame('test-default-option', $command->option('option-three', 'test-default-option'));
     }
 
     public function testTheInputSetterOverwrite()

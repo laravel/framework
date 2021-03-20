@@ -64,15 +64,16 @@ trait InteractsWithIO
      * Get the value of a command argument.
      *
      * @param  string|null  $key
+     * @param mixed $default
      * @return string|array|null
      */
-    public function argument($key = null)
+    public function argument($key = null, $default = null)
     {
         if (is_null($key)) {
             return $this->input->getArguments();
         }
 
-        return $this->input->getArgument($key);
+        return $this->input->getArgument($key) ?? $default;
     }
 
     /**
@@ -100,15 +101,16 @@ trait InteractsWithIO
      * Get the value of a command option.
      *
      * @param  string|null  $key
+     * @param mixed $default
      * @return string|array|bool|null
      */
-    public function option($key = null)
+    public function option($key = null, $default = null)
     {
         if (is_null($key)) {
             return $this->input->getOptions();
         }
 
-        return $this->input->getOption($key);
+        return $this->input->getOption($key) ?? $default;
     }
 
     /**
