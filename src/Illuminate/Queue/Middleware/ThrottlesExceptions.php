@@ -37,11 +37,11 @@ class ThrottlesExceptions
     protected $decayMinutes;
 
     /**
-     * The number of minutes to wait before retrying the job after an exception.
+     * The number of seconds to wait before retrying the job after an exception.
      *
      * @var int
      */
-    protected $retryAfterMinutes = 0;
+    protected $retryAfterSeconds = 0;
 
     /**
      * The callback that determines if rate limiting should apply.
@@ -104,7 +104,7 @@ class ThrottlesExceptions
 
             $this->limiter->hit($jobKey, $this->decayMinutes * 60);
 
-            return $job->release($this->retryAfterMinutes * 60);
+            return $job->release($this->retryAfterSeconds);
         }
     }
 
@@ -142,7 +142,7 @@ class ThrottlesExceptions
      */
     public function backoff($backoff)
     {
-        $this->retryAfterMinutes = $backoff;
+        $this->retryAfterSeconds = $backoff;
 
         return $this;
     }
