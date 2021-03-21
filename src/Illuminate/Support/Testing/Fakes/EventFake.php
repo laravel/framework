@@ -7,6 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
+use ReflectionFunction;
 
 class EventFake implements Dispatcher
 {
@@ -283,5 +284,37 @@ class EventFake implements Dispatcher
     public function until($event, $payload = [])
     {
         return $this->dispatch($event, $payload, true);
+    }
+
+    /**
+     * Assert if an event has a listener attached to it.
+     *
+     * @param string $expectedEvent
+     * @param string $expectedListener
+     * @return void
+     */
+    public function assertAttached($expectedEvent, $expectedListener)
+    {
+        foreach ($this->dispatcher->getListeners($expectedEvent) as $listenerClosure) {
+            $reflection = new ReflectionFunction($listenerClosure);
+            $actualListener = $reflection->getStaticVariables()['listener'];
+
+            if ($actualListener === $expectedListener) {
+                PHPUnit::assertTrue(true);
+
+                return;
+            }
+
+            if ($actualListener instanceof Closure && $expectedListener === Closure::class) {
+                PHPUnit::assertTrue(true);
+
+                return;
+            }
+        }
+
+        PHPUnit::assertTrue(
+            false,
+            sprintf('Event %s does not have the %s listener attached to it', $expectedEvent, print_r($expectedListener, true))
+        );
     }
 }

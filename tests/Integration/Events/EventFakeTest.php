@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Events;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Event;
@@ -126,6 +127,20 @@ class EventFakeTest extends TestCase
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }
+
+    public function testAssertAttached()
+    {
+        Event::fake();
+        Event::listen('event', 'listener');
+        Event::subscribe(PostEventSubscriber::class);
+        Event::listen(function (NonImportantEvent $event) {
+            // do something
+        });
+
+        Event::assertAttached('event', 'listener');
+        Event::assertAttached('post-created', [PostEventSubscriber::class, 'handlePostCreated']);
+        Event::assertAttached(NonImportantEvent::class, Closure::class);
+    }
 }
 
 class Post extends Model
@@ -136,6 +151,21 @@ class Post extends Model
 class NonImportantEvent
 {
     //
+}
+
+class PostEventSubscriber
+{
+    public function handlePostCreated($event)
+    {
+    }
+
+    public function subscribe($events)
+    {
+        $events->listen(
+            'post-created',
+            [PostEventSubscriber::class, 'handlePostCreated']
+        );
+    }
 }
 
 class PostObserver
