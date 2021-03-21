@@ -184,4 +184,14 @@ class FileLoader implements Loader
     {
         return $this->hints;
     }
+    
+    /**
+     * Get an array of all the registered paths to JSON translation files.
+     *
+     * @return array
+     */
+    public function getJsonPaths()
+    {
+        return $this->jsonPaths;
+    }
 }
