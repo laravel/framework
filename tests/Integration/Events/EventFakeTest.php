@@ -128,18 +128,22 @@ class EventFakeTest extends TestCase
         Event::assertNotDispatched(NonImportantEvent::class);
     }
 
-    public function testAssertAttached()
+    public function testAssertListening()
     {
         Event::fake();
         Event::listen('event', 'listener');
+        Event::listen('event', PostEventSubscriber::class);
+        Event::listen('event', [PostEventSubscriber::class, 'foo']);
         Event::subscribe(PostEventSubscriber::class);
         Event::listen(function (NonImportantEvent $event) {
             // do something
         });
 
-        Event::assertAttached('event', 'listener');
-        Event::assertAttached('post-created', [PostEventSubscriber::class, 'handlePostCreated']);
-        Event::assertAttached(NonImportantEvent::class, Closure::class);
+        Event::assertListening('event', 'listener');
+        Event::assertListening('event', PostEventSubscriber::class);
+        Event::assertListening('event', [PostEventSubscriber::class, 'foo']);
+        Event::assertListening('post-created', [PostEventSubscriber::class, 'handlePostCreated']);
+        Event::assertListening(NonImportantEvent::class, Closure::class);
     }
 }
 

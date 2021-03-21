@@ -49,6 +49,38 @@ class EventFake implements Dispatcher
     }
 
     /**
+     * Assert if an event has a listener attached to it.
+     *
+     * @param  string  $expectedEvent
+     * @param  string  $expectedListener
+     * @return void
+     */
+    public function assertListening($expectedEvent, $expectedListener)
+    {
+        foreach ($this->dispatcher->getListeners($expectedEvent) as $listenerClosure) {
+            $actualListener = (new ReflectionFunction($listenerClosure))
+                        ->getStaticVariables()['listener'];
+
+            if ($actualListener === $expectedListener ||
+                ($actualListener instanceof Closure &&
+                $expectedListener === Closure::class)) {
+                PHPUnit::assertTrue(true);
+
+                return;
+            }
+        }
+
+        PHPUnit::assertTrue(
+            false,
+            sprintf(
+                'Event [%s] does not have the [%s] listener attached to it',
+                $expectedEvent,
+                print_r($expectedListener, true)
+            )
+        );
+    }
+
+    /**
      * Assert if an event was dispatched based on a truth-test callback.
      *
      * @param  string|\Closure  $event
@@ -284,37 +316,5 @@ class EventFake implements Dispatcher
     public function until($event, $payload = [])
     {
         return $this->dispatch($event, $payload, true);
-    }
-
-    /**
-     * Assert if an event has a listener attached to it.
-     *
-     * @param string $expectedEvent
-     * @param string $expectedListener
-     * @return void
-     */
-    public function assertAttached($expectedEvent, $expectedListener)
-    {
-        foreach ($this->dispatcher->getListeners($expectedEvent) as $listenerClosure) {
-            $reflection = new ReflectionFunction($listenerClosure);
-            $actualListener = $reflection->getStaticVariables()['listener'];
-
-            if ($actualListener === $expectedListener) {
-                PHPUnit::assertTrue(true);
-
-                return;
-            }
-
-            if ($actualListener instanceof Closure && $expectedListener === Closure::class) {
-                PHPUnit::assertTrue(true);
-
-                return;
-            }
-        }
-
-        PHPUnit::assertTrue(
-            false,
-            sprintf('Event %s does not have the %s listener attached to it', $expectedEvent, print_r($expectedListener, true))
-        );
     }
 }
