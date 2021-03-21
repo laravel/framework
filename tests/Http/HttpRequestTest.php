@@ -12,8 +12,6 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-use function PHPUnit\Framework\assertEquals;
-
 class HttpRequestTest extends TestCase
 {
     protected function tearDown(): void
@@ -324,9 +322,9 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
-        $request->whenHas('boo', function() use (&$boo) {
+        $request->whenHas('boo', function () use (&$boo) {
             $boo = 'test';
-        }, function() use (&$boo) {
+        }, function () use (&$boo) {
             $boo = 'default';
         });
 
@@ -359,9 +357,9 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
-        $request->whenFilled('boo', function() use (&$boo) {
+        $request->whenFilled('boo', function () use (&$boo) {
             $boo = 'test';
-        }, function() use (&$boo) {
+        }, function () use (&$boo) {
             $boo = 'default';
         });
 
