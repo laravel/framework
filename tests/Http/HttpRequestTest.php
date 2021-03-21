@@ -12,6 +12,8 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
+use function PHPUnit\Framework\assertEquals;
+
 class HttpRequestTest extends TestCase
 {
     protected function tearDown(): void
@@ -304,7 +306,7 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
-        $name = $age = $city = $foo = false;
+        $name = $age = $city = $foo = $boo = false;
 
         $request->whenHas('name', function ($value) use (&$name) {
             $name = $value;
@@ -322,17 +324,24 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
+        $request->whenHas('boo', function() use (&$boo) {
+            $boo = 'test';
+        }, function() use (&$boo) {
+            $boo = 'default';
+        });
+
         $this->assertSame('Taylor', $name);
         $this->assertSame('', $age);
         $this->assertNull($city);
         $this->assertFalse($foo);
+        $this->assertSame('default', $boo);
     }
 
     public function testWhenFilledMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
-        $name = $age = $city = $foo = false;
+        $name = $age = $city = $foo = $boo = false;
 
         $request->whenFilled('name', function ($value) use (&$name) {
             $name = $value;
@@ -350,10 +359,17 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
+        $request->whenFilled('boo', function() use (&$boo) {
+            $boo = 'test';
+        }, function() use (&$boo) {
+            $boo = 'default';
+        });
+
         $this->assertSame('Taylor', $name);
         $this->assertFalse($age);
         $this->assertFalse($city);
         $this->assertFalse($foo);
+        $this->assertSame('default', $boo);
     }
 
     public function testMissingMethod()

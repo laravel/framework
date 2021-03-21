@@ -112,12 +112,17 @@ trait InteractsWithInput
      *
      * @param  string  $key
      * @param  callable  $callback
+     * @param  callable|null  $defaultCallback
      * @return $this|mixed
      */
-    public function whenHas($key, callable $callback)
+    public function whenHas($key, callable $callback, callable $defaultCallback = null)
     {
         if ($this->has($key)) {
             return $callback(data_get($this->all(), $key)) ?: $this;
+        }
+
+        if (is_callable($defaultCallback)) {
+            return $defaultCallback();
         }
 
         return $this;
@@ -185,12 +190,17 @@ trait InteractsWithInput
      *
      * @param  string  $key
      * @param  callable  $callback
+     * @param  callable|null  $defaultCallback
      * @return $this|mixed
      */
-    public function whenFilled($key, callable $callback)
+    public function whenFilled($key, callable $callback, callable $defaultCallback = null)
     {
         if ($this->filled($key)) {
             return $callback(data_get($this->all(), $key)) ?: $this;
+        }
+
+        if (is_callable($defaultCallback)) {
+            return $defaultCallback();
         }
 
         return $this;
