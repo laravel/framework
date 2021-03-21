@@ -63,8 +63,8 @@ class Markdown
             'mail', $this->htmlComponentPaths()
         )->make($view, $data)->render();
 
-        if ($this->view->exists($custom = Str::start($this->theme, 'mail.'))) {
-            $theme = $custom;
+        if ($this->view->exists($customTheme = Str::start($this->theme, 'mail.'))) {
+            $theme = $customTheme;
         } else {
             $theme = Str::contains($this->theme, '::')
                 ? $this->theme
