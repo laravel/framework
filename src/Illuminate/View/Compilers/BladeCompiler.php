@@ -5,6 +5,7 @@ namespace Illuminate\View\Compilers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\View\Events\CompiledView;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -156,6 +157,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $this->files->put(
                 $this->getCompiledPath($this->getPath()), $contents
             );
+
+            event(new CompiledView($path, $contents));
         }
     }
 
