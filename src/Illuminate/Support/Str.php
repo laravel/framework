@@ -561,6 +561,25 @@ class Str
     }
 
     /**
+     * Remove any occurrence of the given string in the subject.
+     *
+     * @param string|array<string> $search
+     * @param string $subject
+     * @param bool $caseSensitive
+     * @return string
+     */
+    public static function remove($search, $subject, $caseSensitive = true)
+    {
+        foreach (Arr::wrap($search) as $s) {
+            $subject = $caseSensitive
+                        ? str_replace($search, '', $subject)
+                        : str_ireplace($search, '', $subject);
+        }
+
+        return $subject;
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $value
@@ -762,7 +781,7 @@ class Str
             return call_user_func(static::$uuidFactory);
         }
 
-        $factory = new UuidFactory();
+        $factory = new UuidFactory;
 
         $factory->setRandomGenerator(new CombGenerator(
             $factory->getRandomGenerator(),

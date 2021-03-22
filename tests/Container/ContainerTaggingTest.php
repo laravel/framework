@@ -48,7 +48,7 @@ class ContainerTaggingTest extends TestCase
     public function testTaggedServicesAreLazyLoaded()
     {
         $container = $this->createPartialMock(Container::class, ['make']);
-        $container->expects($this->once())->method('make')->willReturn(new ContainerImplementationTaggedStub());
+        $container->expects($this->once())->method('make')->willReturn(new ContainerImplementationTaggedStub);
 
         $container->tag(ContainerImplementationTaggedStub::class, ['foo']);
         $container->tag(ContainerImplementationTaggedStubTwo::class, ['foo']);

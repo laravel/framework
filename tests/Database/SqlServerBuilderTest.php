@@ -17,7 +17,7 @@ class SqlServerBuilderTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $grammar = new SqlServerGrammar();
+        $grammar = new SqlServerGrammar;
 
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
@@ -31,7 +31,7 @@ class SqlServerBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $grammar = new SqlServerGrammar();
+        $grammar = new SqlServerGrammar;
 
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);

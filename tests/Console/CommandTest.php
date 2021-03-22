@@ -33,7 +33,7 @@ class CommandTest extends TestCase
         $command->setLaravel($application);
 
         $input = new ArrayInput([]);
-        $output = new NullOutput();
+        $output = new NullOutput;
         $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn(m::mock(OutputStyle::class));
 
         $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
@@ -84,7 +84,7 @@ class CommandTest extends TestCase
             '--option-one' => 'test-first-option',
             '--option-two' => 'test-second-option',
         ]);
-        $output = new NullOutput();
+        $output = new NullOutput;
 
         $command->run($input, $output);
 

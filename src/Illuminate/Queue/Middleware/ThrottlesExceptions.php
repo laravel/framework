@@ -135,7 +135,7 @@ class ThrottlesExceptions
     }
 
     /**
-     * Specify the number of seconds a job should be delayed when it is released (before it has reached its max exceptions).
+     * Specify the number of minutes a job should be delayed when it is released (before it has reached its max exceptions).
      *
      * @param  int  $backoff
      * @return $this

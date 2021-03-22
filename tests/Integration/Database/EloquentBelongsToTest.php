@@ -96,7 +96,7 @@ class EloquentBelongsToTest extends DatabaseTestCase
     public function testParentIsNotAnotherModel()
     {
         $child = User::has('parent')->first();
-        $parent = new User();
+        $parent = new User;
         $parent->id = 3;
 
         $this->assertFalse($child->parent()->is($parent));

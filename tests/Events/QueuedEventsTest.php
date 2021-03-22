@@ -39,7 +39,7 @@ class QueuedEventsTest extends TestCase
     {
         $d = new Dispatcher;
 
-        $fakeQueue = new QueueFake(new Container());
+        $fakeQueue = new QueueFake(new Container);
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;
@@ -55,7 +55,7 @@ class QueuedEventsTest extends TestCase
     {
         $d = new Dispatcher;
 
-        $fakeQueue = new QueueFake(new Container());
+        $fakeQueue = new QueueFake(new Container);
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;

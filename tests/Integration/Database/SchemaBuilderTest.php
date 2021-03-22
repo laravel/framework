@@ -61,9 +61,9 @@ class SchemaBuilderTest extends DatabaseTestCase
             'DROP TABLE __temp__test',
         ];
 
-        $statements = $blueprint->toSql($this->getConnection(), new SQLiteGrammar());
+        $statements = $blueprint->toSql($this->getConnection(), new SQLiteGrammar);
 
-        $blueprint->build($this->getConnection(), new SQLiteGrammar());
+        $blueprint->build($this->getConnection(), new SQLiteGrammar);
 
         $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
         $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));

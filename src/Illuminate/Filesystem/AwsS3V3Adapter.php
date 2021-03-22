@@ -75,8 +75,8 @@ class AwsS3V3Adapter extends FilesystemAdapter
         // If an explicit base URL has been set on the disk configuration then we will use
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
-        if (isset($this->config['url'])) {
-            $uri = $this->replaceBaseUrl($uri, $this->config['url']);
+        if (isset($this->config['temporary_url'])) {
+            $uri = $this->replaceBaseUrl($uri, $this->config['temporary_url']);
         }
 
         return (string) $uri;

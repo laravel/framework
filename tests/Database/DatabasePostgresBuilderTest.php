@@ -18,7 +18,7 @@ class DatabasePostgresBuilderTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $grammar = new PostgresGrammar();
+        $grammar = new PostgresGrammar;
 
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
@@ -33,7 +33,7 @@ class DatabasePostgresBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $grammar = new PostgresGrammar();
+        $grammar = new PostgresGrammar;
 
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);

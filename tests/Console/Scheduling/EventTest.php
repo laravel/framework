@@ -66,7 +66,7 @@ class EventTest extends TestCase
 
     public function testBuildCommandSendOutputTo()
     {
-        $quote = (DIRECTORY_SEPARATOR == '\\') ? '"' : "'";
+        $quote = (DIRECTORY_SEPARATOR === '\\') ? '"' : "'";
 
         $event = new Event(m::mock(EventMutex::class), 'php -i');
 
@@ -81,7 +81,7 @@ class EventTest extends TestCase
 
     public function testBuildCommandAppendOutput()
     {
-        $quote = (DIRECTORY_SEPARATOR == '\\') ? '"' : "'";
+        $quote = (DIRECTORY_SEPARATOR === '\\') ? '"' : "'";
 
         $event = new Event(m::mock(EventMutex::class), 'php -i');
 
