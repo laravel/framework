@@ -34,7 +34,7 @@ jobs:
         php: ['7.3', '7.4', '8.0']
         stability: [prefer-lowest, prefer-stable]
         include:
-          - php: 8.1
+          - php: '8.1'
             flags: "--ignore-platform-req=php"
             stability: prefer-stable
 
@@ -84,7 +84,7 @@ jobs:
         php: ['7.3', '7.4', '8.0']
         stability: [prefer-lowest, prefer-stable]
         include:
-          - php: 8.1
+          - php: '8.1'
             flags: "--ignore-platform-req=php"
             stability: prefer-stable
 
