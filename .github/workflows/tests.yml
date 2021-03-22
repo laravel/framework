@@ -36,6 +36,7 @@ jobs:
         include:
           - php: 8.1
             flags: "--ignore-platform-req=php"
+            stability: prefer-stable
 
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
