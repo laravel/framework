@@ -3,8 +3,16 @@
 namespace {{ factoryNamespace }};
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 use {{ namespacedModel }};
 
+/**
+ * @method \{{ namespacedModel }} create($attributes = [], ?Model $parent = null)
+ * @method \{{ namespacedModel }} createOne($attributes = [])
+ * @method \Illuminate\Database\Eloquent\Collection|\{{ namespacedModel }}[] createMany(iterable $records)
+ * @method \{{ namespacedModel }} make($attributes = [], ?Model $parent = null)
+ * @method \{{ namespacedModel }} makeOne($attributes = [])
+ */
 class {{ factory }}Factory extends Factory
 {
     /**
