@@ -938,6 +938,15 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($request->request->all(), $body);
     }
 
+    public function testCreateFromBaseDoesNotUseQueryParametersForRequestBag()
+    {
+        $base = SymfonyRequest::create('/?foo=bar', 'GET');
+
+        $request = Request::createFromBase($base);
+
+        $this->assertEquals([], $request->request->all());
+    }
+
     /**
      * Tests for Http\Request magic methods `__get()` and `__isset()`.
      *
