@@ -116,6 +116,10 @@ class Worker
      */
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
+        if ($connectionName !== 'sync') {
+            config()->set('app.is_run_from_queue_daemon', true);
+        }
+
         if ($this->supportsAsyncSignals()) {
             $this->listenForSignals();
         }

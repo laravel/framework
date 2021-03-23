@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -520,7 +521,9 @@ class Mailer implements MailerContract, MailQueueContract
         try {
             return $this->swift->send($message, $this->failedRecipients);
         } finally {
-            $this->forceReconnection();
+            if (config('app.is_run_from_queue_daemon', false)) {
+                $this->forceReconnection();
+            }
         }
     }
 
