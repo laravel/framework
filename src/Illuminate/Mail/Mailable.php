@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -933,7 +934,13 @@ class Mailable implements MailableContract, Renderable
         return $this->assertionableRenderStrings = $this->withLocale($this->locale, function () {
             Container::getInstance()->call([$this, 'build']);
 
-            $html = Container::getInstance()->make('mailer')->render(
+            $mailer = Container::getInstance()->make('mailer');
+
+            if (is_a($mailer, MailFake::class)) {
+                $mailer = (new MailManager(app()))->mailer();
+            }
+
+            $html = $mailer->render(
                 $view = $this->buildView(), $this->buildViewData()
             );
 
@@ -944,7 +951,7 @@ class Mailable implements MailableContract, Renderable
             $text = $text ?? $view['text'] ?? '';
 
             if (! empty($text) && ! $text instanceof Htmlable) {
-                $text = Container::getInstance()->make('mailer')->render(
+                $text = $mailer->render(
                     $text, $this->buildViewData()
                 );
             }
