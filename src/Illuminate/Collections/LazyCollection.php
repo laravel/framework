@@ -1071,7 +1071,7 @@ class LazyCollection implements Enumerable
         return new static(function () use ($callback) {
             $iterator = $this->getIterator();
 
-            $chunk = new Collection();
+            $chunk = new Collection;
 
             if ($iterator->valid()) {
                 $chunk[$iterator->key()] = $iterator->current();
@@ -1083,7 +1083,7 @@ class LazyCollection implements Enumerable
                 if (! $callback($iterator->current(), $iterator->key(), $chunk)) {
                     yield new static($chunk);
 
-                    $chunk = new Collection();
+                    $chunk = new Collection;
                 }
 
                 $chunk[$iterator->key()] = $iterator->current();

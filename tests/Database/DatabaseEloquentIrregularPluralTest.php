@@ -70,7 +70,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
     /** @test */
     public function itPluralizesTheTableName()
     {
-        $model = new IrregularPluralHuman();
+        $model = new IrregularPluralHuman;
 
         $this->assertSame('irregular_plural_humans', $model->getTable());
     }

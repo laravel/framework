@@ -127,12 +127,12 @@ class ViewTest extends TestCase
     public function testViewGettersSetters()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $this->assertEquals('view', $view->name());
-        $this->assertEquals('path', $view->getPath());
+        $this->assertSame('view', $view->name());
+        $this->assertSame('path', $view->getPath());
         $data = $view->getData();
-        $this->assertEquals('bar', $data['foo']);
+        $this->assertSame('bar', $data['foo']);
         $view->setPath('newPath');
-        $this->assertEquals('newPath', $view->getPath());
+        $this->assertSame('newPath', $view->getPath());
     }
 
     public function testViewArrayAccess()
@@ -140,9 +140,9 @@ class ViewTest extends TestCase
         $view = $this->getView(['foo' => 'bar']);
         $this->assertInstanceOf(ArrayAccess::class, $view);
         $this->assertTrue($view->offsetExists('foo'));
-        $this->assertEquals('bar', $view->offsetGet('foo'));
+        $this->assertSame('bar', $view->offsetGet('foo'));
         $view->offsetSet('foo', 'baz');
-        $this->assertEquals('baz', $view->offsetGet('foo'));
+        $this->assertSame('baz', $view->offsetGet('foo'));
         $view->offsetUnset('foo');
         $this->assertFalse($view->offsetExists('foo'));
     }
@@ -152,9 +152,9 @@ class ViewTest extends TestCase
         $view = $this->getView(new DataObjectStub);
         $this->assertInstanceOf(ArrayAccess::class, $view);
         $this->assertTrue($view->offsetExists('foo'));
-        $this->assertEquals('bar', $view->offsetGet('foo'));
+        $this->assertSame('bar', $view->offsetGet('foo'));
         $view->offsetSet('foo', 'baz');
-        $this->assertEquals('baz', $view->offsetGet('foo'));
+        $this->assertSame('baz', $view->offsetGet('foo'));
         $view->offsetUnset('foo');
         $this->assertFalse($view->offsetExists('foo'));
     }
@@ -163,9 +163,9 @@ class ViewTest extends TestCase
     {
         $view = $this->getView(['foo' => 'bar']);
         $this->assertTrue(isset($view->foo));
-        $this->assertEquals('bar', $view->foo);
+        $this->assertSame('bar', $view->foo);
         $view->foo = 'baz';
-        $this->assertEquals('baz', $view->foo);
+        $this->assertSame('baz', $view->foo);
         $this->assertEquals($view['foo'], $view->foo);
         unset($view->foo);
         $this->assertFalse(isset($view->foo));
@@ -208,8 +208,8 @@ class ViewTest extends TestCase
 
         $view->getFactory()->shouldReceive('getSections')->once()->andReturn(['foo', 'bar']);
         $sections = $view->renderSections();
-        $this->assertEquals('foo', $sections[0]);
-        $this->assertEquals('bar', $sections[1]);
+        $this->assertSame('foo', $sections[0]);
+        $this->assertSame('bar', $sections[1]);
     }
 
     public function testWithErrors()
@@ -219,18 +219,18 @@ class ViewTest extends TestCase
         $this->assertSame($view, $view->withErrors($errors));
         $this->assertInstanceOf(ViewErrorBag::class, $view->errors);
         $foo = $view->errors->get('foo');
-        $this->assertEquals('bar', $foo[0]);
+        $this->assertSame('bar', $foo[0]);
         $qu = $view->errors->get('qu');
-        $this->assertEquals('ux', $qu[0]);
+        $this->assertSame('ux', $qu[0]);
         $data = ['foo' => 'baz'];
         $this->assertSame($view, $view->withErrors(new MessageBag($data)));
         $foo = $view->errors->get('foo');
-        $this->assertEquals('baz', $foo[0]);
+        $this->assertSame('baz', $foo[0]);
         $foo = $view->errors->getBag('default')->get('foo');
-        $this->assertEquals('baz', $foo[0]);
+        $this->assertSame('baz', $foo[0]);
         $this->assertSame($view, $view->withErrors(new MessageBag($data), 'login'));
         $foo = $view->errors->getBag('login')->get('foo');
-        $this->assertEquals('baz', $foo[0]);
+        $this->assertSame('baz', $foo[0]);
     }
 
     protected function getView($data = [])

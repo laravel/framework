@@ -119,7 +119,7 @@ class WorkCommandTest extends TestCase
 
     public function testMaxTimeExceeded()
     {
-        Queue::connection('database')->push(new ThirdJob());
+        Queue::connection('database')->push(new ThirdJob);
         Queue::connection('database')->push(new FirstJob);
         Queue::connection('database')->push(new SecondJob);
 

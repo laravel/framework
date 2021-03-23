@@ -58,7 +58,7 @@ class AssertTest extends TestCase
         $assert->has('example.another');
     }
 
-    public function testAssertCountItemsInProp()
+    public function testAssertHasCountItemsInProp()
     {
         $assert = AssertableJson::fromArray([
             'bar' => [
@@ -70,7 +70,7 @@ class AssertTest extends TestCase
         $assert->has('bar', 2);
     }
 
-    public function testAssertCountFailsWhenAmountOfItemsDoesNotMatch()
+    public function testAssertHasCountFailsWhenAmountOfItemsDoesNotMatch()
     {
         $assert = AssertableJson::fromArray([
             'bar' => [
@@ -85,7 +85,7 @@ class AssertTest extends TestCase
         $assert->has('bar', 1);
     }
 
-    public function testAssertCountFailsWhenPropMissing()
+    public function testAssertHasCountFailsWhenPropMissing()
     {
         $assert = AssertableJson::fromArray([
             'bar' => [
@@ -109,6 +109,90 @@ class AssertTest extends TestCase
         $this->expectException(TypeError::class);
 
         $assert->has('bar', 'invalid');
+    }
+
+    public function testAssertHasOnlyCounts()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $assert->has(3);
+    }
+
+    public function testAssertHasOnlyCountFails()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Root level does not have the expected size.');
+
+        $assert->has(2);
+    }
+
+    public function testAssertHasOnlyCountFailsScoped()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [
+                'baz' => 'example',
+                'prop' => 'value',
+            ],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
+
+        $assert->has('bar', function ($bar) {
+            $bar->has(3);
+        });
+    }
+
+    public function testAssertCount()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $assert->count(3);
+    }
+
+    public function testAssertCountFails()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Root level does not have the expected size.');
+
+        $assert->count(2);
+    }
+
+    public function testAssertCountFailsScoped()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [
+                'baz' => 'example',
+                'prop' => 'value',
+            ],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
+
+        $assert->has('bar', function ($bar) {
+            $bar->count(3);
+        });
     }
 
     public function testAssertMissing()
@@ -421,7 +505,7 @@ class AssertTest extends TestCase
         ]);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Cannot scope directly onto the first entry of property [bar] when asserting that it has a size of 0.');
+        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
 
         $assert->has('bar', 0, function (AssertableJson $item) {
             $item->where('key', 'first');
@@ -442,6 +526,64 @@ class AssertTest extends TestCase
 
         $assert->has('bar', 1, function (AssertableJson $item) {
             $item->where('key', 'first');
+        });
+    }
+
+    public function testFirstScope()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [
+                'key' => 'first',
+            ],
+            'bar' => [
+                'key' => 'second',
+            ],
+        ]);
+
+        $assert->first(function (AssertableJson $item) {
+            $item->where('key', 'first');
+        });
+    }
+
+    public function testFirstScopeFailsWhenNoProps()
+    {
+        $assert = AssertableJson::fromArray([]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Cannot scope directly onto the first element of the root level because it is empty.');
+
+        $assert->first(function (AssertableJson $item) {
+            //
+        });
+    }
+
+    public function testFirstNestedScopeFailsWhenNoProps()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Cannot scope directly onto the first element of property [foo] because it is empty.');
+
+        $assert->has('foo', function (AssertableJson $assert) {
+            $assert->first(function (AssertableJson $item) {
+                //
+            });
+        });
+    }
+
+    public function testFirstScopeFailsWhenPropSingleValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not scopeable.');
+
+        $assert->first(function (AssertableJson $item) {
+            //
         });
     }
 
@@ -560,6 +702,144 @@ class AssertTest extends TestCase
                 return $value === 'foo';
             },
         ]);
+    }
+
+    public function testAssertWhereTypeString()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $assert->whereType('foo', 'string');
+    }
+
+    public function testAssertWhereTypeInteger()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 123,
+        ]);
+
+        $assert->whereType('foo', 'integer');
+    }
+
+    public function testAssertWhereTypeBoolean()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => true,
+        ]);
+
+        $assert->whereType('foo', 'boolean');
+    }
+
+    public function testAssertWhereTypeDouble()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 12.3,
+        ]);
+
+        $assert->whereType('foo', 'double');
+    }
+
+    public function testAssertWhereTypeArray()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => ['bar', 'baz'],
+            'bar' => ['foo' => 'baz'],
+        ]);
+
+        $assert->whereType('foo', 'array');
+        $assert->whereType('bar', 'array');
+    }
+
+    public function testAssertWhereTypeNull()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => null,
+        ]);
+
+        $assert->whereType('foo', 'null');
+    }
+
+    public function testAssertWhereAllType()
+    {
+        $assert = AssertableJson::fromArray([
+            'one' => 'foo',
+            'two' => 123,
+            'three' => true,
+            'four' => 12.3,
+            'five' => ['foo', 'bar'],
+            'six' => ['foo' => 'bar'],
+            'seven' => null,
+        ]);
+
+        $assert->whereAllType([
+            'one' => 'string',
+            'two' => 'integer',
+            'three' => 'boolean',
+            'four' => 'double',
+            'five' => 'array',
+            'six' => 'array',
+            'seven' => 'null',
+        ]);
+    }
+
+    public function testAssertWhereTypeWhenWrongTypeIsGiven()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not of expected type [integer].');
+
+        $assert->whereType('foo', 'integer');
+    }
+
+    public function testAssertWhereTypeWithUnionTypes()
+    {
+        $firstAssert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $secondAssert = AssertableJson::fromArray([
+            'foo' => null,
+        ]);
+
+        $firstAssert->whereType('foo', ['string', 'null']);
+        $secondAssert->whereType('foo', ['string', 'null']);
+    }
+
+    public function testAssertWhereTypeWhenWrongUnionTypeIsGiven()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 123,
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not of expected type [string|null].');
+
+        $assert->whereType('foo', ['string', 'null']);
+    }
+
+    public function testAssertWhereTypeWithPipeInUnionType()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $assert->whereType('foo', 'string|null');
+    }
+
+    public function testAssertWhereTypeWithPipeInWrongUnionType()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not of expected type [integer|null].');
+
+        $assert->whereType('foo', 'integer|null');
     }
 
     public function testAssertHasAll()

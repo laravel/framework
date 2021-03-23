@@ -232,8 +232,8 @@ class ModelSerializationTest extends TestCase
 
         $unserialized = unserialize($serialized);
 
-        $this->assertEquals('taylor@laravel.com', $unserialized->users->first()->email);
-        $this->assertEquals('mohamed@laravel.com', $unserialized->users->last()->email);
+        $this->assertSame('taylor@laravel.com', $unserialized->users->first()->email);
+        $this->assertSame('mohamed@laravel.com', $unserialized->users->last()->email);
     }
 
     public function testItCanUnserializeACollectionInCorrectOrderAndHandleDeletedModels()
@@ -252,8 +252,8 @@ class ModelSerializationTest extends TestCase
 
         $this->assertCount(2, $unserialized->users);
 
-        $this->assertEquals('3@laravel.com', $unserialized->users->first()->email);
-        $this->assertEquals('1@laravel.com', $unserialized->users->last()->email);
+        $this->assertSame('3@laravel.com', $unserialized->users->first()->email);
+        $this->assertSame('1@laravel.com', $unserialized->users->last()->email);
     }
 
     public function testItCanUnserializeCustomCollection()

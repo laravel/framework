@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.18...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.19...6.x)
+
+
+## [v6.20.19 (2021-03-16)](https://github.com/laravel/framework/compare/v6.20.18...v6.20.19)
+
+### Added
+- Added broken pipe exception as lost connection error ([#36601](https://github.com/laravel/framework/pull/36601))
 
 
 ## [v6.20.18 (2021-03-09)](https://github.com/laravel/framework/compare/v6.20.17...v6.20.18)

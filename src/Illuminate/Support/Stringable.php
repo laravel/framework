@@ -324,7 +324,7 @@ class Stringable implements JsonSerializable
      * Convert GitHub flavored Markdown into HTML.
      *
      * @param  array  $options
-     * @return string
+     * @return static
      */
     public function markdown(array $options = [])
     {
@@ -465,6 +465,18 @@ class Stringable implements JsonSerializable
     public function prepend(...$values)
     {
         return new static(implode('', $values).$this->value);
+    }
+
+    /**
+     * Remove any occurrence of the given string in the subject.
+     *
+     * @param string|array<string> $search
+     * @param bool $caseSensitive
+     * @return static
+     */
+    public function remove($search, $caseSensitive = true)
+    {
+        return new static(Str::remove($search, $this->value, $caseSensitive));
     }
 
     /**

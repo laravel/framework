@@ -11,12 +11,26 @@ trait Has
     /**
      * Assert that the prop is of the expected size.
      *
-     * @param  string  $key
-     * @param  int  $length
+     * @param  string|int  $key
+     * @param  int|null  $length
      * @return $this
      */
-    protected function count(string $key, int $length): self
+    public function count($key, int $length = null): self
     {
+        if (is_null($length)) {
+            $path = $this->dotPath();
+
+            PHPUnit::assertCount(
+                $key,
+                $this->prop(),
+                $path
+                    ? sprintf('Property [%s] does not have the expected size.', $path)
+                    : sprintf('Root level does not have the expected size.')
+            );
+
+            return $this;
+        }
+
         PHPUnit::assertCount(
             $length,
             $this->prop($key),
@@ -29,14 +43,18 @@ trait Has
     /**
      * Ensure that the given prop exists.
      *
-     * @param  string  $key
-     * @param  null  $value
-     * @param  \Closure|null  $scope
+     * @param  string|int  $key
+     * @param  int|\Closure|null  $length
+     * @param  \Closure|null  $callback
      * @return $this
      */
-    public function has(string $key, $value = null, Closure $scope = null): self
+    public function has($key, $length = null, Closure $callback = null): self
     {
         $prop = $this->prop();
+
+        if (is_int($key) && is_null($length)) {
+            return $this->count($key);
+        }
 
         PHPUnit::assertTrue(
             Arr::has($prop, $key),
@@ -45,25 +63,20 @@ trait Has
 
         $this->interactsWith($key);
 
-        // When all three arguments are provided this indicates a short-hand expression
-        // that combines both a `count`-assertion, followed by directly creating the
-        // `scope` on the first element. We can simply handle this correctly here.
-        if (is_int($value) && ! is_null($scope)) {
-            $prop = $this->prop($key);
-            $path = $this->dotPath($key);
-
-            PHPUnit::assertTrue($value > 0, sprintf('Cannot scope directly onto the first entry of property [%s] when asserting that it has a size of 0.', $path));
-            PHPUnit::assertIsArray($prop, sprintf('Direct scoping is unsupported for non-array like properties such as [%s].', $path));
-
-            $this->count($key, $value);
-
-            return $this->scope($key.'.'.array_keys($prop)[0], $scope);
+        if (is_int($length) && ! is_null($callback)) {
+            return $this->has($key, function (self $scope) use ($length, $callback) {
+                return $scope->count($length)
+                    ->first($callback)
+                    ->etc();
+            });
         }
 
-        if (is_callable($value)) {
-            $this->scope($key, $value);
-        } elseif (! is_null($value)) {
-            $this->count($key, $value);
+        if (is_callable($length)) {
+            return $this->scope($key, $length);
+        }
+
+        if (! is_null($length)) {
+            return $this->count($key, $length);
         }
 
         return $this;
@@ -129,7 +142,7 @@ trait Has
      * @param  string  $key
      * @return string
      */
-    abstract protected function dotPath(string $key): string;
+    abstract protected function dotPath(string $key = ''): string;
 
     /**
      * Marks the property as interacted.
@@ -155,4 +168,19 @@ trait Has
      * @return $this
      */
     abstract protected function scope(string $key, Closure $callback);
+
+    /**
+     * Disables the interaction check.
+     *
+     * @return $this
+     */
+    abstract public function etc();
+
+    /**
+     * Instantiate a new "scope" on the first element.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    abstract public function first(Closure $callback);
 }

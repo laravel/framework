@@ -52,7 +52,7 @@ class ComponentTest extends TestCase
         $this->viewFactory->shouldReceive('exists')->once()->andReturn(false);
         $this->viewFactory->shouldReceive('addNamespace')->once()->with('__components', '/tmp');
 
-        $component = new TestInlineViewComponent();
+        $component = new TestInlineViewComponent;
         $this->assertSame('__components::c6327913fef3fca4518bcd7df1d0ff630758e241', $component->resolveView());
     }
 
@@ -61,7 +61,7 @@ class ComponentTest extends TestCase
         $view = m::mock(View::class);
         $this->viewFactory->shouldReceive('make')->once()->with('alert', [], [])->andReturn($view);
 
-        $component = new TestRegularViewComponent();
+        $component = new TestRegularViewComponent;
 
         $this->assertSame($view, $component->resolveView());
     }
@@ -71,14 +71,14 @@ class ComponentTest extends TestCase
         $this->viewFactory->shouldReceive('exists')->once()->andReturn(true);
         $this->viewFactory->shouldReceive('addNamespace')->never();
 
-        $component = new TestRegularViewNameViewComponent();
+        $component = new TestRegularViewNameViewComponent;
 
         $this->assertSame('alert', $component->resolveView());
     }
 
     public function testHtmlablesGetReturned()
     {
-        $component = new TestHtmlableReturningViewComponent();
+        $component = new TestHtmlableReturningViewComponent;
 
         $view = $component->resolveView();
 

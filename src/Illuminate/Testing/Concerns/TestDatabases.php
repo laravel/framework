@@ -133,7 +133,7 @@ trait TestDatabases
     {
         $database = DB::getConfig('database');
 
-        if ($database != ':memory:') {
+        if ($database !== ':memory:') {
             $callback($database);
         }
     }

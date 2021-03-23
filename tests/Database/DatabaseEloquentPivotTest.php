@@ -156,7 +156,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testWithoutRelations()
     {
-        $original = new Pivot();
+        $original = new Pivot;
 
         $original->pivotParent = 'foo';
         $original->setRelation('bar', 'baz');
