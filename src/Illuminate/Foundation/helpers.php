@@ -901,3 +901,17 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (!function_exists('pre')) {
+    /**
+     * Get the formatted data from the given value
+     *
+     * @param mixed $value
+     */
+    function pre(mixed $value = '', $formatting = true)
+    {
+        echo ($formatting) ? '<pre>' : '';
+        print_r($value);
+        echo ($formatting) ? '</pre>' : '';
+    }
+}
