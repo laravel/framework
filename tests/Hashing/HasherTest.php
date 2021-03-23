@@ -32,7 +32,7 @@ class HasherTest extends TestCase
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
         $this->assertFalse($hasher->needsRehash($value));
-        $this->assertTrue($hasher->needsRehash($value, ['threads' => 1]));
+        $this->assertTrue($hasher->needsRehash($value, ['time' => 4]));
         $this->assertSame('argon2i', password_get_info($value)['algoName']);
     }
 
@@ -47,7 +47,7 @@ class HasherTest extends TestCase
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
         $this->assertFalse($hasher->needsRehash($value));
-        $this->assertTrue($hasher->needsRehash($value, ['threads' => 1]));
+        $this->assertTrue($hasher->needsRehash($value, ['time' => 4]));
         $this->assertSame('argon2id', password_get_info($value)['algoName']);
     }
 
