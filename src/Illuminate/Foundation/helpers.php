@@ -549,6 +549,20 @@ if (! function_exists('policy')) {
     }
 }
 
+if (!function_exists('pre')) {
+    /**
+     * Get the formatted data from the given value
+     *
+     * @param mixed $value
+     */
+    function pre(mixed $value = null, $formatting = true)
+    {
+        echo ($formatting) ? '<pre>' : '';
+        print_r($value);
+        echo ($formatting) ? '</pre>' : '';
+    }
+}
+
 if (! function_exists('public_path')) {
     /**
      * Get the path to the public folder.
