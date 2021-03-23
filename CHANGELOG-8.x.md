@@ -1,6 +1,38 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.33.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.34.0...8.x)
+
+
+## [v8.34.0 (2021-03-23)](https://github.com/laravel/framework/compare/v8.33.1...v8.34.0)
+
+### Inspiring
+- Added more inspiring quotes ([92b7bde](https://github.com/laravel/framework/commit/92b7bdeb4b8c40848fa276cfe1897c656302942f))
+  
+### Added
+- Added WSREP communication link failure for lost connection detection ([#36668](https://github.com/laravel/framework/pull/36668))
+- Added "exclude-path" option to `route:list` command ([#36619](https://github.com/laravel/framework/pull/36619), [76e11ee](https://github.com/laravel/framework/commit/76e11ee97fc8068be1d55986b4524d4c329af387))
+- Added `Illuminate\Support\Str::remove()` and `Illuminate\Support\Stringable::remove()` methods ([#36639](https://github.com/laravel/framework/pull/36639), [7b0259f](https://github.com/laravel/framework/commit/7b0259faa46409513b75a8a0b512b3aacfcad944), [20e2470](https://github.com/laravel/framework/commit/20e24701e71f71a44b477b4311d0cb69f97906f1))
+- Added `Illuminate\Database\Eloquent\Relations\MorphPivot::getMorphType()` ([#36640](https://github.com/laravel/framework/pull/36640), [7e08215](https://github.com/laravel/framework/commit/7e08215f0d370c3c33beb7bba7e2c1ee2ac7aab5))
+- Added assertion to verify type of key in JSON ([#36638](https://github.com/laravel/framework/pull/36638))
+- Added prohibited validation rule ([#36667](https://github.com/laravel/framework/pull/36667))
+- Added strict comparison to distinct validation rule ([#36669](https://github.com/laravel/framework/pull/36669))
+- Added `Illuminate\Translation\FileLoader::getJsonPaths()` ([#36689](https://github.com/laravel/framework/pull/36689))
+- Added `Illuminate\Support\Testing\Fakes\EventFake::assertAttached()` ([#36690](https://github.com/laravel/framework/pull/36690))
+- Added `lazy()` and `lazyById()`  methods to `Illuminate\Database\Concerns\BuildsQueries` ([#36699](https://github.com/laravel/framework/pull/36699))
+
+### Fixed
+- Fixes the issue using cache:clear with PhpRedis and a clustered Redis instance. ([#36665](https://github.com/laravel/framework/pull/36665))
+- Fix replacing required :input with null on PHP 8.1 in `Illuminate\Validation\Concerns\FormatsMessages::getDisplayableValue()` ([#36622](https://github.com/laravel/framework/pull/36622))
+- Fixed artisan schema:dump error ([#36698](https://github.com/laravel/framework/pull/36698))
+
+### Changed
+- Adjust Fluent Assertions ([#36620](https://github.com/laravel/framework/pull/36620))
+- Added timestamp reference to schedule:work artisan command output ([#36621](https://github.com/laravel/framework/pull/36621))
+- Expect custom markdown mailable themes to be in mail subdirectory ([#36673](https://github.com/laravel/framework/pull/36673))
+- Throw exception when unable to create LockableFile ([#36674](https://github.com/laravel/framework/pull/36674))
+
+### Refactoring
+- Always prefer typesafe string comparisons ([#36657](https://github.com/laravel/framework/pull/36657))
 
 
 ## [v8.33.1 (2021-03-16)](https://github.com/laravel/framework/compare/v8.33.0...v8.33.1)
