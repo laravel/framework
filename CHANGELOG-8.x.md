@@ -1,6 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.33.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.33.1...8.x)
+
+
+## [v8.33.1 (2021-03-16)](https://github.com/laravel/framework/compare/v8.33.0...v8.33.1)
+
+### Added
+- Added `Illuminate\Database\Connection::forgetRecordModificationState()` ([#36617](https://github.com/laravel/framework/pull/36617))
+
+### Reverted
+- Reverted "Container - detect circular dependencies" ([332844e](https://github.com/laravel/framework/commit/332844e5bde34f8db91aeca4d21cd4e0925d691e))
 
 
 ## [v8.33.0 (2021-03-16)](https://github.com/laravel/framework/compare/v8.32.1...v8.33.0)
