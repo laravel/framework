@@ -7,7 +7,9 @@ use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
@@ -801,5 +803,14 @@ class HttpClientTest extends TestCase
         $this->assertSame(1000, $dumped[4]['delay']);
 
         VarDumper::setHandler(null);
+    }
+
+    public function testResponseSequenceIsMacroable()
+    {
+        ResponseSequence::macro('customMethod', function () {
+            return 'yes!';
+        });
+
+        $this->assertSame('yes!', $this->factory->fakeSequence()->customMethod());
     }
 }
