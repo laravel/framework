@@ -13,6 +13,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Throwable;
 
 class Worker
@@ -117,7 +118,7 @@ class Worker
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
         if ($connectionName !== 'sync') {
-            config()->set('app.is_run_from_queue_daemon', true);
+            Config::set('app.is_run_from_queue_daemon', true);
         }
 
         if ($this->supportsAsyncSignals()) {
