@@ -166,11 +166,16 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                 return $this->app->isDownForMaintenance();
             };
 
+            $setQueueDaemonFlag = function ($flag) {
+                $this->app['config']->set('app.is_executed_from_daemon_queue', $flag);
+            };
+
             return new Worker(
                 $app['queue'],
                 $app['events'],
                 $app[ExceptionHandler::class],
-                $isDownForMaintenance
+                $isDownForMaintenance,
+                $setQueueDaemonFlag
             );
         });
     }

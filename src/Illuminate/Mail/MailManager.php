@@ -117,7 +117,8 @@ class MailManager implements FactoryContract
             $name,
             $this->app['view'],
             $this->createSwiftMailer($config),
-            $this->app['events']
+            $this->app['events'],
+            $this->app['config']['app.is_executed_from_daemon_queue'] ?? false
         );
 
         if ($this->app->bound('queue')) {
