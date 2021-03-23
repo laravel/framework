@@ -19,14 +19,14 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      *
      * @var int
      */
-    protected $time = 2;
+    protected $time = 3;
 
     /**
      * The default threads factor.
      *
      * @var int
      */
-    protected $threads = 2;
+    protected $threads = 1;
 
     /**
      * Indicates whether to perform an algorithm check.
