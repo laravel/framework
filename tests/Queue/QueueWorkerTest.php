@@ -118,6 +118,8 @@ class QueueWorkerTest extends TestCase
             $this->exceptionHandler,
             function () {
                 return false;
+            },
+            function () {
             }
         );
 
