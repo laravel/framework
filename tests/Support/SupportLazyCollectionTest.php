@@ -69,7 +69,7 @@ class SupportLazyCollectionTest extends TestCase
         ], $data->all());
     }
 
-    public function testCanCreateCollectionFromIterable()
+    public function testCanCreateCollectionFromGenerator()
     {
         $iterable = function () {
             yield 1;
