@@ -68,7 +68,7 @@ class Worker
     /**
      * The callback used to set the flag for when the app is executed from a queue daemon.
      *
-     * @var callable
+     * @var callable|null
      */
     protected $setQueueDaemonFlag;
 
@@ -100,20 +100,21 @@ class Worker
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
      * @param  callable  $isDownForMaintenance
-     * @param  callable  $setQueueDaemonFlag
+     * @param  callable|null  $setQueueDaemonFlag
      * @return void
      */
     public function __construct(QueueManager $manager,
                                 Dispatcher $events,
                                 ExceptionHandler $exceptions,
                                 callable $isDownForMaintenance,
-                                callable $setQueueDaemonFlag)
+                                ?callable $setQueueDaemonFlag = null)
     {
         $this->events = $events;
         $this->manager = $manager;
         $this->exceptions = $exceptions;
         $this->isDownForMaintenance = $isDownForMaintenance;
-        $this->setQueueDaemonFlag = $setQueueDaemonFlag;
+        $this->setQueueDaemonFlag = $setQueueDaemonFlag ?? function () {
+        };
     }
 
     /**
