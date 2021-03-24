@@ -10,7 +10,7 @@
   
 ### Added
 - Added WSREP communication link failure for lost connection detection ([#36668](https://github.com/laravel/framework/pull/36668))
-- Added "exclude-path" option to `route:list` command ([#36619](https://github.com/laravel/framework/pull/36619), [76e11ee](https://github.com/laravel/framework/commit/76e11ee97fc8068be1d55986b4524d4c329af387))
+- Added "except-path" option to `route:list` command ([#36619](https://github.com/laravel/framework/pull/36619), [76e11ee](https://github.com/laravel/framework/commit/76e11ee97fc8068be1d55986b4524d4c329af387))
 - Added `Illuminate\Support\Str::remove()` and `Illuminate\Support\Stringable::remove()` methods ([#36639](https://github.com/laravel/framework/pull/36639), [7b0259f](https://github.com/laravel/framework/commit/7b0259faa46409513b75a8a0b512b3aacfcad944), [20e2470](https://github.com/laravel/framework/commit/20e24701e71f71a44b477b4311d0cb69f97906f1))
 - Added `Illuminate\Database\Eloquent\Relations\MorphPivot::getMorphType()` ([#36640](https://github.com/laravel/framework/pull/36640), [7e08215](https://github.com/laravel/framework/commit/7e08215f0d370c3c33beb7bba7e2c1ee2ac7aab5))
 - Added assertion to verify type of key in JSON ([#36638](https://github.com/laravel/framework/pull/36638))
