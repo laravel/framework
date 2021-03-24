@@ -130,7 +130,7 @@ class UserWithCreatedAndUpdated extends Eloquent
 
 class UserWithCreated extends Eloquent
 {
-    public const UPDATED_AT = null;
+    const UPDATED_AT = null;
 
     protected $table = 'users_created_at';
 
@@ -141,7 +141,7 @@ class UserWithCreated extends Eloquent
 
 class UserWithUpdated extends Eloquent
 {
-    public const CREATED_AT = null;
+    const CREATED_AT = null;
 
     protected $table = 'users_updated_at';
 
