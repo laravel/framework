@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
 
 class MySqlGrammar extends Grammar
@@ -172,6 +173,20 @@ class MySqlGrammar extends Grammar
         })->implode(', ');
 
         return $sql.$columns;
+    }
+
+    /**
+     * Compile a raw "upsert" statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  array  $values
+     * @param  array  $uniqueBy
+     * @param  \Illuminate\Database\Query\Expression  $raw
+     * @return string
+     */
+    public function compileUpsertRaw(Builder $query, array $values, array $uniqueBy, Expression $raw)
+    {
+        return $this->compileInsert($query, $values).' on duplicate key update '.$raw;
     }
 
     /**

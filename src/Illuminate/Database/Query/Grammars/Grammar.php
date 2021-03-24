@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1007,6 +1008,22 @@ class Grammar extends BaseGrammar
      * @throws \RuntimeException
      */
     public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
+    {
+        throw new RuntimeException('This database engine does not support upserts.');
+    }
+
+    /**
+     * Compile a raw "upsert" statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  array  $values
+     * @param  array  $uniqueBy
+     * @param  \Illuminate\Database\Query\Expression  $raw
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileUpsertRaw(Builder $query, array $values, array $uniqueBy, Expression $raw)
     {
         throw new RuntimeException('This database engine does not support upserts.');
     }

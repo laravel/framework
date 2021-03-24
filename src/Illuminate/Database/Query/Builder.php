@@ -2808,13 +2808,32 @@ class Builder
      */
     public function insert(array $values)
     {
-        // Since every insert gets treated like a batch insert, we will make sure the
-        // bindings are structured in a way that is convenient when building these
-        // inserts statements by verifying these elements are actually an array.
         if (empty($values)) {
             return true;
         }
 
+        $values = $this->prepareValuesForInsert($values);
+
+        // Finally, we will run this query against the database connection and return
+        // the results. We will need to also flatten these bindings before running
+        // the query so they are all in one huge, flattened array for execution.
+        return $this->connection->insert(
+            $this->grammar->compileInsert($this, $values),
+            $this->cleanBindings(Arr::flatten($values, 1))
+        );
+    }
+
+    /**
+     * Prepare the given values for an insert.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    protected function prepareValuesForInsert(array $values)
+    {
+        // Since every insert gets treated like a batch insert, we will make sure the
+        // bindings are structured in a way that is convenient when building these
+        // inserts statements by verifying these elements are actually an array.
         if (! is_array(reset($values))) {
             $values = [$values];
         }
@@ -2830,13 +2849,7 @@ class Builder
             }
         }
 
-        // Finally, we will run this query against the database connection and return
-        // the results. We will need to also flatten these bindings before running
-        // the query so they are all in one huge, flattened array for execution.
-        return $this->connection->insert(
-            $this->grammar->compileInsert($this, $values),
-            $this->cleanBindings(Arr::flatten($values, 1))
-        );
+        return $values;
     }
 
     /**
@@ -2851,14 +2864,7 @@ class Builder
             return 0;
         }
 
-        if (! is_array(reset($values))) {
-            $values = [$values];
-        } else {
-            foreach ($values as $key => $value) {
-                ksort($value);
-                $values[$key] = $value;
-            }
-        }
+        $values = $this->prepareValuesForInsert($values);
 
         return $this->connection->affectingStatement(
             $this->grammar->compileInsertOrIgnore($this, $values),
@@ -2950,15 +2956,7 @@ class Builder
             return (int) $this->insert($values);
         }
 
-        if (! is_array(reset($values))) {
-            $values = [$values];
-        } else {
-            foreach ($values as $key => $value) {
-                ksort($value);
-
-                $values[$key] = $value;
-            }
-        }
+        $values = $this->prepareValuesForInsert($values);
 
         if (is_null($update)) {
             $update = array_keys(reset($values));
@@ -2973,6 +2971,34 @@ class Builder
 
         return $this->connection->affectingStatement(
             $this->grammar->compileUpsert($this, $values, (array) $uniqueBy, $update),
+            $bindings
+        );
+    }
+
+    /**
+     * Insert new records or update the existing ones through a raw expression.
+     *
+     * @param  array  $values
+     * @param  array|string  $uniqueBy
+     * @param  string  $expression
+     * @param  array  $bindings
+     * @return int
+     */
+    public function upsertRaw(array $values, $uniqueBy, $expression, array $bindings = [])
+    {
+        if (empty($values)) {
+            return 0;
+        }
+
+        $values = $this->prepareValuesForInsert($values);
+
+        $bindings = $this->cleanBindings(array_merge(
+            Arr::flatten($values, 1),
+            $bindings
+        ));
+
+        return $this->connection->affectingStatement(
+            $this->grammar->compileUpsertRaw($this, $values, (array) $uniqueBy, new Expression($expression)),
             $bindings
         );
     }
