@@ -2258,6 +2258,16 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
+    public function testUpsertRawMethod()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `name` = concat(values(`name`), ?)', ['foo', 'bar', 'foo2', 'bar2', 'foo3'])->andReturn(1);
+        $result = $builder->from('users')->upsertRaw([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', '`name` = concat(values(`name`), ?)', ['foo3']);
+        $this->assertEquals(1, $result);
+
+        // @todo Test other grammars
+    }
+
     public function testUpdateMethodWithJoins()
     {
         $builder = $this->getBuilder();
