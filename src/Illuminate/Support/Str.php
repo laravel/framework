@@ -570,11 +570,9 @@ class Str
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
-        foreach (Arr::wrap($search) as $s) {
-            $subject = $caseSensitive
-                        ? str_replace($search, '', $subject)
-                        : str_ireplace($search, '', $subject);
-        }
+        $subject = $caseSensitive
+                    ? str_replace($search, '', $subject)
+                    : str_ireplace($search, '', $subject);
 
         return $subject;
     }
