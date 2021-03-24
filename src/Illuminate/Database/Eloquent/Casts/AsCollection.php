@@ -26,7 +26,7 @@ class AsCollection implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                if ($this->isEmpty($value) && $this->wasNull($model, $key)) {
+                if (is_null($model->getRawOriginal($key)) && $this->isEmpty($value)) {
                     return [$key => null];
                 }
 
@@ -40,11 +40,6 @@ class AsCollection implements Castable
                 }
 
                 return empty($value);
-            }
-
-            protected function wasNull($model, $key)
-            {
-                return $model->getRawOriginal($key) === null;
             }
         };
     }
