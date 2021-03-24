@@ -39,7 +39,7 @@ class AsCollection implements Castable
                     return $value->isEmpty();
                 }
 
-                return empty($value);
+                return $value === null;
             }
         };
     }
