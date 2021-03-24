@@ -19,12 +19,34 @@ class AsCollection implements Castable
         return new class implements CastsAttributes {
             public function get($model, $key, $value, $attributes)
             {
-                return isset($attributes[$key]) ? new Collection(json_decode($attributes[$key], true)) : null;
+                return new Collection(json_decode($attributes[$key] ?? '[]', true));
             }
 
             public function set($model, $key, $value, $attributes)
             {
+                if ($this->isEmpty($value) && $this->wasEmpty($model, $key)) {
+                    return [$key => null];
+                }
+
                 return [$key => json_encode($value)];
+            }
+
+            protected function isEmpty($value)
+            {
+                if ($value instanceof Collection) {
+                    return $value->isEmpty();
+                }
+
+                return ! $value;
+            }
+
+            protected function wasEmpty($model, $key)
+            {
+                if ($model instanceof Model) {
+                    return $model->getRawOriginal($key) === null;
+                }
+
+                return false;
             }
         };
     }
