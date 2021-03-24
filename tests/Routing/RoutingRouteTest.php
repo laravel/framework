@@ -9,6 +9,7 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Contracts\Routing\TransactionManager;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -29,6 +30,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use LogicException;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -1926,6 +1928,51 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(301, $response->getStatusCode());
     }
 
+    /**
+     * @test
+     */
+    public function begin_and_commit_transaction_when_method_is_transactional()
+    {
+        $request = Request::create('images/', 'GET');
+        $route = new Route('GET', 'images/', [RouteTestControllerWithTransactionalMethodStub::class, 'update']);
+        $route->bind($request);
+        $transactionManager = Mockery::mock(TransactionManager::class)
+            ->expects('beginTransaction')
+            ->getMock()
+            ->expects('commit')
+            ->getMock();
+        $container = new Container();
+        $container->instance(TransactionManager::class, $transactionManager);
+        $route->setContainer($container);
+
+        $route->run();
+
+        Mockery::close();
+    }
+
+    /**
+     * @test
+     */
+    public function begin_then_rollback_transaction_when_method_is_transactional_and_there_is_exception()
+    {
+        $request = Request::create('images/', 'GET');
+        $route = new Route('GET', 'images/', [RouteTestControllerWithTransactionalMethodStub::class, 'save']);
+        $route->bind($request);
+        $container = new Container();
+        $transactionManager = Mockery::mock(TransactionManager::class)
+            ->expects('beginTransaction')
+            ->getMock()
+            ->expects('commit')
+            ->getMock();
+        $container->instance(TransactionManager::class, $transactionManager);
+        $route->setContainer($container);
+
+        $this->expectException(Exception::class);
+        $route->run();
+
+        Mockery::close();
+    }
+
     protected function getRouter()
     {
         $container = new Container;
@@ -1937,6 +1984,25 @@ class RoutingRouteTest extends TestCase
         });
 
         return $router;
+    }
+}
+
+class RouteTestControllerWithTransactionalMethodStub extends Controller
+{
+    /**
+     * @transactional
+     */
+    public function update()
+    {
+        return 'Hello World';
+    }
+
+    /**
+     * @transactional
+     */
+    public function save()
+    {
+        throw new Exception();
     }
 }
 
