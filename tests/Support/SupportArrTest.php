@@ -301,6 +301,10 @@ class SupportArrTest extends TestCase
         $array = ['foo', 'bar'];
         $this->assertEquals($array, Arr::get($array, null));
 
+        // Test null key and default is not null return default
+        $array = ['foo', 'bar'];
+        $this->assertSame('default', Arr::get($array, null, 'default'));
+
         // Test $array not an array
         $this->assertSame('default', Arr::get(null, 'foo', 'default'));
         $this->assertSame('default', Arr::get(false, 'foo', 'default'));

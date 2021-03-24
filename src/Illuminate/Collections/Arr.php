@@ -292,7 +292,7 @@ class Arr
         if (is_null($key) && !is_null($default)) {
             return value($default);
         }
-        
+
         if (is_null($key)) {
             return $array;
         }
