@@ -29,7 +29,7 @@ class LazyCollection implements Enumerable
      */
     public function __construct($source = null)
     {
-        if ($source instanceof Closure || $source instanceof self) {
+        if ($source instanceof Closure || $source instanceof self || is_iterable($source)) {
             $this->source = $source;
         } elseif (is_null($source)) {
             $this->source = static::empty();
@@ -1364,6 +1364,10 @@ class LazyCollection implements Enumerable
      */
     protected function makeIterator($source)
     {
+        if (is_iterable($source)) {
+            return $source;
+        }
+
         if ($source instanceof IteratorAggregate) {
             return $source->getIterator();
         }
