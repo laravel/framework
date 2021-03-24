@@ -66,7 +66,7 @@ class Worker
     protected $isDownForMaintenance;
 
     /**
-     * The callback used to set the flag for when the app is executed from a queue daemon
+     * The callback used to set the flag for when the app is executed from a queue daemon.
      *
      * @var callable
      */

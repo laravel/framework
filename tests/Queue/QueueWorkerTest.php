@@ -380,7 +380,8 @@ class QueueWorkerTest extends TestCase
             $isInMaintenanceMode ?? function () {
                 return false;
             },
-            $setQueueDaemonFlag ?? function () {},
+            $setQueueDaemonFlag ?? function () {
+            },
         ];
     }
 
