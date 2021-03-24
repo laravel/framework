@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\TransactionManager;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
@@ -16,6 +17,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 use Opis\Closure\SerializableClosure;
+use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
@@ -250,9 +252,33 @@ class Route
      */
     protected function runController()
     {
-        return $this->controllerDispatcher()->dispatch(
+        $controllerDispatcher = $this->controllerDispatcher();
+        if ($this->isTransactional()) {
+            $controllerDispatcher = new TransactionalControllerDispatcher(
+                $controllerDispatcher, $this->container->make(TransactionManager::class)
+            );
+        }
+        return $controllerDispatcher->dispatch(
             $this, $this->getController(), $this->getControllerMethod()
         );
+    }
+
+    /**
+     * Determine if controller's method is transactional
+     *
+     * @return bool
+     *
+     * @throws \ReflectionException
+     */
+    protected function isTransactional(): bool
+    {
+        if (!method_exists($this->getController(), $this->getControllerMethod())) {
+            return false;
+        }
+        $docComment = (new ReflectionClass($this->getController()))
+            ->getMethod($this->getControllerMethod())
+            ->getDocComment();
+        return 1 === preg_match('/@transactional\b/', $docComment);
     }
 
     /**

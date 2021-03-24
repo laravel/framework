@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\StatementPrepared;
+use Illuminate\Contracts\Routing\TransactionManager;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
@@ -22,7 +23,7 @@ use LogicException;
 use PDO;
 use PDOStatement;
 
-class Connection implements ConnectionInterface
+class Connection implements ConnectionInterface,TransactionManager
 {
     use DetectsConcurrencyErrors,
         DetectsLostConnections,

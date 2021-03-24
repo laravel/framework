@@ -6,6 +6,7 @@ use Doctrine\DBAL\Types\Type;
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
 use Illuminate\Contracts\Queue\EntityResolver;
+use Illuminate\Contracts\Routing\TransactionManager;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
@@ -74,6 +75,10 @@ class DatabaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('db.transactions', function ($app) {
             return new DatabaseTransactionsManager;
+        });
+
+        $this->app->bind(TransactionManager::class,function ($app){
+            return $app['db.connection'];
         });
     }
 
