@@ -24,20 +24,11 @@ class AsCollection implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                if (is_null($model->getRawOriginal($key)) && $this->isEmpty($value)) {
+                if (is_null($value) || ($value instanceof Collection && $value->isEmpty())) {
                     return [$key => null];
                 }
 
                 return [$key => json_encode($value)];
-            }
-
-            protected function isEmpty($value)
-            {
-                if ($value instanceof Collection) {
-                    return $value->isEmpty();
-                }
-
-                return $value === null;
             }
         };
     }
