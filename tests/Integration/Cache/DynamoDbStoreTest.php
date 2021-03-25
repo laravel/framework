@@ -124,7 +124,7 @@ class DynamoDbStoreTest extends TestCase
 
             return true;
         } catch (AwsException $e) {
-            if (Str::contains($e->getAwsErrorMessage(), 'resource not found')) {
+            if (Str::contains($e->getAwsErrorMessage(), ['resource not found', 'Cannot do operations on a non-existent table'])) {
                 return false;
             }
 
