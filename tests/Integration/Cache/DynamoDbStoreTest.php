@@ -75,5 +75,38 @@ class DynamoDbStoreTest extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('cache.default', 'dynamodb');
+
+        $config = $app['config']->get('cache.stores.dynamodb');
+
+        /** @var \Aws\DynamoDb\DynamoDbClient $client */
+        $client = $app['cache.dynamodb.client'];
+
+        $client->createTable([
+            'TableName' => $config['table'],
+            'KeySchema' => [
+                [
+                    'AttributeName' => $config['attributes']['key'] ?? 'key',
+                    'KeyType' => 'hash',
+                ],
+            ],
+            'AttributeDefinitions' => [
+                [
+                    'AttributeName' => $config['attributes']['key'] ?? 'key',
+                    'AttributeType' => 'S',
+                ],
+                [
+                    'AttributeName' => $config['attributes']['value'] ?? 'value',
+                    'AttributeType' => 'S',
+                ],
+                [
+                    'AttributeName' => $config['attributes']['expiration'] ?? 'expires_at',
+                    'AttributeType' => 'S',
+                ],
+            ],
+            'ProvisionedThroughput' => [
+                'ReadCapacityUnits' => 1,
+                'WriteCapacityUnits' => 1,
+            ],
+        ]);
     }
 }
