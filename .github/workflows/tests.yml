@@ -69,7 +69,7 @@ jobs:
           port: 8888
 
       - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Cache/DynamoDbStoreTest.php --verbose
+        run: vendor/bin/phpunit --verbose
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
