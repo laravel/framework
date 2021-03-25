@@ -160,6 +160,13 @@ class DatabaseEloquentHasOneTest extends TestCase
         $result1->foreign_key = 1;
         $result2 = new EloquentHasOneModelStub;
         $result2->foreign_key = 2;
+        $result3 = new EloquentHasOneModelStub;
+        $result3->foreign_key = new class {
+            public function __toString()
+            {
+                return '4';
+            }
+        };
 
         $model1 = new EloquentHasOneModelStub;
         $model1->id = 1;
@@ -167,12 +174,15 @@ class DatabaseEloquentHasOneTest extends TestCase
         $model2->id = 2;
         $model3 = new EloquentHasOneModelStub;
         $model3->id = 3;
+        $model4 = new EloquentHasOneModelStub;
+        $model4->id = 4;
 
-        $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2]), 'foo');
+        $models = $relation->match([$model1, $model2, $model3, $model4], new Collection([$result1, $result2, $result3]), 'foo');
 
         $this->assertEquals(1, $models[0]->foo->foreign_key);
         $this->assertEquals(2, $models[1]->foo->foreign_key);
         $this->assertNull($models[2]->foo);
+        $this->assertEquals('4', $models[3]->foo->foreign_key);
     }
 
     public function testRelationCountQueryCanBeBuilt()
