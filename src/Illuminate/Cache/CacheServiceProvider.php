@@ -60,7 +60,7 @@ class CacheServiceProvider extends ServiceProvider implements DeferrableProvider
     public function provides()
     {
         return [
-            'cache', 'cache.store', 'cache.psr6', 'memcached.connector',
+            'cache', 'cache.store', 'cache.psr6', 'memcached.connector', 'cache.dynamodb.client',
         ];
     }
 }
