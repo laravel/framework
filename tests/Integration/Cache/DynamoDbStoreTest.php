@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Aws\DynamoDb\DynamoDbClient;
+use Aws\Exception\AwsException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -13,11 +15,11 @@ class DynamoDbStoreTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (! env('DYNAMODB_CACHE_TABLE')) {
             $this->markTestSkipped('DynamoDB not configured.');
         }
+
+        parent::setUp();
     }
 
     public function testItemsCanBeStoredAndRetrieved()
@@ -74,15 +76,63 @@ class DynamoDbStoreTest extends TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        if (! env('DYNAMODB_CACHE_TABLE')) {
+            $this->markTestSkipped('DynamoDB not configured.');
+        }
+
         $app['config']->set('cache.default', 'dynamodb');
 
-        $app['config']->set('cache.stores.dynamodb', [
-            'driver' => 'dynamodb',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => 'us-east-1',
-            'table' => env('DYNAMODB_CACHE_TABLE', 'laravel_test'),
-            'endpoint' => env('DYNAMODB_ENDPOINT'),
+        $config = $app['config']->get('cache.stores.dynamodb');
+
+        /** @var \Aws\DynamoDb\DynamoDbClient $client */
+        $client = $app['cache.dynamodb.client'];
+
+        if ($this->dynamoTableExists($client, $config['table'])) {
+            return;
+        }
+
+        $client->createTable([
+            'TableName' => $config['table'],
+            'KeySchema' => [
+                [
+                    'AttributeName' => $config['attributes']['key'] ?? 'key',
+                    'KeyType' => 'HASH',
+                ],
+            ],
+            'AttributeDefinitions' => [
+                [
+                    'AttributeName' => $config['attributes']['key'] ?? 'key',
+                    'AttributeType' => 'S',
+                ],
+            ],
+            'ProvisionedThroughput' => [
+                'ReadCapacityUnits' => 1,
+                'WriteCapacityUnits' => 1,
+            ],
         ]);
+    }
+
+    /**
+     * Determine if the given DynamoDB table exists.
+     *
+     * @param  \Aws\DynamoDb\DynamoDbClient  $client
+     * @param  string  $table
+     * @return bool
+     */
+    public function dynamoTableExists(DynamoDbClient $client, $table)
+    {
+        try {
+            $client->describeTable([
+                'TableName' => $table,
+            ]);
+
+            return true;
+        } catch (AwsException $e) {
+            if (Str::contains($e->getAwsErrorMessage(), ['resource not found', 'Cannot do operations on a non-existent table'])) {
+                return false;
+            }
+
+            throw $e;
+        }
     }
 }
