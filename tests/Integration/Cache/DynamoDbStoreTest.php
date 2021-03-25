@@ -87,33 +87,13 @@ class DynamoDbStoreTest extends TestCase
                 [
                     'AttributeName' => $config['attributes']['key'] ?? 'key',
                     'KeyType' => 'HASH',
-                ],
-                [
-                    'AttributeName' => $config['attributes']['value'] ?? 'value',
-                    'KeyType' => 'HASH',
-                ],
-                [
-                    'AttributeName' => $config['attributes']['expiration'] ?? 'expires_at',
-                    'KeyType' => 'HASH',
-                ],
+                ]
             ],
             'AttributeDefinitions' => [
                 [
                     'AttributeName' => $config['attributes']['key'] ?? 'key',
                     'AttributeType' => 'S',
                 ],
-                [
-                    'AttributeName' => $config['attributes']['value'] ?? 'value',
-                    'AttributeType' => 'S',
-                ],
-                [
-                    'AttributeName' => $config['attributes']['expiration'] ?? 'expires_at',
-                    'AttributeType' => 'N',
-                ],
-            ],
-            'ProvisionedThroughput' => [
-                'ReadCapacityUnits' => 1,
-                'WriteCapacityUnits' => 1,
             ],
         ]);
     }
