@@ -72,6 +72,9 @@ jobs:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
           DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
+          DYNAMODB_ENDPOINT: "http://dynamodb-local:8000"
+          AWS_ACCESS_KEY_ID: random_key
+          AWS_SECRET_ACCESS_KEY: random_secret
 
   windows_tests:
     runs-on: windows-latest

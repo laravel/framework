@@ -78,8 +78,8 @@ class DynamoDbStoreTest extends TestCase
 
         $app['config']->set('cache.stores.dynamodb', [
             'driver' => 'dynamodb',
-            'key' => env('AWS_ACCESS_KEY_ID', 'random-key'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY', 'random-secret'),
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => 'us-east-1',
             'table' => env('DYNAMODB_CACHE_TABLE', 'laravel_test'),
             'endpoint' => env('DYNAMODB_ENDPOINT'),
