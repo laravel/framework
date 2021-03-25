@@ -79,6 +79,13 @@ class Factory
     protected $responseSequences = [];
 
     /**
+     * Default options set on all created requests.
+     *
+     * @var array
+     */
+    protected $defaultOptions = [];
+
+    /**
      * Create a new factory instance.
      *
      * @return void
@@ -323,13 +330,30 @@ class Factory
     }
 
     /**
+     * Set default options for all created requests.
+     *
+     * @param  array|null  $defaultOptions
+     * @return array
+     */
+    public function defaultOptions(?array $defaultOptions = null)
+    {
+        if (! is_null($defaultOptions)) {
+            $this->defaultOptions = $defaultOptions;
+        }
+
+        return $this->defaultOptions;
+    }
+
+    /**
      * Create a new pending request instance for this factory.
      *
      * @return \Illuminate\Http\Client\PendingRequest
      */
     protected function newPendingRequest()
     {
-        return new PendingRequest($this);
+        return tap(new PendingRequest($this), function (PendingRequest $request) {
+            $request->withOptions($this->defaultOptions);
+        });
     }
 
     /**

@@ -812,4 +812,27 @@ class HttpClientTest extends TestCase
 
         $this->assertSame('yes!', $this->factory->fakeSequence()->customMethod());
     }
+
+    public function testDefaultOptions()
+    {
+        $defaultOptions = [
+            'headers' => [
+                'Foo' => 'Bar',
+            ],
+        ];
+
+        $this->factory->fake();
+
+        $this->assertEquals([], $this->factory->defaultOptions());
+
+        $this->factory->defaultOptions($defaultOptions);
+
+        $this->assertEquals($defaultOptions, $this->factory->defaultOptions());
+
+        $this->factory->get('http://foo.com');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com' && $request->hasHeader('Foo', 'Bar');
+        });
+    }
 }
