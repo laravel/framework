@@ -71,6 +71,7 @@ jobs:
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
+          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
 
   windows_tests:
     runs-on: windows-latest
