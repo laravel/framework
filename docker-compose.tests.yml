@@ -1,0 +1,19 @@
+version: '3'
+services:
+  tests:
+    depends_on:
+      - mysql
+      - memcached
+      - redis
+    image: registry.gitlab.com/grahamcampbell/php:7.4-base
+    entrypoint: [ "/data/bin/tests-entrypoint.sh" ]
+    working_dir: /data
+    environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+      MEMCACHED_HOST: memcached
+      DB_USERNAME: root
+      CI: ${CI:-1}
+    volumes:
+      - .:/data:delegated
+

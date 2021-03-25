@@ -3,7 +3,7 @@ services:
   memcached:
     image: memcached:1.6-alpine
     ports:
-      - "11211:11211"
+      - "${MEMCACHED_PORT:-11211}:11211"
     restart: always
   mysql:
     image: mysql:5.7
@@ -12,10 +12,10 @@ services:
       MYSQL_ROOT_PASSWORD: ""
       MYSQL_DATABASE: "forge"
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     restart: always
   redis:
     image: redis:5.0-alpine
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     restart: always
