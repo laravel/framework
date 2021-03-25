@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Console\OutputStyle;
-use Symfony\Component\Console\Input\ArrayInput;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Console\EventListCommand;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class EventListCommandTest extends TestCase
 {
