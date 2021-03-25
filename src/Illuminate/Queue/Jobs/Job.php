@@ -195,12 +195,12 @@ abstract class Job
      */
     protected function failed($e)
     {
-        $payload = $this->payload();
+        if ($payload = $this->payload()) {
+            [$class, $method] = JobName::parse($payload['job']);
 
-        [$class, $method] = JobName::parse($payload['job']);
-
-        if (method_exists($this->instance = $this->resolve($class), 'failed')) {
-            $this->instance->failed($payload['data'], $e);
+            if (method_exists($this->instance = $this->resolve($class), 'failed')) {
+                $this->instance->failed($payload['data'], $e);
+            }
         }
     }
 
