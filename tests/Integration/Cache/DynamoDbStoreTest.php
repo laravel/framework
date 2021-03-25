@@ -15,11 +15,11 @@ class DynamoDbStoreTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (! env('DYNAMODB_CACHE_TABLE')) {
             $this->markTestSkipped('DynamoDB not configured.');
         }
+
+        parent::setUp();
     }
 
     public function testItemsCanBeStoredAndRetrieved()
@@ -76,6 +76,10 @@ class DynamoDbStoreTest extends TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        if (! env('DYNAMODB_CACHE_TABLE')) {
+            $this->markTestSkipped('DynamoDB not configured.');
+        }
+
         $app['config']->set('cache.default', 'dynamodb');
 
         $config = $app['config']->get('cache.stores.dynamodb');
