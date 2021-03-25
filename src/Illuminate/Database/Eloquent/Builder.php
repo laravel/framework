@@ -439,6 +439,30 @@ class Builder
     }
 
     /**
+     * Get the first record from the latest ordered records.
+     *
+     * @param string|\Illuminate\Database\Query\Expression $orderByColumn
+     * @param array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     */
+    public function firstLatest($orderByColumn = null, $columns = ['*'])
+    {
+        return $this->latest($orderByColumn)->first($columns);
+    }
+
+    /**
+     * Get the first record from the oldest ordered records.
+     *
+     * @param string|\Illuminate\Database\Query\Expression $orderByColumn
+     * @param array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     */
+    public function firstOldest($orderByColumn = null, $columns = ['*'])
+    {
+        return $this->oldest($orderByColumn)->first($columns);
+    }
+
+    /**
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
