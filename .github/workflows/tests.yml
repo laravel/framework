@@ -63,8 +63,11 @@ jobs:
           max_attempts: 5
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
+      - name: Setup DynamoDB Local
+        uses: rrainn/dynamodb-action@v2.0.0
+
       - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit tests/Integration/Cache/DynamoDbStoreTest.php --verbose
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
