@@ -87,7 +87,7 @@ class DynamoDbStoreTest extends TestCase
                 [
                     'AttributeName' => $config['attributes']['key'] ?? 'key',
                     'KeyType' => 'HASH',
-                ]
+                ],
             ],
             'AttributeDefinitions' => [
                 [
