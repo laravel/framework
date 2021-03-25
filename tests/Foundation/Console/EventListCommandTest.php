@@ -94,4 +94,51 @@ OUTPUT
             , $output->fetch()
         );
     }
+
+    public function testWithFilteredMultipleEvents()
+    {
+        $input = new ArrayInput(['--event' => 'Other']);
+        $output = new BufferedOutput();
+
+        $serviceProvider = m::mock(EventServiceProvider::class)->makePartial();
+        $serviceProvider->shouldReceive('listens')
+            ->andReturn([
+                \Some\Event::class => [
+                    \Some\Listener\FirstListener::class,
+                    \Some\Listener\SecondListener::class,
+                ],
+
+                \Some\Other::class => [
+                    \Some\Listener\ThirdListener::class,
+                ],
+            ]);
+
+        $container = m::mock(Application::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('getProviders')
+            ->with(EventServiceProvider::class)
+            ->andReturn([$serviceProvider]);
+
+        $container->shouldReceive('make')
+            ->with(OutputStyle::class, m::any())
+            ->andReturn(new OutputStyle($input, $output));
+
+        $command = new EventListCommand();
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $command->handle();
+
+        $this->assertEquals(
+            <<<OUTPUT
++------------+-----------------------------+
+| Event      | Listeners                   |
++------------+-----------------------------+
+| Some\Other | Some\Listener\ThirdListener |
++------------+-----------------------------+
+
+OUTPUT
+            , $output->fetch()
+        );
+    }
 }
