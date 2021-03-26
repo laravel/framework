@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Foundation\Console;
 
 use Illuminate\Console\OutputStyle;
+use Illuminate\Events\SpyDispatcher;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Console\EventListCommand;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
@@ -37,6 +39,12 @@ class EventListCommandTest extends TestCase
                 new OutputStyle($input, $output)
             );
 
+        $container->shouldReceive('make')
+            ->with(SpyDispatcher::class)
+            ->andReturn(
+                new SpyDispatcher($container)
+            );
+
         $command = new EventListCommand();
         $command->setLaravel($container);
 
@@ -51,28 +59,23 @@ class EventListCommandTest extends TestCase
         $input = new ArrayInput([]);
         $output = new BufferedOutput();
 
-        $serviceProvider = m::mock(EventServiceProvider::class)->makePartial();
-        $serviceProvider->shouldReceive('listens')
-            ->andReturn([
-                \Some\Event::class => [
-                    \Some\Listener\FirstListener::class,
-                    \Some\Listener\SecondListener::class,
-                ],
-
-                \Some\Other::class => [
-                    \Some\Listener\ThirdListener::class,
-                ],
-            ]);
-
         $container = m::mock(Application::class);
         $container->shouldReceive('call');
         $container->shouldReceive('getProviders')
             ->with(EventServiceProvider::class)
-            ->andReturn([$serviceProvider]);
+            ->andReturn([new TestMultipleEventsServiceProvider($container)]);
+
+        $container->shouldReceive('eventsAreCached')->andReturn(false);
 
         $container->shouldReceive('make')
             ->with(OutputStyle::class, m::any())
             ->andReturn(new OutputStyle($input, $output));
+
+        $container->shouldReceive('make')
+            ->with(SpyDispatcher::class)
+            ->andReturn(
+                new SpyDispatcher($container)
+            );
 
         $command = new EventListCommand();
         $command->setLaravel($container);
@@ -96,28 +99,23 @@ class EventListCommandTest extends TestCase
         $input = new ArrayInput(['--event' => 'Other']);
         $output = new BufferedOutput();
 
-        $serviceProvider = m::mock(EventServiceProvider::class)->makePartial();
-        $serviceProvider->shouldReceive('listens')
-            ->andReturn([
-                \Some\Event::class => [
-                    \Some\Listener\FirstListener::class,
-                    \Some\Listener\SecondListener::class,
-                ],
-
-                \Some\Other::class => [
-                    \Some\Listener\ThirdListener::class,
-                ],
-            ]);
-
         $container = m::mock(Application::class);
         $container->shouldReceive('call');
         $container->shouldReceive('getProviders')
             ->with(EventServiceProvider::class)
-            ->andReturn([$serviceProvider]);
+            ->andReturn([new TestMultipleEventsServiceProvider($container)]);
 
         $container->shouldReceive('make')
             ->with(OutputStyle::class, m::any())
             ->andReturn(new OutputStyle($input, $output));
+
+        $container->shouldReceive('eventsAreCached')->andReturn(false);
+
+        $container->shouldReceive('make')
+            ->with(SpyDispatcher::class)
+            ->andReturn(
+                new SpyDispatcher($container)
+            );
 
         $command = new EventListCommand();
         $command->setLaravel($container);
@@ -156,6 +154,12 @@ class EventListCommandTest extends TestCase
             ->with(TestSubscriber::class)
             ->andReturn(new TestSubscriber());
 
+        $container->shouldReceive('make')
+            ->with(SpyDispatcher::class)
+            ->andReturn(
+                new SpyDispatcher($container)
+            );
+
         $command = new EventListCommand();
         $command->setLaravel($container);
 
@@ -171,6 +175,111 @@ class EventListCommandTest extends TestCase
             '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL, $output->fetch()
         );
     }
+
+    public function testWithClosure()
+    {
+        $input = new ArrayInput([]);
+        $output = new BufferedOutput();
+
+        $container = m::mock(Application::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('getProviders')
+            ->with(EventServiceProvider::class)
+            ->andReturn([new TestClosureServiceProvider($container)]);
+
+        $container->shouldReceive('make')
+            ->with(OutputStyle::class, m::any())
+            ->andReturn(
+                new OutputStyle($input, $output)
+            );
+
+        $container->shouldReceive('make')
+            ->with(SpyDispatcher::class)
+            ->andReturn(
+                new SpyDispatcher($container)
+            );
+
+        $container->shouldReceive('eventsAreCached')
+            ->andReturn(false);
+
+        $command = new EventListCommand();
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $command->handle();
+
+        $this->assertEquals(
+            '+-------+-----------+'.PHP_EOL.
+            '| Event | Listeners |'.PHP_EOL.
+            '+-------+-----------+'.PHP_EOL.
+            '| test  | Closure   |'.PHP_EOL.
+            '+-------+-----------+'.PHP_EOL, $output->fetch()
+        );
+
+//        app()->register(\Tests\Feature\TestClosureServiceProvider::class);
+
+//        $this->artisan('event:mine')
+//            ->expectsOutput('+-------+-----------+')
+//            ->expectsOutput('| Event | Listeners |')
+//            ->expectsOutput('+-------+-----------+')
+//            ->expectsOutput('| test  | Closure   |')
+//            ->expectsOutput('+-------+-----------+');
+    }
+
+    public function testWithWildCards()
+    {
+        $input = new ArrayInput([]);
+        $output = new BufferedOutput();
+
+        $container = m::mock(Application::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('getProviders')
+            ->with(EventServiceProvider::class)
+            ->andReturn([new TestWildCardServiceProvider($container)]);
+
+        $container->shouldReceive('make')
+            ->with(OutputStyle::class, m::any())
+            ->andReturn(
+                new OutputStyle($input, $output)
+            );
+
+        $container->shouldReceive('make')
+            ->with(SpyDispatcher::class)
+            ->andReturn(
+                new SpyDispatcher($container)
+            );
+
+        $container->shouldReceive('eventsAreCached')
+            ->andReturn(false);
+
+        $command = new EventListCommand();
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $command->handle();
+
+        $this->assertEquals(
+            '+--------+-----------+'.PHP_EOL.
+            '| Event  | Listeners |'.PHP_EOL.
+            '+--------+-----------+'.PHP_EOL.
+            '| test.* | Closure   |'.PHP_EOL.
+            '+--------+-----------+'.PHP_EOL, $output->fetch()
+        );
+    }
+}
+
+class TestMultipleEventsServiceProvider extends EventServiceProvider
+{
+    protected $listen = [
+        \Some\Event::class => [
+            \Some\Listener\FirstListener::class,
+            \Some\Listener\SecondListener::class,
+        ],
+
+        \Some\Other::class => [
+            \Some\Listener\ThirdListener::class,
+        ],
+    ];
 }
 
 class TestSubscriberServiceProvider extends EventServiceProvider
@@ -178,6 +287,30 @@ class TestSubscriberServiceProvider extends EventServiceProvider
     protected $subscribe = [
         TestSubscriber::class,
     ];
+}
+
+class TestClosureServiceProvider extends EventServiceProvider
+{
+    public function boot()
+    {
+        parent::boot();
+
+        Event::listen('test', function () {
+            //
+        });
+    }
+}
+
+class TestWildCardServiceProvider extends EventServiceProvider
+{
+    public function boot()
+    {
+        parent::boot();
+
+        Event::listen('test.*', function () {
+            //
+        });
+    }
 }
 
 class TestSubscriber

@@ -3,6 +3,8 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Events\SpyDispatcher;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Str;
 
@@ -45,21 +47,33 @@ class EventListCommand extends Command
      */
     protected function getEvents()
     {
-        $events = [];
+        Event::swap($spy = $this->laravel->make(SpyDispatcher::class));
 
-        foreach ($this->laravel->getProviders(EventServiceProvider::class) as $provider) {
-            $providerEvents = array_merge_recursive($provider->shouldDiscoverEvents() ? $provider->discoverEvents() : [], $provider->listens());
+        foreach ($this->getLaravel()->getProviders(EventServiceProvider::class) as $provider) {
+            $provider->register();
 
-            $events = array_merge_recursive($events, $providerEvents);
+            if (method_exists($provider, 'callBootingCallbacks')) {
+                $provider->callBootingCallbacks();
+            }
+
+            $provider->boot();
         }
+
+        $events = $spy->events();
 
         if ($this->filteringByEvent()) {
             $events = $this->filterEvents($events);
         }
 
-        return collect($events)->map(function ($listeners, $event) {
-            return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
-        })->sortBy('Event')->values()->toArray();
+        return collect($events)
+            ->map(
+                function ($listeners, $event) {
+                    return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
+                }
+            )
+            ->sortBy('Event')
+            ->values()
+            ->toArray();
     }
 
     /**
