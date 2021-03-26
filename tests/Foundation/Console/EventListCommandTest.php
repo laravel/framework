@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
+use Illuminate\Console\OutputStyle;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Events\SpyDispatcher;
+use Illuminate\Foundation\Console\EventListCommand;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Console\OutputStyle;
-use Illuminate\Events\SpyDispatcher;
-use Illuminate\Support\Facades\Event;
 use Symfony\Component\Console\Input\ArrayInput;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Foundation\Console\EventListCommand;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 
 class EventListCommandTest extends TestCase
 {
@@ -68,7 +68,7 @@ class EventListCommandTest extends TestCase
     {
         $this->testRoutine(
             [],
-            [TestMultipleEventsServiceProvider::class],
+            [TestMultipleEventsServiceProvider::class, EventServiceProvider::class],
             '+------------+------------------------------+'.PHP_EOL.
             '| Event      | Listeners                    |'.PHP_EOL.
             '+------------+------------------------------+'.PHP_EOL.
@@ -82,7 +82,7 @@ class EventListCommandTest extends TestCase
     {
         $this->testRoutine(
             ['--event' => 'Other'],
-            [TestMultipleEventsServiceProvider::class],
+            [TestMultipleEventsServiceProvider::class, TestClosureServiceProvider::class],
             '+------------+-----------------------------+'.PHP_EOL.
             '| Event      | Listeners                   |'.PHP_EOL.
             '+------------+-----------------------------+'.PHP_EOL.

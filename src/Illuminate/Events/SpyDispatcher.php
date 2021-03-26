@@ -11,7 +11,7 @@ class SpyDispatcher extends Dispatcher
         }
 
         if (is_array($listener) && isset($listener[0]) && is_string($listener[0])) {
-            return $listener[0] . '@' . $listener[1] ?? 'handle';
+            return $listener[0].'@'.$listener[1] ?? 'handle';
         }
 
         return 'Closure';
