@@ -156,6 +156,19 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
         return $this->user;
     }
+    
+    
+    /**
+     * Get the currently authenticated user or throws exception.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
+     */
+    public function userOrFail()
+    {
+        return $this->user() ?? $this->failedBasicResponse();
+    }
 
     /**
      * Pull a user from the repository by its "remember me" cookie token.
