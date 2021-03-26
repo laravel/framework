@@ -2,6 +2,15 @@
 
 namespace Illuminate\Events;
 
+/**
+ * A Dispatcher to spy on event registration
+ *
+ * Laravel does not store reference to listeners, only
+ * store closures. Which made it difficult to list
+ * application registered events and listeners
+ *
+ * @internal
+ */
 class SpyDispatcher extends Dispatcher
 {
     public function makeListener($listener, $wildcard = false)
