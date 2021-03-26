@@ -20,7 +20,7 @@ class EventListCommandTest extends TestCase
         m::close();
     }
 
-    protected function testRoutine(array $inputParams, array $providerClasses, string $expectedOutput)
+    protected function routine(array $inputParams, array $providerClasses, string $expectedOutput)
     {
         $input = new ArrayInput($inputParams);
         $output = new BufferedOutput();
@@ -55,15 +55,15 @@ class EventListCommandTest extends TestCase
         $command->handle();
 
         $actualOutput = $output->fetch();
-        $actualLines = preg_split("/\r\n|\n|\r/", $actualOutput);
-        $expectedLines = preg_split("/\r\n|\n|\r/", $expectedOutput);
+        $actualLines = array_filter(preg_split("/\r\n|\n|\r/", $actualOutput));
+        $expectedLines = array_filter(preg_split("/\r\n|\n|\r/", $expectedOutput));
 
         $this->assertEquals($expectedLines, $actualLines);
     }
 
     public function testWithNoEvent()
     {
-        $this->testRoutine(
+        $this->routine(
             [],
             [EventServiceProvider::class],
             "Your application doesn't have any events matching the given criteria.");
@@ -71,39 +71,39 @@ class EventListCommandTest extends TestCase
 
     public function testWithMultipleEvents()
     {
-        $this->testRoutine(
+        $this->routine(
             [],
             [TestMultipleEventsServiceProvider::class, EventServiceProvider::class],
             <<<OUTPUT
-+------------+------------------------------+
-| Event      | Listeners                    |
-+------------+------------------------------+
-| Some\Event | Some\Listener\FirstListener  |
-|            | Some\Listener\SecondListener |
-| Some\Other | Some\Listener\ThirdListener  |
-+------------+------------------------------+
++-------------------------------------+------------------------------------------------------------+
+| Event                               | Listeners                                                  |
++-------------------------------------+------------------------------------------------------------+
+| Illuminate\Cache\Events\CacheHit    | Illuminate\Tests\Foundation\Console\FirstCacheHitListener  |
+|                                     | Illuminate\Tests\Foundation\Console\SecondCacheHitListener |
+| Illuminate\Cache\Events\CacheMissed | Illuminate\Tests\Foundation\Console\CacheMissedListener    |
++-------------------------------------+------------------------------------------------------------+
 OUTPUT
         );
     }
 
     public function testWithFilteredMultipleEvents()
     {
-        $this->testRoutine(
-            ['--event' => 'Other'],
+        $this->routine(
+            ['--event' => 'Missed'],
             [TestMultipleEventsServiceProvider::class, TestClosureServiceProvider::class],
             <<<OUTPUT
-+------------+-----------------------------+
-| Event      | Listeners                   |
-+------------+-----------------------------+
-| Some\Other | Some\Listener\ThirdListener |
-+------------+-----------------------------+
++-------------------------------------+---------------------------------------------------------+
+| Event                               | Listeners                                               |
++-------------------------------------+---------------------------------------------------------+
+| Illuminate\Cache\Events\CacheMissed | Illuminate\Tests\Foundation\Console\CacheMissedListener |
++-------------------------------------+---------------------------------------------------------+
 OUTPUT
         );
     }
 
     public function testWithEventSubscribe()
     {
-        $this->testRoutine(
+        $this->routine(
             [],
             [TestSubscriberServiceProvider::class],
             <<<OUTPUT
@@ -119,7 +119,7 @@ OUTPUT
 
     public function testWithClosure()
     {
-        $this->testRoutine(
+        $this->routine(
             [],
             [TestClosureServiceProvider::class],
             <<<'OUTPUT'
@@ -134,7 +134,7 @@ OUTPUT
 
     public function testWithWildCards()
     {
-        $this->testRoutine(
+        $this->routine(
             [],
             [TestWildCardServiceProvider::class],
             <<<'OUTPUT'
@@ -151,13 +151,13 @@ OUTPUT
 class TestMultipleEventsServiceProvider extends EventServiceProvider
 {
     protected $listen = [
-        \Some\Event::class => [
-            \Some\Listener\FirstListener::class,
-            \Some\Listener\SecondListener::class,
+        CacheHit::class => [
+            FirstCacheHitListener::class,
+            SecondCacheHitListener::class,
         ],
 
-        \Some\Other::class => [
-            \Some\Listener\ThirdListener::class,
+        CacheMissed::class => [
+            CacheMissedListener::class,
         ],
     ];
 }
@@ -216,5 +216,26 @@ class TestSubscriber
             'Illuminate\Auth\Events\Logout',
             static::class.'@handleUserLogout'
         );
+    }
+}
+
+class FirstCacheHitListener
+{
+    public function handle(CacheHit $event)
+    {
+    }
+}
+
+class SecondCacheHitListener
+{
+    public function handle(CacheHit $event)
+    {
+    }
+}
+
+class CacheMissedListener
+{
+    public function handle(CacheMissed $event)
+    {
     }
 }
