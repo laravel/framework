@@ -168,8 +168,7 @@ class EventListCommandTest extends TestCase
             '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL.
             '| Illuminate\Auth\Events\Login  | Illuminate\Tests\Foundation\Console\TestSubscriber@handleUserLogin  |'.PHP_EOL.
             '| Illuminate\Auth\Events\Logout | Illuminate\Tests\Foundation\Console\TestSubscriber@handleUserLogout |'.PHP_EOL.
-            '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL
-            , $output->fetch()
+            '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL, $output->fetch()
         );
     }
 }
