@@ -87,7 +87,8 @@ class EventListCommandTest extends TestCase
             '| Some\Event | Some\Listener\FirstListener  |'.PHP_EOL.
             '|            | Some\Listener\SecondListener |'.PHP_EOL.
             '| Some\Other | Some\Listener\ThirdListener  |'.PHP_EOL.
-            '+------------+------------------------------+'.PHP_EOL, $output->fetch()
+            '+------------+------------------------------+'.PHP_EOL
+            , $output->fetch()
         );
     }
 
