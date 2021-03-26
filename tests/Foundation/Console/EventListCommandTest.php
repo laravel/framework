@@ -77,13 +77,12 @@ class EventListCommandTest extends TestCase
             [],
             [TestMultipleEventsServiceProvider::class, EventServiceProvider::class],
             <<<OUTPUT
-+-------------------------------------+------------------------------------------------------------+
-| Event                               | Listeners                                                  |
-+-------------------------------------+------------------------------------------------------------+
-| Illuminate\Cache\Events\CacheHit    | Illuminate\Tests\Foundation\Console\FirstCacheHitListener  |
-|                                     | Illuminate\Tests\Foundation\Console\SecondCacheHitListener |
-| Illuminate\Cache\Events\CacheMissed | Illuminate\Tests\Foundation\Console\CacheMissedListener    |
-+-------------------------------------+------------------------------------------------------------+
++-------------------------------------+---------------------------------------------------------+
+| Event                               | Listeners                                               |
++-------------------------------------+---------------------------------------------------------+
+| Illuminate\Cache\Events\CacheHit    | Illuminate\Tests\Foundation\Console\CacheHitListener    |
+| Illuminate\Cache\Events\CacheMissed | Illuminate\Tests\Foundation\Console\CacheMissedListener |
++-------------------------------------+---------------------------------------------------------+
 OUTPUT
         );
     }
@@ -154,8 +153,7 @@ class TestMultipleEventsServiceProvider extends EventServiceProvider
 {
     protected $listen = [
         CacheHit::class => [
-            FirstCacheHitListener::class,
-            SecondCacheHitListener::class,
+            CacheHitListener::class,
         ],
 
         CacheMissed::class => [
@@ -221,14 +219,7 @@ class TestSubscriber
     }
 }
 
-class FirstCacheHitListener
-{
-    public function handle(CacheHit $event)
-    {
-    }
-}
-
-class SecondCacheHitListener
+class CacheHitListener
 {
     public function handle(CacheHit $event)
     {
