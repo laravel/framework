@@ -11,7 +11,7 @@ class FlushFailedCommand extends Command
      *
      * @var string
      */
-    protected $name = 'queue:flush';
+    protected $signature = 'queue:flush {--age= : Only clear failed jobs older than the given age in days}';
 
     /**
      * The name of the console command.
@@ -36,7 +36,13 @@ class FlushFailedCommand extends Command
      */
     public function handle()
     {
-        $this->laravel['queue.failer']->flush();
+        $this->laravel['queue.failer']->flush($this->option('age'));
+
+        if ($this->option('age')) {
+            $this->info("Failed jobs older than {$this->option('age')} days deleted successfully!");
+
+            return;
+        }
 
         $this->info('All failed jobs deleted successfully!');
     }

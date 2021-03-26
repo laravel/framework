@@ -165,11 +165,12 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     /**
      * Flush all of the failed jobs from storage.
      *
+     * @param  int|null  $age
      * @return void
      *
      * @throws \Exception
      */
-    public function flush()
+    public function flush($age = null)
     {
         throw new Exception("DynamoDb failed job storage may not be flushed. Please use DynamoDb's TTL features on your expires_at attribute.");
     }
