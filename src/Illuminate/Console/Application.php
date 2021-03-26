@@ -4,6 +4,7 @@ namespace Illuminate\Console;
 
 use Closure;
 use Illuminate\Console\Events\ArtisanStarting;
+use Illuminate\Console\Events\CommandFailed;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
@@ -21,6 +22,7 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Throwable;
 
 class Application extends SymfonyApplication implements ApplicationContract
 {
@@ -89,11 +91,19 @@ class Application extends SymfonyApplication implements ApplicationContract
             )
         );
 
-        $exitCode = parent::run($input, $output);
+        try {
+            $exitCode = parent::run($input, $output);
 
-        $this->events->dispatch(
-            new CommandFinished($commandName, $input, $output, $exitCode)
-        );
+            $this->events->dispatch(
+                new CommandFinished($commandName, $input, $output, $exitCode)
+            );
+        } catch (Throwable $e) {
+            $this->events->dispatch(
+                new CommandFailed($commandName, $input, $output, $e)
+            );
+
+            throw $e;
+        }
 
         return $exitCode;
     }
