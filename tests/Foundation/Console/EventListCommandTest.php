@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
+use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Events\SpyDispatcher;
