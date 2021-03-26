@@ -3,7 +3,7 @@
 namespace Illuminate\Events;
 
 /**
- * A Dispatcher to spy on event registration
+ * A Dispatcher to spy on event registration.
  *
  * Laravel does not store reference to listeners, only
  * store closures. Which made it difficult to list
