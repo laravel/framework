@@ -11,6 +11,15 @@ use Orchestra\Testbench\TestCase;
  */
 class DynamoDbStoreTest extends TestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        if (! env('DYNAMODB_CACHE_TABLE')) {
+            $this->markTestSkipped('DynamoDB not configured.');
+        }
+
+        $app['config']->set('cache.default', 'dynamodb');
+    }
+
     protected function setUp(): void
     {
         if (! env('DYNAMODB_CACHE_TABLE')) {
@@ -18,6 +27,8 @@ class DynamoDbStoreTest extends TestCase
         }
 
         parent::setUp();
+
+        $this->artisan('cache:dynamodb');
     }
 
     public function testItemsCanBeStoredAndRetrieved()
@@ -64,22 +75,5 @@ class DynamoDbStoreTest extends TestCase
         Cache::driver('dynamodb')->lock('lock', 10)->get(function () {
             $this->assertFalse(Cache::driver('dynamodb')->lock('lock', 10)->get());
         });
-    }
-
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        if (! env('DYNAMODB_CACHE_TABLE')) {
-            $this->markTestSkipped('DynamoDB not configured.');
-        }
-
-        $this->artisan('cache:dynamodb');
-
-        $app['config']->set('cache.default', 'dynamodb');
     }
 }
