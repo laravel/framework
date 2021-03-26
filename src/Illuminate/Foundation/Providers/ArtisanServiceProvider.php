@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Providers;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
+use Illuminate\Cache\Console\DynamoDBTableCommand;
 use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
@@ -135,6 +136,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * @var array
      */
     protected $devCommands = [
+        'CacheDynamoDBTable' => 'command.cache.dynamodb.table',
         'CacheTable' => 'command.cache.table',
         'CastMake' => 'command.cast.make',
         'ChannelMake' => 'command.channel.make',
@@ -229,6 +231,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.cache.table', function ($app) {
             return new CacheTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerCacheDynamoDBTableCommand()
+    {
+        $this->app->singleton('command.cache.dynamodb.table', function ($app) {
+            return new DynamoDBTableCommand;
         });
     }
 
