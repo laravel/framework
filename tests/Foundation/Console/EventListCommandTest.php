@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
+use Illuminate\Console\OutputStyle;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Events\SpyDispatcher;
+use Illuminate\Foundation\Console\EventListCommand;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Console\OutputStyle;
-use Illuminate\Events\SpyDispatcher;
-use Illuminate\Support\Facades\Event;
 use Symfony\Component\Console\Input\ArrayInput;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Foundation\Console\EventListCommand;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 
 class EventListCommandTest extends TestCase
 {
@@ -55,8 +55,8 @@ class EventListCommandTest extends TestCase
         $command->handle();
 
         $actualOutput = $output->fetch();
-        $actualLines = array_filter(explode(PHP_EOL, $actualOutput));
-        $expectedLines = array_filter(explode(PHP_EOL, $expectedOutput));
+        $actualLines = preg_split("/\r\n|\n|\r/", $actualOutput);
+        $expectedLines = preg_split("/\r\n|\n|\r/", $expectedOutput);
 
         $this->assertEquals($expectedLines, $actualLines);
     }
@@ -122,7 +122,7 @@ OUTPUT
         $this->testRoutine(
             [],
             [TestClosureServiceProvider::class],
-            <<<OUTPUT
+            <<<'OUTPUT'
 +-------+-----------+
 | Event | Listeners |
 +-------+-----------+
@@ -137,7 +137,7 @@ OUTPUT
         $this->testRoutine(
             [],
             [TestWildCardServiceProvider::class],
-            <<<OUTPUT
+            <<<'OUTPUT'
 +--------+-----------+
 | Event  | Listeners |
 +--------+-----------+
