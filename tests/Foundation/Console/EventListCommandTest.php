@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class EventListCommandTest extends TestCase
 {
-    const DOES_NOT_HAVE_ANY_EVENTS = "Your application doesn't have any events matching the given criteria." . PHP_EOL;
+    const DOES_NOT_HAVE_ANY_EVENTS = "Your application doesn't have any events matching the given criteria.".PHP_EOL;
 
     protected function tearDown(): void
     {
@@ -81,14 +81,13 @@ class EventListCommandTest extends TestCase
         $command->handle();
 
         $this->assertEquals(
-            '+------------+------------------------------+' . PHP_EOL .
-            '| Event      | Listeners                    |' . PHP_EOL .
-            '+------------+------------------------------+' . PHP_EOL .
-            '| Some\Event | Some\Listener\FirstListener  |' . PHP_EOL .
-            '|            | Some\Listener\SecondListener |' . PHP_EOL .
-            '| Some\Other | Some\Listener\ThirdListener  |' . PHP_EOL .
-            '+------------+------------------------------+' . PHP_EOL
-            , $output->fetch()
+            '+------------+------------------------------+'.PHP_EOL.
+            '| Event      | Listeners                    |'.PHP_EOL.
+            '+------------+------------------------------+'.PHP_EOL.
+            '| Some\Event | Some\Listener\FirstListener  |'.PHP_EOL.
+            '|            | Some\Listener\SecondListener |'.PHP_EOL.
+            '| Some\Other | Some\Listener\ThirdListener  |'.PHP_EOL.
+            '+------------+------------------------------+'.PHP_EOL, $output->fetch()
         );
     }
 
@@ -127,12 +126,11 @@ class EventListCommandTest extends TestCase
         $command->handle();
 
         $this->assertEquals(
-            '+------------+-----------------------------+' . PHP_EOL .
-            '| Event      | Listeners                   |' . PHP_EOL .
-            '+------------+-----------------------------+' . PHP_EOL .
-            '| Some\Other | Some\Listener\ThirdListener |' . PHP_EOL .
-            '+------------+-----------------------------+' . PHP_EOL
-            , $output->fetch()
+            '+------------+-----------------------------+'.PHP_EOL.
+            '| Event      | Listeners                   |'.PHP_EOL.
+            '+------------+-----------------------------+'.PHP_EOL.
+            '| Some\Other | Some\Listener\ThirdListener |'.PHP_EOL.
+            '+------------+-----------------------------+'.PHP_EOL, $output->fetch()
         );
     }
 }
