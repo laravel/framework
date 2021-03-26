@@ -49,7 +49,7 @@ class EventListCommand extends Command
     {
         Event::swap($spy = $this->laravel->make(SpyDispatcher::class));
 
-        foreach ($this->getLaravel()->getProviders(EventServiceProvider::class) as $provider) {
+        foreach ($this->laravel->getProviders(EventServiceProvider::class) as $provider) {
             $provider->register();
 
             if (method_exists($provider, 'callBootingCallbacks')) {
@@ -65,15 +65,9 @@ class EventListCommand extends Command
             $events = $this->filterEvents($events);
         }
 
-        return collect($events)
-            ->map(
-                function ($listeners, $event) {
-                    return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
-                }
-            )
-            ->sortBy('Event')
-            ->values()
-            ->toArray();
+        return collect($events)->map(function ($listeners, $event) {
+            return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
+        })->sortBy('Event')->values()->toArray();
     }
 
     /**

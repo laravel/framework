@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Events\SpyDispatcher;
 use Illuminate\Support\Facades\Event;
+use Symfony\Component\Console\Input\ArrayInput;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Console\EventListCommand;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 
 class EventListCommandTest extends TestCase
 {
@@ -22,50 +22,21 @@ class EventListCommandTest extends TestCase
         m::close();
     }
 
-    public function testWithNoEvent()
+    protected function testRoutine(array $inputParams, array $providerClasses, string $expectedOutput)
     {
-        $input = new ArrayInput([]);
+        $input = new ArrayInput($inputParams);
         $output = new BufferedOutput();
 
         $container = m::mock(Application::class);
+
         $container->shouldReceive('call');
-        $container->shouldReceive('getProviders')
-            ->with(EventServiceProvider::class)
-            ->andReturn([]);
-
-        $container->shouldReceive('make')
-            ->with(OutputStyle::class, m::any())
-            ->andReturn(
-                new OutputStyle($input, $output)
-            );
-
-        $container->shouldReceive('make')
-            ->with(SpyDispatcher::class)
-            ->andReturn(
-                new SpyDispatcher($container)
-            );
-
-        $command = new EventListCommand();
-        $command->setLaravel($container);
-
-        $command->run($input, $output);
-        $command->handle();
-
-        $this->assertEquals(self::DOES_NOT_HAVE_ANY_EVENTS, $output->fetch());
-    }
-
-    public function testWithMultipleEvents()
-    {
-        $input = new ArrayInput([]);
-        $output = new BufferedOutput();
-
-        $container = m::mock(Application::class);
-        $container->shouldReceive('call');
-        $container->shouldReceive('getProviders')
-            ->with(EventServiceProvider::class)
-            ->andReturn([new TestMultipleEventsServiceProvider($container)]);
-
         $container->shouldReceive('eventsAreCached')->andReturn(false);
+
+        $container->shouldReceive('getProviders')
+            ->with(EventServiceProvider::class)
+            ->andReturn(array_map(function ($providerClass) use ($container) {
+                return new $providerClass($container);
+            }, $providerClasses));
 
         $container->shouldReceive('make')
             ->with(OutputStyle::class, m::any())
@@ -73,9 +44,11 @@ class EventListCommandTest extends TestCase
 
         $container->shouldReceive('make')
             ->with(SpyDispatcher::class)
-            ->andReturn(
-                new SpyDispatcher($container)
-            );
+            ->andReturn(new SpyDispatcher($container));
+
+        $container->shouldReceive('make')
+            ->with(TestSubscriber::class)
+            ->andReturn(new TestSubscriber());
 
         $command = new EventListCommand();
         $command->setLaravel($container);
@@ -83,188 +56,75 @@ class EventListCommandTest extends TestCase
         $command->run($input, $output);
         $command->handle();
 
-        $this->assertEquals(
+        $this->assertEquals($expectedOutput, $output->fetch());
+    }
+
+    public function testWithNoEvent()
+    {
+        $this->testRoutine([], [EventServiceProvider::class], self::DOES_NOT_HAVE_ANY_EVENTS);
+    }
+
+    public function testWithMultipleEvents()
+    {
+        $this->testRoutine(
+            [],
+            [TestMultipleEventsServiceProvider::class],
             '+------------+------------------------------+'.PHP_EOL.
             '| Event      | Listeners                    |'.PHP_EOL.
             '+------------+------------------------------+'.PHP_EOL.
             '| Some\Event | Some\Listener\FirstListener  |'.PHP_EOL.
             '|            | Some\Listener\SecondListener |'.PHP_EOL.
             '| Some\Other | Some\Listener\ThirdListener  |'.PHP_EOL.
-            '+------------+------------------------------+'.PHP_EOL, $output->fetch()
-        );
+            '+------------+------------------------------+'.PHP_EOL);
     }
 
     public function testWithFilteredMultipleEvents()
     {
-        $input = new ArrayInput(['--event' => 'Other']);
-        $output = new BufferedOutput();
-
-        $container = m::mock(Application::class);
-        $container->shouldReceive('call');
-        $container->shouldReceive('getProviders')
-            ->with(EventServiceProvider::class)
-            ->andReturn([new TestMultipleEventsServiceProvider($container)]);
-
-        $container->shouldReceive('make')
-            ->with(OutputStyle::class, m::any())
-            ->andReturn(new OutputStyle($input, $output));
-
-        $container->shouldReceive('eventsAreCached')->andReturn(false);
-
-        $container->shouldReceive('make')
-            ->with(SpyDispatcher::class)
-            ->andReturn(
-                new SpyDispatcher($container)
-            );
-
-        $command = new EventListCommand();
-        $command->setLaravel($container);
-
-        $command->run($input, $output);
-        $command->handle();
-
-        $this->assertEquals(
+        $this->testRoutine(
+            ['--event' => 'Other'],
+            [TestMultipleEventsServiceProvider::class],
             '+------------+-----------------------------+'.PHP_EOL.
             '| Event      | Listeners                   |'.PHP_EOL.
             '+------------+-----------------------------+'.PHP_EOL.
             '| Some\Other | Some\Listener\ThirdListener |'.PHP_EOL.
-            '+------------+-----------------------------+'.PHP_EOL, $output->fetch()
-        );
+            '+------------+-----------------------------+'.PHP_EOL);
     }
 
     public function testWithEventSubscribe()
     {
-        $input = new ArrayInput([]);
-        $output = new BufferedOutput();
-
-        $container = m::mock(Application::class);
-        $container->shouldReceive('call');
-        $container->shouldReceive('getProviders')
-            ->with(EventServiceProvider::class)
-            ->andReturn([new TestSubscriberServiceProvider($container)]);
-
-        $container->shouldReceive('make')
-            ->with(OutputStyle::class, m::any())
-            ->andReturn(
-                new OutputStyle($input, $output)
-            );
-
-        $container->shouldReceive('eventsAreCached')->andReturn(false);
-        $container->shouldReceive('make')
-            ->with(TestSubscriber::class)
-            ->andReturn(new TestSubscriber());
-
-        $container->shouldReceive('make')
-            ->with(SpyDispatcher::class)
-            ->andReturn(
-                new SpyDispatcher($container)
-            );
-
-        $command = new EventListCommand();
-        $command->setLaravel($container);
-
-        $command->run($input, $output);
-        $command->handle();
-
-        $this->assertEquals(
+        $this->testRoutine(
+            [],
+            [TestSubscriberServiceProvider::class],
             '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL.
             '| Event                         | Listeners                                                           |'.PHP_EOL.
             '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL.
             '| Illuminate\Auth\Events\Login  | Illuminate\Tests\Foundation\Console\TestSubscriber@handleUserLogin  |'.PHP_EOL.
             '| Illuminate\Auth\Events\Logout | Illuminate\Tests\Foundation\Console\TestSubscriber@handleUserLogout |'.PHP_EOL.
-            '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL, $output->fetch()
-        );
+            '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL);
     }
 
     public function testWithClosure()
     {
-        $input = new ArrayInput([]);
-        $output = new BufferedOutput();
-
-        $container = m::mock(Application::class);
-        $container->shouldReceive('call');
-        $container->shouldReceive('getProviders')
-            ->with(EventServiceProvider::class)
-            ->andReturn([new TestClosureServiceProvider($container)]);
-
-        $container->shouldReceive('make')
-            ->with(OutputStyle::class, m::any())
-            ->andReturn(
-                new OutputStyle($input, $output)
-            );
-
-        $container->shouldReceive('make')
-            ->with(SpyDispatcher::class)
-            ->andReturn(
-                new SpyDispatcher($container)
-            );
-
-        $container->shouldReceive('eventsAreCached')
-            ->andReturn(false);
-
-        $command = new EventListCommand();
-        $command->setLaravel($container);
-
-        $command->run($input, $output);
-        $command->handle();
-
-        $this->assertEquals(
+        $this->testRoutine(
+            [],
+            [TestClosureServiceProvider::class],
             '+-------+-----------+'.PHP_EOL.
             '| Event | Listeners |'.PHP_EOL.
             '+-------+-----------+'.PHP_EOL.
             '| test  | Closure   |'.PHP_EOL.
-            '+-------+-----------+'.PHP_EOL, $output->fetch()
-        );
-
-//        app()->register(\Tests\Feature\TestClosureServiceProvider::class);
-
-//        $this->artisan('event:mine')
-//            ->expectsOutput('+-------+-----------+')
-//            ->expectsOutput('| Event | Listeners |')
-//            ->expectsOutput('+-------+-----------+')
-//            ->expectsOutput('| test  | Closure   |')
-//            ->expectsOutput('+-------+-----------+');
+            '+-------+-----------+'.PHP_EOL);
     }
 
     public function testWithWildCards()
     {
-        $input = new ArrayInput([]);
-        $output = new BufferedOutput();
-
-        $container = m::mock(Application::class);
-        $container->shouldReceive('call');
-        $container->shouldReceive('getProviders')
-            ->with(EventServiceProvider::class)
-            ->andReturn([new TestWildCardServiceProvider($container)]);
-
-        $container->shouldReceive('make')
-            ->with(OutputStyle::class, m::any())
-            ->andReturn(
-                new OutputStyle($input, $output)
-            );
-
-        $container->shouldReceive('make')
-            ->with(SpyDispatcher::class)
-            ->andReturn(
-                new SpyDispatcher($container)
-            );
-
-        $container->shouldReceive('eventsAreCached')
-            ->andReturn(false);
-
-        $command = new EventListCommand();
-        $command->setLaravel($container);
-
-        $command->run($input, $output);
-        $command->handle();
-
-        $this->assertEquals(
+        $this->testRoutine(
+            [],
+            [TestWildCardServiceProvider::class],
             '+--------+-----------+'.PHP_EOL.
             '| Event  | Listeners |'.PHP_EOL.
             '+--------+-----------+'.PHP_EOL.
             '| test.* | Closure   |'.PHP_EOL.
-            '+--------+-----------+'.PHP_EOL, $output->fetch()
-        );
+            '+--------+-----------+'.PHP_EOL);
     }
 }
 
