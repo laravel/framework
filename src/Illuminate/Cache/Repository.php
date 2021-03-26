@@ -113,19 +113,35 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve multiple items from the cache by key.
      *
-     * Items not found in the cache will have a null value.
+     * Items not found in the cache will use the provided default value, or `null` if not specified.
      *
-     * @param  array  $keys
+     * @param  array  $keys A list of keys that can obtained in a single operation. To specify a default value, use the
+     * array key as the cache key, and the array value as the default value.
      * @return array
      */
     public function many(array $keys)
     {
-        $values = $this->store->many(collect($keys)->map(function ($value, $key) {
-            return is_string($key) ? $key : $value;
-        })->values()->all());
+        $keysDefaultValues = collect($keys)->mapWithKeys(function ($value, $key) {
+            return is_string($key) ? [$key => $value] : [$value => null];
+        })->all();
 
-        return collect($values)->map(function ($value, $key) use ($keys) {
-            return $this->handleManyResult($keys, $key, $value);
+        $formattedToOriginalKeys = [];
+        foreach ($keysDefaultValues as $key => $defaultValue) {
+            $formattedToOriginalKeys[$this->itemKey($key)] = $key;
+        }
+
+        $formattedKeys = array_keys($formattedToOriginalKeys);
+        $valuesForFormattedKeys = $this->store->many($formattedKeys);
+
+        // convert formatted keys back to its original key
+        $values = [];
+        foreach ($valuesForFormattedKeys as $newKey => $value) {
+            $originalKey = $formattedToOriginalKeys[$newKey];
+            $values[$originalKey] = $value;
+        }
+
+        return collect($values)->map(function ($value, $key) use ($keysDefaultValues) {
+            return $this->handleManyResult($keysDefaultValues, $key, $value);
         })->all();
     }
 
@@ -244,7 +260,12 @@ class Repository implements ArrayAccess, CacheContract
             return $this->deleteMultiple(array_keys($values));
         }
 
-        $result = $this->store->putMany($values, $seconds);
+        $newValues = [];
+        foreach ($values as $key => $value) {
+            $newValues[$this->itemKey($key)] = $value;
+        }
+
+        $result = $this->store->putMany($newValues, $seconds);
 
         if ($result) {
             foreach ($values as $key => $value) {
@@ -330,7 +351,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function increment($key, $value = 1)
     {
-        return $this->store->increment($key, $value);
+        return $this->store->increment($this->itemKey($key), $value);
     }
 
     /**
@@ -342,7 +363,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function decrement($key, $value = 1)
     {
-        return $this->store->decrement($key, $value);
+        return $this->store->decrement($this->itemKey($key), $value);
     }
 
     /**

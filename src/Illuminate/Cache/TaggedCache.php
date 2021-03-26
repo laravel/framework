@@ -6,10 +6,6 @@ use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache extends Repository
 {
-    use RetrievesMultipleKeys {
-        putMany as putManyAlias;
-    }
-
     /**
      * The tag set instance.
      *
@@ -29,46 +25,6 @@ class TaggedCache extends Repository
         parent::__construct($store);
 
         $this->tags = $tags;
-    }
-
-    /**
-     * Store multiple items in the cache for a given number of seconds.
-     *
-     * @param  array  $values
-     * @param  int|null  $ttl
-     * @return bool
-     */
-    public function putMany(array $values, $ttl = null)
-    {
-        if ($ttl === null) {
-            return $this->putManyForever($values);
-        }
-
-        return $this->putManyAlias($values, $ttl);
-    }
-
-    /**
-     * Increment the value of an item in the cache.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function increment($key, $value = 1)
-    {
-        $this->store->increment($this->itemKey($key), $value);
-    }
-
-    /**
-     * Decrement the value of an item in the cache.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function decrement($key, $value = 1)
-    {
-        $this->store->decrement($this->itemKey($key), $value);
     }
 
     /**
