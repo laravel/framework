@@ -129,8 +129,8 @@ class CacheTaggedCacheTest extends TestCase
         $values = $store->tags(['fruit'])->many([
             'a' => 147,
             'e' => 547,
-            'b' => "hello world!",
-            'x' => "hello world!",
+            'b' => 'hello world!',
+            'x' => 'hello world!',
             'd',
             'c',
         ]);
