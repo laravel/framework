@@ -7,7 +7,9 @@ use Doctrine\Instantiator\Exception\InvalidArgumentException;
 trait InteractsWithDictionary
 {
     /**
-     * @param mixed $attribute
+     * Get a dictionary key attribute - casting it to a string if necessary.
+     *
+     * @param  mixed  $attribute
      * @return mixed
      */
     protected function getDictionaryKey($attribute)
@@ -16,7 +18,8 @@ trait InteractsWithDictionary
             if (method_exists($attribute, '__toString')) {
                 return $attribute->__toString();
             }
-            throw new InvalidArgumentException('Attribute value is an object without __toString method'); //I would prefer to throw an exception instead of "silent" and unintended behaviour
+
+            throw new InvalidArgumentException('Model attribute value is an object but does not have a __toString method.');
         }
 
         return $attribute;

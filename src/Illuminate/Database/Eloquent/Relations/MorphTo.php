@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 class MorphTo extends BelongsTo
 {
     use InteractsWithDictionary;
+
     /**
      * The type of the polymorphic relation.
      *
@@ -101,6 +102,7 @@ class MorphTo extends BelongsTo
             if ($model->{$this->morphType}) {
                 $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
                 $foreignKeyKey = $this->getDictionaryKey($model->{$this->foreignKey});
+
                 $this->dictionary[$morphTypeKey][$foreignKeyKey][] = $model;
             }
         }

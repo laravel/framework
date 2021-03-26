@@ -15,7 +15,7 @@ use InvalidArgumentException;
 
 class BelongsToMany extends Relation
 {
-    use InteractsWithPivotTable, InteractsWithDictionary;
+    use InteractsWithDictionary, InteractsWithPivotTable;
 
     /**
      * The intermediate table for the relation.
@@ -280,6 +280,7 @@ class BelongsToMany extends Relation
         // the parent models. Then we will return the hydrated models back out.
         foreach ($models as $model) {
             $key = $this->getDictionaryKey($model->{$this->parentKey});
+
             if (isset($dictionary[$key])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
@@ -305,6 +306,7 @@ class BelongsToMany extends Relation
 
         foreach ($results as $result) {
             $value = $this->getDictionaryKey($result->{$this->accessor}->{$this->foreignPivotKey});
+
             $dictionary[$value][] = $result;
         }
 

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 abstract class HasOneOrMany extends Relation
 {
     use InteractsWithDictionary;
+
     /**
      * The foreign key of the parent model.
      *
@@ -179,9 +180,7 @@ abstract class HasOneOrMany extends Relation
         $foreign = $this->getForeignKeyName();
 
         return $results->mapToDictionary(function ($result) use ($foreign) {
-            $dictionaryKey = $this->getDictionaryKey($result->{$foreign});
-
-            return [$dictionaryKey => $result];
+            return [$this->getDictionaryKey($result->{$foreign}) => $result];
         })->all();
     }
 

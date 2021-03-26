@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class HasManyThrough extends Relation
 {
     use InteractsWithDictionary;
+
     /**
      * The "through" parent model instance.
      *

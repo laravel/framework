@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class HasOneThrough extends HasManyThrough
 {
-    use SupportsDefaultModels, InteractsWithDictionary;
+    use InteractsWithDictionary, SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.
