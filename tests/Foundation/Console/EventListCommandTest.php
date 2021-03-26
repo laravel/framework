@@ -2,21 +2,19 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
-use Illuminate\Console\OutputStyle;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Events\SpyDispatcher;
-use Illuminate\Foundation\Console\EventListCommand;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
-use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Console\OutputStyle;
+use Illuminate\Events\SpyDispatcher;
+use Illuminate\Support\Facades\Event;
 use Symfony\Component\Console\Input\ArrayInput;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Console\EventListCommand;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 
 class EventListCommandTest extends TestCase
 {
-    const DOES_NOT_HAVE_ANY_EVENTS = "Your application doesn't have any events matching the given criteria.".PHP_EOL;
-
     protected function tearDown(): void
     {
         m::close();
@@ -56,12 +54,19 @@ class EventListCommandTest extends TestCase
         $command->run($input, $output);
         $command->handle();
 
-        $this->assertEquals($expectedOutput, $output->fetch());
+        $actualOutput = $output->fetch();
+        $actualLines = array_filter(explode(PHP_EOL, $actualOutput));
+        $expectedLines = array_filter(explode(PHP_EOL, $expectedOutput));
+
+        $this->assertEquals($expectedLines, $actualLines);
     }
 
     public function testWithNoEvent()
     {
-        $this->testRoutine([], [EventServiceProvider::class], self::DOES_NOT_HAVE_ANY_EVENTS);
+        $this->testRoutine(
+            [],
+            [EventServiceProvider::class],
+            "Your application doesn't have any events matching the given criteria.");
     }
 
     public function testWithMultipleEvents()
@@ -69,13 +74,16 @@ class EventListCommandTest extends TestCase
         $this->testRoutine(
             [],
             [TestMultipleEventsServiceProvider::class, EventServiceProvider::class],
-            '+------------+------------------------------+'.PHP_EOL.
-            '| Event      | Listeners                    |'.PHP_EOL.
-            '+------------+------------------------------+'.PHP_EOL.
-            '| Some\Event | Some\Listener\FirstListener  |'.PHP_EOL.
-            '|            | Some\Listener\SecondListener |'.PHP_EOL.
-            '| Some\Other | Some\Listener\ThirdListener  |'.PHP_EOL.
-            '+------------+------------------------------+'.PHP_EOL);
+            <<<OUTPUT
++------------+------------------------------+
+| Event      | Listeners                    |
++------------+------------------------------+
+| Some\Event | Some\Listener\FirstListener  |
+|            | Some\Listener\SecondListener |
+| Some\Other | Some\Listener\ThirdListener  |
++------------+------------------------------+
+OUTPUT
+        );
     }
 
     public function testWithFilteredMultipleEvents()
@@ -83,11 +91,14 @@ class EventListCommandTest extends TestCase
         $this->testRoutine(
             ['--event' => 'Other'],
             [TestMultipleEventsServiceProvider::class, TestClosureServiceProvider::class],
-            '+------------+-----------------------------+'.PHP_EOL.
-            '| Event      | Listeners                   |'.PHP_EOL.
-            '+------------+-----------------------------+'.PHP_EOL.
-            '| Some\Other | Some\Listener\ThirdListener |'.PHP_EOL.
-            '+------------+-----------------------------+'.PHP_EOL);
+            <<<OUTPUT
++------------+-----------------------------+
+| Event      | Listeners                   |
++------------+-----------------------------+
+| Some\Other | Some\Listener\ThirdListener |
++------------+-----------------------------+
+OUTPUT
+        );
     }
 
     public function testWithEventSubscribe()
@@ -95,12 +106,15 @@ class EventListCommandTest extends TestCase
         $this->testRoutine(
             [],
             [TestSubscriberServiceProvider::class],
-            '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL.
-            '| Event                         | Listeners                                                           |'.PHP_EOL.
-            '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL.
-            '| Illuminate\Auth\Events\Login  | Illuminate\Tests\Foundation\Console\TestSubscriber@handleUserLogin  |'.PHP_EOL.
-            '| Illuminate\Auth\Events\Logout | Illuminate\Tests\Foundation\Console\TestSubscriber@handleUserLogout |'.PHP_EOL.
-            '+-------------------------------+---------------------------------------------------------------------+'.PHP_EOL);
+            <<<OUTPUT
++-------------------------------+---------------------------------------------------------------------+
+| Event                         | Listeners                                                           |
++-------------------------------+---------------------------------------------------------------------+
+| Illuminate\Auth\Events\Login  | Illuminate\Tests\Foundation\Console\TestSubscriber@handleUserLogin  |
+| Illuminate\Auth\Events\Logout | Illuminate\Tests\Foundation\Console\TestSubscriber@handleUserLogout |
++-------------------------------+---------------------------------------------------------------------+
+OUTPUT
+        );
     }
 
     public function testWithClosure()
@@ -108,11 +122,14 @@ class EventListCommandTest extends TestCase
         $this->testRoutine(
             [],
             [TestClosureServiceProvider::class],
-            '+-------+-----------+'.PHP_EOL.
-            '| Event | Listeners |'.PHP_EOL.
-            '+-------+-----------+'.PHP_EOL.
-            '| test  | Closure   |'.PHP_EOL.
-            '+-------+-----------+'.PHP_EOL);
+            <<<OUTPUT
++-------+-----------+
+| Event | Listeners |
++-------+-----------+
+| test  | Closure   |
++-------+-----------+
+OUTPUT
+        );
     }
 
     public function testWithWildCards()
@@ -120,11 +137,14 @@ class EventListCommandTest extends TestCase
         $this->testRoutine(
             [],
             [TestWildCardServiceProvider::class],
-            '+--------+-----------+'.PHP_EOL.
-            '| Event  | Listeners |'.PHP_EOL.
-            '+--------+-----------+'.PHP_EOL.
-            '| test.* | Closure   |'.PHP_EOL.
-            '+--------+-----------+'.PHP_EOL);
+            <<<OUTPUT
++--------+-----------+
+| Event  | Listeners |
++--------+-----------+
+| test.* | Closure   |
++--------+-----------+
+OUTPUT
+        );
     }
 }
 
@@ -177,10 +197,12 @@ class TestSubscriber
 {
     public function handleUserLogin($event)
     {
+        //
     }
 
     public function handleUserLogout($event)
     {
+        //
     }
 
     public function subscribe($events)
