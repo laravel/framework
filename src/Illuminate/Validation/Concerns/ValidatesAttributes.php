@@ -556,7 +556,7 @@ trait ValidatesAttributes
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
-        return ! in_array($value, array_values($data));
+        return ! in_array($value, array_values($data), in_array('strict', $parameters));
     }
 
     /**
@@ -1432,6 +1432,19 @@ trait ValidatesAttributes
         }
 
         return true;
+    }
+
+    /**
+     * Validate that an attribute does not exist.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibited($attribute, $value)
+    {
+        return false;
     }
 
     /**
