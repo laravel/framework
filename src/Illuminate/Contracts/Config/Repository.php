@@ -20,6 +20,14 @@ interface Repository
      * @return mixed
      */
     public function get($key, $default = null);
+    
+    /**
+     * Get many configuration values.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function getMany($keys);
 
     /**
      * Get all of the configuration items for the application.
