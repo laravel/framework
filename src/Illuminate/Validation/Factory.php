@@ -280,4 +280,27 @@ class Factory implements FactoryContract
     {
         $this->verifier = $presenceVerifier;
     }
+
+    /**
+     * Get the container instance used by the validation factory.
+     *
+     * @return \Illuminate\Contracts\Container\Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
+     * Set the container instance used by the validation factory.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return $this
+     */
+    public function setContainer(Container $container)
+    {
+        $this->container = $container;
+
+        return $this;
+    }
 }
