@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
-use Aws\DynamoDb\DynamoDbClient;
-use Aws\Exception\AwsException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
