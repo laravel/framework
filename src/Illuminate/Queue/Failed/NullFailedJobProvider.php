@@ -53,10 +53,10 @@ class NullFailedJobProvider implements FailedJobProviderInterface
     /**
      * Flush all of the failed jobs from storage.
      *
-     * @param  int|null  $age
+     * @param  int|null  $hours
      * @return void
      */
-    public function flush($age = null)
+    public function flush($hours = null)
     {
         //
     }

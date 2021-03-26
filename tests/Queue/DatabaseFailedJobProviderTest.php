@@ -32,11 +32,11 @@ class DatabaseFailedJobProviderTest extends TestCase
         $this->assertSame(0, $db->getConnection()->table('failed_jobs')->count());
 
         $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
-        $provider->flush(15);
+        $provider->flush(15 * 24);
         $this->assertSame(1, $db->getConnection()->table('failed_jobs')->count());
 
         $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
-        $provider->flush(10);
+        $provider->flush(10 * 24);
         $this->assertSame(0, $db->getConnection()->table('failed_jobs')->count());
     }
 }

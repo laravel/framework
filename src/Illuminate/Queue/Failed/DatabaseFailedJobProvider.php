@@ -98,13 +98,13 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     /**
      * Flush all of the failed jobs from storage.
      *
-     * @param  int|null  $age
+     * @param  int|null  $hours
      * @return void
      */
-    public function flush($age = null)
+    public function flush($hours = null)
     {
-        $this->getTable()->when($age, function ($query, $age) {
-            $query->where('failed_at', '<=', Date::now()->subDays($age));
+        $this->getTable()->when($hours, function ($query, $hours) {
+            $query->where('failed_at', '<=', Date::now()->subHours($hours));
         })->delete();
     }
 
