@@ -33,6 +33,11 @@ jobs:
       matrix:
         php: ['7.3', '7.4', '8.0']
         stability: [prefer-lowest, prefer-stable]
+        include:
+          - php: '8.1'
+            flags: "--ignore-platform-req=php"
+            stability: prefer-stable
+
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
@@ -61,13 +66,23 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
+
+      - name: Setup DynamoDB Local
+        uses: rrainn/dynamodb-action@v2.0.0
+        with:
+          port: 8888
 
       - name: Execute tests
+        continue-on-error: ${{ matrix.php > 8 }}
         run: vendor/bin/phpunit --verbose
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
+          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
+          DYNAMODB_ENDPOINT: "http://localhost:8888"
+          AWS_ACCESS_KEY_ID: random_key
+          AWS_SECRET_ACCESS_KEY: random_secret
 
   windows_tests:
     runs-on: windows-latest
@@ -77,6 +92,10 @@ jobs:
       matrix:
         php: ['7.3', '7.4', '8.0']
         stability: [prefer-lowest, prefer-stable]
+        include:
+          - php: '8.1'
+            flags: "--ignore-platform-req=php"
+            stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
 
@@ -110,7 +129,8 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
 
       - name: Execute tests
+        continue-on-error: ${{ matrix.php > 8 }}
         run: vendor/bin/phpunit --verbose

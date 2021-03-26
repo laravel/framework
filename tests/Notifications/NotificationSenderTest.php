@@ -33,7 +33,7 @@ class NotificationSenderTest extends TestCase
 
         $sender = new NotificationSender($manager, $bus, $events);
 
-        $sender->send($notifiable, new DummyQueuedNotificationWithStringVia());
+        $sender->send($notifiable, new DummyQueuedNotificationWithStringVia);
     }
 
     public function testItCanSendNotificationsWithAnEmptyStringVia()
@@ -46,7 +46,7 @@ class NotificationSenderTest extends TestCase
 
         $sender = new NotificationSender($manager, $bus, $events);
 
-        $sender->sendNow($notifiable, new DummyNotificationWithEmptyStringVia());
+        $sender->sendNow($notifiable, new DummyNotificationWithEmptyStringVia);
     }
 
     public function testItCannotSendNotificationsViaDatabaseForAnonymousNotifiables()
@@ -59,7 +59,7 @@ class NotificationSenderTest extends TestCase
 
         $sender = new NotificationSender($manager, $bus, $events);
 
-        $sender->sendNow($notifiable, new DummyNotificationWithDatabaseVia());
+        $sender->sendNow($notifiable, new DummyNotificationWithDatabaseVia);
     }
 }
 

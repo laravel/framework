@@ -67,7 +67,7 @@ class SendingMailWithLocaleTest extends TestCase
 
     public function testMailIsSentWithLocaleFromMailable()
     {
-        $mailable = new TestMail();
+        $mailable = new TestMail;
         $mailable->locale('ar');
 
         Mail::to('test@mail.com')->send($mailable);

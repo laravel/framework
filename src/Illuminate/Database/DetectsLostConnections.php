@@ -51,6 +51,7 @@ trait DetectsLostConnections
             'SQLSTATE[HY000]: General error: 1105 The last transaction was aborted due to Seamless Scaling. Please retry.',
             'Temporary failure in name resolution',
             'SSL: Broken pipe',
+            'SQLSTATE[08S01]: Communication link failure',
         ]);
     }
 }

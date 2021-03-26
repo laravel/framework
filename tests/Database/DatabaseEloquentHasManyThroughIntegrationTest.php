@@ -321,6 +321,52 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         });
     }
 
+    public function testLazyReturnsCorrectModels()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $country->posts()->lazy(10)->each(function ($post) {
+            $this->assertEquals([
+                'id',
+                'user_id',
+                'title',
+                'body',
+                'email',
+                'created_at',
+                'updated_at',
+                'laravel_through_key',
+            ], array_keys($post->getAttributes()));
+        });
+    }
+
+    public function testLazyById()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $i = 0;
+
+        $country->posts()->lazyById(2)->each(function ($post) use (&$i, &$count) {
+            $i++;
+
+            $this->assertEquals([
+                'id',
+                'user_id',
+                'title',
+                'body',
+                'email',
+                'created_at',
+                'updated_at',
+                'laravel_through_key',
+            ], array_keys($post->getAttributes()));
+        });
+
+        $this->assertEquals(6, $i);
+    }
+
     public function testIntermediateSoftDeletesAreIgnored()
     {
         $this->seedData();

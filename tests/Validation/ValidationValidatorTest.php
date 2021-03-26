@@ -1190,6 +1190,36 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The last field is required unless first is in taylor, sven.', $v->messages()->first('last'));
     }
 
+    public function testProhibited()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [], ['name' => 'prohibited']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['last' => 'bar'], ['name' => 'prohibited']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'prohibited']);
+        $this->assertTrue($v->fails());
+
+        $file = new File('', false);
+        $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
+        $this->assertTrue($v->fails());
+
+        $file = new File(__FILE__, false);
+        $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
+        $this->assertTrue($v->fails());
+
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['files' => [$file, $file2]], ['files.0' => 'prohibited', 'files.1' => 'prohibited']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['files' => [$file, $file2]], ['files' => 'prohibited']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testProhibitedIf()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2365,6 +2395,15 @@ class ValidationValidatorTest extends TestCase
         $v->messages()->setFormat(':message');
         $this->assertSame('There is a duplication!', $v->messages()->first('foo.0'));
         $this->assertSame('There is a duplication!', $v->messages()->first('foo.1'));
+
+        $v = new Validator($trans, ['foo' => ['0100', '100']], ['foo.*' => 'distinct'], ['foo.*.distinct' => 'There is a duplication!']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('There is a duplication!', $v->messages()->first('foo.0'));
+        $this->assertSame('There is a duplication!', $v->messages()->first('foo.1'));
+
+        $v = new Validator($trans, ['foo' => ['0100', '100']], ['foo.*' => 'distinct:strict']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateDistinctForTopLevelArrays()
@@ -2634,7 +2673,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateEmailWithCustomClassCheck()
     {
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation());
+        $container->shouldReceive('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation);
 
         $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar '], ['x' => 'email:'.NoRFCWarningsValidation::class]);
         $v->setContainer($container);
@@ -3830,7 +3869,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
         $v->sometimes('x', 'Confirmed', function ($i) {
-            return $i->x == 'foo';
+            return $i->x === 'foo';
         });
         $this->assertEquals(['x' => ['Required', 'Confirmed']], $v->getRules());
 
@@ -3844,21 +3883,21 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
         $v->sometimes('x', 'Confirmed', function ($i) {
-            return $i->x == 'bar';
+            return $i->x === 'bar';
         });
         $this->assertEquals(['x' => ['Required']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
         $v->sometimes('x', 'Foo|Bar', function ($i) {
-            return $i->x == 'foo';
+            return $i->x === 'foo';
         });
         $this->assertEquals(['x' => ['Required', 'Foo', 'Bar']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
         $v->sometimes('x', ['Foo', 'Bar:Baz'], function ($i) {
-            return $i->x == 'foo';
+            return $i->x === 'foo';
         });
         $this->assertEquals(['x' => ['Required', 'Foo', 'Bar:Baz']], $v->getRules());
 
@@ -3963,7 +4002,7 @@ class ValidationValidatorTest extends TestCase
             ['*.name' => 'dependent_rule:*.age']
         );
         $v->addDependentExtension('dependent_rule', function ($name) use ($v) {
-            return Arr::get($v->getData(), $name) == 'Jamie';
+            return Arr::get($v->getData(), $name) === 'Jamie';
         });
         $this->assertTrue($v->passes());
     }
@@ -5238,7 +5277,7 @@ class ValidationValidatorTest extends TestCase
         );
 
         $this->assertFalse($v->passes());
-        $this->assertTrue(is_array($v->failed()['foo.foo.bar']));
+        $this->assertIsArray($v->failed()['foo.foo.bar']);
     }
 
     public function testImplicitCustomValidationObjects()

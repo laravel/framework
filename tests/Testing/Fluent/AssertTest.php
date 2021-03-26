@@ -704,6 +704,144 @@ class AssertTest extends TestCase
         ]);
     }
 
+    public function testAssertWhereTypeString()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $assert->whereType('foo', 'string');
+    }
+
+    public function testAssertWhereTypeInteger()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 123,
+        ]);
+
+        $assert->whereType('foo', 'integer');
+    }
+
+    public function testAssertWhereTypeBoolean()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => true,
+        ]);
+
+        $assert->whereType('foo', 'boolean');
+    }
+
+    public function testAssertWhereTypeDouble()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 12.3,
+        ]);
+
+        $assert->whereType('foo', 'double');
+    }
+
+    public function testAssertWhereTypeArray()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => ['bar', 'baz'],
+            'bar' => ['foo' => 'baz'],
+        ]);
+
+        $assert->whereType('foo', 'array');
+        $assert->whereType('bar', 'array');
+    }
+
+    public function testAssertWhereTypeNull()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => null,
+        ]);
+
+        $assert->whereType('foo', 'null');
+    }
+
+    public function testAssertWhereAllType()
+    {
+        $assert = AssertableJson::fromArray([
+            'one' => 'foo',
+            'two' => 123,
+            'three' => true,
+            'four' => 12.3,
+            'five' => ['foo', 'bar'],
+            'six' => ['foo' => 'bar'],
+            'seven' => null,
+        ]);
+
+        $assert->whereAllType([
+            'one' => 'string',
+            'two' => 'integer',
+            'three' => 'boolean',
+            'four' => 'double',
+            'five' => 'array',
+            'six' => 'array',
+            'seven' => 'null',
+        ]);
+    }
+
+    public function testAssertWhereTypeWhenWrongTypeIsGiven()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not of expected type [integer].');
+
+        $assert->whereType('foo', 'integer');
+    }
+
+    public function testAssertWhereTypeWithUnionTypes()
+    {
+        $firstAssert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $secondAssert = AssertableJson::fromArray([
+            'foo' => null,
+        ]);
+
+        $firstAssert->whereType('foo', ['string', 'null']);
+        $secondAssert->whereType('foo', ['string', 'null']);
+    }
+
+    public function testAssertWhereTypeWhenWrongUnionTypeIsGiven()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 123,
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not of expected type [string|null].');
+
+        $assert->whereType('foo', ['string', 'null']);
+    }
+
+    public function testAssertWhereTypeWithPipeInUnionType()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $assert->whereType('foo', 'string|null');
+    }
+
+    public function testAssertWhereTypeWithPipeInWrongUnionType()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not of expected type [integer|null].');
+
+        $assert->whereType('foo', 'integer|null');
+    }
+
     public function testAssertHasAll()
     {
         $assert = AssertableJson::fromArray([

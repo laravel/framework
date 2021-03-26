@@ -7,9 +7,11 @@ use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -659,7 +661,7 @@ class HttpClientTest extends TestCase
         $this->factory->get($exampleUrls[2]);
         $this->factory->get($exampleUrls[1]);
 
-        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($exampleUrls);
     }
@@ -677,7 +679,7 @@ class HttpClientTest extends TestCase
         $this->factory->get($exampleUrls[0]);
         $this->factory->get($exampleUrls[1]);
 
-        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($exampleUrls);
     }
@@ -688,13 +690,13 @@ class HttpClientTest extends TestCase
 
         $exampleUrls = [
             function ($request) {
-                return $request->url() == 'http://example.com/1';
+                return $request->url() === 'http://example.com/1';
             },
             function ($request) {
-                return $request->url() == 'http://example.com/2';
+                return $request->url() === 'http://example.com/2';
             },
             function ($request) {
-                return $request->url() == 'http://example.com/3';
+                return $request->url() === 'http://example.com/3';
             },
         ];
 
@@ -778,7 +780,7 @@ class HttpClientTest extends TestCase
             'name' => 'Taylor',
         ]);
 
-        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($executionOrder);
     }
@@ -800,5 +802,14 @@ class HttpClientTest extends TestCase
         $this->assertSame(1000, $dumped[4]['delay']);
 
         VarDumper::setHandler(null);
+    }
+
+    public function testResponseSequenceIsMacroable()
+    {
+        ResponseSequence::macro('customMethod', function () {
+            return 'yes!';
+        });
+
+        $this->assertSame('yes!', $this->factory->fakeSequence()->customMethod());
     }
 }

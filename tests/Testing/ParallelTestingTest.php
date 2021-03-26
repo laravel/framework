@@ -58,7 +58,7 @@ class ParallelTestingTest extends TestCase
         $this->assertFalse($parallelTesting->option('recreate_databases'));
 
         $parallelTesting->resolveOptionsUsing(function ($option) {
-            return $option == 'recreate_databases';
+            return $option === 'recreate_databases';
         });
 
         $this->assertFalse($parallelTesting->option('recreate_caches'));

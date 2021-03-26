@@ -335,7 +335,7 @@ class MailManager implements FactoryContract
             $config['token'] ?? $this->app['config']->get('services.postmark.token'),
             $headers
         ), function ($transport) {
-            $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
+            $transport->registerPlugin(new ThrowExceptionOnFailurePlugin);
         });
     }
 

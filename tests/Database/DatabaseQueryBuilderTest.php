@@ -198,7 +198,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhenCallbackWithDefault()
     {
         $callback = function ($query, $condition) {
-            $this->assertEquals('truthy', $condition);
+            $this->assertSame('truthy', $condition);
 
             $query->where('id', '=', 1);
         };
@@ -263,7 +263,7 @@ class DatabaseQueryBuilderTest extends TestCase
         };
 
         $default = function ($query, $condition) {
-            $this->assertEquals('truthy', $condition);
+            $this->assertSame('truthy', $condition);
 
             $query->where('id', '=', 2);
         };
@@ -1976,7 +1976,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 0]]);
         $results = $builder->from('users')->doesntExistOr(function () {
-            throw new RuntimeException();
+            throw new RuntimeException;
         });
         $this->assertTrue($results);
     }
@@ -1992,7 +1992,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 1]]);
         $results = $builder->from('users')->existsOr(function () {
-            throw new RuntimeException();
+            throw new RuntimeException;
         });
         $this->assertTrue($results);
     }

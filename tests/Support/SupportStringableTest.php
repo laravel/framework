@@ -452,6 +452,20 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Malmö Jönköping', (string) $this->stringable('Malmö Jönköping')->replaceLast('', 'yyy'));
     }
 
+    public function testRemove()
+    {
+        $this->assertSame('Fbar', (string) $this->stringable('Foobar')->remove('o'));
+        $this->assertSame('Foo', (string) $this->stringable('Foobar')->remove('bar'));
+        $this->assertSame('oobar', (string) $this->stringable('Foobar')->remove('F'));
+        $this->assertSame('Foobar', (string) $this->stringable('Foobar')->remove('f'));
+        $this->assertSame('oobar', (string) $this->stringable('Foobar')->remove('f', false));
+
+        $this->assertSame('Fbr', (string) $this->stringable('Foobar')->remove(['o', 'a']));
+        $this->assertSame('Fooar', (string) $this->stringable('Foobar')->remove(['f', 'b']));
+        $this->assertSame('ooar', (string) $this->stringable('Foobar')->remove(['f', 'b'], false));
+        $this->assertSame('Foobar', (string) $this->stringable('Foo|bar')->remove(['f', '|']));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', (string) $this->stringable('LaravelPHPFramework')->snake());
