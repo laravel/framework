@@ -1035,6 +1035,17 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(['x' => 0, 'y' => 1, 'a' => ['b' => 3]], $model->json);
     }
 
+    public function testUpdatingJSONFields()
+    {
+        $model = EloquentTestWithJSON::create(['json' => ['x' => 0, 'y' => 1, 'z' => [1, 2, 3]]]);
+
+        $model->update(['json' => ['z' => [1, 2, 3], 'y' => 1, 'x' => 0]]);
+        $this->assertEquals(false, $model->wasChanged());
+
+        $model->update(['json' => ['x' => 0, 'y' => 1, 'z' => [3, 2, 1]]]);
+        $this->assertEquals(true, $model->wasChanged());
+    }
+
     public function testSaveOrFailWithDuplicatedEntry()
     {
         $this->expectException(QueryException::class);
@@ -2059,7 +2070,7 @@ class EloquentTestWithJSON extends Eloquent
     protected $table = 'with_json';
     public $timestamps = false;
     protected $casts = [
-        'json' => 'array',
+        'json' => 'json',
     ];
 }
 
