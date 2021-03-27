@@ -27,7 +27,7 @@ trait InteractsWithDatabase
         if ($table instanceof Model) {
             return $this->assertDatabaseHas($table->getTable(), $data, $table->getConnectionName());
         }
-        
+
         $this->assertThat(
             $table, new HasInDatabase($this->getConnection($connection), $data)
         );
@@ -48,7 +48,7 @@ trait InteractsWithDatabase
         if ($table instanceof Model) {
             return $this->assertDatabaseMissing($table->getTable(), $data, $table->getConnectionName());
         }
-        
+
         $constraint = new ReverseConstraint(
             new HasInDatabase($this->getConnection($connection), $data)
         );

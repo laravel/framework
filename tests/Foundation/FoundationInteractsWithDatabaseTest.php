@@ -48,7 +48,6 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas(new ProductStub(), $this->data);
     }
 
-
     public function testSeeInDatabaseDoesNotFindResults()
     {
         $this->expectException(ExpectationFailedException::class);
