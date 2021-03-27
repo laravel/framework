@@ -17,9 +17,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
-            return true;
-        });
+        $this->getGateDefine($gate);
         $gate->define('bar', function ($user) {
             return false;
         });
@@ -225,9 +223,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
-            return true;
-        });
+        $this->getGateDefine($gate);
         $gate->before(function ($user, $ability) {
             $this->assertSame('foo', $ability);
 
@@ -241,9 +237,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
-            return true;
-        });
+        $this->getGateDefine($gate);
         $gate->before(function () {
             //
         });
@@ -255,9 +249,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
-            return true;
-        });
+        $this->getGateDefine($gate);
 
         $gate->define('bar', function ($user) {
             return false;
@@ -832,6 +824,16 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('Nullable __invoke was called', AccessGateTestGuestNullableInvokable::$calledMethod);
 
         $this->assertFalse($gate->check('absent_invokable'));
+    }
+
+    /**
+     * @param Gate $gate
+     */
+    private function getGateDefine(Gate $gate): void
+    {
+        $gate->define('foo', function ($user) {
+            return true;
+        });
     }
 }
 
