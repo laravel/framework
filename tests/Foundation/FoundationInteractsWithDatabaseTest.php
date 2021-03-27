@@ -111,6 +111,13 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
+    public function testDontSeeInDatabaseDoesNotFindModelResults()
+    {
+        $this->mockCountBuilder(0);
+
+        $this->assertDatabaseMissing(new ProductStub(), $this->data);
+    }
+
     public function testDontSeeInDatabaseFindsResults()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -121,6 +128,18 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->shouldReceive('get')->andReturn(collect([$this->data]));
 
         $this->assertDatabaseMissing($this->table, $this->data);
+    }
+
+    public function testDontSeeInDatabaseFindsModelResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $builder = $this->mockCountBuilder(1);
+
+        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(collect([$this->data]));
+
+        $this->assertDatabaseMissing(new ProductStub(), $this->data);
     }
 
     public function testAssertTableEntriesCount()
