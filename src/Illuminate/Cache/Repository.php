@@ -125,18 +125,18 @@ class Repository implements ArrayAccess, CacheContract
             return is_string($key) ? [$key => $value] : [$value => null];
         })->all();
 
-        $formattedToOriginalKeys = [];
+        $formattedKeysToOriginalKeys = [];
         foreach ($keysDefaultValues as $key => $defaultValue) {
-            $formattedToOriginalKeys[$this->itemKey($key)] = $key;
+            $formattedKeysToOriginalKeys[$this->itemKey($key)] = $key;
         }
 
-        $formattedKeys = array_keys($formattedToOriginalKeys);
+        $formattedKeys = array_keys($formattedKeysToOriginalKeys);
         $valuesForFormattedKeys = $this->store->many($formattedKeys);
 
         // convert formatted keys back to its original key
         $values = [];
         foreach ($valuesForFormattedKeys as $newKey => $value) {
-            $originalKey = $formattedToOriginalKeys[$newKey];
+            $originalKey = $formattedKeysToOriginalKeys[$newKey];
             $values[$originalKey] = $value;
         }
 
@@ -260,12 +260,12 @@ class Repository implements ArrayAccess, CacheContract
             return $this->deleteMultiple(array_keys($values));
         }
 
-        $newValues = [];
+        $valuesWithFormattedKeys = [];
         foreach ($values as $key => $value) {
-            $newValues[$this->itemKey($key)] = $value;
+            $valuesWithFormattedKeys[$this->itemKey($key)] = $value;
         }
 
-        $result = $this->store->putMany($newValues, $seconds);
+        $result = $this->store->putMany($valuesWithFormattedKeys, $seconds);
 
         if ($result) {
             foreach ($values as $key => $value) {
