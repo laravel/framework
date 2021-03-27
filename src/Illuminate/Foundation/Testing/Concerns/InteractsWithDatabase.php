@@ -61,13 +61,17 @@ trait InteractsWithDatabase
     /**
      * Assert the count of table entries.
      *
-     * @param  string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  int  $count
      * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseCount($table, int $count, $connection = null)
     {
+        if ($table instanceof Model) {
+            return $this->assertDatabaseCount($table->getTable(), $count, $table->getConnectionName());
+        }
+
         $this->assertThat(
             $table, new CountInDatabase($this->getConnection($connection), $count)
         );
