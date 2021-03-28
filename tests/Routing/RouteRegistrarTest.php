@@ -58,6 +58,20 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertEquals(['seven'], $this->getRoute()->middleware());
+
+        $this->router->middleware('eight')->middleware('nine')->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['eight', 'nine'], $this->getRoute()->middleware());
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware('ten')->middleware('eleven');
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['ten', 'eleven'], $this->getRoute()->middleware());
     }
 
     public function testWithoutMiddlewareRegistration()
