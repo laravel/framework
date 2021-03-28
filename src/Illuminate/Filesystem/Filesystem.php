@@ -312,7 +312,15 @@ class Filesystem
     public function link($target, $link)
     {
         if (! windows_os()) {
-            return symlink($target, $link);
+            try{
+                if(!symlink($target, $link)){
+                    throw new \Exception("unlink the target to create symlink");
+                }
+                return true;
+            }catch(\Exception $e){
+                unlink($target);
+                return symlink($target, $link);
+            }
         }
 
         $mode = $this->isDirectory($target) ? 'J' : 'H';
