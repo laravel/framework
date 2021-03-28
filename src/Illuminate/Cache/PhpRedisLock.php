@@ -3,11 +3,16 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Redis\Connections\PhpRedisConnection;
-use Redis;
-use UnexpectedValueException;
 
 class PhpRedisLock extends RedisLock
 {
+    /**
+     * The phpredis factory implementation.
+     *
+     * @var \Illuminate\Redis\Connections\PhpredisConnection
+     */
+    protected $redis;
+
     /**
      * Create a new phpredis lock instance.
      *
@@ -31,7 +36,7 @@ class PhpRedisLock extends RedisLock
             LuaScripts::releaseLock(),
             1,
             $this->name,
-            $this->serializedAndCompressedOwner()
+            ...$this->redis->pack([$this->owner])
         );
     }
 
@@ -41,72 +46,64 @@ class PhpRedisLock extends RedisLock
      * @return string
      *
      * @throws \UnexpectedValueException
+     *
+     * @deprecated Will be removed in a later laravel version. Use PhpRedisConnection::pack.
+     * @see \Illuminate\Redis\Connections\PhpRedisConnection::pack
      */
     protected function serializedAndCompressedOwner(): string
     {
-        $client = $this->redis->client();
-
-        $owner = $client->_serialize($this->owner);
-
-        // https://github.com/phpredis/phpredis/issues/1938
-        if ($this->compressed()) {
-            if ($this->lzfCompressed()) {
-                $owner = \lzf_compress($owner);
-            } elseif ($this->zstdCompressed()) {
-                $owner = \zstd_compress($owner, $client->getOption(Redis::OPT_COMPRESSION_LEVEL));
-            } elseif ($this->lz4Compressed()) {
-                $owner = \lz4_compress($owner, $client->getOption(Redis::OPT_COMPRESSION_LEVEL));
-            } else {
-                throw new UnexpectedValueException(sprintf(
-                    'Unknown phpredis compression in use [%d]. Unable to release lock.',
-                    $client->getOption(Redis::OPT_COMPRESSION)
-                ));
-            }
-        }
-
-        return $owner;
+        return $this->redis->pack([$this->owner])[0];
     }
 
     /**
      * Determine if compression is enabled.
      *
      * @return bool
+     *
+     * @deprecated Will be removed in a later laravel version. Use PhpRedisConnection::compressed.
+     * @see \Illuminate\Redis\Connections\PhpRedisConnection::compressed
      */
     protected function compressed(): bool
     {
-        return $this->redis->client()->getOption(Redis::OPT_COMPRESSION) !== Redis::COMPRESSION_NONE;
+        return $this->redis->compressed();
     }
 
     /**
      * Determine if LZF compression is enabled.
      *
      * @return bool
+     *
+     * @deprecated Will be removed in a later laravel version. Use PhpRedisConnection::lzfCompressed.
+     * @see \Illuminate\Redis\Connections\PhpRedisConnection::lzfCompressed
      */
     protected function lzfCompressed(): bool
     {
-        return defined('Redis::COMPRESSION_LZF') &&
-               $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZF;
+        return $this->redis->lzfCompressed();
     }
 
     /**
      * Determine if ZSTD compression is enabled.
      *
      * @return bool
+     *
+     * @deprecated Will be removed in a later laravel version. Use PhpRedisConnection::zstdCompressed.
+     * @see \Illuminate\Redis\Connections\PhpRedisConnection::zstdCompressed
      */
     protected function zstdCompressed(): bool
     {
-        return defined('Redis::COMPRESSION_ZSTD') &&
-               $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_ZSTD;
+        return $this->redis->zstdCompressed();
     }
 
     /**
      * Determine if LZ4 compression is enabled.
      *
      * @return bool
+     *
+     * @deprecated Will be removed in a later laravel version. Use PhpRedisConnection::lz4Compressed.
+     * @see \Illuminate\Redis\Connections\PhpRedisConnection::lz4Compressed
      */
     protected function lz4Compressed(): bool
     {
-        return defined('Redis::COMPRESSION_LZ4') &&
-               $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZ4;
+        return $this->redis->lz4Compressed();
     }
 }
