@@ -224,17 +224,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         $class = static::class;
 
-        $booted = [];
-
         static::$traitInitializers[$class] = [];
 
         foreach (class_uses_recursive($class) as $trait) {
             $method = 'boot'.class_basename($trait);
 
-            if (method_exists($class, $method) && ! in_array($method, $booted)) {
+            if (method_exists($class, $method)) {
                 forward_static_call([$class, $method]);
-
-                $booted[] = $method;
             }
 
             if (method_exists($class, $method = 'initialize'.class_basename($trait))) {
