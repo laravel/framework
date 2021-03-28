@@ -42,6 +42,40 @@ class Collection extends BaseCollection implements QueueableCollection
         }, $default);
     }
 
+    
+    /**
+     * Find a model in the collection by key or throw an exception.
+     *
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Illuminate\Database\RecordsNotFoundException
+     */
+    public function findOrFail($key)
+    {
+        if (! is_null($model = $this->find($key))) {
+            return $model;
+        }
+
+        throw new RecordsNotFoundException;
+    }
+    
+        
+    /**
+     * Get the first model from the collection or throw an exception.
+     *
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Illuminate\Database\RecordsNotFoundException
+     */
+    public function firstOrFail()
+    {
+        if (! is_null($model = $this->first())) {
+            return $model;
+        }
+
+        throw new RecordsNotFoundException;
+    }
+
     /**
      * Load a set of relationships onto the collection.
      *
