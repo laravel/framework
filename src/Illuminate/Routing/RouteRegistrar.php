@@ -97,6 +97,7 @@ class RouteRegistrar
 
         if ($key === 'middleware' && isset($this->attributes[$key])) {
             $this->attributes[$key] = array_merge($this->attributes[$key], $value);
+
             return $this;
         }
 
