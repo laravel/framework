@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Redis;
 use RedisCluster;
 use RedisException;
+use UnexpectedValueException;
 
 /**
  * @mixin \Redis
@@ -572,5 +573,97 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function __call($method, $parameters)
     {
         return parent::__call(strtolower($method), $parameters);
+    }
+
+    /**
+     * Prepares values to be used with e.g. the `eval` command, because the
+     * phpredis extension does not do it for us.
+     *
+     * @param array<int,mixed> $values
+     * @return array<int,string>
+     */
+    public function serializeAndCompress(array $values): array
+    {
+        if (empty($values)) {
+            return $values;
+        }
+
+        // https://github.com/phpredis/phpredis/issues/1938
+        if ($this->compressed()) {
+            if ($this->lzfCompressed()) {
+                $processor = function ($value) {
+                    return \lzf_compress($this->client->_serialize($value));
+                };
+            } elseif ($this->zstdCompressed()) {
+                $compressionLevel = $this->client->getOption(Redis::OPT_COMPRESSION_LEVEL);
+                $processor = function ($value) use ($compressionLevel) {
+                    return \zstd_compress(
+                        $this->client->_serialize($value),
+                        $compressionLevel === 0 ? Redis::COMPRESSION_ZSTD_DEFAULT : $compressionLevel
+                    );
+                };
+            } elseif ($this->lz4Compressed()) {
+                $processor = function ($value) {
+                    return \lz4_compress(
+                        $this->client->_serialize($value),
+                        $this->client->getOption(Redis::OPT_COMPRESSION_LEVEL)
+                    );
+                };
+            } else {
+                throw new UnexpectedValueException(sprintf(
+                    'Unknown phpredis compression in use [%d].',
+                    $this->client->getOption(Redis::OPT_COMPRESSION)
+                ));
+            }
+        } else {
+            $processor = function ($value) {
+                return $this->client->_serialize($value);
+            };
+        }
+
+        return array_map($processor, $values);
+    }
+
+    /**
+     * Determine if compression is enabled.
+     *
+     * @return bool
+     */
+    protected function compressed(): bool
+    {
+        return $this->client->getOption(Redis::OPT_COMPRESSION) !== Redis::COMPRESSION_NONE;
+    }
+
+    /**
+     * Determine if LZF compression is enabled.
+     *
+     * @return bool
+     */
+    protected function lzfCompressed(): bool
+    {
+        return defined('Redis::COMPRESSION_LZF') &&
+               $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZF;
+    }
+
+    /**
+     * Determine if ZSTD compression is enabled.
+     *
+     * @return bool
+     */
+    protected function zstdCompressed(): bool
+    {
+        return defined('Redis::COMPRESSION_ZSTD') &&
+               $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_ZSTD;
+    }
+
+    /**
+     * Determine if LZ4 compression is enabled.
+     *
+     * @return bool
+     */
+    protected function lz4Compressed(): bool
+    {
+        return defined('Redis::COMPRESSION_LZ4') &&
+               $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZ4;
     }
 }
