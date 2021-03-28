@@ -43,7 +43,6 @@ class Collection extends BaseCollection implements QueueableCollection
         }, $default);
     }
 
-    
     /**
      * Find a model in the collection by key or throw an exception.
      *
@@ -59,8 +58,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         throw new RecordsNotFoundException;
     }
-    
-        
+
     /**
      * Get the first model from the collection or throw an exception.
      *
