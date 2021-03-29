@@ -106,7 +106,7 @@ class FoundationFormRequestTest extends TestCase
         $this->createRequest([], FoundationTestFormRequestHooks::class)->validateResolved();
     }
 
-    public function test_after_validation_runs_after_validation()
+    public function testAfterValidationRunsAfterValidation()
     {
         $request = $this->createRequest([], FoundationTestFormRequestHooks::class);
 
