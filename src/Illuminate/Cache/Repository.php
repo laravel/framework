@@ -115,8 +115,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * Items not found in the cache will use the provided default value, or `null` if not specified.
      *
-     * @param  array  $keys A list of keys that can obtained in a single operation. To specify a default value, use the
-     * array key as the cache key, and the array value as the default value.
+     * @param  array  $keys
      * @return array
      */
     public function many(array $keys)
@@ -134,7 +133,6 @@ class Repository implements ArrayAccess, CacheContract
         $formattedKeys = array_keys($formattedKeysToOriginalKeys);
         $valuesForFormattedKeys = $this->store->many($formattedKeys);
 
-        // convert formatted keys back to its original key
         $values = [];
 
         foreach ($valuesForFormattedKeys as $newKey => $value) {
