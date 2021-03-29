@@ -73,7 +73,7 @@ abstract class Compiler
     }
 
     /**
-     * Create the file compiled directory if necessary.
+     * Create the compiled file directory if necessary.
      *
      * @param  string  $path
      * @return void
