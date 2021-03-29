@@ -678,4 +678,34 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * @param  array  $array
+     * @param  string|int $keyOne
+     * @param  string|int $keyTwo
+     * @return array
+     */
+    public static function swap($array, $keyOne, $keyTwo)
+    {
+        if (! static::isAssoc($array)) {
+            $itemOneTmp = $array[$keyOne];
+
+            $array[$keyOne] = $array[$keyTwo];
+            $array[$keyTwo] = $itemOneTmp;
+
+            return $array;
+        }
+
+        $updatedArray = [];
+        foreach ($array as $key => $value) {
+            if ($key === $keyOne) {
+                $updatedArray[$keyTwo] = $array[$keyTwo];
+            } elseif ($key === $keyTwo) {
+                $updatedArray[$keyOne] = $array[$keyOne];
+            } else {
+                $updatedArray[$key] = $value;
+            }
+        }
+        return $updatedArray;
+    }
 }

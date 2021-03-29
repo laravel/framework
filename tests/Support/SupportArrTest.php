@@ -956,4 +956,37 @@ class SupportArrTest extends TestCase
             ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
         ], $sortedWithCallable);
     }
+
+    public function testSwap()
+    {
+        // Test with integer indexed array.
+        $array = [
+            ['name' => 'One', 'age' => 8, 'meta' => ['key' => 3]],
+            ['name' => 'Two', 'age' => 10, 'meta' => ['key' => 5]],
+            ['name' => 'Three', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'Four', 'age' => 8, 'meta' => ['key' => 2]],
+        ];
+
+        $this->assertEquals([
+            ['name' => 'Three', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'Two', 'age' => 10, 'meta' => ['key' => 5]],
+            ['name' => 'One', 'age' => 8, 'meta' => ['key' => 3]],
+            ['name' => 'Four', 'age' => 8, 'meta' => ['key' => 2]],
+        ], Arr::swap($array, 0, 2));
+
+        // Test with associative array.
+        $assocArray = [
+            'item_one'   => ['name' => 'One', 'age' => 8, 'meta' => ['key' => 3]],
+            'item_two'   => ['name' => 'Two', 'age' => 10, 'meta' => ['key' => 5]],
+            'item_three' => ['name' => 'Three', 'age' => 10, 'meta' => ['key' => 3]],
+            'item_four'  => ['name' => 'Four', 'age' => 8, 'meta' => ['key' => 2]],
+        ];
+
+        $this->assertEquals([
+            'item_three' => ['name' => 'Three', 'age' => 10, 'meta' => ['key' => 3]],
+            'item_two'   => ['name' => 'Two', 'age' => 10, 'meta' => ['key' => 5]],
+            'item_one'   => ['name' => 'One', 'age' => 8, 'meta' => ['key' => 3]],
+            'item_four'  => ['name' => 'Four', 'age' => 8, 'meta' => ['key' => 2]],
+        ], Arr::swap($assocArray, 'item_one', 'item_three'));
+    }
 }
