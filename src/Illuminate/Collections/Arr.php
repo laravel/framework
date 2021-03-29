@@ -680,6 +680,8 @@ class Arr
     }
 
     /**
+     * Swap the order of two items in array.
+     *
      * @param  array  $array
      * @param  string|int $keyOne
      * @param  string|int $keyTwo
