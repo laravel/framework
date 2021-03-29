@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
@@ -386,7 +387,11 @@ class Str
      */
     public static function markdown($string, array $options = [])
     {
-        $converter = new GithubFlavoredMarkdownConverter($options);
+        $app = Container::getInstance();
+
+        $converter = $app->make(GithubFlavoredMarkdownConverter::class, [
+            'config' => $options,
+        ]);
 
         return $converter->convertToHtml($string);
     }
