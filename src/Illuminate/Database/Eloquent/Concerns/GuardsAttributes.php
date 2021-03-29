@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 trait GuardsAttributes
@@ -63,9 +64,9 @@ trait GuardsAttributes
      * @param  array  $fillable
      * @return $this
      */
-    public function mergeFillable(array $fillable)
+    public function mergeFillable(array|string $fillable)
     {
-        $this->fillable = array_merge($this->fillable, $fillable);
+        $this->fillable = array_merge($this->fillable, Arr::wrap($fillable));
 
         return $this;
     }
