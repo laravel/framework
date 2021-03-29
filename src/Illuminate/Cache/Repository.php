@@ -126,6 +126,7 @@ class Repository implements ArrayAccess, CacheContract
         })->all();
 
         $formattedKeysToOriginalKeys = [];
+
         foreach ($keysDefaultValues as $key => $defaultValue) {
             $formattedKeysToOriginalKeys[$this->itemKey($key)] = $key;
         }
@@ -135,6 +136,7 @@ class Repository implements ArrayAccess, CacheContract
 
         // convert formatted keys back to its original key
         $values = [];
+
         foreach ($valuesForFormattedKeys as $newKey => $value) {
             $originalKey = $formattedKeysToOriginalKeys[$newKey];
             $values[$originalKey] = $value;
@@ -261,6 +263,7 @@ class Repository implements ArrayAccess, CacheContract
         }
 
         $valuesWithFormattedKeys = [];
+
         foreach ($values as $key => $value) {
             $valuesWithFormattedKeys[$this->itemKey($key)] = $value;
         }
