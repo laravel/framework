@@ -61,10 +61,10 @@ trait GuardsAttributes
     /**
      * Merge new fillable attributes with existing fillable attributes on the model.
      *
-     * @param  array  $fillable
+     * @param  array|string  $fillable
      * @return $this
      */
-    public function mergeFillable(array|string $fillable)
+    public function mergeFillable($fillable)
     {
         $this->fillable = array_merge($this->fillable, Arr::wrap($fillable));
 
