@@ -103,6 +103,19 @@ class Wormhole
     }
 
     /**
+     * Travel forward the given number of months.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public function months($callback = null)
+    {
+        Carbon::setTestNow(Carbon::now()->addMonths($this->value));
+
+        return $this->handleCallback($callback);
+    }
+
+    /**
      * Travel forward the given number of years.
      *
      * @param  callable|null  $callback
