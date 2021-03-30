@@ -8,23 +8,16 @@ use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
-class EloquentFactoryBuilderTest extends TestCase
+class EloquentFactoryBuilderTest extends DatabaseTestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
+        parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
         $app['config']->set('database.connections.alternative-connection', [
             'driver' => 'sqlite',
             'database' => ':memory:',
