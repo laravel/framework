@@ -2,7 +2,6 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.34.0...8.x)
 
-
 ## [v8.34.0 (2021-03-23)](https://github.com/laravel/framework/compare/v8.33.1...v8.34.0)
 
 ### Inspiring
@@ -21,15 +20,18 @@
 - Added `lazy()` and `lazyById()`  methods to `Illuminate\Database\Concerns\BuildsQueries` ([#36699](https://github.com/laravel/framework/pull/36699))
 
 ### Fixed
-- Fixes the issue using cache:clear with PhpRedis and a clustered Redis instance. ([#36665](https://github.com/laravel/framework/pull/36665))
-- Fix replacing required :input with null on PHP 8.1 in `Illuminate\Validation\Concerns\FormatsMessages::getDisplayableValue()` ([#36622](https://github.com/laravel/framework/pull/36622))
-- Fixed artisan schema:dump error ([#36698](https://github.com/laravel/framework/pull/36698))
+- Fixes the issue using `cache:clear` with PhpRedis and a clustered Redis instance. ([#36665](https://github.com/laravel/framework/pull/36665))
+- Fix replacing required `:input` with null on PHP 8.1 in `Illuminate\Validation\Concerns\FormatsMessages::getDisplayableValue()` ([#36622](https://github.com/laravel/framework/pull/36622))
+- Fixed artisan `schema:dump` error ([#36698](https://github.com/laravel/framework/pull/36698))
+- Fixed `doesntExpectOutput` always causing a failed test ([#36806](https://github.com/laravel/framework/pull/36806))
+- Fixed using `WhereHasMorph` in a `whereHas` callback generates an incorrect sql statement. ([#36801](https://github.com/laravel/framework/pull/36801))
 
 ### Changed
 - Adjust Fluent Assertions ([#36620](https://github.com/laravel/framework/pull/36620))
 - Added timestamp reference to schedule:work artisan command output ([#36621](https://github.com/laravel/framework/pull/36621))
 - Expect custom markdown mailable themes to be in mail subdirectory ([#36673](https://github.com/laravel/framework/pull/36673))
 - Throw exception when unable to create LockableFile ([#36674](https://github.com/laravel/framework/pull/36674))
+- Explicitly set unit of sleep of retry function ([#36810](https://github.com/laravel/framework/pull/36810))
 
 ### Refactoring
 - Always prefer typesafe string comparisons ([#36657](https://github.com/laravel/framework/pull/36657))
