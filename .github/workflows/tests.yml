@@ -124,7 +124,7 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Database --verbose --stop-on-failure --exclude-group MySQL
         env:
           DB_CONNECTION: sqlsrv
-          DB_HOST=0.0.0.0
+          DB_HOST: "0.0.0.0"
           DB_PASSWORD: Forge123
 
 #  windows_tests:
