@@ -122,7 +122,7 @@ jobs:
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Database --verbose --stop-on-failure
+        run: vendor/bin/phpunit tests/Integration/Database --verbose --stop-on-failure --exclude-group MySQL
         env:
           DB_CONNECTION: sqlsrv
 
