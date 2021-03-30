@@ -88,7 +88,6 @@ jobs:
         env:
           ACCEPT_EULA: Y
           SA_PASSWORD: forge
-          MSSQL_PID: forge
         ports:
           - 1433:1433
 
