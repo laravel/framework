@@ -216,13 +216,13 @@ if (! function_exists('retry')) {
      *
      * @param  int  $times
      * @param  callable  $callback
-     * @param  int  $sleep
+     * @param  int  $sleepMilliseconds
      * @param  callable|null  $when
      * @return mixed
      *
      * @throws \Exception
      */
-    function retry($times, callable $callback, $sleep = 0, $when = null)
+    function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null)
     {
         $attempts = 0;
 
@@ -237,8 +237,8 @@ if (! function_exists('retry')) {
                 throw $e;
             }
 
-            if ($sleep) {
-                usleep($sleep * 1000);
+            if ($sleepMilliseconds) {
+                usleep($sleepMilliseconds * 1000);
             }
 
             goto beginning;
