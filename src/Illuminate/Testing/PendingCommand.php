@@ -329,7 +329,6 @@ class PendingCommand
 
         foreach ($this->test->unexpectedOutput as $output => $displayed) {
             $mock->shouldReceive('doWrite')
-                ->once()
                 ->ordered()
                 ->with($output, Mockery::any())
                 ->andReturnUsing(function () use ($output) {
