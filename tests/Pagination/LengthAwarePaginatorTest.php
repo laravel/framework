@@ -40,8 +40,11 @@ class LengthAwarePaginatorTest extends TestCase
     {
         $this->assertEquals(2, $this->p->lastPage());
         $this->assertEquals(2, $this->p->currentPage());
+        $this->assertEquals(null, $this->p->nextPage());
+        $this->assertEquals(1, $this->p->previousPage());
         $this->assertTrue($this->p->hasPages());
         $this->assertFalse($this->p->hasMorePages());
+        $this->assertTrue($this->p->hasPreviousPages());
         $this->assertEquals(['item1', 'item2', 'item3', 'item4'], $this->p->items());
     }
 
@@ -51,8 +54,11 @@ class LengthAwarePaginatorTest extends TestCase
 
         $this->assertEquals(1, $paginator->lastPage());
         $this->assertEquals(1, $paginator->currentPage());
+        $this->assertEquals(null, $paginator->nextPage());
+        $this->assertEquals(null, $paginator->previousPage());
         $this->assertFalse($paginator->hasPages());
         $this->assertFalse($paginator->hasMorePages());
+        $this->assertFalse($paginator->hasPreviousPages());
         $this->assertEmpty($paginator->items());
     }
 
@@ -72,6 +78,20 @@ class LengthAwarePaginatorTest extends TestCase
 
         $this->assertSame('http://website.com?foo=1',
                             $this->p->url($this->p->currentPage() - 2));
+    }
+
+    public function testLengthAwarePaginatorCanGeneratePageUrls()
+    {
+        $this->p->setPath('http://website.com');
+        $this->p->setPageName('foo');
+
+        $this->assertNull($this->p->nextPageUrl());
+
+        $this->assertSame('http://website.com?foo=1',
+                          $this->p->previousPageUrl());
+
+        $this->assertSame('http://website.com?foo=2',
+                          $this->p->lastPageUrl());
     }
 
     public function testLengthAwarePaginatorCanGenerateUrlsWithQuery()
