@@ -28,6 +28,7 @@ jobs:
         ports:
           - 6379:6379
         options: --entrypoint redis-server
+
     strategy:
       fail-fast: true
       matrix:
@@ -79,7 +80,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: random_secret
 
   windows_tests:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     strategy:
       fail-fast: true
@@ -123,3 +124,5 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
+        env:
+          DB_CONNECTION: sqlsrv
