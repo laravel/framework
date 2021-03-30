@@ -36,14 +36,19 @@ class CacheServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->singleton('cache.dynamodb.client', function ($app) {
             $config = $app['config']->get('cache.stores.dynamodb');
 
-            return new DynamoDbClient([
+            $dynamoConfig = [
                 'region' => $config['region'],
                 'version' => 'latest',
                 'endpoint' => $config['endpoint'] ?? null,
-                'credentials' => Arr::only(
+            ];
+
+            if ($config['key'] && $config['secret']) {
+                $dynamoConfig['credentials'] = Arr::only(
                     $config, ['key', 'secret', 'token']
-                ),
-            ]);
+                );
+            }
+
+            return new DynamoDbClient($dynamoConfig);
         });
 
         $this->app->singleton(RateLimiter::class);
