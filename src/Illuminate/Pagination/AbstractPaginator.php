@@ -133,14 +133,36 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Determine if there are previous items in the data source.
+     *
+     * @return bool
+     */
+    public function hasPreviousPages()
+    {
+        return $this->currentPage() > 1;
+    }
+
+    /**
+     * Get the previous page.
+     *
+     * @return int|null
+     */
+    public function previousPage()
+    {
+        if ($this->hasPreviousPages()) {
+            return $this->currentPage() - 1;
+        }
+    }
+
+    /**
      * Get the URL for the previous page.
      *
      * @return string|null
      */
     public function previousPageUrl()
     {
-        if ($this->currentPage() > 1) {
-            return $this->url($this->currentPage() - 1);
+        if ($this->hasPreviousPages()) {
+            return $this->url($this->previousPage());
         }
     }
 
