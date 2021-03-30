@@ -94,10 +94,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-#        php: ['7.2', '7.3', '7.4', '8.0']
-#        stability: [ prefer-lowest, prefer-stable ]
         php: ['8.0']
-        stability: [ prefer-stable ]
+        stability: [prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - SQL Server
 
@@ -109,7 +107,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_sqlsrv
           tools: composer:v2
           coverage: none
 
@@ -124,7 +122,6 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Database --verbose --stop-on-failure --exclude-group MySQL
         env:
           DB_CONNECTION: sqlsrv
-          DB_HOST: "0.0.0.0"
           DB_PASSWORD: Forge123
 
 #  windows_tests:
