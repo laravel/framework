@@ -163,18 +163,6 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     }
 
     /**
-     * Get the URL for the next page.
-     *
-     * @return string|null
-     */
-    public function nextPageUrl()
-    {
-        if ($this->hasMorePages()) {
-            return $this->url($this->currentPage() + 1);
-        }
-    }
-
-    /**
      * Get the last page.
      *
      * @return int
