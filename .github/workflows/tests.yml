@@ -87,7 +87,7 @@ jobs:
         image: mcr.microsoft.com/mssql/server:2019-latest
         env:
           ACCEPT_EULA: Y
-          SA_PASSWORD: forge
+          SA_PASSWORD: Forge123
         ports:
           - 1433:1433
 
@@ -124,6 +124,7 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Database --verbose --stop-on-failure --exclude-group MySQL
         env:
           DB_CONNECTION: sqlsrv
+          DB_PASSWORD: Forge123
 
 #  windows_tests:
 #    runs-on: windows-2019
