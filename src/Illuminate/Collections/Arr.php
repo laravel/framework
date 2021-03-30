@@ -87,6 +87,22 @@ class Arr
 
         return $results;
     }
+    
+    /**
+     * Cycle the elements of an array based on a position.
+     *
+     * @param  array  $array
+     * @param  int  $position
+     * @return  string
+     */
+    public static function cycle($array, $position = 0)
+    {
+        if (!is_array($array)) {
+            return $array;
+        }
+
+        return $array[$position % count($array)];
+    }
 
     /**
      * Divide an array into two arrays. One with keys and the other with values.
