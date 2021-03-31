@@ -134,7 +134,7 @@ class Builder
     /**
      * The maximum number of records to return.
      *
-     * @var int
+     * @var int|null
      */
     public $limit;
 
@@ -155,7 +155,7 @@ class Builder
     /**
      * The maximum number of union records to return.
      *
-     * @var int
+     * @var int|null
      */
     public $unionLimit;
 
@@ -3337,5 +3337,17 @@ class Builder
         }
 
         static::throwBadMethodCallException($method);
+    }
+    
+    /**
+    * Reset the limit or unionLimit property
+    * @return $this
+    */
+    public function resetLimit()
+    {
+        $property = $this->unions ? 'unionLimit' : 'limit';
+        $this->$property = null;
+       
+        return $this;
     }
 }
