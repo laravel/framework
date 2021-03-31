@@ -3340,7 +3340,7 @@ class Builder
     }
 
     /**
-     * Reset the limit or unionLimit property
+     * Reset the limit or unionLimit property.
      * @return $this
      */
     public function resetLimit()
