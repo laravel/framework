@@ -111,4 +111,16 @@ class LengthAwarePaginatorTest extends TestCase
     {
         $this->assertSame($this->options, $this->p->getOptions());
     }
+
+    public function testLengthAwarePaginatorCanRetrieveAllItems()
+    {
+        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, -1);
+
+        $this->assertEquals(4, $paginator->perPage());
+        $this->assertEquals(1, $paginator->lastPage());
+        $this->assertEquals(1, $paginator->currentPage());
+        $this->assertFalse($paginator->hasPages());
+        $this->assertFalse($paginator->hasMorePages());
+        $this->assertEquals(['item1', 'item2', 'item3', 'item4'], $paginator->items());
+    }
 }

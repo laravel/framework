@@ -768,9 +768,11 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = ($total = $this->toBase()->getCountForPagination())
-                                    ? $this->forPage($page, $perPage)->get($columns)
-                                    : $this->model->newCollection();
+        $total = $this->toBase()->getCountForPagination();
+
+        $perPage = ($perPage < 0 && $total > 0) ? $total : $perPage;
+
+        $results = $total ? $this->forPage($page, $perPage)->get($columns) : $this->model->newCollection();
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),

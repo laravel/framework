@@ -3472,6 +3472,36 @@ SQL;
         ]), $result);
     }
 
+    public function testPaginateWithAllItems()
+    {
+        $perPage = -1;
+        $pageName = 'page';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = [];
+
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(0);
+        $builder->shouldNotReceive('forPage');
+        $builder->shouldNotReceive('get');
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate(-1);
+
+        $this->assertEquals(new LengthAwarePaginator($results, 0, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
     public function testWhereRowValues()
     {
         $builder = $this->getBuilder();

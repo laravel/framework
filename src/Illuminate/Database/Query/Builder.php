@@ -2329,6 +2329,8 @@ class Builder
 
         $total = $this->getCountForPagination();
 
+        $perPage = ($perPage < 0 && $total > 0) ? $total : $perPage;
+
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : collect();
 
         return $this->paginator($results, $total, $perPage, $page, [
