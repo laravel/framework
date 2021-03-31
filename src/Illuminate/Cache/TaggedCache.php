@@ -52,7 +52,7 @@ class TaggedCache extends Repository
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return void
+     * @return int|bool
      */
     public function increment($key, $value = 1)
     {
@@ -64,7 +64,7 @@ class TaggedCache extends Repository
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return void
+     * @return int|bool
      */
     public function decrement($key, $value = 1)
     {
