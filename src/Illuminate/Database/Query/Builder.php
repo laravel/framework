@@ -3338,16 +3338,16 @@ class Builder
 
         static::throwBadMethodCallException($method);
     }
-    
+
     /**
-    * Reset the limit or unionLimit property
-    * @return $this
-    */
+     * Reset the limit or unionLimit property
+     * @return $this
+     */
     public function resetLimit()
     {
         $property = $this->unions ? 'unionLimit' : 'limit';
         $this->$property = null;
-       
+
         return $this;
     }
 }
