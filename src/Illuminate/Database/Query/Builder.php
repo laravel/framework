@@ -134,7 +134,7 @@ class Builder
     /**
      * The maximum number of records to return.
      *
-     * @var int
+     * @var null|int
      */
     public $limit;
 
@@ -155,7 +155,7 @@ class Builder
     /**
      * The maximum number of union records to return.
      *
-     * @var int
+     * @var null|int
      */
     public $unionLimit;
 
@@ -2073,7 +2073,7 @@ class Builder
     /**
      * Alias to set the "limit" value of the query.
      *
-     * @param  int  $value
+     * @param  null|int  $value
      * @return $this
      */
     public function take($value)
@@ -2084,14 +2084,14 @@ class Builder
     /**
      * Set the "limit" value of the query.
      *
-     * @param  int  $value
+     * @param  null|int  $value
      * @return $this
      */
     public function limit($value)
     {
         $property = $this->unions ? 'unionLimit' : 'limit';
 
-        if ($value >= 0) {
+        if ($value >= 0 || $value === null) {
             $this->$property = $value;
         }
 
