@@ -808,6 +808,18 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Push an item onto the beginning of the collection.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $key
+     * @return $this
+     */
+    public function unshift($value, $key = null)
+    {
+        return $this->prepend(...func_get_args());
+    }
+
+    /**
      * Push one or more items onto the end of the collection.
      *
      * @param  mixed  $values [optional]
