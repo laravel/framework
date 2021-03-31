@@ -1305,6 +1305,18 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Push an item onto the beginning of the collection.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $key
+     * @return $this
+     */
+    public function unshift($value, $key = null)
+    {
+        return $this->prepend($value, $key);
+    }
+
+    /**
      * Reset the keys on the underlying array.
      *
      * @return static

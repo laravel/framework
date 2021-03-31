@@ -818,6 +818,26 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['v' => 2], ['v' => '3'], ['v' => 4]], $c->whereNotInStrict('v', [1, 3])->values()->all());
     }
 
+    public function testUnshift(){
+        $c = new Collection(['one', 'two', 'three', 'four']);
+        $this->assertEquals(
+            ['zero', 'one', 'two', 'three', 'four'],
+            $c->unshift('zero')->all()
+        );
+
+        $c = new Collection(['one' => 1, 'two' => 2]);
+        $this->assertEquals(
+            ['zero' => 0, 'one' => 1, 'two' => 2],
+            $c->unshift(0, 'zero')->all()
+        );
+
+        $c = new Collection(['one' => 1, 'two' => 2]);
+        $this->assertEquals(
+            [null => 0, 'one' => 1, 'two' => 2],
+            $c->unshift(0, null)->all()
+        );
+    }
+    
     /**
      * @dataProvider collectionClassProvider
      */
