@@ -61,6 +61,8 @@ trait Dispatchable
      * Dispatch a command to its appropriate handler in the current process.
      *
      * @return mixed
+     *
+     * @deprecated Will be removed in a future Laravel version.
      */
     public static function dispatchNow()
     {
