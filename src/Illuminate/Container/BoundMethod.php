@@ -14,7 +14,7 @@ class BoundMethod
      * Call the given Closure / class@method and inject its dependencies.
      *
      * @param  \Illuminate\Container\Container  $container
-     * @param  callable|string  $callback
+     * @param  callable|string|array  $callback
      * @param  array  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
@@ -38,10 +38,10 @@ class BoundMethod
     }
 
     /**
-     * Call a string reference to a class using Class@method syntax.
+     * Call a string reference to a class using Class@method or [Class, method] syntax.
      *
      * @param  \Illuminate\Container\Container  $container
-     * @param  string  $target
+     * @param  string|array  $target
      * @param  array  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
@@ -50,20 +50,29 @@ class BoundMethod
      */
     protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
     {
-        $segments = explode('@', $target);
+        if ($target instanceof Closure) {
+            throw new InvalidArgumentException('Callback function cannot use defaultMethod param.');
+        } elseif (is_string($target)) {
+            $segments = explode('@', $target);
+        } else {
+            $segments = $target;
+        }
 
         // We will assume an @ sign is used to delimit the class name from the method
         // name. We will split on this @ sign and then build a callable array that
         // we can pass right back into the "call" method for dependency binding.
         $method = count($segments) === 2
-                        ? $segments[1] : $defaultMethod;
+            ? $segments[1] : $defaultMethod;
 
         if (is_null($method)) {
             throw new InvalidArgumentException('Method not provided.');
         }
 
+        $instance = is_string($segments[0])
+            ? $container->make($segments[0]) : $segments[0];
+
         return static::call(
-            $container, [$container->make($segments[0]), $method], $parameters
+            $container, [$instance, $method], $parameters
         );
     }
 
@@ -71,7 +80,7 @@ class BoundMethod
      * Call a method that has been bound to the container.
      *
      * @param  \Illuminate\Container\Container  $container
-     * @param  callable  $callback
+     * @param  callable|string|array  $callback
      * @param  mixed  $default
      * @return mixed
      */
@@ -110,7 +119,7 @@ class BoundMethod
      * Get all dependencies for a given method.
      *
      * @param  \Illuminate\Container\Container  $container
-     * @param  callable|string  $callback
+     * @param  callable|string|array  $callback
      * @param  array  $parameters
      * @return array
      *
@@ -130,7 +139,7 @@ class BoundMethod
     /**
      * Get the proper reflection instance for the given callback.
      *
-     * @param  callable|string  $callback
+     * @param  callable|string|array  $callback
      * @return \ReflectionFunctionAbstract
      *
      * @throws \ReflectionException

@@ -6,6 +6,7 @@ use Closure;
 use Error;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -90,6 +91,15 @@ class ContainerCallTest extends TestCase
         $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo']);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
         $this->assertSame('taylor', $result[1]);
+
+        $container = new Container;
+        $result = $container->call([new ContainerTestCallStub, 'inject'], [], 'defaultMethod');
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
+
+        $container = new Container;
+        $result = $container->call([new ContainerTestCallStub], ['default' => 'foo'], 'inject');
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
+        $this->assertSame('foo', $result[1]);
     }
 
     public function testBindMethodAcceptsAnArray()
@@ -119,6 +129,12 @@ class ContainerCallTest extends TestCase
         $container->call(function (ContainerCallConcreteStub $stub) {
             //
         }, ['foo' => 'bar', 'stub' => new ContainerCallConcreteStub]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Callback function cannot use defaultMethod parameter.');
+        $container->call(function (ContainerCallConcreteStub $stub) {
+            //
+        }, ['foo' => 'bar'], 'defaultMethod');
     }
 
     public function testCallWithDependencies()
