@@ -7,77 +7,77 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-#  linux_tests:
-#    runs-on: ubuntu-20.04
-#
-#    services:
-#      memcached:
-#        image: memcached:1.6-alpine
-#        ports:
-#          - 11211:11211
-#      mysql:
-#        image: mysql:5.7
-#        env:
-#          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-#          MYSQL_DATABASE: forge
-#        ports:
-#          - 33306:3306
-#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-#      redis:
-#        image: redis:5.0
-#        ports:
-#          - 6379:6379
-#        options: --entrypoint redis-server
-#
-#    strategy:
-#      fail-fast: true
-#      matrix:
-#        php: ['7.2', '7.3', '7.4', '8.0']
-#        stability: [prefer-lowest, prefer-stable]
-#
-#    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
-#
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v2
-#
-#      - name: Setup PHP
-#        uses: shivammathur/setup-php@v2
-#        with:
-#          php-version: ${{ matrix.php }}
-#          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, memcached
-#          tools: composer:v2
-#          coverage: none
-#
-#      - name: Set Minimum Guzzle Version
-#        uses: nick-invision/retry@v1
-#        with:
-#          timeout_minutes: 5
-#          max_attempts: 5
-#          command: composer require guzzlehttp/guzzle:^7.2 --no-interaction --no-update
-#        if: matrix.php >= 8
-#
-#      - name: Install dependencies
-#        uses: nick-invision/retry@v1
-#        with:
-#          timeout_minutes: 5
-#          max_attempts: 5
-#          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
-#
-#      - name: Setup DynamoDB Local
-#        uses: rrainn/dynamodb-action@v2.0.0
-#        with:
-#          port: 8888
-#
-#      - name: Execute tests
-#        run: vendor/bin/phpunit --verbose
-#        env:
-#          DB_PORT: ${{ job.services.mysql.ports[3306] }}
-#          DB_USERNAME: root
-#          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
-#          DYNAMODB_ENDPOINT: "http://localhost:8888"
-#          AWS_ACCESS_KEY_ID: random_key
-#          AWS_SECRET_ACCESS_KEY: random_secret
+  linux_tests:
+    runs-on: ubuntu-20.04
+
+    services:
+      memcached:
+        image: memcached:1.6-alpine
+        ports:
+          - 11211:11211
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: forge
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      redis:
+        image: redis:5.0
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: ['7.2', '7.3', '7.4', '8.0']
+        stability: [prefer-lowest, prefer-stable]
+
+    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, memcached
+          tools: composer:v2
+          coverage: none
+
+      - name: Set Minimum Guzzle Version
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require guzzlehttp/guzzle:^7.2 --no-interaction --no-update
+        if: matrix.php >= 8
+
+      - name: Install dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+
+      - name: Setup DynamoDB Local
+        uses: rrainn/dynamodb-action@v2.0.0
+        with:
+          port: 8888
+
+      - name: Execute tests
+        run: vendor/bin/phpunit --verbose
+        env:
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+          DB_USERNAME: root
+          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
+          DYNAMODB_ENDPOINT: "http://localhost:8888"
+          AWS_ACCESS_KEY_ID: random_key
+          AWS_SECRET_ACCESS_KEY: random_secret
 
   sqlsrv_tests:
     runs-on: ubuntu-20.04
@@ -127,48 +127,48 @@ jobs:
           DB_USERNAME: SA
           DB_PASSWORD: Forge123
 
-#  windows_tests:
-#    runs-on: windows-2019
-#
-#    strategy:
-#      fail-fast: true
-#      matrix:
-#        php: ['7.2', '7.3', '7.4', '8.0']
-#        stability: [prefer-lowest, prefer-stable]
-#
-#    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
-#
-#    steps:
-#      - name: Set git to use LF
-#        run: |
-#          git config --global core.autocrlf false
-#          git config --global core.eol lf
-#
-#      - name: Checkout code
-#        uses: actions/checkout@v2
-#
-#      - name: Setup PHP
-#        uses: shivammathur/setup-php@v2
-#        with:
-#          php-version: ${{ matrix.php }}
-#          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached
-#          tools: composer:v2
-#          coverage: none
-#
-#      - name: Set Minimum Guzzle Version
-#        uses: nick-invision/retry@v1
-#        with:
-#          timeout_minutes: 5
-#          max_attempts: 5
-#          command: composer require guzzlehttp/guzzle:^7.2 --no-interaction --no-update
-#        if: matrix.php >= 8
-#
-#      - name: Install dependencies
-#        uses: nick-invision/retry@v1
-#        with:
-#          timeout_minutes: 5
-#          max_attempts: 5
-#          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
-#
-#      - name: Execute tests
-#        run: vendor/bin/phpunit --verbose
+  windows_tests:
+    runs-on: windows-2019
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: ['7.2', '7.3', '7.4', '8.0']
+        stability: [prefer-lowest, prefer-stable]
+
+    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
+
+    steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached
+          tools: composer:v2
+          coverage: none
+
+      - name: Set Minimum Guzzle Version
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require guzzlehttp/guzzle:^7.2 --no-interaction --no-update
+        if: matrix.php >= 8
+
+      - name: Install dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests
+        run: vendor/bin/phpunit --verbose
