@@ -62,7 +62,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
 
         Request::macro('validateWithBag', function (string $errorBag, array $rules, ...$params) {
             try {
-                return $this->validate($rules, ...$params);
+                return validator()->validate($rules, ...$params);
             } catch (ValidationException $e) {
                 $e->errorBag = $errorBag;
 
