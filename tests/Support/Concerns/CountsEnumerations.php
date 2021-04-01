@@ -7,6 +7,21 @@ use Illuminate\Support\LazyCollection;
 
 trait CountsEnumerations
 {
+    protected function makeGeneratorFunctionWithRecorder($numbers = 10)
+    {
+        $recorder = new Collection();
+
+        $generatorFunction = function () use ($numbers, $recorder) {
+            for ($i = 1; $i <= $numbers; $i++) {
+                $recorder->push($i);
+
+                yield $i;
+            }
+        };
+
+        return [$generatorFunction, $recorder];
+    }
+
     protected function assertDoesNotEnumerate(callable $executor)
     {
         $this->assertEnumerates(0, $executor);

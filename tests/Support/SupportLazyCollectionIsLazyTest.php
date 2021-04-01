@@ -10,6 +10,31 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 {
     use Concerns\CountsEnumerations;
 
+    public function testMakeWithClosureIsLazy()
+    {
+        [$closure, $recorder] = $this->makeGeneratorFunctionWithRecorder();
+
+        LazyCollection::make($closure);
+
+        $this->assertEquals([], $recorder->all());
+    }
+
+    public function testMakeWithLazyCollectionIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            LazyCollection::make($collection);
+        });
+    }
+
+    public function testMakeWithGeneratorIsNotLazy()
+    {
+        [$closure, $recorder] = $this->makeGeneratorFunctionWithRecorder(5);
+
+        LazyCollection::make($closure());
+
+        $this->assertEquals([1, 2, 3, 4, 5], $recorder->all());
+    }
+
     public function testEagerEnumeratesOnce()
     {
         $this->assertEnumeratesOnce(function ($collection) {
