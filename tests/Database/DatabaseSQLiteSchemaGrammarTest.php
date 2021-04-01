@@ -914,7 +914,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->create();
         $blueprint->string('my_json_column');
-        $blueprint->string('my_other_column')->virtualAs('my_json_column->some_attribute');
+        $blueprint->string('my_other_column')->virtualAsJson('my_json_column->some_attribute');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
@@ -924,7 +924,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->create();
         $blueprint->string('my_json_column');
-        $blueprint->string('my_other_column')->virtualAs('my_json_column->some_attribute->nested');
+        $blueprint->string('my_other_column')->virtualAsJson('my_json_column->some_attribute->nested');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
@@ -947,7 +947,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->create();
         $blueprint->string('my_json_column');
-        $blueprint->string('my_other_column')->storedAs('my_json_column->some_attribute');
+        $blueprint->string('my_other_column')->storedAsJson('my_json_column->some_attribute');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
@@ -957,7 +957,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->create();
         $blueprint->string('my_json_column');
-        $blueprint->string('my_other_column')->storedAs('my_json_column->some_attribute->nested');
+        $blueprint->string('my_other_column')->storedAsJson('my_json_column->some_attribute->nested');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 

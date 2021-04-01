@@ -1217,7 +1217,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->create();
         $blueprint->string('my_json_column');
-        $blueprint->string('my_other_column')->virtualAs('my_json_column->some_attribute');
+        $blueprint->string('my_other_column')->virtualAsJson('my_json_column->some_attribute');
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
@@ -1230,7 +1230,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->create();
         $blueprint->string('my_json_column');
-        $blueprint->string('my_other_column')->virtualAs('my_json_column->some_attribute->nested');
+        $blueprint->string('my_other_column')->virtualAsJson('my_json_column->some_attribute->nested');
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
@@ -1261,7 +1261,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->create();
         $blueprint->string('my_json_column');
-        $blueprint->string('my_other_column')->storedAs('my_json_column->some_attribute');
+        $blueprint->string('my_other_column')->storedAsJson('my_json_column->some_attribute');
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
@@ -1274,7 +1274,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->create();
         $blueprint->string('my_json_column');
-        $blueprint->string('my_other_column')->storedAs('my_json_column->some_attribute->nested');
+        $blueprint->string('my_other_column')->storedAsJson('my_json_column->some_attribute->nested');
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
