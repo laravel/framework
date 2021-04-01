@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use ReflectionClass;
 
 trait AuthorizesRequests
 {
@@ -90,6 +92,75 @@ trait AuthorizesRequests
             $modelName = in_array($method, $this->resourceMethodsWithoutModels()) ? $model : $parameter;
 
             $middleware["can:{$ability},{$modelName}"][] = $method;
+        }
+
+        foreach ($middleware as $middlewareName => $methods) {
+            $this->middleware($middlewareName, $options)->only($methods);
+        }
+    }
+
+    /**
+     * Authorize all methods declared in the controller (except resource methods)
+     *
+     * @param $model
+     * @param null $parameter
+     * @param array $options
+     * @throws \ReflectionException
+     */
+    public function authorizeMethods($model, $parameter = null, array $options = [])
+    {
+        $reflection = new ReflectionClass($this);
+
+        $class = get_class($this);
+
+        $traitMethods = collect($reflection->getTraits())
+            ->reduce(function ($methods, $trait) {
+                return $methods->merge($trait->getMethods());
+            }, collect())
+            ->map(function ($method) {
+                return $method->name;
+            });
+
+        $methods = collect($reflection->getMethods())
+            ->filter(function ($method) use ($class) {
+                return $class == $method->getDeclaringClass()->name && !str_starts_with($method->getName(), '__');
+            })
+            ->map(function ($method) use ($class) {
+                return $method->getName();
+            })
+            ->diff($traitMethods);
+
+        $this->authorizeOnly($model, $methods, $parameter, $options);
+    }
+
+    /**
+     * Authorize specified methods in the controller (resource methods are ignored)
+     *
+     * @param $model
+     * @param iterable $methods
+     * @param null $parameter
+     * @param array $options
+     * @throws \ReflectionException
+     */
+    public function authorizeOnly($model, iterable $methods, $parameter = null, array $options = [])
+    {
+        $reflection = new ReflectionClass($this);
+
+        $middleware = [];
+
+        foreach ($methods as $method) {
+            if (isset($this->resourceAbilityMap()[$method])) {
+                continue;
+            }
+
+            $binding = Arr::first($reflection->getMethod($method)->getParameters(),
+                function ($param) use ($model, $parameter) {
+                    return $param->name == $parameter && $param->getType() && $param->getType()->getName() == $model;
+                });
+
+            $modelName = $binding ? $parameter : $model;
+
+            $middleware["can:{$method},{$modelName}"][] = $method;
         }
 
         foreach ($middleware as $middlewareName => $methods) {

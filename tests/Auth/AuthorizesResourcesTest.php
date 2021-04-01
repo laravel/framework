@@ -54,6 +54,24 @@ class AuthorizesResourcesTest extends TestCase
         $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user');
     }
 
+    public function testAuthorizesOtherMethods() {
+        $controller = new AuthorizesAllMethodsController;
+
+        $this->assertHasMiddleware($controller, 'noBinding', 'can:noBinding,Illuminate\Tests\Auth\DummyUser');
+        $this->assertHasMiddleware($controller, 'withBinding', 'can:withBinding,user');
+
+        $this->assertCount(2, $controller->getMiddleware());
+    }
+
+    public function testAuthorizesOnlyMethods() {
+        $controller = new AuthorizesOnlyMethodsController;
+
+        $this->assertHasMiddleware($controller, 'noBinding', 'can:noBinding,Illuminate\Tests\Auth\DummyUser');
+        $this->assertHasMiddleware($controller, 'withBinding', 'can:withBinding,user');
+
+        $this->assertCount(2, $controller->getMiddleware());
+    }
+
     /**
      * Assert that the given middleware has been registered on the given controller for the given method.
      *
@@ -67,7 +85,7 @@ class AuthorizesResourcesTest extends TestCase
         $router = new Router(new Dispatcher);
 
         $router->aliasMiddleware('can', AuthorizesResourcesMiddleware::class);
-        $router->get($method)->uses(AuthorizesResourcesController::class.'@'.$method);
+        $router->get($method)->uses([ get_class($controller), $method ]);
 
         $this->assertSame(
             'caught '.$middleware,
@@ -121,6 +139,43 @@ class AuthorizesResourcesController extends Controller
         //
     }
 }
+
+class AuthorizesAllMethodsController extends Controller
+{
+    use AuthorizesRequests;
+
+    public function __construct()
+    {
+        $this->authorizeMethods(DummyUser::class, 'user');
+    }
+
+    public function index() {}
+
+    public function show(DummyUser $user) {}
+
+    public function noBinding() {}
+
+    public function withBinding(DummyUser $user) {}
+}
+
+
+class AuthorizesOnlyMethodsController extends Controller
+{
+    use AuthorizesRequests;
+
+    public function __construct()
+    {
+        $this->authorizeOnly(DummyUser::class, [ 'noBinding', 'withBinding' ], 'user');
+    }
+
+    public function noBinding() {}
+
+    public function withBinding(DummyUser $user) {}
+
+    public function excluded() {}
+}
+
+class DummyUser {}
 
 class AuthorizesResourcesMiddleware
 {
