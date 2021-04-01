@@ -20,4 +20,13 @@ class DatabaseTestCase extends TestCase
             ]);
         }
     }
+
+    protected function tearDown(): void
+    {
+        if (! env('DB_CONNECTION')) {
+            $this->artisan('db:wipe');
+        }
+
+        parent::tearDown();
+    }
 }
