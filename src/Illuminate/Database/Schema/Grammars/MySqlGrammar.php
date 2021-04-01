@@ -920,8 +920,12 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->virtualAs)) {
-            return " as ({$column->virtualAs})";
+        if (! is_null($virtualAs = $column->virtualAs)) {
+            if ($this->isJsonSelector($virtualAs)) {
+                $virtualAs = $this->wrapJsonSelector($virtualAs);
+            }
+
+            return " as ({$virtualAs})";
         }
     }
 
@@ -934,8 +938,12 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->storedAs)) {
-            return " as ({$column->storedAs}) stored";
+        if (! is_null($storedAs = $column->storedAs)) {
+            if ($this->isJsonSelector($storedAs)) {
+                $storedAs = $this->wrapJsonSelector($storedAs);
+            }
+
+            return " as ({$storedAs}) stored";
         }
     }
 
@@ -1096,5 +1104,18 @@ class MySqlGrammar extends Grammar
         }
 
         return $value;
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
+
+        return 'json_unquote(json_extract('.$field.$path.'))';
     }
 }
