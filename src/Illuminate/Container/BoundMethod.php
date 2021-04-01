@@ -62,14 +62,14 @@ class BoundMethod
         // name. We will split on this @ sign and then build a callable array that
         // we can pass right back into the "call" method for dependency binding.
         $method = count($segments) === 2
-            ? $segments[1] : $defaultMethod;
+                    ? $segments[1] : $defaultMethod;
 
         if (is_null($method)) {
             throw new InvalidArgumentException('Method not provided.');
         }
 
         $instance = is_string($segments[0])
-            ? $container->make($segments[0]) : $segments[0];
+                    ? $container->make($segments[0]) : $segments[0];
 
         return static::call(
             $container, [$instance, $method], $parameters
