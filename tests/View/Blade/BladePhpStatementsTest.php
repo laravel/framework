@@ -52,4 +52,19 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testStringWithEmptyStringDataValue()
+    {
+        $string = "@php(\$data = ['test' => ''])";
+
+        $expected = "<?php (\$data = ['test' => '']); ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "@php(\$data = ['test' => \"\"])";
+
+        $expected = "<?php (\$data = ['test' => \"\"]); ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
