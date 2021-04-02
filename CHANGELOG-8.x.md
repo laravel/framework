@@ -1,6 +1,31 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.34.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.35.0...8.x)
+
+
+## [v8.35.0 (2021-03-30)](https://github.com/laravel/framework/compare/v8.34.0...v8.35.0)
+
+### Added
+- Added support of DynamoDB in CI suite ([#36749](https://github.com/laravel/framework/pull/36749))
+- Support username parameter for predis ([#36762](https://github.com/laravel/framework/pull/36762))
+- Added missing months() to Wormhole ([#36808](https://github.com/laravel/framework/pull/36808))
+
+### Deprecated
+- Deprecate MocksApplicationServices trait ([#36716](https://github.com/laravel/framework/pull/36716))
+
+### Fixed
+- Fixes missing lazy() and lazyById() on BelongsToMany and HasManyThrough relation query builder ([#36758](https://github.com/laravel/framework/pull/36758))
+- Ensure the compiled view directory exists  ([#36772](https://github.com/laravel/framework/pull/36772))
+- Fix Artisan test method PendingCommand::doesntExpectOutput() always causing a failed test ([#36806](https://github.com/laravel/framework/pull/36806))
+- FIXED: The use of whereHasMorph in a whereHas callback generates a wrong sql statements ([#36801](https://github.com/laravel/framework/pull/36801))
+
+### Changed
+- Allow lazy collection to be instantiated from a generator ([#36738](https://github.com/laravel/framework/pull/36738))
+- Use qualified column names in pivot query ([#36720](https://github.com/laravel/framework/pull/36720))
+- Octane Prep ([#36777](https://github.com/laravel/framework/pull/36777))
+
+### Refactoring
+- Remove useless loop in `Str::remove()` ([#36722](https://github.com/laravel/framework/pull/36722))
 
 
 ## [v8.34.0 (2021-03-23)](https://github.com/laravel/framework/compare/v8.33.1...v8.34.0)
