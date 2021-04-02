@@ -8,13 +8,6 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class TransformsRequest
 {
     /**
-     * All of the registered skip callbacks.
-     *
-     * @var array
-     */
-    protected static $skipCallbacks = [];
-
-    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -23,12 +16,6 @@ class TransformsRequest
      */
     public function handle($request, Closure $next)
     {
-        foreach (static::$skipCallbacks as $callback) {
-            if ($callback($request)) {
-                return $next($request);
-            }
-        }
-
         $this->clean($request);
 
         return $next($request);
@@ -104,16 +91,5 @@ class TransformsRequest
     protected function transform($key, $value)
     {
         return $value;
-    }
-
-    /**
-     * Register a callback that instructs the middleware to be skipped.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public static function skipWhen(Closure $callback)
-    {
-        static::$skipCallbacks[] = $callback;
     }
 }
