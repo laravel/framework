@@ -41,6 +41,17 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
+    public function testSeeInDatabaseFindModelResults()
+    {
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(1);
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertDatabaseHas(new ProductStub($this->data));
+    }
+
     public function testSeeInDatabaseDoesNotFindResults()
     {
         $this->expectException(ExpectationFailedException::class);
