@@ -53,6 +53,10 @@ class Response extends SymfonyResponse
             $this->header('Content-Type', 'application/json');
 
             $content = $this->morphToJson($content);
+            
+            if ($content === false) {
+                throw new \UnexpectedValueException(sprintf("Failed to convert the provided Response content to JSON with the message: %s", json_last_error_msg()));
+            }
         }
 
         // If this content implements the "Renderable" interface then we will call the
