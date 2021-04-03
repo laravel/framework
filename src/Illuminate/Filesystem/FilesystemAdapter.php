@@ -631,7 +631,10 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         $parsed = parse_url($url);
 
-        return $uri->withScheme($parsed['scheme'])->withHost($parsed['host'])->withPort($parsed['port']);
+        return $uri
+            ->withScheme($parsed['scheme'])
+            ->withHost($parsed['host'])
+            ->withPort($parsed['port'] ?? null);
     }
 
     /**
