@@ -47,7 +47,7 @@ class Composer
 
         $command = array_merge($this->findComposer(), ['dump-autoload'], $extra);
 
-        $this->getProcess($command)->run();
+        $this->getProcess($command)->mustRun();
     }
 
     /**
