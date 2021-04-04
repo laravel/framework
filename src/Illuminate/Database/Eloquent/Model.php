@@ -1055,6 +1055,37 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
+     * Insert new records while casting attributes
+     *
+     * @param  array  $values
+     * @return bool
+     */
+    protected function insertWithCasts(array $values)
+    {
+        if (empty($values)) {
+            return true;
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        return $this->insert(
+            collect($values)
+            ->map(function ($attributes) {
+                foreach ($attributes as $key => $value) {
+                    $this->setAttribute($key, $value);
+
+                    $attributes[$key] = $this->attributes[$key];
+                }
+
+                return $attributes;
+            })
+            ->toArray()
+        );
+    }
+
+    /**
      * Destroy the models for the given IDs.
      *
      * @param  \Illuminate\Support\Collection|array|int|string  $ids
@@ -1879,7 +1910,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['increment', 'decrement'])) {
+        if (in_array($method, ['increment', 'decrement', 'insertWithCasts'])) {
             return $this->$method(...$parameters);
         }
 

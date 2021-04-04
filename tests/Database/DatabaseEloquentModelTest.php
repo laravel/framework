@@ -644,6 +644,73 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->exists);
     }
 
+
+    public function testInsertWithCastsWithoutEntries()
+    {
+        $model = $this->getMockBuilder(EloquentModelCastingStub::class)->onlyMethods(['newQuery'])->getMock();
+        $query = m::mock(Builder::class);
+
+        $query->shouldNotReceive('insert');
+
+        $model->expects($this->any())->method('newQuery')->willReturn($query);
+
+        $model->insertWithCasts([]);
+    }
+
+    public function testInsertWithCastsWithSingleEntry()
+    {
+        $model = $this->getMockBuilder(EloquentModelCastingStub::class)->onlyMethods(['newQuery'])->getMock();
+        $query = m::mock(Builder::class);
+
+        $query->shouldReceive('insert')->once()->with([
+            [
+                'intAttribute' => 5,
+                'jsonAttribute' => '{"foo":"bar"}',
+            ]
+        ])
+        ->andReturn(true);
+
+        $model->expects($this->once())->method('newQuery')->willReturn($query);
+
+        $model->insertWithCasts([
+            'intAttribute' => 5,
+            'jsonAttribute' => ['foo' => 'bar'],
+        ]);
+    }
+
+    public function testInsertWithCastsWithMultipleEntries()
+    {
+        $model = $this->getMockBuilder(EloquentModelCastingStub::class)->onlyMethods(['newQuery'])->getMock();
+        $query = m::mock(Builder::class);
+
+        $query->shouldReceive('insert')->once()->with([
+            [
+                'intAttribute' => 5,
+                'jsonAttribute' => '{"foo":"bar"}',
+            ],
+            [
+                'boolAttribute' => '1',
+                'collectionAttribute' => '["foo","bar"]',
+                'datetimeAttribute' => '2017-03-23 22:17:00',
+            ],
+        ])
+        ->andReturn(true);
+
+        $model->expects($this->once())->method('newQuery')->willReturn($query);
+
+        $model->setDateFormat('Y-m-d H:i:s')->insertWithCasts([
+            [
+                'intAttribute' => 5,
+                'jsonAttribute' => ['foo' => 'bar'],
+            ],
+            [
+                'boolAttribute' => true,
+                'collectionAttribute' => collect(['foo', 'bar']),
+                'datetimeAttribute' => '2017-03-23 22:17:00',
+            ],
+        ]);
+    }
+
     public function testDeleteProperlyDeletesModel()
     {
         $model = $this->getMockBuilder(Model::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'touchOwners'])->getMock();
@@ -2540,6 +2607,8 @@ class EloquentModelGetMutatorsStub extends Model
 
 class EloquentModelCastingStub extends Model
 {
+    protected $table = 'stub';
+
     protected $casts = [
         'intAttribute' => 'int',
         'floatAttribute' => 'float',
