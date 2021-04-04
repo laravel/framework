@@ -39,7 +39,7 @@ class Composer
      * Regenerate the Composer autoloader files.
      *
      * @param  string|array  $extra
-     * @return int The process exit status code
+     * @return int
      */
     public function dumpAutoloads($extra = '')
     {
@@ -53,7 +53,7 @@ class Composer
     /**
      * Regenerate the optimized Composer autoloader files.
      *
-     * @return int The process exit status code
+     * @return int
      */
     public function dumpOptimized()
     {
