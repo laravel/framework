@@ -1055,7 +1055,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
-     * Insert new records while casting attributes
+     * Insert new records while casting attributes.
      *
      * @param  array  $values
      * @return bool

@@ -644,7 +644,6 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->exists);
     }
 
-
     public function testInsertWithCastsWithoutEntries()
     {
         $model = $this->getMockBuilder(EloquentModelCastingStub::class)->onlyMethods(['newQuery'])->getMock();
@@ -666,7 +665,7 @@ class DatabaseEloquentModelTest extends TestCase
             [
                 'intAttribute' => 5,
                 'jsonAttribute' => '{"foo":"bar"}',
-            ]
+            ],
         ])
         ->andReturn(true);
 
