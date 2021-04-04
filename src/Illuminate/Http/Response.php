@@ -7,10 +7,10 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use UnexpectedValueException;
 
 class Response extends SymfonyResponse
 {
@@ -42,6 +42,8 @@ class Response extends SymfonyResponse
      *
      * @param  mixed  $content
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function setContent($content)
     {
@@ -56,7 +58,7 @@ class Response extends SymfonyResponse
             $content = $this->morphToJson($content);
 
             if ($content === false) {
-                throw new UnexpectedValueException(sprintf('Unable to convert the provided response data to JSON: %s', json_last_error_msg()));
+                throw new InvalidArgumentException(json_last_error_msg());
             }
         }
 
