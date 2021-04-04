@@ -175,6 +175,8 @@ abstract class Manager
     public function forgetDrivers()
     {
         $this->drivers = [];
+
+        return $this;
     }
 
     /**
