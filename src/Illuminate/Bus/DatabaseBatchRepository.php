@@ -241,8 +241,8 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     public function prune(DateTimeInterface $before)
     {
         $query = $this->connection->table($this->table)
-            ->whereNotNull('finished_at')
-            ->where('finished_at', '<', $before->getTimestamp());
+            ->whereNotNull('created_at')
+            ->where('created_at', '<', $before->getTimestamp());
 
         $totalDeleted = 0;
 
