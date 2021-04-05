@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
@@ -909,6 +910,36 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertSame('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
         $this->assertEquals(['qux', true], $builder->getBindings());
+    }
+
+    /**
+     * @group select
+     */
+    public function testWithCountAndSelectThatGetsRawQuery()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $builder = $model->select('id')->withCount(['foo' => function ($q) {
+            $q->select(new Expression('count(distinct(bar))'));
+        }]);
+
+        $this->assertSame('select "id", (select count(distinct(bar)) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    /**
+     * @group select
+     */
+    public function testWithCountAndSelectRaw()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $builder = $model->select('id')->withCount(['foo' => function ($q) {
+            $q->selectRaw('count(distinct(bar))');
+        }]);
+
+        $this->assertSame('select "id", (select count(distinct(bar)) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithCountAndGlobalScope()
