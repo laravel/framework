@@ -241,7 +241,30 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     public function prune(DateTimeInterface $before)
     {
         $query = $this->connection->table($this->table)
-            ->whereNotNull('created_at')
+            ->whereNotNull('finished_at')
+            ->where('finished_at', '<', $before->getTimestamp());
+
+        $totalDeleted = 0;
+
+        do {
+            $deleted = $query->take(1000)->delete();
+
+            $totalDeleted += $deleted;
+        } while ($deleted !== 0);
+
+        return $totalDeleted;
+    }
+
+    /**
+     * Prune all of the unfinished entries older than the given date.
+     *
+     * @param  \DateTimeInterface  $before
+     * @return int
+     */
+    public function pruneUnfinished(DateTimeInterface $before)
+    {
+        $query = $this->connection->table($this->table)
+            ->whereNull('finished_at')
             ->where('created_at', '<', $before->getTimestamp());
 
         $totalDeleted = 0;
