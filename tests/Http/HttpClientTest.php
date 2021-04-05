@@ -465,6 +465,27 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testExceptionAccessorOnSuccess()
+    {
+        $resp = new Response(new Psr7Response());
+
+        $this->assertNull($resp->toException());
+    }
+
+    public function testExceptionAccessorOnFailure()
+    {
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+        $resp = new Response($response);
+
+        $this->assertInstanceOf(RequestException::class, $resp->toException());
+    }
+
     public function testRequestExceptionSummary()
     {
         $this->expectException(RequestException::class);
