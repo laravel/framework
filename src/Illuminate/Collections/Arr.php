@@ -290,7 +290,7 @@ class Arr
         }
 
         if (is_null($key)) {
-            return $array;
+            return $default ?: $array;
         }
 
         if (static::exists($array, $key)) {
