@@ -17,7 +17,7 @@ class PruneBatchesCommand extends Command
      */
     protected $signature = 'queue:prune-batches
                 {--hours=24 : The number of hours to retain batch data}
-                {--unfinished= : Include unfinished batches }';
+                {--unfinished= : The number of hours to retain unfinished batch data }';
 
     /**
      * The console command description.
