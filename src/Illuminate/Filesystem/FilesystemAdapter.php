@@ -621,7 +621,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * Replace the scheme and host of the given UriInterface with values from the given URL.
+     * Replace the scheme, host and port of the given UriInterface with values from the given URL.
      *
      * @param  \Psr\Http\Message\UriInterface  $uri
      * @param  string  $url
@@ -631,7 +631,10 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         $parsed = parse_url($url);
 
-        return $uri->withScheme($parsed['scheme'])->withHost($parsed['host']);
+        return $uri
+            ->withScheme($parsed['scheme'])
+            ->withHost($parsed['host'])
+            ->withPort($parsed['port'] ?? null);
     }
 
     /**
