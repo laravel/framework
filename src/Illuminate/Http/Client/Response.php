@@ -247,8 +247,6 @@ class Response implements ArrayAccess
         if ($this->failed()) {
             return new RequestException($this);
         }
-
-        return null;
     }
 
     /**
