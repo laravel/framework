@@ -605,7 +605,7 @@ class SupportStringableTest extends TestCase
 
     public function testRepeat()
     {
-        $this->assertSame("aaaaa", (string) $this->stringable("a")->repeat(5));
-        $this->assertSame("", (string) $this->stringable("")->repeat(5));
+        $this->assertSame('aaaaa', (string) $this->stringable("a")->repeat(5));
+        $this->assertSame('', (string) $this->stringable("")->repeat(5));
     }
 }
