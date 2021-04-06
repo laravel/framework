@@ -41,11 +41,13 @@ trait ManagesTransactions
             }
 
             try {
+                if ($this->transactions == 1) {
+                    $this->getPdo()->commit();
+                }
+
                 $this->transactions = max(0, $this->transactions - 1);
 
                 if ($this->transactions == 0) {
-                    $this->getPdo()->commit();
-
                     optional($this->transactionsManager)->commit($this->getName());
                 }
             } catch (Throwable $e) {
@@ -187,11 +189,13 @@ trait ManagesTransactions
     {
         if ($this->transactions == 1) {
             $this->getPdo()->commit();
-
-            optional($this->transactionsManager)->commit($this->getName());
         }
 
         $this->transactions = max(0, $this->transactions - 1);
+
+        if ($this->transactions == 0) {
+            optional($this->transactionsManager)->commit($this->getName());
+        }
 
         $this->fireConnectionEvent('committed');
     }
