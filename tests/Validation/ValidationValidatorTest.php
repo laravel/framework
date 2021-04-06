@@ -614,7 +614,7 @@ class ValidationValidatorTest extends TestCase
                 ]
             ]
         ]);
-        $v = new Validator($trans, ['name' => ''], ['name' => 'between:5,20']);
+        $v = new Validator($trans, ['name' => 'Taylor'], ['name' => 'between:10,20']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('Some custom message here', $v->messages()->first('name'));
