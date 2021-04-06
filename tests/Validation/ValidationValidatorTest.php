@@ -610,9 +610,9 @@ class ValidationValidatorTest extends TestCase
                         'file' => 'The :attribute must be between :min and :max kilobytes.',
                         'string' => 'Some custom message here',
                         'array' => 'The :attribute must have between :min and :max items.',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
         $v = new Validator($trans, ['name' => 'Taylor'], ['name' => 'between:10,20']);
         $this->assertFalse($v->passes());
