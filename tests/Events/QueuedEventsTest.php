@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
