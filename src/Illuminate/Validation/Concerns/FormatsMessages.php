@@ -42,6 +42,7 @@ trait FormatsMessages
             if (in_array($rule, $this->sizeRules)) {
                 return $this->getCustomSizeMessage($attribute, $rule);
             }
+
             return $customMessage;
         }
 
@@ -181,7 +182,7 @@ trait FormatsMessages
 
         return $this->translator->get($key);
     }
-    
+
     /**
      * Get the proper error message for an attribute and size rule when using custom messages.
      *
