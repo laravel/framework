@@ -31,18 +31,16 @@ trait FormatsMessages
 
         $lowerRule = Str::snake($rule);
 
-        $customMessage = $this->getCustomMessageFromTranslator(
-            $customKey = "validation.custom.{$attribute}.{$lowerRule}"
-        );
+        $customKey = in_array($rule, $this->sizeRules)
+            ? "validation.custom.{$attribute}.{$lowerRule}.{$this->getAttributeType($attribute)}"
+            : "validation.custom.{$attribute}.{$lowerRule}";
+
+        $customMessage = $this->getCustomMessageFromTranslator($customKey);
 
         // First we check for a custom defined validation message for the attribute
         // and rule. This allows the developer to specify specific messages for
         // only some attributes and rules that need to get specially formed.
         if ($customMessage !== $customKey) {
-            if (in_array($rule, $this->sizeRules)) {
-                return $this->getCustomSizeMessage($attribute, $rule);
-            }
-
             return $customMessage;
         }
 
@@ -179,27 +177,6 @@ trait FormatsMessages
         $type = $this->getAttributeType($attribute);
 
         $key = "validation.{$lowerRule}.{$type}";
-
-        return $this->translator->get($key);
-    }
-
-    /**
-     * Get the proper error message for an attribute and size rule when using custom messages.
-     *
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @return string
-     */
-    protected function getCustomSizeMessage($attribute, $rule)
-    {
-        $lowerRule = Str::snake($rule);
-
-        // There are three different types of size validations. The attribute may be
-        // either a number, file, or string so we will check a few things to know
-        // which type of value it is and return the correct line for that type.
-        $type = $this->getAttributeType($attribute);
-
-        $key = "validation.custom.{$attribute}.{$lowerRule}.{$type}";
 
         return $this->translator->get($key);
     }
