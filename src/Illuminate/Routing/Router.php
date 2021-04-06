@@ -711,31 +711,31 @@ class Router implements BindingRegistrar, RegistrarContract
 
         $middleware = collect($route->gatherMiddleware())->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
-        })->flatten()->reject(function ($name) use ($excluded) {
-            if (empty($excluded)) {
-                return false;
-            }
+        })->flatten();
 
-            if ($name instanceof Closure) {
-                return false;
-            }
+        if (! empty($excluded)) {
+            $middleware = $middleware->reject(function ($name) use ($excluded) {
+                if ($name instanceof Closure) {
+                    return false;
+                }
 
-            if (in_array($name, $excluded, true)) {
-                return true;
-            }
+                if (in_array($name, $excluded, true)) {
+                    return true;
+                }
 
-            if (! class_exists($name)) {
-                return false;
-            }
+                if (! class_exists($name)) {
+                    return false;
+                }
 
-            $reflection = new ReflectionClass($name);
+                $reflection = new ReflectionClass($name);
 
-            return collect($excluded)->contains(function ($exclude) use ($reflection) {
-                return class_exists($exclude) && $reflection->isSubclassOf($exclude);
+                return collect($excluded)->contains(function ($exclude) use ($reflection) {
+                    return class_exists($exclude) && $reflection->isSubclassOf($exclude);
+                });
             });
-        })->values();
+        }
 
-        return $this->sortMiddleware($middleware);
+        return $this->sortMiddleware($middleware->values());
     }
 
     /**
