@@ -598,6 +598,28 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('really required!', $v->messages()->first('name'));
     }
 
+    public function testCustomValidationLinesForSizeRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'required' => 'required!',
+            'custom' => [
+                'name' => [
+                    'between' => [
+                        'numeric' => 'The :attribute must be between :min and :max.',
+                        'file' => 'The :attribute must be between :min and :max kilobytes.',
+                        'string' => 'Some custom message here',
+                        'array' => 'The :attribute must have between :min and :max items.',
+                    ]
+                ]
+            ]
+        ]);
+        $v = new Validator($trans, ['name' => ''], ['name' => 'between:5,20']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('Some custom message here', $v->messages()->first('name'));
+    }
+
     public function testCustomValidationLinesAreRespectedWithAsterisks()
     {
         $trans = $this->getIlluminateArrayTranslator();
