@@ -1,6 +1,32 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.35.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.36.0...8.x)
+
+
+## [v8.36.0 (2021-04-06)](https://github.com/laravel/framework/compare/v8.35.1...v8.36.0)
+
+### Revert
+- Revert ["[8.x] Allow lazy collection to be instantiated from a generator"](https://github.com/laravel/framework/pull/36738) ([#36844](https://github.com/laravel/framework/pull/36844))
+
+### Added
+- Added support useCurrentOnUpdate for MySQL datetime column types ([#36817](https://github.com/laravel/framework/pull/36817))
+- Added `dispatch_sync()` helper ([#36835](https://github.com/laravel/framework/pull/36835))
+- Allowing skipping TransformRequests middlewares via Closure ([#36856](https://github.com/laravel/framework/pull/36856))
+- Added type option to make controller command ([#36853](https://github.com/laravel/framework/pull/36853))
+- Added missing return $this to `Illuminate\Support\Manager::forgetDrivers()` ([#36859](https://github.com/laravel/framework/pull/36859))
+- Added unfinished option to PruneBatchesCommand ([#36877](https://github.com/laravel/framework/pull/36877))
+- Added a simple Str::repeat() helper function ([#36887](https://github.com/laravel/framework/pull/36887))
+
+### Fixed
+- Fixed getMultiple and increment / decrement on tagged cache ([0d21194](https://github.com/laravel/framework/commit/0d211947da9ad222fa8eb092889bb7d7f5fb1726))
+- Implement proper return types in cache increment and decrement ([#36836](https://github.com/laravel/framework/pull/36836))
+- Fixed blade compiler regex issue ([#36843](https://github.com/laravel/framework/pull/36843), [#36848](https://github.com/laravel/framework/pull/36848))
+- Added missing temporary_url when creating flysystem  ([#36860](https://github.com/laravel/framework/pull/36860))
+- Fixed PostgreSQL schema:dump when read/write hosts are arrays ([#36881](https://github.com/laravel/framework/pull/36881))
+
+### Changed
+- Improve the exception thrown when JSON encoding response contents fails in `Response::setContent()` ([#36851](https://github.com/laravel/framework/pull/36851), [#36868](https://github.com/laravel/framework/pull/36868))
+- Revert isDownForMaintenance function to use file_exists() ([#36889](https://github.com/laravel/framework/pull/36889))
 
 
 ## [v8.35.1 (2021-03-31)](https://github.com/laravel/framework/compare/v8.35.0...v8.35.1)
