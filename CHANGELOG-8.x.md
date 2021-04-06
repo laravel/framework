@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.35.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.35.1...8.x)
+
+
+## [v8.35.1 (2021-03-31)](https://github.com/laravel/framework/compare/v8.35.0...v8.35.1)
+
+### Fixed
+- Fixed setting DynamoDB credentials ([#36822](https://github.com/laravel/framework/pull/36822))
 
 
 ## [v8.35.0 (2021-03-30)](https://github.com/laravel/framework/compare/v8.34.0...v8.35.0)
