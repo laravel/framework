@@ -18,6 +18,7 @@ class RetryCommand extends Command
      */
     protected $signature = 'queue:retry
                             {id?* : The ID of the failed job or "all" to retry all jobs}
+                            {--queue= : Retry all of the failed jobs for the specified queue}
                             {--range=* : Range of job IDs (numeric) to be retried}';
 
     /**
@@ -60,6 +61,19 @@ class RetryCommand extends Command
 
         if (count($ids) === 1 && $ids[0] === 'all') {
             return Arr::pluck($this->laravel['queue.failer']->all(), 'id');
+        }
+
+        if ($queue = $this->option('queue')) {
+            $ids = collect($this->laravel['queue.failer']->all())
+                            ->where('queue', $queue)
+                            ->pluck('id')
+                            ->toArray();
+
+            if (count($ids) === 0) {
+                $this->error("Unable to find failed jobs for queue [{$queue}].");
+            }
+
+            return $ids;
         }
 
         if ($ranges = (array) $this->option('range')) {
