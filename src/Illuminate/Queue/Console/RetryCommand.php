@@ -64,16 +64,7 @@ class RetryCommand extends Command
         }
 
         if ($queue = $this->option('queue')) {
-            $ids = collect($this->laravel['queue.failer']->all())
-                            ->where('queue', $queue)
-                            ->pluck('id')
-                            ->toArray();
-
-            if (count($ids) === 0) {
-                $this->error("Unable to find failed jobs for queue [{$queue}].");
-            }
-
-            return $ids;
+            return $this->getJobIdsByQueue($queue);
         }
 
         if ($ranges = (array) $this->option('range')) {
@@ -81,6 +72,26 @@ class RetryCommand extends Command
         }
 
         return array_values(array_filter(array_unique($ids)));
+    }
+
+    /**
+     * Get the job IDs by queue, if applicable.
+     *
+     * @param  string  $queue
+     * @return array
+     */
+    protected function getJobIdsByQueue($queue)
+    {
+        $ids = collect($this->laravel['queue.failer']->all())
+                        ->where('queue', $queue)
+                        ->pluck('id')
+                        ->toArray();
+
+        if (count($ids) === 0) {
+            $this->error("Unable to find failed jobs for queue [{$queue}].");
+        }
+
+        return $ids;
     }
 
     /**
