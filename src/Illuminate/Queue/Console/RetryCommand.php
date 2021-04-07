@@ -66,7 +66,7 @@ class RetryCommand extends Command
         if ($queue = $this->option('queue')) {
             $ids = collect($this->laravel['queue.failer']->all())->where('queue', $queue)->pluck('id')->toArray();
 
-            if (count($ids)===0) {
+            if (count($ids) === 0) {
                 $this->error("Unable to find failed jobs in a queue named [{$queue}].");
             }
 
