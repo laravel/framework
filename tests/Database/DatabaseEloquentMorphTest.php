@@ -253,37 +253,41 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertEquals($created, $relation->create(['name' => 'taylor']));
     }
 
-    protected function getOneRelation()
+    protected function getOneRelation($id = 1)
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
-        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        if (is_null($id)) {
+            $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
+        }
+        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', $id);
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn($id);
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
         $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
 
         return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }
 
-    protected function getManyRelation()
+    protected function getManyRelation($id = 1)
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
-        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        if (is_null($id)) {
+            $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
+        }
+        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', $id);
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn($id);
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
         $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
 
         return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }
 
-    protected function getNamespacedRelation($alias)
+    protected function getNamespacedRelation($alias, $id = 1)
     {
         require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
 
@@ -292,12 +296,14 @@ class DatabaseEloquentMorphTest extends TestCase
         ]);
 
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
-        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        if (is_null($id)) {
+            $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
+        }
+        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', $id);
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(EloquentModelNamespacedStub::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn($id);
         $parent->shouldReceive('getMorphClass')->andReturn($alias);
         $builder->shouldReceive('where')->once()->with('table.morph_type', $alias);
 

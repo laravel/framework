@@ -67,9 +67,14 @@ abstract class HasOneOrMany extends Relation
     public function addConstraints()
     {
         if (static::$constraints) {
-            $this->query->where($this->foreignKey, '=', $this->getParentKey());
+            $parentKey = $this->getParentKey();
+            $this->query->where($this->foreignKey, '=', $parentKey);
 
-            $this->query->whereNotNull($this->foreignKey);
+            // When $parentKey is null the above line is treated as whereNull($this->foreignKey)
+            // Avoid loading all models with null foreignKey in that situation
+            if (is_null($parentKey)) {
+                $this->query->whereNotNull($this->foreignKey);
+            }
         }
     }
 

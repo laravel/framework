@@ -196,15 +196,17 @@ class DatabaseEloquentHasOneTest extends TestCase
         $relation->getRelationExistenceCountQuery($builder, $builder);
     }
 
-    protected function getRelation()
+    protected function getRelation($id = 1)
     {
         $this->builder = m::mock(Builder::class);
-        $this->builder->shouldReceive('whereNotNull')->with('table.foreign_key');
-        $this->builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        if (is_null($id)) {
+            $this->builder->shouldReceive('whereNotNull')->once()->with('table.foreign_key');
+        }
+        $this->builder->shouldReceive('where')->once()->with('table.foreign_key', '=', $id);
         $this->related = m::mock(Model::class);
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $this->parent = m::mock(Model::class);
-        $this->parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $this->parent->shouldReceive('getAttribute')->with('id')->andReturn($id);
         $this->parent->shouldReceive('getAttribute')->with('username')->andReturn('taylor');
         $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $this->parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');

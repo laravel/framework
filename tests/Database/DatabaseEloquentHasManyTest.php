@@ -252,15 +252,17 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($colin, $instances[1]);
     }
 
-    protected function getRelation()
+    protected function getRelation($id = 1)
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
-        $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        if (is_null($id)) {
+            $builder->shouldReceive('whereNotNull')->once()->with('table.foreign_key');
+        }
+        $builder->shouldReceive('where')->once()->with('table.foreign_key', '=', $id);
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn($id);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
 
