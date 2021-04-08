@@ -3807,11 +3807,32 @@ SQL;
         $this->assertEquals([], $clone->getBindings());
     }
 
-    public function testToSqlWithBindingsMethod()
+    public function testToSqlWithBindingsMethodUsingMysqlBuilder()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('name', 'like', '%Taylor%');
         $this->assertSame("select * from `users` where `name` like '%Taylor%'", $builder->toSqlWithBindings());
+    }
+
+    public function testToSqlWithBindingsMethodUsingPostgresBuilder()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('name', 'like', '%Taylor%');
+        $this->assertSame("select * from \"users\" where \"name\"::text like '%Taylor%'", $builder->toSqlWithBindings());
+    }
+
+    public function testToSqlWithBindingsMethodUsingSQLiteBuilder()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('name', 'like', '%Taylor%');
+        $this->assertSame("select * from \"users\" where \"name\" like '%Taylor%'", $builder->toSqlWithBindings());
+    }
+
+    public function testToSqlWithBindingsMethodUsingSqlServerBuilder()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('name', 'like', '%Taylor%');
+        $this->assertSame("select * from [users] where [name] like '%Taylor%'", $builder->toSqlWithBindings());
     }
 
     protected function getConnection()
