@@ -196,7 +196,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
         if ($value) {
             return Arr::get($this->validator->validated(), $value);
         }
-        
+
         return $this->validator->validated();
     }
 
