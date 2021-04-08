@@ -2951,6 +2951,27 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testContainsAll($collection)
+    {
+        $c = new $collection([1, 3, 5]);
+
+        $this->assertTrue($c->containsAll([1, 3]));
+        $this->assertTrue($c->containsAll([1, 5]));
+        $this->assertFalse($c->containsAll([1, 2]));
+        $this->assertFalse($c->containsAll([1, 3, 5, 7]));
+
+        $this->assertTrue($c->containsAll(collect([1, 3])));
+        $this->assertTrue($c->containsAll(collect([1, 5])));
+        $this->assertFalse($c->containsAll(collect([1, 2])));
+        $this->assertFalse($c->containsAll(collect([1, 3, 5, 7])));
+
+        $this->assertTrue($c->containsAll([]));
+        $this->assertTrue($c->containsAll(collect([])));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSome($collection)
     {
         $c = new $collection([1, 3, 5]);
