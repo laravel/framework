@@ -2265,6 +2265,26 @@ class Builder
     }
 
     /**
+     * Get the SQL representation of the query replacing all bindings.
+     *
+     * @return string
+     */
+    public function toSqlWithBindings()
+    {
+        return Str::replaceArray(
+            '?',
+            collect($this->getBindings())
+                ->map(function($i) {
+                    if (is_object($i)) {
+                        $i = (string) $i;
+                    }
+                    return (is_string($i)) ? "'{$i}'" : $i;
+                })->all(),
+            $this->toSql()
+        );
+    }
+
+    /**
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id

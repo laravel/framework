@@ -3807,6 +3807,13 @@ SQL;
         $this->assertEquals([], $clone->getBindings());
     }
 
+    public function testToSqlWithBindingsMethod()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('name', 'like', '%Taylor%');
+        $this->assertSame("select * from `users` where `name` like '%Taylor%'", $builder->toSqlWithBindings());
+    }
+
     protected function getConnection()
     {
         $connection = m::mock(ConnectionInterface::class);
