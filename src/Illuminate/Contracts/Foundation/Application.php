@@ -69,6 +69,13 @@ interface Application extends Container
     public function environment(...$environments);
 
     /**
+     * Determine if the application is running in Laravel Octane.
+     *
+     * @return bool
+     */
+    public function runningInOctane();
+
+    /**
      * Determine if the application is running in the console.
      *
      * @return bool

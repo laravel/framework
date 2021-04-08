@@ -141,6 +141,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $environmentFile = '.env';
 
     /**
+     * Indicates if the application is running in Laravel Octane.
+     *
+     * @var bool|null
+     */
+    protected $isRunningInOctane;
+
+    /**
      * Indicates if the application is running in the console.
      *
      * @var bool|null
@@ -605,6 +612,20 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $args = $_SERVER['argv'] ?? null;
 
         return $this['env'] = (new EnvironmentDetector)->detect($callback, $args);
+    }
+
+    /**
+     * Determine if the application is running in Laravel Octane.
+     *
+     * @return bool
+     */
+    public function runningInOctane()
+    {
+        if ($this->isRunningInOctane === null) {
+            $this->isRunningInOctane = isset($_SERVER['LARAVEL_OCTANE']);
+        }
+
+        return $this->isRunningInOctane;
     }
 
     /**
