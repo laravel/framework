@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -190,8 +191,12 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @return array
      */
-    public function validated()
+    public function validated(?string $value)
     {
+        if ($value) {
+            return Arr::get($this->validator->validated(), $value);
+        }
+        
         return $this->validator->validated();
     }
 
