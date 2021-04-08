@@ -189,6 +189,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get the validated data from the request.
      *
+     * @param string|null $value
      * @return array
      */
     public function validated(?string $value)
