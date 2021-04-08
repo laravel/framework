@@ -194,6 +194,35 @@ trait EnumeratesValues
     }
 
     /**
+     * Determine if all items exists in the collection.
+     *
+     * @param mixed $values
+     * @param bool $strict
+     * @return bool
+     */
+    public function containsAll($values, $strict = false)
+    {
+        $values = $this->getArrayableItems($values);
+
+        if (empty($values)) {
+            return true;
+        }
+
+        foreach ($this as $item) {
+            $index = array_search($item, $values, $strict);
+            if ($index === false) {
+                continue;
+            }
+            if (count($values) === 1) {
+                return true;
+            }
+            unset($values[$index]);
+        }
+
+        return false;
+    }
+
+    /**
      * Dump the items and end the script.
      *
      * @param  mixed  ...$args

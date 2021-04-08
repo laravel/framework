@@ -155,6 +155,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testContainsAllIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->containsAll([1, 2, 3, 4, 5]);
+        });
+    }
+
     public function testCountEnumeratesOnce()
     {
         $this->assertEnumeratesOnce(function ($collection) {
