@@ -192,7 +192,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @param string|null $value
      * @return array
      */
-    public function validated(?string $value)
+    public function validated(?string $value = null)
     {
         if ($value) {
             return Arr::get($this->validator->validated(), $value);
