@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Cache;
 trait CachesComponents
 {
     /**
-     * The attributes that can be passed to the component to control the
-     * caching behavior.
+     * The cache controlling attributes for this component.
+     *
      * @return array
      */
     protected function cacheAttributes()
@@ -47,7 +47,7 @@ trait CachesComponents
     /**
      * The key used to cache the component.
      *
-     * @param array $slots
+     * @param  array  $slots
      * @return bool
      */
     protected function cacheKey(array $slots)
@@ -68,9 +68,10 @@ trait CachesComponents
     /**
      * Render the resolved component view so that it can be cached.
      *
-     * @param \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string $view
-     * @param array $data
+     * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string $view
+     * @param  array  $data
      * @return string
+     *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function renderResolvedView($view, $data)
@@ -94,9 +95,9 @@ trait CachesComponents
      * Cache the resolved component view and return a Htmlable class that will
      * return the cached result.
      *
-     * @param \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string $view
-     * @param array $data
-     * @return Htmlable
+     * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string  $view
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
     protected function cacheResolvedView($view, $data)
     {
