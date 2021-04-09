@@ -715,8 +715,8 @@ abstract class Factory
         $resolver = static::$factoryNameResolver ?: function (string $modelName) {
             $appNamespace = static::appNamespace();
 
-            $modelName = Str::startsWith($modelName, $appNamespace . 'Models\\')
-                ? Str::after($modelName, $appNamespace . 'Models\\')
+            $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')
+                ? Str::after($modelName, $appNamespace.'Models\\')
                 : Str::afterLast($modelName, '\\');
 
             return static::$namespace.$modelName.'Factory';
