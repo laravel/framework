@@ -5,14 +5,19 @@ namespace Illuminate\View;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\View\Concerns\CachesComponents;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 
 abstract class Component
 {
+    use CachesComponents;
+
     /**
      * The cache of public property names, keyed by class.
      *
@@ -65,25 +70,31 @@ abstract class Component
         $view = $this->render();
 
         if ($view instanceof ViewContract) {
-            return $view;
+            $resolvedView = $view;
+        } elseif ($view instanceof Htmlable) {
+            $resolvedView = $view;
+        } else {
+            $resolver = function ($view) {
+                $factory = Container::getInstance()->make('view');
+
+                return $factory->exists($view)
+                    ? $view
+                    : $this->createBladeViewFromString($factory, $view);
+            };
+
+            $resolvedView = $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
+                return $resolver($view($data));
+            }
+                : $resolver($view);
         }
 
-        if ($view instanceof Htmlable) {
-            return $view;
+        if ($this->canBeCached()) {
+            return function($data) use ($resolvedView) {
+                return $this->cacheResolvedView($resolvedView, $data);
+            };
         }
 
-        $resolver = function ($view) {
-            $factory = Container::getInstance()->make('view');
-
-            return $factory->exists($view)
-                        ? $view
-                        : $this->createBladeViewFromString($factory, $view);
-        };
-
-        return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
-            return $resolver($view($data));
-        }
-        : $resolver($view);
+        return $resolvedView;
     }
 
     /**

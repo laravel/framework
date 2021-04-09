@@ -2,7 +2,9 @@
 
 namespace Illuminate\View;
 
-class AnonymousComponent extends Component
+use Illuminate\Contracts\View\CanBeCached;
+
+class AnonymousComponent extends Component implements CanBeCached
 {
     /**
      * The component view.

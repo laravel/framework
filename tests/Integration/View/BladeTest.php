@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\View;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
@@ -15,6 +16,67 @@ class BladeTest extends TestCase
         $view = View::make('hello', ['name' => 'Taylor'])->render();
 
         $this->assertSame('Hello Taylor', trim($view));
+    }
+
+    public function test_caching_a_component()
+    {
+        $view = View::make('uses-panel-cached', ['name' => 'Taylor'])->render();
+
+        $this->assertSame('<div class="ml-2">
+    Hello Taylor
+</div>', trim($view));
+
+        $view = View::make('uses-panel-cached', ['name' => 'Marcel'])->render();
+
+        $this->assertSame('<div class="ml-2">
+    Hello Taylor
+</div>', trim($view));
+    }
+
+    public function test_caching_a_component_with_custom_cache_ttl()
+    {
+        $view = View::make('uses-panel-cached', ['name' => 'Taylor', 'ttl' => 10])->render();
+
+        $this->assertSame('<div class="ml-2">
+    Hello Taylor
+</div>', trim($view));
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(9));
+
+        $view = View::make('uses-panel-cached', ['name' => 'Marcel'])->render();
+
+        $this->assertSame('<div class="ml-2">
+    Hello Taylor
+</div>', trim($view));
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(10));
+
+        $view = View::make('uses-panel-cached', ['name' => 'Marcel'])->render();
+
+        $this->assertSame('<div class="ml-2">
+    Hello Marcel
+</div>', trim($view));
+    }
+
+    public function test_caching_a_component_with_custom_cache_keys()
+    {
+        $view = View::make('uses-panel-cached', ['name' => 'Taylor', 'cacheKey' => 'cache-key'])->render();
+
+        $this->assertSame('<div class="ml-2">
+    Hello Taylor
+</div>', trim($view));
+
+        $view = View::make('uses-panel-cached', ['name' => 'Marcel', 'cacheKey' => 'cache-key'])->render();
+
+        $this->assertSame('<div class="ml-2">
+    Hello Taylor
+</div>', trim($view));
+
+        $view = View::make('uses-panel-cached', ['name' => 'Marcel', 'cacheKey' => 'cache-key-2'])->render();
+
+        $this->assertSame('<div class="ml-2">
+    Hello Marcel
+</div>', trim($view));
     }
 
     public function test_rendering_a_component()
