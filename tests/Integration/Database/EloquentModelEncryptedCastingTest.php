@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Schema;
+use stdClass;
 
 /**
  * @group integration
@@ -98,9 +99,39 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         ]);
     }
 
+    public function testJsonAttributeIsCastable()
+    {
+        $this->encrypter->expects('encrypt')
+            ->with('{"key1":"value1"}', false)
+            ->andReturn('encrypted-secret-json-string');
+        $this->encrypter->expects('decrypt')
+            ->with('encrypted-secret-json-string', false)
+            ->andReturn('{"key1":"value1"}');
+        $this->encrypter->expects('encrypt')
+            ->with('{"key1":"value1","key2":"value2"}', false)
+            ->andReturn('encrypted-secret-json-string2');
+        $this->encrypter->expects('decrypt')
+            ->with('encrypted-secret-json-string2', false)
+            ->andReturn('{"key1":"value1","key2":"value2"}');
+
+        $subject = new EncryptedCast([
+            'secret_json' => ['key1' => 'value1'],
+        ]);
+        $subject->fill([
+            'secret_json->key2' => 'value2',
+        ]);
+        $subject->save();
+
+        $this->assertSame(['key1' => 'value1', 'key2' => 'value2'], $subject->secret_json);
+        $this->assertDatabaseHas('encrypted_casts', [
+            'id' => $subject->id,
+            'secret_json' => 'encrypted-secret-json-string2',
+        ]);
+    }
+
     public function testObjectIsCastable()
     {
-        $object = new \stdClass();
+        $object = new stdClass;
         $object->key1 = 'value1';
 
         $this->encrypter->expects('encrypt')
@@ -116,7 +147,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             'secret_object' => $object,
         ]);
 
-        $this->assertInstanceOf(\stdClass::class, $object->secret_object);
+        $this->assertInstanceOf(stdClass::class, $object->secret_object);
         $this->assertSame('value1', $object->secret_object->key1);
         $this->assertDatabaseHas('encrypted_casts', [
             'id' => $object->id,

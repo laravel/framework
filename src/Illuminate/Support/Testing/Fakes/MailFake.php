@@ -276,7 +276,7 @@ class MailFake implements Factory, Mailer, MailQueue
      * Get a mailer instance by name.
      *
      * @param  string|null  $name
-     * @return \Illuminate\Mail\Mailer
+     * @return \Illuminate\Contracts\Mail\Mailer
      */
     public function mailer($name = null)
     {
@@ -322,7 +322,7 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Send a new message using a view.
      *
-     * @param  string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return void

@@ -76,6 +76,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new RuntimeException('Exception message'));
     }
 
+    public function testHandlerCallsContextMethodIfPresent()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::subset(['foo' => 'bar'])])->once();
+
+        $this->handler->report(new ContextProvidingException('Exception message'));
+    }
+
     public function testHandlerReportsExceptionWhenUnReportable()
     {
         $logger = m::mock(LoggerInterface::class);
@@ -96,6 +105,20 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger->shouldNotReceive('error');
 
         $this->handler->report(new ReportableException('Exception message'));
+    }
+
+    public function testHandlerReportsExceptionUsingCallableClass()
+    {
+        $reporter = m::mock(ReportingService::class);
+        $reporter->shouldReceive('send')->withArgs(['Exception message'])->once();
+
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $this->handler->reportable(new CustomReporter($reporter));
+
+        $this->handler->report(new CustomException('Exception message'));
     }
 
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
@@ -123,6 +146,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $response = $this->handler->render($this->request, new CustomException)->getContent();
 
         $this->assertSame('{"response":"My custom exception response"}', $response);
+    }
+
+    public function testReturnsCustomResponseFromCallableClass()
+    {
+        $this->handler->renderable(new CustomRenderer);
+
+        $response = $this->handler->render($this->request, new CustomException)->getContent();
+
+        $this->assertSame('{"response":"The CustomRenderer response"}', $response);
     }
 
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
@@ -242,7 +274,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
         $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
 
-        $response = $this->handler->render($this->request, new RecordsNotFoundException());
+        $response = $this->handler->render($this->request, new RecordsNotFoundException);
 
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertStringContainsString('"message": "Not found."', $response->getContent());
@@ -251,7 +283,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->container->instance(LoggerInterface::class, $logger);
         $logger->shouldNotReceive('error');
 
-        $this->handler->report(new RecordsNotFoundException());
+        $this->handler->report(new RecordsNotFoundException);
     }
 }
 
@@ -280,6 +312,41 @@ class UnReportableException extends Exception
     public function report()
     {
         return false;
+    }
+}
+
+class ContextProvidingException extends Exception
+{
+    public function context()
+    {
+        return [
+            'foo' => 'bar',
+        ];
+    }
+}
+
+class CustomReporter
+{
+    private $service;
+
+    public function __construct(ReportingService $service)
+    {
+        $this->service = $service;
+    }
+
+    public function __invoke(CustomException $e)
+    {
+        $this->service->send($e->getMessage());
+
+        return false;
+    }
+}
+
+class CustomRenderer
+{
+    public function __invoke(CustomException $e, $request)
+    {
+        return response()->json(['response' => 'The CustomRenderer response']);
     }
 }
 

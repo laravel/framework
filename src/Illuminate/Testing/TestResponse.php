@@ -14,6 +14,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
+use Illuminate\Testing\Fluent\AssertableJson;
 use LogicException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -234,7 +235,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Asserts that the response does not contains the given header.
+     * Asserts that the response does not contain the given header.
      *
      * @param  string  $headerName
      * @return $this
@@ -358,7 +359,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Asserts that the response does not contains the given cookie.
+     * Asserts that the response does not contain the given cookie.
      *
      * @param  string  $cookieName
      * @return $this
@@ -507,13 +508,25 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response is a superset of the given JSON.
      *
-     * @param  array  $data
+     * @param  array|callable  $value
      * @param  bool  $strict
      * @return $this
      */
-    public function assertJson(array $data, $strict = false)
+    public function assertJson($value, $strict = false)
     {
-        $this->decodeResponseJson()->assertSubset($data, $strict);
+        $json = $this->decodeResponseJson();
+
+        if (is_array($value)) {
+            $json->assertSubset($value, $strict);
+        } else {
+            $assert = AssertableJson::fromAssertableJsonString($json);
+
+            $value($assert);
+
+            if (Arr::isAssoc($assert->toArray())) {
+                $assert->interacted();
+            }
+        }
 
         return $this;
     }
@@ -692,13 +705,13 @@ class TestResponse implements ArrayAccess
 
         $json = $this->json();
 
-        if (! array_key_exists($responseKey, $json)) {
-            PHPUnit::assertArrayNotHasKey($responseKey, $json);
+        if (! Arr::has($json, $responseKey)) {
+            PHPUnit::assertTrue(true);
 
             return $this;
         }
 
-        $errors = $json[$responseKey];
+        $errors = Arr::get($json, $responseKey, []);
 
         if (is_null($keys) && count($errors) > 0) {
             PHPUnit::fail(

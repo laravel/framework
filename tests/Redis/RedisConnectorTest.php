@@ -41,7 +41,7 @@ class RedisConnectorTest extends TestCase
         $phpRedisClient = $this->redis['phpredis']->connection()->client();
         $this->assertEquals($host, $phpRedisClient->getHost());
         $this->assertEquals($port, $phpRedisClient->getPort());
-        $this->assertEquals('default', $phpRedisClient->client('GETNAME'));
+        $this->assertSame('default', $phpRedisClient->client('GETNAME'));
     }
 
     public function testUrl()
@@ -160,5 +160,28 @@ class RedisConnectorTest extends TestCase
         $phpRedisClient = $phpRedis->connection()->client();
         $this->assertSame("tcp://{$host}", $phpRedisClient->getHost());
         $this->assertEquals($port, $phpRedisClient->getPort());
+    }
+
+    public function testPredisConfigurationWithUsername()
+    {
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
+        $username = 'testuser';
+        $password = 'testpw';
+
+        $predis = new RedisManager(new Application, 'predis', [
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'username' => $username,
+                'password' => $password,
+                'database' => 5,
+                'timeout' => 0.5,
+            ],
+        ]);
+        $predisClient = $predis->connection()->client();
+        $parameters = $predisClient->getConnection()->getParameters();
+        $this->assertEquals($username, $parameters->username);
+        $this->assertEquals($password, $parameters->password);
     }
 }

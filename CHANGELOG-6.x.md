@@ -1,6 +1,90 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.10...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.22...6.x)
+
+
+## [v6.20.22 (2021-03-31)](https://github.com/laravel/framework/compare/v6.20.21...v6.20.22)
+
+### Fixed
+- Fixed setting DynamoDB credentials ([#36822](https://github.com/laravel/framework/pull/36822))
+
+
+## [v6.20.21 (2021-03-30)](https://github.com/laravel/framework/compare/v6.20.20...v6.20.21)
+
+### Added
+- Added support of DynamoDB in CI suite ([#36749](https://github.com/laravel/framework/pull/36749))
+- Support username parameter for predis ([#36762](https://github.com/laravel/framework/pull/36762))
+
+### Changed
+- Use qualified column names in pivot query ([#36720](https://github.com/laravel/framework/pull/36720))
+
+
+## [v6.20.20 (2021-03-23)](https://github.com/laravel/framework/compare/v6.20.19...v6.20.20)
+
+### Added
+- Added WSREP communication link failure for lost connection detection ([#36668](https://github.com/laravel/framework/pull/36668))
+
+### Fixed
+- Fixes the issue using cache:clear with PhpRedis and a clustered Redis instance. ([#36665](https://github.com/laravel/framework/pull/36665))
+
+
+## [v6.20.19 (2021-03-16)](https://github.com/laravel/framework/compare/v6.20.18...v6.20.19)
+
+### Added
+- Added broken pipe exception as lost connection error ([#36601](https://github.com/laravel/framework/pull/36601))
+
+
+## [v6.20.18 (2021-03-09)](https://github.com/laravel/framework/compare/v6.20.17...v6.20.18)
+
+### Fixed
+- Fix validator treating null as true for (required|exclude)_(if|unless) due to loose `in_array()` check ([#36504](https://github.com/laravel/framework/pull/36504))
+
+### Changed
+- Delete existing links that are broken in `Illuminate\Foundation\Console\StorageLinkCommand` ([#36470](https://github.com/laravel/framework/pull/36470))
+
+
+## [v6.20.17 (2021-03-02)](https://github.com/laravel/framework/compare/v6.20.16...v6.20.17)
+
+### Added
+- Added new line to `DetectsLostConnections` ([#36373](https://github.com/laravel/framework/pull/36373))
+
+
+## [v6.20.16 (2021-02-02)](https://github.com/laravel/framework/compare/v6.20.15...v6.20.16)
+
+### Fixed
+- Fixed `Illuminate\View\ViewException::report()` ([#36110](https://github.com/laravel/framework/pull/36110))
+- Fixed `Illuminate\Redis\Connections\PhpRedisConnection::spop()` ([#36106](https://github.com/laravel/framework/pull/36106))
+
+### Changed
+- Typecast page number as integer in `Illuminate\Pagination\AbstractPaginator::resolveCurrentPage()` ([#36055](https://github.com/laravel/framework/pull/36055))
+
+
+## [v6.20.15 (2021-01-26)](https://github.com/laravel/framework/compare/v6.20.14...v6.20.15)
+
+### Changed
+- Pipe new through render and report exception methods ([#36037](https://github.com/laravel/framework/pull/36037))
+
+
+## [v6.20.14 (2021-01-21)](https://github.com/laravel/framework/compare/v6.20.13...v6.20.14)
+
+### Fixed
+- Fixed type error in `Illuminate\Http\Concerns\InteractsWithContentTypes::isJson()` ([#35956](https://github.com/laravel/framework/pull/35956))
+- Limit expected bindings ([#35972](https://github.com/laravel/framework/pull/35972), [006873d](https://github.com/laravel/framework/commit/006873df411d28bfd03fea5e7f91a2afe3918498))
+
+
+## [v6.20.13 (2021-01-19)](https://github.com/laravel/framework/compare/v6.20.12...v6.20.13)
+
+### Fixed
+- Fixed empty html mail ([#35941](https://github.com/laravel/framework/pull/35941))
+
+
+## [v6.20.12 (2021-01-13)](https://github.com/laravel/framework/compare/v6.20.11...v6.20.12)
+
+
+## [v6.20.11 (2021-01-13)](https://github.com/laravel/framework/compare/v6.20.10...v6.20.11)
+
+### Fixed
+- Limit expected bindings ([#35865](https://github.com/laravel/framework/pull/35865))
 
 
 ## [v6.20.10 (2021-01-12)](https://github.com/laravel/framework/compare/v6.20.9...v6.20.10)
@@ -214,6 +298,8 @@
 
 ### Changed
 - Improve cookie encryption ([#33662](https://github.com/laravel/framework/pull/33662))
+
+This change will invalidate all existing cookies. Please see [this security bulletin](https://blog.laravel.com/laravel-cookie-security-releases) for more information.
 
 
 ## [v6.18.26 (2020-07-21)](https://github.com/laravel/framework/compare/v6.18.25...v6.18.26)

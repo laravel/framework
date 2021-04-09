@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -126,9 +127,39 @@ class EloquentWhereTest extends DatabaseTestCase
 
     public function testSoleFailsIfNoRecords()
     {
-        $this->expectException(ModelNotFoundException::class);
+        try {
+            UserWhereTest::where('name', 'test-name')->sole();
+        } catch (ModelNotFoundException $exception) {
+            //
+        }
 
-        UserWhereTest::where('name', 'test-name')->sole();
+        $this->assertSame(UserWhereTest::class, $exception->getModel());
+    }
+
+    public function testChunkMap()
+    {
+        UserWhereTest::create([
+            'name' => 'first-name',
+            'email' => 'first-email',
+            'address' => 'first-address',
+        ]);
+
+        UserWhereTest::create([
+            'name' => 'second-name',
+            'email' => 'second-email',
+            'address' => 'second-address',
+        ]);
+
+        DB::enableQueryLog();
+
+        $results = UserWhereTest::orderBy('id')->chunkMap(function ($user) {
+            return $user->name;
+        }, 1);
+
+        $this->assertCount(2, $results);
+        $this->assertSame('first-name', $results[0]);
+        $this->assertSame('second-name', $results[1]);
+        $this->assertCount(3, DB::getQueryLog());
     }
 }
 

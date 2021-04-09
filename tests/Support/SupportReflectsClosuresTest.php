@@ -12,7 +12,7 @@ class SupportReflectsClosuresTest extends TestCase
     {
         $this->assertParameterTypes([ExampleParameter::class], function (ExampleParameter $one) {
             // assert the Closure isn't actually executed
-            throw new RuntimeException();
+            throw new RuntimeException;
         });
 
         $this->assertParameterTypes([], function () {

@@ -170,7 +170,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function send($mailer)
     {
-        return $this->withLocale($this->locale, function () use ($mailer) {
+        $this->withLocale($this->locale, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
 
             $mailer = $mailer instanceof MailFactory

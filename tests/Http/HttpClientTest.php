@@ -7,9 +7,13 @@ use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Http\Client\ResponseSequence;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\VarDumper;
 
 class HttpClientTest extends TestCase
 {
@@ -52,6 +56,21 @@ class HttpClientTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $response['result']);
         $this->assertIsObject($response->object());
         $this->assertSame('bar', $response->object()->result->foo);
+    }
+
+    public function testResponseCanBeReturnedAsCollection()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertInstanceOf(Collection::class, $response->collect());
+        $this->assertEquals(collect(['result' => ['foo' => 'bar']]), $response->collect());
+        $this->assertEquals(collect(['foo' => 'bar']), $response->collect('result'));
+        $this->assertEquals(collect(['bar']), $response->collect('result.foo'));
+        $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
     public function testUrlsCanBeStubbedByPath()
@@ -446,6 +465,27 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testExceptionAccessorOnSuccess()
+    {
+        $resp = new Response(new Psr7Response());
+
+        $this->assertNull($resp->toException());
+    }
+
+    public function testExceptionAccessorOnFailure()
+    {
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+        $resp = new Response($response);
+
+        $this->assertInstanceOf(RequestException::class, $resp->toException());
+    }
+
     public function testRequestExceptionSummary()
     {
         $this->expectException(RequestException::class);
@@ -642,7 +682,7 @@ class HttpClientTest extends TestCase
         $this->factory->get($exampleUrls[2]);
         $this->factory->get($exampleUrls[1]);
 
-        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($exampleUrls);
     }
@@ -660,7 +700,7 @@ class HttpClientTest extends TestCase
         $this->factory->get($exampleUrls[0]);
         $this->factory->get($exampleUrls[1]);
 
-        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($exampleUrls);
     }
@@ -671,13 +711,13 @@ class HttpClientTest extends TestCase
 
         $exampleUrls = [
             function ($request) {
-                return $request->url() == 'http://example.com/1';
+                return $request->url() === 'http://example.com/1';
             },
             function ($request) {
-                return $request->url() == 'http://example.com/2';
+                return $request->url() === 'http://example.com/2';
             },
             function ($request) {
-                return $request->url() == 'http://example.com/3';
+                return $request->url() === 'http://example.com/3';
             },
         ];
 
@@ -761,8 +801,36 @@ class HttpClientTest extends TestCase
             'name' => 'Taylor',
         ]);
 
-        $this->expectException(\PHPUnit\Framework\AssertionFailedError::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->factory->assertSentInOrder($executionOrder);
+    }
+
+    public function testCanDump()
+    {
+        $dumped = [];
+
+        VarDumper::setHandler(function ($value) use (&$dumped) {
+            $dumped[] = $value;
+        });
+
+        $this->factory->fake()->dump(1, 2, 3)->withOptions(['delay' => 1000])->get('http://foo.com');
+
+        $this->assertSame(1, $dumped[0]);
+        $this->assertSame(2, $dumped[1]);
+        $this->assertSame(3, $dumped[2]);
+        $this->assertInstanceOf(Request::class, $dumped[3]);
+        $this->assertSame(1000, $dumped[4]['delay']);
+
+        VarDumper::setHandler(null);
+    }
+
+    public function testResponseSequenceIsMacroable()
+    {
+        ResponseSequence::macro('customMethod', function () {
+            return 'yes!';
+        });
+
+        $this->assertSame('yes!', $this->factory->fakeSequence()->customMethod());
     }
 }

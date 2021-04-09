@@ -69,6 +69,13 @@ class BladeTest extends TestCase
 </div>', trim($view));
     }
 
+    public function tested_nested_anonymous_attribute_proxying_works_correctly()
+    {
+        $view = View::make('uses-child-input')->render();
+
+        $this->assertSame('<input class="disabled-class" foo="bar" type="text" disabled />', trim($view));
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);

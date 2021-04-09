@@ -2,14 +2,15 @@
 
 namespace Illuminate\Tests\Database;
 
+use Faker\Generator;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Foundation\Application;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +19,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     protected function setUp(): void
     {
         $container = Container::getInstance();
-        $container->singleton(\Faker\Generator::class, function ($app, $parameters) {
+        $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
         $container->instance(Application::class, $app = Mockery::mock(Application::class));
@@ -199,8 +200,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame($user, $_SERVER['__test.user.making']);
         $this->assertSame($user, $_SERVER['__test.user.creating']);
 
-        unset($_SERVER['__test.user.making']);
-        unset($_SERVER['__test.user.creating']);
+        unset($_SERVER['__test.user.making'], $_SERVER['__test.user.creating']);
     }
 
     public function test_has_many_relationship()
@@ -231,9 +231,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.creating-user']);
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.post.state-user']);
 
-        unset($_SERVER['__test.post.creating-post']);
-        unset($_SERVER['__test.post.creating-user']);
-        unset($_SERVER['__test.post.state-user']);
+        unset($_SERVER['__test.post.creating-post'], $_SERVER['__test.post.creating-user'], $_SERVER['__test.post.state-user']);
     }
 
     public function test_belongs_to_relationship()
@@ -243,7 +241,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->create();
 
         $this->assertCount(3, $posts->filter(function ($post) {
-            return $post->user->name == 'Taylor Otwell';
+            return $post->user->name === 'Taylor Otwell';
         }));
 
         $this->assertCount(1, FactoryTestUser::all());
@@ -331,8 +329,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-role']);
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-user']);
 
-        unset($_SERVER['__test.role.creating-role']);
-        unset($_SERVER['__test.role.creating-user']);
+        unset($_SERVER['__test.role.creating-role'], $_SERVER['__test.role.creating-user']);
     }
 
     public function test_belongs_to_many_relationship_with_existing_model_instances()
@@ -403,11 +400,11 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(4, $user->roles);
 
         $this->assertCount(2, $user->roles->filter(function ($role) {
-            return $role->pivot->admin == 'Y';
+            return $role->pivot->admin === 'Y';
         }));
 
         $this->assertCount(2, $user->roles->filter(function ($role) {
-            return $role->pivot->admin == 'N';
+            return $role->pivot->admin === 'N';
         }));
     }
 
@@ -489,6 +486,16 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(FactoryTestUser::class, $post->author);
         $this->assertSame('Taylor Otwell', $post->author->name);
         $this->assertCount(2, $post->comments);
+    }
+
+    public function test_can_be_macroable()
+    {
+        $factory = FactoryTestUserFactory::new();
+        $factory->macro('getFoo', function () {
+            return 'Hello World';
+        });
+
+        $this->assertSame('Hello World', $factory->getFoo());
     }
 
     /**

@@ -175,7 +175,7 @@ trait ManagesLayouts
     }
 
     /**
-     * Check if section exists.
+     * Check if the section exists.
      *
      * @param  string  $name
      * @return bool

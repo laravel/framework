@@ -99,7 +99,7 @@ class RateLimited
     }
 
     /**
-     * Do not release the job back to the queue if limit is exceeded.
+     * Do not release the job back to the queue if the limit is exceeded.
      *
      * @return $this
      */
@@ -126,25 +126,21 @@ class RateLimited
      *
      * @return array
      */
-    public function __serialize()
+    public function __sleep()
     {
         return [
-            'limiterName' => $this->limiterName,
-            'shouldRelease' => $this->shouldRelease,
+            'limiterName',
+            'shouldRelease',
         ];
     }
 
     /**
      * Prepare the object after unserialization.
      *
-     * @param  array  $data
      * @return void
      */
-    public function __unserialize(array $data)
+    public function __wakeup()
     {
         $this->limiter = Container::getInstance()->make(RateLimiter::class);
-
-        $this->limiterName = $data['limiterName'];
-        $this->shouldRelease = $data['shouldRelease'];
     }
 }

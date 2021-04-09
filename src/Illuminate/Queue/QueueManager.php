@@ -247,6 +247,33 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Get the application instance used by the manager.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    public function getApplication()
+    {
+        return $this->app;
+    }
+
+    /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
+
+        foreach ($this->connections as $connection) {
+            $connection->setContainer($app);
+        }
+
+        return $this;
+    }
+
+    /**
      * Dynamically pass calls to the default connection.
      *
      * @param  string  $method

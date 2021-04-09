@@ -203,12 +203,12 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function testMailIsSentToMultipleAdresses()
+    public function testMailIsSentToMultipleAddresses()
     {
         $notification = new TestMailNotificationWithSubject;
         $notification->id = Str::uuid()->toString();
 
-        $user = NotifiableUserWithMultipleAddreses::forceCreate([
+        $user = NotifiableUserWithMultipleAddresses::forceCreate([
             'email' => 'taylor@laravel.com',
         ]);
 
@@ -365,7 +365,7 @@ class NotifiableUserWithNamedAddress extends NotifiableUser
     }
 }
 
-class NotifiableUserWithMultipleAddreses extends NotifiableUser
+class NotifiableUserWithMultipleAddresses extends NotifiableUser
 {
     public function routeNotificationForMail($notification)
     {

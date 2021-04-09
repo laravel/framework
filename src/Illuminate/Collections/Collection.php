@@ -554,6 +554,16 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Determine if the collection contains a single item.
+     *
+     * @return bool
+     */
+    public function containsOneItem()
+    {
+        return $this->count() === 1;
+    }
+
+    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue
@@ -1086,7 +1096,7 @@ class Collection implements ArrayAccess, Enumerable
 
         $callback && is_callable($callback)
             ? uasort($items, $callback)
-            : asort($items, $callback);
+            : asort($items, $callback ?? SORT_REGULAR);
 
         return new static($items);
     }
@@ -1168,7 +1178,7 @@ class Collection implements ArrayAccess, Enumerable
                 if (is_callable($prop)) {
                     $result = $prop($a, $b);
                 } else {
-                    $values = [Arr::get($a, $prop), Arr::get($b, $prop)];
+                    $values = [data_get($a, $prop), data_get($b, $prop)];
 
                     if (! $ascending) {
                         $values = array_reverse($values);

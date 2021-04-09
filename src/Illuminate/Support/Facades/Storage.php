@@ -21,6 +21,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static \Illuminate\Filesystem\FilesystemManager extend(string $driver, \Closure $callback)
  * @method static bool makeDirectory(string $path)
  * @method static bool move(string $from, string $to)
+ * @method static string path(string $path)
  * @method static bool prepend(string $path, string $data)
  * @method static bool put(string $path, string|resource $contents, mixed $options = [])
  * @method static string|false putFile(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, mixed $options = [])
@@ -50,9 +51,13 @@ class Storage extends Facade
     {
         $disk = $disk ?: static::$app['config']->get('filesystems.default');
 
-        (new Filesystem)->cleanDirectory(
-            $root = storage_path('framework/testing/disks/'.$disk)
-        );
+        $root = storage_path('framework/testing/disks/'.$disk);
+
+        if ($token = ParallelTesting::token()) {
+            $root = "{$root}_test_{$token}";
+        }
+
+        (new Filesystem)->cleanDirectory($root);
 
         static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
             'root' => $root,

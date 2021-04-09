@@ -13,14 +13,14 @@ class AddQueuedCookiesToResponseTest extends TestCase
 {
     public function testHandle(): void
     {
-        $cookieJar = new CookieJar();
+        $cookieJar = new CookieJar;
         $cookieOne = $cookieJar->make('foo', 'bar', 0, '/path');
         $cookieTwo = $cookieJar->make('foo', 'rab', 0, '/');
         $cookieJar->queue($cookieOne);
         $cookieJar->queue($cookieTwo);
         $addQueueCookiesToResponseMiddleware = new AddQueuedCookiesToResponse($cookieJar);
         $next = function (Request $request) {
-            return new Response();
+            return new Response;
         };
         $this->assertEquals(
             [
@@ -33,7 +33,7 @@ class AddQueuedCookiesToResponseTest extends TestCase
                     ],
                 ],
             ],
-            $addQueueCookiesToResponseMiddleware->handle(new Request(), $next)->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY)
+            $addQueueCookiesToResponseMiddleware->handle(new Request, $next)->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY)
         );
     }
 }

@@ -63,8 +63,8 @@ class JobChainingTest extends TestCase
     public function testJobsCanBeChainedOnSuccessUsingBusFacade()
     {
         Bus::dispatchChain([
-            new JobChainingTestFirstJob(),
-            new JobChainingTestSecondJob(),
+            new JobChainingTestFirstJob,
+            new JobChainingTestSecondJob,
         ]);
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
@@ -74,8 +74,8 @@ class JobChainingTest extends TestCase
     public function testJobsCanBeChainedOnSuccessUsingBusFacadeAsArguments()
     {
         Bus::dispatchChain(
-            new JobChainingTestFirstJob(),
-            new JobChainingTestSecondJob()
+            new JobChainingTestFirstJob,
+            new JobChainingTestSecondJob
         );
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
@@ -156,9 +156,9 @@ class JobChainingTest extends TestCase
     public function testCatchCallbackIsCalledOnFailure()
     {
         Bus::chain([
-            new JobChainingTestFirstJob(),
-            new JobChainingTestFailingJob(),
-            new JobChainingTestSecondJob(),
+            new JobChainingTestFirstJob,
+            new JobChainingTestFailingJob,
+            new JobChainingTestSecondJob,
         ])->catch(static function () {
             self::$catchCallbackRan = true;
         })->dispatch();

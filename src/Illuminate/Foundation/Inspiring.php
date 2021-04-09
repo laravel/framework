@@ -45,6 +45,11 @@ class Inspiring
             'Waste no more time arguing what a good man should be, be one. - Marcus Aurelius',
             'Well begun is half done. - Aristotle',
             'When there is no desire, all things are at peace. - Laozi',
+            'Walk as if you are kissing the Earth with your feet. - Thich Nhat Hanh',
+            'Because you are alive, everything is possible. - Thich Nhat Hanh',
+            'Breathing in, I calm body and mind. Breathing out, I smile. - Thich Nhat Hanh',
+            'Life is available only in the present moment. - Thich Nhat Hanh',
+            'The best way to take care of the future is to take care of the present moment. - Thich Nhat Hanh',
         ])->random();
     }
 }

@@ -119,15 +119,15 @@ class FoundationFormRequestTest extends TestCase
      * Catch the given exception thrown from the executor, and return it.
      *
      * @param  string  $class
-     * @param  \Closure  $excecutor
+     * @param  \Closure  $executor
      * @return \Exception
      *
      * @throws \Exception
      */
-    protected function catchException($class, $excecutor)
+    protected function catchException($class, $executor)
     {
         try {
-            $excecutor();
+            $executor();
         } catch (Exception $e) {
             if (is_a($e, $class)) {
                 return $e;

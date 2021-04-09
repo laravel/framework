@@ -12,7 +12,7 @@ interface MigrationRepositoryInterface
     public function getRan();
 
     /**
-     * Get list of migrations.
+     * Get the list of migrations.
      *
      * @param  int  $steps
      * @return array

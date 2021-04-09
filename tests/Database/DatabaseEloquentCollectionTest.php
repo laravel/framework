@@ -278,10 +278,10 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testCollectionReturnsDuplicateBasedOnlyOnKeys()
     {
-        $one = new TestEloquentCollectionModel();
-        $two = new TestEloquentCollectionModel();
-        $three = new TestEloquentCollectionModel();
-        $four = new TestEloquentCollectionModel();
+        $one = new TestEloquentCollectionModel;
+        $two = new TestEloquentCollectionModel;
+        $three = new TestEloquentCollectionModel;
+        $four = new TestEloquentCollectionModel;
         $one->id = 1;
         $one->someAttribute = '1';
         $two->id = 1;
@@ -346,10 +346,10 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testCollectionReturnsUniqueStrictBasedOnKeysOnly()
     {
-        $one = new TestEloquentCollectionModel();
-        $two = new TestEloquentCollectionModel();
-        $three = new TestEloquentCollectionModel();
-        $four = new TestEloquentCollectionModel();
+        $one = new TestEloquentCollectionModel;
+        $two = new TestEloquentCollectionModel;
+        $three = new TestEloquentCollectionModel;
+        $four = new TestEloquentCollectionModel;
         $one->id = 1;
         $one->someAttribute = '1';
         $two->id = 1;

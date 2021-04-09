@@ -62,6 +62,14 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($stringable->matchAll('/nothing/')->isEmpty());
     }
 
+    public function testTest()
+    {
+        $stringable = $this->stringable('foo bar');
+
+        $this->assertTrue($stringable->test('/bar/'));
+        $this->assertTrue($stringable->test('/foo (.*)/'));
+    }
+
     public function testTrim()
     {
         $this->assertSame('foo', (string) $this->stringable(' foo ')->trim());
@@ -444,6 +452,20 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Malmö Jönköping', (string) $this->stringable('Malmö Jönköping')->replaceLast('', 'yyy'));
     }
 
+    public function testRemove()
+    {
+        $this->assertSame('Fbar', (string) $this->stringable('Foobar')->remove('o'));
+        $this->assertSame('Foo', (string) $this->stringable('Foobar')->remove('bar'));
+        $this->assertSame('oobar', (string) $this->stringable('Foobar')->remove('F'));
+        $this->assertSame('Foobar', (string) $this->stringable('Foobar')->remove('f'));
+        $this->assertSame('oobar', (string) $this->stringable('Foobar')->remove('f', false));
+
+        $this->assertSame('Fbr', (string) $this->stringable('Foobar')->remove(['o', 'a']));
+        $this->assertSame('Fooar', (string) $this->stringable('Foobar')->remove(['f', 'b']));
+        $this->assertSame('ooar', (string) $this->stringable('Foobar')->remove(['f', 'b'], false));
+        $this->assertSame('Foobar', (string) $this->stringable('Foo|bar')->remove(['f', '|']));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', (string) $this->stringable('LaravelPHPFramework')->snake());
@@ -544,5 +566,46 @@ class SupportStringableTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $chunks);
         $this->assertSame(['foo', 'bar', 'baz'], $chunks->all());
+    }
+
+    public function testJsonSerialize()
+    {
+        $this->assertSame('"foo"', json_encode($this->stringable('foo')));
+    }
+
+    public function testTap()
+    {
+        $stringable = $this->stringable('foobarbaz');
+
+        $fromTheTap = '';
+
+        $stringable = $stringable->tap(function (Stringable $string) use (&$fromTheTap) {
+            $fromTheTap = $string->substr(0, 3);
+        });
+
+        $this->assertSame('foo', (string) $fromTheTap);
+        $this->assertSame('foobarbaz', (string) $stringable);
+    }
+
+    public function testPipe()
+    {
+        $callback = function ($stringable) {
+            return 'bar';
+        };
+
+        $this->assertInstanceOf(Stringable::class, $this->stringable('foo')->pipe($callback));
+        $this->assertSame('bar', (string) $this->stringable('foo')->pipe($callback));
+    }
+
+    public function testMarkdown()
+    {
+        $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
+        $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
+    }
+
+    public function testRepeat()
+    {
+        $this->assertSame('aaaaa', (string) $this->stringable('a')->repeat(5));
+        $this->assertSame('', (string) $this->stringable('')->repeat(5));
     }
 }
