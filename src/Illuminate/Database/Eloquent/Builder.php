@@ -1609,7 +1609,7 @@ class Builder
     }
 
     /**
-     * Clone the query.
+     * Clone the Eloquent query builder.
      *
      * @return static
      */
