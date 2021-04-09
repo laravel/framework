@@ -18,6 +18,17 @@ class BladeTest extends TestCase
         $this->assertSame('Hello Taylor', trim($view));
     }
 
+    public function test_caching_a_component_uses_slots_for_default_cache_key()
+    {
+        $view = View::make('uses-link-cached', ['title' => 'Laravel'])->render();
+
+        $this->assertSame('This is a sentence with a <a href="https://laravel.com">Laravel</a>.', trim($view));
+
+        $view = View::make('uses-link-cached', ['title' => 'PHP Framework'])->render();
+
+        $this->assertSame('This is a sentence with a <a href="https://laravel.com">PHP Framework</a>.', trim($view));
+    }
+
     public function test_caching_a_component()
     {
         $view = View::make('uses-panel-cached', ['name' => 'Taylor'])->render();

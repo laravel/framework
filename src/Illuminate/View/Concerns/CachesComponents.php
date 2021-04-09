@@ -47,11 +47,12 @@ trait CachesComponents
     /**
      * The key used to cache the component.
      *
+     * @param array $slots
      * @return bool
      */
-    protected function cacheKey()
+    protected function cacheKey(array $slots)
     {
-        return $this->attributes->get('x-cache-key', sha1(static::class . $this->attributes->except($this->cacheAttributes())->toHtml()));
+        return $this->attributes->get('x-cache-key', static::class.sha1($this->attributes->except($this->cacheAttributes())->toHtml().serialize($slots)));
     }
 
     /**
@@ -103,7 +104,7 @@ trait CachesComponents
             return $view;
         }
 
-        $html = Cache::remember($this->cacheKey(), $this->cacheTtl(), function() use ($view, $data) {
+        $html = Cache::remember($this->cacheKey($data['__laravel_slots']), $this->cacheTtl(), function () use ($view, $data) {
             return $this->renderResolvedView($view, $data);
         });
 

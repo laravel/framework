@@ -85,11 +85,11 @@ abstract class Component
             $resolvedView = $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
                 return $resolver($view($data));
             }
-                : $resolver($view);
+            : $resolver($view);
         }
 
         if ($this->canBeCached()) {
-            return function($data) use ($resolvedView) {
+            return function ($data) use ($resolvedView) {
                 return $this->cacheResolvedView($resolvedView, $data);
             };
         }
