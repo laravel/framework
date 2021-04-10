@@ -795,7 +795,11 @@ class Worker
         }
 
         // Inform the developer that the worker is awoken again.
-        $this->raiseWorkerAwakendEvent($connectionName, $sleepingType);
+        // We are only informing the developer of the awakend event when the sleeping
+        // event was also fired.
+        if ($sleepingType !== 0) {
+            $this->raiseWorkerAwakendEvent($connectionName, $sleepingType);
+        }
     }
 
     /**
