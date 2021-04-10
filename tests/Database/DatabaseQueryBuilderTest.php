@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
-use Carbon\CarbonPeriod;
 use DateTime;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
