@@ -109,14 +109,29 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $result1->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $result2 = m::mock(stdClass::class);
         $result2->shouldReceive('getAttribute')->with('id')->andReturn(2);
+        $result3 = m::mock(stdClass::class);
+        $result3->shouldReceive('getAttribute')->with('id')->andReturn(new class {
+            public function __toString()
+            {
+                return '3';
+            }
+        });
         $model1 = new EloquentBelongsToModelStub;
         $model1->foreign_key = 1;
         $model2 = new EloquentBelongsToModelStub;
         $model2->foreign_key = 2;
-        $models = $relation->match([$model1, $model2], new Collection([$result1, $result2]), 'foo');
+        $model3 = new EloquentBelongsToModelStub;
+        $model3->foreign_key = new class {
+            public function __toString()
+            {
+                return '3';
+            }
+        };
+        $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
 
         $this->assertEquals(1, $models[0]->foo->getAttribute('id'));
         $this->assertEquals(2, $models[1]->foo->getAttribute('id'));
+        $this->assertEquals('3', $models[2]->foo->getAttribute('id'));
     }
 
     public function testAssociateMethodSetsForeignKeyOnModel()

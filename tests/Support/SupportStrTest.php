@@ -531,6 +531,12 @@ class SupportStrTest extends TestCase
         $this->assertSame("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
         $this->assertSame("<h1>hello world</h1>\n", Str::markdown('# hello world'));
     }
+
+    public function testRepeat()
+    {
+        $this->assertSame('aaaaa', Str::repeat('a', 5));
+        $this->assertSame('', Str::repeat('', 5));
+    }
 }
 
 class StringableObjectStub

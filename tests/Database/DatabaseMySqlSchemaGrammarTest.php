@@ -811,6 +811,42 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` datetime(1) not null', $statements[0]);
     }
 
+    public function testAddingDateTimeWithDefaultCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('foo')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` datetime default CURRENT_TIMESTAMP not null', $statements[0]);
+    }
+
+    public function testAddingDateTimeWithOnUpdateCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('foo')->useCurrentOnUpdate();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` datetime on update CURRENT_TIMESTAMP not null', $statements[0]);
+    }
+
+    public function testAddingDateTimeWithDefaultCurrentAndOnUpdateCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('foo')->useCurrent()->useCurrentOnUpdate();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` datetime default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP not null', $statements[0]);
+    }
+
+    public function testAddingDateTimeWithDefaultCurrentOnUpdateCurrentAndPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('foo', 3)->useCurrent()->useCurrentOnUpdate();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` datetime(3) default CURRENT_TIMESTAMP(3) on update CURRENT_TIMESTAMP(3) not null', $statements[0]);
+    }
+
     public function testAddingDateTimeTz()
     {
         $blueprint = new Blueprint('users');

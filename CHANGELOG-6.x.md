@@ -1,6 +1,22 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.20...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.22...6.x)
+
+
+## [v6.20.22 (2021-03-31)](https://github.com/laravel/framework/compare/v6.20.21...v6.20.22)
+
+### Fixed
+- Fixed setting DynamoDB credentials ([#36822](https://github.com/laravel/framework/pull/36822))
+
+
+## [v6.20.21 (2021-03-30)](https://github.com/laravel/framework/compare/v6.20.20...v6.20.21)
+
+### Added
+- Added support of DynamoDB in CI suite ([#36749](https://github.com/laravel/framework/pull/36749))
+- Support username parameter for predis ([#36762](https://github.com/laravel/framework/pull/36762))
+
+### Changed
+- Use qualified column names in pivot query ([#36720](https://github.com/laravel/framework/pull/36720))
 
 
 ## [v6.20.20 (2021-03-23)](https://github.com/laravel/framework/compare/v6.20.19...v6.20.20)

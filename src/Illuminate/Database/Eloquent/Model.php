@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
-use Exception;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -20,6 +19,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
+use LogicException;
 
 abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -1097,14 +1097,14 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      *
      * @return bool|null
      *
-     * @throws \Exception
+     * @throws \LogicException
      */
     public function delete()
     {
         $this->mergeAttributesFromClassCasts();
 
         if (is_null($this->getKeyName())) {
-            throw new Exception('No primary key defined on model.');
+            throw new LogicException('No primary key defined on model.');
         }
 
         // If the model doesn't exist, there is nothing to delete so we'll just return

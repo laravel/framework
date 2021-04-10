@@ -296,6 +296,31 @@ class AuthManager implements FactoryContract
     }
 
     /**
+     * Forget all of the resolved guard instances.
+     *
+     * @return $this
+     */
+    public function forgetGuards()
+    {
+        $this->guards = [];
+
+        return $this;
+    }
+
+    /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
+
+        return $this;
+    }
+
+    /**
      * Dynamically call the default driver instance.
      *
      * @param  string  $method

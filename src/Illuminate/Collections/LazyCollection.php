@@ -5,7 +5,6 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
-use Generator;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
@@ -30,7 +29,7 @@ class LazyCollection implements Enumerable
      */
     public function __construct($source = null)
     {
-        if ($source instanceof Closure || $source instanceof Generator || $source instanceof self) {
+        if ($source instanceof Closure || $source instanceof self) {
             $this->source = $source;
         } elseif (is_null($source)) {
             $this->source = static::empty();
@@ -1365,10 +1364,6 @@ class LazyCollection implements Enumerable
      */
     protected function makeIterator($source)
     {
-        if ($source instanceof Generator) {
-            return $source;
-        }
-
         if ($source instanceof IteratorAggregate) {
             return $source->getIterator();
         }

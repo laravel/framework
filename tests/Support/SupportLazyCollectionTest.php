@@ -69,31 +69,6 @@ class SupportLazyCollectionTest extends TestCase
         ], $data->all());
     }
 
-    public function testCanCreateCollectionFromGenerator()
-    {
-        $iterable = function () {
-            yield 1;
-            yield 2;
-            yield 3;
-        };
-        $data = LazyCollection::make($iterable());
-
-        $this->assertSame([1, 2, 3], $data->all());
-
-        $iterable = function () {
-            yield 'a' => 1;
-            yield 'b' => 2;
-            yield 'c' => 3;
-        };
-        $data = LazyCollection::make($iterable());
-
-        $this->assertSame([
-            'a' => 1,
-            'b' => 2,
-            'c' => 3,
-        ], $data->all());
-    }
-
     public function testEager()
     {
         $source = [1, 2, 3, 4, 5];

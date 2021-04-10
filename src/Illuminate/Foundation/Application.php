@@ -33,7 +33,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '8.34.0';
+    const VERSION = '8.36.2';
 
     /**
      * The base path for the Laravel installation.
@@ -1093,7 +1093,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function isDownForMaintenance()
     {
-        return is_file($this->storagePath().'/framework/down');
+        return file_exists($this->storagePath().'/framework/down');
     }
 
     /**
