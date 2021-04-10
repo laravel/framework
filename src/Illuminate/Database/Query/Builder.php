@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query;
 
+use Carbon\CarbonPeriod;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Support\Arrayable;
@@ -1110,14 +1111,18 @@ class Builder
      * Add a where between statement to the query.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
-     * @param  array  $values
+     * @param  array|\Carbon\CarbonPeriod  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
+    public function whereBetween($column, $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
+
+        if ($values instanceof CarbonPeriod) {
+            $values = [$values->start, $values->end ];
+        }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
@@ -1148,10 +1153,10 @@ class Builder
      * Add an or where between statement to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  array|\Carbon\CarbonPeriod  $values
      * @return $this
      */
-    public function orWhereBetween($column, array $values)
+    public function orWhereBetween($column, $values)
     {
         return $this->whereBetween($column, $values, 'or');
     }
@@ -1172,11 +1177,11 @@ class Builder
      * Add a where not between statement to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  array|\Carbon\CarbonPeriod  $values
      * @param  string  $boolean
      * @return $this
      */
-    public function whereNotBetween($column, array $values, $boolean = 'and')
+    public function whereNotBetween($column, $values, $boolean = 'and')
     {
         return $this->whereBetween($column, $values, $boolean, true);
     }
@@ -1198,10 +1203,10 @@ class Builder
      * Add an or where not between statement to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  array|\Carbon\CarbonPeriod  $values
      * @return $this
      */
-    public function orWhereNotBetween($column, array $values)
+    public function orWhereNotBetween($column, $values)
     {
         return $this->whereNotBetween($column, $values, 'or');
     }
