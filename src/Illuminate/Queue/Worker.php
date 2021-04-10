@@ -11,6 +11,8 @@ use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerSleeping;
+use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
 use Throwable;
@@ -124,12 +126,15 @@ class Worker
 
         [$startTime, $jobsProcessed] = [hrtime(true) / 1e9, 0];
 
+        // Inform the developer that the worker is starting within the deamon.
+        $this->raiseWorkerStartingEvent($connectionName, 1);
+
         while (true) {
             // Before reserving any jobs, we will make sure this queue is not paused and
             // if it is we will just pause this worker for a given amount of time and
             // make sure we do not need to kill this worker process off completely.
             if (! $this->daemonShouldRun($options, $connectionName, $queue)) {
-                $status = $this->pauseWorker($options, $lastRestart);
+                $status = $this->pauseWorker($options, $lastRestart, $connectionName);
 
                 if (! is_null($status)) {
                     return $this->stop($status);
@@ -158,10 +163,10 @@ class Worker
                 $this->runJob($job, $connectionName, $options);
 
                 if ($options->rest > 0) {
-                    $this->sleep($options->rest);
+                    $this->sleep($options->rest, $connectionName, 2);
                 }
             } else {
-                $this->sleep($options->sleep);
+                $this->sleep($options->sleep, $connectionName, 1);
             }
 
             if ($this->supportsAsyncSignals()) {
@@ -254,11 +259,12 @@ class Worker
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
+     * @param  string $connectionName
      * @return int|null
      */
-    protected function pauseWorker(WorkerOptions $options, $lastRestart)
+    protected function pauseWorker(WorkerOptions $options, $lastRestart, $connectionName)
     {
-        $this->sleep($options->sleep > 0 ? $options->sleep : 1);
+        $this->sleep($options->sleep > 0 ? $options->sleep : 1, $connectionName, 3);
 
         return $this->stopIfNecessary($options, $lastRestart);
     }
@@ -300,6 +306,9 @@ class Worker
      */
     public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
+        // Inform the developer that the worker is starting within the once option.
+        $this->raiseWorkerStartingEvent($connectionName, 2);
+
         $job = $this->getNextJob(
             $this->manager->connection($connectionName), $queue
         );
@@ -311,7 +320,7 @@ class Worker
             return $this->runJob($job, $connectionName, $options);
         }
 
-        $this->sleep($options->sleep);
+        $this->sleep($options->sleep, $connectionName, 3);
     }
 
     /**
@@ -342,7 +351,7 @@ class Worker
 
             $this->stopWorkerIfLostConnection($e);
 
-            $this->sleep(1);
+            $this->sleep(1, 'unknown', 0);
         }
     }
 
@@ -596,6 +605,34 @@ class Worker
     }
 
     /**
+     * Raise the worker starting event.
+     *
+     * @param  string  $connectionName
+     * @param  int     $startingType
+     * @return void
+     */
+    protected function raiseWorkerStartingEvent($connectionName, $startingType)
+    {
+        $this->events->dispatch(new WorkerStarting(
+            $connectionName, $startingType
+        ));
+    }
+
+    /**
+     * Raise the worker sleeping event.
+     *
+     * @param  string  $connectionName
+     * @param  int     $sleepingType
+     * @return void
+     */
+    protected function raiseWorkerSleepingEvent($connectionName, $sleepingType)
+    {
+        $this->events->dispatch(new WorkerSleeping(
+            $connectionName, $sleepingType
+        ));
+    }
+
+    /**
      * Raise the exception occurred queue job event.
      *
      * @param  string  $connectionName
@@ -723,10 +760,19 @@ class Worker
      * Sleep the script for a given number of seconds.
      *
      * @param  int|float  $seconds
+     * @param  string $connectionName
+     * @param  int $sleepingType
      * @return void
      */
-    public function sleep($seconds)
+    public function sleep($seconds, $connectionName, $sleepingType)
     {
+        // Inform the developer that the worker is going to sleep.
+        // We are only informing the developer of the sleeping event when the
+        // sleeping happens within the deamon.
+        if ($sleepingType !== 0) {
+            $this->raiseWorkerSleepingEvent($connectionName, $sleepingType);
+        }
+
         if ($seconds < 1) {
             usleep($seconds * 1000000);
         } else {
