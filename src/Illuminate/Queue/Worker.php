@@ -11,6 +11,7 @@ use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerAwakend;
 use Illuminate\Queue\Events\WorkerSleeping;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
@@ -633,6 +634,20 @@ class Worker
     }
 
     /**
+     * Raise the worker awakend event.
+     *
+     * @param  string  $connectionName
+     * @param  int     $sleepingType
+     * @return void
+     */
+    protected function raiseWorkerAwakendEvent($connectionName, $sleepingType)
+    {
+        $this->events->dispatch(new WorkerAwakend(
+            $connectionName, $sleepingType
+        ));
+    }
+
+    /**
      * Raise the exception occurred queue job event.
      *
      * @param  string  $connectionName
@@ -778,6 +793,9 @@ class Worker
         } else {
             sleep($seconds);
         }
+
+        // Inform the developer that the worker is awoken again.
+        $this->raiseWorkerAwakendEvent($connectionName, $sleepingType);
     }
 
     /**
