@@ -90,7 +90,7 @@ class WorkCommand extends Command
     public function handle()
     {
         if ($this->downForMaintenance() && $this->option('once')) {
-            return $this->worker->sleep($this->option('sleep'));
+            return $this->worker->sleep($this->option('sleep'), null, Worker::WORKER_SLEEPING_NO_EVENT);
         }
 
         // We'll listen to the processed and failed events so we can write information

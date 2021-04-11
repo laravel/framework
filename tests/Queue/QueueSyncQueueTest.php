@@ -41,7 +41,7 @@ class QueueSyncQueueTest extends TestCase
         $container = new Container;
         Container::setInstance($container);
         $events = m::mock(Dispatcher::class);
-        $events->shouldReceive('dispatch')->times(3);
+        $events->shouldReceive('dispatch')->times(4);
         $container->instance('events', $events);
         $container->instance(Dispatcher::class, $events);
         $sync->setContainer($container);

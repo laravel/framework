@@ -2,16 +2,19 @@
 
 namespace Illuminate\Queue;
 
+use Throwable;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
-use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
-use Illuminate\Queue\Jobs\SyncJob;
-use Throwable;
+use Illuminate\Queue\Events\WorkerStarting;
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 
 class SyncQueue extends Queue implements QueueContract
 {
+    const WORKER_STARTING_DEAMON = 1;
+
     /**
      * Get the size of the queue.
      *
@@ -36,7 +39,9 @@ class SyncQueue extends Queue implements QueueContract
     public function push($job, $data = '', $queue = null)
     {
         $queueJob = $this->resolveJob($this->createPayload($job, $queue, $data), $queue);
-
+        
+        $this->raiseWorkerStartingEvent($this->connectionName, static::WORKER_STARTING_DEAMON);
+        
         try {
             $this->raiseBeforeJobEvent($queueJob);
 
@@ -85,6 +90,21 @@ class SyncQueue extends Queue implements QueueContract
     {
         if ($this->container->bound('events')) {
             $this->container['events']->dispatch(new JobProcessed($this->connectionName, $job));
+        }
+    }
+
+    /**
+     * Raise the worker starting event.
+     *
+     * @param  int     $startingType
+     * @return void
+     */
+    protected function raiseWorkerStartingEvent($startingType)
+    {
+        if ($this->container->bound('events')) {
+            $this->container['events']->dispatch(new WorkerStarting(
+                $this->connectionName, $startingType
+            ));
         }
     }
 

@@ -111,6 +111,39 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Register an event listener for the daemon queue starting.
+     *
+     * @param  mixed  $callback
+     * @return void
+     */
+    public function starting($callback)
+    {
+        $this->app['events']->listen(Events\WorkerStarting::class, $callback);
+    }
+
+    /**
+     * Register an event listener for the daemon queue sleeping.
+     *
+     * @param  mixed  $callback
+     * @return void
+     */
+    public function sleeping($callback)
+    {
+        $this->app['events']->listen(Events\WorkerSleeping::class, $callback);
+    }
+
+    /**
+     * Register an event listener for the daemon queue awakend.
+     *
+     * @param  mixed  $callback
+     * @return void
+     */
+    public function awakend($callback)
+    {
+        $this->app['events']->listen(Events\WorkerAwakend::class, $callback);
+    }
+
+    /**
      * Determine if the driver is connected.
      *
      * @param  string|null  $name

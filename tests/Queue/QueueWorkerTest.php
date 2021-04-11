@@ -401,7 +401,7 @@ class InsomniacWorker extends Worker
     public $sleptFor;
     public $stopOnMemoryExceeded = false;
 
-    public function sleep($seconds)
+    public function sleep($seconds, $connectionName, $sleepingType)
     {
         $this->sleptFor = $seconds;
     }
