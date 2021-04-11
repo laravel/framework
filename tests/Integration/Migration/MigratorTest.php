@@ -74,8 +74,8 @@ class MigratorTest extends TestCase
 
     public function testPretendMigrate()
     {
-        $this->expectOutput('<info>2014_10_12_000000_create_people_table:</info> create table "people" ("id" integer not null primary key autoincrement, "name" varchar not null, "email" varchar not null, "password" varchar not null, "remember_token" varchar, "created_at" datetime, "updated_at" datetime)');
-        $this->expectOutput('<info>2014_10_12_000000_create_people_table:</info> create unique index "people_email_unique" on "people" ("email")');
+        $this->expectOutput('<info>CreatePeopleTable:</info> create table "people" ("id" integer not null primary key autoincrement, "name" varchar not null, "email" varchar not null, "password" varchar not null, "remember_token" varchar, "created_at" datetime, "updated_at" datetime)');
+        $this->expectOutput('<info>CreatePeopleTable:</info> create unique index "people_email_unique" on "people" ("email")');
         $this->expectOutput('<info>2015_10_04_000000_modify_people_table:</info> alter table "people" add column "first_name" varchar');
         $this->expectOutput('<info>2016_10_04_000000_modify_people_table:</info> alter table "people" add column "last_name" varchar');
 

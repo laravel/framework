@@ -410,7 +410,12 @@ class Migrator
     protected function pretendToRun($migration, $method)
     {
         foreach ($this->getQueries($migration, $method) as $query) {
-            $name = $this->getMigrationName((new ReflectionClass($migration))->getFileName());
+            $name = get_class($migration);
+
+            $reflectionClass = new ReflectionClass($migration);
+            if ($reflectionClass->isAnonymous()) {
+                $name = $this->getMigrationName($reflectionClass->getFileName());
+            }
 
             $this->note("<info>{$name}:</info> {$query['query']}");
         }
