@@ -2273,12 +2273,8 @@ class Builder
     {
         return Str::replaceArray(
             '?',
-            collect($this->getBindings())
+            collect($this->connection->prepareBindings($this->getBindings()))
                 ->map(function ($i) {
-                    if (is_object($i)) {
-                        $i = (string) $i;
-                    }
-
                     return (is_string($i)) ? "'{$i}'" : $i;
                 })->all(),
             $this->toSql()

@@ -3809,30 +3809,88 @@ SQL;
 
     public function testToSqlWithBindingsMethodUsingMysqlBuilder()
     {
-        $builder = $this->getMySqlBuilder();
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
+        $connection = m::mock(ConnectionInterface::class);
+
+        $connection->expects('prepareBindings')
+            ->with(['%Taylor%'])
+            ->andReturn(['%Taylor%']);
+
+        $builder = new Builder($connection, $grammar, $processor);
+
         $builder->select('*')->from('users')->where('name', 'like', '%Taylor%');
         $this->assertSame("select * from `users` where `name` like '%Taylor%'", $builder->toSqlWithBindings());
     }
 
     public function testToSqlWithBindingsMethodUsingPostgresBuilder()
     {
-        $builder = $this->getPostgresBuilder();
+        $grammar = new PostgresGrammar;
+        $processor = m::mock(Processor::class);
+        $connection = m::mock(ConnectionInterface::class);
+
+        $connection->expects('prepareBindings')
+            ->with(['%Taylor%'])
+            ->andReturn(['%Taylor%']);
+
+        $builder = new Builder($connection, $grammar, $processor);
+
         $builder->select('*')->from('users')->where('name', 'like', '%Taylor%');
         $this->assertSame("select * from \"users\" where \"name\"::text like '%Taylor%'", $builder->toSqlWithBindings());
     }
 
     public function testToSqlWithBindingsMethodUsingSQLiteBuilder()
     {
-        $builder = $this->getSQLiteBuilder();
+        $grammar = new SQLiteGrammar;
+        $processor = m::mock(Processor::class);
+        $connection = m::mock(ConnectionInterface::class);
+
+        $connection->expects('prepareBindings')
+            ->with(['%Taylor%'])
+            ->andReturn(['%Taylor%']);
+
+        $builder = new Builder($connection, $grammar, $processor);
+
         $builder->select('*')->from('users')->where('name', 'like', '%Taylor%');
         $this->assertSame("select * from \"users\" where \"name\" like '%Taylor%'", $builder->toSqlWithBindings());
     }
 
     public function testToSqlWithBindingsMethodUsingSqlServerBuilder()
     {
-        $builder = $this->getSqlServerBuilder();
+        $grammar = new SqlServerGrammar;
+        $processor = m::mock(Processor::class);
+        $connection = m::mock(ConnectionInterface::class);
+
+        $connection->expects('prepareBindings')
+            ->with(['%Taylor%'])
+            ->andReturn(['%Taylor%']);
+
+        $builder = new Builder($connection, $grammar, $processor);
+
         $builder->select('*')->from('users')->where('name', 'like', '%Taylor%');
         $this->assertSame("select * from [users] where [name] like '%Taylor%'", $builder->toSqlWithBindings());
+    }
+
+    public function testToSqlWithBindingsWorksWithObjectsThatDoesntImplementToString()
+    {
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
+        $connection = m::mock(ConnectionInterface::class);
+
+        $datetime = new Datetime();
+
+        $connection->expects('prepareBindings')
+            ->with([$datetime])
+            ->andReturn([$datetime->format('Y-m-d H:i:s')]);
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $builder->from('users')->where('created_at', '>', $datetime);
+
+        $this->assertSame(
+            "select * from `users` where `created_at` > '{$datetime->format('Y-m-d H:i:s')}'",
+            $builder->toSqlWithBindings()
+        );
     }
 
     protected function getConnection()
