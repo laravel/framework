@@ -3,7 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
-use function GuzzleHttp\Promise\promise_for;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -34,6 +34,8 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\PendingRequest withoutVerifying()
  * @method \Illuminate\Http\Client\PendingRequest dump()
  * @method \Illuminate\Http\Client\PendingRequest dd()
+ * @method \Illuminate\Http\Client\PendingRequest async()
+ * @method \Illuminate\Http\Client\Pool pool()
  * @method \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method \Illuminate\Http\Client\Response get(string $url, array $query = [])
  * @method \Illuminate\Http\Client\Response head(string $url, array $query = [])
@@ -104,7 +106,7 @@ class Factory
             $headers['Content-Type'] = 'application/json';
         }
 
-        return promise_for(new Psr7Response($status, $headers, $body));
+        return Create::promiseFor(new Psr7Response($status, $headers, $body));
     }
 
     /**
