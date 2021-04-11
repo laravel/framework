@@ -118,12 +118,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->distinct()->select('foo', 'bar')->from('users');
         $this->assertSame('select distinct "foo", "bar" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->distinct()->from('users');
+        $this->assertSame('select distinct * from "users"', $builder->toSql());
     }
 
     public function testBasicSelectDistinctOnColumns()
     {
         $builder = $this->getBuilder();
         $builder->distinct('foo')->select('foo', 'bar')->from('users');
+        $this->assertSame('select distinct "foo", "bar" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->distinct('foo')->from('users');
+        $this->assertSame('select distinct "foo" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->distinct('foo', 'bar')->from('users');
         $this->assertSame('select distinct "foo", "bar" from "users"', $builder->toSql());
 
         $builder = $this->getPostgresBuilder();
