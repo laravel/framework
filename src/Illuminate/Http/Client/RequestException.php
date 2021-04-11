@@ -2,8 +2,6 @@
 
 namespace Illuminate\Http\Client;
 
-use GuzzleHttp\Psr7\Message;
-
 class RequestException extends HttpClientException
 {
     /**
@@ -36,7 +34,7 @@ class RequestException extends HttpClientException
     {
         $message = "HTTP request returned status code {$response->status()}";
 
-        $summary = Message::bodySummary($response->toPsrResponse());
+        $summary = \GuzzleHttp\Psr7\get_message_body_summary($response->toPsrResponse());
 
         return is_null($summary) ? $message : $message .= ":\n{$summary}\n";
     }
