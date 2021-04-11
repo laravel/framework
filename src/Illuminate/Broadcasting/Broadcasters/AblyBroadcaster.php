@@ -120,7 +120,7 @@ class AblyBroadcaster extends Broadcaster
     }
 
     /**
-     * Return true if channel is protected by authentication.
+     * Return true if the channel is protected by authentication.
      *
      * @param  string  $channel
      * @return bool

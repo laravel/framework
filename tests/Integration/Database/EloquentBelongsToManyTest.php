@@ -349,7 +349,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($tag2->name, $post->tags()->find($tag2->id)->name);
         $this->assertCount(0, $post->tags()->findMany([]));
         $this->assertCount(2, $post->tags()->findMany([$tag->id, $tag2->id]));
-        $this->assertCount(0, $post->tags()->findMany(new Collection()));
+        $this->assertCount(0, $post->tags()->findMany(new Collection));
         $this->assertCount(2, $post->tags()->findMany(new Collection([$tag->id, $tag2->id])));
     }
 

@@ -36,7 +36,7 @@ class MailLogTransportTest extends TestCase
     public function testGetLogTransportWithPsrLogger()
     {
         $this->app['config']->set('mail.driver', 'log');
-        $logger = $this->app->instance('log', new NullLogger());
+        $logger = $this->app->instance('log', new NullLogger);
 
         $transportLogger = app('mailer')->getSwiftMailer()->getTransport()->logger();
 

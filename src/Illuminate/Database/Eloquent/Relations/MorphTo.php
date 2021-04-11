@@ -6,9 +6,12 @@ use BadMethodCallException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
 class MorphTo extends BelongsTo
 {
+    use InteractsWithDictionary;
+
     /**
      * The type of the polymorphic relation.
      *
@@ -97,7 +100,10 @@ class MorphTo extends BelongsTo
     {
         foreach ($models as $model) {
             if ($model->{$this->morphType}) {
-                $this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}][] = $model;
+                $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
+                $foreignKeyKey = $this->getDictionaryKey($model->{$this->foreignKey});
+
+                $this->dictionary[$morphTypeKey][$foreignKeyKey][] = $model;
             }
         }
     }
@@ -164,7 +170,7 @@ class MorphTo extends BelongsTo
                     ? array_keys($this->dictionary[$type])
                     : array_map(function ($modelId) {
                         return (string) $modelId;
-                    }, array_keys($this->dictionary[$type]));
+                    }, array_filter(array_keys($this->dictionary[$type])));
     }
 
     /**
@@ -207,7 +213,7 @@ class MorphTo extends BelongsTo
     protected function matchToMorphParents($type, Collection $results)
     {
         foreach ($results as $result) {
-            $ownerKey = ! is_null($this->ownerKey) ? $result->{$this->ownerKey} : $result->getKey();
+            $ownerKey = ! is_null($this->ownerKey) ? $this->getDictionaryKey($result->{$this->ownerKey}) : $result->getKey();
 
             if (isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
@@ -226,7 +232,7 @@ class MorphTo extends BelongsTo
     public function associate($model)
     {
         $this->parent->setAttribute(
-            $this->foreignKey, $model instanceof Model ? $model->getKey() : null
+            $this->foreignKey, $model instanceof Model ? $model->{$this->ownerKey ?: $model->getKeyName()} : null
         );
 
         $this->parent->setAttribute(
@@ -324,7 +330,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Specify constraints on the query for a given morph types.
+     * Specify constraints on the query for a given morph type.
      *
      * @param  array  $callbacks
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo

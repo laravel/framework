@@ -152,7 +152,7 @@ abstract class Queue
             ],
         ]);
 
-        $command = $job instanceof ShouldBeEncrypted && $this->container->bound(Encrypter::class)
+        $command = $this->jobShouldBeEncrypted($job) && $this->container->bound(Encrypter::class)
                     ? $this->container[Encrypter::class]->encrypt(serialize(clone $job))
                     : serialize(clone $job);
 
@@ -214,6 +214,21 @@ abstract class Queue
     }
 
     /**
+     * Determine if the job should be encrypted.
+     *
+     * @param  object  $job
+     * @return bool
+     */
+    protected function jobShouldBeEncrypted($job)
+    {
+        if ($job instanceof ShouldBeEncrypted) {
+            return true;
+        }
+
+        return isset($job->shouldBeEncrypted) && $job->shouldBeEncrypted;
+    }
+
+    /**
      * Create a typical, string based queue payload array.
      *
      * @param  string  $job
@@ -238,7 +253,7 @@ abstract class Queue
     /**
      * Register a callback to be executed when creating job payloads.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return void
      */
     public static function createPayloadUsing($callback)
@@ -352,6 +367,16 @@ abstract class Queue
         $this->connectionName = $name;
 
         return $this;
+    }
+
+    /**
+     * Get the container instance being used by the connection.
+     *
+     * @return \Illuminate\Container\Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
     }
 
     /**

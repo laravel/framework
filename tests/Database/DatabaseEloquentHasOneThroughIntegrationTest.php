@@ -234,6 +234,25 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         });
     }
 
+    public function testLazyReturnsCorrectModels()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $position = HasOneThroughTestPosition::find(1);
+
+        $position->contract()->lazy()->each(function ($contract) {
+            $this->assertEquals([
+                'id',
+                'user_id',
+                'title',
+                'body',
+                'email',
+                'created_at',
+                'updated_at',
+                'laravel_through_key', ], array_keys($contract->getAttributes()));
+        });
+    }
+
     public function testIntermediateSoftDeletesAreIgnored()
     {
         $this->seedData();

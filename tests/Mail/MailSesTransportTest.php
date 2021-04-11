@@ -16,7 +16,7 @@ class MailSesTransportTest extends TestCase
     /** @group Foo */
     public function testGetTransport()
     {
-        $container = new Container();
+        $container = new Container;
 
         $container->singleton('config', function () {
             return new Repository([

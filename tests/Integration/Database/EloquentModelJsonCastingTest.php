@@ -52,7 +52,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
 
     public function testObjectsAreCastable()
     {
-        $object = new stdClass();
+        $object = new stdClass;
         $object->key1 = 'value1';
 
         /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */

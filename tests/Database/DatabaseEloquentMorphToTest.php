@@ -26,6 +26,12 @@ class DatabaseEloquentMorphToTest extends TestCase
             $one = (object) ['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1'],
             $two = (object) ['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1'],
             $three = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => 'foreign_key_2'],
+            $four = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => new class {
+                public function __toString()
+                {
+                    return 'foreign_key_2';
+                }
+            }],
         ]);
 
         $dictionary = $relation->getDictionary();
@@ -40,6 +46,7 @@ class DatabaseEloquentMorphToTest extends TestCase
             'morph_type_2' => [
                 'foreign_key_2' => [
                     $three,
+                    $four,
                 ],
             ],
         ], $dictionary);
@@ -132,7 +139,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         $relation = $this->getRelationAssociate($parent);
 
         $associate = m::mock(Model::class);
-        $associate->shouldReceive('getKey')->once()->andReturn(1);
+        $associate->shouldReceive('getAttribute')->once()->andReturn(1);
         $associate->shouldReceive('getMorphClass')->once()->andReturn('Model');
 
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);

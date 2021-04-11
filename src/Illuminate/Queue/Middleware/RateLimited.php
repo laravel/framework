@@ -99,7 +99,7 @@ class RateLimited
     }
 
     /**
-     * Do not release the job back to the queue if limit is exceeded.
+     * Do not release the job back to the queue if the limit is exceeded.
      *
      * @return $this
      */

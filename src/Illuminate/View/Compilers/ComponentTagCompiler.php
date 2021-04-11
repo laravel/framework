@@ -48,7 +48,7 @@ class ComponentTagCompiler
     protected $boundAttributes = [];
 
     /**
-     * Create new component tag compiler.
+     * Create a new component tag compiler.
      *
      * @param  array  $aliases
      * @param  array  $namespaces
@@ -460,12 +460,16 @@ class ComponentTagCompiler
                 $value = "'".$this->compileAttributeEchos($value)."'";
             }
 
+            if (Str::startsWith($attribute, '::')) {
+                $attribute = substr($attribute, 1);
+            }
+
             return [$attribute => $value];
         })->toArray();
     }
 
     /**
-     * Parse the attribute bag in a given attribute string into it's fully-qualified syntax.
+     * Parse the attribute bag in a given attribute string into its fully-qualified syntax.
      *
      * @param  string  $attributeString
      * @return string
@@ -490,7 +494,7 @@ class ComponentTagCompiler
     {
         $pattern = "/
             (?:^|\s+)     # start of the string or whitespace between attributes
-            :             # attribute needs to start with a semicolon
+            :(?!:)        # attribute needs to start with a single colon
             ([\w\-:.@]+)  # match the actual attribute name
             =             # only match attributes that have a value
         /xm";

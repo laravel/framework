@@ -39,8 +39,7 @@ class CompiledRouteCollectionTest extends TestCase
     {
         parent::tearDown();
 
-        unset($this->routeCollection);
-        unset($this->router);
+        unset($this->routeCollection, $this->router);
     }
 
     /**

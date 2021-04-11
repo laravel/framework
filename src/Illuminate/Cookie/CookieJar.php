@@ -214,4 +214,16 @@ class CookieJar implements JarContract
     {
         return Arr::flatten($this->queued);
     }
+
+    /**
+     * Flush the cookies which have been queued for the next request.
+     *
+     * @return $this
+     */
+    public function flushQueuedCookies()
+    {
+        $this->queued = [];
+
+        return $this;
+    }
 }

@@ -87,7 +87,7 @@ class Event
     public $expiresAt = 1440;
 
     /**
-     * Indicates if the command should run in background.
+     * Indicates if the command should run in the background.
      *
      * @var bool
      */
@@ -328,7 +328,7 @@ class Event
             $date->setTimezone($this->timezone);
         }
 
-        return CronExpression::factory($this->expression)->isDue($date->toDateTimeString());
+        return (new CronExpression($this->expression))->isDue($date->toDateTimeString());
     }
 
     /**
@@ -587,7 +587,7 @@ class Event
     }
 
     /**
-     * State that the command should run in background.
+     * State that the command should run in the background.
      *
      * @return $this
      */
@@ -890,9 +890,8 @@ class Event
      */
     public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
     {
-        return Date::instance(CronExpression::factory(
-            $this->getExpression()
-        )->getNextRunDate($currentTime, $nth, $allowCurrentDate, $this->timezone));
+        return Date::instance((new CronExpression($this->getExpression()))
+            ->getNextRunDate($currentTime, $nth, $allowCurrentDate, $this->timezone));
     }
 
     /**

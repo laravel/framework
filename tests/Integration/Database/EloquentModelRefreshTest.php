@@ -100,7 +100,7 @@ class AsPivotPost extends Post
     public function children()
     {
         return $this
-            ->belongsToMany(static::class, (new AsPivotPostPivot())->getTable(), 'foreign_id', 'related_id')
+            ->belongsToMany(static::class, (new AsPivotPostPivot)->getTable(), 'foreign_id', 'related_id')
             ->using(AsPivotPostPivot::class);
     }
 }

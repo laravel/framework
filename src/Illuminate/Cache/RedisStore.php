@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 
 class RedisStore extends TaggableStore implements LockProvider
 {
@@ -188,7 +189,15 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return new RedisLock($this->lockConnection(), $this->prefix.$name, $seconds, $owner);
+        $lockName = $this->prefix.$name;
+
+        $lockConnection = $this->lockConnection();
+
+        if ($lockConnection instanceof PhpRedisConnection) {
+            return new PhpRedisLock($lockConnection, $lockName, $seconds, $owner);
+        }
+
+        return new RedisLock($lockConnection, $lockName, $seconds, $owner);
     }
 
     /**

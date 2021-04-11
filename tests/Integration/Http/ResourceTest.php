@@ -781,7 +781,7 @@ class ResourceTest extends TestCase
         $collection = new PostCollectionResource($posts);
 
         $this->assertCount(2, $collection);
-        $this->assertSame(2, count($collection));
+        $this->assertCount(2, $collection);
     }
 
     public function testKeysArePreservedIfTheResourceIsFlaggedToPreserveKeys()

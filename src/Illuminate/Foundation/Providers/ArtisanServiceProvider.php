@@ -466,7 +466,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerEventListCommand()
     {
         $this->app->singleton('command.event.list', function () {
-            return new EventListCommand();
+            return new EventListCommand;
         });
     }
 

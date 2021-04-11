@@ -35,6 +35,10 @@ class StorageLinkCommand extends Command
                 continue;
             }
 
+            if (is_link($link)) {
+                $this->laravel->make('files')->delete($link);
+            }
+
             if ($relative) {
                 $this->laravel->make('files')->relativeLink($target, $link);
             } else {

@@ -63,7 +63,7 @@ class MailManager implements FactoryContract
      * Get a mailer instance by name.
      *
      * @param  string|null  $name
-     * @return \Illuminate\Mail\Mailer
+     * @return \Illuminate\Contracts\Mail\Mailer
      */
     public function mailer($name = null)
     {
@@ -335,7 +335,7 @@ class MailManager implements FactoryContract
             $config['token'] ?? $this->app['config']->get('services.postmark.token'),
             $headers
         ), function ($transport) {
-            $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
+            $transport->registerPlugin(new ThrowExceptionOnFailurePlugin);
         });
     }
 
@@ -468,6 +468,41 @@ class MailManager implements FactoryContract
     public function extend($driver, Closure $callback)
     {
         $this->customCreators[$driver] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Get the application instance used by the manager.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    public function getApplication()
+    {
+        return $this->app;
+    }
+
+    /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
+
+        return $this;
+    }
+
+    /**
+     * Forget all of the resolved mailer instances.
+     *
+     * @return $this
+     */
+    public function forgetMailers()
+    {
+        $this->mailers = [];
 
         return $this;
     }

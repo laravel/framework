@@ -5,9 +5,12 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
 abstract class HasOneOrMany extends Relation
 {
+    use InteractsWithDictionary;
+
     /**
      * The foreign key of the parent model.
      *
@@ -53,7 +56,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Create and return an un-saved instances of the related models.
+     * Create and return an un-saved instance of the related models.
      *
      * @param  iterable  $records
      * @return \Illuminate\Database\Eloquent\Collection
@@ -141,7 +144,7 @@ abstract class HasOneOrMany extends Relation
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->getAttribute($this->localKey)])) {
+            if (isset($dictionary[$key = $this->getDictionaryKey($model->getAttribute($this->localKey))])) {
                 $model->setRelation(
                     $relation, $this->getRelationValue($dictionary, $key, $type)
                 );
@@ -177,12 +180,12 @@ abstract class HasOneOrMany extends Relation
         $foreign = $this->getForeignKeyName();
 
         return $results->mapToDictionary(function ($result) use ($foreign) {
-            return [$result->{$foreign} => $result];
+            return [$this->getDictionaryKey($result->{$foreign}) => $result];
         })->all();
     }
 
     /**
-     * Find a model by its primary key or return new instance of the related model.
+     * Find a model by its primary key or return a new instance of the related model.
      *
      * @param  mixed  $id
      * @param  array  $columns

@@ -365,6 +365,20 @@ class SupportStrTest extends TestCase
         $this->assertSame('Malmö Jönköping', Str::replaceLast('', 'yyy', 'Malmö Jönköping'));
     }
 
+    public function testRemove()
+    {
+        $this->assertSame('Fbar', Str::remove('o', 'Foobar'));
+        $this->assertSame('Foo', Str::remove('bar', 'Foobar'));
+        $this->assertSame('oobar', Str::remove('F', 'Foobar'));
+        $this->assertSame('Foobar', Str::remove('f', 'Foobar'));
+        $this->assertSame('oobar', Str::remove('f', 'Foobar', false));
+
+        $this->assertSame('Fbr', Str::remove(['o', 'a'], 'Foobar'));
+        $this->assertSame('Fooar', Str::remove(['f', 'b'], 'Foobar'));
+        $this->assertSame('ooar', Str::remove(['f', 'b'], 'Foobar', false));
+        $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
@@ -510,6 +524,18 @@ class SupportStrTest extends TestCase
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
         ];
+    }
+
+    public function testMarkdown()
+    {
+        $this->assertSame("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
+        $this->assertSame("<h1>hello world</h1>\n", Str::markdown('# hello world'));
+    }
+
+    public function testRepeat()
+    {
+        $this->assertSame('aaaaa', Str::repeat('a', 5));
+        $this->assertSame('', Str::repeat('', 5));
     }
 }
 

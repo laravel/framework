@@ -36,6 +36,36 @@ class PostgresGrammar extends Grammar
     protected $fluentCommands = ['Comment'];
 
     /**
+     * Compile a create database command.
+     *
+     * @param  string $name
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    public function compileCreateDatabase($name, $connection)
+    {
+        return sprintf(
+            'create database %s encoding %s',
+            $this->wrapValue($name),
+            $this->wrapValue($connection->getConfig('charset')),
+        );
+    }
+
+    /**
+     * Compile a drop database if exists command.
+     *
+     * @param  string $name
+     * @return string
+     */
+    public function compileDropDatabaseIfExists($name)
+    {
+        return sprintf(
+            'drop database if exists %s',
+            $this->wrapValue($name)
+        );
+    }
+
+    /**
      * Compile the query to determine if a table exists.
      *
      * @return string
@@ -87,7 +117,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile the auto incrementing column starting values.
+     * Compile the auto-incrementing column starting values.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @return array
