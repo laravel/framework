@@ -66,6 +66,22 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute contains only arabic characters.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateArabic($attribute, $value)
+    {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
+        return preg_match("/[^\x{0600}-\x{06FF}a-zA-Z0-9_.-]/u", $value) > 0;
+    }
+
+    /**
      * "Break" on first validation fail.
      *
      * Always returns true, just lets us put "bail" in rules.
