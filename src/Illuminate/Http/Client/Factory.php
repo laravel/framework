@@ -3,11 +3,12 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
-use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
+
+use function GuzzleHttp\Promise\promise_for;
 
 /**
  * @method \Illuminate\Http\Client\PendingRequest accept(string $contentType)
@@ -106,7 +107,7 @@ class Factory
             $headers['Content-Type'] = 'application/json';
         }
 
-        return Create::promiseFor(new Psr7Response($status, $headers, $body));
+        return promise_for(new Psr7Response($status, $headers, $body));
     }
 
     /**
