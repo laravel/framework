@@ -34,6 +34,8 @@ class Worker
     const WORKER_SLEEPING_BETWEEN_JOBS = 2;
     const WORKER_SLEEPING_DEAMON = 3;
 
+    const WORKER_AWAKEND_JOB_FOUND = 4;
+
     /**
      * The name of the worker.
      *
@@ -96,6 +98,11 @@ class Worker
      * @var callable[]
      */
     protected static $popCallbacks = [];
+
+    /**
+     * Indicates if the worker is slept because of no jobs.
+     */
+    protected $sleepingNoJobs = false;
 
     /**
      * Create a new queue worker.
@@ -169,6 +176,11 @@ class Worker
             if ($job) {
                 $jobsProcessed++;
 
+                if ($this->sleepingNoJobs) {
+                    $this->sleepingNoJobs = false;
+                    $this->raiseWorkerAwakendEvent($connectionName, static::WORKER_AWAKEND_JOB_FOUND);
+                }
+
                 $this->runJob($job, $connectionName, $options);
 
                 if ($options->rest > 0) {
@@ -176,6 +188,7 @@ class Worker
                 }
             } else {
                 $this->sleep($options->sleep, $connectionName, STATIC::WORKER_SLEEPING_NO_JOBS);
+                $this->sleepingNoJobs = true;
             }
 
             if ($this->supportsAsyncSignals()) {
@@ -645,13 +658,16 @@ class Worker
      * Raise the worker awakend event.
      *
      * @param  string  $connectionName
-     * @param  int     $sleepingType
+     * @param  int     $awakendType
      * @return void
      */
-    protected function raiseWorkerAwakendEvent($connectionName, $sleepingType)
+    protected function raiseWorkerAwakendEvent($connectionName, $awakendType)
     {
+
         $this->events->dispatch(new WorkerAwakend(
-            $connectionName, $sleepingType
+            $connectionName, 
+            $awakendType == static::WORKER_AWAKEND_JOB_FOUND ? null : $awakendType,
+            $awakendType == static::WORKER_AWAKEND_JOB_FOUND
         ));
     }
 
