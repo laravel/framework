@@ -134,13 +134,15 @@ class Grammar extends BaseGrammar
             return;
         }
 
-        if ($query->distinct) {
-            $select = 'select distinct ';
-        } else {
-            $select = 'select ';
+        if (! $query->distinct) {
+            return 'select '.$this->columnize($columns);
         }
 
-        return $select.$this->columnize($columns);
+        if(is_bool($query->distinct) or $columns !== ['*']){
+            return 'select distinct ' .$this->columnize($columns);
+        }
+
+        return 'select distinct '.$this->columnize($query->distinct);
     }
 
     /**
