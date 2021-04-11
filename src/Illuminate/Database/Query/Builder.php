@@ -1110,12 +1110,12 @@ class Builder
      * Add a where between statement to the query.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
-     * @param  array  $values
+     * @param  iterable  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
+    public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
 
@@ -1148,10 +1148,10 @@ class Builder
      * Add an or where between statement to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  iterable  $values
      * @return $this
      */
-    public function orWhereBetween($column, array $values)
+    public function orWhereBetween($column, iterable $values)
     {
         return $this->whereBetween($column, $values, 'or');
     }
@@ -1172,11 +1172,11 @@ class Builder
      * Add a where not between statement to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  iterable  $values
      * @param  string  $boolean
      * @return $this
      */
-    public function whereNotBetween($column, array $values, $boolean = 'and')
+    public function whereNotBetween($column, iterable $values, $boolean = 'and')
     {
         return $this->whereBetween($column, $values, $boolean, true);
     }
@@ -1198,10 +1198,10 @@ class Builder
      * Add an or where not between statement to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  iterable  $values
      * @return $this
      */
-    public function orWhereNotBetween($column, array $values)
+    public function orWhereNotBetween($column, iterable $values)
     {
         return $this->whereNotBetween($column, $values, 'or');
     }
