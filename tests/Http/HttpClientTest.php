@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Http;
 
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Http\Client\Factory;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Pool;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
@@ -832,5 +835,71 @@ class HttpClientTest extends TestCase
         });
 
         $this->assertSame('yes!', $this->factory->fakeSequence()->customMethod());
+    }
+
+    public function testRequestsCanBeAsync()
+    {
+        $request = new PendingRequest($this->factory);
+
+        $promise = $request->async()->get('http://foo.com');
+
+        $this->assertInstanceOf(PromiseInterface::class, $promise);
+
+        $this->assertSame($promise, $request->getPromise());
+    }
+
+    public function testClientCanBeSet()
+    {
+        $client = $this->factory->buildClient();
+
+        $request = new PendingRequest($this->factory);
+
+        $this->assertNotSame($client, $request->buildClient());
+
+        $request->setClient($client);
+
+        $this->assertSame($client, $request->buildClient());
+    }
+
+    public function testMultipleRequestsAreSentInThePool()
+    {
+        $this->factory->fake([
+            '200.com' => $this->factory::response('', 200),
+            '400.com' => $this->factory::response('', 400),
+            '500.com' => $this->factory::response('', 500),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('200.com'),
+                $pool->get('400.com'),
+                $pool->get('500.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses[0]->status());
+        $this->assertSame(400, $responses[1]->status());
+        $this->assertSame(500, $responses[2]->status());
+    }
+
+    public function testMultipleRequestsAreSentInThePoolWithKeys()
+    {
+        $this->factory->fake([
+            '200.com' => $this->factory::response('', 200),
+            '400.com' => $this->factory::response('', 400),
+            '500.com' => $this->factory::response('', 500),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->add('test200')->get('200.com'),
+                $pool->add('test400')->get('400.com'),
+                $pool->add('test500')->get('500.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses['test200']->status());
+        $this->assertSame(400, $responses['test400']->status());
+        $this->assertSame(500, $responses['test500']->status());
     }
 }
