@@ -194,9 +194,9 @@ class Store implements Session
     }
 
     /**
-     * Checks if a key is missing.
+     * Determine if the given key is missing from the session data.
      *
-     * @param string|array $key
+     * @param  string|array  $key
      * @return bool
      */
     public function missing($key)
