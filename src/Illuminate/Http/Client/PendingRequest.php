@@ -5,10 +5,13 @@ namespace Illuminate\Http\Client;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Psr\Http\Message\MessageInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
 class PendingRequest
@@ -21,6 +24,13 @@ class PendingRequest
      * @var \Illuminate\Http\Client\Factory|null
      */
     protected $factory;
+
+    /**
+     * The client instance.
+     *
+     * @var \GuzzleHttp\Client
+     */
+    protected $client;
 
     /**
      * The base URL for the request.
@@ -105,6 +115,20 @@ class PendingRequest
      * @var \Illuminate\Support\Collection
      */
     protected $middleware;
+
+    /**
+     * Whether the requests should be asynchronous.
+     *
+     * @var bool
+     */
+    protected $async = false;
+
+    /**
+     * The pending request promise.
+     *
+     * @var \GuzzleHttp\Promise\PromiseInterface
+     */
+    protected $promise;
 
     /**
      * Create a new HTTP Client instance.
@@ -601,18 +625,14 @@ class PendingRequest
 
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
+        if ($this->async) {
+            return $this->makePromise($method, $url, $options);
+        }
+
         return retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {
-                $laravelData = $this->parseRequestData($method, $url, $options);
-
-                return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
-                    'laravel_data' => $laravelData,
-                    'on_stats' => function ($transferStats) {
-                        $this->transferStats = $transferStats;
-                    },
-                ], $options))), function ($response) {
-                    $response->cookies = $this->cookies;
-                    $response->transferStats = $this->transferStats;
+                return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) {
+                    $this->populateResponse($response);
 
                     if ($this->tries > 1 && ! $response->successful()) {
                         $response->throw();
@@ -635,6 +655,49 @@ class PendingRequest
         return collect($data)->map(function ($value, $key) {
             return is_array($value) ? $value : ['name' => $key, 'contents' => $value];
         })->values()->all();
+    }
+
+    /**
+     * Send an asynchronous request to the given URL.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    protected function makePromise(string $method, string $url, array $options = [])
+    {
+        return $this->promise = $this->sendRequest($method, $url, $options)
+            ->then(function (MessageInterface $message) {
+                return $this->populateResponse(new Response($message));
+            })
+            ->otherwise(function (TransferException $e) {
+                return $e instanceof RequestException ? $this->populateResponse(new Response($e->getResponse())) : $e;
+            });
+    }
+
+    /**
+     * Send a request either synchronously or asynchronously.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return \Psr\Http\Message\MessageInterface|\GuzzleHttp\Promise\PromiseInterface
+     *
+     * @throws \Exception
+     */
+    protected function sendRequest(string $method, string $url, array $options = [])
+    {
+        $clientMethod = $this->async ? 'requestAsync' : 'request';
+
+        $laravelData = $this->parseRequestData($method, $url, $options);
+
+        return $this->buildClient()->$clientMethod($method, $url, $this->mergeOptions([
+            'laravel_data' => $laravelData,
+            'on_stats' => function ($transferStats) {
+                $this->transferStats = $transferStats;
+            },
+        ], $options));
     }
 
     /**
@@ -665,13 +728,41 @@ class PendingRequest
     }
 
     /**
+     * Populate the given response with additional data.
+     *
+     * @param  \Illuminate\Http\Client\Response  $response
+     * @return \Illuminate\Http\Client\Response
+     */
+    protected function populateResponse(Response $response)
+    {
+        $response->cookies = $this->cookies;
+
+        $response->transferStats = $this->transferStats;
+
+        return $response;
+    }
+
+    /**
+     * Set the client instance.
+     *
+     * @param  \GuzzleHttp\Client  $client
+     * @return $this
+     */
+    public function setClient(Client $client)
+    {
+        $this->client = $client;
+
+        return $this;
+    }
+
+    /**
      * Build the Guzzle client.
      *
      * @return \GuzzleHttp\Client
      */
     public function buildClient()
     {
-        return new Client([
+        return $this->client = $this->client ?: new Client([
             'handler' => $this->buildHandlerStack(),
             'cookies' => true,
         ]);
@@ -825,5 +916,49 @@ class PendingRequest
         $this->stubCallbacks = collect($callback);
 
         return $this;
+    }
+
+    /**
+     * Toggle asynchronicity in requests.
+     *
+     * @param  bool  $async
+     * @return $this
+     */
+    public function async(bool $async = true)
+    {
+        $this->async = $async;
+
+        return $this;
+    }
+
+    /**
+     * Send a pool of asynchronous requests concurrently
+     *
+     * @param  callable  $callback
+     * @return array
+     */
+    public function pool(callable $callback)
+    {
+        $results = [];
+
+        $requests = tap(new Pool($this->factory), $callback)->getRequests();
+
+        foreach ($requests as $key => $item) {
+            $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+        }
+
+        ksort($results);
+
+        return $results;
+    }
+
+    /**
+     * Retrieve the pending request promise.
+     *
+     * @return \GuzzleHttp\Promise\PromiseInterface|null
+     */
+    public function getPromise()
+    {
+        return $this->promise;
     }
 }
