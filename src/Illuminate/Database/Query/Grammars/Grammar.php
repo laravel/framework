@@ -138,7 +138,7 @@ class Grammar extends BaseGrammar
             return 'select '.$this->columnize($columns);
         }
 
-        if(is_bool($query->distinct) or $columns !== ['*']){
+        if($query->distinct === true or $columns !== ['*']){
             return 'select distinct ' .$this->columnize($columns);
         }
 
