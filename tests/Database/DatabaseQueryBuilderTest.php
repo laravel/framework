@@ -3977,16 +3977,3 @@ SQL;
         ])->makePartial();
     }
 }
-
-class PDOStub extends PDO
-{
-    public function __construct()
-    {
-        //
-    }
-
-    public function quote($string, $type = PDO::PARAM_STR)
-    {
-        //
-    }
-}
