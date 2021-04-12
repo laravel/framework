@@ -44,7 +44,7 @@ class Pool
      * @param  string  $key
      * @return \Illuminate\Http\Client\PendingRequest
      */
-    public function add(string $key)
+    public function as(string $key)
     {
         return $this->pool[$key] = $this->asyncRequest();
     }
@@ -56,7 +56,6 @@ class Pool
      */
     protected function asyncRequest()
     {
-        // the same client instance needs to be shared across all async requests
         return $this->factory->setClient($this->client)->async();
     }
 

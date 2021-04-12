@@ -26,7 +26,7 @@ class PendingRequest
     protected $factory;
 
     /**
-     * The client instance.
+     * The Guzzle client instance.
      *
      * @var \GuzzleHttp\Client
      */
@@ -596,6 +596,27 @@ class PendingRequest
     }
 
     /**
+     * Send a pool of asynchronous requests concurrently.
+     *
+     * @param  callable  $callback
+     * @return array
+     */
+    public function pool(callable $callback)
+    {
+        $results = [];
+
+        $requests = tap(new Pool($this->factory), $callback)->getRequests();
+
+        foreach ($requests as $key => $item) {
+            $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+        }
+
+        ksort($results);
+
+        return $results;
+    }
+
+    /**
      * Send the request to the given URL.
      *
      * @param  string  $method
@@ -740,19 +761,6 @@ class PendingRequest
         $response->transferStats = $this->transferStats;
 
         return $response;
-    }
-
-    /**
-     * Set the client instance.
-     *
-     * @param  \GuzzleHttp\Client  $client
-     * @return $this
-     */
-    public function setClient(Client $client)
-    {
-        $this->client = $client;
-
-        return $this;
     }
 
     /**
@@ -932,27 +940,6 @@ class PendingRequest
     }
 
     /**
-     * Send a pool of asynchronous requests concurrently.
-     *
-     * @param  callable  $callback
-     * @return array
-     */
-    public function pool(callable $callback)
-    {
-        $results = [];
-
-        $requests = tap(new Pool($this->factory), $callback)->getRequests();
-
-        foreach ($requests as $key => $item) {
-            $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
-        }
-
-        ksort($results);
-
-        return $results;
-    }
-
-    /**
      * Retrieve the pending request promise.
      *
      * @return \GuzzleHttp\Promise\PromiseInterface|null
@@ -960,5 +947,18 @@ class PendingRequest
     public function getPromise()
     {
         return $this->promise;
+    }
+
+    /**
+     * Set the client instance.
+     *
+     * @param  \GuzzleHttp\Client  $client
+     * @return $this
+     */
+    public function setClient(Client $client)
+    {
+        $this->client = $client;
+
+        return $this;
     }
 }

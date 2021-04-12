@@ -892,9 +892,9 @@ class HttpClientTest extends TestCase
 
         $responses = $this->factory->pool(function (Pool $pool) {
             return [
-                $pool->add('test200')->get('200.com'),
-                $pool->add('test400')->get('400.com'),
-                $pool->add('test500')->get('500.com'),
+                $pool->as('test200')->get('200.com'),
+                $pool->as('test400')->get('400.com'),
+                $pool->as('test500')->get('500.com'),
             ];
         });
 
