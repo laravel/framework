@@ -455,6 +455,25 @@ class Str
     }
 
     /**
+     * Pluralize the last word of an English phrase (multi-word string).
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function pluralPhrase($value) {
+        $words = explode(' ', $value);
+
+        if (count($words) == 0) {
+            return $value;
+        } elseif (count($words) == 1) {
+            return Str::plural($words[0]);
+        } else {
+            $last = array_pop($words);
+            return implode(' ', $words) . ' ' . Str::plural($last);
+        }
+    }
+
+    /**
      * Pluralize the last word of an English, studly caps case string.
      *
      * @param  string  $value

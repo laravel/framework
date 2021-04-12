@@ -446,6 +446,15 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Pluralize the last word of an English phrase (multi-word string).
+     *
+     * @return static
+     */
+    public function pluralPhrase() {
+        return new static(Str::pluralPhrase($this->value));
+    }
+
+    /**
      * Pluralize the last word of an English, studly caps case string.
      *
      * @param  int  $count
