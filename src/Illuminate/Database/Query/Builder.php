@@ -2279,10 +2279,10 @@ class Builder
                         if (method_exists($this->connection, 'getPdo')) {
                             return is_string($i) ? $this->connection->getPdo()->quote($i) : $i;
                         }
-                        $search = ["\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a"];
-                        $replace = ["\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z"];
+                        $search = ['\\',  "\x00", "\n",  "\r",  "'",  '"', "\x1a"];
+                        $replace = ['\\\\', '\\0', '\\n', '\\r', "\'", '\"', '\\Z'];
 
-                        return "'" . str_replace($search, $replace, $value) . "'";
+                        return "'".str_replace($search, $replace, $value)."'";
                     }
 
                     return $i;
