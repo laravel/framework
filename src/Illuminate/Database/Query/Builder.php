@@ -2282,7 +2282,7 @@ class Builder
                         $search = ['\\',  "\x00", "\n",  "\r",  "'",  '"', "\x1a"];
                         $replace = ['\\\\', '\\0', '\\n', '\\r', "\'", '\"', '\\Z'];
 
-                        return "'".str_replace($search, $replace, $value)."'";
+                        return "'".str_replace($search, $replace, $i)."'";
                     }
 
                     return $i;
