@@ -1554,7 +1554,7 @@ trait ValidatesAttributes
 
         $values = array_slice($parameters, 1);
 
-        if ($this->shouldConvert($parameters[0], $other) || is_bool($other)) {
+        if ($this->shouldConvert($parameters[0]) || is_bool($other)) {
             $values = $this->convertValuesToBoolean($values);
         } elseif (is_null($other)) {
             $values = $this->convertValuesToNull($values);
@@ -1567,10 +1567,9 @@ trait ValidatesAttributes
      * Check if parameter should be converted to boolean.
      *
      * @param $parameter
-     * @param mixed $other
      * @return bool
      */
-    protected function shouldConvert($parameter, $other)
+    protected function shouldConvert($parameter)
     {
         $rules = Arr::get($this->rules, $parameter, []);
 
