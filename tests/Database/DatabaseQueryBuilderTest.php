@@ -19,7 +19,6 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use InvalidArgumentException;
 use Mockery as m;
-use PDO;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -3814,10 +3813,6 @@ SQL;
         $processor = m::mock(Processor::class);
         $connection = m::mock(ConnectionInterface::class);
 
-        $pdo = $this->createMock(PDOStub::class);
-        $pdo->expects($this->once())->method('quote')->with('%Taylor%')->willReturn("'%Taylor%'");
-
-        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with(['%Taylor%'])
             ->andReturn(['%Taylor%']);
@@ -3834,10 +3829,6 @@ SQL;
         $processor = m::mock(Processor::class);
         $connection = m::mock(ConnectionInterface::class);
 
-        $pdo = $this->createMock(PDOStub::class);
-        $pdo->expects($this->once())->method('quote')->with('%Taylor%')->willReturn("'%Taylor%'");
-
-        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with(['%Taylor%'])
             ->andReturn(['%Taylor%']);
@@ -3854,10 +3845,6 @@ SQL;
         $processor = m::mock(Processor::class);
         $connection = m::mock(ConnectionInterface::class);
 
-        $pdo = $this->createMock(PDOStub::class);
-        $pdo->expects($this->once())->method('quote')->with('%Taylor%')->willReturn("'%Taylor%'");
-
-        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with(['%Taylor%'])
             ->andReturn(['%Taylor%']);
@@ -3874,10 +3861,6 @@ SQL;
         $processor = m::mock(Processor::class);
         $connection = m::mock(ConnectionInterface::class);
 
-        $pdo = $this->createMock(PDOStub::class);
-        $pdo->expects($this->once())->method('quote')->with('%Taylor%')->willReturn("'%Taylor%'");
-
-        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with(['%Taylor%'])
             ->andReturn(['%Taylor%']);
@@ -3896,12 +3879,6 @@ SQL;
 
         $datetime = new Datetime();
 
-        $pdo = $this->createMock(PDOStub::class);
-        $pdo->expects($this->once())->method('quote')
-            ->with($datetime->format('Y-m-d H:i:s'))
-            ->willReturn("'{$datetime->format('Y-m-d H:i:s')}'");
-
-        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with([$datetime])
             ->andReturn([$datetime->format('Y-m-d H:i:s')]);
@@ -3922,10 +3899,6 @@ SQL;
         $processor = m::mock(Processor::class);
         $connection = m::mock(ConnectionInterface::class);
 
-        $pdo = $this->createMock(PDOStub::class);
-        $pdo->expects($this->once())->method('quote')->with("%Taylor's%")->willReturn("'%Taylor\'s%'");
-
-        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with(['%Taylor\'s%'])
             ->andReturn(['%Taylor\'s%']);
