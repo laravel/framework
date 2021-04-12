@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Http;
 
+use function config;
 use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Cookie;
-use function config;
 
 class MaintenanceModeBypassCookie
 {
