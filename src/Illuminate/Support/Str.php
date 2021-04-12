@@ -460,7 +460,8 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function pluralPhrase($value) {
+    public static function pluralPhrase($value)
+    {
         $words = explode(' ', $value);
 
         if (count($words) == 0) {

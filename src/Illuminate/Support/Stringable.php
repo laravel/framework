@@ -450,7 +450,8 @@ class Stringable implements JsonSerializable
      *
      * @return static
      */
-    public function pluralPhrase() {
+    public function pluralPhrase()
+    {
         return new static(Str::pluralPhrase($this->value));
     }
 
