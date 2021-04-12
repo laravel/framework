@@ -187,6 +187,19 @@ class Batch implements Arrayable, JsonSerializable
         $this->repository->transaction(function () use ($jobs, $count) {
             $this->repository->incrementTotalJobs($this->id, $count);
 
+            $jobs->each(function ($job, $key) use(&$jobs) {
+                if(!empty($job->delay)) {
+                    $this->queue->connection($this->options['connection'] ?? null)->later(
+                        $job->delay,
+                        $job,
+                        $data = '',
+                        $this->options['queue'] ?? null
+                    );
+
+                    $jobs->forget($key);
+                }
+            });
+
             $this->queue->connection($this->options['connection'] ?? null)->bulk(
                 $jobs->all(),
                 $data = '',
