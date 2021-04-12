@@ -56,7 +56,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
     }
 
     /**
-     * Register the not compromise verifier.
+     * Register the not compromised verifier.
      *
      * @return void
      */
