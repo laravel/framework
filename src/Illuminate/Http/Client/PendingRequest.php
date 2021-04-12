@@ -932,7 +932,7 @@ class PendingRequest
     }
 
     /**
-     * Send a pool of asynchronous requests concurrently
+     * Send a pool of asynchronous requests concurrently.
      *
      * @param  callable  $callback
      * @return array
