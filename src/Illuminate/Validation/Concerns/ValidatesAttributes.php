@@ -1564,7 +1564,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Check if parameter should be converted to boolean
+     * Check if parameter should be converted to boolean.
      *
      * @param $parameter
      * @param mixed $other
