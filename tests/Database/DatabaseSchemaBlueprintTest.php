@@ -292,7 +292,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
-    public function testTinyTextColumn(){
+    public function testTinyTextColumn()
+    {
         $base = new Blueprint('posts', function ($table) {
             $table->tinyText('note');
         });
@@ -320,7 +321,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new SqlServerGrammar));
     }
 
-    public function testTinyTextNullableColumn(){
+    public function testTinyTextNullableColumn()
+    {
         $base = new Blueprint('posts', function ($table) {
             $table->tinyText('note')->nullable();
         });
