@@ -470,7 +470,7 @@ class Str
             return Str::plural($words[0]);
         } else {
             $last = array_pop($words);
-            return implode(' ', $words) . ' ' . Str::plural($last);
+            return implode(' ', $words).' '.Str::plural($last);
         }
     }
 
