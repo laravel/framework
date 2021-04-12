@@ -122,6 +122,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->distinct()->from('users');
         $this->assertSame('select distinct * from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->distinct(false)->from('users');
+        $this->assertSame('select * from "users"', $builder->toSql());
     }
 
     public function testBasicSelectDistinctOnColumns()
