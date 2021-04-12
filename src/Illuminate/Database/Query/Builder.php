@@ -2275,7 +2275,7 @@ class Builder
             '?',
             collect($this->connection->prepareBindings($this->getBindings()))
                 ->map(function ($i) {
-                    return (is_string($i)) ? "'{$i}'" : $i;
+                    return (is_string($i)) ? $this->connection->getPdo()->quote($i) : $i;
                 })->all(),
             $this->toSql()
         );

@@ -19,6 +19,7 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use InvalidArgumentException;
 use Mockery as m;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -3813,6 +3814,10 @@ SQL;
         $processor = m::mock(Processor::class);
         $connection = m::mock(ConnectionInterface::class);
 
+        $pdo = $this->createMock(PDOStub::class);
+        $pdo->expects($this->once())->method('quote')->with('%Taylor%')->willReturn("'%Taylor%'");
+
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with(['%Taylor%'])
             ->andReturn(['%Taylor%']);
@@ -3829,6 +3834,10 @@ SQL;
         $processor = m::mock(Processor::class);
         $connection = m::mock(ConnectionInterface::class);
 
+        $pdo = $this->createMock(PDOStub::class);
+        $pdo->expects($this->once())->method('quote')->with('%Taylor%')->willReturn("'%Taylor%'");
+
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with(['%Taylor%'])
             ->andReturn(['%Taylor%']);
@@ -3845,6 +3854,10 @@ SQL;
         $processor = m::mock(Processor::class);
         $connection = m::mock(ConnectionInterface::class);
 
+        $pdo = $this->createMock(PDOStub::class);
+        $pdo->expects($this->once())->method('quote')->with('%Taylor%')->willReturn("'%Taylor%'");
+
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with(['%Taylor%'])
             ->andReturn(['%Taylor%']);
@@ -3861,6 +3874,10 @@ SQL;
         $processor = m::mock(Processor::class);
         $connection = m::mock(ConnectionInterface::class);
 
+        $pdo = $this->createMock(PDOStub::class);
+        $pdo->expects($this->once())->method('quote')->with('%Taylor%')->willReturn("'%Taylor%'");
+
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with(['%Taylor%'])
             ->andReturn(['%Taylor%']);
@@ -3879,6 +3896,12 @@ SQL;
 
         $datetime = new Datetime();
 
+        $pdo = $this->createMock(PDOStub::class);
+        $pdo->expects($this->once())->method('quote')
+            ->with($datetime->format('Y-m-d H:i:s'))
+            ->willReturn("'{$datetime->format('Y-m-d H:i:s')}'");
+
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
         $connection->expects('prepareBindings')
             ->with([$datetime])
             ->andReturn([$datetime->format('Y-m-d H:i:s')]);
@@ -3891,6 +3914,26 @@ SQL;
             "select * from `users` where `created_at` > '{$datetime->format('Y-m-d H:i:s')}'",
             $builder->toSqlWithBindings()
         );
+    }
+
+    public function testToSqlWithBindingsWorksWithQuotedStrings()
+    {
+        $grammar = new MySqlGrammar();
+        $processor = m::mock(Processor::class);
+        $connection = m::mock(ConnectionInterface::class);
+
+        $pdo = $this->createMock(PDOStub::class);
+        $pdo->expects($this->once())->method('quote')->with("%Taylor's%")->willReturn("'%Taylor\'s%'");
+
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
+        $connection->expects('prepareBindings')
+            ->with(['%Taylor\'s%'])
+            ->andReturn(['%Taylor\'s%']);
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $builder->select('*')->from('users')->where('name', 'like', '%Taylor\'s%');
+        $this->assertSame("select * from `users` where `name` like '%Taylor\'s%'", $builder->toSqlWithBindings());
     }
 
     protected function getConnection()
@@ -3959,5 +4002,18 @@ SQL;
             new Grammar,
             m::mock(Processor::class),
         ])->makePartial();
+    }
+}
+
+class PDOStub extends PDO
+{
+    public function __construct()
+    {
+        //
+    }
+
+    public function quote($string, $type = PDO::PARAM_STR)
+    {
+        //
     }
 }
