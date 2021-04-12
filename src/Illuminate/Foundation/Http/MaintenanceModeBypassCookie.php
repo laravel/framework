@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Http;
 
 use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Cookie;
+use function config;
 
 class MaintenanceModeBypassCookie
 {
@@ -16,11 +17,22 @@ class MaintenanceModeBypassCookie
     public static function create(string $key)
     {
         $expiresAt = Carbon::now()->addHours(12);
+        $config = config('session');
 
-        return new Cookie('laravel_maintenance', base64_encode(json_encode([
-            'expires_at' => $expiresAt->getTimestamp(),
-            'mac' => hash_hmac('SHA256', $expiresAt->getTimestamp(), $key),
-        ])), $expiresAt, '/', env('SESSION_DOMAIN', null));
+        return new Cookie(
+            'laravel_maintenance',
+            base64_encode(json_encode([
+                'expires_at' => $expiresAt->getTimestamp(),
+                'mac' => hash_hmac('SHA256', $expiresAt->getTimestamp(), $key),
+            ])),
+            $expiresAt,
+            $config['path'] ?? '/',
+            $config['domain'] ?? null,
+            $config['secure'] ?? null,
+            $config['httpOnly'] ?? false,
+            $config['raw'] ?? false,
+            $config['same_site'] ?? null
+        );
     }
 
     /**
