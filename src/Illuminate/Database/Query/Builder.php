@@ -2277,7 +2277,7 @@ class Builder
                 ->map(function ($i) {
                     if (is_string($i)) {
                         if (method_exists($this->connection, 'getPdo')) {
-                            return is_string($i) ? $this->connection->getPdo()->quote($i) : $i;
+                            return $this->connection->getPdo()->quote($i);
                         }
                         $search = ['\\',  "\x00", "\n",  "\r",  "'",  '"', "\x1a"];
                         $replace = ['\\\\', '\\0', '\\n', '\\r', "\'", '\"', '\\Z'];
