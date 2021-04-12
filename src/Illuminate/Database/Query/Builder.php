@@ -2275,7 +2275,17 @@ class Builder
             '?',
             collect($this->connection->prepareBindings($this->getBindings()))
                 ->map(function ($i) {
-                    return (is_string($i)) ? $this->connection->getPdo()->quote($i) : $i;
+                    if (is_string($i)) {
+                        if (method_exists($this->connection, 'getPdo')) {
+                            return is_string($i) ? $this->connection->getPdo()->quote($i) : $i;
+                        }
+                        $search = ["\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a"];
+                        $replace = ["\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z"];
+
+                        return "'" . str_replace($search, $replace, $value) . "'";
+                    }
+
+                    return $i;
                 })->all(),
             $this->toSql()
         );
