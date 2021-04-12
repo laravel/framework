@@ -464,14 +464,12 @@ class Str
     {
         $words = explode(' ', $value);
 
-        if (count($words) == 0) {
-            return $value;
-        } elseif (count($words) == 1) {
-            return Str::plural($words[0]);
-        } else {
-            $last = array_pop($words);
+        if (count($words) > 1) {
+            $lastWord = array_pop($words);
 
-            return implode(' ', $words).' '.Str::plural($last);
+            return implode(' ', $words).' '.self::plural($lastWord);
+        } else {
+            return self::plural($words[0]);
         }
     }
 
