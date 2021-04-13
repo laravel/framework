@@ -45,7 +45,7 @@ class NotPwnedVerifier implements NotCompromisedVerifier
             ->contains(function ($line) use ($hash, $hashPrefix) {
                 [$hashSuffix, $count] = explode(':', $line);
 
-                return $hashPrefix.$hashSuffix == $hash && $count > 1;
+                return $hashPrefix.$hashSuffix == $hash && $count > 0;
             });
     }
 
