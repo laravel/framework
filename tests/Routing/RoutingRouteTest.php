@@ -873,10 +873,14 @@ class RoutingRouteTest extends TestCase
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
         }]);
-        $router->bind('bar', function ($value) {
-            return strtoupper($value);
+        $router->get('foo2/{bar:replace}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->bind('bar', function ($value, $route, $field) {
+            return $field === 'replace' ? str_repeat('*', strlen($value)) : strtoupper($value);
         });
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+        $this->assertSame('******', $router->dispatch(Request::create('foo2/taylor', 'GET'))->getContent());
     }
 
     public function testRouteClassBinding()
@@ -885,8 +889,12 @@ class RoutingRouteTest extends TestCase
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
         }]);
+        $router->get('foo2/{bar:replace}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
         $router->bind('bar', RouteBindingStub::class);
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+        $this->assertSame('******', $router->dispatch(Request::create('foo2/taylor', 'GET'))->getContent());
     }
 
     public function testRouteClassMethodBinding()
@@ -895,8 +903,12 @@ class RoutingRouteTest extends TestCase
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
         }]);
+        $router->get('foo2/{bar:replace}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
         $router->bind('bar', RouteBindingStub::class.'@find');
         $this->assertSame('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
+        $this->assertSame('######', $router->dispatch(Request::create('foo2/Dragon', 'GET'))->getContent());
     }
 
     public function testMiddlewarePrioritySorting()
@@ -936,6 +948,20 @@ class RoutingRouteTest extends TestCase
         }]);
         $router->model('bar', RouteModelBindingStub::class);
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testModelBindingWithResolver()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->get('foo2/{bar:replace}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->model('bar', RouteModelBindingStub::class);
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+        $this->assertSame('******', $router->dispatch(Request::create('foo2/taylor', 'GET'))->getContent());
     }
 
     public function testModelBindingWithNullReturn()
@@ -2105,14 +2131,14 @@ class ResponsableResponse implements Responsable
 
 class RouteBindingStub
 {
-    public function bind($value, $route)
+    public function bind($value, $route, $field)
     {
-        return strtoupper($value);
+        return $field === 'replace' ? str_repeat('*', strlen($value)) : strtoupper($value);
     }
 
-    public function find($value, $route)
+    public function find($value, $route, $field)
     {
-        return strtolower($value);
+        return $field === 'replace' ? str_repeat('#', strlen($value)) : strtolower($value);
     }
 }
 
@@ -2133,6 +2159,15 @@ class RouteModelBindingStub extends Model
     public function first()
     {
         return strtoupper($this->value);
+    }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if($field === 'replace') {
+            return str_repeat('*', strlen($value));
+        }
+
+        return parent::resolveRouteBinding($value, $field);
     }
 }
 
