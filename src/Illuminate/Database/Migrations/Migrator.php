@@ -187,6 +187,7 @@ class Migrator
         // migration file name. Once we have the instances we can run the actual
         // command such as "up" or "down", or we can just simulate the action.
         $migration = $this->resolvePath($file);
+
         $name = $this->getMigrationName($file);
 
         if ($pretend) {
@@ -349,6 +350,7 @@ class Migrator
         // instance of the migration. Once we get an instance we can either run a
         // pretend execution of the migration or we can run the real migration.
         $instance = $this->resolvePath($file);
+
         $name = $this->getMigrationName($file);
 
         $this->note("<comment>Rolling back:</comment> {$name}");
@@ -413,6 +415,7 @@ class Migrator
             $name = get_class($migration);
 
             $reflectionClass = new ReflectionClass($migration);
+
             if ($reflectionClass->isAnonymous()) {
                 $name = $this->getMigrationName($reflectionClass->getFileName());
             }
@@ -458,7 +461,7 @@ class Migrator
     }
 
     /**
-     * Resolve a migration instance from migration path.
+     * Resolve a migration instance from a migration path.
      *
      * @param  string  $path
      * @return object
@@ -466,6 +469,7 @@ class Migrator
     protected function resolvePath(string $path)
     {
         $class = $this->getMigrationClass($this->getMigrationName($path));
+
         if (class_exists($class)) {
             return new $class;
         }
@@ -474,7 +478,7 @@ class Migrator
     }
 
     /**
-     * Generate migration class name based on migration name.
+     * Generate a migration class name based on the migration file name.
      *
      * @param  string  $migrationName
      * @return string
