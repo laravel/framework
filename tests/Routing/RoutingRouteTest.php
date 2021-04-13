@@ -1678,6 +1678,26 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('1|4', $router->dispatch(Request::create('foo/1/4', 'GET'))->getContent());
     }
 
+
+    public function testParentChildExplicitBindings()
+    {
+        $router = $this->getRouter();
+
+        $router->model('foo', RoutingTestPostModel::class);
+
+        $router->get('foo/{user}/{foo:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $user, RoutingTestPostModel $foo) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $user);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $foo);
+
+                return $user->value.'|'.$foo->value;
+            },
+        ]);
+
+        $this->assertSame('1|test-slug', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
+    }
+
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
     {
         $router = $this->getRouter();
