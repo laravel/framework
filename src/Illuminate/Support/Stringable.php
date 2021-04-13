@@ -480,6 +480,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Repeat the string.
+     *
+     * @param  int  $times
+     * @return static
+     */
+    public function repeat(int $times)
+    {
+        return new static(Str::repeat($this->value, $times));
+    }
+
+    /**
      * Replace the given value in the given string.
      *
      * @param  string|string[]  $search

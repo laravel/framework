@@ -1093,7 +1093,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function isDownForMaintenance()
     {
-        return is_file($this->storagePath().'/framework/down');
+        return file_exists($this->storagePath().'/framework/down');
     }
 
     /**

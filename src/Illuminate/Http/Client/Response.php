@@ -238,6 +238,18 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Create an exception if a server or client error occurred.
+     *
+     * @return \Illuminate\Http\Client\RequestException|null
+     */
+    public function toException()
+    {
+        if ($this->failed()) {
+            return new RequestException($this);
+        }
+    }
+
+    /**
      * Throw an exception if a server or client error occurred.
      *
      * @param  \Closure|null  $callback
@@ -250,7 +262,7 @@ class Response implements ArrayAccess
         $callback = func_get_args()[0] ?? null;
 
         if ($this->failed()) {
-            throw tap(new RequestException($this), function ($exception) use ($callback) {
+            throw tap($this->toException(), function ($exception) use ($callback) {
                 if ($callback && is_callable($callback)) {
                     $callback($this, $exception);
                 }

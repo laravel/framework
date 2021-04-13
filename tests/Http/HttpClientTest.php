@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Http;
 
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Http\Client\Factory;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Pool;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
@@ -465,6 +468,27 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testExceptionAccessorOnSuccess()
+    {
+        $resp = new Response(new Psr7Response());
+
+        $this->assertNull($resp->toException());
+    }
+
+    public function testExceptionAccessorOnFailure()
+    {
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+        $resp = new Response($response);
+
+        $this->assertInstanceOf(RequestException::class, $resp->toException());
+    }
+
     public function testRequestExceptionSummary()
     {
         $this->expectException(RequestException::class);
@@ -811,5 +835,71 @@ class HttpClientTest extends TestCase
         });
 
         $this->assertSame('yes!', $this->factory->fakeSequence()->customMethod());
+    }
+
+    public function testRequestsCanBeAsync()
+    {
+        $request = new PendingRequest($this->factory);
+
+        $promise = $request->async()->get('http://foo.com');
+
+        $this->assertInstanceOf(PromiseInterface::class, $promise);
+
+        $this->assertSame($promise, $request->getPromise());
+    }
+
+    public function testClientCanBeSet()
+    {
+        $client = $this->factory->buildClient();
+
+        $request = new PendingRequest($this->factory);
+
+        $this->assertNotSame($client, $request->buildClient());
+
+        $request->setClient($client);
+
+        $this->assertSame($client, $request->buildClient());
+    }
+
+    public function testMultipleRequestsAreSentInThePool()
+    {
+        $this->factory->fake([
+            '200.com' => $this->factory::response('', 200),
+            '400.com' => $this->factory::response('', 400),
+            '500.com' => $this->factory::response('', 500),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('200.com'),
+                $pool->get('400.com'),
+                $pool->get('500.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses[0]->status());
+        $this->assertSame(400, $responses[1]->status());
+        $this->assertSame(500, $responses[2]->status());
+    }
+
+    public function testMultipleRequestsAreSentInThePoolWithKeys()
+    {
+        $this->factory->fake([
+            '200.com' => $this->factory::response('', 200),
+            '400.com' => $this->factory::response('', 400),
+            '500.com' => $this->factory::response('', 500),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->as('test200')->get('200.com'),
+                $pool->as('test400')->get('400.com'),
+                $pool->as('test500')->get('500.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses['test200']->status());
+        $this->assertSame(400, $responses['test400']->status());
+        $this->assertSame(500, $responses['test500']->status());
     }
 }

@@ -473,6 +473,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a tiny text type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTinyText(Fluent $column)
+    {
+        return 'varchar(255)';
+    }
+
+    /**
      * Create the column definition for a text type.
      *
      * @param  \Illuminate\Support\Fluent  $column

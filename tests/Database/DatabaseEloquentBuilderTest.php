@@ -1497,6 +1497,18 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->withCasts(['foo' => 'bar']);
     }
 
+    public function testClone()
+    {
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $builder->select('*')->from('users');
+        $clone = $builder->clone()->where('email', 'foo');
+
+        $this->assertNotSame($builder, $clone);
+        $this->assertSame('select * from "users"', $builder->toSql());
+        $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';

@@ -255,7 +255,7 @@ class FilesystemManager implements FactoryContract
      */
     protected function createFlysystem(FlysystemAdapter $adapter, array $config)
     {
-        $config = Arr::only($config, ['visibility', 'disable_asserts', 'url']);
+        $config = Arr::only($config, ['visibility', 'disable_asserts', 'url', 'temporary_url']);
 
         return new Flysystem($adapter, $config);
     }

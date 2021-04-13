@@ -492,6 +492,18 @@ class Str
     }
 
     /**
+     * Repeat the given string.
+     *
+     * @param  string  $string
+     * @param  int  $times
+     * @return string
+     */
+    public static function repeat(string $string, int $times)
+    {
+        return str_repeat($string, $times);
+    }
+
+    /**
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
