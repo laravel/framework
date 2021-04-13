@@ -885,11 +885,11 @@ class RoutingRouteTest extends TestCase
         $router->get('name/{bar:name}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
         }]);
-        $router->get('job/{bar:job}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
-            return $name;
+        $router->get('job/{bar:job}', ['middleware' => SubstituteBindings::class, 'uses' => function ($job) {
+            return $job;
         }]);
-        $router->bind('bar', function ($value, $route = null, $key = null) {
-            return $route->bindingFieldFor($key).'='.strtoupper($value);
+        $router->bind('bar', function ($value, $route = null, $field = null) {
+            return $field.'='.strtoupper($value);
         });
         $this->assertSame('name=TAYLOR', $router->dispatch(Request::create('name/taylor', 'GET'))->getContent());
         $this->assertSame('job=DEVELOPER', $router->dispatch(Request::create('job/developer', 'GET'))->getContent());
