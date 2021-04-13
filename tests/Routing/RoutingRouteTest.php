@@ -938,6 +938,26 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testModelBindingWithKey()
+    {
+        $router = $this->getRouter();
+
+        $router->model('foo', RoutingTestUserModel::class);
+        $router->model('bar', RoutingTestPostModel::class);
+
+        $router->get('test/{foo}/{bar:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function ($foo, $bar) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $foo);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $bar);
+
+                return $foo->key.'='.$foo->value.'|'.$bar->key.'='.$bar->value;
+            },
+        ]);
+
+        $this->assertSame('id=1|slug=test-slug', $router->dispatch(Request::create('test/1/test-slug', 'GET'))->getContent());
+    }
+
     public function testModelBindingWithNullReturn()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -2199,6 +2219,7 @@ class RoutingTestUserModel extends Model
 
     public function where($key, $value)
     {
+        $this->key = $key;
         $this->value = $value;
 
         return $this;
@@ -2224,6 +2245,7 @@ class RoutingTestPostModel extends Model
 
     public function where($key, $value)
     {
+        $this->key = $key;
         $this->value = $value;
 
         return $this;
