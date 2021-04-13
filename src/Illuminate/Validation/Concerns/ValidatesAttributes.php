@@ -1475,22 +1475,11 @@ trait ValidatesAttributes
 
         $values = array_slice($parameters, 1);
 
-        if ($this->shouldConvertToBoolean($parameters[0]) || is_bool($other)) {
+        if (is_bool($other)) {
             $values = $this->convertValuesToBoolean($values);
         }
 
         return [$values, $other];
-    }
-
-    /**
-     * Check if parameter should be converted to boolean.
-     *
-     * @param  string  $parameter
-     * @return bool
-     */
-    protected function shouldConvertToBoolean($parameter)
-    {
-        return in_array('boolean', Arr::get($this->rules, $parameter, []));
     }
 
     /**
