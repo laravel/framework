@@ -1090,6 +1090,17 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['first' => 'dayle', 'last' => ''], ['last' => 'RequiredIf:first,taylor,dayle']);
         $this->assertFalse($v->passes());
         $this->assertSame('The last field is required when first is dayle.', $v->messages()->first('last'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 0], [
+            'foo' => 'required|boolean',
+            'bar' => 'required_if:foo,true',
+            'baz' => 'required_if:foo,false',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertCount(1, $v->messages());
+        $this->assertSame('The baz field is required when foo is 0.', $v->messages()->first('baz'));
     }
 
     public function testRequiredUnless()
