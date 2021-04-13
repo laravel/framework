@@ -879,6 +879,22 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testRouteBindingWithField()
+    {
+        $router = $this->getRouter();
+        $router->get('name/{bar:name}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->get('job/{bar:job}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->bind('bar', function ($value, $route = null, $key = null) {
+            return $route->bindingFieldFor($key).'='.strtoupper($value);
+        });
+        $this->assertSame('name=TAYLOR', $router->dispatch(Request::create('name/taylor', 'GET'))->getContent());
+        $this->assertSame('job=DEVELOPER', $router->dispatch(Request::create('job/developer', 'GET'))->getContent());
+    }
+
     public function testRouteClassBinding()
     {
         $router = $this->getRouter();
@@ -1677,7 +1693,6 @@ class RoutingRouteTest extends TestCase
 
         $this->assertSame('1|4', $router->dispatch(Request::create('foo/1/4', 'GET'))->getContent());
     }
-
 
     public function testParentChildExplicitBindings()
     {
