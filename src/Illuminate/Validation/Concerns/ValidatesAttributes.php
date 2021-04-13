@@ -1490,9 +1490,7 @@ trait ValidatesAttributes
      */
     protected function shouldConvertToBoolean($parameter)
     {
-        $rules = Arr::get($this->rules, $parameter, []);
-
-        return in_array('boolean', $rules);
+        return in_array('boolean', Arr::get($this->rules, $parameter, []));
     }
 
     /**
