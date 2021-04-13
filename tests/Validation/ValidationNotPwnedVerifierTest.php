@@ -39,16 +39,20 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
         $httpFactory
             ->shouldReceive('withHeaders')
+            ->once()
             ->with(['Add-Padding' => true])
-            ->andThrow($httpFactory);
+            ->andReturn($httpFactory);
 
         $httpFactory->shouldReceive('get')
+            ->once()
             ->andReturn($response);
 
         $response->shouldReceive('successful')
+            ->once()
             ->andReturn(true);
 
         $response->shouldReceive('body')
+            ->once()
             ->andReturn('');
 
         $verifier = new NotPwnedVerifier($httpFactory);
@@ -63,13 +67,16 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
         $httpFactory
             ->shouldReceive('withHeaders')
+            ->once()
             ->with(['Add-Padding' => true])
-            ->andThrow($httpFactory);
+            ->andReturn($httpFactory);
 
         $httpFactory->shouldReceive('get')
+            ->once()
             ->andReturn($response);
 
         $response->shouldReceive('successful')
+            ->once()
             ->andReturn(false);
 
         $verifier = new NotPwnedVerifier($httpFactory);
@@ -92,11 +99,13 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
         $httpFactory
             ->shouldReceive('withHeaders')
+            ->once()
             ->with(['Add-Padding' => true])
-            ->andThrow($httpFactory);
+            ->andReturn($httpFactory);
 
         $httpFactory
             ->shouldReceive('get')
+            ->once()
             ->andThrow($exception);
 
         $verifier = new NotPwnedVerifier($httpFactory);
