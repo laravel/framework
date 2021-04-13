@@ -164,13 +164,17 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @param  array  $attributes
      * @return void
      */
-    public function __construct(array $attributes = [])
+    public function __construct(array $attributes = [], array $fillable = null)
     {
         $this->bootIfNotBooted();
 
         $this->initializeTraits();
 
         $this->syncOriginal();
+
+        if ($fillable) {
+            $this->fillable($fillable);
+        }
 
         $this->fill($attributes);
     }
@@ -402,7 +406,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
         // hydration of new objects via the Eloquent query builder instances.
-        $model = new static((array) $attributes);
+        $model = new static((array) $attributes, (array) $this->fillable);
 
         $model->exists = $exists;
 
