@@ -990,16 +990,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
-     * Get all of the current attributes on the model for insert.
-     *
-     * @return array
-     */
-    protected function getAttributesForInsert()
-    {
-        return $this->getAttributes();
-    }
-
-    /**
      * Perform a model insert operation.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
