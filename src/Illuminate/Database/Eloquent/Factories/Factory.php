@@ -213,7 +213,7 @@ abstract class Factory
         return new EloquentCollection(
             array_map(function ($record) {
                 return $this->state($record)->create();
-            }, $records)
+            }, iterator_to_array($records))
         );
     }
 
