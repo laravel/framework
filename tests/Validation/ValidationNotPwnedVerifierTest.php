@@ -35,6 +35,13 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory = m::mock(HttpFactory::class);
         $response = m::mock(Response::class);
 
+        $httpFactory = m::mock(HttpFactory::class);
+
+        $httpFactory
+            ->shouldReceive('withHeaders')
+            ->with(['Add-Padding' => true])
+            ->andThrow($httpFactory);
+
         $httpFactory->shouldReceive('get')
             ->andReturn($response);
 
@@ -53,6 +60,11 @@ class ValidationNotPwnedVerifierTest extends TestCase
     {
         $httpFactory = m::mock(HttpFactory::class);
         $response = m::mock(Response::class);
+
+        $httpFactory
+            ->shouldReceive('withHeaders')
+            ->with(['Add-Padding' => true])
+            ->andThrow($httpFactory);
 
         $httpFactory->shouldReceive('get')
             ->andReturn($response);
@@ -77,7 +89,14 @@ class ValidationNotPwnedVerifierTest extends TestCase
         });
 
         $httpFactory = m::mock(HttpFactory::class);
-        $httpFactory->shouldReceive('get')
+
+        $httpFactory
+            ->shouldReceive('withHeaders')
+            ->with(['Add-Padding' => true])
+            ->andThrow($httpFactory);
+
+        $httpFactory
+            ->shouldReceive('get')
             ->andThrow($exception);
 
         $verifier = new NotPwnedVerifier($httpFactory);

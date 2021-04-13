@@ -72,7 +72,9 @@ class NotPwnedVerifier implements NotCompromisedVerifier
     protected function search($hashPrefix)
     {
         try {
-            $response = $this->factory->get(
+            $response = $this->factory->withHeaders([
+                'Add-Padding' => true,
+            ])->get(
                 'https://api.pwnedpasswords.com/range/'.$hashPrefix
             );
         } catch (Exception $e) {
