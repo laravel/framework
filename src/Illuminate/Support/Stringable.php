@@ -757,7 +757,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Get the amount of words a string contains.
+     * Get the number of words a string contains.
      *
      * @return int
      */
