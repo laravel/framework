@@ -391,7 +391,7 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $ignoreQuery[] = 'signature';
 
-        $url = $absolute ? $request->url() : '/' . $request->path();
+        $url = $absolute ? $request->url() : '/'.$request->path();
 
         $original = rtrim($url.'?'.Arr::query(
             Arr::except($request->query(), $ignoreQuery)
