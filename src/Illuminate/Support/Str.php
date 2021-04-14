@@ -767,7 +767,7 @@ class Str
     }
 
     /**
-     * Get the amount of words a string contains.
+     * Get the number of words a string contains.
      *
      * @param  string  $string
      * @return int
