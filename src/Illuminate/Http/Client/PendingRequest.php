@@ -740,7 +740,7 @@ class PendingRequest
         }
 
         $contentType = $this->options['headers']['Content-Type'] ?? null;
-        $isPotentiallyFormRequest = !$contentType || $contentType === 'application/x-www-form-urlencoded';
+        $isPotentiallyFormRequest = ! $contentType || $contentType === 'application/x-www-form-urlencoded';
 
         // If no content type was provided or it's an encoded form request, parse the string to a usable array
         // We do not wish to parse any other content types
@@ -750,7 +750,7 @@ class PendingRequest
             $laravelData = is_array($parsedData) ? $parsedData : [];
         }
 
-        if (!is_array($laravelData)) {
+        if (! is_array($laravelData)) {
             return [];
         }
 
