@@ -8,7 +8,7 @@ use Illuminate\Database\Migrations\Migration;
 abstract class MigrationEvent implements MigrationEventContract
 {
     /**
-     * An migration instance.
+     * A migration instance.
      *
      * @var \Illuminate\Database\Migrations\Migration
      */

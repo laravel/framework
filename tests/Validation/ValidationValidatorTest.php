@@ -1998,9 +1998,9 @@ class ValidationValidatorTest extends TestCase
     }
 
     /**
-     * @param mixed $input
-     * @param mixed $allowed
-     * @param bool $passes
+     * @param  mixed  $input
+     * @param  mixed  $allowed
+     * @param  bool  $passes
      *
      * @dataProvider multipleOfDataProvider
      */
