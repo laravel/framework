@@ -902,4 +902,17 @@ class HttpClientTest extends TestCase
         $this->assertSame(400, $responses['test400']->status());
         $this->assertSame(500, $responses['test500']->status());
     }
+    
+    public function testRequestWithXmlAndCustomContentType()
+    {
+        $this->factory->fake();
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?><body/>';
+
+        $this->factory->withBody($xml, 'application/octet-stream')->post('does-not-matter');
+
+        $this->factory->assertSent(function(Request $request) use ($xml) {
+            return $xml === $request->body();
+        });
+    }
 }
