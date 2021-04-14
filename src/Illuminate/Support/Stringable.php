@@ -757,6 +757,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Get the number of words a string contains.
+     *
+     * @return int
+     */
+    public function wordCount()
+    {
+        return str_word_count($this->value);
+    }
+
+    /**
      * Dump the string.
      *
      * @return $this
