@@ -26,6 +26,8 @@ class RouteSignatureParameters
                         ? static::fromClassMethodString($callback)
                         : (new ReflectionFunction($callback))->getParameters();
 
+        $parameters = static::parametersWithKeys($parameters);
+
         return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
             return Reflector::isParameterSubclassOf($p, $subClass);
         });
@@ -46,5 +48,21 @@ class RouteSignatureParameters
         }
 
         return (new ReflectionMethod($class, $method))->getParameters();
+    }
+
+    /**
+     * Get parameters array with parameter name as array key.
+     *
+     * @param  array  $parameters
+     * @return array
+     */
+    protected static function parametersWithKeys(array $parameters)
+    {
+        $parametersWithKeys = [];
+        foreach ($parameters as $parameter) {
+            $parametersWithKeys[$parameter->getName()] = $parameter;
+        }
+
+        return $parametersWithKeys;
     }
 }

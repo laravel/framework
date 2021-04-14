@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
@@ -818,6 +819,24 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Substitute the implicit Eloquent model bindings for the route parameter if exists.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @param string  $parameter
+     * @return void
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function substituteImplicitBinding($route, string $parameter)
+    {
+        $signatureParameter = $route->signatureParameter($parameter, UrlRoutable::class);
+
+        if ($signatureParameter) {
+            ImplicitRouteBinding::resolveForRouteParameter($this->container, $route, $signatureParameter);
+        }
+    }
+
+    /**
      * Substitute the implicit Eloquent model bindings for the route.
      *
      * @param  \Illuminate\Routing\Route  $route
@@ -991,7 +1010,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function model($key, $class, Closure $callback = null)
     {
-        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
+        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback, $key));
     }
 
     /**

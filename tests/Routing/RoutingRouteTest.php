@@ -959,15 +959,15 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
 
         $router->model('foo', RoutingTestUserModel::class);
-        $router->model('bar', RoutingTestPostModel::class);
+        $router->model('special_post', RoutingTestPostModel::class);
 
-        $router->get('test/{foo}/{bar:slug}', [
+        $router->get('test/{foo}/{special_post:slug}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function ($foo, $bar) {
+            'uses' => function ($foo, $specialPost) {
                 $this->assertInstanceOf(RoutingTestUserModel::class, $foo);
-                $this->assertInstanceOf(RoutingTestPostModel::class, $bar);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $specialPost);
 
-                return $foo->key.'='.$foo->value.'|'.$bar->key.'='.$bar->value;
+                return $foo->key.'='.$foo->value.'|'.$specialPost->key.'='.$specialPost->value;
             },
         ]);
 
@@ -1677,6 +1677,84 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('1|test-slug', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
     }
 
+    public function testParentChildExplicitBindings()
+    {
+        $router = $this->getRouter();
+
+        $router->model('writer', RoutingTestUserModel::class);
+        $router->model('special_post', RoutingTestPostModel::class);
+        $router->model('daily_post', RoutingTestPostModel::class);
+
+        $router->get('foo/{writer}/{special_post:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $writer, RoutingTestPostModel $foo) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $writer);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $foo);
+                return $writer->value.'|'.$foo->value.'|'.($foo->special ? 'special' : 'not_special');
+            },
+        ]);
+        $router->get('bar/{writer}/{daily_post:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $writer, RoutingTestPostModel $foo) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $writer);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $foo);
+
+                return $writer->value.'|'.$foo->value.'|'.($foo->special ? 'special' : 'not_special');
+            },
+        ]);
+
+        $this->assertSame('1|test-slug|special', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
+        $this->assertSame('1|test-slug|not_special', $router->dispatch(Request::create('bar/1/test-slug', 'GET'))->getContent());
+    }
+
+    public function testImplicitParentExplicitChildBindings()
+    {
+        $router = $this->getRouter();
+
+        $router->model('special_post', RoutingTestPostModel::class);
+        $router->model('daily_post', RoutingTestPostModel::class);
+
+        $router->get('foo/{user}/{special_post:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $user, RoutingTestPostModel $specialPost) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $user);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $specialPost);
+                return $user->value.'|'.$specialPost->value.'|'.($specialPost->special ? 'special' : 'not_special');
+            },
+        ]);
+        $router->get('bar/{user}/{daily_post:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $user, RoutingTestPostModel $dailyPost) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $user);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $dailyPost);
+
+                return $user->value.'|'.$dailyPost->value.'|'.($dailyPost->special ? 'special' : 'not_special');
+            },
+        ]);
+
+        $this->assertSame('1|test-slug|special', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
+        $this->assertSame('1|test-slug|not_special', $router->dispatch(Request::create('bar/1/test-slug', 'GET'))->getContent());
+    }
+
+    public function testExplicitParentImplicitChildBindings()
+    {
+        $router = $this->getRouter();
+
+        $router->model('writer', RoutingTestUserModel::class);
+
+        $router->get('foo/{writer}/{post:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $writer, RoutingTestPostModel $post) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $writer);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $post);
+
+                return $writer->value.'|'.$post->value;
+            },
+        ]);
+
+        $this->assertSame('1|test-slug', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
+    }
+
     public function testParentChildImplicitBindingsProperlyCamelCased()
     {
         $router = $this->getRouter();
@@ -1692,25 +1770,6 @@ class RoutingRouteTest extends TestCase
         ]);
 
         $this->assertSame('1|4', $router->dispatch(Request::create('foo/1/4', 'GET'))->getContent());
-    }
-
-    public function testParentChildExplicitBindings()
-    {
-        $router = $this->getRouter();
-
-        $router->model('foo', RoutingTestPostModel::class);
-
-        $router->get('foo/{user}/{foo:slug}', [
-            'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $user, RoutingTestPostModel $foo) {
-                $this->assertInstanceOf(RoutingTestUserModel::class, $user);
-                $this->assertInstanceOf(RoutingTestPostModel::class, $foo);
-
-                return $user->value.'|'.$foo->value;
-            },
-        ]);
-
-        $this->assertSame('1|test-slug', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
     }
 
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
@@ -2242,6 +2301,16 @@ class RoutingTestUserModel extends Model
         return new RoutingTestPostModel;
     }
 
+    public function routingTestPostModels()
+    {
+        return new RoutingTestPostModel;
+    }
+
+    public function specialPosts()
+    {
+        return (new RoutingTestPostModel)->whereSpecial();
+    }
+
     public function testTeams()
     {
         return new RoutingTestTeamModel;
@@ -2269,6 +2338,15 @@ class RoutingTestUserModel extends Model
     {
         return $this;
     }
+
+    public function __call($method, $parameters)
+    {
+        if ($method == 'dailyPosts') {
+            return static::throwBadMethodCallException($method);
+        }
+
+        return parent::__call($method, $parameters);
+    }
 }
 
 class RoutingTestPostModel extends Model
@@ -2282,6 +2360,13 @@ class RoutingTestPostModel extends Model
     {
         $this->key = $key;
         $this->value = $value;
+
+        return $this;
+    }
+
+    public function whereSpecial()
+    {
+        $this->special = true;
 
         return $this;
     }

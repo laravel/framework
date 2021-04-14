@@ -2,7 +2,9 @@
 
 namespace Illuminate\Routing;
 
+use BadMethodCallException;
 use Closure;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 
@@ -51,14 +53,15 @@ class RouteBinding
      * @param  \Illuminate\Container\Container  $container
      * @param  string  $class
      * @param  \Closure|null  $callback
+     * @param  string|null  $key
      * @return \Closure
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public static function forModel($container, $class, $callback = null)
+    public static function forModel($container, $class, $callback = null, $key = null)
     {
-        return function ($value, $route = null, $field = null) use ($container, $class, $callback) {
-            if (is_null($value)) {
+        return function ($value, $route = null, $field = null) use ($container, $class, $callback, $key) {
+            if (is_null($value) || is_null($key)) {
                 return;
             }
 
@@ -67,7 +70,23 @@ class RouteBinding
             // throw a not found exception otherwise we will return the instance.
             $instance = $container->make($class);
 
-            if ($model = $instance->resolveRouteBinding($value, $field)) {
+            $parent = $route->parentOfParameter($key);
+
+            if ($parent instanceof UrlRoutable && in_array($key, array_keys($route->bindingFields()))) {
+                try {
+                    $model = $parent->resolveChildRouteBinding(
+                        $key, $value, $field
+                    );
+                } catch (BadMethodCallException $exception) {
+                    $model = $parent->resolveChildRouteBinding(
+                        class_basename($class), $value, $field
+                    );
+                }
+            } else {
+                $model = $instance->resolveRouteBinding($value, $field);
+            }
+
+            if ($model) {
                 return $model;
             }
 

@@ -19,7 +19,7 @@ class RouteSignatureParametersTest extends TestCase
         $parameters = RouteSignatureParameters::fromAction($action);
 
         $this->assertContainsOnlyInstancesOf(ReflectionParameter::class, $parameters);
-        $this->assertSame('user', $parameters[0]->getName());
+        $this->assertSame('user', array_values($parameters)[0]->getName());
     }
 }
 

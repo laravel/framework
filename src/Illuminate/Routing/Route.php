@@ -143,6 +143,13 @@ class Route
     protected $bindingFields = [];
 
     /**
+     * Parameters that are listed in the route / controller signature.
+     *
+     * @var array|\ReflectionParameter[]
+     */
+    protected $signatureParameters = [];
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -496,14 +503,32 @@ class Route
     }
 
     /**
+     * Get the parameter that is listed in the route / controller signature via parameter name.
+     *
+     * @param  string       $name
+     * @param  string|null  $subClass
+     * @return \ReflectionParameter|null
+     */
+    public function signatureParameter(string $name, $subClass = null)
+    {
+        $parameters = $this->signatureParameters($subClass);
+
+        return $parameters[$name] ?? null;
+    }
+
+    /**
      * Get the parameters that are listed in the route / controller signature.
      *
      * @param  string|null  $subClass
-     * @return array
+     * @return array|\ReflectionParameter[]
      */
     public function signatureParameters($subClass = null)
     {
-        return RouteSignatureParameters::fromAction($this->action, $subClass);
+        if (! isset($this->signatureParameters[$subClass])) {
+            $this->signatureParameters[$subClass] = RouteSignatureParameters::fromAction($this->action, $subClass);
+        }
+
+        return $this->signatureParameters[$subClass];
     }
 
     /**
@@ -555,6 +580,8 @@ class Route
         if ($key === 0) {
             return;
         }
+
+        $this->router->substituteImplicitBinding($this, array_keys($this->parameters)[$key - 1]);
 
         return array_values($this->parameters)[$key - 1];
     }

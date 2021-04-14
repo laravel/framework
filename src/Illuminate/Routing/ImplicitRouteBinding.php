@@ -20,35 +20,50 @@ class ImplicitRouteBinding
      */
     public static function resolveForRoute($container, $route)
     {
+        foreach ($route->signatureParameters(UrlRoutable::class) as $parameter) {
+            static::resolveForRouteParameter($container, $route, $parameter);
+        }
+    }
+
+    /**
+     * Resolve the implicit route bindings for the given route parameter.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Routing\Route  $route
+     * @param  \ReflectionParameter  $parameter
+     * @return void
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public static function resolveForRouteParameter($container, $route, $parameter)
+    {
         $parameters = $route->parameters();
 
-        foreach ($route->signatureParameters(UrlRoutable::class) as $parameter) {
-            if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
-                continue;
-            }
+        if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
+            return;
+        }
 
-            $parameterValue = $parameters[$parameterName];
+        $parameterValue = $parameters[$parameterName];
 
-            if ($parameterValue instanceof UrlRoutable) {
-                continue;
-            }
+        if ($parameterValue instanceof UrlRoutable) {
+            return;
+        }
 
-            $instance = $container->make(Reflector::getParameterClassName($parameter));
+        $instance = $container->make(Reflector::getParameterClassName($parameter));
 
-            $parent = $route->parentOfParameter($parameterName);
+        $parent = $route->parentOfParameter($parameterName);
 
-            if ($parent instanceof UrlRoutable && in_array($parameterName, array_keys($route->bindingFields()))) {
-                if (! $model = $parent->resolveChildRouteBinding(
-                    $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
-                )) {
-                    throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
-                }
-            } elseif (! $model = $instance->resolveRouteBinding($parameterValue, $route->bindingFieldFor($parameterName))) {
+        if ($parent instanceof UrlRoutable && in_array($parameterName, array_keys($route->bindingFields()))) {
+            if (! $model = $parent->resolveChildRouteBinding(
+                $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
+            )) {
                 throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
             }
-
-            $route->setParameter($parameterName, $model);
+        } elseif (! $model = $instance->resolveRouteBinding($parameterValue, $route->bindingFieldFor($parameterName))) {
+            throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
         }
+
+        $route->setParameter($parameterName, $model);
     }
 
     /**
