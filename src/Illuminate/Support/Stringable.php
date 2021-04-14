@@ -426,7 +426,7 @@ class Stringable implements JsonSerializable
     /**
      * Call the given callback and return a new string.
      *
-     * @param callable $callback
+     * @param  callable  $callback
      * @return static
      */
     public function pipe(callable $callback)
@@ -470,8 +470,8 @@ class Stringable implements JsonSerializable
     /**
      * Remove any occurrence of the given string in the subject.
      *
-     * @param string|array<string> $search
-     * @param bool $caseSensitive
+     * @param  string|array<string>  $search
+     * @param  bool  $caseSensitive
      * @return static
      */
     public function remove($search, $caseSensitive = true)

@@ -112,9 +112,9 @@ class QueueBeanstalkdQueueTest extends TestCase
     }
 
     /**
-     * @param string $default
-     * @param int $timeToRun
-     * @param int $blockFor
+     * @param  string  $default
+     * @param  int  $timeToRun
+     * @param  int  $blockFor
      */
     private function setQueue($default, $timeToRun, $blockFor = 0)
     {
