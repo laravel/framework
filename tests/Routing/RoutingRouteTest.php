@@ -1719,6 +1719,7 @@ class RoutingRouteTest extends TestCase
             'uses' => function (RoutingTestUserModel $user, RoutingTestPostModel $specialPost) {
                 $this->assertInstanceOf(RoutingTestUserModel::class, $user);
                 $this->assertInstanceOf(RoutingTestPostModel::class, $specialPost);
+
                 return $user->value.'|'.$specialPost->value.'|'.($specialPost->special ? 'special' : 'not_special');
             },
         ]);
