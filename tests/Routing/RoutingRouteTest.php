@@ -2312,6 +2312,11 @@ class RoutingTestUserModel extends Model
         return (new RoutingTestPostModel)->whereSpecial();
     }
 
+    public function dailyPosts()
+    {
+        return static::throwBadMethodCallException('dailyPosts');
+    }
+
     public function testTeams()
     {
         return new RoutingTestTeamModel;
@@ -2338,15 +2343,6 @@ class RoutingTestUserModel extends Model
     public function firstOrFail()
     {
         return $this;
-    }
-
-    public function __call($method, $parameters)
-    {
-        if ($method == 'dailyPosts') {
-            return static::throwBadMethodCallException($method);
-        }
-
-        return parent::__call($method, $parameters);
     }
 }
 
