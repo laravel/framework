@@ -358,12 +358,12 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  bool  $absolute
-     * @param  array  $paramsToIgnoreInOriginal
+     * @param  array  $ignoreQuery
      * @return bool
      */
-    public function hasValidSignature(Request $request, $absolute = true, array $paramsToIgnoreInOriginal = ['signature'])
+    public function hasValidSignature(Request $request, $absolute = true, array $ignoreQuery = [])
     {
-        return $this->hasCorrectSignature($request, $absolute, $paramsToIgnoreInOriginal)
+        return $this->hasCorrectSignature($request, $absolute, $ignoreQuery)
             && $this->signatureHasNotExpired($request);
     }
 
@@ -371,12 +371,12 @@ class UrlGenerator implements UrlGeneratorContract
      * Determine if the given request has a valid signature for a relative URL.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  array $paramsToIgnoreInOriginal
+     * @param  array  $ignoreQuery
      * @return bool
      */
-    public function hasValidRelativeSignature(Request $request, array $paramsToIgnoreInOriginal = ['signature'])
+    public function hasValidRelativeSignature(Request $request, array $ignoreQuery = [])
     {
-        return $this->hasValidSignature($request, false, $paramsToIgnoreInOriginal);
+        return $this->hasValidSignature($request, false, $ignoreQuery);
     }
 
     /**
@@ -384,15 +384,17 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  bool  $absolute
-     * @param  array $paramsToIgnoreInOriginal
+     * @param  array  $ignoreQuery
      * @return bool
      */
-    public function hasCorrectSignature(Request $request, $absolute = true, array $paramsToIgnoreInOriginal)
+    public function hasCorrectSignature(Request $request, $absolute = true, array $ignoreQuery = [])
     {
+        $ignoreQuery[] = 'signature';
+
         $url = $absolute ? $request->url() : '/' . $request->path();
 
-        $original = rtrim($url . '?' . Arr::query(
-            Arr::except($request->query(), $paramsToIgnoreInOriginal)
+        $original = rtrim($url.'?'.Arr::query(
+            Arr::except($request->query(), $ignoreQuery)
         ), '?');
 
         $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
