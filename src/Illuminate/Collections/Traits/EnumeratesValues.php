@@ -504,11 +504,11 @@ trait EnumeratesValues
      * Apply the callback if the value is falsy.
      *
      * @param  bool  $value
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  callable|null  $default
      * @return static|mixed
      */
-    public function unless($value, callable $callback, callable $default = null)
+    public function unless($value, callable $callback = null, callable $default = null)
     {
         return $this->when(! $value, $callback, $default);
     }
