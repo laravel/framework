@@ -915,4 +915,20 @@ class HttpClientTest extends TestCase
             return $xml === $request->body();
         });
     }
+
+    public function testRequestWithStreamAsBody()
+    {
+        $this->factory->fake();
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?><body/>';
+        $xmlStream = fopen('php://memory', 'r+');
+        fwrite($xmlStream, $xml);
+        rewind($xmlStream);
+
+        $this->factory->withBody($xmlStream, 'text/xml')->post('does-not-matter');
+
+        $this->factory->assertSent(function (Request $request) use ($xml) {
+            return $xml === $request->body();
+        });
+    }
 }
