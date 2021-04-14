@@ -456,13 +456,15 @@ trait EnumeratesValues
     /**
      * Apply the callback if the value is truthy.
      *
-     * @param  bool|mixed  $value
+     * @param  bool|\Closure  $value
      * @param  callable|null  $callback
      * @param  callable|null  $default
      * @return static|mixed
      */
     public function when($value, callable $callback = null, callable $default = null)
     {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
         if (! $callback) {
             return new HigherOrderWhenProxy($this, $value);
         }
@@ -503,13 +505,15 @@ trait EnumeratesValues
     /**
      * Apply the callback if the value is falsy.
      *
-     * @param  bool  $value
+     * @param  bool|\Closure  $value
      * @param  callable|null  $callback
      * @param  callable|null  $default
      * @return static|mixed
      */
     public function unless($value, callable $callback = null, callable $default = null)
     {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
         return $this->when(! $value, $callback, $default);
     }
 

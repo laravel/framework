@@ -4201,6 +4201,62 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhenWithValueClosure($collection)
+    {
+        // Callback returns true
+        $data = new $collection([1]);
+
+        $data = $data->when(
+            function ($data) {
+                return $data->count() == 1;
+            },
+            function ($data) {
+                return $data->concat([2]);
+            }
+        );
+
+        $this->assertSame([1, 2], $data->all());
+
+        // Callback returns false
+        $data = new $collection([1]);
+
+        $data = $data->when(
+            function ($data) {
+                return $data->count() == 2;
+            },
+            function ($data) {
+                return $data->concat([2]);
+            }
+        );
+
+        $this->assertSame([1], $data->all());
+
+        // Callback returns true with proxy
+        $data = new $collection([1]);
+
+        $data = $data
+            ->when(function ($data) {
+                return $data->count() == 1;
+            })
+            ->concat([2]);
+
+        $this->assertSame([1, 2], $data->all());
+
+        // Callback returns false with proxy
+        $data = new $collection([1]);
+
+        $data = $data
+            ->when(function ($data) {
+                return $data->count() == 2;
+            })
+            ->concat([2]);
+
+        $this->assertSame([1], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhenEmpty($collection)
     {
         $data = new $collection(['michael', 'tom']);
@@ -4310,6 +4366,62 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertSame(['michael', 'tom', 'taylor'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUnlessWithValueClosure($collection)
+    {
+        // Callback returns true
+        $data = new $collection([1]);
+
+        $data = $data->unless(
+            function ($data) {
+                return $data->count() == 1;
+            },
+            function ($data) {
+                return $data->concat([2]);
+            }
+        );
+
+        $this->assertSame([1], $data->all());
+
+        // Callback returns false
+        $data = new $collection([1]);
+
+        $data = $data->unless(
+            function ($data) {
+                return $data->count() == 2;
+            },
+            function ($data) {
+                return $data->concat([2]);
+            }
+        );
+
+        $this->assertSame([1, 2], $data->all());
+
+        // Callback returns true with proxy
+        $data = new $collection([1]);
+
+        $data = $data
+            ->unless(function ($data) {
+                return $data->count() == 1;
+            })
+            ->concat([2]);
+
+        $this->assertSame([1], $data->all());
+
+        // Callback returns false with proxy
+        $data = new $collection([1]);
+
+        $data = $data
+            ->unless(function ($data) {
+                return $data->count() == 2;
+            })
+            ->concat([2]);
+
+        $this->assertSame([1, 2], $data->all());
     }
 
     /**
