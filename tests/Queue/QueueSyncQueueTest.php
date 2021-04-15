@@ -7,7 +7,6 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
