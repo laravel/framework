@@ -286,7 +286,7 @@ class Grammar extends BaseGrammar
 
         return '1 = 1';
     }
- 
+
     /**
      * Compile a "where (x,y) in ((a,b),(c,d))" clause.
      *
