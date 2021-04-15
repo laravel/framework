@@ -210,11 +210,9 @@ abstract class Factory
      */
     public function createMany(iterable $records)
     {
-        return new EloquentCollection(
-            array_map(function ($record) {
-                return $this->state($record)->create();
-            }, iterator_to_array($records))
-        );
+        return (new EloquentCollection($records))->transform(function ($record) {
+            return $this->state($record)->create();
+        });
     }
 
     /**
