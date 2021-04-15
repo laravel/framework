@@ -9,7 +9,7 @@ class SQLiteBuilder extends Builder
     /**
      * Create a database in the schema.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      */
     public function createDatabase($name)
@@ -20,7 +20,7 @@ class SQLiteBuilder extends Builder
     /**
      * Drop a database from the schema if the database exists.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      */
     public function dropDatabaseIfExists($name)

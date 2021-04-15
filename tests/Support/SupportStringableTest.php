@@ -611,4 +611,10 @@ class SupportStringableTest extends TestCase
         $this->assertSame('aaaaa', (string) $this->stringable('a')->repeat(5));
         $this->assertSame('', (string) $this->stringable('')->repeat(5));
     }
+
+    public function testWordCount()
+    {
+        $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
+        $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+    }
 }

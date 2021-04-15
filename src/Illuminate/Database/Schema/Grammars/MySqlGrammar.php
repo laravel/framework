@@ -29,7 +29,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a create database command.
      *
-     * @param  string $name
+     * @param  string  $name
      * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
@@ -46,7 +46,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a drop database if exists command.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return string
      */
     public function compileDropDatabaseIfExists($name)

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Closure;
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
@@ -57,11 +56,7 @@ trait InteractsWithViews
     {
         $component = $this->app->make($componentClass, $data);
 
-        $view = $component->resolveView();
-
-        if ($view instanceof Closure) {
-            $view = $view($data);
-        }
+        $view = value($component->resolveView(), $data);
 
         return $view instanceof View
                 ? new TestView($view->with($component->data()))

@@ -2,7 +2,6 @@
 
 namespace Illuminate\View\Concerns;
 
-use Closure;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
@@ -84,9 +83,7 @@ trait ManagesComponents
 
         $data = $this->componentData();
 
-        if ($view instanceof Closure) {
-            $view = $view($data);
-        }
+        $view = value($view, $data);
 
         if ($view instanceof View) {
             return $view->with($data)->render();
@@ -151,8 +148,7 @@ trait ManagesComponents
             $this->slotStack[$this->currentComponent()]
         );
 
-        $this->slots[$this->currentComponent()]
-                    [$currentSlot] = new HtmlString(trim(ob_get_clean()));
+        $this->slots[$this->currentComponent()][$currentSlot] = new HtmlString(trim(ob_get_clean()));
     }
 
     /**
