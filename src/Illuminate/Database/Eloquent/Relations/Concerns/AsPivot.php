@@ -124,7 +124,6 @@ trait AsPivot
         if ($this->fireModelEvent('deleting') === false) {
             return 0;
         }
-        
         if (isset($this->attributes[$this->getKeyName()])) {
             return (int) parent::delete();
         }
