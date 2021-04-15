@@ -121,13 +121,15 @@ trait AsPivot
      */
     public function delete()
     {
+        if ($this->fireModelEvent('deleting') === false) {
+            return 0;
+        }
+        
         if (isset($this->attributes[$this->getKeyName()])) {
             return (int) parent::delete();
         }
 
-        if ($this->fireModelEvent('deleting') === false) {
-            return 0;
-        }
+
 
         $this->touchOwners();
 
