@@ -1323,6 +1323,16 @@ trait HasAttributes
     }
 
     /**
+     * Get all of the current attributes on the model for an insert operation.
+     *
+     * @return array
+     */
+    protected function getAttributesForInsert()
+    {
+        return $this->getAttributes();
+    }
+
+    /**
      * Set the array of model attributes. No checking is done.
      *
      * @param  array  $attributes

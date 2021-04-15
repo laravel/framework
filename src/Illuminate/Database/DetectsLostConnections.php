@@ -52,6 +52,8 @@ trait DetectsLostConnections
             'Temporary failure in name resolution',
             'SSL: Broken pipe',
             'SQLSTATE[08S01]: Communication link failure',
+            'SQLSTATE[08006] [7] could not connect to server: Connection refused Is the server running on host',
+            'SQLSTATE[HY000]: General error: 7 SSL SYSCALL error: No route to host',
         ]);
     }
 }
