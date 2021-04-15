@@ -128,8 +128,6 @@ trait AsPivot
             return (int) parent::delete();
         }
 
-
-
         $this->touchOwners();
 
         return tap($this->getDeleteQuery()->delete(), function () {
