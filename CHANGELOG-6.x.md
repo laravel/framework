@@ -5,7 +5,8 @@
 
 ## [v6.20.23 (2021-04-13)](https://github.com/laravel/framework/compare/v6.20.22...v6.20.23)
 
-### Added strings to the `DetectsLostConnections.php` ([4210258](https://github.com/laravel/framework/commit/42102589bc7f7b8533ee1b815ef0cc18017d4e45))
+### Added 
+- Added strings to the `DetectsLostConnections.php` ([4210258](https://github.com/laravel/framework/commit/42102589bc7f7b8533ee1b815ef0cc18017d4e45))
 
 
 ## [v6.20.22 (2021-03-31)](https://github.com/laravel/framework/compare/v6.20.21...v6.20.22)
