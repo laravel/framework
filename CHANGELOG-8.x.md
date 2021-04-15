@@ -1,6 +1,16 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.36.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.36.1...8.x)
+
+
+## [v8.36.1 (2021-04-07)](https://github.com/laravel/framework/compare/v8.36.0...v8.36.1)
+
+### Fixed
+- Fixed escaping within quoted strings in blade ([#36893](https://github.com/laravel/framework/pull/36893))
+
+### Changed
+- Call transaction callbacks after updating the transaction level ([#36890](https://github.com/laravel/framework/pull/36890), [#36892](https://github.com/laravel/framework/pull/36892))
+- Support maxExceptions option on queued listeners ([#36891](https://github.com/laravel/framework/pull/36891))
 
 
 ## [v8.36.0 (2021-04-06)](https://github.com/laravel/framework/compare/v8.35.1...v8.36.0)
