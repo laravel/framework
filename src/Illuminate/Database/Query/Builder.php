@@ -1000,7 +1000,7 @@ class Builder
     {
         return $this->whereNotIn($column, $values, 'or');
     }
-    
+
     /**
      * Add a "where (x,y) in ((a,b),(c,d))" clause to the query.
      *
