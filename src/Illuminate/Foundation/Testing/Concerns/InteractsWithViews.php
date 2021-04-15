@@ -56,7 +56,7 @@ trait InteractsWithViews
     {
         $component = $this->app->make($componentClass, $data);
 
-        $view = $component->resolveView();
+        $view = value($component->resolveView(), $data);
 
         return $view instanceof View
                 ? new TestView($view->with($component->data()))

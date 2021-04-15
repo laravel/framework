@@ -57,4 +57,15 @@ class EngineResolver
 
         throw new InvalidArgumentException("Engine [{$engine}] not found.");
     }
+
+    /**
+     * Remove a resolved engine.
+     *
+     * @param  string  $engine
+     * @return void
+     */
+    public function forget($engine)
+    {
+        unset($this->resolved[$engine]);
+    }
 }

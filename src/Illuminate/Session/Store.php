@@ -194,6 +194,17 @@ class Store implements Session
     }
 
     /**
+     * Determine if the given key is missing from the session data.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        return ! $this->exists($key);
+    }
+
+    /**
      * Checks if a key is present and not null.
      *
      * @param  string|array  $key

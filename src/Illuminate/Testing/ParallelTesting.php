@@ -238,7 +238,7 @@ class ParallelTesting
     }
 
     /**
-     * Get an parallel testing option.
+     * Get a parallel testing option.
      *
      * @param  string  $option
      * @return mixed
@@ -269,7 +269,7 @@ class ParallelTesting
     /**
      * Apply the callback if tests are running in parallel.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return void
      */
     protected function whenRunningInParallel($callback)

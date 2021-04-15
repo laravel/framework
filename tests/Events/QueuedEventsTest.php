@@ -66,6 +66,24 @@ class QueuedEventsTest extends TestCase
 
         $fakeQueue->assertPushedOn('some_other_queue', CallQueuedListener::class);
     }
+
+    public function testQueuePropagateRetryUntilAndMaxExceptions()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherOptions::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->maxExceptions === 1 && $job->retryUntil !== null;
+        });
+    }
 }
 
 class TestDispatcherQueuedHandler implements ShouldQueue
@@ -102,5 +120,20 @@ class TestDispatcherGetQueue implements ShouldQueue
     public function viaQueue()
     {
         return 'some_other_queue';
+    }
+}
+
+class TestDispatcherOptions implements ShouldQueue
+{
+    public $maxExceptions = 1;
+
+    public function retryUntil()
+    {
+        return now()->addHour(1);
+    }
+
+    public function handle()
+    {
+        //
     }
 }

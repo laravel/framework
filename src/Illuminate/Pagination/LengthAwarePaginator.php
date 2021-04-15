@@ -99,7 +99,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function linkCollection()
+    public function linkCollection()
     {
         return collect($this->elements())->flatMap(function ($item) {
             if (! is_array($item)) {

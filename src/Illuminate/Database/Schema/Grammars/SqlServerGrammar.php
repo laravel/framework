@@ -31,7 +31,7 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile a create database command.
      *
-     * @param  string $name
+     * @param  string  $name
      * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
@@ -46,7 +46,7 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile a drop database if exists command.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return string
      */
     public function compileDropDatabaseIfExists($name)
@@ -415,6 +415,17 @@ class SqlServerGrammar extends Grammar
     protected function typeString(Fluent $column)
     {
         return "nvarchar({$column->length})";
+    }
+
+    /**
+     * Create the column definition for a tiny text type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTinyText(Fluent $column)
+    {
+        return 'nvarchar(255)';
     }
 
     /**

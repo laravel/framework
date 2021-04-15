@@ -41,6 +41,13 @@ class CallQueuedListener implements ShouldQueue
     public $tries;
 
     /**
+     * The maximum number of exceptions allowed, regardless of attempts.
+     *
+     * @var int
+     */
+    public $maxExceptions;
+
+    /**
      * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
      * @var int

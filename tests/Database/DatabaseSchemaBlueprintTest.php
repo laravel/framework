@@ -291,4 +291,62 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
+
+    public function testTinyTextColumn()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->tinyText('note');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `posts` add `note` tinytext not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add column "note" text not null',
+        ], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add column "note" varchar(255) not null',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add "note" nvarchar(255) not null',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testTinyTextNullableColumn()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->tinyText('note')->nullable();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `posts` add `note` tinytext null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add column "note" text',
+        ], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add column "note" varchar(255) null',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add "note" nvarchar(255) null',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
 }

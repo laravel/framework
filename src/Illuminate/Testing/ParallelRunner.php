@@ -106,7 +106,7 @@ class ParallelRunner implements RunnerInterface
     /**
      * Apply the given callback for each process.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return void
      */
     protected function forEachProcess($callback)
