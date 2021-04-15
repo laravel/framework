@@ -6,8 +6,11 @@ use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
+use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -54,6 +57,26 @@ class QueueSyncQueueTest extends TestCase
 
         Container::setInstance();
     }
+
+    public function testCreatesPayloadObject()
+    {
+        $sync = new SyncQueue;
+        $container = new Container;
+        $container->bind(\Illuminate\Contracts\Events\Dispatcher::class, \Illuminate\Events\Dispatcher::class);
+        $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $sync->setContainer($container);
+
+        SyncQueue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['data' => ['extra' => 'extraValue']];
+        });
+
+        try {
+            $sync->push(new SyncQueueJob());
+        } catch (LogicException $e) {
+            $this->assertEquals('extraValue', $e->getMessage());
+        }
+    }
 }
 
 class SyncQueueTestEntity implements QueueableEntity
@@ -92,5 +115,22 @@ class FailingSyncQueueTestHandler
     public function failed()
     {
         $_SERVER['__sync.failed'] = true;
+    }
+}
+
+class SyncQueueJob implements ShouldQueue
+{
+    use InteractsWithQueue;
+
+    public function handle()
+    {
+        throw new LogicException($this->getValueFromJob('extra'));
+    }
+
+    public function getValueFromJob($key)
+    {
+        $payload = $this->job->payload();
+
+        return $payload['data'][$key] ?? null;
     }
 }
