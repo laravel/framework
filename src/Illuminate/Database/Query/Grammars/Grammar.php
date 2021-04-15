@@ -286,6 +286,38 @@ class Grammar extends BaseGrammar
 
         return '1 = 1';
     }
+ 
+    /**
+     * Compile a "where (x,y) in ((a,b),(c,d))" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereInArray(Builder $query, $where)
+    {
+        if (! empty($where['values'])) {
+            return '('.$this->columnize($where['columns']).') in (('.implode('), (', array_map([$this, 'parameterize'], $where['values'])).'))';
+        }
+
+        return '0 = 1';
+    }
+
+    /**
+     * Compile a "where (x,y) not in ((a,b),(c,d))" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotInArray(Builder $query, $where)
+    {
+        if (! empty($where['values'])) {
+            return '('.$this->columnize($where['columns']).') not in (('.implode('), (', array_map([$this, 'parameterize'], $where['values'])).'))';
+        }
+
+        return '0 = 1';
+    }
 
     /**
      * Compile a "where not in raw" clause.
