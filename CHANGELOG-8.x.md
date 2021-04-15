@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.36.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.36.2...8.x)
+
+
+## [v8.36.1 (2021-04-07)](https://github.com/laravel/framework/compare/v8.36.1...v8.36.2)
+
+### Revert
+- Revert blade changes ([#36902](https://github.com/laravel/framework/pull/36902))
 
 
 ## [v8.36.1 (2021-04-07)](https://github.com/laravel/framework/compare/v8.36.0...v8.36.1)
