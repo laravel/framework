@@ -2,6 +2,9 @@
 
 namespace Illuminate\Http\Client;
 
+/**
+ * @mixin \Illuminate\Http\Client\Factory
+ */
 class Pool
 {
     /**
