@@ -266,7 +266,9 @@ class Grammar extends BaseGrammar
     {
         if (! empty($where['values'])) {
             if (is_array($where['column'])) {
-                return '('.$this->columnize($where['column']).') in (('.implode('), (', array_map([$this, 'parameterize'], $where['values'])).'))';
+                $parameters = implode('), (', array_map($this, 'parameterize'], $where['values']));
+                $columns = $this->columnize($where['column']);                
+                return "($columns) in (($parameters))";
             } else {
                 return $this->wrap($where['column']).' in ('.$this->parameterize($where['values']).')';
             }
@@ -286,28 +288,12 @@ class Grammar extends BaseGrammar
     {
         if (! empty($where['values'])) {
             if (is_array($where['column'])) {
-                return '('.$this->columnize($where['column']).') not in (('.implode('), (', array_map([$this, 'parameterize'], $where['values'])).'))';
+                $parameters = implode('), (', array_map($this, 'parameterize'], $where['values']));
+                $columns = $this->columnize($where['column']);                
+                return "($columns) not in (($parameters))";
             } else {
                 return $this->wrap($where['column']).' not in ('.$this->parameterize($where['values']).')';
             }
-        }
-
-        return '1 = 1';
-    }
-
-    /**
-     * Compile a "where not in raw" clause.
-     *
-     * For safety, whereIntegerInRaw ensures this method is only used with integer values.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereNotInRaw(Builder $query, $where)
-    {
-        if (! empty($where['values'])) {
-            return $this->wrap($where['column']).' not in ('.implode(', ', $where['values']).')';
         }
 
         return '1 = 1';
@@ -325,10 +311,41 @@ class Grammar extends BaseGrammar
     protected function whereInRaw(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            return $this->wrap($where['column']).' in ('.implode(', ', $where['values']).')';
+            if (is_array($where['column'])) {
+                $parameters = implode('), (', array_map(fn ($record) => implode(', ', $record), $where['values']));
+                $columns = $this->columnize($where['column']);
+                return "($columns) in (($parameters))";
+            } else {
+                return $this->wrap($where['column']).' in ('.implode(', ', $where['values']).')';
+            }
+            
         }
 
         return '0 = 1';
+    }
+    
+    /**
+     * Compile a "where not in raw" clause.
+     *
+     * For safety, whereIntegerInRaw ensures this method is only used with integer values.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotInRaw(Builder $query, $where)
+    {
+        if (! empty($where['values'])) {
+            if (is_array($where['column'])) {
+                $parameters = implode('), (', array_map(fn ($record) => implode(', ', $record), $where['values']));
+                $columns = $this->columnize($where['column']);
+                return "($columns) not in (($parameters))";
+            } else {
+                return $this->wrap($where['column']).' not in ('.implode(', ', $where['values']).')';
+            }
+        }
+
+        return '1 = 1';
     }
 
     /**
