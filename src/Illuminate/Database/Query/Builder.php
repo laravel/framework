@@ -922,17 +922,18 @@ class Builder
     {
         return $this->whereRaw($sql, $bindings, 'or');
     }
-
+    
+    
     /**
      * Add a "where in" clause to the query.
      *
-     * @param  string  $column
+     * @param  string|array  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
      */
-    public function whereIn($column, $values, $boolean = 'and', $not = false)
+    public function whereIn($columns, $values, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotIn' : 'In';
 
@@ -967,7 +968,7 @@ class Builder
     /**
      * Add an "or where in" clause to the query.
      *
-     * @param  string  $column
+     * @param  string|array  $column
      * @param  mixed  $values
      * @return $this
      */
@@ -979,7 +980,7 @@ class Builder
     /**
      * Add a "where not in" clause to the query.
      *
-     * @param  string  $column
+     * @param  string|array  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @return $this
@@ -999,59 +1000,6 @@ class Builder
     public function orWhereNotIn($column, $values)
     {
         return $this->whereNotIn($column, $values, 'or');
-    }
-
-    /**
-     * Add a "where (x,y) in ((a,b),(c,d))" clause to the query.
-     *
-     * @param  array  $columns
-     * @param  mixed  $values
-     * @param  string $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function whereInArray($columns, $values, $boolean = 'and', $not = false)
-    {
-        $type = $not ? 'NotInArray' : 'InArray';
-
-        // If the value is a query builder instance we will assume the developer wants to
-        // look for any values that exists within this given query. So we will add the
-        // query accordingly so that this query is properly executed when it is run.
-        if ($this->isQueryable($values)) {
-            [$query, $bindings] = $this->createSub($values);
-
-            $values = [new Expression($query)];
-
-            $this->addBinding($bindings, 'where');
-        }
-
-        // Next, if the value is Arrayable we need to cast it to its raw array form so we
-        // have the underlying array value instead of an Arrayable object which is not
-        // able to be added as a binding, etc. We will then add to the wheres array.
-        if ($values instanceof Arrayable) {
-            $values = $values->toArray();
-        }
-
-        $this->wheres[] = compact('type', 'columns', 'values', 'boolean');
-
-        // Finally we'll add a binding for each values unless that value is an expression
-        // in which case we will just skip over it since it will be the query as a raw
-        // string and not as a parameterized place-holder to be replaced by the PDO.
-        $this->addBinding($this->cleanBindings($values), 'where');
-
-        return $this;
-    }
-
-    /**
-     * Add an "where (x,y) not in ((a,b),(c,d))" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @return $this
-     */
-    public function whereNotInArray($column, $values)
-    {
-        return $this->whereInArray($column, $values, 'or', true);
     }
 
     /**
