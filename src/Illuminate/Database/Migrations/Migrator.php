@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
@@ -68,6 +69,13 @@ class Migrator
     protected $output;
 
     /**
+     * List of migrations that did not find table references
+     *
+     * @var array
+     */
+    protected $pending_migrations = [];
+
+    /**
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
@@ -109,6 +117,11 @@ class Migrator
         // we will go ahead and run them "up". This will execute each migration as
         // an operation against a database. Then we'll return this list of them.
         $this->runPending($migrations, $options);
+
+        // Rerun the migration that failed to find table references the last time.
+        if (! empty($this->pending_migrations)) {
+            $this->runPending($this->pending_migrations, $options);
+        }
 
         return $migrations;
     }
@@ -194,11 +207,35 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $this->note("<comment>Migrating:</comment> {$name}");
+        if (isset($this->pending_migrations[$name])) {
+            $this->note("<comment>Remigrating:</comment> {$name}");
+        } else {
+            $this->note("<comment>Migrating:</comment> {$name}");
+        }
 
         $startTime = microtime(true);
 
-        $this->runMigration($migration, 'up');
+        try {
+            $this->runMigration($migration, 'up');
+
+            // Remove pending migration from lists
+            if(isset($this->pending_migrations[$name])) {
+                unset($this->pending_migrations[$name]);
+            }
+        } catch (QueryException $exception) {
+            // Make sure this exception caused by reference
+            if ($exception->getCode() === 'HY000') {
+
+                // Throw an QueryException if there is no such reference.
+                if(isset($this->pending_migrations[$name])) {
+                    throw $exception;
+                }
+
+                $this->note('<comment>Waiting for the reference table: </comment>' . $name);
+                $this->pending_migrations[$name] = $file;
+                $this->runMigration($migration, 'down');
+            }
+        }
 
         $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
 
