@@ -117,6 +117,62 @@ abstract class Grammar
     }
 
     /**
+     * Convert array into sql group.
+     *
+     * @param  mixed  $values
+     * @return string
+     */
+    public function group($values)
+    {
+        return '('.implode(', ', $values).')';
+    }
+
+    /**
+     * Recursively group arrays containing values into groups.
+     *
+     * @param  mixed  $values
+     * @return string
+     */
+    public function groupify($values)
+    {
+        if (is_array($values)) {
+            return $this->group(array_map([$this, __FUNCTION__], $values));
+        }
+
+        return $this->parameter($values);
+    }
+
+    /**
+     * Recursively group arrays containing columns into groups.
+     *
+     * @param  mixed  $values
+     * @return string
+     */
+    public function groupifyColumns($values)
+    {
+        if (is_array($values)) {
+            return $this->group(array_map([$this, __FUNCTION__], $values));
+        }
+
+        return $this->wrap($values);
+    }
+
+    /**
+     * Recursively group arrays containing raw values into groups.
+     *
+     * @param  mixed  $values
+     * @return string
+     */
+    public function groupifyRaw($values)
+    {
+        if (is_array($values)) {
+            return $this->group(array_map([$this, __FUNCTION__], $values));
+        }
+
+        return $values;
+    }
+
+    /**
      * Convert an array of column names into a delimited string.
      *
      * @param  array  $columns

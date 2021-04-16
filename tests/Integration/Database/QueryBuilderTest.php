@@ -203,6 +203,24 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
     }
 
+    public function testWhereIn()
+    {
+        $this->assertEquals('select * from "posts" where "id" in (?, ?)',
+            DB::table('posts')->whereIn('id', [1, 2])->toSql());
+
+        $this->assertEquals('select * from "posts" where ("id", "title") in ((?, ?), (?, ?))',
+            DB::table('posts')->whereIn(['id', 'title'], [[1, 'Foo Post'], [2, 'No Post']])->toSql());
+    }
+
+    public function testWhereNotIn()
+    {
+        $this->assertEquals('select * from "posts" where "id" not in (?, ?)',
+            DB::table('posts')->whereNotIn('id', [1, 2])->toSql());
+
+        $this->assertEquals('select * from "posts" where ("id", "title") not in ((?, ?), (?, ?))',
+            DB::table('posts')->whereNotIn(['id', 'title'], [[1, 'Foo Post'], [2, 'No Post']])->toSql());
+    }
+
     public function testPaginateWithSpecificColumns()
     {
         $result = DB::table('posts')->paginate(5, ['title', 'content']);

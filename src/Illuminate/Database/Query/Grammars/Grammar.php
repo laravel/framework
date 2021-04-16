@@ -265,7 +265,10 @@ class Grammar extends BaseGrammar
     protected function whereIn(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            return $this->wrap($where['column']).' in ('.$this->parameterize($where['values']).')';
+            $parameters = $this->groupify($where['values']);
+            $column = $this->groupifyColumns($where['column']);
+
+            return "$column in $parameters";
         }
 
         return '0 = 1';
@@ -281,57 +284,10 @@ class Grammar extends BaseGrammar
     protected function whereNotIn(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            return $this->wrap($where['column']).' not in ('.$this->parameterize($where['values']).')';
-        }
+            $parameters = $this->groupify($where['values']);
+            $column = $this->groupifyColumns($where['column']);
 
-        return '1 = 1';
-    }
-
-    /**
-     * Compile a "where (x,y) in ((a,b),(c,d))" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereInArray(Builder $query, $where)
-    {
-        if (! empty($where['values'])) {
-            return '('.$this->columnize($where['columns']).') in (('.implode('), (', array_map([$this, 'parameterize'], $where['values'])).'))';
-        }
-
-        return '0 = 1';
-    }
-
-    /**
-     * Compile a "where (x,y) not in ((a,b),(c,d))" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereNotInArray(Builder $query, $where)
-    {
-        if (! empty($where['values'])) {
-            return '('.$this->columnize($where['columns']).') not in (('.implode('), (', array_map([$this, 'parameterize'], $where['values'])).'))';
-        }
-
-        return '0 = 1';
-    }
-
-    /**
-     * Compile a "where not in raw" clause.
-     *
-     * For safety, whereIntegerInRaw ensures this method is only used with integer values.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereNotInRaw(Builder $query, $where)
-    {
-        if (! empty($where['values'])) {
-            return $this->wrap($where['column']).' not in ('.implode(', ', $where['values']).')';
+            return "$column not in $parameters";
         }
 
         return '1 = 1';
@@ -349,10 +305,34 @@ class Grammar extends BaseGrammar
     protected function whereInRaw(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            return $this->wrap($where['column']).' in ('.implode(', ', $where['values']).')';
+            $parameters = $this->groupifyRaw($where['values']);
+            $column = $this->groupifyColumns($where['column']);
+
+            return "$column in $parameters";
         }
 
         return '0 = 1';
+    }
+
+    /**
+     * Compile a "where not in raw" clause.
+     *
+     * For safety, whereIntegerInRaw ensures this method is only used with integer values.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotInRaw(Builder $query, $where)
+    {
+        if (! empty($where['values'])) {
+            $parameters = $this->groupifyRaw($where['values']);
+            $column = $this->groupifyColumns($where['column']);
+
+            return "$column not in $parameters";
+        }
+
+        return '1 = 1';
     }
 
     /**
@@ -914,9 +894,7 @@ class Grammar extends BaseGrammar
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same amount of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = collect($values)->map(function ($record) {
-            return '('.$this->parameterize($record).')';
-        })->implode(', ');
+        $parameters = collect($values)->map([$this, 'groupify'])->implode(', ');
 
         return "insert into $table ($columns) values $parameters";
     }
