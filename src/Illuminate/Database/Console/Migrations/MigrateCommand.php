@@ -18,6 +18,7 @@ class MigrateCommand extends BaseCommand
      * @var string
      */
     protected $signature = 'migrate {--database= : The database connection to use}
+                {--retry=3 : Maximum of retrying the migration when an error occurs}
                 {--force : Force the operation to run when in production}
                 {--path=* : The path(s) to the migrations files to be executed}
                 {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
@@ -83,6 +84,7 @@ class MigrateCommand extends BaseCommand
                     ->run($this->getMigrationPaths(), [
                         'pretend' => $this->option('pretend'),
                         'step' => $this->option('step'),
+                        'retry' => $this->option('retry')
                     ]);
 
             // Finally, if the "seed" option has been given, we will re-run the database

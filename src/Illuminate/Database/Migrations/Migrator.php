@@ -69,11 +69,18 @@ class Migrator
     protected $output;
 
     /**
+     * Maximum number of retries
+     *
+     * @var int|mixed
+     */
+    protected $max_retries = 3;
+
+    /**
      * List of migrations that did not find table references
      *
      * @var array
      */
-    protected $pending_migrations = [];
+    protected $need_remigrates = [];
 
     /**
      * Create a new migrator instance.
@@ -104,6 +111,8 @@ class Migrator
      */
     public function run($paths = [], array $options = [])
     {
+        $this->max_retries = $options['retry'] ?? $this->max_retries;
+
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
@@ -119,8 +128,8 @@ class Migrator
         $this->runPending($migrations, $options);
 
         // Rerun the migration that failed to find table references the last time.
-        if (! empty($this->pending_migrations)) {
-            $this->runPending($this->pending_migrations, $options);
+        while (! empty($this->need_remigrates)) {
+            $this->runPending(array_keys($this->need_remigrates), $options);
         }
 
         return $migrations;
@@ -207,8 +216,8 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        if (isset($this->pending_migrations[$name])) {
-            $this->note("<comment>Remigrating:</comment> {$name}");
+        if (isset($this->need_remigrates[$file])) {
+            $this->note("<comment>Remigrate:</comment> {$name} (<comment>{$this->need_remigrates[$file]} of {$this->max_retries} tries</comment>)");
         } else {
             $this->note("<comment>Migrating:</comment> {$name}");
         }
@@ -219,21 +228,15 @@ class Migrator
             $this->runMigration($migration, 'up');
 
             // Remove pending migration from lists
-            if(isset($this->pending_migrations[$name])) {
-                unset($this->pending_migrations[$name]);
+            if(isset($this->need_remigrates[$file])) {
+                unset($this->need_remigrates[$file]);
             }
-        } catch (QueryException $exception) {
+        } catch (QueryException $e) {
             // Make sure this exception caused by reference
-            if ($exception->getCode() === 'HY000') {
-
-                // Throw an QueryException if there is no such reference.
-                if(isset($this->pending_migrations[$name])) {
-                    throw $exception;
-                }
-
-                $this->note('<comment>Waiting for the reference table: </comment>' . $name);
-                $this->pending_migrations[$name] = $file;
+            if ($e->getCode() === 'HY000' && stripos($e->getMessage(), 'Failed to open the') && $this->needRemigrate($name, $file)) {
                 $this->runMigration($migration, 'down');
+            } else {
+                throw $e;
             }
         }
 
@@ -245,6 +248,26 @@ class Migrator
         $this->repository->log($name, $batch);
 
         $this->note("<info>Migrated:</info>  {$name} ({$runTime}ms)");
+    }
+
+    /**
+     * @param  string  $name
+     * @param  string  $file
+     * @return bool
+     */
+    protected function needRemigrate($name, $file)
+    {
+        if(! isset($this->need_remigrates[$file])) {
+            $this->need_remigrates[$file] = 0;
+        }
+
+        if($this->need_remigrates[$file] >= $this->max_retries) {
+            return false;
+        }
+
+        $this->note('<comment>Waiting for the reference table: </comment>' . $name);
+
+        return (bool) ++$this->need_remigrates[$file];
     }
 
     /**
