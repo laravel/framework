@@ -265,8 +265,8 @@ class Grammar extends BaseGrammar
     protected function whereIn(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            $parameters = $this->groupify($where['values']);
-            $column = $this->groupifyColumns($where['column']);
+            $parameters = $this->tuplify($where['values']);
+            $column = $this->tuplifyColumns($where['column']);
 
             return "$column in $parameters";
         }
@@ -284,8 +284,8 @@ class Grammar extends BaseGrammar
     protected function whereNotIn(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            $parameters = $this->groupify($where['values']);
-            $column = $this->groupifyColumns($where['column']);
+            $parameters = $this->tuplify($where['values']);
+            $column = $this->tuplifyColumns($where['column']);
 
             return "$column not in $parameters";
         }
@@ -305,8 +305,8 @@ class Grammar extends BaseGrammar
     protected function whereInRaw(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            $parameters = $this->groupifyRaw($where['values']);
-            $column = $this->groupifyColumns($where['column']);
+            $parameters = $this->tuplifyRaw($where['values']);
+            $column = $this->tuplifyColumns($where['column']);
 
             return "$column in $parameters";
         }
@@ -326,8 +326,8 @@ class Grammar extends BaseGrammar
     protected function whereNotInRaw(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            $parameters = $this->groupifyRaw($where['values']);
-            $column = $this->groupifyColumns($where['column']);
+            $parameters = $this->tuplifyRaw($where['values']);
+            $column = $this->tuplifyColumns($where['column']);
 
             return "$column not in $parameters";
         }
@@ -894,7 +894,7 @@ class Grammar extends BaseGrammar
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same amount of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = collect($values)->map([$this, 'groupify'])->implode(', ');
+        $parameters = collect($values)->map([$this, 'tuplify'])->implode(', ');
 
         return "insert into $table ($columns) values $parameters";
     }

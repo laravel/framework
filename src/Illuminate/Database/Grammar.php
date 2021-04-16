@@ -117,56 +117,56 @@ abstract class Grammar
     }
 
     /**
-     * Convert array into sql group.
+     * Convert array into a tuple.
      *
      * @param  mixed  $values
      * @return string
      */
-    public function group($values)
+    public function tuple($values)
     {
         return '('.implode(', ', $values).')';
     }
 
     /**
-     * Recursively group arrays containing values into groups.
+     * Recursively group arrays containing values into a tuple.
      *
      * @param  mixed  $values
      * @return string
      */
-    public function groupify($values)
+    public function tuplify($values)
     {
         if (is_array($values)) {
-            return $this->group(array_map([$this, __FUNCTION__], $values));
+            return $this->tuple(array_map([$this, __FUNCTION__], $values));
         }
 
         return $this->parameter($values);
     }
 
     /**
-     * Recursively group arrays containing columns into groups.
+     * Recursively group arrays containing columns into a tuple.
      *
      * @param  mixed  $values
      * @return string
      */
-    public function groupifyColumns($values)
+    public function tuplifyColumns($values)
     {
         if (is_array($values)) {
-            return $this->group(array_map([$this, __FUNCTION__], $values));
+            return $this->tuple(array_map([$this, __FUNCTION__], $values));
         }
 
         return $this->wrap($values);
     }
 
     /**
-     * Recursively group arrays containing raw values into groups.
+     * Recursively group arrays containing raw values into a tuple.
      *
      * @param  mixed  $values
      * @return string
      */
-    public function groupifyRaw($values)
+    public function tuplifyRaw($values)
     {
         if (is_array($values)) {
-            return $this->group(array_map([$this, __FUNCTION__], $values));
+            return $this->tuple(array_map([$this, __FUNCTION__], $values));
         }
 
         return $values;
