@@ -6,7 +6,7 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
-use Illuminate\Database\Concerns\ExplainsQueries;
+use Illuminate\Database\Concerns\ExplainsQueries;w
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -933,7 +933,7 @@ class Builder
      * @param  bool  $not
      * @return $this
      */
-    public function whereIn($columns, $values, $boolean = 'and', $not = false)
+    public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotIn' : 'In';
 
