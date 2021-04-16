@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Database\QueryException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
@@ -10,6 +9,7 @@ use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\NoPendingMigrations;
+use Illuminate\Database\QueryException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -69,14 +69,14 @@ class Migrator
     protected $output;
 
     /**
-     * Maximum number of retries
+     * Maximum number of retries.
      *
      * @var int|mixed
      */
     protected $max_retries = 3;
 
     /**
-     * List of migrations that did not find table references
+     * List of migrations that did not find table references.
      *
      * @var array
      */
@@ -228,7 +228,7 @@ class Migrator
             $this->runMigration($migration, 'up');
 
             // Remove pending migration from lists
-            if(isset($this->need_remigrates[$file])) {
+            if (isset($this->need_remigrates[$file])) {
                 unset($this->need_remigrates[$file]);
             }
         } catch (QueryException $e) {
@@ -247,7 +247,9 @@ class Migrator
         // in the application. A migration repository keeps the migrate order.
         $this->repository->log($name, $batch);
 
-        $this->note("<info>Migrated:</info>  {$name} ({$runTime}ms)");
+        if (! isset($this->need_remigrates[$file])) {
+            $this->note("<info>Migrated:</info>  {$name} ({$runTime}ms)");
+        }
     }
 
     /**
@@ -257,15 +259,15 @@ class Migrator
      */
     protected function needRemigrate($name, $file)
     {
-        if(! isset($this->need_remigrates[$file])) {
+        if (! isset($this->need_remigrates[$file])) {
             $this->need_remigrates[$file] = 0;
         }
 
-        if($this->need_remigrates[$file] >= $this->max_retries) {
+        if ($this->need_remigrates[$file] >= $this->max_retries) {
             return false;
         }
 
-        $this->note('<comment>Waiting for the reference table: </comment>' . $name);
+        $this->note("<comment>Waiting for the reference:</comment> $name <comment>(skipped)</comment>");
 
         return (bool) ++$this->need_remigrates[$file];
     }

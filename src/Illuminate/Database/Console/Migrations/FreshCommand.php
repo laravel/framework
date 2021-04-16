@@ -53,7 +53,7 @@ class FreshCommand extends Command
             '--schema-path' => $this->input->getOption('schema-path'),
             '--force' => true,
             '--step' => $this->option('step'),
-            '--retry' => $this->input->getOption('retry')
+            '--retry' => $this->input->getOption('retry'),
         ]));
 
         if ($this->laravel->bound(Dispatcher::class)) {
