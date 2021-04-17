@@ -982,9 +982,10 @@ class Container implements ArrayAccess, ContainerContract
     protected function resolveClass(ReflectionParameter $parameter)
     {
         try {
+            $className = Util::getParameterClassName($parameter);
             return $parameter->isVariadic()
-                        ? $this->resolveVariadicClass($parameter)
-                        : $this->make(Util::getParameterClassName($parameter));
+                        ? $this->resolveVariadicClass($className)
+                        : $this->make($className);
         }
 
         // If we can not resolve the class instance, we will check to see if the value
@@ -1010,13 +1011,11 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve a class based variadic dependency from the container.
      *
-     * @param  \ReflectionParameter  $parameter
+     * @param  string  $className
      * @return mixed
      */
-    protected function resolveVariadicClass(ReflectionParameter $parameter)
+    protected function resolveVariadicClass($className)
     {
-        $className = Util::getParameterClassName($parameter);
-
         $abstract = $this->getAlias($className);
 
         if (! is_array($concrete = $this->getContextualConcrete($abstract))) {
