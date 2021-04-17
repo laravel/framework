@@ -73,7 +73,24 @@ class ComponentTagCompiler
     {
         $value = $this->compileSlots($value);
 
+        $value = $this->compileAttributes($value);
+
         return $this->compileTags($value);
+    }
+
+    /**
+     * Compile the attribute within the given string.
+     *
+     * @param  string $value
+     * @return string
+     */
+    public function compileAttributes(string $value)
+    {
+        $pattern = '/x-(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?/';
+
+        return preg_replace_callback($pattern, function (array $matches) {
+            return $matches[1].'="{{ '.$matches[2].' }}"';
+        }, $value);
     }
 
     /**
