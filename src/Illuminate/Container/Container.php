@@ -983,6 +983,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         try {
             $className = Util::getParameterClassName($parameter);
+            
             return $parameter->isVariadic()
                         ? $this->resolveVariadicClass($className)
                         : $this->make($className);
