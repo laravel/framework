@@ -254,6 +254,11 @@ class CallQueuedHandler
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
+        if ($chainLock = $command->chainLock) {
+            $cache = $this->container->make(Cache::class);
+            $cache->lock($chainLock)->forceRelease();
+        }
+
         $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);
         $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);
 

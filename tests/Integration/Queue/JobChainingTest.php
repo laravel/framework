@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -218,6 +219,99 @@ class JobChainingTest extends TestCase
         $this->assertNull(JobChainingTestThirdJob::$usedQueue);
         $this->assertNull(JobChainingTestThirdJob::$usedConnection);
     }
+
+    public function testUniqueChainedJobCanBeDispatched()
+    {
+        Bus::chain([
+            new JobChainingTestFirstJob,
+            new JobChainingTestSecondJob(),
+        ])->dispatchUnique('chain');
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
+    public function testDuplicateUniqueChainedJobsAreNotDispatched()
+    {
+        // first job acquires lock
+        $this->app->get(Cache::class)->lock($this->getLockName('chain'), 10)->get();
+        // dispatch second job
+        Bus::chain([
+            new JobChainingTestSecondJob(),
+        ])->dispatchUnique('chain');
+
+        $this->assertFalse(JobChainingTestSecondJob::$ran);
+    }
+
+    public function testUniqueChainedJobsWithIdAreDispatched()
+    {
+        // dispatch second job
+        Bus::chain([
+            new JobChainingTestFirstJob(),
+            new JobChainingTestSecondJob(),
+        ])->dispatchUnique('chain', 1);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
+    public function testDuplicateUniqueChainedJobsWithIdAreNotDispatched()
+    {
+        // first chain acquires lock
+        $this->app->get(Cache::class)->lock($this->getLockName('chain', 1), 10)->get();
+        // dispatch second chain
+        Bus::chain([
+            new JobChainingTestFirstJob(),
+            new JobChainingTestSecondJob(),
+        ])->dispatchUnique('chain', 1);
+
+        $this->assertFalse(JobChainingTestFirstJob::$ran);
+        $this->assertFalse(JobChainingTestSecondJob::$ran);
+    }
+
+    public function testUniqueChainedJobsSetLockName()
+    {
+        // dispatch second job
+        $chain = Bus::chain([
+            new JobChainingTestFirstJob(),
+            new JobChainingTestSecondJob(),
+        ]);
+
+        $chain->dispatchUnique('chain', 1);
+        $this->assertEquals($this->getLockName('chain', 1), $chain->lock);
+    }
+
+    public function testChainedJobsLockIsReleasedOnCompletion()
+    {
+        Bus::chain([
+            new JobChainingTestFirstJob,
+            new JobChainingTestSecondJob(),
+        ])->dispatchUnique('chain', 1);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+        $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockName('chain', 1))->get());
+    }
+
+    public function testChainedJobsLockIsReleasedOnFailure()
+    {
+        try {
+            Bus::chain([
+                new JobChainingTestFirstJob(),
+                new JobChainingTestFailingJob(),
+                new JobChainingTestSecondJob(),
+            ])->dispatchUnique('chain', 1);
+
+        } finally {
+            $this->assertTrue(JobChainingTestFailingJob::$ran);
+            $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockName('chain', 1))->get());
+        }
+    }
+
+    protected function getLockName($name, $id = null)
+    {
+        return "laravel_unique_chain:{$name}:{$id}";
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
@@ -295,8 +389,11 @@ class JobChainingTestFailingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
+    public static $ran = false;
+
     public function handle()
     {
+        static::$ran = true;
         $this->fail();
     }
 }

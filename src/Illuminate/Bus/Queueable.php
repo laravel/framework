@@ -46,6 +46,13 @@ trait Queueable
     public $chainCatchCallbacks;
 
     /**
+     * The name of any lock for the chain
+     *
+     * @var int|string
+     */
+    public $chainLock;
+
+    /**
      * The number of seconds before the job should be made available.
      *
      * @var \DateTimeInterface|\DateInterval|int|null
@@ -229,6 +236,7 @@ trait Queueable
 
                 $next->chainConnection = $this->chainConnection;
                 $next->chainQueue = $this->chainQueue;
+                $next->chainLock = $this->chainLock;
                 $next->chainCatchCallbacks = $this->chainCatchCallbacks;
             }));
         }

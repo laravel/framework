@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation\Bus;
 
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\SerializableClosure;
 
@@ -50,6 +52,13 @@ class PendingChain
      * @var array
      */
     public $catchCallbacks = [];
+
+    /**
+     *  The name of any lock for this chain
+     *
+     * @var int|string
+     */
+    public $lock;
 
     /**
      * Create a new PendingChain instance.
@@ -129,6 +138,36 @@ class PendingChain
     }
 
     /**
+     * Prevents the dispatch of duplicate chained jobs.
+     *
+     * @param  string  $name
+     * @param  int|string  $uniqueId
+     * @param  int  $uniqueFor
+     * @return \Illuminate\Foundation\Bus\PendingDispatch|null
+     */
+    public function dispatchUnique($name, $uniqueId = null, $uniqueFor = 3600)
+    {
+        $cache = Container::getInstance()->make(Cache::class);
+        $lock = $cache->lock(
+            $lockName = "laravel_unique_chain:{$name}:{$uniqueId}",
+            $uniqueFor
+        );
+
+        if ($lock->get()) {
+            $this->lock = $lockName;
+            // Release the lock once all chained jobs are complete
+            $this->chain[] = function () use ($lockName) {
+                $cache = Container::getInstance()->make(Cache::class);
+                $cache->lock($lockName)->forceRelease();
+            };
+
+            return $this->dispatch();
+        }
+
+        return null;
+    }
+
+    /**
      * Dispatch the job with the given arguments.
      *
      * @return \Illuminate\Foundation\Bus\PendingDispatch
@@ -158,6 +197,7 @@ class PendingChain
         }
 
         $firstJob->chain($this->chain);
+        $firstJob->chainLock = $this->lock;
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
         return app(Dispatcher::class)->dispatch($firstJob);
