@@ -233,9 +233,9 @@ class JobChainingTest extends TestCase
 
     public function testDuplicateUniqueChainedJobsAreNotDispatched()
     {
-        // first job acquires lock
+        // first chain acquires lock
         $this->app->get(Cache::class)->lock($this->getLockName('chain'), 10)->get();
-        // dispatch second job
+        // dispatch second chain
         Bus::chain([
             new JobChainingTestSecondJob(),
         ])->dispatchUnique('chain');
@@ -245,7 +245,6 @@ class JobChainingTest extends TestCase
 
     public function testUniqueChainedJobsWithIdAreDispatched()
     {
-        // dispatch second job
         Bus::chain([
             new JobChainingTestFirstJob(),
             new JobChainingTestSecondJob(),
@@ -271,7 +270,6 @@ class JobChainingTest extends TestCase
 
     public function testUniqueChainedJobsSetLockName()
     {
-        // dispatch second job
         $chain = Bus::chain([
             new JobChainingTestFirstJob(),
             new JobChainingTestSecondJob(),
