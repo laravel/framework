@@ -395,7 +395,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Checks if the user should login by executing the given callbacks
+     * Checks if the user should login by executing the given callbacks.
      *
      * @param  array|callable|null  $callbacks
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
