@@ -37,6 +37,40 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testFirstWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'baz']);
+        $result = $data->first(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstWithCallbackAndDefault($collection)
+    {
+        $data = new $collection(['foo', 'bar']);
+        $result = $data->first(function ($value) {
+            return $value === 'baz';
+        }, 'default');
+        $this->assertSame('default', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstWithDefaultAndWithoutCallback($collection)
+    {
+        $data = new $collection;
+        $result = $data->first(null, 'default');
+        $this->assertSame('default', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists($collection)
     {
         $collection = new $collection([
@@ -76,40 +110,6 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $collection->where('name', 'foo')->sole();
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testFirstWithCallback($collection)
-    {
-        $data = new $collection(['foo', 'bar', 'baz']);
-        $result = $data->first(function ($value) {
-            return $value === 'bar';
-        });
-        $this->assertSame('bar', $result);
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testFirstWithCallbackAndDefault($collection)
-    {
-        $data = new $collection(['foo', 'bar']);
-        $result = $data->first(function ($value) {
-            return $value === 'baz';
-        }, 'default');
-        $this->assertSame('default', $result);
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testFirstWithDefaultAndWithoutCallback($collection)
-    {
-        $data = new $collection;
-        $result = $data->first(null, 'default');
-        $this->assertSame('default', $result);
     }
 
     /**
