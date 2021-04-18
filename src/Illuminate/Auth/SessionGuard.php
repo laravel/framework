@@ -17,6 +17,7 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Session\Session;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -349,9 +350,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  array  $credentials
      * @param  bool  $remember
+     * @param  array|callable|null  $callbacks
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false)
+    public function attempt(array $credentials = [], $remember = false, $callbacks = null)
     {
         $this->fireAttemptEvent($credentials, $remember);
 
@@ -360,7 +362,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // If an implementation of UserInterface was returned, we'll ask the provider
         // to validate the user against the given credentials, and if they are in
         // fact valid we'll log the users into the application and return true.
-        if ($this->hasValidCredentials($user, $credentials)) {
+        if ($this->hasValidCredentials($user, $credentials) && $this->shouldLogin($callbacks, $user)) {
             $this->login($user, $remember);
 
             return true;
@@ -390,6 +392,24 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         }
 
         return $validated;
+    }
+
+    /**
+     * Checks if the user should login by executing the given callbacks
+     *
+     * @param  array|callable|null  $callbacks
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return bool
+     */
+    protected function shouldLogin($callbacks, AuthenticatableContract $user)
+    {
+        foreach (Arr::wrap($callbacks) as $callback) {
+            if (! $callback($user)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
