@@ -1,6 +1,27 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.36.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.37.0...8.x)
+
+
+## [v8.37.0 (2021-04-13)](https://github.com/laravel/framework/compare/v8.36.2...v8.37.0)
+
+### Added
+- Allow to retry jobs by queue name ([#36898](https://github.com/laravel/framework/pull/36898), [f2d9b59](https://github.com/laravel/framework/commit/f2d9b595e51d564c5e1390eb42438c632e0daf36), [c351a30](https://github.com/laravel/framework/commit/c351a309f1a02098f9a7ee24a8a402e9ce06fead))
+- Added strings to the `DetectsLostConnections.php` ([4210258](https://github.com/laravel/framework/commit/42102589bc7f7b8533ee1b815ef0cc18017d4e45))
+- Allow testing of Blade components that return closures ([#36919](https://github.com/laravel/framework/pull/36919))
+- Added anonymous migrations ([#36906](https://github.com/laravel/framework/pull/36906))
+- Added `Session\Store::missing()` method ([#36937](https://github.com/laravel/framework/pull/36937))
+- Handle concurrent asynchronous requests in the HTTP client ([#36948](https://github.com/laravel/framework/pull/36948), [245a712](https://github.com/laravel/framework/commit/245a7125076e52da7ce55b494c1c01f0f28df55d))
+- Added tinyText data type to Blueprint and to available database grammars ([#36949](https://github.com/laravel/framework/pull/36949))
+- Added a method to remove a resolved view engine ([#36955](https://github.com/laravel/framework/pull/36955))
+- Added `Illuminate\Database\Eloquent\Model::getAttributesForInsert()` protected method ([9a9f59f](https://github.com/laravel/framework/commit/9a9f59fcc6e7b93465ce9848b52a473477dff64a), [314bf87](https://github.com/laravel/framework/commit/314bf875ba5d37c056ccea5148181fcb0517f596))
+
+### Fixed
+- Fixed clone() on EloquentBuilder ([#36924](https://github.com/laravel/framework/pull/36924))
+
+### Changed
+- `Model::delete()` throw LogicException not Exception ([#36914](https://github.com/laravel/framework/pull/36914))
+- Make pagination linkCollection() method public ([#36959](https://github.com/laravel/framework/pull/36959))
 
 
 ## [v8.36.2 (2021-04-07)](https://github.com/laravel/framework/compare/v8.36.1...v8.36.2)
