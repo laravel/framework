@@ -295,28 +295,6 @@ trait EnumeratesValues
     }
 
     /**
-     * Get the first item in the collection, but only if exactly
-     * item exists. Otherwise, throw an exception.
-     *
-     * @return mixed
-     *
-     * @throws ItemNotFoundException
-     * @throws MultipleItemsFoundException
-     */
-    public function sole()
-    {
-        if ($this->isEmpty()) {
-            throw new ItemNotFoundException;
-        }
-
-        if ($this->count() > 1) {
-            throw new MultipleItemsFoundException;
-        }
-
-        return $this->first();
-    }
-
-    /**
      * Determine if the collection is not empty.
      *
      * @return bool

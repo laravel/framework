@@ -4,6 +4,8 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Illuminate\Collections\ItemNotFoundException;
+use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
@@ -1048,6 +1050,31 @@ class Collection implements ArrayAccess, Enumerable
     public function splitIn($numberOfGroups)
     {
         return $this->chunk(ceil($this->count() / $numberOfGroups));
+    }
+
+    /**
+     * Get the first item in the collection, but only if exactly
+     * item exists. Otherwise, throw an exception.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     *
+     * @throws ItemNotFoundException
+     * @throws MultipleItemsFoundException
+     */
+    public function sole(callable $callback = null)
+    {
+        $items = $this->filter($callback);
+
+        if ($items->isEmpty()) {
+            throw new ItemNotFoundException;
+        }
+
+        if ($items->count() > 1) {
+            throw new MultipleItemsFoundException;
+        }
+
+        return $items->first();
     }
 
     /**

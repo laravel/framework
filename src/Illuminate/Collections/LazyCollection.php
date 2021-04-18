@@ -5,6 +5,8 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
+use Illuminate\Collections\ItemNotFoundException;
+use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
@@ -1009,6 +1011,52 @@ class LazyCollection implements Enumerable
     {
         return $this->passthru('split', func_get_args());
     }
+
+    /**
+     * Get the first item in the collection, but only if exactly
+     * item exists. Otherwise, throw an exception.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     *
+     * @throws ItemNotFoundException
+     * @throws MultipleItemsFoundException
+     */
+    public function sole(callable $callback = null)
+    {
+        $iterator = $this->getIterator();
+
+        if (is_null($callback)) {
+            if (! $iterator->valid()) {
+                throw new ItemNotFoundException;
+            }
+
+            if ($this->take(2)->count() > 1) {
+                throw new MultipleItemsFoundException;
+            }
+
+            return $iterator->current();
+        }
+
+        $items = [];
+
+        foreach ($iterator as $key => $value) {
+            if ($callback($value, $key)) {
+                $items[] = $value;
+            }
+        }
+
+        if (! count($items)) {
+            throw new ItemNotFoundException;
+        }
+
+        if (count($items) > 1) {
+            throw new MultipleItemsFoundException;
+        }
+
+        return $items[0];
+    }
+
 
     /**
      * Chunk the collection into chunks of the given size.

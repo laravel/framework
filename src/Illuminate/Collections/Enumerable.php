@@ -444,17 +444,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function firstWhere($key, $operator = null, $value = null);
 
     /**
-     * Get the first item in the collection, but only if exactly
-     * item exists. Otherwise, throw an exception.
-     *
-     * @return mixed
-     *
-     * @throws ItemNotFoundException
-     * @throws MultipleItemsFoundException
-     */
-    public function sole();
-
-    /**
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth
@@ -820,6 +809,18 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return static
      */
     public function split($numberOfGroups);
+
+    /**
+     * Get the first item in the collection, but only if exactly
+     * item exists. Otherwise, throw an exception.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     *
+     * @throws ItemNotFoundException
+     * @throws MultipleItemsFoundException
+     */
+    public function sole(callable $callback = null);
 
     /**
      * Chunk the collection into chunks of the given size.
