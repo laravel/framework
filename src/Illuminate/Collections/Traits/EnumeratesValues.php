@@ -310,7 +310,7 @@ trait EnumeratesValues
         }
 
         if ($this->count() > 1) {
-            throw new MultipleItemsFoundException();
+            throw new MultipleItemsFoundException;
         }
 
         return $this->first();
