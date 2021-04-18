@@ -48,4 +48,31 @@ class RequestValidationTest extends TestCase
             $this->assertSame('some_bag', $validationException->errorBag);
         }
     }
+
+    public function testValidateWithMacro()
+    {
+        $input = [
+            'age' => 23,
+            'height' => 175,
+            'weight' => 62
+        ];
+
+        $request = Request::create('/', 'GET', $input);
+
+        $validated = $request->validateWith('numeric', ['age', 'height', 'weight']);
+
+        $this->assertSame($input, $validated);
+    }
+
+    public function testValidateWithMacroWhenItFails()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('/', 'GET', [
+            'first_name' => 'John2',
+            'last_name' => 'Doe^'
+        ]);
+
+        $request->validateWith('alpha', ['first_name', 'last_name']);
+    }
 }
