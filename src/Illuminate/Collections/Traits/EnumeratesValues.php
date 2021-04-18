@@ -5,6 +5,8 @@ namespace Illuminate\Support\Traits;
 use CachingIterator;
 use Closure;
 use Exception;
+use Illuminate\Collections\ItemNotFoundException;
+use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
@@ -290,6 +292,28 @@ trait EnumeratesValues
     public function firstWhere($key, $operator = null, $value = null)
     {
         return $this->first($this->operatorForWhere(...func_get_args()));
+    }
+
+    /**
+     * Get the first item in the collection, but only if exactly
+     * item exists. Otherwise, throw an exception.
+     *
+     * @return mixed
+     *
+     * @throws ItemNotFoundException
+     * @throws MultipleItemsFoundException
+     */
+    public function sole()
+    {
+        if ($this->isEmpty()) {
+            throw new ItemNotFoundException;
+        }
+
+        if ($this->count() > 1) {
+            throw new MultipleItemsFoundException();
+        }
+
+        return $this->first();
     }
 
     /**

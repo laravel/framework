@@ -3,6 +3,8 @@
 namespace Illuminate\Support;
 
 use Countable;
+use Illuminate\Collections\ItemNotFoundException;
+use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use IteratorAggregate;
@@ -440,6 +442,17 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return mixed
      */
     public function firstWhere($key, $operator = null, $value = null);
+
+    /**
+     * Get the first item in the collection, but only if exactly
+     * item exists. Otherwise, throw an exception.
+     *
+     * @return mixed
+     *
+     * @throws ItemNotFoundException
+     * @throws MultipleItemsFoundException
+     */
+    public function sole();
 
     /**
      * Get a flattened array of the items in the collection.
