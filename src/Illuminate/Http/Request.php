@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
  * @method array validate(array $rules, ...$params)
+ * @method array validateWith(array|string $rules, array $fields)
  * @method array validateWithBag(string $errorBag, array $rules, ...$params)
  * @method bool hasValidSignature(bool $absolute = true)
  */
