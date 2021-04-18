@@ -115,6 +115,46 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExistsWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'baz']);
+        $result = $data->sole(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfNoItemsExistsWithCallback($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'baz']);
+
+        $data->sole(function ($value) {
+            return $value === 'invalid';
+        });
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfMoreThanOneItemExistsWithCallback($collection)
+    {
+        $this->expectException(MultipleItemsFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'bar']);
+
+        $data->sole(function ($value) {
+            return $value === 'bar';
+        });
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testFirstWhere($collection)
     {
         $data = new $collection([
