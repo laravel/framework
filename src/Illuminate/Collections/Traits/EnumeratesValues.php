@@ -5,8 +5,6 @@ namespace Illuminate\Support\Traits;
 use CachingIterator;
 use Closure;
 use Exception;
-use Illuminate\Collections\ItemNotFoundException;
-use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;

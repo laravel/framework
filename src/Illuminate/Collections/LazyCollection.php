@@ -1057,7 +1057,6 @@ class LazyCollection implements Enumerable
         return $items[0];
     }
 
-
     /**
      * Chunk the collection into chunks of the given size.
      *
