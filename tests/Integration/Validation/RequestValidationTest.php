@@ -54,7 +54,7 @@ class RequestValidationTest extends TestCase
         $input = [
             'age' => 23,
             'height' => 175,
-            'weight' => 62
+            'weight' => 62,
         ];
 
         $request = Request::create('/', 'GET', $input);
@@ -70,7 +70,7 @@ class RequestValidationTest extends TestCase
 
         $request = Request::create('/', 'GET', [
             'first_name' => 'John2',
-            'last_name' => 'Doe^'
+            'last_name' => 'Doe^',
         ]);
 
         $request->validateWith('alpha', ['first_name', 'last_name']);
