@@ -456,6 +456,21 @@ trait EnumeratesValues
     }
 
     /**
+     * Get the first item by the given key value pair, but only if
+     * exactly one item matches the criteria. Otherwise, throw
+     * an exception.
+     *
+     * @param  string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function soleWhere($key, $operator = null, $value = null)
+    {
+        return $this->sole($this->operatorForWhere(...func_get_args()));
+    }
+
+    /**
      * Apply the callback if the value is truthy.
      *
      * @param  bool|mixed  $value
