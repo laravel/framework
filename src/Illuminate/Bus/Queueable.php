@@ -46,7 +46,7 @@ trait Queueable
     public $chainCatchCallbacks;
 
     /**
-     * The name of any lock for the chain
+     * The name of any lock for the chain.
      *
      * @var int|string
      */

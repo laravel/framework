@@ -112,12 +112,13 @@ class CallQueuedHandler
     protected function dispatchThroughMiddleware(Job $job, $command)
     {
         return (new Pipeline($this->container))->send($command)
-                ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
-                ->then(function ($command) use ($job) {
-                    return $this->dispatcher->dispatchNow(
-                        $command, $this->resolveHandler($job, $command)
-                    );
-                });
+            ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [],
+                $command->middleware ?? []))
+            ->then(function ($command) use ($job) {
+                return $this->dispatcher->dispatchNow(
+                    $command, $this->resolveHandler($job, $command)
+                );
+            });
     }
 
     /**
@@ -199,12 +200,12 @@ class CallQueuedHandler
         }
 
         $uniqueId = method_exists($command, 'uniqueId')
-                    ? $command->uniqueId()
-                    : ($command->uniqueId ?? '');
+            ? $command->uniqueId()
+            : ($command->uniqueId ?? '');
 
         $cache = method_exists($command, 'uniqueVia')
-                    ? $command->uniqueVia()
-                    : $this->container->make(Cache::class);
+            ? $command->uniqueVia()
+            : $this->container->make(Cache::class);
 
         $cache->lock(
             'laravel_unique_job:'.get_class($command).$uniqueId
@@ -254,9 +255,9 @@ class CallQueuedHandler
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
-        if ($chainLock = $command->chainLock) {
+        if (isset($command->chainLock)) {
             $cache = $this->container->make(Cache::class);
-            $cache->lock($chainLock)->forceRelease();
+            $cache->lock($command->chainLock)->forceRelease();
         }
 
         $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);

@@ -54,7 +54,7 @@ class PendingChain
     public $catchCallbacks = [];
 
     /**
-     *  The name of any lock for this chain
+     *  The name of any lock for this chain.
      *
      * @var int|string
      */

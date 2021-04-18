@@ -237,9 +237,11 @@ class JobChainingTest extends TestCase
         $this->app->get(Cache::class)->lock($this->getLockName('chain'), 10)->get();
         // dispatch second chain
         Bus::chain([
+            new JobChainingTestFirstJob(),
             new JobChainingTestSecondJob(),
         ])->dispatchUnique('chain');
 
+        $this->assertFalse(JobChainingTestFirstJob::$ran);
         $this->assertFalse(JobChainingTestSecondJob::$ran);
     }
 
@@ -299,7 +301,6 @@ class JobChainingTest extends TestCase
                 new JobChainingTestFailingJob(),
                 new JobChainingTestSecondJob(),
             ])->dispatchUnique('chain', 1);
-
         } finally {
             $this->assertTrue(JobChainingTestFailingJob::$ran);
             $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockName('chain', 1))->get());
