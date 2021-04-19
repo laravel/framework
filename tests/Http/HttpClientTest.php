@@ -80,7 +80,7 @@ class HttpClientTest extends TestCase
     {
         $body = '{"test":"phpunit"}';
 
-        $fakeRequest = function(Request $request) use ($body) {
+        $fakeRequest = function (Request $request) use ($body) {
             self::assertSame($body, $request->body());
 
             return ['my' => 'response'];
