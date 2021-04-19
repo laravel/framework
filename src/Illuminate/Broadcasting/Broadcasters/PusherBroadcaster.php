@@ -160,4 +160,15 @@ class PusherBroadcaster extends Broadcaster
     {
         return $this->pusher;
     }
+
+    /**
+     * Set the Pusher SDK instance.
+     *
+     * @param \Pusher\Pusher $pusher
+     * @return void
+     */
+    public function setPusher($pusher)
+    {
+        $this->pusher = $pusher;
+    }
 }
