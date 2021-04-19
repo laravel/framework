@@ -811,30 +811,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function split($numberOfGroups);
 
     /**
-     * Get the first item in the collection, but only if exactly
-     * item exists. Otherwise, throw an exception.
-     *
-     * @param  callable|null  $callback
-     * @return mixed
-     *
-     * @throws ItemNotFoundException
-     * @throws MultipleItemsFoundException
-     */
-    public function sole(callable $callback = null);
-
-    /**
-     * Get the first item by the given key value pair, but only if
-     * exactly one item matches the criteria. Otherwise, throw
-     * an exception.
-     *
-     * @param  string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return mixed
-     */
-    public function soleWhere($key, $operator = null, $value = null);
-
-    /**
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
