@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\TestView;
 use Illuminate\View\View;
