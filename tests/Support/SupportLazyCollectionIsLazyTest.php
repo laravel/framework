@@ -977,6 +977,17 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testSoleIsLazy()
+    {
+        $data = $this->make([['a' => 1], ['a' => 2], ['a' => 3]]);
+
+        $this->assertEnumeratesCollection($data, 3, function ($collection) {
+            $collection->sole(function ($item) {
+                return $item['a'] === 2;
+            });
+        });
+    }
+
     public function testSortIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
