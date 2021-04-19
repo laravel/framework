@@ -1024,16 +1024,16 @@ class LazyCollection implements Enumerable
      */
     public function sole($key = null, $operator = null, $value = null)
     {
-        if (func_num_args() <= 1) {
-            return $this
-                ->when($key)
-                ->filter($key)
-                ->take(2)
-                ->collect()
-                ->sole();
-        }
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
 
-        return $this->sole($this->operatorForWhere(...func_get_args()));
+        return $this
+            ->when($filter)
+            ->filter($filter)
+            ->take(2)
+            ->collect()
+            ->sole();
     }
 
     /**

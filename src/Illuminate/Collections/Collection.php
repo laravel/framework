@@ -1066,21 +1066,21 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function sole($key = null, $operator = null, $value = null)
     {
-        if (func_num_args() <= 1) {
-            $items = $this->when($key)->filter($key);
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
 
-            if ($items->isEmpty()) {
-                throw new ItemNotFoundException;
-            }
+        $items = $this->when($filter)->filter($filter);
 
-            if ($items->count() > 1) {
-                throw new MultipleItemsFoundException;
-            }
-
-            return $items->first();
+        if ($items->isEmpty()) {
+            throw new ItemNotFoundException;
         }
 
-        return $this->sole($this->operatorForWhere(...func_get_args()));
+        if ($items->count() > 1) {
+            throw new MultipleItemsFoundException;
+        }
+
+        return $items->first();
     }
 
     /**
