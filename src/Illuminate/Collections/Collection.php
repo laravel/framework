@@ -1064,7 +1064,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function sole(callable $callback = null)
     {
-        $items = $this->filter($callback);
+        $items = $this->when($callback)->filter($callback);
 
         if ($items->isEmpty()) {
             throw new ItemNotFoundException;
