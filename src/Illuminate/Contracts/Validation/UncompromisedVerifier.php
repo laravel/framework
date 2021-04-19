@@ -2,7 +2,7 @@
 
 namespace Illuminate\Contracts\Validation;
 
-interface NotCompromisedVerifier
+interface UncompromisedVerifier
 {
     /**
      * Verify that the given value has not been compromised in data leaks.

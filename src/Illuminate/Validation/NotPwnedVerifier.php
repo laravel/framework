@@ -3,11 +3,11 @@
 namespace Illuminate\Validation;
 
 use Exception;
-use Illuminate\Contracts\Validation\NotCompromisedVerifier;
+use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Str;
 
-class NotPwnedVerifier implements NotCompromisedVerifier
+class NotPwnedVerifier implements UncompromisedVerifier
 {
     /**
      * The http factory instance.
@@ -64,9 +64,9 @@ class NotPwnedVerifier implements NotCompromisedVerifier
     }
 
     /**
-     * Search by the given hash prefix and returns all occurrences.
+     * Search by the given hash prefix and returns all occurrences of leaked passwords.
      *
-     * @param  string $hashPrefix
+     * @param  string  $hashPrefix
      * @return \Illuminate\Support\Collection
      */
     protected function search($hashPrefix)

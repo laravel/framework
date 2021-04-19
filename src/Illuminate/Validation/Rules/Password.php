@@ -2,33 +2,21 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 
 class Password implements Rule, DataAwareRule
 {
     /**
-     * If the password requires at least one uppercase and one lowercase letter.
-     *
-     * @var bool
-     */
-    protected $caseDiff = false;
-
-    /**
      * The data under validation.
      *
      * @var array
      */
     protected $data;
-
-    /**
-     * If the password requires at least one letter.
-     *
-     * @var bool
-     */
-    protected $letters = false;
 
     /**
      * The minimum size of the password.
@@ -38,11 +26,18 @@ class Password implements Rule, DataAwareRule
     protected $min = 8;
 
     /**
-     * If the password should has not been compromised in data leaks.
+     * If the password requires at least one uppercase and one lowercase letter.
      *
      * @var bool
      */
-    protected $notCompromised = false;
+    protected $mixedCase = false;
+
+    /**
+     * If the password requires at least one letter.
+     *
+     * @var bool
+     */
+    protected $letters = false;
 
     /**
      * If the password requires at least one number.
@@ -57,6 +52,13 @@ class Password implements Rule, DataAwareRule
      * @var bool
      */
     protected $symbols = false;
+
+    /**
+     * If the password should has not been compromised in data leaks.
+     *
+     * @var bool
+     */
+    protected $uncompromised = false;
 
     /**
      * The failure messages, if any.
@@ -105,9 +107,9 @@ class Password implements Rule, DataAwareRule
      *
      * @return $this
      */
-    public function ensureNotCompromised()
+    public function uncompromised()
     {
-        $this->notCompromised = true;
+        $this->uncompromised = true;
 
         return $this;
     }
@@ -117,9 +119,9 @@ class Password implements Rule, DataAwareRule
      *
      * @return $this
      */
-    public function requireCaseDiff()
+    public function mixedCase()
     {
-        $this->caseDiff = true;
+        $this->mixedCase = true;
 
         return $this;
     }
@@ -129,7 +131,7 @@ class Password implements Rule, DataAwareRule
      *
      * @return $this
      */
-    public function requireLetters()
+    public function letters()
     {
         $this->letters = true;
 
@@ -141,7 +143,7 @@ class Password implements Rule, DataAwareRule
      *
      * @return $this
      */
-    public function requireNumbers()
+    public function numbers()
     {
         $this->numbers = true;
 
@@ -153,7 +155,7 @@ class Password implements Rule, DataAwareRule
      *
      * @return $this
      */
-    public function requireSymbols()
+    public function symbols()
     {
         $this->symbols = true;
 
@@ -170,7 +172,7 @@ class Password implements Rule, DataAwareRule
     public function passes($attribute, $value)
     {
         $validator = Validator::make($this->data, [
-            $attribute => 'required|string|confirmed|min:'.$this->min,
+            $attribute => 'string|min:'.$this->min,
         ]);
 
         if ($validator->fails()) {
@@ -179,7 +181,7 @@ class Password implements Rule, DataAwareRule
 
         $value = (string) $value;
 
-        if ($this->caseDiff && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
+        if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
             $this->fail('The :attribute must contain at least one uppercase and one lowercase letter.');
         }
 
@@ -199,7 +201,7 @@ class Password implements Rule, DataAwareRule
             return false;
         }
 
-        if ($this->notCompromised && ! app('validation.not_compromised')->verify($value)) {
+        if ($this->uncompromised && ! Container::getInstance()->make(UncompromisedVerifier::class)->verify($value)) {
             return $this->fail(
                 'The given :attribute has appeared in a data leak. Please choose a different :attribute.'
             );
@@ -226,7 +228,11 @@ class Password implements Rule, DataAwareRule
      */
     protected function fail($messages)
     {
-        $this->messages = array_merge($this->messages, Arr::wrap($messages));
+        $messages = collect(Arr::wrap($messages))->map(function ($message) {
+            return __($message);
+        })->all();
+
+        $this->messages = array_merge($this->messages, $messages);
 
         return false;
     }

@@ -13,15 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationPasswordRuleTest extends TestCase
 {
-    public function testRequired()
-    {
-        $this->fails(Password::min(3), [null], [
-            'validation.required',
-        ]);
-
-        $this->passes(Password::min(3), ['1234', 'abcd', 'a z s']);
-    }
-
     public function testString()
     {
         $this->fails(Password::min(3), [['foo' => 'bar'], ['foo']], [
@@ -47,43 +38,43 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testCaseDiff()
     {
-        $this->fails(Password::min(2)->requireCaseDiff(), ['nn', 'MM'], [
+        $this->fails(Password::min(2)->mixedCase(), ['nn', 'MM'], [
             'The my password must contain at least one uppercase and one lowercase letter.',
         ]);
 
-        $this->passes(Password::min(2)->requireCaseDiff(), ['Nn', 'Mn', 'âA']);
+        $this->passes(Password::min(2)->mixedCase(), ['Nn', 'Mn', 'âA']);
     }
 
     public function testLetters()
     {
-        $this->fails(Password::min(2)->requireLetters(), ['11', '22', '^^', '``', '**'], [
+        $this->fails(Password::min(2)->letters(), ['11', '22', '^^', '``', '**'], [
             'The my password must contain at least one letter.',
         ]);
 
-        $this->passes(Password::min(2)->requireLetters(), ['1a', 'b2', 'â1']);
+        $this->passes(Password::min(2)->letters(), ['1a', 'b2', 'â1']);
     }
 
     public function testNumbers()
     {
-        $this->fails(Password::min(2)->requireNumbers(), ['aa', 'bb', '  a'], [
+        $this->fails(Password::min(2)->numbers(), ['aa', 'bb', '  a'], [
             'The my password must contain at least one number.',
         ]);
 
-        $this->passes(Password::min(2)->requireNumbers(), ['1a', 'b2', '00']);
+        $this->passes(Password::min(2)->numbers(), ['1a', 'b2', '00']);
     }
 
     public function testSymbols()
     {
-        $this->fails(Password::min(2)->requireSymbols(), ['ab', '1v'], [
+        $this->fails(Password::min(2)->symbols(), ['ab', '1v'], [
             'The my password must contain at least one symbol.',
         ]);
 
-        $this->passes(Password::min(2)->requireSymbols(), ['n^d', 'd^!', 'âè']);
+        $this->passes(Password::min(2)->symbols(), ['n^d', 'd^!', 'âè']);
     }
 
     public function testNotCompromised()
     {
-        $this->fails(Password::min(2)->ensureNotCompromised(), [
+        $this->fails(Password::min(2)->uncompromised(), [
             '123456',
             'password',
             'welcome',
@@ -96,7 +87,7 @@ class ValidationPasswordRuleTest extends TestCase
             'The given my password has appeared in a data leak. Please choose a different my password.',
         ]);
 
-        $this->passes(Password::min(2)->ensureNotCompromised(), [
+        $this->passes(Password::min(2)->uncompromised(), [
             '!p8VrB',
             '&xe6VeKWF#n4',
             '%HurHUnw7zM!',
@@ -110,11 +101,11 @@ class ValidationPasswordRuleTest extends TestCase
     {
         $makeRule = function () {
             return Password::min(8)
-                ->requireCaseDiff()
-                ->requireLetters()
-                ->requireNumbers()
-                ->requireSymbols()
-                ->ensureNotCompromised();
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised();
         };
 
         $this->fails($makeRule(), ['foo', 'azdazd', '1231231'], [
@@ -132,27 +123,6 @@ class ValidationPasswordRuleTest extends TestCase
             'The my password must contain at least one letter.',
             'The my password must contain at least one symbol.',
         ]);
-    }
-
-    public function testConfirmed()
-    {
-        $v = new Validator(
-            resolve('translator'),
-            ['my_password' => '1234', 'my_password_confirmation' => '5678'],
-            ['my_password' => Password::min(3)]
-        );
-
-        $this->assertSame(false, $v->passes());
-        $this->assertSame(['my_password' => ['validation.confirmed']], $v->messages()->toArray());
-
-        $v = new Validator(
-            resolve('translator'),
-            ['my_password' => '1234'],
-            ['my_password' => Password::min(3)]
-        );
-
-        $this->assertSame(false, $v->passes());
-        $this->assertSame(['my_password' => ['validation.confirmed']], $v->messages()->toArray());
     }
 
     protected function passes($rule, $values)
