@@ -849,6 +849,27 @@ class Route
 
         return false;
     }
+    
+    /**
+     * Determine if the route name is included in the specified patterns.
+     *
+     * @param  mixed  ...$patterns
+     * @return bool
+     */
+    public function included(...$patterns)
+    {
+        if (is_null($routeName = $this->getName())) {
+            return false;
+        }
+
+        foreach ($patterns as $pattern) {
+            if (strpos($routeName, $pattern) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Set the handler for the route.
