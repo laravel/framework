@@ -1019,42 +1019,17 @@ class LazyCollection implements Enumerable
      * @param  callable|null  $callback
      * @return mixed
      *
-     * @throws ItemNotFoundException
-     * @throws MultipleItemsFoundException
+     * @throws \Illuminate\Collections\ItemNotFoundException
+     * @throws \Illuminate\Collections\MultipleItemsFoundException
      */
     public function sole(callable $callback = null)
     {
-        $iterator = $this->getIterator();
-
-        if (is_null($callback)) {
-            if (! $iterator->valid()) {
-                throw new ItemNotFoundException;
-            }
-
-            if ($this->take(2)->count() > 1) {
-                throw new MultipleItemsFoundException;
-            }
-
-            return $iterator->current();
-        }
-
-        $items = [];
-
-        foreach ($iterator as $key => $value) {
-            if ($callback($value, $key)) {
-                $items[] = $value;
-            }
-        }
-
-        if (! count($items)) {
-            throw new ItemNotFoundException;
-        }
-
-        if (count($items) > 1) {
-            throw new MultipleItemsFoundException;
-        }
-
-        return $items[0];
+        return $this
+            ->when($callback)
+            ->filter($callback)
+            ->take(2)
+            ->collect()
+            ->sole();
     }
 
     /**

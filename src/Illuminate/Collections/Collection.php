@@ -1059,8 +1059,8 @@ class Collection implements ArrayAccess, Enumerable
      * @param  callable|null  $callback
      * @return mixed
      *
-     * @throws ItemNotFoundException
-     * @throws MultipleItemsFoundException
+     * @throws \Illuminate\Collections\ItemNotFoundException
+     * @throws \Illuminate\Collections\MultipleItemsFoundException
      */
     public function sole(callable $callback = null)
     {

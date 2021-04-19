@@ -171,50 +171,6 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSoleWhere($collection)
-    {
-        $data = new $collection([
-            ['material' => 'paper', 'type' => 'book'],
-            ['material' => 'rubber', 'type' => 'gasket'],
-        ]);
-
-        $this->assertSame('book', $data->soleWhere('material', 'paper')['type']);
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testSoleWhereThrowsExceptionIfNoItemExists($collection)
-    {
-        $this->expectException(ItemNotFoundException::class);
-
-        $data = new $collection([
-            ['material' => 'paper', 'type' => 'book'],
-            ['material' => 'rubber', 'type' => 'gasket'],
-        ]);
-
-        $data->soleWhere('material', 'invalid');
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testSoleWhereThrowsExceptionIfMultipleItemsExists($collection)
-    {
-        $this->expectException(MultipleItemsFoundException::class);
-
-        $data = new $collection([
-            ['material' => 'paper', 'type' => 'book'],
-            ['material' => 'paper', 'type' => 'letter'],
-            ['material' => 'rubber', 'type' => 'gasket'],
-        ]);
-
-        $data->soleWhere('material', 'paper');
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
     public function testLastReturnsLastItemInCollection($collection)
     {
         $c = new $collection(['foo', 'bar']);
