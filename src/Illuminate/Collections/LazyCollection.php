@@ -1014,20 +1014,26 @@ class LazyCollection implements Enumerable
      * Get the first item in the collection, but only if exactly
      * item exists. Otherwise, throw an exception.
      *
-     * @param  callable|null  $callback
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return mixed
      *
      * @throws \Illuminate\Collections\ItemNotFoundException
      * @throws \Illuminate\Collections\MultipleItemsFoundException
      */
-    public function sole(callable $callback = null)
+    public function sole($key = null, $operator = null, $value = null)
     {
-        return $this
-            ->when($callback)
-            ->filter($callback)
-            ->take(2)
-            ->collect()
-            ->sole();
+        if (func_num_args() <= 1) {
+            return $this
+                ->when($key)
+                ->filter($key)
+                ->take(2)
+                ->collect()
+                ->sole();
+        }
+
+        return $this->sole($this->operatorForWhere(...func_get_args()));
     }
 
     /**

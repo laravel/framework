@@ -79,6 +79,8 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->sole());
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', '=', 'foo'));
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', 'foo'));
     }
 
     /**

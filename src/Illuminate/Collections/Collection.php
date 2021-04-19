@@ -1056,25 +1056,31 @@ class Collection implements ArrayAccess, Enumerable
      * Get the first item in the collection, but only if exactly
      * item exists. Otherwise, throw an exception.
      *
-     * @param  callable|null  $callback
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return mixed
      *
      * @throws \Illuminate\Collections\ItemNotFoundException
      * @throws \Illuminate\Collections\MultipleItemsFoundException
      */
-    public function sole(callable $callback = null)
+    public function sole($key = null, $operator = null, $value = null)
     {
-        $items = $this->when($callback)->filter($callback);
+        if (func_num_args() <= 1) {
+            $items = $this->when($key)->filter($key);
 
-        if ($items->isEmpty()) {
-            throw new ItemNotFoundException;
+            if ($items->isEmpty()) {
+                throw new ItemNotFoundException;
+            }
+
+            if ($items->count() > 1) {
+                throw new MultipleItemsFoundException;
+            }
+
+            return $items->first();
         }
 
-        if ($items->count() > 1) {
-            throw new MultipleItemsFoundException;
-        }
-
-        return $items->first();
+        return $this->sole($this->operatorForWhere(...func_get_args()));
     }
 
     /**
