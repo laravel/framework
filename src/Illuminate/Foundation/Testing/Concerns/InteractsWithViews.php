@@ -38,11 +38,12 @@ trait InteractsWithViews
             ViewFacade::addLocation(sys_get_temp_dir());
         }
 
-        $tempFile = tempnam($tempDirectory, 'laravel-blade').'.blade.php';
+        $tempFileInfo = pathinfo(tempnam($tempDirectory, 'laravel-blade'));
+        $tempFile = $tempFileInfo['dirname'].'/'.$tempFileInfo['filename'].'.blade.php';
 
         file_put_contents($tempFile, $template);
 
-        return new TestView(view(Str::before(basename($tempFile), '.blade.php'), $data));
+        return new TestView(view($tempFileInfo['filename'], $data));
     }
 
     /**
