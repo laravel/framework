@@ -76,6 +76,21 @@ class HttpClientTest extends TestCase
         $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
+    public function testSendRequestBody()
+    {
+        $body = '{"test":"phpunit"}';
+
+        $fakeRequest = function (Request $request) use ($body) {
+            self::assertSame($body, $request->body());
+
+            return ['my' => 'response'];
+        };
+
+        $this->factory->fake($fakeRequest);
+
+        $this->factory->withBody($body, 'application/json')->send('get', 'http://foo.com/api');
+    }
+
     public function testUrlsCanBeStubbedByPath()
     {
         $this->factory->fake([
