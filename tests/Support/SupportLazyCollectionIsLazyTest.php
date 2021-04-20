@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -974,6 +975,33 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             $collection->some(function ($value) {
                 return false;
             });
+        });
+    }
+
+    public function testSoleIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            try {
+                $collection->sole();
+            } catch (MultipleItemsFoundException $e) {
+                //
+            }
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sole(function ($item) {
+                return $item === 1;
+            });
+        });
+
+        $this->assertEnumerates(4, function ($collection) {
+            try {
+                $collection->sole(function ($item) {
+                    return $item % 2 === 0;
+                });
+            } catch (MultipleItemsFoundException $e) {
+                //
+            }
         });
     }
 

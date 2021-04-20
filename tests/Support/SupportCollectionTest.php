@@ -7,6 +7,8 @@ use ArrayIterator;
 use ArrayObject;
 use CachingIterator;
 use Exception;
+use Illuminate\Collections\ItemNotFoundException;
+use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
@@ -64,6 +66,92 @@ class SupportCollectionTest extends TestCase
         $data = new $collection;
         $result = $data->first(null, 'default');
         $this->assertSame('default', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->sole());
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', '=', 'foo'));
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', 'foo'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfNoItemsExists($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'INVALID')->sole();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfMoreThanOneItemExists($collection)
+    {
+        $this->expectException(MultipleItemsFoundException::class);
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'foo')->sole();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExistsWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'baz']);
+        $result = $data->sole(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfNoItemsExistsWithCallback($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'baz']);
+
+        $data->sole(function ($value) {
+            return $value === 'invalid';
+        });
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfMoreThanOneItemExistsWithCallback($collection)
+    {
+        $this->expectException(MultipleItemsFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'bar']);
+
+        $data->sole(function ($value) {
+            return $value === 'bar';
+        });
     }
 
     /**

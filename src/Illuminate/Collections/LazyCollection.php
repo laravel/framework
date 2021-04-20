@@ -1011,6 +1011,31 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return mixed
+     *
+     * @throws \Illuminate\Collections\ItemNotFoundException
+     * @throws \Illuminate\Collections\MultipleItemsFoundException
+     */
+    public function sole($key = null, $operator = null, $value = null)
+    {
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
+
+        return $this
+            ->when($filter)
+            ->filter($filter)
+            ->take(2)
+            ->collect()
+            ->sole();
+    }
+
+    /**
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
