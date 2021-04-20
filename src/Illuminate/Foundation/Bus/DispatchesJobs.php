@@ -22,6 +22,8 @@ trait DispatchesJobs
      *
      * @param  mixed  $job
      * @return mixed
+     *
+     * @deprecated Will be removed in a future Laravel version.
      */
     public function dispatchNow($job)
     {
