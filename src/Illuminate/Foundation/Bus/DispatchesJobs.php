@@ -27,4 +27,17 @@ trait DispatchesJobs
     {
         return app(Dispatcher::class)->dispatchNow($job);
     }
+    
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
+     * Queueable jobs will be dispatched to the "sync" queue.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    public function dispatchSync($job)
+    {
+        return app(Dispatcher::class)->dispatchSync($job);
+    }
 }
