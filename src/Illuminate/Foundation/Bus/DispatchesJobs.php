@@ -27,7 +27,7 @@ trait DispatchesJobs
     {
         return app(Dispatcher::class)->dispatchNow($job);
     }
-    
+
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
