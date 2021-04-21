@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.23...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.24...6.x)
+
+
+## [v6.20.24 (2021-04-20)](https://github.com/laravel/framework/compare/v6.20.23...v6.20.24)
+
+### Fixed
+- Fixed required_if boolean validation ([#36969](https://github.com/laravel/framework/pull/36969))
 
 
 ## [v6.20.23 (2021-04-13)](https://github.com/laravel/framework/compare/v6.20.22...v6.20.23)
