@@ -4,7 +4,6 @@ namespace Illuminate\Validation;
 
 use Exception;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
-use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Str;
 
 class NotPwnedVerifier implements UncompromisedVerifier
