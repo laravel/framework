@@ -65,7 +65,7 @@ class Password implements Rule, DataAwareRule
      *
      * @var int
      */
-    protected $uncompromisedThreshold = 0;
+    protected $compromisedThreshold = 0;
 
     /**
      * The failure messages, if any.
@@ -119,7 +119,7 @@ class Password implements Rule, DataAwareRule
     {
         $this->uncompromised = true;
 
-        $this->uncompromisedThreshold = $threshold;
+        $this->compromisedThreshold = $threshold;
 
         return $this;
     }
@@ -213,7 +213,7 @@ class Password implements Rule, DataAwareRule
 
         if ($this->uncompromised && ! Container::getInstance()->make(UncompromisedVerifier::class)->verify([
             'value' => $value,
-            'threshold' => $this->uncompromisedThreshold,
+            'threshold' => $this->compromisedThreshold,
         ])) {
             return $this->fail(
                 'The given :attribute has appeared in a data leak. Please choose a different :attribute.'
