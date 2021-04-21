@@ -36,7 +36,7 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(Password::min(3), ['1234', 'abcd']);
     }
 
-    public function testCaseDiff()
+    public function testMixedCase()
     {
         $this->fails(Password::min(2)->mixedCase(), ['nn', 'MM'], [
             'The my password must contain at least one uppercase and one lowercase letter.',
@@ -72,7 +72,7 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(Password::min(2)->symbols(), ['n^d', 'd^!', 'âè']);
     }
 
-    public function testNotCompromised()
+    public function testUncompromised()
     {
         $this->fails(Password::min(2)->uncompromised(), [
             '123456',
