@@ -1,6 +1,20 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.37.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.38.0...8.x)
+
+
+## [v8.38.0 (2021-04-20)](https://github.com/laravel/framework/compare/v8.37.0...v8.38.0)
+
+### Added
+- Added a `wordCount()` string helper ([#36990](https://github.com/laravel/framework/pull/36990))
+- Allow anonymous and class based migration coexisting ([#37006](https://github.com/laravel/framework/pull/37006))
+- Added `Illuminate\Broadcasting\Broadcasters\PusherBroadcaster::setPusher()` ([#37033](https://github.com/laravel/framework/pull/37033))
+
+### Fixed
+- Fixed required_if boolean validation ([#36969](https://github.com/laravel/framework/pull/36969))
+- Correctly merge object payload data in `Illuminate\Queue\Queue::createObjectPayload()` ([#36998](https://github.com/laravel/framework/pull/36998))
+- Allow the use of temporary views for Blade testing on Windows machines ([#37044](https://github.com/laravel/framework/pull/37044))
+- Fixed `Http::withBody()` not being sent ([#37057](https://github.com/laravel/framework/pull/37057))
 
 
 ## [v8.37.0 (2021-04-13)](https://github.com/laravel/framework/compare/v8.36.2...v8.37.0)
