@@ -24,7 +24,7 @@ class ValidationPasswordRuleTest extends TestCase
             'validation.string',
         ]);
 
-        $this->passes(Password::min(3), ['abcd', '454qb^']);
+        $this->passes(Password::min(3), ['abcd', '454qb^', '接2133手田']);
     }
 
     public function testMin()
@@ -69,7 +69,7 @@ class ValidationPasswordRuleTest extends TestCase
             'The my password must contain at least one symbol.',
         ]);
 
-        $this->passes(Password::min(2)->symbols(), ['n^d', 'd^!', 'âè$']);
+        $this->passes(Password::min(2)->symbols(), ['n^d', 'd^!', 'âè$', '金廿土弓竹中；']);
     }
 
     public function testUncompromised()
@@ -92,6 +92,7 @@ class ValidationPasswordRuleTest extends TestCase
         ]);
 
         $this->passes(Password::min(2)->uncompromised(), [
+            '手田日尸Ｚ難金木水口火女月土廿卜竹弓一十山',
             '!p8VrB',
             '&xe6VeKWF#n4',
             '%HurHUnw7zM!',
