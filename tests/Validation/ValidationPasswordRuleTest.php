@@ -38,11 +38,11 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testMixedCase()
     {
-        $this->fails(Password::min(2)->mixedCase(), ['nn', 'MM'], [
+        $this->fails(Password::min(2)->mixedCase(), ['nn', 'MM', '京都府'], [
             'The my password must contain at least one uppercase and one lowercase letter.',
         ]);
 
-        $this->passes(Password::min(2)->mixedCase(), ['Nn', 'Mn', 'âA']);
+        $this->passes(Password::min(2)->mixedCase(), ['Nn', 'Mn', 'âA', '京都府']);
     }
 
     public function testLetters()
@@ -51,16 +51,16 @@ class ValidationPasswordRuleTest extends TestCase
             'The my password must contain at least one letter.',
         ]);
 
-        $this->passes(Password::min(2)->letters(), ['1a', 'b2', 'â1']);
+        $this->passes(Password::min(2)->letters(), ['1a', 'b2', 'â1', '1 京都府']);
     }
 
     public function testNumbers()
     {
-        $this->fails(Password::min(2)->numbers(), ['aa', 'bb', '  a'], [
+        $this->fails(Password::min(2)->numbers(), ['aa', 'bb', '  a', '京都府'], [
             'The my password must contain at least one number.',
         ]);
 
-        $this->passes(Password::min(2)->numbers(), ['1a', 'b2', '00']);
+        $this->passes(Password::min(2)->numbers(), ['1a', 'b2', '00', '京都府 1']);
     }
 
     public function testSymbols()
@@ -69,7 +69,7 @@ class ValidationPasswordRuleTest extends TestCase
             'The my password must contain at least one symbol.',
         ]);
 
-        $this->passes(Password::min(2)->symbols(), ['n^d', 'd^!', 'âè']);
+        $this->passes(Password::min(2)->symbols(), ['n^d', 'd^!', 'âè$']);
     }
 
     public function testUncompromised()

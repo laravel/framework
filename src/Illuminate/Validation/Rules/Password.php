@@ -195,15 +195,15 @@ class Password implements Rule, DataAwareRule
             $this->fail('The :attribute must contain at least one uppercase and one lowercase letter.');
         }
 
-        if ($this->letters && ! preg_match('/\pL/', $value)) {
+        if ($this->letters && ! preg_match('/\pL/u', $value)) {
             $this->fail('The :attribute must contain at least one letter.');
         }
 
-        if ($this->symbols && ! preg_match('/\p{Z}|\p{S}|\p{P}/', $value)) {
+        if ($this->symbols && ! preg_match('/\p{Z}|\p{S}|\p{P}/u', $value)) {
             $this->fail('The :attribute must contain at least one symbol.');
         }
 
-        if ($this->numbers && ! preg_match('/\pN/', $value)) {
+        if ($this->numbers && ! preg_match('/\pN/u', $value)) {
             $this->fail('The :attribute must contain at least one number.');
         }
 
