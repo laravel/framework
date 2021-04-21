@@ -28,13 +28,16 @@ class NotPwnedVerifier implements UncompromisedVerifier
     }
 
     /**
-     * Verify that the given value has not been compromised in public breaches.
+     * Verify that the given data has not been compromised in public breaches.
      *
-     * @param  string  $value
+     * @param  array  $data
      * @return bool
      */
-    public function verify($value)
+    public function verify($data)
     {
+        $value = $data['value'];
+        $threshold = $data['threshold'];
+
         if (empty($value = (string) $value)) {
             return false;
         }
@@ -42,10 +45,10 @@ class NotPwnedVerifier implements UncompromisedVerifier
         [$hash, $hashPrefix] = $this->getHash($value);
 
         return ! $this->search($hashPrefix)
-            ->contains(function ($line) use ($hash, $hashPrefix) {
+            ->contains(function ($line) use ($hash, $hashPrefix, $threshold) {
                 [$hashSuffix, $count] = explode(':', $line);
 
-                return $hashPrefix.$hashSuffix == $hash && $count > 0;
+                return $hashPrefix.$hashSuffix == $hash && $count > $threshold;
             });
     }
 

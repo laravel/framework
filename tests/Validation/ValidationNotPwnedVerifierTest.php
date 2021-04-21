@@ -26,7 +26,10 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $verifier = new NotPwnedVerifier($httpFactory);
 
         foreach (['', false, 0] as $password) {
-            $this->assertFalse($verifier->verify($password));
+            $this->assertFalse($verifier->verify([
+                'value' => $password,
+                'threshold' => 0,
+            ]));
         }
     }
 
@@ -57,7 +60,10 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
         $verifier = new NotPwnedVerifier($httpFactory);
 
-        $this->assertTrue($verifier->verify(123123123));
+        $this->assertTrue($verifier->verify([
+            'value' => 123123123,
+            'threshold' => 0,
+        ]));
     }
 
     public function testApiGoesDown()
@@ -81,7 +87,10 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
         $verifier = new NotPwnedVerifier($httpFactory);
 
-        $this->assertTrue($verifier->verify(123123123));
+        $this->assertTrue($verifier->verify([
+            'value' => 123123123,
+            'threshold' => 0,
+        ]));
     }
 
     public function testDnsDown()
@@ -109,6 +118,9 @@ class ValidationNotPwnedVerifierTest extends TestCase
             ->andThrow($exception);
 
         $verifier = new NotPwnedVerifier($httpFactory);
-        $this->assertTrue($verifier->verify(123123123));
+        $this->assertTrue($verifier->verify([
+            'value' => 123123123,
+            'threshold' => 0,
+        ]));
     }
 }

@@ -5,10 +5,10 @@ namespace Illuminate\Contracts\Validation;
 interface UncompromisedVerifier
 {
     /**
-     * Verify that the given value has not been compromised in data leaks.
+     * Verify that the given data has not been compromised in data leaks.
      *
-     * @param  string  $value
+     * @param  array  $data
      * @return bool
      */
-    public function verify($value);
+    public function verify($data);
 }

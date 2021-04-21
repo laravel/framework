@@ -87,6 +87,10 @@ class ValidationPasswordRuleTest extends TestCase
             'The given my password has appeared in a data leak. Please choose a different my password.',
         ]);
 
+        $this->passes(Password::min(2)->uncompromised(9999999), [
+            'nuno',
+        ]);
+
         $this->passes(Password::min(2)->uncompromised(), [
             '!p8VrB',
             '&xe6VeKWF#n4',
