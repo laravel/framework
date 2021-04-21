@@ -104,6 +104,14 @@ class HttpJsonResponseTest extends TestCase
             [$nan],
         ];
     }
+
+    public function testFromJsonString()
+    {
+        $json_string = '{"foo":"bar"}';
+        $response = JsonResponse::fromJsonString($json_string);
+
+        $this->assertSame('bar', $response->getData()->foo);
+    }
 }
 
 class JsonResponseTestJsonableObject implements Jsonable
