@@ -360,6 +360,19 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
+
+        return $this;
+    }
+
+    /**
      * Dynamically pass methods to the default connection.
      *
      * @param  string  $method

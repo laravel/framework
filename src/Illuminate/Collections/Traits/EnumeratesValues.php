@@ -740,13 +740,7 @@ trait EnumeratesValues
      */
     public function reduceWithKeys(callable $callback, $initial = null)
     {
-        $result = $initial;
-
-        foreach ($this as $key => $value) {
-            $result = $callback($result, $value, $key);
-        }
-
-        return $result;
+        return $this->reduce($callback, $initial);
     }
 
     /**
