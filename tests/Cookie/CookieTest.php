@@ -118,12 +118,12 @@ class CookieTest extends TestCase
         $this->assertFalse($cookieJar->hasQueued('foo', '/wrongPath'));
     }
 
-    public function testQueueForget()
+    public function testExpire()
     {
         $cookieJar = $this->getCreator();
         $this->assertCount(0, $cookieJar->getQueuedCookies());
 
-        $cookieJar->queueForget('foobar', '/path', '/domain');
+        $cookieJar->expire('foobar', '/path', '/domain');
 
         $cookie = $cookieJar->queued('foobar');
         $this->assertEquals('foobar', $cookie->getName());

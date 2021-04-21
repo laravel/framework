@@ -161,7 +161,7 @@ class CookieJar implements JarContract
      * @param  string|null  $domain
      * @return void
      */
-    public function queueForget($name, $path = null, $domain = null)
+    public function expire($name, $path = null, $domain = null)
     {
         $this->queue($this->forget($name, $path, $domain));
     }
