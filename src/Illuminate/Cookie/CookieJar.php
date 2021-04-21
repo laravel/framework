@@ -154,6 +154,19 @@ class CookieJar implements JarContract
     }
 
     /**
+     * Queue a cookie to expire with the next response.
+     *
+     * @param  string  $name
+     * @param  string|null  $path
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function queueForget($name, $path = null, $domain = null)
+    {
+        $this->queue($this->forget($name, $path, $domain));
+    }
+
+    /**
      * Remove a cookie from the queue.
      *
      * @param  string  $name
