@@ -18,6 +18,13 @@ class Encrypter implements EncrypterContract, StringEncrypter
     protected $key;
 
     /**
+     * The additional decryption keys.
+     *
+     * @var array
+     */
+    protected $decryptionKeys = [];
+
+    /**
      * The algorithm used for encryption.
      *
      * @var string
@@ -134,18 +141,32 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     public function decrypt($payload, $unserialize = true)
     {
-        $payload = $this->getJsonPayload($payload);
+        $decrypted = false;
 
-        $iv = base64_decode($payload['iv']);
+        foreach (array_merge([$this->key], $this->decryptionKeys) as $key) {
+            try {
+                $payload = $this->getJsonPayload($payload, $key);
 
-        // Here we will decrypt the value. If we are able to successfully decrypt it
-        // we will then unserialize it and return it out to the caller. If we are
-        // unable to decrypt this value we will throw out an exception message.
-        $decrypted = \openssl_decrypt(
-            $payload['value'], $this->cipher, $this->key, 0, $iv
-        );
+                $iv = base64_decode($payload['iv']);
 
-        if ($decrypted === false) {
+                // Here we will decrypt the value. If we are able to successfully decrypt it
+                // we will then unserialize it and return it out to the caller. If we are
+                // unable to decrypt this value we will throw out an exception message.
+                $decrypted = \openssl_decrypt(
+                    $payload['value'], $this->cipher, $key, 0, $iv
+                );
+
+                if ($decrypted !== false) {
+                    break;
+                }
+            } catch (DecryptException $e) {
+                $lastException = $e;
+            }
+        }
+
+        if ($decrypted === false && isset($lastException)) {
+            throw $lastException;
+        } elseif ($decrypted === false) {
             throw new DecryptException('Could not decrypt the data.');
         }
 
@@ -170,22 +191,24 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @param  string  $iv
      * @param  mixed  $value
+     * @param  string|null  $key
      * @return string
      */
-    protected function hash($iv, $value)
+    protected function hash($iv, $value, $key = null)
     {
-        return hash_hmac('sha256', $iv.$value, $this->key);
+        return hash_hmac('sha256', $iv.$value, $key ?: $this->key);
     }
 
     /**
      * Get the JSON array from the given payload.
      *
      * @param  string  $payload
+     * @param  string  $key
      * @return array
      *
      * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
-    protected function getJsonPayload($payload)
+    protected function getJsonPayload($payload, $key)
     {
         $payload = json_decode(base64_decode($payload), true);
 
@@ -196,7 +219,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
             throw new DecryptException('The payload is invalid.');
         }
 
-        if (! $this->validMac($payload)) {
+        if (! $this->validMac($payload, $key)) {
             throw new DecryptException('The MAC is invalid.');
         }
 
@@ -219,12 +242,13 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * Determine if the MAC for the given payload is valid.
      *
      * @param  array  $payload
+     * @param  string  $key
      * @return bool
      */
-    protected function validMac(array $payload)
+    protected function validMac(array $payload, $key)
     {
         return hash_equals(
-            $this->hash($payload['iv'], $payload['value']), $payload['mac']
+            $this->hash($payload['iv'], $payload['value'], $key), $payload['mac']
         );
     }
 
@@ -236,5 +260,24 @@ class Encrypter implements EncrypterContract, StringEncrypter
     public function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * Set the additional decryption keys to be used as a fallback.
+     *
+     * @param  array  $keys
+     * @return $this
+     */
+    public function additionalDecryptionKeys(array $keys)
+    {
+        foreach ($keys as $key) {
+            if (! static::supported($key, $this->cipher)) {
+                throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+            }
+        }
+
+        $this->decryptionKeys = $keys;
+
+        return $this;
     }
 }

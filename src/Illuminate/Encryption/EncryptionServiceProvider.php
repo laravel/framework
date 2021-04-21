@@ -29,7 +29,10 @@ class EncryptionServiceProvider extends ServiceProvider
         $this->app->singleton('encrypter', function ($app) {
             $config = $app->make('config')->get('app');
 
-            return new Encrypter($this->parseKey($config), $config['cipher']);
+            return (new Encrypter($this->parseKey($config), $config['cipher']))
+                            ->additionalDecryptionKeys(array_map(function ($key) {
+                                return $this->parseKeyString($key);
+                            }, $config['previous_keys'] ?? []));
         });
     }
 
@@ -50,18 +53,27 @@ class EncryptionServiceProvider extends ServiceProvider
     }
 
     /**
-     * Parse the encryption key.
+     * Parse the encryption key from the configuration array.
      *
      * @param  array  $config
      * @return string
      */
     protected function parseKey(array $config)
     {
-        if (Str::startsWith($key = $this->key($config), $prefix = 'base64:')) {
-            $key = base64_decode(Str::after($key, $prefix));
-        }
+        return $this->parseKeyString($this->key($config));
+    }
 
-        return $key;
+    /**
+     * Parse the encryption key string.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function parseKeyString(string $key)
+    {
+        return Str::startsWith($key, $prefix = 'base64:')
+                    ? base64_decode(Str::after($key, $prefix))
+                    : $key;
     }
 
     /**

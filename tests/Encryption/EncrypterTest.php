@@ -17,6 +17,34 @@ class EncrypterTest extends TestCase
         $this->assertSame('foo', $e->decrypt($encrypted));
     }
 
+    public function testFallbackEncryption()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->encrypt('foo');
+
+        $this->assertNotSame('foo', $encrypted);
+
+        $e = new Encrypter(str_repeat('b', 16));
+        $e->additionalDecryptionKeys([str_repeat('c', 16), str_repeat('a', 16)]);
+
+        $this->assertSame('foo', $e->decrypt($encrypted));
+    }
+
+    public function testFallbackEncryptionThrowsExceptionIfAllKeysFail()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->encrypt('foo');
+
+        $this->assertNotSame('foo', $encrypted);
+
+        $e = new Encrypter(str_repeat('b', 16));
+        $e->additionalDecryptionKeys([str_repeat('c', 16), str_repeat('x', 16)]);
+
+        $e->decrypt($encrypted);
+    }
+
     public function testRawStringEncryption()
     {
         $e = new Encrypter(str_repeat('a', 16));
