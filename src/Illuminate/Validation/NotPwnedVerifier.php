@@ -17,7 +17,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
     protected $factory;
 
     /**
-     * Create a new not compromised verifier.
+     * Create a new uncompromised verifier.
      *
      * @param  \Illuminate\Http\Client\Factory  $factory
      * @return void
