@@ -38,11 +38,11 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testMixedCase()
     {
-        $this->fails(Password::min(2)->mixedCase(), ['nn', 'MM', '京都府'], [
+        $this->fails(Password::min(2)->mixedCase(), ['nn', 'MM'], [
             'The my password must contain at least one uppercase and one lowercase letter.',
         ]);
 
-        $this->passes(Password::min(2)->mixedCase(), ['Nn', 'Mn', 'âA', '京都府']);
+        $this->passes(Password::min(2)->mixedCase(), ['Nn', 'Mn', 'âA']);
     }
 
     public function testLetters()
