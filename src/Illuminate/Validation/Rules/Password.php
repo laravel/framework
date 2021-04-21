@@ -236,7 +236,7 @@ class Password implements Rule, DataAwareRule
     /**
      * Adds the given failures, and return false.
      *
-     * @param  array|string $message
+     * @param  array|string  $messages
      * @return bool
      */
     protected function fail($messages)
