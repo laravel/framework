@@ -4,6 +4,7 @@ namespace Illuminate\Mail\Transport;
 
 use GuzzleHttp\ClientInterface;
 use Swift_Mime_SimpleMessage;
+use Illuminate\Support\Facades\Config;
 
 class MailgunTransport extends Transport
 {
@@ -93,7 +94,7 @@ class MailgunTransport extends Transport
      */
     protected function payload(Swift_Mime_SimpleMessage $message, $to)
     {
-        if (! config('services.mailgun.batch_sending') || count($message->getTo()) === 1) {
+        if (! Config::get('services.mailgun.batch_sending', false) || count($message->getTo()) === 1) {
             return [
                 'auth' => [
                     'api',
