@@ -93,23 +93,63 @@ class MailgunTransport extends Transport
      */
     protected function payload(Swift_Mime_SimpleMessage $message, $to)
     {
-        return [
-            'auth' => [
-                'api',
-                $this->key,
-            ],
-            'multipart' => [
-                [
-                    'name' => 'to',
-                    'contents' => $to,
+        if (!config('services.mailgun.batch_sending') || count($message->getTo()) === 1) {
+            return [
+                'auth' => [
+                    'api',
+                    $this->key,
                 ],
-                [
-                    'name' => 'message',
-                    'contents' => $message->toString(),
-                    'filename' => 'message.mime',
+                'multipart' => [
+                    [
+                        'name' => 'to',
+                        'contents' => $to,
+                    ],
+                    [
+                        'name' => 'message',
+                        'contents' => $message->toString(),
+                        'filename' => 'message.mime',
+                    ],
                 ],
-            ],
+            ];
+        }
+
+        //  batch sending
+        $ret = [
+                'auth' => [
+                    'api',
+                    $this->key,
+                ],
+                'multipart' => [
+                    [
+                        'name' => 'message',
+                        'contents' => str_replace(
+                            $message->getHeaders()->get('to')->toString(),
+                            'To: %recipient%' . PHP_EOL,
+                            $message->toString()
+                        ),
+                        'filename' => 'message.mime',
+                    ],
+                ],
+            ];
+
+        $recipients = [];
+        foreach ($message->getTo() as $address => $name) {
+            $ret['multipart'][] = [
+                'name' => 'to',
+                'contents' => "$name <$address>",
+            ];
+
+            $recipients[$address] = [
+                'name' => $name,
+            ];
+        }
+
+        $ret['multipart'][] = [
+            'name' => 'recipient-variables',
+            'contents' => json_encode($recipients),
         ];
+
+        return $ret;
     }
 
     /**
