@@ -662,7 +662,7 @@ class Stringable implements JsonSerializable
      */
     public function substrCount($needle, $offset = null, $length = null)
     {
-        return Str::substrCount($this->value, $needle, $offset, $length);
+        return Str::substrCount($this->value, $needle, $offset ?? 0, $length);
     }
 
     /**

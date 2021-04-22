@@ -515,10 +515,10 @@ class Collection implements ArrayAccess, Enumerable
         $first = $this->first();
 
         if (is_array($first) || (is_object($first) && ! $first instanceof Stringable)) {
-            return implode($glue, $this->pluck($value)->all());
+            return implode($glue ?? '', $this->pluck($value)->all());
         }
 
-        return implode($value, $this->items);
+        return implode($value ?? '', $this->items);
     }
 
     /**
