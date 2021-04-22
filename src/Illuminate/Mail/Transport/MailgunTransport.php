@@ -3,8 +3,8 @@
 namespace Illuminate\Mail\Transport;
 
 use GuzzleHttp\ClientInterface;
-use Swift_Mime_SimpleMessage;
 use Illuminate\Support\Facades\Config;
+use Swift_Mime_SimpleMessage;
 
 class MailgunTransport extends Transport
 {
@@ -125,7 +125,7 @@ class MailgunTransport extends Transport
                     'name' => 'message',
                     'contents' => str_replace(
                         $message->getHeaders()->get('to')->toString(),
-                        'To: %recipient%' . PHP_EOL,
+                        'To: %recipient%'.PHP_EOL,
                         $message->toString()
                     ),
                     'filename' => 'message.mime',
