@@ -1231,6 +1231,239 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testValidateProhibitedWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'Taylor'], ['last' => 'prohibited_with:first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['first' => 'Taylor', 'last' => ''], ['last' => 'prohibited_with:first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['first' => ''], ['last' => 'prohibited_with:first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['last' => 'prohibited_with:first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['first' => 'Taylor', 'last' => 'Otwell'], ['last' => 'prohibited_with:first']);
+        $this->assertTrue($v->fails());
+
+        $file = new File('', false);
+        $v = new Validator($trans, ['file' => $file, 'foo' => ''], ['foo' => 'prohibited_with:file']);
+        $this->assertTrue($v->passes());
+
+        $file = new File(__FILE__, false);
+        $foo = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'prohibited_with:file']);
+        $this->assertTrue($v->fails());
+
+        $file = new File('', false);
+        $foo = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'prohibited_with:file']);
+        $this->assertTrue($v->passes());
+
+        $file = new File(__FILE__, false);
+        $foo = new File('', false);
+        $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'prohibited_with:file']);
+        $this->assertTrue($v->fails());
+    }
+
+    public function testProhibitedWithMultiple()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $rules = [
+            'f1' => 'prohibited_with:f2,f3',
+            'f2' => 'prohibited_with:f1,f3',
+            'f3' => 'prohibited_with:f1,f2',
+        ];
+
+        $v = new Validator($trans, [], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f2' => 'foo'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f3' => 'foo'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f2' => 'bar'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f3' => 'bar'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f2' => 'foo', 'f3' => 'bar'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f2' => 'bar', 'f3' => 'baz'], $rules);
+        $this->assertTrue($v->fails());
+    }
+
+    public function testProhibitedWithAll()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $rules = [
+            'f1' => 'prohibited_with_all:f2,f3',
+            'f2' => 'prohibited_with_all:f1,f3',
+            'f3' => 'prohibited_with_all:f1,f2',
+
+        ];
+
+        $v = new Validator($trans, [], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f2' => 'foo'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f3' => 'foo'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f2' => 'bar'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f3' => 'bar'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f2' => 'foo', 'f3' => 'bar'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f2' => 'bar', 'f3' => 'baz'], $rules);
+        $this->assertTrue($v->fails());
+    }
+
+    public function testValidateProhibitedWithout()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'Taylor'], ['last' => 'prohibited_without:first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['first' => 'Taylor', 'last' => ''], ['last' => 'prohibited_without:first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['first' => ''], ['last' => 'prohibited_without:first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['last' => 'prohibited_without:first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['first' => 'Taylor', 'last' => 'Otwell'], ['last' => 'prohibited_without:first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['last' => 'Otwell'], ['last' => 'prohibited_without:first']);
+        $this->assertTrue($v->fails());
+
+        $file = new File('', false);
+        $v = new Validator($trans, ['file' => $file], ['foo' => 'prohibited_without:file']);
+        $this->assertTrue($v->passes());
+
+        $foo = new File('', false);
+        $v = new Validator($trans, ['foo' => $foo], ['foo' => 'prohibited_without:file']);
+        $this->assertTrue($v->fails());
+
+        $foo = new File(__FILE__, false);
+        $v = new Validator($trans, ['foo' => $foo], ['foo' => 'prohibited_without:file']);
+        $this->assertTrue($v->fails());
+
+        $file = new File(__FILE__, false);
+        $foo = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'prohibited_without:file']);
+        $this->assertTrue($v->passes());
+
+        $file = new File(__FILE__, false);
+        $foo = new File('', false);
+        $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'prohibited_without:file']);
+        $this->assertTrue($v->passes());
+
+        $file = new File('', false);
+        $foo = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'prohibited_without:file']);
+        $this->assertTrue($v->fails());
+
+        $file = new File('', false);
+        $foo = new File('', false);
+        $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'prohibited_without:file']);
+        $this->assertTrue($v->fails());
+    }
+
+    public function testProhibitedWithoutMultiple()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $rules = [
+            'f1' => 'prohibited_without:f2,f3',
+            'f2' => 'prohibited_without:f1,f3',
+            'f3' => 'prohibited_without:f1,f2',
+        ];
+
+        $v = new Validator($trans, [], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f2' => 'foo'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f3' => 'foo'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f2' => 'bar'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f3' => 'bar'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f2' => 'foo', 'f3' => 'bar'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f2' => 'bar', 'f3' => 'baz'], $rules);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testProhibitedWithoutAll()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $rules = [
+            'f1' => 'prohibited_without_all:f2,f3',
+            'f2' => 'prohibited_without_all:f1,f3',
+            'f3' => 'prohibited_without_all:f1,f2',
+        ];
+
+        $v = new Validator($trans, [], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f2' => 'foo'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f3' => 'foo'], $rules);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f2' => 'bar'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f3' => 'bar'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f2' => 'foo', 'f3' => 'bar'], $rules);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['f1' => 'foo', 'f2' => 'bar', 'f3' => 'baz'], $rules);
+        $this->assertTrue($v->passes());
+    }
+
     public function testProhibitedIf()
     {
         $trans = $this->getIlluminateArrayTranslator();

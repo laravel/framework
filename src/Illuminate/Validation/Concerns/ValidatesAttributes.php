@@ -1490,6 +1490,58 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute does not exist when any other attribute exists.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibitedWith($attribute, $value, $parameters)
+    {
+        return ! $this->anyPassingRequired($parameters);
+    }
+
+    /**
+     * Validate that an attribute does not exist when all other attributes exist.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibitedWithAll($attribute, $value, $parameters)
+    {
+        return ! $this->allPassingRequired($parameters);
+    }
+
+    /**
+     * Validate that an attribute does not exist when another attribute does not exist.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibitedWithout($attribute, $value, $parameters)
+    {
+        return ! $this->anyFailingRequired($parameters);
+    }
+
+    /**
+     * Validate that an attribute does not exist when all other attributes do not exist.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibitedWithoutAll($attribute, $value, $parameters)
+    {
+        return $this->anyPassingRequired($parameters);
+    }
+
+    /**
      * Indicate that an attribute should be excluded when another attribute has a given value.
      *
      * @param  string  $attribute
@@ -1722,6 +1774,40 @@ trait ValidatesAttributes
     {
         foreach ($attributes as $key) {
             if ($this->validateRequired($key, $this->getValue($key))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if any of the given attributes pass the required test.
+     *
+     * @param  array  $attributes
+     * @return bool
+     */
+    protected function anyPassingRequired(array $attributes)
+    {
+        foreach ($attributes as $key) {
+            if ($this->validateRequired($key, $this->getValue($key))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if all of the given attributes pass the required test.
+     *
+     * @param  array  $attributes
+     * @return bool
+     */
+    protected function allPassingRequired(array $attributes)
+    {
+        foreach ($attributes as $key) {
+            if (! $this->validateRequired($key, $this->getValue($key))) {
                 return false;
             }
         }

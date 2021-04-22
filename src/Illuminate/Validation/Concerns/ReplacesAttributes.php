@@ -249,6 +249,62 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the prohibited_with rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceProhibitedWith($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':values', implode(' / ', $this->getAttributeList($parameters)), $message);
+    }
+
+    /**
+     * Replace all place-holders for the prohibited_with_all rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceProhibitedWithAll($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceProhibitedWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the prohibited_without rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceProhibitedWithout($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceProhibitedWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the prohibited_without_all rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceProhibitedWithoutAll($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceProhibitedWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
      * Replace all place-holders for the size rule.
      *
      * @param  string  $message
