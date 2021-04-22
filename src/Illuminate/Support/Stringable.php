@@ -745,6 +745,23 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Execute the given callback if the string is not empty.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function whenNotEmpty($callback)
+    {
+        if ($this->isNotEmpty()) {
+            $result = $callback($this);
+
+            return is_null($result) ? $this : $result;
+        }
+
+        return $this;
+    }
+
+    /**
      * Limit the number of words in a string.
      *
      * @param  int  $words
