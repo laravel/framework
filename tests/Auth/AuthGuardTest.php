@@ -148,12 +148,14 @@ class AuthGuardTest extends TestCase
         $this->assertTrue($mock->attemptWith(['foo'], false, function ($user, $guard) {
             static::assertInstanceOf(Authenticatable::class, $user);
             static::assertInstanceOf(SessionGuard::class, $guard);
+
             return true;
         }));
 
         $this->assertFalse($mock->attemptWith(['foo'], false, function ($user, $guard) {
             static::assertInstanceOf(Authenticatable::class, $user);
             static::assertInstanceOf(SessionGuard::class, $guard);
+
             return false;
         }));
 
