@@ -93,7 +93,7 @@ class MailgunTransport extends Transport
      */
     protected function payload(Swift_Mime_SimpleMessage $message, $to)
     {
-        if (!config('services.mailgun.batch_sending') || count($message->getTo()) === 1) {
+        if (! config('services.mailgun.batch_sending') || count($message->getTo()) === 1) {
             return [
                 'auth' => [
                     'api',
@@ -115,22 +115,22 @@ class MailgunTransport extends Transport
 
         //  batch sending
         $ret = [
-                'auth' => [
-                    'api',
-                    $this->key,
+            'auth' => [
+                'api',
+                $this->key,
+            ],
+            'multipart' => [
+                [
+                    'name' => 'message',
+                    'contents' => str_replace(
+                        $message->getHeaders()->get('to')->toString(),
+                        'To: %recipient%' . PHP_EOL,
+                        $message->toString()
+                    ),
+                    'filename' => 'message.mime',
                 ],
-                'multipart' => [
-                    [
-                        'name' => 'message',
-                        'contents' => str_replace(
-                            $message->getHeaders()->get('to')->toString(),
-                            'To: %recipient%' . PHP_EOL,
-                            $message->toString()
-                        ),
-                        'filename' => 'message.mime',
-                    ],
-                ],
-            ];
+            ],
+        ];
 
         $recipients = [];
         foreach ($message->getTo() as $address => $name) {
