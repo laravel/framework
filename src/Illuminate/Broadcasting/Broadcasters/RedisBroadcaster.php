@@ -20,16 +20,16 @@ class RedisBroadcaster extends Broadcaster
     /**
      * The Redis connection to use for broadcasting.
      *
-     * @var string
+     * @var ?string
      */
-    protected $connection;
+    protected $connection = null;
 
     /**
      * The Redis key prefix.
      *
      * @var string
      */
-    protected $prefix;
+    protected $prefix = '';
 
     /**
      * Create a new broadcaster instance.
