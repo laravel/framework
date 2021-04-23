@@ -825,7 +825,7 @@ class LazyCollection implements Enumerable
      * @param  mixed  $keys
      * @return static
      */
-    public function filled($source)
+    public function filled()
     {
         return $this->passthru('filled', func_get_args());
     }
