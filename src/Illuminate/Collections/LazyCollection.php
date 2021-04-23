@@ -816,7 +816,7 @@ class LazyCollection implements Enumerable
      */
     public function blank()
     {
-        return $this->passthru('blank', func_get_args());
+        return $this->filter('blank');
     }
 
     /**
