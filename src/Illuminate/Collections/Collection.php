@@ -804,9 +804,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function filled()
     {
-        return $this->filter(function ($item) {
-            return filled($item);
-        });
+        return $this->filter('filled');
     }
 
     /**
