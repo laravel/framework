@@ -315,7 +315,8 @@ class MailManager implements FactoryContract
             $this->guzzle($config),
             $config['secret'],
             $config['domain'],
-            $config['endpoint'] ?? null
+            $config['endpoint'] ?? null,
+            $config['batch_sending'] ?? false
         );
     }
 

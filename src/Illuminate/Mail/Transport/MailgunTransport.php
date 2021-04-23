@@ -3,7 +3,6 @@
 namespace Illuminate\Mail\Transport;
 
 use GuzzleHttp\ClientInterface;
-use Illuminate\Support\Facades\Config;
 use Swift_Mime_SimpleMessage;
 
 class MailgunTransport extends Transport
@@ -37,19 +36,28 @@ class MailgunTransport extends Transport
     protected $endpoint;
 
     /**
+     * Whether enable Mailgun batch sending.
+     *
+     * @var bool
+     */
+    protected $batchSending;
+
+    /**
      * Create a new Mailgun transport instance.
      *
      * @param  \GuzzleHttp\ClientInterface  $client
      * @param  string  $key
      * @param  string  $domain
      * @param  string|null  $endpoint
+     * @param  bool $batchSending
      * @return void
      */
-    public function __construct(ClientInterface $client, $key, $domain, $endpoint = null)
+    public function __construct(ClientInterface $client, $key, $domain, $endpoint = null, $batchSending = false)
     {
         $this->key = $key;
         $this->client = $client;
         $this->endpoint = $endpoint ?? 'api.mailgun.net';
+        $this->batchSending = $batchSending;
 
         $this->setDomain($domain);
     }
@@ -94,7 +102,7 @@ class MailgunTransport extends Transport
      */
     protected function payload(Swift_Mime_SimpleMessage $message, $to)
     {
-        if (! Config::get('services.mailgun.batch_sending', false) || count($message->getTo()) === 1) {
+        if (! $this->batchSending || count($message->getTo()) === 1) {
             return [
                 'auth' => [
                     'api',
