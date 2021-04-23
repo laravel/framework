@@ -3506,6 +3506,26 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testFilled($collection)
+    {
+        $data = new $collection([0, true, false, '', '   ', null, collect()]);
+
+        $this->assertEquals([0, true, false], $data->filled());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testBlank($collection)
+    {
+        $data = new $collection(['', '   ', null, collect(), 0, true, false]);
+
+        $this->assertEquals(['', '   ', null, collect()], $data->filled());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testOnly($collection)
     {
         $data = new $collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);
