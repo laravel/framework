@@ -793,9 +793,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function blank()
     {
-        return $this->filter(function ($item) {
-            return blank($item);
-        });
+        return $this->filter('blank');
     }
 
     /**
