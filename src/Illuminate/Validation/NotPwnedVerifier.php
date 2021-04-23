@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class NotPwnedVerifier implements UncompromisedVerifier
 {
     /**
-     * The http factory instance.
+     * The HTTP factory instance.
      *
      * @var \Illuminate\Http\Client\Factory
      */
@@ -60,6 +60,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
     protected function getHash($value)
     {
         $hash = strtoupper(sha1((string) $value));
+
         $hashPrefix = substr($hash, 0, 5);
 
         return [$hash, $hashPrefix];
