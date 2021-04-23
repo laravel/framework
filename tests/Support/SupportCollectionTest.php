@@ -3510,7 +3510,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([0, true, false, '', '   ', null, collect()]);
 
-        $this->assertEquals([0, true, false], $data->filled());
+        $this->assertEquals([0, true, false], $data->filled()->all());
     }
 
     /**
@@ -3520,7 +3520,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['', '   ', null, collect(), 0, true, false]);
 
-        $this->assertEquals(['', '   ', null, collect()], $data->blank());
+        $this->assertEquals(['', '   ', null, collect()], $data->blank()->all());
     }
 
     /**
