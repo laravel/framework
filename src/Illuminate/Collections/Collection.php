@@ -786,6 +786,28 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get the items that are not filled.
+     *
+     * @param  mixed  $keys
+     * @return static
+     */
+    public function blank()
+    {
+        return $this->filter(fn($item) => blank($item));
+    }
+
+    /**
+     * Get the items that are not blank.
+     *
+     * @param  mixed  $keys
+     * @return static
+     */
+    public function filled()
+    {
+        return $this->filter(fn($item) => filled($item));
+    }
+
+    /**
      * Get and remove the last item from the collection.
      *
      * @return mixed
