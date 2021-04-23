@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
+use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Database\Eloquent\Model;
@@ -5244,6 +5245,66 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('name must be taylor', $v->errors()->get('name')[0]);
         $this->assertSame('name must be a first name', $v->errors()->get('name')[1]);
         $this->assertSame('validation.string', $v->errors()->get('name')[2]);
+
+        // Test access to the validator data
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['password' => 'foo', 'password_confirmation' => 'foo'],
+            [
+                'password' => [
+                    new class implements Rule, DataAwareRule {
+                        protected $data;
+
+                        public function setData($data)
+                        {
+                            $this->data = $data;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            return $value === $this->data['password_confirmation'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute confirmation does not match.'];
+                        }
+                    }, 'string',
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['password' => 'foo', 'password_confirmation' => 'bar'],
+            [
+                'password' => [
+                    new class implements Rule, DataAwareRule {
+                        protected $data;
+
+                        public function setData($data)
+                        {
+                            $this->data = $data;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            return $value === $this->data['password_confirmation'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute confirmation does not match.'];
+                        }
+                    }, 'string',
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertSame('The password confirmation does not match.', $v->errors()->get('password')[0]);
     }
 
     public function testCustomValidationObjectWithDotKeysIsCorrectlyPassedValue()
