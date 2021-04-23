@@ -54,7 +54,7 @@ trait FormatsMessages
         // messages out of the translator service for this validation rule.
         $key = "validation.{$lowerRule}";
 
-        if ($key != ($value = $this->translator->get($key))) {
+        if ($key !== ($value = $this->translator->get($key))) {
             return $value;
         }
 
