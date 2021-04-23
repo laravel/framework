@@ -11,7 +11,7 @@ interface Rule
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value);
+    public function passes($attribute, $value, $payload);
 
     /**
      * Get the validation error message.

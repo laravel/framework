@@ -748,7 +748,9 @@ class Validator implements ValidatorContract
 
         $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
 
-        if (! $rule->passes($attribute, $value)) {
+        $payload = new Fluent($this->getData());
+
+        if (! $rule->passes($attribute, $value, $payload)) {
             $this->failedRules[$attribute][get_class($rule)] = [];
 
             $messages = $rule->message();
