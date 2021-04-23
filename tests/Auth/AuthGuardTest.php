@@ -126,6 +126,48 @@ class AuthGuardTest extends TestCase
         $this->assertFalse($mock->attempt(['foo']));
     }
 
+    public function testAttemptAndWithCallbacks()
+    {
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
+        $mock->setDispatcher($events = m::mock(Dispatcher::class));
+        $user = m::mock(Authenticatable::class);
+        $events->shouldReceive('dispatch')->times(3)->with(m::type(Attempting::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(Login::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
+        $events->shouldReceive('dispatch')->twice()->with(m::type(Validated::class));
+        $events->shouldReceive('dispatch')->twice()->with(m::type(Failed::class));
+        $mock->expects($this->once())->method('getName')->willReturn('foo');
+        $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
+        $mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
+        $session->shouldReceive('migrate')->once();
+        $mock->getProvider()->shouldReceive('retrieveByCredentials')->times(3)->with(['foo'])->andReturn($user);
+        $mock->getProvider()->shouldReceive('validateCredentials')->twice()->andReturnTrue();
+        $mock->getProvider()->shouldReceive('validateCredentials')->once()->andReturnFalse();
+
+        $this->assertTrue($mock->attemptWith(['foo'], false, function ($user, $guard) {
+            static::assertInstanceOf(Authenticatable::class, $user);
+            static::assertInstanceOf(SessionGuard::class, $guard);
+
+            return true;
+        }));
+
+        $this->assertFalse($mock->attemptWith(['foo'], false, function ($user, $guard) {
+            static::assertInstanceOf(Authenticatable::class, $user);
+            static::assertInstanceOf(SessionGuard::class, $guard);
+
+            return false;
+        }));
+
+        $executed = false;
+
+        $this->assertFalse($mock->attemptWith(['foo'], false, function () use (&$executed) {
+            return $executed = true;
+        }));
+
+        $this->assertFalse($executed);
+    }
+
     public function testLoginStoresIdentifierInSession()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
