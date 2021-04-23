@@ -809,6 +809,28 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Get the items that are not filled.
+     *
+     * @param  mixed  $keys
+     * @return static
+     */
+    public function blank()
+    {
+        return $this->passthru('blank', func_get_args());
+    }
+
+    /**
+     * Get the items that are not blank.
+     *
+     * @param  mixed  $keys
+     * @return static
+     */
+    public function filled($source)
+    {
+        return $this->passthru('filled', func_get_args());
+    }
+
+    /**
      * Push all of the given items onto the collection.
      *
      * @param  iterable  $source
