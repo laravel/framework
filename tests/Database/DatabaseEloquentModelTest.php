@@ -443,6 +443,23 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->save());
     }
 
+    public function testUpdateProcessWithoutTimestampsUsingSaveOptions()
+    {
+        $model = $this->getMockBuilder(EloquentModelEventObjectStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'fireModelEvent'])->getMock();
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->once()->with('id', '=', 1);
+        $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->never())->method('updateTimestamps');
+        $model->expects($this->any())->method('fireModelEvent')->willReturn(true);
+
+        $model->id = 1;
+        $model->syncOriginal();
+        $model->name = 'taylor';
+        $model->exists = true;
+        $this->assertTrue($model->save(['timestamps' => false]));
+    }
+
     public function testUpdateUsesOldPrimaryKey()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();

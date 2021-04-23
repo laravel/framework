@@ -843,10 +843,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return false;
         }
 
+        $timestamps = $this->timestamps;
+
         // If the model already exists in the database we can just update our record
         // that is already in this database using the current IDs in this "where"
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
+            if (($options['timestamps'] ?? null) === false) {
+                $this->timestamps = false;
+            }
+
             $saved = $this->isDirty() ?
                         $this->performUpdate($query) : true;
         }
@@ -869,6 +875,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         if ($saved) {
             $this->finishSave($options);
         }
+
+        $this->timestamps = $timestamps;
 
         return $saved;
     }
