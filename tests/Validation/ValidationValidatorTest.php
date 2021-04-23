@@ -770,7 +770,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
         $v->setContainer($container);
@@ -794,7 +794,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
         $v->setContainer($container);
@@ -818,7 +818,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
         $v->setContainer($container);
@@ -842,7 +842,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password:custom']);
         $v->setContainer($container);
