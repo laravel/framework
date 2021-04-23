@@ -379,11 +379,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Attempt to authenticate a user with credentials and additional callbacks.
      *
      * @param  array  $credentials
-     * @param  false  $remember
      * @param  array|callable  $callbacks
+     * @param  false  $remember
      * @return bool
      */
-    public function attemptWith(array $credentials = [], $remember = false, $callbacks = null)
+    public function attemptWhen(array $credentials = [], $callbacks = null, $remember = false)
     {
         $this->fireAttemptEvent($credentials, $remember);
 

@@ -145,14 +145,14 @@ class AuthGuardTest extends TestCase
         $mock->getProvider()->shouldReceive('validateCredentials')->twice()->andReturnTrue();
         $mock->getProvider()->shouldReceive('validateCredentials')->once()->andReturnFalse();
 
-        $this->assertTrue($mock->attemptWith(['foo'], false, function ($user, $guard) {
+        $this->assertTrue($mock->attemptWhen(['foo'], function ($user, $guard) {
             static::assertInstanceOf(Authenticatable::class, $user);
             static::assertInstanceOf(SessionGuard::class, $guard);
 
             return true;
         }));
 
-        $this->assertFalse($mock->attemptWith(['foo'], false, function ($user, $guard) {
+        $this->assertFalse($mock->attemptWhen(['foo'], function ($user, $guard) {
             static::assertInstanceOf(Authenticatable::class, $user);
             static::assertInstanceOf(SessionGuard::class, $guard);
 
@@ -161,7 +161,7 @@ class AuthGuardTest extends TestCase
 
         $executed = false;
 
-        $this->assertFalse($mock->attemptWith(['foo'], false, function () use (&$executed) {
+        $this->assertFalse($mock->attemptWhen(['foo'], false, function () use (&$executed) {
             return $executed = true;
         }));
 
