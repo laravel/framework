@@ -29,11 +29,16 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testMin()
     {
+        $this->fails(new Password(8), ['a', 'ff', '12'], [
+            'validation.min.string',
+        ]);
+
         $this->fails(Password::min(3), ['a', 'ff', '12'], [
             'validation.min.string',
         ]);
 
-        $this->passes(Password::min(3), ['1234', 'abcd']);
+        $this->passes(Password::min(3), ['333', 'abcd']);
+        $this->passes(new Password(8), ['88888888']);
     }
 
     public function testMixedCase()
@@ -61,6 +66,14 @@ class ValidationPasswordRuleTest extends TestCase
         ]);
 
         $this->passes(Password::min(2)->numbers(), ['1a', 'b2', '00', '京都府 1']);
+    }
+
+    public function testDefaultRules()
+    {
+        $this->fails(Password::min(3), [null], [
+            'validation.string',
+            'validation.min.string',
+        ]);
     }
 
     public function testSymbols()
@@ -102,32 +115,66 @@ class ValidationPasswordRuleTest extends TestCase
         ]);
     }
 
-    public function testMessages()
+    public function testMessagesOrder()
     {
-        $makeRule = function () {
-            return Password::min(8)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised();
+        $makeRules = function () {
+            return ['required', Password::min(8)->mixedCase()->numbers()];
         };
 
-        $this->fails($makeRule(), ['foo', 'azdazd', '1231231'], [
+        $this->fails($makeRules(), [null], [
+            'validation.required',
+        ]);
+
+        $this->fails($makeRules(), ['foo', 'azdazd', '1231231'], [
             'validation.min.string',
         ]);
 
-        $this->fails($makeRule(), ['aaaaaaaaa', 'TJQSJQSIUQHS'], [
+        $this->fails($makeRules(), ['4564654564564'], [
             'The my password must contain at least one uppercase and one lowercase letter.',
-            'The my password must contain at least one symbol.',
+        ]);
+
+        $this->fails($makeRules(), ['aaaaaaaaa', 'TJQSJQSIUQHS'], [
+            'The my password must contain at least one uppercase and one lowercase letter.',
             'The my password must contain at least one number.',
         ]);
 
-        $this->fails($makeRule(), ['4564654564564'], [
-            'The my password must contain at least one uppercase and one lowercase letter.',
+        $this->passes($makeRules(), ['4564654564564Abc']);
+
+        $makeRules = function () {
+            return ['nullable', 'confirmed', Password::min(8)->letters()->symbols()->uncompromised()];
+        };
+
+        $this->passes($makeRules(), [null]);
+
+        $this->fails($makeRules(), ['foo', 'azdazd', '1231231'], [
+            'validation.min.string',
+        ]);
+
+        $this->fails($makeRules(), ['aaaaaaaaa', 'TJQSJQSIUQHS'], [
+            'The my password must contain at least one symbol.',
+        ]);
+
+        $this->fails($makeRules(), ['4564654564564'], [
             'The my password must contain at least one letter.',
             'The my password must contain at least one symbol.',
         ]);
+
+        $this->fails($makeRules(), ['abcabcabc!'], [
+            'The given my password has appeared in a data leak. Please choose a different my password.',
+        ]);
+
+        $v = new Validator(
+            resolve('translator'),
+            ['my_password' => 'Nuno'],
+            ['my_password' => ['nullable', 'confirmed', Password::min(3)->letters()]]
+        );
+
+        $this->assertFalse($v->passes());
+
+        $this->assertSame(
+            ['my_password' => ['validation.confirmed']],
+            $v->messages()->toArray()
+        );
     }
 
     protected function passes($rule, $values)
@@ -146,7 +193,7 @@ class ValidationPasswordRuleTest extends TestCase
             $v = new Validator(
                 resolve('translator'),
                 ['my_password' => $value, 'my_password_confirmation' => $value],
-                ['my_password' => clone $rule]
+                ['my_password' => is_object($rule) ? clone $rule : $rule]
             );
 
             $this->assertSame($result, $v->passes());
