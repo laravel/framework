@@ -872,6 +872,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "products" add "price" int not null, "discounted_virtual" as (price - 5), "discounted_stored" as (price - 5) persisted', $statements[0]);
     }
 
+    public function testAddingComment()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('foo')->comment("bar");
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame("EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'bar', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'users', @level2type = N'COLUMN', @level2name = N'foo'", $statements[1]);
+    }
+
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.

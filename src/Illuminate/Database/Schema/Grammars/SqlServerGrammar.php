@@ -29,6 +29,13 @@ class SqlServerGrammar extends Grammar
     protected $serials = ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'];
 
     /**
+     * The commands to be executed outside of create or alter command.
+     *
+     * @var string[]
+     */
+    protected $fluentCommands = ['Comment'];
+
+    /**
      * Compile a create database command.
      *
      * @param  string  $name
@@ -393,6 +400,31 @@ class SqlServerGrammar extends Grammar
             FROM sys.views;
 
             EXEC sp_executesql @sql;";
+    }
+
+    /**
+     * Compile a comment command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileComment(Blueprint $blueprint, Fluent $command)
+    {
+        $tableName = $this->getTablePrefix().$blueprint->getTable();
+
+        $sql = "EXEC sys.sp_addextendedproperty ";
+        $sql .= "@name = N'MS_Description', ";
+        $sql .= "@value = %s, ";
+        $sql .= "@level0type = N'SCHEMA', @level0name = N'dbo', ";
+        $sql .= "@level1type = N'TABLE', @level1name = %s, ";
+        $sql .= "@level2type = N'COLUMN', @level2name = %s";
+
+        return sprintf($sql,
+            $this->quoteString($command->value),
+            $this->quoteString($tableName),
+            $this->quoteString($command->column->name)
+        );
     }
 
     /**
