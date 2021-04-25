@@ -1186,6 +1186,24 @@ class Builder
     }
 
     /**
+     * Nest all current where statements in a single group.
+     *
+     * @return $this
+     */
+    public function nestWheres()
+    {
+        $query = $this->query;
+
+        $query->wheres = [];
+
+        $this->groupWhereSliceForScope(
+            $query, $query->wheres
+        );
+
+        return $this;
+    }
+
+    /**
      * Create a where array with nested where conditions.
      *
      * @param  array  $whereSlice
