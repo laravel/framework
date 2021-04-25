@@ -1194,10 +1194,12 @@ class Builder
     {
         $query = $this->query;
 
+        $allWheres = $query->wheres;
+
         $query->wheres = [];
 
         $this->groupWhereSliceForScope(
-            $query, $query->wheres
+            $query, $allWheres
         );
 
         return $this;
