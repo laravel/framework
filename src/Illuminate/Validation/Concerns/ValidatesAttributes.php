@@ -235,6 +235,7 @@ trait ValidatesAttributes
     {
         try {
             $validFormat = new DateTime($value);
+            
             return Date::parse($value);
         } catch (Exception $e) {
             //
