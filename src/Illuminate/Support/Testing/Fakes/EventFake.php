@@ -190,7 +190,7 @@ class EventFake implements Dispatcher
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  \Closure|string|array  $events
+     * @param  \Closure|\Illuminate\Events\QueuedClosure|string|array  $events
      * @param  mixed  $listener
      * @return void
      */

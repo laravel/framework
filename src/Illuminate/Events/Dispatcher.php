@@ -70,7 +70,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  \Closure|string|array  $events
+     * @param  \Closure|\Illuminate\Events\QueuedClosure|string|array  $events
      * @param  \Closure|string|array|null  $listener
      * @return void
      */
