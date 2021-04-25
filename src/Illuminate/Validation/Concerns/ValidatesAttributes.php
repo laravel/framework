@@ -234,6 +234,7 @@ trait ValidatesAttributes
     protected function getDateTime($value)
     {
         try {
+            $validFormat = new DateTime($value);
             return Date::parse($value);
         } catch (Exception $e) {
             //
