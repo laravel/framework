@@ -58,4 +58,46 @@ interface PasswordBroker
      * @return mixed
      */
     public function reset(array $credentials, Closure $callback);
+
+    /**
+     * Get the user for the given credentials.
+     *
+     * @param  array  $credentials
+     * @return \Illuminate\Contracts\Auth\CanResetPassword|null
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function getUser(array $credentials);
+
+    /**
+     * Create a new password reset token for the given user.
+     *
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+     * @return string
+     */
+    public function createToken(CanResetPassword $user);
+
+    /**
+     * Delete password reset tokens of the given user.
+     *
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+     * @return void
+     */
+    public function deleteToken(CanResetPassword $user);
+
+    /**
+     * Validate the given password reset token.
+     *
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+     * @param  string  $token
+     * @return bool
+     */
+    public function tokenExists(CanResetPassword $user, $token);
+
+    /**
+     * Get the password reset token repository implementation.
+     *
+     * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
+     */
+    public function getRepository();
 }

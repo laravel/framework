@@ -2,6 +2,7 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.37.0...8.x)
 
+- Added missing public methods from `PasswordBroker` concrete class to the contract
 
 ## [v8.37.0 (2021-04-13)](https://github.com/laravel/framework/compare/v8.36.2...v8.37.0)
 
