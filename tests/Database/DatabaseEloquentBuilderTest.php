@@ -1210,7 +1210,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->foo_id = 'baz';
 
         $child = (new EloquentBuilderTestModelCloseRelatedStub())->forceFill([
-            'id' => 'quux'
+            'id' => 'quux',
         ])->setKeyType('string');
 
         $builder = $model->address()->whereRelationKey('bar', $child);
@@ -1225,12 +1225,12 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->foo_id = 'baz';
 
         $child = (new EloquentBuilderTestModelCloseRelatedStub())->forceFill([
-           'id' => 'quux'
+            'id' => 'quux',
         ])->setKeyType('string');
 
         $builder = $model->address()->whereRelationKey([
             'bar' => $child,
-            'baz' => 'bax'
+            'baz' => 'bax',
         ]);
 
         $this->assertSame('select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = ? and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" and "eloquent_builder_test_model_far_related_stubs"."id" in (?)) and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" and "eloquent_builder_test_model_far_related_stubs"."id" = ?)', $builder->toSql());
@@ -1254,7 +1254,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->foo_id = 'baz';
 
         $child = (new EloquentBuilderTestModelCloseRelatedStub())->forceFill([
-            'id' => 'quux'
+            'id' => 'quux',
         ])->setKeyType('string');
 
         $builder = $model->address()->whereRelationKeyNot('bar', $child);
@@ -1269,12 +1269,12 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->foo_id = 'baz';
 
         $child = (new EloquentBuilderTestModelCloseRelatedStub())->forceFill([
-            'id' => 'quux'
+            'id' => 'quux',
         ])->setKeyType('string');
 
         $builder = $model->address()->whereRelationKey([
             'bar' => $child,
-            'baz' => 'bax'
+            'baz' => 'bax',
         ]);
 
         $this->assertSame('select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = ? and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" and "eloquent_builder_test_model_far_related_stubs"."id" in (?)) and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" and "eloquent_builder_test_model_far_related_stubs"."id" = ?)', $builder->toSql());
