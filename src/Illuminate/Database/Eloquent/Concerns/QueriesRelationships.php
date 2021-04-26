@@ -199,8 +199,8 @@ trait QueriesRelationships
         }
 
         foreach ($relation as $name => $ids) {
-            $this->whereHas($name, static function (Builder $query) use ($id): void {
-                $query->whereKey($id);
+            $this->whereHas($name, static function (Builder $query) use ($ids): void {
+                $query->whereKey($ids);
             });
         }
 
@@ -221,8 +221,8 @@ trait QueriesRelationships
         }
 
         foreach ($relation as $name => $ids) {
-            $this->whereHas($name, static function (Builder $query) use ($id): void {
-                $query->whereKeyNot($id);
+            $this->whereHas($name, static function (Builder $query) use ($ids): void {
+                $query->whereKeyNot($ids);
             });
         }
 
