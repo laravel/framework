@@ -194,7 +194,7 @@ trait QueriesRelationships
      */
     public function whereRelationKey($relation, $id = null)
     {
-        if (! is_array($relation) && null !== $id) {
+        if (! is_iterable($relation) && null !== $id) {
             $relation = [$relation => $id];
         }
 
@@ -216,7 +216,7 @@ trait QueriesRelationships
      */
     public function whereRelationKeyNot($relation, $id = null)
     {
-        if (! is_array($relation) && null !== $id) {
+        if (! is_iterable($relation) && null !== $id) {
             $relation = [$relation => $id];
         }
 
