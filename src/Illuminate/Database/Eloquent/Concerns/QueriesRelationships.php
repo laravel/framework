@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -183,6 +184,34 @@ trait QueriesRelationships
     public function orWhereDoesntHave($relation, Closure $callback = null)
     {
         return $this->doesntHave($relation, 'or', $callback);
+    }
+
+    /**
+     * Add a strict relationship condition to the query by its primary key.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
+     * @param  mixed $id
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereRelationKey($relation, $id)
+    {
+        return $this->whereHas($relation, static function (Builder $query) use ($id): void {
+            $query->whereKey($id);
+        });
+    }
+
+    /**
+     * Add a strict relationship condition to the query by its primary key.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
+     * @param  mixed $id
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereRelationKeyNot($relation, $id)
+    {
+        return $this->whereHas($relation, static function (Builder $query) use ($id): void {
+            $query->whereKeyNot($id);
+        });
     }
 
     /**
