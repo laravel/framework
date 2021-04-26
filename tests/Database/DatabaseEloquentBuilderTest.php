@@ -1215,7 +1215,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->address()->whereRelationKey('bar', $child);
 
-        $this->assertSame('select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = ? and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" and "eloquent_builder_test_model_far_related_stubs"."id" in (?))', $builder->toSql());
+        $this->assertSame('select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = ? and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" and "eloquent_builder_test_model_far_related_stubs"."id" = ?)', $builder->toSql());
         $this->assertEquals(['baz', 'quux'], $builder->getBindings());
     }
 
@@ -1259,7 +1259,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->address()->whereRelationKeyNot('bar', $child);
 
-        $this->assertSame('select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = ? and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" and "eloquent_builder_test_model_far_related_stubs"."id" not in (?))', $builder->toSql());
+        $this->assertSame('select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = ? and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" and "eloquent_builder_test_model_far_related_stubs"."id" != ?)', $builder->toSql());
         $this->assertEquals(['baz', 'quux'], $builder->getBindings());
     }
 

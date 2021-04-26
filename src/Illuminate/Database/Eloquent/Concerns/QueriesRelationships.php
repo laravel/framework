@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -188,17 +189,13 @@ trait QueriesRelationships
     /**
      * Add a strict relationship condition to the query by its primary key.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string|array  $relation
+     * @param  \Illuminate\Database\Eloquent\Model|string|array  $relation
      * @param  mixed|null $id
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereRelationKey($relation, $id = null)
     {
-        if (! is_iterable($relation) && null !== $id) {
-            $relation = [$relation => $id];
-        }
-
-        foreach ($relation as $name => $ids) {
+        foreach ($this->parseRelationKey($relation, $id) as $name => $ids) {
             $this->whereHas($name, static function (Builder $query) use ($ids): void {
                 $query->whereKey($ids);
             });
@@ -210,23 +207,35 @@ trait QueriesRelationships
     /**
      * Add a strict relationship condition to the query by its primary key.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string|array  $relation
+     * @param  \Illuminate\Database\Eloquent\Model|string|array  $relation
      * @param  mixed|null $id
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereRelationKeyNot($relation, $id = null)
     {
-        if (! is_iterable($relation) && null !== $id) {
-            $relation = [$relation => $id];
-        }
-
-        foreach ($relation as $name => $ids) {
+        foreach ($this->parseRelationKey($relation, $id) as $name => $ids) {
             $this->whereHas($name, static function (Builder $query) use ($ids): void {
                 $query->whereKeyNot($ids);
             });
         }
 
         return $this;
+    }
+
+    /**
+     * Parses the relation key for querying.
+     *
+     * @param  $relation
+     * @param  $id
+     * @return iterable
+     */
+    protected function parseRelationKey($relation, $id): iterable
+    {
+        if (is_iterable($relation) && null === $id) {
+            return $relation;
+        }
+
+        return [$relation => $id instanceof Model ? $id->getKey() : $id];
     }
 
     /**
