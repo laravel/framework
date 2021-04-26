@@ -336,6 +336,10 @@ trait FormatsMessages
             return $value ? 'true' : 'false';
         }
 
+        if (is_null($value)) {
+            return 'null';
+        }
+
         return $value;
     }
 
