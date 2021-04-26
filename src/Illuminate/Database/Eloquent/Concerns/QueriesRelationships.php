@@ -188,29 +188,45 @@ trait QueriesRelationships
     /**
      * Add a strict relationship condition to the query by its primary key.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
-     * @param  mixed $id
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string|array  $relation
+     * @param  mixed|null $id
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereRelationKey($relation, $id)
+    public function whereRelationKey($relation, $id = null)
     {
-        return $this->whereHas($relation, static function (Builder $query) use ($id): void {
-            $query->whereKey($id);
-        });
+        if (! is_array($relation) && null !== $id) {
+            $relation = [$relation => $id];
+        }
+
+        foreach ($relation as $name => $ids) {
+            $this->whereHas($name, static function (Builder $query) use ($id): void {
+                $query->whereKey($id);
+            });
+        }
+
+        return $this;
     }
 
     /**
      * Add a strict relationship condition to the query by its primary key.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
-     * @param  mixed $id
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string|array  $relation
+     * @param  mixed|null $id
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereRelationKeyNot($relation, $id)
+    public function whereRelationKeyNot($relation, $id = null)
     {
-        return $this->whereHas($relation, static function (Builder $query) use ($id): void {
-            $query->whereKeyNot($id);
-        });
+        if (! is_array($relation) && null !== $id) {
+            $relation = [$relation => $id];
+        }
+
+        foreach ($relation as $name => $ids) {
+            $this->whereHas($name, static function (Builder $query) use ($id): void {
+                $query->whereKeyNot($id);
+            });
+        }
+
+        return $this;
     }
 
     /**

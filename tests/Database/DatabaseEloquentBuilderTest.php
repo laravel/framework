@@ -1197,9 +1197,11 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->where('bar', 'baz')->whereRelationKey('foo', 'quux');
+        $builder = $model->foo()->whereRelationKey('bar', 'quux');
 
-        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "eloquent_builder_test_model_close_related_stubs"."id" = ?)', $builder->toSql());
+        // TODO: Get correct SQL.
+
+        $this->assertSame('select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" is null and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" and "eloquent_builder_test_model_far_related_stubs"."id" = ?)', $builder->toSql());
         $this->assertEquals(['baz', 'quux'], $builder->getBindings());
     }
 
@@ -1210,7 +1212,27 @@ class DatabaseEloquentBuilderTest extends TestCase
             'id' => 'quux'
         ])->setKeyType('string');
 
-        $builder = $model->where('bar', 'baz')->whereRelationKey('foo', $child);
+        $builder = $model->foo()->whereRelationKey('bar', $child);
+
+        // TODO: Get correct SQL.
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "eloquent_builder_test_model_close_related_stubs"."id" in (?))', $builder->toSql());
+        $this->assertEquals(['baz', 'quux'], $builder->getBindings());
+    }
+
+    public function testWhereRelationKeyWithArray()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $child = (new EloquentBuilderTestModelCloseRelatedStub())->forceFill([
+           'id' => 'quux'
+        ])->setKeyType('string');
+
+        $builder = $model->foo()->whereRelationKey([
+            'bar' => $child,
+            'baz' => 'bax'
+        ]);
+
+        // TODO: Get correct SQL.
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "eloquent_builder_test_model_close_related_stubs"."id" in (?))', $builder->toSql());
         $this->assertEquals(['baz', 'quux'], $builder->getBindings());
@@ -1220,7 +1242,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->where('bar', 'baz')->whereRelationKeyNot('foo', 'quux');
+        $builder = $model->foo()->whereRelationKeyNot('bar', 'quux');
+
+        // TODO: Get correct SQL.
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "eloquent_builder_test_model_close_related_stubs"."id" != ?)', $builder->toSql());
         $this->assertEquals(['baz', 'quux'], $builder->getBindings());
@@ -1233,9 +1257,29 @@ class DatabaseEloquentBuilderTest extends TestCase
             'id' => 'quux'
         ])->setKeyType('string');
 
-        $builder = $model->where('bar', 'baz')->whereRelationKeyNot('foo', $child);
+        $builder = $model->foo()->whereRelationKeyNot('bar', $child);
+
+        // TODO: Get correct SQL.
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "eloquent_builder_test_model_close_related_stubs"."id" not in (?))', $builder->toSql());
+        $this->assertEquals(['baz', 'quux'], $builder->getBindings());
+    }
+
+    public function testWhereRelationKeyNotWithArray()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $child = (new EloquentBuilderTestModelCloseRelatedStub())->forceFill([
+            'id' => 'quux'
+        ])->setKeyType('string');
+
+        $builder = $model->foo()->whereRelationKey([
+            'bar' => $child,
+            'baz' => 'bax'
+        ]);
+
+        // TODO: Get correct SQL.
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "eloquent_builder_test_model_close_related_stubs"."id" in (?))', $builder->toSql());
         $this->assertEquals(['baz', 'quux'], $builder->getBindings());
     }
 
