@@ -545,6 +545,18 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['bar', 'baz'], $builder->pluck('name')->all());
     }
 
+    public function testModelKeysReturnsModelPrimaryKeyValues()
+    {
+        $builder = $this->getBuilder();
+        $builder->setModel($model = $this->getMockModel());
+        $builder->getQuery()->shouldReceive('pluck')->with($primaryKeyName = $model->getKeyName(), null)->andReturn(new BaseCollection($keys = [1, 2, 3]));
+        $builder->getModel()->shouldReceive('hasGetMutator')->with($primaryKeyName)->andReturn(false);
+        $builder->getModel()->shouldReceive('hasCast')->with($primaryKeyName)->andReturn(false);
+        $builder->getModel()->shouldReceive('getDates')->andReturn(['created_at']);
+
+        $this->assertEquals($keys, $builder->modelKeys());
+    }
+
     public function testLocalMacrosAreCalledOnBuilder()
     {
         unset($_SERVER['__test.builder']);

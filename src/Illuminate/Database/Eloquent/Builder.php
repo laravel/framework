@@ -752,6 +752,16 @@ class Builder
     }
 
     /**
+     * Get the array of primary keys.
+     *
+     * @return array
+     */
+    public function modelKeys()
+    {
+        return $this->pluck($this->defaultKeyName())->toArray();
+    }
+
+    /**
      * Paginate the given query.
      *
      * @param  int|null  $perPage
