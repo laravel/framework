@@ -1812,6 +1812,73 @@ class Builder
     }
 
     /**
+     * Slice where conditions at the given offset and add them to the query as a nested condition.
+     *
+     * @param  array  $whereSlice
+     * @return void
+     */
+    protected function groupWhereSlice($whereSlice)
+    {
+        $whereBooleans = collect($whereSlice)->pluck('boolean');
+
+        // Here we'll check if the given subset of where clauses contains any "or"
+        // booleans and in this case create a nested where expression. That way
+        // we don't add any unnecessary nesting thus keeping the query clean.
+        if ($whereBooleans->contains('or')) {
+            $this->wheres[] = $this->createNestedWhere(
+                $whereSlice, $whereBooleans->first()
+            );
+        } else {
+            $this->wheres = array_merge($this->wheres, $whereSlice);
+        }
+    }
+
+
+    /**
+     * Nest where conditions by slicing them at the given where count.
+     *
+     * @param  int|null  $originalWhereCount
+     * @return $this
+     */
+    public function nestWheres($originalWhereCount = null)
+    {
+        // Here, we totally remove all of the where clauses since we are going to
+        // rebuild them as nested queries by slicing the groups of wheres into
+        // their own sections. This is to prevent any confusing logic order.
+        $allWheres = $this->wheres;
+
+        $this->wheres = [];
+
+        $this->groupWhereSlice(
+            is_null($originalWhereCount) ? $allWheres : array_slice($allWheres, 0, $originalWhereCount)
+        );
+
+        if (!is_null($originalWhereCount)) {
+            $this->groupWhereSlice(
+                array_slice($allWheres, $originalWhereCount)
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Create a where array with nested where conditions.
+     *
+     * @param  array  $whereSlice
+     * @param  string  $boolean
+     * @return array
+     */
+    protected function createNestedWhere($whereSlice, $boolean = 'and')
+    {
+        $whereGroup = $this->forNestedWhere();
+
+        $whereGroup->wheres = $whereSlice;
+
+        return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => $boolean];
+    }
+
+    /**
      * Add a "group by" clause to the query.
      *
      * @param  array|string  ...$groups
