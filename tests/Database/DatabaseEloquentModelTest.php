@@ -327,6 +327,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEmpty($instance->getEagerLoads());
     }
 
+    public function testWithOnlyMethodLoadsRelationshipCorrectly()
+    {
+        $model = new EloquentModelWithoutRelationStub();
+        $this->addMockConnection($model);
+        $instance = $model->newInstance()->newQuery()->withOnly('taylor');
+        $this->assertNotNull($instance->getEagerLoads()['taylor']);
+        $this->assertArrayNotHasKey('foo', $instance->getEagerLoads());
+    }
+
     public function testEagerLoadingWithColumns()
     {
         $model = new EloquentModelWithoutRelationStub;
