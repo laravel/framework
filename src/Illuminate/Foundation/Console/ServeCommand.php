@@ -70,7 +70,7 @@ class ServeCommand extends Command
 
                 $process->stop(5);
 
-                $process = $this->startProcess();
+                $process = $this->startProcess($hasEnvironment);
             }
 
             usleep(500 * 1000);
