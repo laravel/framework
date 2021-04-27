@@ -313,8 +313,8 @@ class DatabaseQueryBuilderTest extends TestCase
             ->orWhere('status', 0)
             ->nestWheres()
             ->orWhere(function ($q) {
-            $q->where('is_active', 1)->orWhere('is_shared', 0);
-        })->nestWheres();
+                $q->where('is_active', 1)->orWhere('is_shared', 0);
+            })->nestWheres();
         $this->assertSame('select * from "users" where (("id" = ? or "status" = ?) or ("is_active" = ? or "is_shared" = ?))', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 0, 2 => 1, 3 => 0], $builder->getBindings());
     }

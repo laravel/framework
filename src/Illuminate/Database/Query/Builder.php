@@ -1853,7 +1853,7 @@ class Builder
             is_null($originalWhereCount) ? $allWheres : array_slice($allWheres, 0, $originalWhereCount)
         );
 
-        if (!is_null($originalWhereCount)) {
+        if (! is_null($originalWhereCount)) {
             $this->groupWhereSlice(
                 array_slice($allWheres, $originalWhereCount)
             );
