@@ -1237,7 +1237,7 @@ class Builder
     }
 
     /**
-     * Provide the specified relations for eager loading.
+     * Set the relationships that should be eager loaded while removing any previously added eager loading specifications.
      *
      * @param  mixed  $relations
      * @return $this
