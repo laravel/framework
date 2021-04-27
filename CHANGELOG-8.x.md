@@ -1,6 +1,29 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.38.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.39.0...8.x)
+
+
+## [v8.39.0 (2021-04-27)](https://github.com/laravel/framework/compare/v8.38.0...v8.39.0)
+
+### Added
+- Added `Illuminate\Collections\Collection::sole()` method ([#37034](https://github.com/laravel/framework/pull/37034))
+- Support `url` for php artisan db command ([#37064](https://github.com/laravel/framework/pull/37064))
+- Added `Illuminate\Foundation\Bus\DispatchesJobs::dispatchSync()` ([#37063](https://github.com/laravel/framework/pull/37063))
+- Added `Illuminate\Cookie\CookieJar::expire()` ([#37072](https://github.com/laravel/framework/pull/37072), [fa3a14f](https://github.com/laravel/framework/commit/fa3a14f4da763a9a95162dc4092d5ab7356e0cb8))
+- Added `Illuminate\Database\DatabaseManager::setApplication()` ([#37068](https://github.com/laravel/framework/pull/37068))
+- Added `Illuminate\Support\Stringable::whenNotEmpty()` ([#37080](https://github.com/laravel/framework/pull/37080))
+- Added `Illuminate\Auth\SessionGuard::attemptWhen()` ([#37090](https://github.com/laravel/framework/pull/37090), [e3fcd97](https://github.com/laravel/framework/commit/e3fcd97d16a064d39c419201937fcc299d6bfa2e))
+- Added password validation rule ([#36960](https://github.com/laravel/framework/pull/36960))
+
+### Fixed
+- Fixed `JsonResponse::fromJasonString()` double encoding string ([#37076](https://github.com/laravel/framework/pull/37076))
+- Fallback to primary key if owner key doesnt exist on model at all in `MorphTo` relation ([a011109](https://github.com/laravel/framework/commit/a0111098c039c27a76df4b4dd555f351ee3c81eb))
+- Fixes for PHP 8.1 ([#37087](https://github.com/laravel/framework/pull/37087), [#37101](https://github.com/laravel/framework/pull/37101))
+- Do not execute beforeSending callbacks twice in HTTP client ([#37116](https://github.com/laravel/framework/pull/37116))
+- Fixed nullable values for required_if ([#37128](https://github.com/laravel/framework/pull/37128), [86fd558](https://github.com/laravel/framework/commit/86fd558b4e5d8d7d45cf457cd1a72d54334297a1))
+
+### Changed
+- Schedule list timezone command ([#37117](https://github.com/laravel/framework/pull/37117))
 
 
 ## [v8.38.0 (2021-04-20)](https://github.com/laravel/framework/compare/v8.37.0...v8.38.0)
