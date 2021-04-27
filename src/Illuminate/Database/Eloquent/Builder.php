@@ -1237,16 +1237,16 @@ class Builder
     }
 
     /**
-     * Prevent the specified relations from being eager loaded.
+     * Provide the specified relations for eager loading.
      *
      * @param  mixed  $relations
      * @return $this
      */
     public function withOnly($relations)
     {
-        $this->eagerLoad = array_flip(is_string($relations) ? func_get_args() : $relations);
+        $this->eagerLoad = [];
 
-        return $this;
+        return $this->with($relations);
     }
 
     /**
