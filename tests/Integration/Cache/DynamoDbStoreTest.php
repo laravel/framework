@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\Exception\AwsException;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -85,7 +86,7 @@ class DynamoDbStoreTest extends TestCase
         $config = $app['config']->get('cache.stores.dynamodb');
 
         /** @var \Aws\DynamoDb\DynamoDbClient $client */
-        $client = $app['cache.dynamodb.client'];
+        $client = $app->make(Repository::class)->getStore()->getClient();
 
         if ($this->dynamoTableExists($client, $config['table'])) {
             return;
