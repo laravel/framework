@@ -189,8 +189,8 @@ trait QueriesRelationships
     /**
      * Add a strict relationship condition to the query by its primary key.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string|array  $relation
-     * @param  mixed|null $id
+     * @param  string|iterable  $relation
+     * @param  \Illuminate\Database\Eloquent\Model|string|int|null $id
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereRelationKey($relation, $id = null)
@@ -207,8 +207,8 @@ trait QueriesRelationships
     /**
      * Add a strict relationship condition to the query by its primary key.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string|array  $relation
-     * @param  mixed|null $id
+     * @param  string|iterable  $relation
+     * @param  \Illuminate\Database\Eloquent\Model|string|int|null $id
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereRelationKeyNot($relation, $id = null)
@@ -225,8 +225,8 @@ trait QueriesRelationships
     /**
      * Parses the relation key for querying.
      *
-     * @param  $relation
-     * @param  $id
+     * @param  string|iterable $relation
+     * @param  \Illuminate\Database\Eloquent\Model|string|int|null $id
      * @return iterable
      */
     protected function parseRelationKey($relation, $id): iterable
