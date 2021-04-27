@@ -1237,6 +1237,19 @@ class Builder
     }
 
     /**
+     * Prevent the specified relations from being eager loaded.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function withOnly($relations)
+    {
+        $this->eagerLoad = array_flip(is_string($relations) ? func_get_args() : $relations);
+
+        return $this;
+    }
+
+    /**
      * Create a new instance of the model being queried.
      *
      * @param  array  $attributes
