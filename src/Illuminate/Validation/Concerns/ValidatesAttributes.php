@@ -228,13 +228,15 @@ trait ValidatesAttributes
     /**
      * Get a DateTime instance from a string with no format.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return \DateTime|null
      */
     protected function getDateTime($value)
     {
         try {
-            $validFormat = new DateTime($value);
+            if (is_string($value)) {
+                new DateTime($value);
+            }
 
             return Date::parse($value);
         } catch (Exception $e) {
