@@ -90,8 +90,7 @@ class ServeCommand extends Command
     /**
      * Start a new server process.
      *
-     * @param bool $hasEnvironment
-     *
+     * @param bool  $hasEnvironment
      * @return \Symfony\Component\Process\Process
      */
     protected function startProcess($hasEnvironment)
