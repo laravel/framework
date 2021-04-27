@@ -337,7 +337,7 @@ trait FormatsMessages
         }
 
         if (is_null($value)) {
-            return 'null';
+            return 'empty';
         }
 
         return $value;
