@@ -527,7 +527,7 @@ class DynamoDbStore implements LockProvider, Store
     }
 
     /**
-     * Get the DynamoDb Client Instance
+     * Get the DynamoDb Client instance.
      *
      * @return DynamoDbClient
      */

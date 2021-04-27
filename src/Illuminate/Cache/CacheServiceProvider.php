@@ -2,9 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Aws\DynamoDb\DynamoDbClient;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 

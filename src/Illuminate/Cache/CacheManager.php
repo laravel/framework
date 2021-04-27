@@ -241,7 +241,7 @@ class CacheManager implements FactoryContract
     }
 
     /**
-     * Create new DynamoDb Client instance
+     * Create new DynamoDb Client instance.
      *
      * @return DynamoDbClient
      */
