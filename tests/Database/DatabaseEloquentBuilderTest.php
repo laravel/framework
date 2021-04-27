@@ -1225,6 +1225,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->foo_id = 'baz';
 
         $child = (new EloquentBuilderTestModelCloseRelatedStub())->forceFill([
+            '0' => 'invalid',
             'id' => 'quux',
         ])->setKeyType('string');
 
@@ -1269,6 +1270,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->foo_id = 'baz';
 
         $child = (new EloquentBuilderTestModelCloseRelatedStub())->forceFill([
+            '0' => 'invalid',
             'id' => 'quux',
         ])->setKeyType('string');
 
