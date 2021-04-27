@@ -97,7 +97,7 @@ class ServeCommand extends Command
     protected function startProcess($hasEnvironment)
     {
         $process = new Process($this->serverCommand(), null, collect($_ENV)->mapWithKeys(function ($value, $key) use ($hasEnvironment) {
-            if ($this->option('no-reload') || !$hasEnvironment) {
+            if ($this->option('no-reload') || ! $hasEnvironment) {
                 return [$key => $value];
             }
 
