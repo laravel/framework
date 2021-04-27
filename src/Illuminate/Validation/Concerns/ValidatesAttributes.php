@@ -1465,7 +1465,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
-        if (in_array($other, $values, is_bool($other))) {
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
             return ! $this->validateRequired($attribute, $value);
         }
 
@@ -1486,7 +1486,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
-        if (! in_array($other, $values, is_bool($other))) {
+        if (! in_array($other, $values, is_bool($other) || is_null($other))) {
             return ! $this->validateRequired($attribute, $value);
         }
 
