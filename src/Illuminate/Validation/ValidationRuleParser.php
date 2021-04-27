@@ -214,7 +214,7 @@ class ValidationRuleParser
      */
     protected static function parseArrayRule(array $rule)
     {
-        return [Str::studly(trim(Arr::get($rule, 0))), array_slice($rule, 1)];
+        return [Str::studly(trim(Arr::get($rule, 0, ''))), array_slice($rule, 1)];
     }
 
     /**

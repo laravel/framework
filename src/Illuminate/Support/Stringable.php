@@ -662,7 +662,7 @@ class Stringable implements JsonSerializable
      */
     public function substrCount($needle, $offset = null, $length = null)
     {
-        return Str::substrCount($this->value, $needle, $offset, $length);
+        return Str::substrCount($this->value, $needle, $offset ?? 0, $length);
     }
 
     /**
@@ -736,6 +736,23 @@ class Stringable implements JsonSerializable
     public function whenEmpty($callback)
     {
         if ($this->isEmpty()) {
+            $result = $callback($this);
+
+            return is_null($result) ? $this : $result;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute the given callback if the string is not empty.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function whenNotEmpty($callback)
+    {
+        if ($this->isNotEmpty()) {
             $result = $callback($this);
 
             return is_null($result) ? $this : $result;

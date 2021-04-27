@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
+use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Database\Eloquent\Model;
@@ -429,7 +430,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['email' => null], ['email' => 'email']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
-        $this->assertSame(' is not a valid email', $v->messages()->first('email'));
+        $this->assertSame('empty is not a valid email', $v->messages()->first('email'));
     }
 
     public function testInputIsReplacedByItsDisplayableValue()
@@ -770,7 +771,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
         $v->setContainer($container);
@@ -794,7 +795,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
         $v->setContainer($container);
@@ -818,7 +819,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
         $v->setContainer($container);
@@ -842,7 +843,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password:custom']);
         $v->setContainer($container);
@@ -1134,13 +1135,44 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
         $v = new Validator($trans, ['foo' => 0], [
-            'foo' => 'required|boolean',
+            'foo' => 'nullable|required|boolean',
             'bar' => 'required_if:foo,true',
             'baz' => 'required_if:foo,false',
         ]);
         $this->assertTrue($v->fails());
         $this->assertCount(1, $v->messages());
         $this->assertSame('The baz field is required when foo is 0.', $v->messages()->first('baz'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], [
+            'foo' => 'nullable|boolean',
+            'baz' => 'nullable|required_if:foo,false',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => null], [
+            'foo' => 'nullable|boolean',
+            'baz' => 'nullable|required_if:foo,false',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], [
+            'foo' => 'nullable|boolean',
+            'baz' => 'nullable|required_if:foo,null',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => null], [
+            'foo' => 'nullable|boolean',
+            'baz' => 'nullable|required_if:foo,null',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertCount(1, $v->messages());
+        $this->assertSame('The baz field is required when foo is empty.', $v->messages()->first('baz'));
     }
 
     public function testRequiredUnless()
@@ -5244,6 +5276,66 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('name must be taylor', $v->errors()->get('name')[0]);
         $this->assertSame('name must be a first name', $v->errors()->get('name')[1]);
         $this->assertSame('validation.string', $v->errors()->get('name')[2]);
+
+        // Test access to the validator data
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['password' => 'foo', 'password_confirmation' => 'foo'],
+            [
+                'password' => [
+                    new class implements Rule, DataAwareRule {
+                        protected $data;
+
+                        public function setData($data)
+                        {
+                            $this->data = $data;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            return $value === $this->data['password_confirmation'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute confirmation does not match.'];
+                        }
+                    }, 'string',
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['password' => 'foo', 'password_confirmation' => 'bar'],
+            [
+                'password' => [
+                    new class implements Rule, DataAwareRule {
+                        protected $data;
+
+                        public function setData($data)
+                        {
+                            $this->data = $data;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            return $value === $this->data['password_confirmation'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute confirmation does not match.'];
+                        }
+                    }, 'string',
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertSame('The password confirmation does not match.', $v->errors()->get('password')[0]);
     }
 
     public function testCustomValidationObjectWithDotKeysIsCorrectlyPassedValue()

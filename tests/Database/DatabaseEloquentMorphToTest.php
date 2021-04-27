@@ -134,13 +134,13 @@ class DatabaseEloquentMorphToTest extends TestCase
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('getAttribute')->with('foreign_key')->andReturn('foreign.value');
 
         $relation = $this->getRelationAssociate($parent);
 
         $associate = m::mock(Model::class);
-        $associate->shouldReceive('getAttribute')->once()->andReturn(1);
-        $associate->shouldReceive('getMorphClass')->once()->andReturn('Model');
+        $associate->shouldReceive('getAttribute')->andReturn(1);
+        $associate->shouldReceive('getMorphClass')->andReturn('Model');
 
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
         $parent->shouldReceive('setAttribute')->once()->with('morph_type', 'Model');
