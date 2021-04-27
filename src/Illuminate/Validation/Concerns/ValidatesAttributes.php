@@ -1595,7 +1595,7 @@ trait ValidatesAttributes
             $values = $this->convertValuesToBoolean($values);
         }
 
-        if ($this->shouldConvertToNull($parameters[0]) || is_null($other)) {
+        if (is_null($other)) {
             $values = $this->convertValuesToNull($values);
         }
 
@@ -1611,17 +1611,6 @@ trait ValidatesAttributes
     protected function shouldConvertToBoolean($parameter)
     {
         return in_array('boolean', Arr::get($this->rules, $parameter, []));
-    }
-
-    /**
-     * Check if parameter should be converted to null.
-     *
-     * @param  string  $parameter
-     * @return bool
-     */
-    protected function shouldConvertToNull($parameter)
-    {
-        return in_array('nullable', Arr::get($this->rules, $parameter, []));
     }
 
     /**
