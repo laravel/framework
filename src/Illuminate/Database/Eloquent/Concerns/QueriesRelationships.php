@@ -231,7 +231,7 @@ trait QueriesRelationships
      */
     protected function parseRelationKey($relation, $id): iterable
     {
-        if (!is_iterable($relation) && null !== $id) {
+        if (! is_iterable($relation) && null !== $id) {
             return [$relation => $id];
         }
 
