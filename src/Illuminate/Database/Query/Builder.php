@@ -1833,7 +1833,6 @@ class Builder
         }
     }
 
-
     /**
      * Nest where conditions by slicing them at the given where count.
      *
