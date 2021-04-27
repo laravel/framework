@@ -197,7 +197,7 @@ trait QueriesRelationships
     {
         foreach ($this->parseRelationKey($relation, $id) as $name => $ids) {
             $this->whereHas($name, static function (Builder $query) use ($ids): void {
-                $query->whereKey($ids);
+                $query->whereKey($ids instanceof Model ? $ids->getKey() : $ids);
             });
         }
 
@@ -215,7 +215,7 @@ trait QueriesRelationships
     {
         foreach ($this->parseRelationKey($relation, $id) as $name => $ids) {
             $this->whereHas($name, static function (Builder $query) use ($ids): void {
-                $query->whereKeyNot($ids);
+                $query->whereKeyNot($ids instanceof Model ? $ids->getKey() : $ids);
             });
         }
 
@@ -231,11 +231,11 @@ trait QueriesRelationships
      */
     protected function parseRelationKey($relation, $id): iterable
     {
-        if (is_iterable($relation) && null === $id) {
-            return $relation;
+        if (!is_iterable($relation) && null !== $id) {
+            return [$relation => $id];
         }
 
-        return [$relation => $id instanceof Model ? $id->getKey() : $id];
+        return $relation;
     }
 
     /**
