@@ -44,6 +44,19 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([], $query->getBindings());
     }
 
+    public function testGlobalScopeCanBePermanentlyRemoved()
+    {
+        $model = new EloquentGlobalScopesWithRemovedScopeTestModel;
+        $model::removeGlobalScope(ActiveScope::class);
+        $query = $model->newQuery();
+        $this->assertSame('select * from "table"', $query->toSql());
+        $this->assertEquals([], $query->getBindings());
+
+        $query = $model->newQuery();
+        $this->assertSame('select * from "table"', $query->toSql());
+        $this->assertEquals([], $query->getBindings());
+    }
+
     public function testClosureGlobalScopeIsApplied()
     {
         $model = new EloquentClosureGlobalScopesTestModel;
@@ -180,6 +193,18 @@ class EloquentClosureGlobalScopesWithOrTestModel extends EloquentClosureGlobalSc
 }
 
 class EloquentGlobalScopesTestModel extends Model
+{
+    protected $table = 'table';
+
+    public static function boot()
+    {
+        static::addGlobalScope(new ActiveScope);
+
+        parent::boot();
+    }
+}
+
+class EloquentGlobalScopesWithRemovedScopeTestModel extends Model
 {
     protected $table = 'table';
 

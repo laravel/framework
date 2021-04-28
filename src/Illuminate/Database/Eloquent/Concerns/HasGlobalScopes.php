@@ -32,6 +32,41 @@ trait HasGlobalScopes
     }
 
     /**
+     * Unregister a global scope from the model.
+     * 
+     * @param  \Illuminate\Database\Eloquent\Scope|\Closure|string  $scope
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function removeGlobalScope($scope)
+    {
+        if (is_string($scope)) {
+            unset(static::$globalScopes[static::class][$scope]);
+        } elseif ($scope instanceof Closure) {
+            unset(static::$globalScopes[static::class][spl_object_hash($scope)]);
+        } elseif ($scope instanceof Scope) {
+            unset(static::$globalScopes[static::class][get_class($scope)]);
+        }
+        else {
+            throw new InvalidArgumentException('Global scope must be an instance of Closure or Scope.');
+        }
+    }
+
+    /**
+     * Unregister all global scopes from the model.
+     * 
+     * @return void
+     */
+    public static function removeGlobalScopes()
+    {
+        $scopes = Arr::get(static::$globalScopes, static::class, []);
+        foreach ($scopes as $scope => $implementation) {
+            self::removeGlobalScope($scope);
+        }
+    }
+
+    /**
      * Determine if a model has a global scope.
      *
      * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
