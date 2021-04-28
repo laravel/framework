@@ -499,11 +499,11 @@ class FilesystemAdapter implements CloudFilesystemContract
         if (! is_null($url = $this->driver->getConfig()->get('url'))) {
             return $this->concatPathToUrl($url, parse_url(
                 $adapter->getClient()->getObjectUrl(
-                    $adapter->getBucket(), $adapter->getPathPrefix() . $path
+                    $adapter->getBucket(), $adapter->getPathPrefix().$path
                 ),
                 PHP_URL_PATH
             ));
-	}
+        }
 
         return $adapter->getClient()->getObjectUrl(
             $adapter->getBucket(), $adapter->getPathPrefix().$path
