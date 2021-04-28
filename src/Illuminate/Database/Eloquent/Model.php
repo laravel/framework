@@ -782,7 +782,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
         return $this->fill($attributes)->save($options);
     }
-    
+
     /**
      * Update the model in the database without raising any events.
      *
