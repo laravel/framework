@@ -783,7 +783,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         return $this->fill($attributes)->save($options);
     }
     
-     /**
+    /**
      * Update the model in the database without raising any events.
      *
      * @param  array  $attributes
@@ -792,7 +792,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function updateQuietly(array $attributes = [], array $options = [])
     {
-        if (!$this->exists) {
+        if (! $this->exists) {
             return false;
         }
 
