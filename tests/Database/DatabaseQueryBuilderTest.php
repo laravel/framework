@@ -2906,6 +2906,14 @@ SQL;
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(10)->take(10)->orderBy('email', 'desc');
         $this->assertSame('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->take('foo');
+        $this->assertSame('select * from [users]', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->take('foo')->offset('bar');
+        $this->assertSame('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 1 and 0 order by row_num', $builder->toSql());
     }
 
     public function testMySqlSoundsLikeOperator()
