@@ -474,7 +474,9 @@ class Migrator
             return new $class;
         }
 
-        return $this->files->getRequire($path);
+        $migration = $this->files->getRequire($path);
+
+        return is_object($migration) ? $migration : new $class;
     }
 
     /**
