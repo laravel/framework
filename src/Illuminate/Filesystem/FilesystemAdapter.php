@@ -497,8 +497,13 @@ class FilesystemAdapter implements CloudFilesystemContract
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
         if (! is_null($url = $this->driver->getConfig()->get('url'))) {
-            return $this->concatPathToUrl($url, $adapter->getPathPrefix().$path);
-        }
+            return $this->concatPathToUrl($url, parse_url(
+                $adapter->getClient()->getObjectUrl(
+                    $adapter->getBucket(), $adapter->getPathPrefix() . $path
+                ),
+                PHP_URL_PATH
+            ));
+	}
 
         return $adapter->getClient()->getObjectUrl(
             $adapter->getBucket(), $adapter->getPathPrefix().$path
