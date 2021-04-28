@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use DateTimeInterface;
 use Doctrine\DBAL\Driver\PDOPgSql\Driver as DoctrineDriver;
 use Doctrine\DBAL\Version;
 use Illuminate\Database\PDO\PostgresDriver;
@@ -29,6 +30,8 @@ class PostgresConnection extends Connection
                 $pdoParam = PDO::PARAM_INT;
             } elseif (is_resource($value)) {
                 $pdoParam = PDO::PARAM_LOB;
+            } elseif (is_bool($value)) {
+                $pdoParam = PDO::PARAM_BOOL;
             } else {
                 $pdoParam = PDO::PARAM_STR;
             }
@@ -39,6 +42,28 @@ class PostgresConnection extends Connection
                 $pdoParam
             );
         }
+    }
+
+    /**
+     * Prepare the query bindings for execution.
+     *
+     * @param  array  $bindings
+     * @return array
+     */
+    public function prepareBindings(array $bindings)
+    {
+        $grammar = $this->getQueryGrammar();
+
+        foreach ($bindings as $key => $value) {
+            // We need to transform all instances of DateTimeInterface into the actual
+            // date string. Each query grammar maintains its own date string format
+            // so we'll just ask the grammar for the format to get from the date.
+            if ($value instanceof DateTimeInterface) {
+                $bindings[$key] = $value->format($grammar->getDateFormat());
+            }
+        }
+
+        return $bindings;
     }
 
     /**
