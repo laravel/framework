@@ -2913,7 +2913,11 @@ SQL;
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->take('foo')->offset('bar');
-        $this->assertSame('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 1 and 0 order by row_num', $builder->toSql());
+        $this->assertSame('select * from [users]', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->offset('bar');
+        $this->assertSame('select * from [users]', $builder->toSql());
     }
 
     public function testMySqlSoundsLikeOperator()
