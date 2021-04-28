@@ -55,7 +55,7 @@ class PendingBatch
     }
 
     /**
-     * Add a jobs to the batch.
+     * Add jobs to the batch.
      *
      * @param  array  $jobs
      * @return $this
