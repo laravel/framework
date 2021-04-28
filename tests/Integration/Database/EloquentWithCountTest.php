@@ -131,7 +131,7 @@ class Model3 extends Model
         parent::boot();
 
         static::addGlobalScope('app', function ($builder) {
-            $builder->where('idz', '>', 0);
+            $builder->where('id', '>', 0);
         });
     }
 }
