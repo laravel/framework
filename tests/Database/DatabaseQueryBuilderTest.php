@@ -298,6 +298,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testNestWheres()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhere('status', 0)->nestWheres();
+        $this->assertSame('select * from "users" where ("id" = ? or "status" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 0], $builder->getBindings());
+    }
+
+    public function testNestWheresWithAdvancedWheres()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)
+            ->orWhere('status', 0)
+            ->nestWheres()
+            ->orWhere(function ($q) {
+            $q->where('is_active', 1)->orWhere('is_shared', 0);
+        })->nestWheres();
+        $this->assertSame('select * from "users" where (("id" = ? or "status" = ?) or ("is_active" = ? or "is_shared" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 0, 2 => 1, 3 => 0], $builder->getBindings());
+    }
+
     public function testWheresWithArrayValue()
     {
         $builder = $this->getBuilder();
