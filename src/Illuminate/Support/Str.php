@@ -54,6 +54,16 @@ class Str
     }
 
     /**
+     * Get a new stringable object.
+     *
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function builder()
+    {
+        return new Stringable;
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject

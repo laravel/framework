@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 
@@ -542,6 +543,18 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
+    }
+
+    public function testOf()
+    {
+        $this->assertInstanceOf(Stringable::class, Str::of('foo'));
+        $this->assertSame('foo', (string) Str::of('foo'));
+    }
+
+    public function testBuilder()
+    {
+        $this->assertInstanceOf(Stringable::class, Str::builder());
+        $this->assertSame('', (string) Str::builder());
     }
 }
 
