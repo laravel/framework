@@ -68,6 +68,13 @@ class Password implements Rule, DataAwareRule
     protected $compromisedThreshold = 0;
 
     /**
+     * Determines if the environment is local or not
+     *
+     * @var bool
+     */
+    protected $local = false;
+
+    /**
      * The failure messages, if any.
      *
      * @var array
@@ -173,6 +180,18 @@ class Password implements Rule, DataAwareRule
     }
 
     /**
+     * Skips over everything if the environment is local
+     *
+     * @return $this
+     */
+    public function local()
+    {
+        $this->local = true;
+
+        return $this;
+    }
+
+    /**
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
@@ -181,6 +200,12 @@ class Password implements Rule, DataAwareRule
      */
     public function passes($attribute, $value)
     {
+        if ($this->local) {
+            if (app()->environment() !== 'production') {
+                return true;
+            }
+        }
+
         $validator = Validator::make($this->data, [
             $attribute => 'string|min:'.$this->min,
         ]);
