@@ -68,7 +68,7 @@ class Password implements Rule, DataAwareRule
     protected $compromisedThreshold = 0;
 
     /**
-     * Determines if the environment is local or not
+     * Determines if the environment is local or not.
      *
      * @var bool
      */
@@ -180,7 +180,7 @@ class Password implements Rule, DataAwareRule
     }
 
     /**
-     * Skips over everything if the environment is local
+     * Skips over everything if the environment is local.
      *
      * @return $this
      */
