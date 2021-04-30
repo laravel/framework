@@ -218,7 +218,7 @@ class Builder
                     $this->query->select($this->query->from.'.*');
                 }
 
-                $this->query->columns[] = new SubSelect($column, $as, $this);
+                $this->query->columns[] = new SubSelect($this, $column, $as);
             } else {
                 $this->query->addSelect([$as => $column]);
             }
