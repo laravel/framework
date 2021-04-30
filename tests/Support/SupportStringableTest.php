@@ -436,8 +436,8 @@ class SupportStringableTest extends TestCase
 
     public function testReplace()
     {
-        $this->assertSame('foo bar laravel', $this->stringable('foo bar baz')->replace('baz', 'laravel'));
-        $this->assertSame('foo bar baz 8.x', $this->stringable('foo bar baz ?')->replace('?', '8.x'));
+        $this->assertSame('foo bar baz', $this->stringable('? ? ?')->replace('?', ['foo', 'bar', 'baz']));
+        $this->assertSame('foo bar 8.x', $this->stringable('foo bar ?')->replace('?', '8.x'));
         $this->assertSame('foo/bar/baz', $this->stringable('foo bar baz')->replace(' ', '/'));
         $this->assertSame('foo bar baz', $this->stringable('?1 ?2 ?3')->replace(['?1','?2', '?3'], ['foo','bar','baz']));
     }
