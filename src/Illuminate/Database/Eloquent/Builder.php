@@ -203,6 +203,31 @@ class Builder
     }
 
     /**
+     * Add a new select column to the query.
+     *
+     * @param  array|mixed $column
+     * @return $this
+     */
+    public function addSelect($column)
+    {
+        $columns = is_array($column) ? $column : func_get_args();
+
+        foreach ($columns as $as => $column) {
+            if (is_string($as) && $column instanceof self) {
+                if (is_null($this->query->columns)) {
+                    $this->query->select($this->query->from.'.*');
+                }
+
+                $this->query->columns[] = new SubSelect($column, $as, $this);
+            } else {
+                $this->query->addSelect([$as => $column]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a where clause on the primary key to the query.
      *
      * @param  mixed  $id
