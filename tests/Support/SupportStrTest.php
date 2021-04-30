@@ -34,18 +34,6 @@ class SupportStrTest extends TestCase
         $this->assertEquals($nbsp, Str::words($nbsp));
     }
 
-    public function testStringAscii()
-    {
-        $this->assertSame('@', Str::ascii('@'));
-        $this->assertSame('u', Str::ascii('ü'));
-    }
-
-    public function testStringAsciiWithSpecificLocale()
-    {
-        $this->assertSame('h H sht Sht a A ia yo', Str::ascii('х Х щ Щ ъ Ъ иа йо', 'bg'));
-        $this->assertSame('ae oe ue Ae Oe Ue', Str::ascii('ä ö ü Ä Ö Ü', 'de'));
-    }
-
     public function testStartsWith()
     {
         $this->assertTrue(Str::startsWith('jason', 'jas'));
@@ -264,10 +252,6 @@ class SupportStrTest extends TestCase
 
         // empty patterns
         $this->assertFalse(Str::is([], 'test'));
-
-        $this->assertFalse(Str::is('', 0));
-        $this->assertFalse(Str::is([null], 0));
-        $this->assertTrue(Str::is([null], null));
     }
 
     /**
@@ -352,7 +336,6 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo foobar', Str::replaceFirst('bar', '', 'foobar foobar'));
         $this->assertSame('foobar foobar', Str::replaceFirst('xxx', 'yyy', 'foobar foobar'));
         $this->assertSame('foobar foobar', Str::replaceFirst('', 'yyy', 'foobar foobar'));
-        $this->assertSame('1', Str::replaceFirst(0, '1', '0'));
         // Test for multibyte string support
         $this->assertSame('Jxxxnköping Malmö', Str::replaceFirst('ö', 'xxx', 'Jönköping Malmö'));
         $this->assertSame('Jönköping Malmö', Str::replaceFirst('', 'yyy', 'Jönköping Malmö'));
@@ -472,13 +455,6 @@ class SupportStrTest extends TestCase
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
-    }
-
-    public function testAsciiNull()
-    {
-        $this->assertSame('', Str::ascii(null));
-        $this->assertTrue(Str::isAscii(null));
-        $this->assertSame('', Str::slug(null));
     }
 
     public function testPadBoth()
