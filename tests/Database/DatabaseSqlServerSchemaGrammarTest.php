@@ -875,7 +875,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     public function testAddingComment()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->string('foo')->comment("bar");
+        $blueprint->string('foo')->comment('bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);

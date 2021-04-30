@@ -413,9 +413,9 @@ class SqlServerGrammar extends Grammar
     {
         $tableName = $this->getTablePrefix().$blueprint->getTable();
 
-        $sql = "EXEC sys.sp_addextendedproperty ";
+        $sql = 'EXEC sys.sp_addextendedproperty ';
         $sql .= "@name = N'MS_Description', ";
-        $sql .= "@value = %s, ";
+        $sql .= '@value = %s, ';
         $sql .= "@level0type = N'SCHEMA', @level0name = N'dbo', ";
         $sql .= "@level1type = N'TABLE', @level1name = %s, ";
         $sql .= "@level2type = N'COLUMN', @level2name = %s";
