@@ -24,13 +24,7 @@ class SupportStringableTest extends TestCase
             $this->stringable(static::class)->classBasename()
         );
     }
-
-    public function testIsAscii()
-    {
-        $this->assertTrue($this->stringable('A')->isAscii());
-        $this->assertFalse($this->stringable('ù')->isAscii());
-    }
-
+ 
     public function testIsEmpty()
     {
         $this->assertTrue($this->stringable('')->isEmpty());
@@ -109,6 +103,23 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenNotEmpty()
+    {
+        tap($this->stringable(), function ($stringable) {
+            $this->assertSame($stringable, $stringable->whenNotEmpty(function ($stringable) {
+                return $stringable.'.';
+            }));
+        });
+
+        $this->assertSame('', (string) $this->stringable()->whenNotEmpty(function ($stringable) {
+            return $stringable.'.';
+        }));
+
+        $this->assertSame('Not empty.', (string) $this->stringable('Not empty')->whenNotEmpty(function ($stringable) {
+            return $stringable.'.';
+        }));
+    }
+
     public function testWhenFalse()
     {
         $this->assertSame('when', (string) $this->stringable('when')->when(false, function ($stringable, $value) {
@@ -153,19 +164,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame(' ', (string) $this->stringable(' ')->words());
         $this->assertEquals($nbsp, (string) $this->stringable($nbsp)->words());
     }
-
-    public function testAscii()
-    {
-        $this->assertSame('@', (string) $this->stringable('@')->ascii());
-        $this->assertSame('u', (string) $this->stringable('ü')->ascii());
-    }
-
-    public function testAsciiWithSpecificLocale()
-    {
-        $this->assertSame('h H sht Sht a A ia yo', (string) $this->stringable('х Х щ Щ ъ Ъ иа йо')->ascii('bg'));
-        $this->assertSame('ae oe ue Ae Oe Ue', (string) $this->stringable('ä ö ü Ä Ö Ü')->ascii('de'));
-    }
-
+  
     public function testStartsWith()
     {
         $this->assertTrue($this->stringable('jason')->startsWith('jas'));
@@ -571,9 +570,6 @@ class SupportStringableTest extends TestCase
     public function testJsonSerialize()
     {
         $this->assertSame('"foo"', json_encode($this->stringable('foo')));
-        $this->assertSame('"laravel-php-framework"', json_encode($this->stringable('LaravelPhpFramework')->kebab()));
-        $this->assertSame('["laravel-php-framework"]', json_encode([$this->stringable('LaravelPhpFramework')->kebab()]));
-        $this->assertSame('{"title":"laravel-php-framework"}', json_encode(['title' => $this->stringable('LaravelPhpFramework')->kebab()]));
     }
 
     public function testTap()
