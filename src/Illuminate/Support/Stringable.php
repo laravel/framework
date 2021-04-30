@@ -64,14 +64,15 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Transliterate a UTF-8 value to ASCII.
+     * Transliterate a string to target encoding.
      *
-     * @param  string  $language
+     * @param  string  $to
+     * @param  string|string[]|null  $from
      * @return static
      */
-    public function ascii($language = 'en')
+    public function encoding($to, $from)
     {
-        return new static(Str::ascii($this->value, $language));
+        return new static(Str::encoding($this->value, $to, $from));
     }
 
     /**
@@ -248,13 +249,15 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Determine if a given string is 7 bit ASCII.
+     * Determine if a given string is encoding.
      *
+     * @param  string  $encoding
+     * @param  bool  $strict
      * @return bool
      */
-    public function isAscii()
+    public function isEncoding($encoding, $strict = true)
     {
-        return Str::isAscii($this->value);
+        return Str::isEncoding($this->value, $encoding, $strict);
     }
 
     /**
