@@ -8,7 +8,6 @@ use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
-use voku\helper\ASCII;
 
 class Str
 {
@@ -88,15 +87,16 @@ class Str
     }
 
     /**
-     * Transliterate a UTF-8 value to ASCII.
+     * Determine the encoding of a particular string.
      *
      * @param  string  $value
-     * @param  string  $language
-     * @return string
+     * @param  string|string[]|null  $encodings
+     * @param  bool  $strict
+     * @return bool
      */
-    public static function ascii($value, $language = 'en')
+    public static function isEncoding($value, $encodings, $strict = false)
     {
-        return ASCII::to_ascii((string) $value, $language);
+        return mb_detect_encoding((string) $value, $encodings, $strict);
     }
 
     /**
@@ -278,14 +278,16 @@ class Str
     }
 
     /**
-     * Determine if a given string is 7 bit ASCII.
+     * Transliterate a given value to target encoding.
      *
      * @param  string  $value
-     * @return bool
+     * @param  string  $to
+     * @param  string|string[]|null  $from
+     * @return string
      */
-    public static function isAscii($value)
+    public static function encoding($value, $to, $from)
     {
-        return ASCII::is_ascii((string) $value);
+        return mb_convert_encoding((string) $value, $to, $from);
     }
 
     /**
@@ -641,12 +643,12 @@ class Str
      *
      * @param  string  $title
      * @param  string  $separator
-     * @param  string|null  $language
+     * @param  bool  $encoding
      * @return string
      */
-    public static function slug($title, $separator = '-', $language = 'en')
+    public static function slug($title, $separator = '-', $encoding = true)
     {
-        $title = $language ? static::ascii($title, $language) : $title;
+        $title = $encoding ? static::encoding($title, 'ASCII', 'UTF-8') : $title;
 
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';
