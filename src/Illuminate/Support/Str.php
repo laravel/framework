@@ -87,28 +87,6 @@ class Str
     }
 
     /**
-     * Transliterate a UTF-8 value to ASCII.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    public static function ascii($value)
-    {
-        return static::encoding($value, 'UTF-8', 'ASCII');
-    }
-
-    /**
-     * Transliterate a ASCII value to UTF-8.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    public static function utf8($value)
-    {
-        return static::encoding($value, 'ASCII', 'UTF-8');
-    }
-
-    /**
      * Transliterate a given value to target encoding.
      *
      * @param  string  $value
@@ -300,28 +278,6 @@ class Str
         }
 
         return false;
-    }
-
-    /**
-     * Determine if a given string is 7 bit ASCII.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    public static function isAscii($value)
-    {
-        return static::isEncoding($value, 'ASCII');
-    }
-
-    /**
-     * Determine if a given string is UTF-8.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    public static function isUtf8($value)
-    {
-        return static::isEncoding($value, 'UTF-8');
     }
 
     /**
