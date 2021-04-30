@@ -617,16 +617,16 @@ class SupportStringableTest extends TestCase
     public function testStringEncoding()
     {
         $this->assertSame('@', (string) $this->stringable('@')->encoding('ASCII', 'UTF-8'));
-        $this->assertSame('u', (string) $this->stringable('ü')->encoding('ASCII', 'UTF-8'));
-        $this->assertSame('ü', (string) $this->stringable('u')->encoding('UTF-8', 'ASCII'));
+        $this->assertSame('ú', (string) $this->stringable('ü')->encoding('ASCII', 'UTF-8'));
+        $this->assertSame('ü', (string) $this->stringable('ú')->encoding('UTF-8', 'ASCII'));
     }
 
     public function testEncodingNull()
     {
-        $this->assertSame('', (string) $this->stringable('')->encoding('ASCII', 'UTF-8'));
-        $this->assertTrue((string) $this->stringable('')->isEncoding('ASCII'));
-        $this->assertSame('', (string) $this->stringable('')->encoding('UTF-8', 'ASCII'));
-        $this->assertTrue((string) $this->stringable('')->isEncoding('UTF-8'));
+        $this->assertSame(null, (string) $this->stringable(null)->encoding('ASCII', 'UTF-8'));
+        $this->assertTrue((string) $this->stringable(null)->isEncoding('ASCII'));
+        $this->assertSame(null, (string) $this->stringable(null)->encoding('UTF-8', 'ASCII'));
+        $this->assertTrue((string) $this->stringable(null)->isEncoding('UTF-8'));
     }
 
     public function testIsEncoding()
