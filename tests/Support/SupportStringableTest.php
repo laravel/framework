@@ -24,7 +24,7 @@ class SupportStringableTest extends TestCase
             $this->stringable(static::class)->classBasename()
         );
     }
- 
+
     public function testIsEmpty()
     {
         $this->assertTrue($this->stringable('')->isEmpty());
@@ -164,7 +164,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame(' ', (string) $this->stringable(' ')->words());
         $this->assertEquals($nbsp, (string) $this->stringable($nbsp)->words());
     }
-  
+
     public function testStartsWith()
     {
         $this->assertTrue($this->stringable('jason')->startsWith('jas'));
@@ -612,5 +612,28 @@ class SupportStringableTest extends TestCase
     {
         $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+    }
+
+    public function testStringEncoding()
+    {
+        $this->assertSame('@', (string) $this->stringable('@')->encoding('ASCII', 'UTF8'));
+        $this->assertSame('u', (string) $this->stringable('ü')->encoding('ASCII', 'UTF8'));
+        $this->assertSame('ü', (string) $this->stringable('u')->encoding('UTF-8', 'ASCII'));
+    }
+
+    public function testEncodingNull()
+    {
+        $this->assertSame('', (string) $this->stringable('')->encoding('ASCII', 'UTF8'));
+        $this->assertTrue((string) $this->stringable('')->isEncoding('ASCII'));
+        $this->assertSame('', (string) $this->stringable('')->encoding('UTF-8', 'ASCII'));
+        $this->assertTrue((string) $this->stringable('')->isEncoding('UTF-8'));
+    }
+
+    public function testIsEncoding()
+    {
+        $this->assertTrue($this->stringable('A')->isEncoding('ASCII'));
+        $this->assertFalse($this->stringable('ù')->isEncoding('UTF-8'));
+        $this->assertTrue($this->stringable('A')->isEncoding('ASCII', true));
+        $this->assertFalse($this->stringable('ù')->isEncoding('UTF-8', true));
     }
 }
