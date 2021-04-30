@@ -481,6 +481,28 @@ class SupportStrTest extends TestCase
         $this->assertEquals(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
     }
 
+    public function testStringEncoding()
+    {
+        $this->assertSame('@', Str::encoding('@', 'ASCII', 'UTF8'));
+        $this->assertSame('u', Str::encoding('ü', 'ASCII', 'UTF8'));
+        $this->assertSame('ü', Str::encoding('u', 'UTF-8', 'ASCII'));
+    }
+
+    public function testIsEncoding()
+    {
+        $this->assertTrue(Str::isEncoding('@', 'UTF-8'));
+        $this->assertTrue(Str::isEncoding('ü', 'UTF-8'));
+        $this->assertFalse(Str::isEncoding('ü', 'ASCII'));
+        $this->assertTrue(Str::isEncoding('u', 'ASCII'));
+    }
+
+    public function testEncodingNull()
+    {
+        $this->assertSame('', Str::encoding(null));
+        $this->assertTrue(Str::isEncoding(null, 'ASCII'));
+        $this->assertSame('', Str::slug(null));
+    }
+
     public function validUuidList()
     {
         return [
