@@ -16,7 +16,7 @@
 - Added password validation rule ([#36960](https://github.com/laravel/framework/pull/36960))
 
 ### Fixed
-- Fixed `JsonResponse::fromJasonString()` double encoding string ([#37076](https://github.com/laravel/framework/pull/37076))
+- Fixed `JsonResponse::fromJsonString()` double encoding string ([#37076](https://github.com/laravel/framework/pull/37076))
 - Fallback to primary key if owner key doesnt exist on model at all in `MorphTo` relation ([a011109](https://github.com/laravel/framework/commit/a0111098c039c27a76df4b4dd555f351ee3c81eb))
 - Fixes for PHP 8.1 ([#37087](https://github.com/laravel/framework/pull/37087), [#37101](https://github.com/laravel/framework/pull/37101))
 - Do not execute beforeSending callbacks twice in HTTP client ([#37116](https://github.com/laravel/framework/pull/37116))
