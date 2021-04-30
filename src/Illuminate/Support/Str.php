@@ -526,21 +526,20 @@ class Str
 
         return $result;
     }
-    
+
     /**
      * Replace the given value in the given string.
      *
      * @param  string|string[]  $search
      * @param  string|string[]  $replace
      * @param  string|string[]  $subject
-     * 
      * @return static
      */
     public static function replace($search, $replace, $subject)
     {
         return str_replace($search, $replace, $subject);
     }
-    
+
     /**
      * Replace the first occurrence of a given value in the string.
      *
