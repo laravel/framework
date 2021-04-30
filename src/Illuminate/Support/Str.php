@@ -96,6 +96,10 @@ class Str
      */
     public static function isEncoding($value, $encodings, $strict = false)
     {
+        if('' === $value) {
+            return true;
+        }
+
         return mb_detect_encoding((string) $value, $encodings, $strict);
     }
 
@@ -287,6 +291,10 @@ class Str
      */
     public static function encoding($value, $to, $from)
     {
+        if('' === $value) {
+            return '';
+        }
+
         return mb_convert_encoding((string) $value, $to, $from);
     }
 
