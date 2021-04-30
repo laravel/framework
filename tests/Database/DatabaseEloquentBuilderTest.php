@@ -1259,6 +1259,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey($collection);
     }
 
+    public function testWhereKeyMethodWithModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', m::on(function ($argument) {
+            return $argument === '1';
+        }));
+
+        $builder->whereKey(new class extends Model {
+            protected $attributes = ['id' => 1];
+        });
+    }
+
     public function testWhereKeyNotMethodWithStringZero()
     {
         $model = new EloquentBuilderTestStubStringPrimaryKey;
@@ -1323,6 +1338,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, $collection);
 
         $builder->whereKeyNot($collection);
+    }
+
+    public function testWhereKeyNotMethodWithModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', m::on(function ($argument) {
+            return $argument === '1';
+        }));
+
+        $builder->whereKeyNot(new class extends Model {
+            protected $attributes = ['id' => 1];
+        });
     }
 
     public function testWhereIn()
