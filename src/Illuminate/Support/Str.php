@@ -8,6 +8,7 @@ use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use voku\helper\ASCII;
 
 class Str
 {
@@ -90,35 +91,12 @@ class Str
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $value
+     * @param  string  $language
      * @return string
      */
-    public static function ascii($value)
+    public static function ascii($value, $language = 'en')
     {
-        return static::encoding($value, 'UTF-8', 'ASCII');
-    }
-
-    /**
-     * Transliterate a ASCII value to UTF-8.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    public static function utf8($value)
-    {
-        return static::encoding($value, 'ASCII', 'UTF-8');
-    }
-
-    /**
-     * Transliterate a given value to target encoding.
-     *
-     * @param  string  $value
-     * @param  string  $to
-     * @param  string|string[]  $from
-     * @return string
-     */
-    public static function encoding($value, $to, $from)
-    {
-        return mb_convert_encoding((string) $value, $to, $from);
+        return ASCII::to_ascii((string) $value, $language);
     }
 
     /**
@@ -310,31 +288,7 @@ class Str
      */
     public static function isAscii($value)
     {
-        return static::isEncoding($value, 'ASCII');
-    }
-
-    /**
-     * Determine if a given string is UTF-8.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    public static function isUtf8($value)
-    {
-        return static::isEncoding($value, 'UTF-8');
-    }
-
-    /**
-     * Determine the encoding of a particular string.
-     *
-     * @param  string  $value
-     * @param  string|string[]|null  $encodings
-     * @param  bool  $strict
-     * @return bool
-     */
-    public static function isEncoding($value, $encodings, $strict = false)
-    {
-        return mb_detect_encoding((string) $value, $encodings, $strict);
+        return ASCII::is_ascii((string) $value);
     }
 
     /**
