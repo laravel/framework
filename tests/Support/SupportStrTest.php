@@ -483,14 +483,13 @@ class SupportStrTest extends TestCase
 
     public function testStringEncoding()
     {
-        $this->assertSame('@', Str::encoding('@', 'ASCII', 'UTF8'));
-        $this->assertSame('u', Str::encoding('ü', 'ASCII', 'UTF8'));
+        $this->assertSame('@', Str::encoding('@', 'ASCII', 'UTF-8'));
+        $this->assertSame('u', Str::encoding('ü', 'ASCII', 'UTF-8'));
         $this->assertSame('ü', Str::encoding('u', 'UTF-8', 'ASCII'));
     }
 
     public function testIsEncoding()
     {
-        $this->assertTrue(Str::isEncoding('@', 'UTF-8'));
         $this->assertTrue(Str::isEncoding('ü', 'UTF-8'));
         $this->assertFalse(Str::isEncoding('ü', 'ASCII'));
         $this->assertTrue(Str::isEncoding('u', 'ASCII'));

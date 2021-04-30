@@ -616,14 +616,14 @@ class SupportStringableTest extends TestCase
 
     public function testStringEncoding()
     {
-        $this->assertSame('@', (string) $this->stringable('@')->encoding('ASCII', 'UTF8'));
-        $this->assertSame('u', (string) $this->stringable('ü')->encoding('ASCII', 'UTF8'));
+        $this->assertSame('@', (string) $this->stringable('@')->encoding('ASCII', 'UTF-8'));
+        $this->assertSame('u', (string) $this->stringable('ü')->encoding('ASCII', 'UTF-8'));
         $this->assertSame('ü', (string) $this->stringable('u')->encoding('UTF-8', 'ASCII'));
     }
 
     public function testEncodingNull()
     {
-        $this->assertSame('', (string) $this->stringable('')->encoding('ASCII', 'UTF8'));
+        $this->assertSame('', (string) $this->stringable('')->encoding('ASCII', 'UTF-8'));
         $this->assertTrue((string) $this->stringable('')->isEncoding('ASCII'));
         $this->assertSame('', (string) $this->stringable('')->encoding('UTF-8', 'ASCII'));
         $this->assertTrue((string) $this->stringable('')->isEncoding('UTF-8'));
