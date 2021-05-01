@@ -198,4 +198,18 @@ trait SoftDeletes
     {
         return $this->qualifyColumn($this->getDeletedAtColumn());
     }
+    
+    /**
+     * Restore or Delete a soft-deleted model instance.
+     *
+     * @return bool|null
+     */
+    public function restoreOrDelete()
+    {
+        if($this->trashed()){
+            return $this->restore();
+        }else{
+            return $this->delete();
+        }
+    }
 }
