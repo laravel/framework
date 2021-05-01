@@ -253,7 +253,9 @@ class Builder
     public function selectSub($query, $as)
     {
         if ($this->isBuilder($query)) {
-            return $this->addSelect(new SubSelect($this, $query, $as));
+            $this->columns[] = new SubSelect($this, $query, $as);
+
+            return $this;
         }
 
         [$query, $bindings] = $this->createSub($query);
@@ -3353,5 +3355,23 @@ class Builder
         }
 
         static::throwBadMethodCallException($method);
+    }
+
+    /**
+     * Clone subselects.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        if (! is_array($this->columns)) {
+            return;
+        }
+
+        foreach($this->columns as $key => $column) {
+            if($column instanceof SubSelect) {
+                $this->columns[$key] = (clone $column)->setParent($this);
+            }
+        }
     }
 }

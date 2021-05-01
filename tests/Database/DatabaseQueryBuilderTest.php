@@ -117,6 +117,30 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame(['baz'], $builder->getBindings());
     }
 
+    public function testAddingSubSelectsAddsBindingsOnce()
+    {
+        $subBuilder = $this->getBuilder();
+        $builder = $this->getBuilder();
+        $subBuilder->where('bar', 'baz');
+        $builder->addSelect([
+            'foo' => $subBuilder,
+        ]);
+        $builder->toSql();
+        $builder->toSql();
+        $this->assertSame(['baz'], $builder->getBindings());
+    }
+
+    public function testClonedBuilderHasClonedSubSelects()
+    {
+        $subBuilder = $this->getBuilder();
+        $builder = $this->getBuilder();
+        $builder->addSelect(['foo' => $subBuilder]);
+        $this->assertSame($builder, $builder->columns[1]->getParent());
+
+        $cloned = clone $builder;
+        $this->assertSame($cloned, $cloned->columns[1]->getParent());
+    }
+
     public function testAddedSubSelectsCanBeModifiedLater()
     {
         $subBuilder = $this->getBuilder();

@@ -2,12 +2,14 @@
 
 namespace Illuminate\Database\Query;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+
 class SubSelect extends Expression
 {
     /**
      * The parent query builder.
      *
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     * @var \Illuminate\Database\Query\Builder
      */
     protected $parent;
 
@@ -26,17 +28,47 @@ class SubSelect extends Expression
     protected $as;
 
     /**
+     * Determines whether the bindings have ben added to the parent query.
+     *
+     * @var boolean
+     */
+    protected $binded = false;
+
+    /**
      * Create new SubSelect instance.
      *
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $parent
+     * @param \Illuminate\Database\Query\Builder $parent
      * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query
      * @param string  $as
      */
-    public function __construct($parent, $query, $as)
+    public function __construct(Builder $parent, $query, $as)
     {
         $this->parent = $parent;
         $this->query = $query;
         $this->as = $as;
+    }
+
+    /**
+     * Set parent query builder.
+     *
+     * @param \Illuminate\Database\Query\Builder $parent
+     * @return $this
+     */
+    public function setParent(Builder $parent)
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * Get parent query builder object.
+     *
+     * @return Builder
+     */
+    public function getParent()
+    {
+        return $this->parent;
     }
 
     /**
@@ -46,14 +78,28 @@ class SubSelect extends Expression
      */
     public function getValue()
     {
-        $bindings = $this->query->getBindings();
+        $this->addBindings();
 
-        $value = '('.$this->query->toSql().') as '.$this->parent->getGrammar()->wrap($this->as);
+        return '('.$this->query->toSql().') as '.$this->parent->getGrammar()->wrap($this->as);
+    }
 
-        if ($bindings) {
-            $this->parent->addBinding($bindings, 'select');
+    /**
+     * Add the subselect bindings to the parent query builder.
+     *
+     * @return void
+     */
+    protected function addBindings()
+    {
+        if ($this->binded) {
+            return false;
         }
 
-        return $value;
+        if (!$bindings = $this->query->getBindings()) {
+            return;
+        }
+
+        $this->parent->addBinding($bindings, 'select');
+
+        $this->binded = true;
     }
 }
