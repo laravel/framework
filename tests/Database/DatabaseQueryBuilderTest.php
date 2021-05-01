@@ -111,7 +111,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $subBuilder->where('bar', 'baz');
         $builder->addSelect([
-            'foo' => $subBuilder
+            'foo' => $subBuilder,
         ]);
         $this->assertSame('select "".*, (select * where "bar" = ?) as "foo"', $builder->toSql());
         $this->assertSame(['baz'], $builder->getBindings());
@@ -122,7 +122,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $subBuilder = $this->getBuilder();
         $builder = $this->getBuilder();
         $builder->addSelect([
-            'foo' => $subBuilder
+            'foo' => $subBuilder,
         ]);
         $subBuilder->where('bar', 'baz');
         $this->assertSame('select "".*, (select * where "bar" = ?) as "foo"', $builder->toSql());

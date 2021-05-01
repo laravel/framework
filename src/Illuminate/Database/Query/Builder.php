@@ -252,7 +252,7 @@ class Builder
      */
     public function selectSub($query, $as)
     {
-        if($this->isBuilder($query)) {
+        if ($this->isBuilder($query)) {
             return $this->addSelect(new SubSelect($this, $query, $as));
         }
 
