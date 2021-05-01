@@ -1074,7 +1074,7 @@ trait HasAttributes
      */
     protected function serializeDate(DateTimeInterface $date)
     {
-        return Carbon::instance($date)->toJSON();
+        return Carbon::instance($date)->jsonSerialize();
     }
 
     /**
