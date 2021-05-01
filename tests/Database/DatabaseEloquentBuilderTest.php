@@ -28,28 +28,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         m::close();
     }
 
-    public function testAddingSubSelects()
-    {
-        $subQuery = new Builder(new BaseBuilder(
-            m::mock(ConnectionInterface::class),
-            new Grammar,
-            m::mock(Processor::class)
-        ));
-        $query = new Builder(new BaseBuilder(
-            m::mock(ConnectionInterface::class),
-            new Grammar,
-            m::mock(Processor::class)
-        ));
-
-        $query->from('users')->addSelect([
-            'foo' => $subQuery,
-        ]);
-        $subQuery->where('bar', 'baz');
-
-        $this->assertSame('select "users".*, (select * where "bar" = ?) as "foo" from "users"', $query->toSql());
-        $this->assertSame(['baz'], $query->getBindings());
-    }
-
     public function testFindMethod()
     {
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
