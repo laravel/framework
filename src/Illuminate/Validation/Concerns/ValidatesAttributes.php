@@ -747,7 +747,7 @@ trait ValidatesAttributes
      */
     protected function getUniqueIds($idColumn, $parameters)
     {
-        $idColumn = $idColumn ?? $parameters[3] ?? 'id';
+        $idColumn = $parameters[3] ?? $idColumn ?? 'id';
 
         return [$idColumn, $this->prepareUniqueId($parameters[2])];
     }
