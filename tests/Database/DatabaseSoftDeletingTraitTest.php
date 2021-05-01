@@ -56,6 +56,22 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
         $this->assertFalse($model->restore());
     }
+    
+    public function testRestoreOrDelete()
+    {
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
+        $model->makePartial();
+        $wasTrashed = $model->trashed();
+        $model->shouldReceive('restoreOrDelete');
+
+        $model->restoreOrDelete();
+
+        if($wasTrashed){
+            $this->assertNotNull($model->deleted_at);
+        }else{
+            $this->assertNull($model->deleted_at);
+        }
+    }
 }
 
 class DatabaseSoftDeletingTraitStub
