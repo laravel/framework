@@ -105,6 +105,30 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
     }
 
+    public function testAddingSubSelects()
+    {
+        $subBuilder = $this->getBuilder();
+        $builder = $this->getBuilder();
+        $subBuilder->where('bar', 'baz');
+        $builder->addSelect([
+            'foo' => $subBuilder
+        ]);
+        $this->assertSame('select "".*, (select * where "bar" = ?) as "foo"', $builder->toSql());
+        $this->assertSame(['baz'], $builder->getBindings());
+    }
+
+    public function testAddedSubSelectsCanBeModifiedLater()
+    {
+        $subBuilder = $this->getBuilder();
+        $builder = $this->getBuilder();
+        $builder->addSelect([
+            'foo' => $subBuilder
+        ]);
+        $subBuilder->where('bar', 'baz');
+        $this->assertSame('select "".*, (select * where "bar" = ?) as "foo"', $builder->toSql());
+        $this->assertSame(['baz'], $builder->getBindings());
+    }
+
     public function testBasicSelectWithPrefix()
     {
         $builder = $this->getBuilder();

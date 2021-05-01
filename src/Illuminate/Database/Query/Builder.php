@@ -252,6 +252,10 @@ class Builder
      */
     public function selectSub($query, $as)
     {
+        if($this->isBuilder($query)) {
+            return $this->addSelect(new SubSelect($this, $query, $as));
+        }
+
         [$query, $bindings] = $this->createSub($query);
 
         return $this->selectRaw(
@@ -3253,6 +3257,18 @@ class Builder
                $value instanceof EloquentBuilder ||
                $value instanceof Relation ||
                $value instanceof Closure;
+    }
+
+    /**
+     * Determine if the value is a query builder.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function isBuilder($value)
+    {
+        return $value instanceof self ||
+               $value instanceof EloquentBuilder;
     }
 
     /**
