@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Query;
 
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-
 class SubSelect extends Expression
 {
     /**
@@ -30,7 +28,7 @@ class SubSelect extends Expression
     /**
      * Determines whether the bindings have ben added to the parent query.
      *
-     * @var boolean
+     * @var bool
      */
     protected $binded = false;
 
@@ -94,7 +92,7 @@ class SubSelect extends Expression
             return false;
         }
 
-        if (!$bindings = $this->query->getBindings()) {
+        if (! $bindings = $this->query->getBindings()) {
             return;
         }
 

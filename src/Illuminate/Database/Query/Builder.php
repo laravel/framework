@@ -3368,8 +3368,8 @@ class Builder
             return;
         }
 
-        foreach($this->columns as $key => $column) {
-            if($column instanceof SubSelect) {
+        foreach ($this->columns as $key => $column) {
+            if ($column instanceof SubSelect) {
                 $this->columns[$key] = (clone $column)->setParent($this);
             }
         }
