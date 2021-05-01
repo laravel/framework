@@ -1550,6 +1550,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      *
      * @return string
      */
+    public static function table()
+    {
+        return (new static)->getTable();
+    }
+
+    /**
+     * Get the table associated with the model.
+     *
+     * @return string
+     */
     public function getTable()
     {
         return $this->table ?? Str::snake(Str::pluralStudly(class_basename($this)));

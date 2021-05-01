@@ -813,6 +813,12 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('foo', $model->getTable());
     }
 
+    public function testGetTableNameStatically()
+    {
+        $model = new EloquentModelStub;
+        $this->assertSame($model->getTable(), EloquentModelStub::table());
+    }
+
     public function testGetKeyReturnsValueOfPrimaryKey()
     {
         $model = new EloquentModelStub;
