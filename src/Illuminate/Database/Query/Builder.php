@@ -3370,6 +3370,10 @@ class Builder
 
         foreach ($this->columns as $key => $column) {
             if ($column instanceof SubSelect) {
+
+                // Cloning all subselect instance of the query builder as well
+                // so the bindings will be added to the cloned instance of the
+                // query builder when rendering.
                 $this->columns[$key] = (clone $column)->setParent($this);
             }
         }
