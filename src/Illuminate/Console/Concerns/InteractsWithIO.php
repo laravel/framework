@@ -343,7 +343,7 @@ trait InteractsWithIO
     public function warn($string, $verbosity = null)
     {
         if (! $this->output->getFormatter()->hasStyle('warning')) {
-            $style = new OutputFormatterStyle('yellow');
+            $style = new OutputFormatterStyle('black', 'yellow');
 
             $this->output->getFormatter()->setStyle('warning', $style);
         }
