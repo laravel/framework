@@ -839,7 +839,7 @@ class Builder
 
         if (count($parameters) === 1 && ! is_null($cursor)) {
             $this->where($column = $parameters[0], $comparisonOperator, $cursor->getParam($column));
-        } else if (count($parameters) > 1 && ! is_null($cursor)) {
+        } elseif (count($parameters) > 1 && ! is_null($cursor)) {
             $this->whereRowValues($parameters, $comparisonOperator, $cursor->getParams($parameters));
         }
 
@@ -872,7 +872,7 @@ class Builder
         }
 
         if ($shouldReverse) {
-            $this->query->orders = collect($this->query->orders)->map(function($order) {
+            $this->query->orders = collect($this->query->orders)->map(function ($order) {
                 $order['direction'] = ($order['direction'] === 'asc' ? 'desc' : 'asc');
 
                 return $order;

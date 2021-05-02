@@ -124,7 +124,7 @@ class Cursor implements Arrayable
      */
     public function encode()
     {
-        return str_replace(['+','/','='], ['-','_',''], base64_encode(json_encode($this->toArray())));
+        return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($this->toArray())));
     }
 
     /**
@@ -139,7 +139,7 @@ class Cursor implements Arrayable
             return null;
         }
 
-        $parameters = json_decode(base64_decode(str_replace(['-','_'], ['+','/'], $encodedString)), true);
+        $parameters = json_decode(base64_decode(str_replace(['-', '_'], ['+', '/'], $encodedString)), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return null;

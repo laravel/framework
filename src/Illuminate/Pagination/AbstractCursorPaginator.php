@@ -145,7 +145,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     public function previousCursor()
     {
         if (is_null($this->cursor) ||
-            ($this->cursor->isPrev() && ! $this->hasMore) ) {
+            ($this->cursor->isPrev() && ! $this->hasMore)) {
             return null;
         }
 
@@ -160,7 +160,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     public function nextCursor()
     {
         if ((is_null($this->cursor) && ! $this->hasMore) ||
-            (! is_null($this->cursor) && $this->cursor->isNext() && ! $this->hasMore) ) {
+            (! is_null($this->cursor) && $this->cursor->isNext() && ! $this->hasMore)) {
             return null;
         }
 
