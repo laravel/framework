@@ -2403,7 +2403,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, [
-            'x' => new class {
+            'x' => new class
+            {
                 public function __toString()
                 {
                     return 'aslsdlks';
@@ -2413,7 +2414,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, [
-            'x' => new class {
+            'x' => new class
+            {
                 public function __toString()
                 {
                     return 'foo@gmail.com';
@@ -4792,7 +4794,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
             [
-                'name' => new class implements Rule {
+                'name' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return $value === 'taylor';
@@ -4814,7 +4817,8 @@ class ValidationValidatorTest extends TestCase
             ['name' => 'adam'],
             [
                 'name' => [
-                    new class implements Rule {
+                    new class implements Rule
+                    {
                         public function passes($attribute, $value)
                         {
                             return $value === 'taylor';
@@ -4868,7 +4872,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
             [
-                'states.*' => new class implements Rule {
+                'states.*' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return in_array($value, ['AK', 'HI']);
@@ -4906,7 +4911,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 42],
             [
-                'name' => new class implements Rule {
+                'name' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return $value === 'taylor';
@@ -4930,7 +4936,8 @@ class ValidationValidatorTest extends TestCase
             ['name' => 42],
             [
                 'name' => [
-                    new class implements Rule {
+                    new class implements Rule
+                    {
                         public function passes($attribute, $value)
                         {
                             return $value === 'taylor';
@@ -4958,7 +4965,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => ''],
             [
-                'name' => $rule = new class implements ImplicitRule {
+                'name' => $rule = new class implements ImplicitRule
+                {
                     public $called = false;
 
                     public function passes($attribute, $value)

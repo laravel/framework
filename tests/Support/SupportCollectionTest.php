@@ -495,7 +495,8 @@ class SupportCollectionTest extends TestCase
     public function testHigherOrderFilter($collection)
     {
         $c = new $collection([
-            new class {
+            new class
+            {
                 public $name = 'Alex';
 
                 public function active()
@@ -503,7 +504,8 @@ class SupportCollectionTest extends TestCase
                     return true;
                 }
             },
-            new class {
+            new class
+            {
                 public $name = 'John';
 
                 public function active()
