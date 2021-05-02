@@ -2,12 +2,14 @@
 
 namespace Illuminate\Pagination;
 
+use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use stdClass;
 
 /**
  * @mixin \Illuminate\Support\Collection
@@ -168,7 +170,9 @@ abstract class AbstractCursorPaginator implements Htmlable
     }
 
     /**
-     * @param  \ArrayAccess  $item
+     * Get a cursor instance for the given item.
+     *
+     * @param  \ArrayAccess|\stdClass  $item
      * @param  bool  $isNext
      * @return \Illuminate\Pagination\Cursor
      */
@@ -178,14 +182,20 @@ abstract class AbstractCursorPaginator implements Htmlable
     }
 
     /**
-     * @param  \ArrayAccess  $item
+     * @param  \ArrayAccess|\stdClass  $item
      */
     public function getParametersForItem($item)
     {
         return collect($this->parameters)
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
-                return $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')];
+                if ($item instanceof ArrayAccess) {
+                    return $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')];
+                } else if ($item instanceof stdClass) {
+                    return $item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')};
+                }
+
+                throw new \Exception('A cursor paginator item must either implement ArrayAccess or be an stdClass instance');
             })->toArray();
     }
 

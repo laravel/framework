@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use DateTimeInterface;
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -2358,6 +2360,73 @@ class Builder
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * Get a paginator only supporting simple next and previous links.
+     *
+     * This is more efficient on larger data-sets, etc.
+     *
+     * @param  int|null  $perPage
+     * @param  array  $columns
+     * @param  string  $cursorName
+     * @param  string|null  $cursor
+     * @return \Illuminate\Contracts\Pagination\Paginator
+     * @throws \Exception
+     */
+    public function cursorPaginate($perPage = 15, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
+    {
+        $cursor = $cursor ?: CursorPaginator::resolveCurrentCursor($cursorName);
+
+        $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->isPrev());
+
+        $orderDirection = $orders->first()['direction'] ?? 'asc';
+
+        $comparisonOperator = ($orderDirection === 'asc' ? '>' : '<');
+
+        $parameters = $orders->pluck('column')->toArray();
+
+        if (count($parameters) === 1 && ! is_null($cursor)) {
+            $this->where($column = $parameters[0], $comparisonOperator, $cursor->getParam($column));
+        } elseif (count($parameters) > 1 && ! is_null($cursor)) {
+            $this->whereRowValues($parameters, $comparisonOperator, $cursor->getParams($parameters));
+        }
+
+        $this->limit($perPage + 1);
+
+        return $this->cursorPaginator($this->get($columns), $perPage, $cursor, [
+            'path' => Paginator::resolveCurrentPath(),
+            'cursorName' => $cursorName,
+            'parameters' => $parameters,
+        ]);
+    }
+
+    /**
+     * Ensure the proper order by required for cursor pagination.
+     *
+     * @param  bool  $shouldReverse
+     * @return \Illuminate\Support\Collection
+     * @throws \Exception
+     */
+    protected function ensureOrderForCursorPagination($shouldReverse = false)
+    {
+        $this->enforceOrderBy();
+
+        $orderDirections = collect($this->orders)->pluck('direction')->unique();
+
+        if ($orderDirections->count() > 1) {
+            throw new Exception('Only a single order by direction is supported in cursor pagination.');
+        }
+
+        if ($shouldReverse) {
+            $this->orders = collect($this->orders)->map(function ($order) {
+                $order['direction'] = ($order['direction'] === 'asc' ? 'desc' : 'asc');
+
+                return $order;
+            })->toArray();
+        }
+
+        return collect($this->orders);
     }
 
     /**

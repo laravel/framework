@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
 /**
  * @group integration
  */
-class EloquentPaginateTest extends DatabaseTestCase
+class EloquentCursorPaginateTest extends DatabaseTestCase
 {
     protected function setUp(): void
     {
@@ -28,7 +28,7 @@ class EloquentPaginateTest extends DatabaseTestCase
         });
     }
 
-    public function testPaginationOnTopOfColumns()
+    public function testCursorPaginationOnTopOfColumns()
     {
         for ($i = 1; $i <= 50; $i++) {
             Post::create([
@@ -36,7 +36,7 @@ class EloquentPaginateTest extends DatabaseTestCase
             ]);
         }
 
-        $this->assertCount(15, Post::paginate(15, ['id', 'title']));
+        $this->assertCount(15, Post::cursorPaginate(15, ['id', 'title']));
     }
 
     public function testPaginationWithDistinct()
@@ -50,22 +50,7 @@ class EloquentPaginateTest extends DatabaseTestCase
 
         $this->assertEquals(6, $query->get()->count());
         $this->assertEquals(6, $query->count());
-        $this->assertEquals(6, $query->paginate()->total());
-    }
-
-    public function testPaginationWithDistinctAndSelect()
-    {
-        // This is the 'broken' behaviour, but this test is added to show backwards compatibility.
-        for ($i = 1; $i <= 3; $i++) {
-            Post::create(['title' => 'Hello world']);
-            Post::create(['title' => 'Goodbye world']);
-        }
-
-        $query = Post::query()->distinct()->select('title');
-
-        $this->assertEquals(2, $query->get()->count());
-        $this->assertEquals(6, $query->count());
-        $this->assertEquals(6, $query->paginate()->total());
+        $this->assertCount(6, $query->cursorPaginate()->items());
     }
 
     public function testPaginationWithDistinctColumnsAndSelect()
@@ -79,7 +64,7 @@ class EloquentPaginateTest extends DatabaseTestCase
 
         $this->assertEquals(2, $query->get()->count());
         $this->assertEquals(2, $query->count());
-        $this->assertEquals(2, $query->paginate()->total());
+        $this->assertCount(2, $query->cursorPaginate()->items());
     }
 
     public function testPaginationWithDistinctColumnsAndSelectAndJoin()
@@ -99,7 +84,7 @@ class EloquentPaginateTest extends DatabaseTestCase
 
         $this->assertEquals(5, $query->get()->count());
         $this->assertEquals(5, $query->count());
-        $this->assertEquals(5, $query->paginate()->total());
+        $this->assertCount(5, $query->cursorPaginate()->items());
     }
 }
 
