@@ -189,9 +189,9 @@ abstract class AbstractCursorPaginator implements Htmlable
         return collect($this->parameters)
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
-                if ($item instanceof ArrayAccess) {
+                if ($item instanceof ArrayAccess || is_array($item)) {
                     return $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')];
-                } else if ($item instanceof stdClass) {
+                } elseif ($item instanceof stdClass) {
                     return $item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')};
                 }
 

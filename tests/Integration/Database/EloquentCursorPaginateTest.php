@@ -15,14 +15,14 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('test_posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
             $table->unsignedInteger('user_id')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('users', function ($table) {
+        Schema::create('test_users', function ($table) {
             $table->increments('id');
             $table->timestamps();
         });
@@ -31,22 +31,22 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     public function testCursorPaginationOnTopOfColumns()
     {
         for ($i = 1; $i <= 50; $i++) {
-            Post::create([
+            TestPost::create([
                 'title' => 'Title '.$i,
             ]);
         }
 
-        $this->assertCount(15, Post::cursorPaginate(15, ['id', 'title']));
+        $this->assertCount(15, TestPost::cursorPaginate(15, ['id', 'title']));
     }
 
     public function testPaginationWithDistinct()
     {
         for ($i = 1; $i <= 3; $i++) {
-            Post::create(['title' => 'Hello world']);
-            Post::create(['title' => 'Goodbye world']);
+            TestPost::create(['title' => 'Hello world']);
+            TestPost::create(['title' => 'Goodbye world']);
         }
 
-        $query = Post::query()->distinct();
+        $query = TestPost::query()->distinct();
 
         $this->assertEquals(6, $query->get()->count());
         $this->assertEquals(6, $query->count());
@@ -56,11 +56,11 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     public function testPaginationWithDistinctColumnsAndSelect()
     {
         for ($i = 1; $i <= 3; $i++) {
-            Post::create(['title' => 'Hello world']);
-            Post::create(['title' => 'Goodbye world']);
+            TestPost::create(['title' => 'Hello world']);
+            TestPost::create(['title' => 'Goodbye world']);
         }
 
-        $query = Post::query()->distinct('title')->select('title');
+        $query = TestPost::query()->distinct('title')->select('title');
 
         $this->assertEquals(2, $query->get()->count());
         $this->assertEquals(2, $query->count());
@@ -70,17 +70,17 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     public function testPaginationWithDistinctColumnsAndSelectAndJoin()
     {
         for ($i = 1; $i <= 5; $i++) {
-            $user = User::create();
+            $user = TestUser::create();
             for ($j = 1; $j <= 10; $j++) {
-                Post::create([
+                TestPost::create([
                     'title' => 'Title '.$i,
                     'user_id' => $user->id,
                 ]);
             }
         }
 
-        $query = User::query()->join('posts', 'posts.user_id', '=', 'users.id')
-            ->distinct('users.id')->select('users.*');
+        $query = TestUser::query()->join('test_posts', 'test_posts.user_id', '=', 'test_users.id')
+            ->distinct('test_users.id')->select('test_users.*');
 
         $this->assertEquals(5, $query->get()->count());
         $this->assertEquals(5, $query->count());
@@ -88,12 +88,12 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     }
 }
 
-class Post extends Model
+class TestPost extends Model
 {
     protected $guarded = [];
 }
 
-class User extends Model
+class TestUser extends Model
 {
     protected $guarded = [];
 }
