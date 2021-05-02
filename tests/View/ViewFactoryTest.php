@@ -663,7 +663,8 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
 
-        $data = (new class {
+        $data = (new class
+        {
             public function generate()
             {
                 for ($count = 0; $count < 3; $count++) {

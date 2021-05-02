@@ -131,7 +131,8 @@ class ParallelRunner implements RunnerInterface
     {
         $applicationResolver = static::$applicationResolver ?: function () {
             if (trait_exists(\Tests\CreatesApplication::class)) {
-                $applicationCreator = new class {
+                $applicationCreator = new class
+                {
                     use \Tests\CreatesApplication;
                 };
 

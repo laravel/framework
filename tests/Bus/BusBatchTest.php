@@ -83,11 +83,13 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue);
 
-        $job = new class {
+        $job = new class
+        {
             use Batchable;
         };
 
-        $secondJob = new class {
+        $secondJob = new class
+        {
             use Batchable;
         };
 
@@ -133,11 +135,13 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue);
 
-        $job = new class {
+        $job = new class
+        {
             use Batchable;
         };
 
-        $secondJob = new class {
+        $secondJob = new class
+        {
             use Batchable;
         };
 
@@ -169,11 +173,13 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue, $allowFailures = false);
 
-        $job = new class {
+        $job = new class
+        {
             use Batchable;
         };
 
-        $secondJob = new class {
+        $secondJob = new class
+        {
             use Batchable;
         };
 
@@ -208,11 +214,13 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue, $allowFailures = true);
 
-        $job = new class {
+        $job = new class
+        {
             use Batchable;
         };
 
-        $secondJob = new class {
+        $secondJob = new class
+        {
             use Batchable;
         };
 
@@ -377,7 +385,7 @@ class BusBatchTest extends TestCase
                 'failed_jobs' => '',
                 'failed_job_ids' => '[]',
                 'options' => $serialize,
-                'created_at' => null,
+                'created_at' => now()->timestamp,
                 'cancelled_at' => null,
                 'finished_at' => null,
             ]);

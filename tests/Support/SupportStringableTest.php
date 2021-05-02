@@ -109,6 +109,23 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenNotEmpty()
+    {
+        tap($this->stringable(), function ($stringable) {
+            $this->assertSame($stringable, $stringable->whenNotEmpty(function ($stringable) {
+                return $stringable.'.';
+            }));
+        });
+
+        $this->assertSame('', (string) $this->stringable()->whenNotEmpty(function ($stringable) {
+            return $stringable.'.';
+        }));
+
+        $this->assertSame('Not empty.', (string) $this->stringable('Not empty')->whenNotEmpty(function ($stringable) {
+            return $stringable.'.';
+        }));
+    }
+
     public function testWhenFalse()
     {
         $this->assertSame('when', (string) $this->stringable('when')->when(false, function ($stringable, $value) {
@@ -415,6 +432,14 @@ class SupportStringableTest extends TestCase
     {
         $this->assertSame(11, $this->stringable('foo bar baz')->length());
         $this->assertSame(11, $this->stringable('foo bar baz')->length('UTF-8'));
+    }
+
+    public function testReplace()
+    {
+        $this->assertSame('foo/foo/foo', (string) $this->stringable('?/?/?')->replace('?', 'foo'));
+        $this->assertSame('bar/bar', (string) $this->stringable('?/?')->replace('?', 'bar'));
+        $this->assertSame('?/?/?', (string) $this->stringable('? ? ?')->replace(' ', '/'));
+        $this->assertSame('foo/bar/baz/bam', (string) $this->stringable('?1/?2/?3/?4')->replace(['?1', '?2', '?3', '?4'], ['foo', 'bar', 'baz', 'bam']));
     }
 
     public function testReplaceArray()

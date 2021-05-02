@@ -161,7 +161,8 @@ class DatabaseEloquentHasOneTest extends TestCase
         $result2 = new EloquentHasOneModelStub;
         $result2->foreign_key = 2;
         $result3 = new EloquentHasOneModelStub;
-        $result3->foreign_key = new class {
+        $result3->foreign_key = new class
+        {
             public function __toString()
             {
                 return '4';

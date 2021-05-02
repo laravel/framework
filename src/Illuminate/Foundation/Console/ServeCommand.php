@@ -63,7 +63,7 @@ class ServeCommand extends Command
                             ? filemtime($environmentFile)
                             : now()->addDays(30)->getTimestamp();
 
-        $process = $this->startProcess();
+        $process = $this->startProcess($hasEnvironment);
 
         while ($process->isRunning()) {
             if ($hasEnvironment) {
@@ -79,7 +79,7 @@ class ServeCommand extends Command
 
                 $process->stop(5);
 
-                $process = $this->startProcess();
+                $process = $this->startProcess($hasEnvironment);
             }
 
             usleep(500 * 1000);
@@ -99,12 +99,13 @@ class ServeCommand extends Command
     /**
      * Start a new server process.
      *
+     * @param  bool  $hasEnvironment
      * @return \Symfony\Component\Process\Process
      */
-    protected function startProcess()
+    protected function startProcess($hasEnvironment)
     {
-        $process = new Process($this->serverCommand(), null, collect($_ENV)->mapWithKeys(function ($value, $key) {
-            if ($this->option('no-reload')) {
+        $process = new Process($this->serverCommand(), null, collect($_ENV)->mapWithKeys(function ($value, $key) use ($hasEnvironment) {
+            if ($this->option('no-reload') || ! $hasEnvironment) {
                 return [$key => $value];
             }
 

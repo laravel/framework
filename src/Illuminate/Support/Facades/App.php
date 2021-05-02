@@ -34,6 +34,7 @@ namespace Illuminate\Support\Facades;
  * @method static string storagePath(string $path = '')
  * @method static string version()
  * @method static string|bool environment(string|array ...$environments)
+ * @method static void abort(int $code, string $message = '', array $headers = [])
  * @method static void boot()
  * @method static void booted(callable $callback)
  * @method static void booting(callable $callback)
