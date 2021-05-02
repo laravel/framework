@@ -19,7 +19,8 @@ class PaginatorLoadMorphCountTest extends TestCase
         $items = m::mock(Collection::class);
         $items->shouldReceive('loadMorphCount')->once()->with('parentable', $relations);
 
-        $p = (new class extends AbstractPaginator {
+        $p = (new class extends AbstractPaginator
+        {
             //
         })->setCollection($items);
 

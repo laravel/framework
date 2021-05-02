@@ -1269,7 +1269,8 @@ class DatabaseEloquentBuilderTest extends TestCase
             return $argument === '1';
         }));
 
-        $builder->whereKey(new class extends Model {
+        $builder->whereKey(new class extends Model
+        {
             protected $attributes = ['id' => 1];
         });
     }
@@ -1350,7 +1351,8 @@ class DatabaseEloquentBuilderTest extends TestCase
             return $argument === '1';
         }));
 
-        $builder->whereKeyNot(new class extends Model {
+        $builder->whereKeyNot(new class extends Model
+        {
             protected $attributes = ['id' => 1];
         });
     }

@@ -35,7 +35,8 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
 
         $result1 = (object) [
             'pivot' => (object) [
-                'foreign_key' => new class {
+                'foreign_key' => new class
+                {
                     public function __toString()
                     {
                         return '1';

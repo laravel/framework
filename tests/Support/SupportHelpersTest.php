@@ -442,7 +442,8 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertNull(optional(null)->something());
 
-        $this->assertEquals(10, optional(new class {
+        $this->assertEquals(10, optional(new class
+        {
             public function something()
             {
                 return 10;
@@ -520,10 +521,12 @@ class SupportHelpersTest extends TestCase
 
         $this->assertNull(optional(null)->present()->something());
 
-        $this->assertSame('$10.00', optional(new class {
+        $this->assertSame('$10.00', optional(new class
+        {
             public function present()
             {
-                return new class {
+                return new class
+                {
                     public function something()
                     {
                         return '$10.00';
