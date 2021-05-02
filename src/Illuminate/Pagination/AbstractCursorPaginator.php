@@ -12,7 +12,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 /**
  * @mixin \Illuminate\Support\Collection
  */
-abstract class AbstractPaginator implements Htmlable
+abstract class AbstractCursorPaginator implements Htmlable
 {
     use ForwardsCalls;
 
@@ -29,13 +29,6 @@ abstract class AbstractPaginator implements Htmlable
      * @var int
      */
     protected $perPage;
-
-    /**
-     * The current page being "viewed".
-     *
-     * @var int
-     */
-    protected $currentPage;
 
     /**
      * The base path to assign to all URLs.
@@ -59,18 +52,25 @@ abstract class AbstractPaginator implements Htmlable
     protected $fragment;
 
     /**
-     * The query string variable used to store the page.
+     * The cursor string variable used to store the page.
      *
      * @var string
      */
-    protected $pageName = 'page';
+    protected $cursorName = 'cursor';
 
     /**
-     * The number of links to display on each side of current page link.
+     * The current cursor.
      *
-     * @var int
+     * @var \Illuminate\Pagination\Cursor|null
      */
-    public $onEachSide = 3;
+    protected $cursor;
+
+    /**
+     * The paginator parameters for the cursor.
+     *
+     * @var array
+     */
+    protected $parameters;
 
     /**
      * The paginator options.
@@ -80,56 +80,33 @@ abstract class AbstractPaginator implements Htmlable
     protected $options;
 
     /**
-     * The current path resolver callback.
+     * The current cursor resolver callback.
      *
      * @var \Closure
      */
-    protected static $currentPathResolver;
+    protected static $currentCursorResolver;
 
     /**
-     * The current page resolver callback.
+     * Get the URL for a given cursor.
      *
-     * @var \Closure
+     * @param  \Illuminate\Pagination\Cursor|null  $cursor
+     * @return string
      */
-    protected static $currentPageResolver;
-
-    /**
-     * The query string resolver callback.
-     *
-     * @var \Closure
-     */
-    protected static $queryStringResolver;
-
-    /**
-     * The view factory resolver callback.
-     *
-     * @var \Closure
-     */
-    protected static $viewFactoryResolver;
-
-    /**
-     * The default pagination view.
-     *
-     * @var string
-     */
-    public static $defaultView = 'pagination::tailwind';
-
-    /**
-     * The default "simple" pagination view.
-     *
-     * @var string
-     */
-    public static $defaultSimpleView = 'pagination::simple-tailwind';
-
-    /**
-     * Determine if the given value is a valid page number.
-     *
-     * @param  int  $page
-     * @return bool
-     */
-    protected function isValidPageNumber($page)
+    public function url($cursor)
     {
-        return $page >= 1 && filter_var($page, FILTER_VALIDATE_INT) !== false;
+        // If we have any extra query string key / value pairs that need to be added
+        // onto the URL, we will put them in query string form and then attach it
+        // to the URL. This allows for extra information like sortings storage.
+        $parameters = is_null($cursor) ? [] : [$this->cursorName => $cursor->encode()];
+
+        if (count($this->query) > 0) {
+            $parameters = array_merge($this->query, $parameters);
+        }
+
+        return $this->path()
+            .(Str::contains($this->path(), '?') ? '&' : '?')
+            .Arr::query($parameters)
+            .$this->buildFragment();
     }
 
     /**
@@ -139,50 +116,77 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function previousPageUrl()
     {
-        if ($this->currentPage() > 1) {
-            return $this->url($this->currentPage() - 1);
+        if (is_null($previousCursor = $this->previousCursor())) {
+            return null;
         }
+
+        return $this->url($previousCursor);
     }
 
     /**
-     * Create a range of pagination URLs.
+     * The URL for the next page, or null.
      *
-     * @param  int  $start
-     * @param  int  $end
-     * @return array
+     * @return string|null
      */
-    public function getUrlRange($start, $end)
+    public function nextPageUrl()
     {
-        return collect(range($start, $end))->mapWithKeys(function ($page) {
-            return [$page => $this->url($page)];
-        })->all();
+        if (is_null($nextCursor = $this->nextCursor())) {
+            return null;
+        }
+
+        return $this->url($nextCursor);
     }
 
     /**
-     * Get the URL for a given page number.
+     * Get the "cursor" of the previous set of items.
      *
-     * @param  int  $page
-     * @return string
+     * @return \Illuminate\Pagination\Cursor|null
      */
-    public function url($page)
+    public function previousCursor()
     {
-        if ($page <= 0) {
-            $page = 1;
+        if (is_null($this->cursor) ||
+            ($this->cursor->isPrev() && ! $this->hasMore) ) {
+            return null;
         }
 
-        // If we have any extra query string key / value pairs that need to be added
-        // onto the URL, we will put them in query string form and then attach it
-        // to the URL. This allows for extra information like sortings storage.
-        $parameters = [$this->pageName => $page];
+        return $this->getCursorForItem($this->items->first(), false);
+    }
 
-        if (count($this->query) > 0) {
-            $parameters = array_merge($this->query, $parameters);
+    /**
+     * Get the "cursor" of the next set of items.
+     *
+     * @return \Illuminate\Pagination\Cursor|null
+     */
+    public function nextCursor()
+    {
+        if ((is_null($this->cursor) && ! $this->hasMore) ||
+            (! is_null($this->cursor) && $this->cursor->isNext() && ! $this->hasMore) ) {
+            return null;
         }
 
-        return $this->path()
-                        .(Str::contains($this->path(), '?') ? '&' : '?')
-                        .Arr::query($parameters)
-                        .$this->buildFragment();
+        return $this->getCursorForItem($this->items->last(), true);
+    }
+
+    /**
+     * @param  \ArrayAccess  $item
+     * @param  bool  $isNext
+     * @return \Illuminate\Pagination\Cursor
+     */
+    public function getCursorForItem($item, $isNext = true)
+    {
+        return new Cursor($this->getParametersForItem($item), $isNext);
+    }
+
+    /**
+     * @param  \ArrayAccess  $item
+     */
+    public function getParametersForItem($item)
+    {
+        return collect($this->parameters)
+            ->flip()
+            ->map(function ($_, $parameterName) use ($item) {
+                return $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')];
+            })->toArray();
     }
 
     /**
@@ -244,8 +248,8 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function withQueryString()
     {
-        if (isset(static::$queryStringResolver)) {
-            return $this->appends(call_user_func(static::$queryStringResolver));
+        if (! is_null($query = Paginator::resolveQueryString())) {
+            return $this->appends($query);
         }
 
         return $this;
@@ -260,7 +264,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     protected function addQuery($key, $value)
     {
-        if ($key !== $this->pageName) {
+        if ($key !== $this->cursorName) {
             $this->query[$key] = $value;
         }
 
@@ -316,26 +320,6 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Get the number of the first item in the slice.
-     *
-     * @return int
-     */
-    public function firstItem()
-    {
-        return count($this->items) > 0 ? ($this->currentPage - 1) * $this->perPage + 1 : null;
-    }
-
-    /**
-     * Get the number of the last item in the slice.
-     *
-     * @return int
-     */
-    public function lastItem()
-    {
-        return count($this->items) > 0 ? $this->firstItem() + $this->count() - 1 : null;
-    }
-
-    /**
      * Transform each item in the slice of items using a callback.
      *
      * @param  callable  $callback
@@ -359,54 +343,34 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Determine if there are enough items to split into multiple pages.
+     * Get the current cursor being paginated.
      *
-     * @return bool
+     * @return \Illuminate\Pagination\Cursor|null
      */
-    public function hasPages()
+    public function cursor()
     {
-        return $this->currentPage() != 1 || $this->hasMorePages();
+        return $this->cursor;
     }
 
     /**
-     * Determine if the paginator is on the first page.
-     *
-     * @return bool
-     */
-    public function onFirstPage()
-    {
-        return $this->currentPage() <= 1;
-    }
-
-    /**
-     * Get the current page.
-     *
-     * @return int
-     */
-    public function currentPage()
-    {
-        return $this->currentPage;
-    }
-
-    /**
-     * Get the query string variable used to store the page.
+     * Get the query string variable used to store the cursor.
      *
      * @return string
      */
-    public function getPageName()
+    public function getCursorName()
     {
-        return $this->pageName;
+        return $this->cursorName;
     }
 
     /**
-     * Set the query string variable used to store the page.
+     * Set the query string variable used to store the cursor.
      *
      * @param  string  $name
      * @return $this
      */
-    public function setPageName($name)
+    public function setCursorName($name)
     {
-        $this->pageName = $name;
+        $this->cursorName = $name;
 
         return $this;
     }
@@ -436,19 +400,6 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Set the number of links to display on each side of current page link.
-     *
-     * @param  int  $count
-     * @return $this
-     */
-    public function onEachSide($count)
-    {
-        $this->onEachSide = $count;
-
-        return $this;
-    }
-
-    /**
      * Get the base path for paginator generated URLs.
      *
      * @return string|null
@@ -459,82 +410,29 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Resolve the query string or return the default value.
+     * Resolve the current cursor or return the default value.
      *
-     * @param  string|array|null  $default
-     * @return string
+     * @param  string  $cursorName
+     * @return \Illuminate\Pagination\Cursor|null
      */
-    public static function resolveQueryString($default = null)
+    public static function resolveCurrentCursor($cursorName = 'cursor', $default = null)
     {
-        if (isset(static::$queryStringResolver)) {
-            return call_user_func(static::$queryStringResolver);
+        if (isset(static::$currentCursorResolver)) {
+            return call_user_func(static::$currentCursorResolver, $cursorName);
         }
 
         return $default;
     }
 
     /**
-     * Resolve the current request path or return the default value.
-     *
-     * @param  string  $default
-     * @return string
-     */
-    public static function resolveCurrentPath($default = '/')
-    {
-        if (isset(static::$currentPathResolver)) {
-            return call_user_func(static::$currentPathResolver);
-        }
-
-        return $default;
-    }
-
-    /**
-     * Set the current request path resolver callback.
+     * Set the current cursor resolver callback.
      *
      * @param  \Closure  $resolver
      * @return void
      */
-    public static function currentPathResolver(Closure $resolver)
+    public static function currentCursorResolver(Closure $resolver)
     {
-        static::$currentPathResolver = $resolver;
-    }
-
-    /**
-     * Resolve the current page or return the default value.
-     *
-     * @param  string  $pageName
-     * @param  int  $default
-     * @return int
-     */
-    public static function resolveCurrentPage($pageName = 'page', $default = 1)
-    {
-        if (isset(static::$currentPageResolver)) {
-            return (int) call_user_func(static::$currentPageResolver, $pageName);
-        }
-
-        return $default;
-    }
-
-    /**
-     * Set the current page resolver callback.
-     *
-     * @param  \Closure  $resolver
-     * @return void
-     */
-    public static function currentPageResolver(Closure $resolver)
-    {
-        static::$currentPageResolver = $resolver;
-    }
-
-    /**
-     * Set with query string resolver callback.
-     *
-     * @param  \Closure  $resolver
-     * @return void
-     */
-    public static function queryStringResolver(Closure $resolver)
-    {
-        static::$queryStringResolver = $resolver;
+        static::$currentCursorResolver = $resolver;
     }
 
     /**
@@ -544,73 +442,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public static function viewFactory()
     {
-        return call_user_func(static::$viewFactoryResolver);
-    }
-
-    /**
-     * Set the view factory resolver callback.
-     *
-     * @param  \Closure  $resolver
-     * @return void
-     */
-    public static function viewFactoryResolver(Closure $resolver)
-    {
-        static::$viewFactoryResolver = $resolver;
-    }
-
-    /**
-     * Set the default pagination view.
-     *
-     * @param  string  $view
-     * @return void
-     */
-    public static function defaultView($view)
-    {
-        static::$defaultView = $view;
-    }
-
-    /**
-     * Set the default "simple" pagination view.
-     *
-     * @param  string  $view
-     * @return void
-     */
-    public static function defaultSimpleView($view)
-    {
-        static::$defaultSimpleView = $view;
-    }
-
-    /**
-     * Indicate that Tailwind styling should be used for generated links.
-     *
-     * @return void
-     */
-    public static function useTailwind()
-    {
-        static::defaultView('pagination::tailwind');
-        static::defaultSimpleView('pagination::simple-tailwind');
-    }
-
-    /**
-     * Indicate that Bootstrap 4 styling should be used for generated links.
-     *
-     * @return void
-     */
-    public static function useBootstrap()
-    {
-        static::defaultView('pagination::bootstrap-4');
-        static::defaultSimpleView('pagination::simple-bootstrap-4');
-    }
-
-    /**
-     * Indicate that Bootstrap 3 styling should be used for generated links.
-     *
-     * @return void
-     */
-    public static function useBootstrapThree()
-    {
-        static::defaultView('pagination::default');
-        static::defaultSimpleView('pagination::simple-default');
+        return Paginator::viewFactory();
     }
 
     /**

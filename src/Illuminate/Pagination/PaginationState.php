@@ -33,5 +33,11 @@ class PaginationState
         Paginator::queryStringResolver(function () use ($app) {
             return $app['request']->query();
         });
+
+        CursorPaginator::currentCursorResolver(function ($cursorName = 'cursor') use ($app) {
+            $encodedCursor = $app['request']->input($cursorName);
+
+            return Cursor::fromEncoded($encodedCursor);
+        });
     }
 }
