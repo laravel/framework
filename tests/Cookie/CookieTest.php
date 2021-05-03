@@ -204,6 +204,17 @@ class CookieTest extends TestCase
         );
     }
 
+    public function testFlushQueuedCookies(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieJar->queue($cookieJar->make('foo', 'bar', 0, '/path'));
+        $cookieJar->queue($cookieJar->make('foo', 'rab', 0, '/'));
+        $this->assertCount(2, $cookieJar->getQueuedCookies());
+
+        $cookieJar->flushQueuedCookies();
+        $this->assertEmpty($cookieJar->getQueuedCookies());
+    }
+
     public function getCreator()
     {
         return new CookieJar;
