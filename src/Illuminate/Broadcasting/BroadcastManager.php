@@ -212,8 +212,7 @@ class BroadcastManager implements FactoryContract
     {
         $pusher = new Pusher(
             $config['key'], $config['secret'],
-            $config['app_id'], $config['options'] ?? [],
-            $config['guzzle'] ?? null
+            $config['app_id'], $config['options'] ?? []
         );
 
         if ($config['log'] ?? false) {
