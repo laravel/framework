@@ -669,6 +669,10 @@ class Grammar extends BaseGrammar
             return $having['boolean'].' '.$having['sql'];
         } elseif ($having['type'] === 'between') {
             return $this->compileHavingBetween($having);
+        } elseif ($having['type'] === 'Null') {
+            return $this->compileHavingNull($having);
+        } elseif ($having['type'] === 'NotNull') {
+            return $this->compileHavingNotNull($having);
         }
 
         return $this->compileBasicHaving($having);
@@ -706,6 +710,32 @@ class Grammar extends BaseGrammar
         $max = $this->parameter(last($having['values']));
 
         return $having['boolean'].' '.$column.' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
+     * Compile a having null clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingNull($having)
+    {
+        $column = $this->wrap($having['column']);
+
+        return $having['boolean'].' '.$column.' is null';
+    }
+
+    /**
+     * Compile a having not null clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingNotNull($having)
+    {
+        $column = $this->wrap($having['column']);
+
+        return $having['boolean'].' '.$column.' is not null';
     }
 
     /**

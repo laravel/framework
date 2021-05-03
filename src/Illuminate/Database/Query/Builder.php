@@ -1899,6 +1899,59 @@ class Builder
     }
 
     /**
+     * Add a "having null" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function havingNull($columns, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'NotNull' : 'Null';
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->havings[] = compact('type', 'column', 'boolean');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or having null" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orHavingNull($column)
+    {
+        return $this->havingNull($column, 'or');
+    }
+
+    /**
+     * Add a "having not null" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function havingNotNull($columns, $boolean = 'and')
+    {
+        return $this->havingNull($columns, $boolean, true);
+    }
+
+    /**
+     * Add an "or having not null" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orHavingNotNull($column)
+    {
+        return $this->havingNotNull($column, 'or');
+    }
+
+    /**
      * Add a "having between " clause to the query.
      *
      * @param  string  $column
