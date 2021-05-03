@@ -468,6 +468,74 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanConditionallyAddHeadersSimpleTrue()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeadersIf(true, [
+            'X-Test-Header' => 'foo',
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders([
+                       'X-Test-Header' => 'foo',
+                   ]);
+        });
+    }
+
+    public function testCanConditionallyAddHeadersSimpleFalse()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeadersIf(false, [
+            'X-Test-Header' => 'foo',
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   ! $request->hasHeaders([
+                       'X-Test-Header' => 'foo',
+                   ]);
+        });
+    }
+
+    public function testCanConditionallyAddHeadersCallbackTrue()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeadersIf(function() {
+            return true;
+        }, [
+            'X-Test-Header' => 'foo',
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders([
+                       'X-Test-Header' => 'foo',
+                   ]);
+        });
+    }
+
+    public function testCanConditionallyAddHeadersCallbackFalse()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeadersIf(function() {
+            return true;
+        }, [
+            'X-Test-Header' => 'foo',
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders([
+                       'X-Test-Header' => 'foo',
+                   ]);
+        });
+    }
+
     public function testCanConfirmManyHeadersUsingAString()
     {
         $this->factory->fake();

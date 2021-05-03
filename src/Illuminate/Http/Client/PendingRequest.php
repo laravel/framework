@@ -305,6 +305,32 @@ class PendingRequest
     }
 
     /**
+     * Add the given headers to the request if the condition evauluates to true
+     *
+     * @param  mixed  $condition
+     * @param  array  $headers
+     * @return $this
+     */
+    public function withHeadersIf(mixed $condition, array $headers)
+    {
+        $status = false;
+
+        if (is_callable($condition)) {
+            $status = (bool) $condition();
+        } else {
+            $status = (bool) $condition;
+        }
+
+        if (! $status) {
+            return $this;
+        }
+
+        return tap($this, function () use ($headers) {
+            $this->withHeaders($headers);
+        });
+    }
+
+    /**
      * Specify the basic authentication username and password for the request.
      *
      * @param  string  $username
