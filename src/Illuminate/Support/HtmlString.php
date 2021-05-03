@@ -57,12 +57,11 @@ class HtmlString implements Htmlable
     /**
      * Checks if the given string is an HTML string.
      *
-     * @param  string  $html
      * @return bool
      */
-    public function isHtml($html)
+    public function isHtml()
     {
-        return Str::contains($html, '<html');
+        return Str::contains($this->html, '<html');
     }
 
     /**
