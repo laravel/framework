@@ -210,12 +210,15 @@ trait EnumeratesValues
 
         foreach ($this as $item) {
             $index = array_search($item, $values, $strict);
+
             if ($index === false) {
                 continue;
             }
+
             if (count($values) === 1) {
                 return true;
             }
+
             unset($values[$index]);
         }
 
