@@ -4,7 +4,7 @@ namespace Illuminate\Http\Client;
 
 use ArrayAccess;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 
@@ -97,7 +97,7 @@ class Response implements ArrayAccess
      */
     public function str()
     {
-        return Str::of($this->body());
+        return new Stringable($this->body());
     }
 
     /**
