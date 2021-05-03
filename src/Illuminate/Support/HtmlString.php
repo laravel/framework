@@ -61,7 +61,7 @@ class HtmlString implements Htmlable
      */
     public function isHtml()
     {
-        $html = tidy_parse_string($this->html);
+        $html = (new \tidy)->parseString($this->html);
 
         return $html->isHtml();
     }
