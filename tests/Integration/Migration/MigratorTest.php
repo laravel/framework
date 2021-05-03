@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Migration;
 
 use Illuminate\Support\Facades\DB;
+use LogicException;
 use Mockery;
 use Mockery\Mock;
 use Orchestra\Testbench\TestCase;
@@ -46,7 +47,7 @@ class MigratorTest extends TestCase
         $this->expectOutput('<comment>Migrating:</comment> 2016_10_04_000000_modify_people_table');
         $this->expectOutput(Mockery::pattern('#<info>Migrated:</info>  2016_10_04_000000_modify_people_table (.*)#'));
 
-        $this->subject->run([__DIR__.'/fixtures']);
+        $this->subject->run([__DIR__.'/migrations/valid']);
 
         self::assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         self::assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
@@ -67,7 +68,7 @@ class MigratorTest extends TestCase
         $this->expectOutput('<comment>Rolling back:</comment> 2014_10_12_000000_create_people_table');
         $this->expectOutput(Mockery::pattern('#<info>Rolled back:</info>  2014_10_12_000000_create_people_table (.*)#'));
 
-        $this->subject->rollback([__DIR__.'/fixtures']);
+        $this->subject->rollback([__DIR__.'/migrations/valid']);
 
         self::assertFalse(DB::getSchemaBuilder()->hasTable('people'));
     }
@@ -79,9 +80,30 @@ class MigratorTest extends TestCase
         $this->expectOutput('<info>ModifyPeopleTable:</info> alter table "people" add column "first_name" varchar');
         $this->expectOutput('<info>2016_10_04_000000_modify_people_table:</info> alter table "people" add column "last_name" varchar');
 
-        $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
+        $this->subject->run([__DIR__.'/migrations/valid'], ['pretend' => true]);
 
         self::assertFalse(DB::getSchemaBuilder()->hasTable('people'));
+    }
+
+    public function testCanNotMigrateUpWhenUpIsMissing()
+    {
+        $this->expectOutput('<comment>Migrating:</comment> 2021_05_04_000000_can_not_migrate');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The «up()» method is not implemented in the migration.');
+
+        $this->subject->run([__DIR__.'/migrations/invalid/can-not-migrate']);
+    }
+
+    public function testCanNotMigrateDownWhenDownIsMissing()
+    {
+        $this->expectOutput('<comment>Migrating:</comment> 2021_05_04_000000_can_not_rollback');
+        $this->expectOutput(Mockery::pattern('#<info>Migrated:</info>  2021_05_04_000000_can_not_rollback (.*)#'));
+        $this->expectOutput('<comment>Rolling back:</comment> 2021_05_04_000000_can_not_rollback');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The «down()» method is not implemented in the migration.');
+
+        $this->subject->run([__DIR__.'/migrations/invalid/can-not-rollback']);
+        $this->subject->rollback([__DIR__.'/migrations/invalid/can-not-rollback']);
     }
 
     private function expectOutput($argument): void

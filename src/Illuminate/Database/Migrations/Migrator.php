@@ -13,6 +13,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LogicException;
 use ReflectionClass;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -393,6 +394,9 @@ class Migrator
                 $migration->{$method}();
 
                 $this->fireMigrationEvent(new MigrationEnded($migration, $method));
+            } else {
+                $error = sprintf('The «%s()» method is not implemented in the migration.', $method);
+                throw new LogicException($error);
             }
         };
 
