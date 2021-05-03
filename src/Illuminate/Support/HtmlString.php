@@ -61,9 +61,7 @@ class HtmlString implements Htmlable
      */
     public function isHtml()
     {
-        $html = tidy_parse_string($this->html);
-
-        return $html->isHtml();
+        return Str::contains($this->html, '<html');
     }
 
     /**
