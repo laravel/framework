@@ -523,14 +523,14 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->withHeadersIf(function() {
-            return true;
+            return false;
         }, [
             'X-Test-Header' => 'foo',
         ])->post('http://foo.com/json');
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/json' &&
-                   $request->hasHeaders([
+                   ! $request->hasHeaders([
                        'X-Test-Header' => 'foo',
                    ]);
         });
