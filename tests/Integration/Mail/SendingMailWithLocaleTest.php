@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Testing\Assert;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -19,13 +18,6 @@ use Orchestra\Testbench\TestCase;
  */
 class SendingMailWithLocaleTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('app.debug', 'true');
