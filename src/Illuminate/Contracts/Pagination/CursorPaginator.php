@@ -7,7 +7,7 @@ interface CursorPaginator
     /**
      * Get the URL for a given cursor.
      *
-     * @param  string  $cursor
+     * @param  \Illuminate\Pagination\Cursor|null  $cursor
      * @return string
      */
     public function url($cursor);
@@ -15,7 +15,7 @@ interface CursorPaginator
     /**
      * Add a set of query string values to the paginator.
      *
-     * @param  array|string  $key
+     * @param  array|string|null  $key
      * @param  string|null  $value
      * @return $this
      */
@@ -25,7 +25,7 @@ interface CursorPaginator
      * Get / set the URL fragment to be appended to URLs.
      *
      * @param  string|null  $fragment
-     * @return $this|string
+     * @return $this|string|null
      */
     public function fragment($fragment = null);
 
