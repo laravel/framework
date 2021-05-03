@@ -20,7 +20,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('这是...', Str::words('这是 段中文', 1));
         $this->assertSame('这是___', Str::words('这是 段中文', 1, '___'));
         $this->assertSame('这是-段中文', Str::words('这是-段中文', 3, '___'));
-        $this->assertSame('这是___', Str::words('这是     段中文',1, '___'));
+        $this->assertSame('这是___', Str::words('这是     段中文', 1, '___'));
     }
 
     public function testStringTrimmedOnlyWhereNecessary()
