@@ -160,8 +160,8 @@ class Arr
      *
      * @param  iterable  $array
      * @param  callable|null  $callback
-     * @param  mixed  $default
-     * @return mixed
+     * @param  mixed|null  $default
+     * @return mixed|null
      */
     public static function first($array, callable $callback = null, $default = null)
     {
@@ -189,8 +189,8 @@ class Arr
      *
      * @param  array  $array
      * @param  callable|null  $callback
-     * @param  mixed  $default
-     * @return mixed
+     * @param  mixed|null  $default
+     * @return mixed|null
      */
     public static function last($array, callable $callback = null, $default = null)
     {
@@ -280,8 +280,8 @@ class Arr
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @param  mixed|null  $default
+     * @return mixed|null
      */
     public static function get($array, $key, $default = null)
     {
@@ -350,7 +350,7 @@ class Arr
      * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  string|array|null  $keys
      * @return bool
      */
     public static function hasAny($array, $keys)
@@ -462,7 +462,7 @@ class Arr
      *
      * @param  array  $array
      * @param  mixed  $value
-     * @param  mixed  $key
+     * @param  mixed|null  $key
      * @return array
      */
     public static function prepend($array, $value, $key = null)
@@ -481,8 +481,8 @@ class Arr
      *
      * @param  array  $array
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @param  mixed|null  $default
+     * @return mixed|null
      */
     public static function pull(&$array, $key, $default = null)
     {
@@ -617,7 +617,7 @@ class Arr
      *
      * @param  array  $array
      * @param  int  $options
-     * @param  bool  $descending
+     * @param  bool|false  $descending
      * @return array
      */
     public static function sortRecursive($array, $options = SORT_REGULAR, $descending = false)
@@ -667,7 +667,7 @@ class Arr
     /**
      * If the given value is not an array and not null, wrap it in one.
      *
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return array
      */
     public static function wrap($value)
