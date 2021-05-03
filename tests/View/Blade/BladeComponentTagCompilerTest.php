@@ -66,7 +66,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testDataSnakeCasing()
     {
-        $result = $this->compiler([ 'profile' => TestProfileSnakeCaseComponent::class ])->compileTags('<x-profile user-id="1"></x-profile>');
+        $result = $this->compiler(['profile' => TestProfileSnakeCaseComponent::class])->compileTags('<x-profile user-id="1"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileSnakeCaseComponent', 'profile', ['user_id' => '1'])
 <?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
@@ -349,15 +349,12 @@ class TestProfileComponent extends Component
 
 class TestProfileSnakeCaseComponent extends Component
 {
-
     public $user_id;
-
 
     public function __construct($user_id = 'foo')
     {
         $this->user_id = $user_id;
     }
-
 
     public function render()
     {

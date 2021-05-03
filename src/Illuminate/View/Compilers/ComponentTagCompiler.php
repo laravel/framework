@@ -367,16 +367,18 @@ class ComponentTagCompiler
                     ? collect($constructor->getParameters())->map->getName()->all()
                     : [];
 
-        return collect($attributes)->reduce(function($partitioned, $value, $key) use ($parameterNames) {
+        return collect($attributes)->reduce(function ($partitioned, $value, $key) use ($parameterNames) {
             // This allows us to match to $camelCase and $snake_case style properties
             foreach ([Str::camel($key), str_replace('-', '_', $key)] as $format) {
                 if (in_array($format, $parameterNames)) {
                     $partitioned[0][$format] = $value;
+
                     return $partitioned;
                 }
             }
 
             $partitioned[1][$key] = $value;
+
             return $partitioned;
         }, [collect(), collect()]);
     }
