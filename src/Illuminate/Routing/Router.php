@@ -795,6 +795,10 @@ class Router implements BindingRegistrar, RegistrarContract
             $response->setNotModified();
         }
 
+        if (! $response->headers->has('Permissions-Policy')) {
+            $response->headers->set('Permissions-Policy', 'interest-cohort=()');
+        }
+
         return $response->prepare($request);
     }
 
