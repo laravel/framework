@@ -4,6 +4,7 @@ namespace Illuminate\Http\Client;
 
 use ArrayAccess;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 
@@ -87,6 +88,16 @@ class Response implements ArrayAccess
     public function collect($key = null)
     {
         return Collection::make($this->json($key));
+    }
+    
+    /**
+     * Get the body of the response as a stringable object.
+     *
+     * @return \Illuminate\Support\Stringable
+     */
+    public function str()
+    {
+        return Str::of($this->body());
     }
 
     /**
