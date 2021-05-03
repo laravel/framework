@@ -28,9 +28,8 @@ class SupportHtmlStringTest extends TestCase
 
     public function testIsHtml()
     {
-        $this->assertTrue((new HtmlString('<html><head></head></html>'))->isHtml());
+        $this->assertTrue((new HtmlString('<html'))->isHtml());
         $this->assertFalse((new HtmlString('foo'))->isHtml());
-
     }
 
     public function testIsNotEmpty()
