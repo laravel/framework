@@ -182,9 +182,7 @@ abstract class Factory
      */
     public function raw($attributes = [], ?Model $parent = null)
     {
-        if ($this->count instanceof Closure) {
-            $this->count = call_user_func($this->count, $parent);
-        }
+        $this->count = value($this->count, $parent);
 
         if ($this->count === null) {
             return $this->state($attributes)->getExpandedAttributes($parent);
@@ -321,9 +319,7 @@ abstract class Factory
             return $this->state($attributes)->make([], $parent);
         }
 
-        if ($this->count instanceof Closure) {
-            $this->count = call_user_func($this->count, $parent);
-        }
+        $this->count = value($this->count, $parent);
 
         if ($this->count === null) {
             return tap($this->makeInstance($parent), function ($instance) {
