@@ -315,7 +315,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * @param  \ArrayAccess|array  $items
      * @return static
      */
-    public function merge($items)
+    public function merge($items, $appendToTop = false)
     {
         $dictionary = $this->getDictionary();
 

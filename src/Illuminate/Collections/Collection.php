@@ -700,11 +700,25 @@ class Collection implements ArrayAccess, Enumerable
      * Merge the collection with the given items.
      *
      * @param  mixed  $items
+     * @param  bool   $appendToTop
      * @return static
      */
-    public function merge($items)
+    public function merge($items, $appendToTop = false)
     {
-        return new static(array_merge($this->items, $this->getArrayableItems($items)));
+        return $appendToTop
+            ? new static(array_merge($this->getArrayableItems($items), $this->items))
+            : new static(array_merge($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
+     * Merge the collection, but append the given items at the top.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function mergeToTop($items)
+    {
+        return $this->merge($items, $appendToTop = true);
     }
 
     /**

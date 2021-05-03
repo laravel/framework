@@ -1034,10 +1034,64 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMergeArrayWithoutKeys($collection)
+    {
+        $collection = new $collection(['Apple', 'Banana']);
+        $this->assertEquals(['Apple', 'Banana', 'Pineapple'], $collection->merge(['Pineapple'])->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testMergeCollection($collection)
     {
         $c = new $collection(['name' => 'Hello']);
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new $collection(['name' => 'World', 'id' => 1]))->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMergeCollectionWithoutKeys($collection)
+    {
+        $collection = new $collection(['Banana', 'Apple']);
+        $this->assertEquals(['Banana', 'Apple', 'Pineapple'], $collection->merge(new $collection(['Pineapple']))->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMergeArrayAppendToTop($collection)
+    {
+        $collection = new $collection(['Apple', 'Banana']);
+        $this->assertEquals(['Pineapple', 'Apple', 'Banana'], $collection->merge(['Pineapple'], $appendToTop = true)->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMergeCollectionAppendToTop($collection)
+    {
+        $collection = new $collection(['Banana', 'Apple']);
+        $this->assertEquals(['Pineapple', 'Banana', 'Apple'], $collection->merge(new $collection(['Pineapple']), $appendToTop = true)->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMergeArrayAppendToTopAsMethod($collection)
+    {
+        $collection = new $collection(['Apple', 'Banana']);
+        $this->assertEquals(['Pineapple', 'Apple', 'Banana'], $collection->mergeToTop(['Pineapple'])->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMergeCollectionAppendToTopAsMethod($collection)
+    {
+        $collection = new $collection(['Banana', 'Apple']);
+        $this->assertEquals(['Pineapple', 'Banana', 'Apple'], $collection->mergeToTop(new $collection(['Pineapple']))->all());
     }
 
     /**

@@ -699,6 +699,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Merge the collection, but append the given items at the top.
+     *
+     * @param  mixed $items
+     * @return static
+     */
+    public function mergeToTop($items)
+    {
+        return $this->passthru('mergeToTop', func_get_args());
+    }
+
+    /**
      * Recursively merge the collection with the given items.
      *
      * @param  mixed  $items
