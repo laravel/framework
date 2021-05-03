@@ -143,6 +143,33 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(0, FactoryTestUser::all());
     }
 
+    public function test_make_multiple_model_instances()
+    {
+        $users = FactoryTestUserFactory::new()->count(10)->make(['name' => 'Taylor Otwell']);
+
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(10, $users);
+        $users->each(function ($user) {
+            $this->assertInstanceOf(Eloquent::class, $user);
+            $this->assertSame('Taylor Otwell', $user->name);
+        });
+    }
+
+    public function test_make_multiple_model_instances_with_closure()
+    {
+        $users = FactoryTestUserFactory::new()->count(function () {
+            return rand(5, 10);
+        })->make(['name' => 'Taylor Otwell']);
+
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertGreaterThanOrEqual(5, count($users));
+        $this->assertLessThanOrEqual(10, count($users));
+        $users->each(function ($user) {
+            $this->assertInstanceOf(Eloquent::class, $user);
+            $this->assertSame('Taylor Otwell', $user->name);
+        });
+    }
+
     public function test_basic_model_attributes_can_be_created()
     {
         $user = FactoryTestUserFactory::new()->raw();
@@ -184,6 +211,18 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertIsArray($posts);
 
         $this->assertCount(10, $posts);
+    }
+
+    public function test_multiple_model_attributes_can_be_created_using_closure()
+    {
+        $posts = FactoryTestPostFactory::new()->times(function () {
+            return rand(5, 10);
+        })->raw();
+
+        $this->assertIsArray($posts);
+
+        $this->assertGreaterThanOrEqual(5, count($posts));
+        $this->assertLessThanOrEqual(10, count($posts));
     }
 
     public function test_after_creating_and_making_callbacks_are_called()
@@ -375,6 +414,31 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-role']);
 
         unset($_SERVER['__test.role.creating-role']);
+    }
+
+    public function test_relationship_with_variable_count()
+    {
+        $closureExecuted = 0;
+        $users = FactoryTestUserFactory::times(10)
+                        ->has(
+                            FactoryTestPostFactory::times(function ($parent) use (&$closureExecuted) {
+                                $closureExecuted++;
+                                $this->assertInstanceOf(FactoryTestUser::class, $parent);
+
+                                return rand(5, 10);
+                            }),
+                            'posts'
+                        )
+                        ->create();
+
+        $this->assertEquals(10, $closureExecuted);
+        $this->assertCount(10, FactoryTestUser::all());
+        $users->each(function ($user) {
+            $this->assertGreaterThanOrEqual(5, count($user->posts));
+            $this->assertLessThanOrEqual(10, count($user->posts));
+        });
+        $this->assertGreaterThanOrEqual(5, count(FactoryTestUser::latest()->first()->posts));
+        $this->assertLessThanOrEqual(10, count(FactoryTestUser::latest()->first()->posts));
     }
 
     public function test_sequences()

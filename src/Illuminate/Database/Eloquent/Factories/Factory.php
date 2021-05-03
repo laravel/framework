@@ -30,7 +30,7 @@ abstract class Factory
     /**
      * The number of models that should be generated.
      *
-     * @var int|null
+     * @var Closure|int|null
      */
     protected $count;
 
@@ -107,7 +107,7 @@ abstract class Factory
     /**
      * Create a new factory instance.
      *
-     * @param  int|null  $count
+     * @param  Closure|int|null  $count
      * @param  \Illuminate\Support\Collection|null  $states
      * @param  \Illuminate\Support\Collection|null  $has
      * @param  \Illuminate\Support\Collection|null  $for
@@ -155,10 +155,10 @@ abstract class Factory
     /**
      * Get a new factory instance for the given number of models.
      *
-     * @param  int  $count
+     * @param  Closure|int  $count
      * @return static
      */
-    public static function times(int $count)
+    public static function times($count)
     {
         return static::new()->count($count);
     }
@@ -182,6 +182,10 @@ abstract class Factory
      */
     public function raw($attributes = [], ?Model $parent = null)
     {
+        if ($this->count instanceof Closure) {
+            $this->count = call_user_func($this->count, $parent);
+        }
+
         if ($this->count === null) {
             return $this->state($attributes)->getExpandedAttributes($parent);
         }
@@ -315,6 +319,10 @@ abstract class Factory
     {
         if (! empty($attributes)) {
             return $this->state($attributes)->make([], $parent);
+        }
+
+        if ($this->count instanceof Closure) {
+            $this->count = call_user_func($this->count, $parent);
         }
 
         if ($this->count === null) {
@@ -577,10 +585,10 @@ abstract class Factory
     /**
      * Specify how many models should be generated.
      *
-     * @param  int|null  $count
+     * @param  Closure|int|null  $count
      * @return static
      */
-    public function count(?int $count)
+    public function count($count = null)
     {
         return $this->newInstance(['count' => $count]);
     }
