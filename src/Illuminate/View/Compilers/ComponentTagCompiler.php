@@ -212,10 +212,6 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
-        $data = $data->mapWithKeys(function ($value, $key) {
-            return [Str::camel($key) => $value];
-        });
-
         // If the component doesn't exists as a class we'll assume it's a class-less
         // component and pass the component as a view parameter to the data so it
         // can be accessed within the component and we can render out the view.
@@ -360,7 +356,7 @@ class ComponentTagCompiler
     {
         // If the class doesn't exists, we'll assume it's a class-less component and
         // return all of the attributes as both data and attributes since we have
-        // now way to partition them. The user can exclude attributes manually.
+        // no way to partition them. The user can exclude attributes manually.
         if (! class_exists($class)) {
             return [collect($attributes), collect($attributes)];
         }
@@ -371,9 +367,18 @@ class ComponentTagCompiler
                     ? collect($constructor->getParameters())->map->getName()->all()
                     : [];
 
-        return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
-            return in_array(Str::camel($key), $parameterNames);
-        })->all();
+        return collect($attributes)->reduce(function($partitioned, $value, $key) use ($parameterNames) {
+            // This allows us to match to $camelCase and $snake_case style properties
+            foreach ([Str::camel($key), str_replace('-', '_', $key)] as $format) {
+                if (in_array($format, $parameterNames)) {
+                    $partitioned[0][$format] = $value;
+                    return $partitioned;
+                }
+            }
+
+            $partitioned[1][$key] = $value;
+            return $partitioned;
+        }, [collect(), collect()]);
     }
 
     /**
