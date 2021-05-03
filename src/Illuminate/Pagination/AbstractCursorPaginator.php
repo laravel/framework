@@ -4,12 +4,12 @@ namespace Illuminate\Pagination;
 
 use ArrayAccess;
 use Closure;
+use Exception;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
-use stdClass;
 
 /**
  * @mixin \Illuminate\Support\Collection
@@ -191,11 +191,11 @@ abstract class AbstractCursorPaginator implements Htmlable
             ->map(function ($_, $parameterName) use ($item) {
                 if ($item instanceof ArrayAccess || is_array($item)) {
                     return $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')];
-                } elseif ($item instanceof stdClass) {
+                } elseif (is_object($item)) {
                     return $item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')};
                 }
 
-                throw new \Exception('A cursor paginator item must either implement ArrayAccess or be an stdClass instance');
+                throw new Exception('Only arrays and objects are supported for pagination items');
             })->toArray();
     }
 

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Pagination\CursorPaginationException;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
@@ -2386,10 +2387,12 @@ class Builder
 
         $parameters = $orders->pluck('column')->toArray();
 
-        if (count($parameters) === 1 && ! is_null($cursor)) {
-            $this->where($column = $parameters[0], $comparisonOperator, $cursor->getParam($column));
-        } elseif (count($parameters) > 1 && ! is_null($cursor)) {
-            $this->whereRowValues($parameters, $comparisonOperator, $cursor->getParams($parameters));
+        if (! is_null($cursor)) {
+            if (count($parameters) === 1) {
+                $this->where($column = $parameters[0], $comparisonOperator, $cursor->getParam($column));
+            } elseif (count($parameters) > 1) {
+                $this->whereRowValues($parameters, $comparisonOperator, $cursor->getParams($parameters));
+            }
         }
 
         $this->limit($perPage + 1);
@@ -2415,7 +2418,7 @@ class Builder
         $orderDirections = collect($this->orders)->pluck('direction')->unique();
 
         if ($orderDirections->count() > 1) {
-            throw new Exception('Only a single order by direction is supported in cursor pagination.');
+            throw new CursorPaginationException('Only a single order by direction is supported in cursor pagination.');
         }
 
         if ($shouldReverse) {

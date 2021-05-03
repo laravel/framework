@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
+use Illuminate\Pagination\CursorPaginationException;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
@@ -837,10 +838,12 @@ class Builder
 
         $parameters = $orders->pluck('column')->toArray();
 
-        if (count($parameters) === 1 && ! is_null($cursor)) {
-            $this->where($column = $parameters[0], $comparisonOperator, $cursor->getParam($column));
-        } elseif (count($parameters) > 1 && ! is_null($cursor)) {
-            $this->whereRowValues($parameters, $comparisonOperator, $cursor->getParams($parameters));
+        if (! is_null($cursor)) {
+            if (count($parameters) === 1) {
+                $this->where($column = $parameters[0], $comparisonOperator, $cursor->getParam($column));
+            } elseif (count($parameters) > 1) {
+                $this->whereRowValues($parameters, $comparisonOperator, $cursor->getParams($parameters));
+            }
         }
 
         $this->take($perPage + 1);
@@ -864,7 +867,7 @@ class Builder
         $orderDirections = collect($this->query->orders)->pluck('direction')->unique();
 
         if ($orderDirections->count() > 1) {
-            throw new Exception('Only a single order by direction is supported in cursor pagination.');
+            throw new CursorPaginationException('Only a single order by direction is supported in cursor pagination.');
         }
 
         if ($orderDirections->count() === 0) {

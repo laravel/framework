@@ -467,7 +467,7 @@ abstract class AbstractPaginator implements Htmlable
     public static function resolveQueryString($default = null)
     {
         if (isset(static::$queryStringResolver)) {
-            return call_user_func(static::$queryStringResolver);
+            return (static::$queryStringResolver)();
         }
 
         return $default;
