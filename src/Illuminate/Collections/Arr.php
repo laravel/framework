@@ -379,6 +379,19 @@ class Arr
     }
 
     /**
+     * Initializes a variable as an array and returns it.
+     *
+     * @param  array|null  $array
+     * @param  array  $default
+     *
+     * @return array
+     */
+    public static function init(?array &$array, array $default = []): array
+    {
+        return $array = ($array ?? $default);
+    }
+
+    /**
      * Determines if an array is associative.
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.

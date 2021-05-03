@@ -415,6 +415,15 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::hasAny($array, ['foo.bax', 'foo.baz']));
     }
 
+    public function testInit()
+    {
+        $this->assertIsArray(Arr::init($a));
+        $this->assertIsArray(Arr::init($a['b'], ['c' => 'd']));
+        $this->assertArrayHasKey('b', $a);
+        $this->assertArrayHasKey('c', $a);
+        $this->assertEquals('d', $a['c']);
+    }
+
     public function testIsAssoc()
     {
         $this->assertTrue(Arr::isAssoc(['a' => 'a', 0 => 'b']));
