@@ -34,7 +34,7 @@
         }
     },
     "suggest": {
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0|^5.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0|^5.0|^6.0)."
     },
     "config": {
         "sort-packages": true
