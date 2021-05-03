@@ -144,7 +144,7 @@
         "phpunit/phpunit": "Required to use assertions and run tests (^8.5.8|^9.3.3).",
         "predis/predis": "Required to use the predis connector (^1.1.2).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0|^5.0).",
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0|^5.0|^6.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^5.1.4).",
         "symfony/filesystem": "Required to enable support for relative symbolic links (^5.1.4).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
