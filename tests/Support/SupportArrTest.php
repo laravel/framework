@@ -420,8 +420,8 @@ class SupportArrTest extends TestCase
         $this->assertIsArray(Arr::init($a));
         $this->assertIsArray(Arr::init($a['b'], ['c' => 'd']));
         $this->assertArrayHasKey('b', $a);
-        $this->assertArrayHasKey('c', $a);
-        $this->assertEquals('d', $a['c']);
+        $this->assertArrayHasKey('c', $a['b']);
+        $this->assertEquals('d', $a['b']['c']);
     }
 
     public function testIsAssoc()
