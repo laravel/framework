@@ -1285,6 +1285,76 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
+    public function testHavingNull()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->havingNull('email');
+        $this->assertSame('select * from "users" having "email" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->havingNull('email')
+            ->havingNull('phone');
+        $this->assertSame('select * from "users" having "email" is null and "phone" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->orHavingNull('email')
+            ->orHavingNull('phone');
+        $this->assertSame('select * from "users" having "email" is null or "phone" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupBy('email')->havingNull('email');
+        $this->assertSame('select * from "users" group by "email" having "email" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('email as foo_email')->from('users')->havingNull('foo_email');
+        $this->assertSame('select "email" as "foo_email" from "users" having "foo_email" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNull('total');
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNull('total');
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is null', $builder->toSql());
+    }
+
+    public function testHavingNotNull()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->havingNotNull('email');
+        $this->assertSame('select * from "users" having "email" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->havingNotNull('email')
+            ->havingNotNull('phone');
+        $this->assertSame('select * from "users" having "email" is not null and "phone" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->orHavingNotNull('email')
+            ->orHavingNotNull('phone');
+        $this->assertSame('select * from "users" having "email" is not null or "phone" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupBy('email')->havingNotNull('email');
+        $this->assertSame('select * from "users" group by "email" having "email" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('email as foo_email')->from('users')->havingNotNull('foo_email');
+        $this->assertSame('select "email" as "foo_email" from "users" having "foo_email" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
+    }
+
     public function testHavingShortcut()
     {
         $builder = $this->getBuilder();
