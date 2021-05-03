@@ -3,18 +3,12 @@
 namespace Illuminate\Tests\Cookie;
 
 use Illuminate\Cookie\CookieJar;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class CookieTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCookiesAreCreatedWithProperOptions()
     {
         $cookie = $this->getCreator();
