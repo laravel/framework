@@ -27,7 +27,7 @@ trait CanBeOneOfMany
      * @var array
      */
     protected $forwardToOneOfManyQuery = [
-        'get', 'exists', 'count',
+        'get', 'exists', 'count', 'sum', 'avg', 'first', 'join', 'crossJoin'
     ];
 
     /**
