@@ -49,7 +49,7 @@ trait CanBeOneOfMany
         $this->isOneOfMany = true;
 
         $this->setOneOfManyQuery();
-        
+
         if (! $this->relationName = $relation) {
             $this->relationName = $this->guessRelationship();
         }
