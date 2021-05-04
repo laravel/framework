@@ -54,6 +54,27 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->schema()->drop('logins');
     }
 
+    public function testItGetsCorrectResults()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $previousLogin = $user->logins()->create();
+        $latestLogin = $user->logins()->create();
+
+        $result = $user->latest_login()->getResults();
+        $this->assertNotNull($result);
+        $this->assertSame($latestLogin->id, $result->id);
+    }
+
+    public function testItGetsWithConstraintsCorrectResults()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $previousLogin = $user->logins()->create();
+        $user->logins()->create();
+
+        $result = $user->latest_login()->whereKey($previousLogin->getKey())->getResults();
+        $this->assertNull($result);
+    }
+
     public function testItEagerLoadsCorrectModels()
     {
         $user = HasOneOfManyTestUser::create();
