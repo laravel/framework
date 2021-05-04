@@ -54,6 +54,24 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->schema()->drop('logins');
     }
 
+    public function testItGuessesRelationName()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $this->assertSame('latest_login', $user->latest_login()->getRelationName());
+    }
+
+    public function testRelationNameCanBeSet()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $this->assertSame('foo', $user->latest_login_with_other_name()->getRelationName());
+    }
+
+    public function testQualifyingSubSelectColumn()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $this->assertSame('latest_login.id', $user->latest_login()->qualifySubSelectColumn('id'));
+    }
+
     public function testItGetsCorrectResults()
     {
         $user = HasOneOfManyTestUser::create();
@@ -208,6 +226,13 @@ class HasOneOfManyTestUser extends Eloquent
     public function latest_login()
     {
         return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany()->orderByDesc('id');
+    }
+
+    public function latest_login_with_other_name()
+    {
+        return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')
+            ->ofMany('foo')
+            ->orderByDesc('id');
     }
 }
 

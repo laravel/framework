@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait CanBeOneOfMany
 {
@@ -21,6 +22,13 @@ trait CanBeOneOfMany
     protected $oneOfManyQuery;
 
     /**
+     * The name of the relationship.
+     *
+     * @var string
+     */
+    protected $relationName;
+
+    /**
      * The methods that should be forwarded to the one-of-many query builder
      * instance.
      *
@@ -33,18 +41,42 @@ trait CanBeOneOfMany
     /**
      * Wether the relation is a partial of a one-to-many relationship.
      *
-     * @param  bool $ofMany
+     * @param  string|null $ofMany
      * @return $this
      */
-    public function ofMany(bool $ofMany = true)
+    public function ofMany($relation = null)
     {
         $this->isOneOfMany = true;
 
-        if ($ofMany) {
-            $this->setOneOfManyQuery();
+        $this->setOneOfManyQuery();
+        
+        if (! $this->relationName = $relation) {
+            $this->relationName = $this->guessRelationship();
         }
 
         return $this;
+    }
+
+    /**
+     * Guess the "hasOne" relationship name.
+     *
+     * @return string
+     */
+    protected function guessRelationship()
+    {
+        [$one, $two, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+
+        return $caller['function'];
+    }
+
+    /**
+     * Get the name of the relationship.
+     *
+     * @return string
+     */
+    public function getRelationName()
+    {
+        return $this->relationName;
     }
 
     /**
@@ -58,7 +90,7 @@ trait CanBeOneOfMany
             return;
         }
 
-        $this->oneOfManyQuery = $this->getOneOfManyQueryFor($this->query);
+        $this->oneOfManyQuery = $this->newOneOfManyQuery();
     }
 
     /**
@@ -76,9 +108,9 @@ trait CanBeOneOfMany
      *
      * @return string
      */
-    protected function getSubSelectAlias()
+    public function getSubSelectAlias()
     {
-        return $this->getRelatedTableName()."_{$this->localKey}_".spl_object_id($this);
+        return $this->getRelationName()."_{$this->localKey}";
     }
 
     /**
@@ -111,18 +143,18 @@ trait CanBeOneOfMany
      *
      * @return string
      */
-    protected function getSubSelectTableAlias()
+    public function getSubSelectTableAlias()
     {
-        return $this->getRelatedTableName().'_'.spl_object_id($this);
+        return $this->getRelationName();
     }
 
     /**
-     * Get the qualified subselect column name.
+     * Get the qualified column name for the one-of-many subselect.
      *
      * @param  string $column
      * @return string
      */
-    protected function qualifySubSelectColumn($column)
+    public function qualifySubSelectColumn($column)
     {
         $segments = explode('.', $column);
 
@@ -142,12 +174,11 @@ trait CanBeOneOfMany
     /**
      * Get the result query builder instance for the given query builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function getOneOfManyQueryFor(Builder $query)
+    protected function newOneOfManyQuery()
     {
-        return $query->clone();
+        return $this->query->getModel()->newQuery();
     }
 
     /**
