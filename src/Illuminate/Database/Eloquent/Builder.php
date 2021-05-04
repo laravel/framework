@@ -822,7 +822,7 @@ class Builder
      * @param  string  $cursorName
      * @param  string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\Paginator
-     * @throws \Exception
+     * @throws \Illuminate\Pagination\CursorPaginationException
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
@@ -860,7 +860,7 @@ class Builder
      *
      * @param  bool  $shouldReverse
      * @return \Illuminate\Support\Collection
-     * @throws \Exception
+     * @throws \Illuminate\Pagination\CursorPaginationException
      */
     protected function ensureOrderForCursorPagination($shouldReverse = false)
     {
