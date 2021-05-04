@@ -180,7 +180,9 @@ abstract class HasOneOrMany extends Relation
         $foreign = $this->getForeignKeyName();
 
         return $results->mapToDictionary(function ($result) use ($foreign) {
-            return [$this->getDictionaryKey($result->{$foreign}) => $result];
+            $key = data_get($result, str_replace('->', '.', $foreign));
+
+            return [$this->getDictionaryKey($key) => $result];
         })->all();
     }
 
