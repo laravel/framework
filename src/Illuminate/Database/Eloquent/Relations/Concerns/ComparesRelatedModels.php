@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
+use Illuminate\Contracts\Database\Eloquent\PartialRelation;
 use Illuminate\Database\Eloquent\Model;
 
 trait ComparesRelatedModels
@@ -17,7 +18,8 @@ trait ComparesRelatedModels
         return ! is_null($model) &&
                $this->compareKeys($this->getParentKey(), $this->getRelatedKeyFrom($model)) &&
                $this->related->getTable() === $model->getTable() &&
-               $this->related->getConnectionName() === $model->getConnectionName();
+               $this->related->getConnectionName() === $model->getConnectionName() &&
+               $this->compareOneOfMany($model);
     }
 
     /**
@@ -64,5 +66,26 @@ trait ComparesRelatedModels
         }
 
         return $parentKey === $relatedKey;
+    }
+
+    /**
+     * Determine if the given model is the correct relationship model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
+     * @return bool
+     */
+    protected function compareOneOfMany($model)
+    {
+        if (! $this instanceof PartialRelation) {
+            return true;
+        }
+
+        if(! $this->isOneOfMany()) {
+            return true;
+        }
+
+        return $this->resolveOneOfManyQuery()
+            ->whereKey($model->getKey())
+            ->exists();
     }
 }

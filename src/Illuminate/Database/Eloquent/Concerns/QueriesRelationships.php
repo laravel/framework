@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
+use Illuminate\Contracts\Database\Eloquent\PartialRelation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -411,7 +412,7 @@ trait QueriesRelationships
             $query->orders = null;
             $query->setBindings([], 'order');
 
-            if (count($query->columns) > 1) {
+            if (count($query->columns) > 1 && !$this->isOneOfMany($relation)) {
                 $query->columns = [$query->columns[0]];
                 $query->bindings['select'] = [];
             }
@@ -430,6 +431,18 @@ trait QueriesRelationships
         }
 
         return $this;
+    }
+
+    /**
+     * Determines whether the given relation is one-of-many.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
+     * @return boolean
+     */
+    protected function isOneOfMany($relation)
+    {
+        return $relation instanceof PartialRelation
+            && $relation->isOneOfMany();
     }
 
     /**
@@ -503,7 +516,9 @@ trait QueriesRelationships
      */
     protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
     {
-        $hasQuery->mergeConstraintsFrom($relation->getQuery());
+        if(!$this->isOneOfMany($relation)) {
+            $hasQuery->mergeConstraintsFrom($relation->getQuery());
+        }
 
         return $this->canUseExistsForExistenceCheck($operator, $count)
                 ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $operator === '<' && $count === 1)
