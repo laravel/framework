@@ -1547,10 +1547,6 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'required_unless');
 
-        if (! Arr::has($this->data, $parameters[0])) {
-            return true;
-        }
-
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         if (! in_array($other, $values, is_bool($other) || is_null($other))) {

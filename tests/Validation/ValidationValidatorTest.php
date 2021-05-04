@@ -1198,12 +1198,24 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,false']);
-        $this->assertTrue($v->passes());
+        $v = new Validator($trans, [], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->fails());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,true']);
         $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => '1'], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,false']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['foo' => 'required_unless:bar,null']);
+        $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => true], ['bar' => 'required_unless:foo,null']);
