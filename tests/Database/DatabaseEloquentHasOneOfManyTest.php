@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group one-of-many
@@ -66,7 +66,6 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($latestLogin->id, $user->latest_login->id);
     }
 
-    
     public function testHasNested()
     {
         $user = HasOneOfManyTestUser::create();

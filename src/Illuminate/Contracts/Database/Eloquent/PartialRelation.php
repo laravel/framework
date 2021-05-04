@@ -7,7 +7,7 @@ interface PartialRelation
     /**
      * Wether the relation is a partial of a one-to-many relationship.
      *
-     * @param  boolean $ofMany
+     * @param  bool $ofMany
      * @return $this
      */
     public function ofMany(bool $ofMany = true);
@@ -15,7 +15,7 @@ interface PartialRelation
     /**
      * Determines wether the relationship is one-of-many.
      *
-     * @return boolean
+     * @return bool
      */
     public function isOneOfMany();
 

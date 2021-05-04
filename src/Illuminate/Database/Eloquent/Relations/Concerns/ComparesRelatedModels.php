@@ -80,7 +80,7 @@ trait ComparesRelatedModels
             return true;
         }
 
-        if(! $this->isOneOfMany()) {
+        if (! $this->isOneOfMany()) {
             return true;
         }
 

@@ -89,7 +89,7 @@ class HasOne extends HasOneOrMany implements PartialRelation
      */
     public function addEagerConstraints(array $models)
     {
-        if(! $this->isOneOfMany()) {
+        if (! $this->isOneOfMany()) {
             return parent::addEagerConstraints($models);
         }
 
@@ -112,7 +112,7 @@ class HasOne extends HasOneOrMany implements PartialRelation
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        if(! $this->isOneOfMany()) {
+        if (! $this->isOneOfMany()) {
             return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
         }
 

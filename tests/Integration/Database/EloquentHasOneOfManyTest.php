@@ -2,11 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentHasOneOfManyTest;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -45,7 +42,7 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
                 }
             }
         });
-        
+
         $user = User::create();
         $user->latest_login()->create();
         $user->latest_login()->create();

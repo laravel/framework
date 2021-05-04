@@ -412,7 +412,7 @@ trait QueriesRelationships
             $query->orders = null;
             $query->setBindings([], 'order');
 
-            if (count($query->columns) > 1 && !$this->isOneOfMany($relation)) {
+            if (count($query->columns) > 1 && ! $this->isOneOfMany($relation)) {
                 $query->columns = [$query->columns[0]];
                 $query->bindings['select'] = [];
             }
@@ -437,7 +437,7 @@ trait QueriesRelationships
      * Determines whether the given relation is one-of-many.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
-     * @return boolean
+     * @return bool
      */
     protected function isOneOfMany($relation)
     {
@@ -516,7 +516,7 @@ trait QueriesRelationships
      */
     protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
     {
-        if(!$this->isOneOfMany($relation)) {
+        if (! $this->isOneOfMany($relation)) {
             $hasQuery->mergeConstraintsFrom($relation->getQuery());
         }
 
