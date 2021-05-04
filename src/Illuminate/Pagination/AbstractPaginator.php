@@ -459,21 +459,6 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Resolve the query string or return the default value.
-     *
-     * @param  string|array|null  $default
-     * @return string
-     */
-    public static function resolveQueryString($default = null)
-    {
-        if (isset(static::$queryStringResolver)) {
-            return (static::$queryStringResolver)();
-        }
-
-        return $default;
-    }
-
-    /**
      * Resolve the current request path or return the default value.
      *
      * @param  string  $default
@@ -524,6 +509,21 @@ abstract class AbstractPaginator implements Htmlable
     public static function currentPageResolver(Closure $resolver)
     {
         static::$currentPageResolver = $resolver;
+    }
+
+    /**
+     * Resolve the query string or return the default value.
+     *
+     * @param  string|array|null  $default
+     * @return string
+     */
+    public static function resolveQueryString($default = null)
+    {
+        if (isset(static::$queryStringResolver)) {
+            return (static::$queryStringResolver)();
+        }
+
+        return $default;
     }
 
     /**
