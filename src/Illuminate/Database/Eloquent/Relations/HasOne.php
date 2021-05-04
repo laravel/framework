@@ -25,7 +25,7 @@ class HasOne extends HasOneOrMany implements PartialRelation
             return $this->getDefaultFor($this->parent);
         }
 
-        if($this->isOneOfMany()) {
+        if ($this->isOneOfMany()) {
             $result = $this->resolveOneOfManyQuery()->first();
         } else {
             $result = $this->query->first();
