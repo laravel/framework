@@ -18,12 +18,7 @@ class TestDatabasesTest extends TestCase
         Container::setInstance($container = new Container);
 
         $container->singleton('config', function () {
-            return m::mock(Config::class)
-                ->shouldReceive('get')
-                ->once()
-                ->with('database.default', null)
-                ->andReturn('mysql')
-                ->getMock();
+            return m::mock(Config::class);
         });
 
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
@@ -31,18 +26,44 @@ class TestDatabasesTest extends TestCase
 
     public function testSwitchToDatabaseWithoutUrl()
     {
-        DB::shouldReceive('purge')->once();
+        DB::shouldReceive('purge')->once()->with('mysql');
 
         config()->shouldReceive('get')
-            ->once()
-            ->with('database.connections.mysql.url', false)
-            ->andReturn(false);
+                ->once()
+                ->with('database.connections.mysql.url', false)
+                ->andReturn(false);
 
         config()->shouldReceive('set')
-            ->once()
-            ->with('database.connections.mysql.database', 'my_database_test_1');
+                ->once()
+                ->with('database.connections.mysql.database', 'my_database_test_1');
 
-        $this->switchToDatabase('my_database_test_1');
+        $this->switchToDatabase(['mysql'], 'my_database_test_1');
+    }
+
+    public function testSwitchToDatabaseWithMultipleConnections()
+    {
+        DB::shouldReceive('purge')->once()->with('connection_1');
+        DB::shouldReceive('purge')->once()->with('connection_2');
+
+        config()->shouldReceive('get')
+                ->once()
+                ->with('database.connections.connection_1.url', false)
+                ->andReturn(false);
+
+        config()->shouldReceive('get')
+                ->once()
+                ->with('database.connections.connection_2.url', false)
+                ->andReturn(false);
+
+        config()->shouldReceive('set')
+                ->once()
+                ->with('database.connections.connection_1.database', 'my_database_test_1');
+
+        config()->shouldReceive('set')
+                ->once()
+                ->with('database.connections.connection_2.database', 'my_database_test_1');
+
+        $this->switchToDatabase(['connection_1', 'connection_2'], 'my_database_test_1');
     }
 
     /**
@@ -50,21 +71,21 @@ class TestDatabasesTest extends TestCase
      */
     public function testSwitchToDatabaseWithUrl($testDatabase, $url, $testUrl)
     {
-        DB::shouldReceive('purge')->once();
+        DB::shouldReceive('purge')->once()->with('mysql');
 
         config()->shouldReceive('get')
-            ->once()
-            ->with('database.connections.mysql.url', false)
-            ->andReturn($url);
+                ->once()
+                ->with('database.connections.mysql.url', false)
+                ->andReturn($url);
 
         config()->shouldReceive('set')
-            ->once()
-            ->with('database.connections.mysql.url', $testUrl);
+                ->once()
+                ->with('database.connections.mysql.url', $testUrl);
 
-        $this->switchToDatabase($testDatabase);
+        $this->switchToDatabase(['mysql'], $testDatabase);
     }
 
-    public function switchToDatabase($database)
+    public function switchToDatabase($database, $connections)
     {
         $instance = new class
         {
@@ -72,7 +93,7 @@ class TestDatabasesTest extends TestCase
         };
 
         $method = new ReflectionMethod($instance, 'switchToDatabase');
-        tap($method)->setAccessible(true)->invoke($instance, $database);
+        tap($method)->setAccessible(true)->invoke($instance, $database, $connections);
     }
 
     public function databaseUrls()

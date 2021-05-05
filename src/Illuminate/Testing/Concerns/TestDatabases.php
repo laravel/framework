@@ -26,60 +26,81 @@ trait TestDatabases
      */
     protected function bootTestDatabase()
     {
-        ParallelTesting::setUpProcess(function () {
-            $this->whenNotUsingInMemoryDatabase(function ($database) {
-                if (ParallelTesting::option('recreate_databases')) {
-                    Schema::dropDatabaseIfExists(
-                        $this->testDatabase($database)
-                    );
-                }
-            });
-        });
+        ParallelTesting::setUpProcess([$this, 'recreateDatabasesWhenRequested']);
 
-        ParallelTesting::setUpTestCase(function ($testCase) {
-            $uses = array_flip(class_uses_recursive(get_class($testCase)));
+        ParallelTesting::setUpTestCase([$this, 'updateDatabasesWhenNeeded']);
+    }
 
-            $databaseTraits = [
-                Testing\DatabaseMigrations::class,
-                Testing\DatabaseTransactions::class,
-                Testing\RefreshDatabase::class,
-            ];
-
-            if (Arr::hasAny($uses, $databaseTraits)) {
-                $this->whenNotUsingInMemoryDatabase(function ($database) use ($uses) {
-                    [$testDatabase, $created] = $this->ensureTestDatabaseExists($database);
-
-                    $this->switchToDatabase($testDatabase);
-
-                    if (isset($uses[Testing\DatabaseTransactions::class])) {
-                        $this->ensureSchemaIsUpToDate();
-                    }
-
-                    if ($created) {
-                        ParallelTesting::callSetUpTestDatabaseCallbacks($testDatabase);
-                    }
-                });
+    /**
+     * Recreates databases if requested.
+     *
+     * @return void
+     */
+    public function recreateDatabasesWhenRequested()
+    {
+        $this->whenNotUsingInMemoryDatabase(function ($database) {
+            if (ParallelTesting::option('recreate_databases')) {
+                Schema::dropDatabaseIfExists(
+                    $this->testDatabase($database)
+                );
             }
         });
+    }
+
+    /**
+     * Update database configuration and run migrations if needed.
+     *
+     * @param  Testing\TestCase  $testCase
+     *
+     * @return void
+     */
+    public function updateDatabasesWhenNeeded(Testing\TestCase $testCase)
+    {
+        $uses = array_flip(class_uses_recursive(get_class($testCase)));
+
+        $databaseTraits = [
+            Testing\DatabaseMigrations::class,
+            Testing\DatabaseTransactions::class,
+            Testing\RefreshDatabase::class,
+        ];
+
+        if (Arr::hasAny($uses, $databaseTraits)) {
+            $connections = $this->connectionsToUpdate($testCase);
+
+            $this->whenNotUsingInMemoryDatabase(function ($database) use ($connections, $uses) {
+                [$testDatabase, $created] = $this->ensureTestDatabaseExists($database, $connections);
+
+                $this->switchToDatabase($connections, $testDatabase);
+
+                if (isset($uses[Testing\DatabaseTransactions::class])) {
+                    $this->ensureSchemaIsUpToDate();
+                }
+
+                if ($created) {
+                    ParallelTesting::callSetUpTestDatabaseCallbacks($testDatabase);
+                }
+            });
+        }
     }
 
     /**
      * Ensure a test database exists and returns its name.
      *
      * @param  string  $database
+     * @param  array  $connections
      *
      * @return array
      */
-    protected function ensureTestDatabaseExists($database)
+    protected function ensureTestDatabaseExists($database, array $connections)
     {
         $testDatabase = $this->testDatabase($database);
 
         try {
-            $this->usingDatabase($testDatabase, function () {
+            $this->usingDatabase($testDatabase, $connections, function () {
                 Schema::hasTable('dummy');
             });
         } catch (QueryException $e) {
-            $this->usingDatabase($database, function () use ($testDatabase) {
+            $this->usingDatabase($database, $connections, function () use ($testDatabase) {
                 Schema::dropDatabaseIfExists($testDatabase);
                 Schema::createDatabase($testDatabase);
             });
@@ -108,18 +129,20 @@ trait TestDatabases
      * Runs the given callable using the given database.
      *
      * @param  string  $database
+     * @param  array  $connections
      * @param  callable  $callable
+     *
      * @return void
      */
-    protected function usingDatabase($database, $callable)
+    protected function usingDatabase($database, array $connections, $callable)
     {
         $original = DB::getConfig('database');
 
         try {
-            $this->switchToDatabase($database);
+            $this->switchToDatabase($connections, $database);
             $callable();
         } finally {
-            $this->switchToDatabase($original);
+            $this->switchToDatabase($connections, $original);
         }
     }
 
@@ -127,6 +150,7 @@ trait TestDatabases
      * Apply the given callback when tests are not using in memory database.
      *
      * @param  callable  $callback
+     *
      * @return void
      */
     protected function whenNotUsingInMemoryDatabase($callback)
@@ -141,27 +165,29 @@ trait TestDatabases
     /**
      * Switch to the given database.
      *
+     * @param  array  $connections
      * @param  string  $database
+     *
      * @return void
      */
-    protected function switchToDatabase($database)
+    protected function switchToDatabase(array $connections, $database)
     {
-        DB::purge();
+        foreach ($connections as $connection) {
+            DB::purge($connection);
 
-        $default = config('database.default');
+            $url = config("database.connections.{$connection}.url");
 
-        $url = config("database.connections.{$default}.url");
-
-        if ($url) {
-            config()->set(
-                "database.connections.{$default}.url",
-                preg_replace('/^(.*)(\/[\w-]*)(\??.*)$/', "$1/{$database}$3", $url),
-            );
-        } else {
-            config()->set(
-                "database.connections.{$default}.database",
-                $database,
-            );
+            if ($url) {
+                config()->set(
+                    "database.connections.{$connection}.url",
+                    preg_replace('/^(.*)(\/[\w-]*)(\??.*)$/', "$1/{$database}$3", $url),
+                );
+            } else {
+                config()->set(
+                    "database.connections.{$connection}.database",
+                    $database,
+                );
+            }
         }
     }
 
@@ -175,5 +201,18 @@ trait TestDatabases
         $token = ParallelTesting::token();
 
         return "{$database}_test_{$token}";
+    }
+
+    /**
+     * The database connections that should be updated.
+     *
+     * @param  mixed  $testCase
+     *
+     * @return array
+     */
+    protected function connectionsToUpdate($testCase)
+    {
+        return property_exists($testCase, 'connectionsToUpdate')
+            ? $testCase->connectionsToUpdate : [config('database.default')];
     }
 }
