@@ -72,7 +72,7 @@ class Cursor implements Arrayable
     }
 
     /**
-     * Determine whether the cursor points to the next set of items.
+     * Determine whether the cursor points to the previous set of items.
      *
      * @return bool
      */

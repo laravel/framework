@@ -14,7 +14,7 @@ use JsonSerializable;
 class CursorPaginator extends AbstractCursorPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, PaginatorContract
 {
     /**
-     * Determine if there are more items in the data source.
+     * Indicates whether there are more items in the data source.
      *
      * @return bool
      */
