@@ -821,7 +821,7 @@ trait ValidatesAttributes
         $singular = Str::singular($table);
         $baseName = Str::title($singular);
 
-        $rootNamespace = "App\\";
+        $rootNamespace = 'App\\';
 
         return is_dir(app_path('Models'))
                     ? $rootNamespace.'Models\\'.$baseName
