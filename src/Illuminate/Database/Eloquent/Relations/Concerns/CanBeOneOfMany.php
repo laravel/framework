@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait CanBeOneOfMany
@@ -197,9 +198,18 @@ trait CanBeOneOfMany
 
         return $this->oneOfManyQuery
             ->whereExists(function ($existsQuery) use ($query) {
-                $existsQuery
-                    ->selectSub($query, $this->getSubSelectAlias())
-                    ->whereColumn($this->getSubSelectAlias(), $this->getRelatedKeyName());
+                $existsQuery->selectSub($query, $this->getSubSelectAlias());
+
+                if ($query->getConnection() instanceof SQLiteConnection) {
+                    $existsQuery->whereColumn(
+                        $this->getSubSelectAlias(),
+                        $this->getRelatedKeyName()
+                    );
+                } else {
+                    $existsQuery->havingRaw(
+                        $this->getSubSelectAlias() . ' = '. $this->getRelatedKeyName()
+                    );
+                }
             });
     }
 
