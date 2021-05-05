@@ -24,6 +24,22 @@ class KernelTest extends TestCase
         $this->assertEquals([], $kernel->getRouteMiddleware());
     }
 
+    public function testGetMiddlewarePriority()
+    {
+        $kernel = new Kernel($this->getApplication(), $this->getRouter());
+
+        $this->assertEquals([
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+            \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Auth\Middleware\Authorize::class,
+        ], $kernel->getMiddlewarePriority());
+    }
+
     /**
      * @return \Illuminate\Contracts\Foundation\Application
      */
