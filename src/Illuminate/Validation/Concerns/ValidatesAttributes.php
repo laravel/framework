@@ -747,9 +747,24 @@ trait ValidatesAttributes
      */
     protected function getUniqueIds($idColumn, $parameters)
     {
-        $idColumn = $idColumn ?? $parameters[3] ?? 'id';
+        $idColumn = $idColumn ?? $parameters[3] ?? $this->getParsedModelIdColumn($parameters[0]);
 
         return [$idColumn, $this->prepareUniqueId($parameters[2])];
+    }
+
+    /**
+     * Get the ID column of given table by parsing table Model.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    protected function getParsedModelIdColumn($table)
+    {
+        $modelClass = $this->parseModel($table);
+        $model = new $modelClass;
+        $idColumn = $model->getKeyName();
+
+        return $idColumn;
     }
 
     /**
@@ -791,6 +806,40 @@ trait ValidatesAttributes
     }
 
     /**
+     * Parse to table to get model.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function parseModel($table)
+    {
+        // check if already a model
+        if ($this->isModel($table)) {
+            return $table;
+        }
+
+        $singular = Str::singular($table);
+        $baseName = Str::title($singular);
+
+        $rootNamespace = "App\\";
+
+        return is_dir(app_path('Models'))
+                    ? $rootNamespace.'Models\\'.$baseName
+                    : $rootNamespace.$baseName;
+    }
+
+    /**
+     * Check if the table parameter is a Model Class.
+     *
+     * @param  string  $table
+     * @return bool
+     */
+    public function isModel($table)
+    {
+        return Str::contains($table, '\\') && class_exists($table) && is_a($table, Model::class, true);
+    }
+
+    /**
      * Parse the connection / table for the unique / exists rules.
      *
      * @param  string  $table
@@ -800,8 +849,8 @@ trait ValidatesAttributes
     {
         [$connection, $table] = Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
 
-        if (Str::contains($table, '\\') && class_exists($table) && is_a($table, Model::class, true)) {
-            $model = new $table;
+        if ($this->isModel($table)) {
+            $model = new $modelClass;
 
             $table = $model->getTable();
             $connection = $connection ?? $model->getConnectionName();
