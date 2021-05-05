@@ -4,7 +4,6 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use DateTimeInterface;
-use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -2373,7 +2372,7 @@ class Builder
      * @param  string  $cursorName
      * @param  string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\Paginator
-     * @throws \Exception
+     * @throws \Illuminate\Pagination\CursorPaginationException
      */
     public function cursorPaginate($perPage = 15, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
@@ -2409,7 +2408,7 @@ class Builder
      *
      * @param  bool  $shouldReverse
      * @return \Illuminate\Support\Collection
-     * @throws \Exception
+     * @throws \Illuminate\Pagination\CursorPaginationException
      */
     protected function ensureOrderForCursorPagination($shouldReverse = false)
     {
