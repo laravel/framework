@@ -332,16 +332,6 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Return the priority-sorted list of middleware.
-     *
-     * @return array
-     */
-    public function getMiddlewarePriority()
-    {
-        return $this->middlewarePriority;
-    }
-
-    /**
      * Prepend the given middleware to the middleware priority list.
      *
      * @param  string  $middleware
@@ -391,6 +381,16 @@ class Kernel implements KernelContract
         foreach ($this->routeMiddleware as $key => $middleware) {
             $this->router->aliasMiddleware($key, $middleware);
         }
+    }
+
+    /**
+     * Get the priority-sorted list of middleware.
+     *
+     * @return array
+     */
+    public function getMiddlewarePriority()
+    {
+        return $this->middlewarePriority;
     }
 
     /**
