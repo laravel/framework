@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\SQLiteConnection;
 
 trait CanBeOneOfMany
 {
@@ -207,7 +207,7 @@ trait CanBeOneOfMany
                     );
                 } else {
                     $existsQuery->havingRaw(
-                        $this->getSubSelectAlias() . ' = '. $this->getRelatedKeyName()
+                        $this->getSubSelectAlias().' = '.$this->getRelatedKeyName()
                     );
                 }
             });
