@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Pagination\Cursor;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -53,6 +55,127 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(6, $query->cursorPaginate()->items());
     }
 
+    public function testPaginationWithWhereClause()
+    {
+        for ($i = 1; $i <= 3; $i++) {
+            TestPost::create(['title' => 'Hello world', 'user_id' => null]);
+            TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
+        }
+
+        $query = TestPost::query()->whereNull('user_id');
+
+        $this->assertEquals(3, $query->get()->count());
+        $this->assertEquals(3, $query->count());
+        $this->assertCount(3, $query->cursorPaginate()->items());
+    }
+
+    public function testPaginationWithHasClause()
+    {
+        for ($i = 1; $i <= 3; $i++) {
+            TestUser::create(['id' => $i]);
+            TestPost::create(['title' => 'Hello world', 'user_id' => null]);
+            TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
+            TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
+        }
+
+        $query = TestUser::query()->has('posts');
+
+        $this->assertEquals(2, $query->get()->count());
+        $this->assertEquals(2, $query->count());
+        $this->assertCount(2, $query->cursorPaginate()->items());
+    }
+
+    public function testPaginationWithWhereHasClause()
+    {
+        for ($i = 1; $i <= 3; $i++) {
+            TestUser::create(['id' => $i]);
+            TestPost::create(['title' => 'Hello world', 'user_id' => null]);
+            TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
+            TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
+        }
+
+        $query = TestUser::query()->whereHas('posts', function ($query) {
+            $query->where('title', 'Howdy');
+        });
+
+        $this->assertEquals(1, $query->get()->count());
+        $this->assertEquals(1, $query->count());
+        $this->assertCount(1, $query->cursorPaginate()->items());
+    }
+
+    public function testPaginationWithWhereExistsClause()
+    {
+        for ($i = 1; $i <= 3; $i++) {
+            TestUser::create(['id' => $i]);
+            TestPost::create(['title' => 'Hello world', 'user_id' => null]);
+            TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
+            TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
+        }
+
+        $query = TestUser::query()->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('test_posts')
+                ->whereColumn('test_posts.user_id', 'test_users.id');
+        });
+
+        $this->assertEquals(2, $query->get()->count());
+        $this->assertEquals(2, $query->count());
+        $this->assertCount(2, $query->cursorPaginate()->items());
+    }
+
+    public function testPaginationWithMultipleWhereClauses()
+    {
+        for ($i = 1; $i <= 4; $i++) {
+            TestUser::create(['id' => $i]);
+            TestPost::create(['title' => 'Hello world', 'user_id' => null]);
+            TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
+            TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
+            TestPost::create(['title' => 'Howdy', 'user_id' => 4]);
+        }
+
+        $query = TestUser::query()->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('test_posts')
+                ->whereColumn('test_posts.user_id', 'test_users.id');
+        })->whereHas('posts', function ($query) {
+            $query->where('title', 'Howdy');
+        })->where('id', '<', 5)->orderBy('id');
+
+        $clonedQuery = $query->clone();
+        $anotherQuery = $query->clone();
+
+        $this->assertEquals(2, $query->get()->count());
+        $this->assertEquals(2, $query->count());
+        $this->assertCount(2, $query->cursorPaginate()->items());
+        $this->assertCount(1, $clonedQuery->cursorPaginate(1)->items());
+        $this->assertCount(
+            1,
+            $anotherQuery->cursorPaginate(5, ['*'], 'cursor', new Cursor(['id' => 3]))
+                        ->items()
+        );
+    }
+
+    public function testPaginationWithAliasedOrderBy()
+    {
+        for ($i = 1; $i <= 6; $i++) {
+            TestUser::create(['id' => $i]);
+        }
+
+        $query = TestUser::query()->select('id as user_id')->orderBy('user_id');
+        $clonedQuery = $query->clone();
+        $anotherQuery = $query->clone();
+
+        $this->assertEquals(6, $query->get()->count());
+        $this->assertEquals(6, $query->count());
+        $this->assertCount(6, $query->cursorPaginate()->items());
+        $this->assertCount(3, $clonedQuery->cursorPaginate(3)->items());
+        $this->assertCount(
+            4,
+            $anotherQuery->cursorPaginate(10, ['*'], 'cursor', new Cursor(['user_id' => 2]))
+                        ->items()
+        );
+    }
+
     public function testPaginationWithDistinctColumnsAndSelect()
     {
         for ($i = 1; $i <= 3; $i++) {
@@ -96,4 +219,9 @@ class TestPost extends Model
 class TestUser extends Model
 {
     protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->hasMany(TestPost::class, 'user_id');
+    }
 }
