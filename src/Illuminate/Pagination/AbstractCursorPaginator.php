@@ -140,14 +140,14 @@ abstract class AbstractCursorPaginator implements Htmlable
     }
 
     /**
-     * Get the "cursor" of the previous set of items.
+     * Get the "cursor" that points to the previous set of items.
      *
      * @return \Illuminate\Pagination\Cursor|null
      */
     public function previousCursor()
     {
         if (is_null($this->cursor) ||
-            ($this->cursor->isPrev() && ! $this->hasMore)) {
+            ($this->cursor->pointsToPreviousItems() && ! $this->hasMore)) {
             return null;
         }
 
@@ -155,14 +155,14 @@ abstract class AbstractCursorPaginator implements Htmlable
     }
 
     /**
-     * Get the "cursor" of the next set of items.
+     * Get the "cursor" that points to the next set of items.
      *
      * @return \Illuminate\Pagination\Cursor|null
      */
     public function nextCursor()
     {
         if ((is_null($this->cursor) && ! $this->hasMore) ||
-            (! is_null($this->cursor) && $this->cursor->isNext() && ! $this->hasMore)) {
+            (! is_null($this->cursor) && $this->cursor->pointsToNextItems() && ! $this->hasMore)) {
             return null;
         }
 
@@ -182,7 +182,10 @@ abstract class AbstractCursorPaginator implements Htmlable
     }
 
     /**
+     * Get the cursor parameters for a given object.
+     *
      * @param  \ArrayAccess|\stdClass  $item
+     * @return array
      */
     public function getParametersForItem($item)
     {
@@ -195,7 +198,7 @@ abstract class AbstractCursorPaginator implements Htmlable
                     return $item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')};
                 }
 
-                throw new Exception('Only arrays and objects are supported for pagination items');
+                throw new Exception('Only arrays and objects are supported when cursor paginating items.');
             })->toArray();
     }
 

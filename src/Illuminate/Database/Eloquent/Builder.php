@@ -830,19 +830,19 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->isPrev());
+        $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
         $orderDirection = $orders->first()['direction'] ?? 'asc';
 
-        $comparisonOperator = ($orderDirection === 'asc' ? '>' : '<');
+        $comparisonOperator = $orderDirection === 'asc' ? '>' : '<';
 
         $parameters = $orders->pluck('column')->toArray();
 
         if (! is_null($cursor)) {
             if (count($parameters) === 1) {
-                $this->where($column = $parameters[0], $comparisonOperator, $cursor->getParam($column));
+                $this->where($column = $parameters[0], $comparisonOperator, $cursor->parameter($column));
             } elseif (count($parameters) > 1) {
-                $this->whereRowValues($parameters, $comparisonOperator, $cursor->getParams($parameters));
+                $this->whereRowValues($parameters, $comparisonOperator, $cursor->parameters($parameters));
             }
         }
 
@@ -867,7 +867,7 @@ class Builder
         $orderDirections = collect($this->query->orders)->pluck('direction')->unique();
 
         if ($orderDirections->count() > 1) {
-            throw new CursorPaginationException('Only a single order by direction is supported in cursor pagination.');
+            throw new CursorPaginationException('Only a single order by direction is supported when using cursor pagination.');
         }
 
         if ($orderDirections->count() === 0) {
@@ -876,7 +876,7 @@ class Builder
 
         if ($shouldReverse) {
             $this->query->orders = collect($this->query->orders)->map(function ($order) {
-                $order['direction'] = ($order['direction'] === 'asc' ? 'desc' : 'asc');
+                $order['direction'] = $order['direction'] === 'asc' ? 'desc' : 'asc';
 
                 return $order;
             })->toArray();

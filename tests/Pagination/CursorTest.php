@@ -25,7 +25,7 @@ class CursorTest extends TestCase
             'created_at' => ($now = Carbon::now()->toDateTimeString()),
         ], true);
 
-        $this->assertEquals([$now, 422], $cursor->getParams(['created_at', 'id']));
+        $this->assertEquals([$now, 422], $cursor->parameters(['created_at', 'id']));
     }
 
     public function testCanGetParam()
@@ -35,6 +35,6 @@ class CursorTest extends TestCase
             'created_at' => ($now = Carbon::now()->toDateTimeString()),
         ], true);
 
-        $this->assertEquals($now, $cursor->getParam('created_at'));
+        $this->assertEquals($now, $cursor->parameter('created_at'));
     }
 }

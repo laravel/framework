@@ -19,18 +19,18 @@ class Cursor implements Arrayable
      *
      * @var bool
      */
-    protected $isNext;
+    protected $pointsToNextItems;
 
     /**
      * Create a new cursor instance.
      *
      * @param  array  $parameters
-     * @param  bool  $isNext
+     * @param  bool  $pointsToNextItems
      */
-    public function __construct(array $parameters, $isNext = true)
+    public function __construct(array $parameters, $pointsToNextItems = true)
     {
         $this->parameters = $parameters;
-        $this->isNext = $isNext;
+        $this->pointsToNextItems = $pointsToNextItems;
     }
 
     /**
@@ -39,7 +39,7 @@ class Cursor implements Arrayable
      * @param  string  $parameterName
      * @return string|null
      */
-    public function getParam(string $parameterName)
+    public function parameter(string $parameterName)
     {
         if (! isset($this->parameters[$parameterName])) {
             throw new UnexpectedValueException("Unable to find parameter [{$parameterName}] in pagination item.");
@@ -54,10 +54,10 @@ class Cursor implements Arrayable
      * @param  array  $parameterNames
      * @return array
      */
-    public function getParams(array $parameterNames)
+    public function parameters(array $parameterNames)
     {
         return collect($parameterNames)->map(function ($parameterName) {
-            return $this->getParam($parameterName);
+            return $this->parameter($parameterName);
         })->toArray();
     }
 
@@ -66,9 +66,9 @@ class Cursor implements Arrayable
      *
      * @return bool
      */
-    public function isNext()
+    public function pointsToNextItems()
     {
-        return $this->isNext;
+        return $this->pointsToNextItems;
     }
 
     /**
@@ -76,33 +76,9 @@ class Cursor implements Arrayable
      *
      * @return bool
      */
-    public function isPrev()
+    public function pointsToPreviousItems()
     {
-        return ! $this->isNext;
-    }
-
-    /**
-     * Set the cursor to point to the next set of items.
-     *
-     * @return $this
-     */
-    public function setNext()
-    {
-        $this->isNext = true;
-
-        return $this;
-    }
-
-    /**
-     * Set the cursor to point to the previous set of items.
-     *
-     * @return $this
-     */
-    public function setPrev()
-    {
-        $this->isNext = false;
-
-        return $this;
+        return ! $this->pointsToNextItems;
     }
 
     /**
@@ -113,7 +89,7 @@ class Cursor implements Arrayable
     public function toArray()
     {
         return array_merge($this->parameters, [
-            '_isNext' => $this->isNext,
+            '_pointsToNextItems' => $this->pointsToNextItems,
         ]);
     }
 
@@ -145,10 +121,10 @@ class Cursor implements Arrayable
             return null;
         }
 
-        $isNext = $parameters['_isNext'];
+        $pointsToNextItems = $parameters['_pointsToNextItems'];
 
-        unset($parameters['_isNext']);
+        unset($parameters['_pointsToNextItems']);
 
-        return new static($parameters, $isNext);
+        return new static($parameters, $pointsToNextItems);
     }
 }
