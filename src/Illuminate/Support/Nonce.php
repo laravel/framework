@@ -7,20 +7,20 @@ use RuntimeException;
 class Nonce
 {
     /**
-     * The nonce value
+     * The nonce value.
      *
      * @var string|null
      */
     protected static $nonce = null;
 
     /**
-     * The callable that returns a string as the nonce value
+     * The callable that returns a string as the nonce value.
      * @var callable|null
      */
     protected static $nonceProvider = null;
 
     /**
-     * Set a string value or callable as the nonce provider which returns a string
+     * Set a string value or callable as the nonce provider which returns a string.
      *
      * @param string|callable $nonce
      * @return void
@@ -37,7 +37,7 @@ class Nonce
     }
 
     /**
-     * Get the nonce value from stored static variable or resolve it from provider
+     * Get the nonce value from stored static variable or resolve it from provider.
      *
      * @return string|null
      */
@@ -55,7 +55,7 @@ class Nonce
     }
 
     /**
-     * Check if the nonce value is available
+     * Check if the nonce value is available.
      *
      * @return bool
      */
@@ -65,7 +65,7 @@ class Nonce
     }
 
     /**
-     * Reset the nonce value and the provider
+     * Reset the nonce value and the provider.
      *
      * @return void
      */
@@ -77,7 +77,7 @@ class Nonce
     }
 
     /**
-     * Ensure the nonce value is sanitized
+     * Ensure the nonce value is sanitized.
      *
      * @param string $nonce
      * @return string
