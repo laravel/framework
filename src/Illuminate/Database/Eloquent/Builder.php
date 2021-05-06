@@ -357,6 +357,56 @@ class Builder
     }
 
     /**
+     * Create a collection of models from plain arrays and hydrate relations.
+     *
+     * @param  array  $items
+     * @param  array  $with
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function hydrateWith(array $items, array $with = [])
+    {
+        $instance = $this->newModelInstance();
+
+        return $instance->newCollection(array_map(function ($item) use ($instance, $with) {
+            $model = $instance->newFromBuilder($item);
+            if (count($with)) {
+                $results = [];
+                foreach ($with as $name) {
+                    $keys = explode('.', $name);
+                    $key = array_shift($keys);
+                    if (!array_key_exists($key, $results)) {
+                        $results[$key] = [];
+                    }
+                    if (count($keys)) {
+                        $results[$key][] = implode('.', $keys);
+                    }
+                }
+                foreach ($results as $key => $value) {
+                    if (method_exists($model, $key)) {
+                        $result = $model->$key();
+                        if ($result instanceof \Illuminate\Database\Eloquent\Relations\Relation) {
+                            if ($result instanceof \Illuminate\Database\Eloquent\Relations\HasOne
+                                || $result instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
+                                $relation = $result->getModel()::hydrateWith([$model->getAttributes()[$key]] ?? null, $value)->first();
+                                $model->offsetUnset($key);
+                                $model->setRelation($key, $relation);
+                            } else if ($result instanceof \Illuminate\Database\Eloquent\Relations\HasMany
+                                || $result instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany) {
+                                $relation = $result->getModel()::hydrateWith($model->getAttributes()[$key] ?? null, $value);
+                                $model->offsetUnset($key);
+                                $model->setRelation($key, $relation);
+                            } else {
+                                throw new \RuntimeException('Relation '.get_class($result).' is not hydratable.');
+                            }
+                        }
+                    }
+                }
+            }
+            return $model;
+        }, $items));
+    }
+
+    /**
      * Create a collection of models from a raw query.
      *
      * @param  string  $query
