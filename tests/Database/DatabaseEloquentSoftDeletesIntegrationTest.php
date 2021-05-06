@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -136,11 +137,18 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             return 1;
         });
 
+        CursorPaginator::currentCursorResolver(function () {
+            return null;
+        });
+
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->paginate(2)->all());
 
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->simplePaginate(2)->all());
+
+        $query = SoftDeletesTestUser::query();
+        $this->assertCount(1, $query->cursorPaginate(2)->all());
 
         $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->increment('id'));
         $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->decrement('id'));
