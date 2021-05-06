@@ -60,4 +60,13 @@ class NonceTest extends TestCase
     {
         $this->assertNull(Nonce::getNonce());
     }
+
+    public function testHasNonce()
+    {
+        $this->assertFalse(Nonce::hasNonce());
+
+        Nonce::setNonce('foo-bar');
+
+        $this->assertTrue(Nonce::hasNonce());
+    }
 }
