@@ -11,7 +11,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
 
         <!-- Styles -->
+        @if (\Illuminate\Support\Nonce::hasNonce())
+        <style nonce="{{ \Illuminate\Support\Nonce::getNonce() }}">
+        @else
         <style>
+        @endif
             html, body {
                 background-color: #fff;
                 color: #636b6f;

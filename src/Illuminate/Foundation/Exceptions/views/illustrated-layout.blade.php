@@ -11,7 +11,12 @@
         <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
 
         <!-- Styles -->
+
+        @if (\Illuminate\Support\Nonce::hasNonce())
+        <style nonce="{{ \Illuminate\Support\Nonce::getNonce() }}">
+        @else
         <style>
+        @endif
             html {
                 line-height: 1.15;
                     -ms-text-size-adjust: 100%;
