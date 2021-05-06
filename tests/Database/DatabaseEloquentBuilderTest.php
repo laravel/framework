@@ -606,6 +606,65 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['hydrated'], $models);
     }
 
+    public function testGetModelsProperlyHydratesModelsWithRelations()
+    {
+        $users = [
+            [
+                'user_id' => 1,
+                'username' => 'User 1',
+                'avatar' => [ // hasOne
+                    'avatar_id' => 1,
+                    'filename' => 'avatar1.png',
+                ],
+                'posts' => [ // hasMany
+                    [
+                        'post_id' => 1,
+                        'title' => 'Post 1',
+                        'image' => [ // morphOne
+                            'image_id' => 1,
+                            'filename' => 'image.png',
+                        ],
+                        'comments' => [ // morphMany
+                            [
+                                'comment_id' => 1,
+                                'comment' => 'Comment 1',
+                                'image' => [ // belongsTo
+                                    'image_id' => 2,
+                                    'filename' => 'image2.png',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'subscribedTo' => [ // belongsToMany
+                    [
+                        'post_id' => 2,
+                        'title' => 'Post 2',
+                        'pivot' => [
+                            'created_at' => '2010-01-01 00:00:00',
+                        ]
+                    ],
+                    [
+                        'post_id' => 3,
+                        'title' => 'Post 3',
+                    ],
+                ],
+            ]
+        ];
+
+        // Most likely this is where mocking needs to happen
+        // getting error "Error: Call to a member function connection() on null"
+        $users = EloquentBuilderTestUser::hydrateWith($users, [
+            'posts',
+            'posts.image',
+            'posts.country',
+            'posts.comments.image',
+            'subscribeTo',
+        ]);
+
+        // $this->assertEquals(['hydrated'], $models);
+    }
+
     public function testEagerLoadRelationsLoadTopLevelRelationships()
     {
         $builder = m::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
@@ -1750,4 +1809,133 @@ class EloquentBuilderTestStubStringPrimaryKey extends Model
     protected $table = 'foo_table';
 
     protected $keyType = 'string';
+}
+
+class EloquentBuilderTestUser extends Model
+{
+    protected $table = 'users';
+    protected $guarded = [];
+
+    public function avatar()
+    {
+        return $this->hasOne(EloquentBuilderTestAvatar::class, 'user_id');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(EloquentBuilderTestPost::class, 'user_id');
+    }
+
+    public function subscribedTo()
+    {
+        return $this->belongsToMany(EloquentBuilderTestPost::class, 'post_user', 'user_id', 'post_id');
+    }
+
+    public function image()
+    {
+        return $this->morphOne(EloquentBuilderTestImage::class, 'imageable');
+    }
+}
+
+class EloquentBuilderTestAvatar extends Model
+{
+    protected $table = 'avatars';
+    protected $guarded = [];
+
+    public function user()
+    {
+        return $this->belongsTo(EloquentBuilderTestUser::class, 'user_id');
+    }
+}
+
+class EloquentBuilderTestPost extends Model
+{
+    protected $table = 'posts';
+    protected $guarded = [];
+
+    public function owner()
+    {
+        return $this->belongsTo(EloquentBuilderTestUser::class, 'user_id');
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(EloquentBuilderTestCountry::class, 'country_id');
+    }
+
+    public function subscribers()
+    {
+        return $this->belongsToMany(EloquentBuilderTestUser::class, 'post_user', 'post_id', 'user_id');
+    }
+
+    public function image()
+    {
+        return $this->morphOne(EloquentBuilderTestImage::class, 'imageable');
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(EloquentBuilderTestComment::class, 'commentable');
+    }
+}
+
+class EloquentBuilderTestCountry extends Model
+{
+    protected $table = 'countries';
+    protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->hasManyThrough(EloquentBuilderTestPost::class, EloquentBuilderTestUser::class, 'country_id', 'user_id');
+    }
+
+    public function users()
+    {
+        return $this->hasMany(EloquentBuilderTestUser::class, 'country_id');
+    }
+}
+
+class EloquentBuilderTestImage extends Model
+{
+    protected $table = 'images';
+    protected $guarded = [];
+
+    public function imageable()
+    {
+        return $this->morphTo();
+    }
+}
+
+class EloquentBuilderTestComment extends Model
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+
+    public function commentable()
+    {
+        return $this->morphTo();
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(EloquentBuilderTestComment::class, 'commentable');
+    }
+
+    public function image()
+    {
+        return $this->belongsTo(EloquentBuilderTestImage::class, 'image_id');
+    }
+}
+
+class EloquentBuilderTestTag extends Model
+{
+    public function posts()
+    {
+        return $this->morphedByMany(EloquentBuilderTestPost::class, 'taggable');
+    }
+
+    public function users()
+    {
+        return $this->morphedByMany(EloquentBuilderTestUser::class, 'taggable');
+    }
 }
