@@ -24,6 +24,7 @@ class MigrateCommand extends BaseCommand
                 {--schema-path= : The path to a schema dump file}
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
+                {--seeder= : The class name of the root seeder}
                 {--step : Force the migrations to be run so they can be rolled back individually}';
 
     /**
@@ -89,7 +90,10 @@ class MigrateCommand extends BaseCommand
             // seed task to re-populate the database, which is convenient when adding
             // a migration and a seed at the same time, as it is only this command.
             if ($this->option('seed') && ! $this->option('pretend')) {
-                $this->call('db:seed', ['--force' => true]);
+                $this->call('db:seed', [
+                    '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
+                    '--force' => true,
+                ]);
             }
         });
 
