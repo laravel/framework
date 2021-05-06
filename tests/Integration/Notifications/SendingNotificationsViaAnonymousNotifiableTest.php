@@ -59,6 +59,11 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
             }
         );
     }
+
+    public function testItReturnsAnonymousNotifiable()
+    {
+        $this->assertInstanceOf(AnonymousNotifiable::class, NotificationFacade::anonymous());
+    }
 }
 
 class TestMailNotificationForAnonymousNotifiable extends Notification

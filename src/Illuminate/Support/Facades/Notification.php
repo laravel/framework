@@ -48,6 +48,16 @@ class Notification extends Facade
     }
 
     /**
+     * Begin sending a notification to an anonymous notifiable.
+     * 
+     * @return \Illuminate\Notifications\AnonymousNotifiable
+     */
+    public static function anonymous()
+    {
+        return new AnonymousNotifiable;
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string
