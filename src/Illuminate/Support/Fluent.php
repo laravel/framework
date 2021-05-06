@@ -58,7 +58,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     /**
      * Convert the fluent instance to an array.
      *
-     * @return array|string
+     * @return array
      */
     public function toArray()
     {
@@ -68,7 +68,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array|string
+     * @return array
      */
     public function jsonSerialize()
     {
