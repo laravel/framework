@@ -82,14 +82,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \'users\') drop table "users"', $statements[0]);
+        $this->assertSame('if exists (select * from sys.sysobjects where id = object_id(\'users\', \'U\')) drop table "users"', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropIfExists();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar()->setTablePrefix('prefix_'));
 
         $this->assertCount(1, $statements);
-        $this->assertSame('if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \'prefix_users\') drop table "prefix_users"', $statements[0]);
+        $this->assertSame('if exists (select * from sys.sysobjects where id = object_id(\'prefix_users\', \'U\')) drop table "prefix_users"', $statements[0]);
     }
 
     public function testDropColumn()
