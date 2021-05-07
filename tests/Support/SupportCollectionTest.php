@@ -2702,7 +2702,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testGetNthReturnsNthItemInCollection($collection)
     {
-        $c = new $collection(['a', 'b', 'c','d']);
+        $c = new $collection(['a', 'b', 'c', 'd']);
         $this->assertSame('c', $c->getNth(3));
     }
 
