@@ -643,7 +643,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  bool  $remember
      * @return void
      */
-    protected function fireAttemptEvent(array $credentials, $remember = false)
+    public function fireAttemptEvent(array $credentials, $remember = false)
     {
         if (isset($this->events)) {
             $this->events->dispatch(new Attempting(
@@ -658,7 +658,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function fireValidatedEvent($user)
+    public function fireValidatedEvent($user)
     {
         if (isset($this->events)) {
             $this->events->dispatch(new Validated(
@@ -674,7 +674,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  bool  $remember
      * @return void
      */
-    protected function fireLoginEvent($user, $remember = false)
+    public function fireLoginEvent($user, $remember = false)
     {
         if (isset($this->events)) {
             $this->events->dispatch(new Login(
@@ -689,7 +689,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function fireAuthenticatedEvent($user)
+    public function fireAuthenticatedEvent($user)
     {
         if (isset($this->events)) {
             $this->events->dispatch(new Authenticated(
@@ -704,7 +704,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function fireOtherDeviceLogoutEvent($user)
+    public function fireOtherDeviceLogoutEvent($user)
     {
         if (isset($this->events)) {
             $this->events->dispatch(new OtherDeviceLogout(
@@ -720,7 +720,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  array  $credentials
      * @return void
      */
-    protected function fireFailedEvent($user, array $credentials)
+    public function fireFailedEvent($user, array $credentials)
     {
         if (isset($this->events)) {
             $this->events->dispatch(new Failed(
