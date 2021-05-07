@@ -134,7 +134,7 @@ trait BuildsQueries
             }
 
             $lastId = $results->last()->{$alias};
-            
+
             if ($lastId === null) {
                 throw new RuntimeException('Unable to determine last id using alias:'.$alias);
             }
