@@ -2700,6 +2700,15 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testGetNthReturnsNthItemInCollection($collection)
+    {
+        $c = new $collection(['a', 'b', 'c','d']);
+        $this->assertSame('c', $c->getNth(3));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testMapWithKeysOverwritingKeys($collection)
     {
         $data = new $collection([

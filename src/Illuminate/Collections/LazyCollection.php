@@ -774,6 +774,18 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Get the nth item from the collection.
+     *
+     * @param int $nth
+     *
+     * @return mixed
+     */
+    public function getNth($nth)
+    {
+        return $this->values()->get($nth - 1);
+    }
+
+    /**
      * Get the items with the specified keys.
      *
      * @param  mixed  $keys

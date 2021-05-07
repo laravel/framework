@@ -674,6 +674,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function nth($step, $offset = 0);
 
     /**
+     * Get the nth item from the collection.
+     *
+     * @param  int $nth
+     * @return mixed
+     */
+    public function getNth($nth);
+
+    /**
      * Get the items with the specified keys.
      *
      * @param  mixed  $keys
