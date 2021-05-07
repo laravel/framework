@@ -712,6 +712,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             'posts.country',
             'posts.image',
             'posts.tags',
+            'posts.tags.users',
             'subscribedTo',
             'nonExistant',
             'other.nonExistant.relation',
@@ -724,10 +725,10 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertCount(3, $users[0]->countries);
         $this->assertInstanceOf(EloquentBuilderTestCountry::class, $users[0]->countries[0]);
-        $this->assertEquals('USA', $users[0]->countries[0]->name);
         $this->assertInstanceOf(EloquentBuilderTestCountry::class, $users[0]->countries[1]);
-        $this->assertEquals(2, $users[0]->countries[1]->country_id);
         $this->assertInstanceOf(EloquentBuilderTestCountry::class, $users[0]->countries[2]);
+        $this->assertEquals('USA', $users[0]->countries[0]->name);
+        $this->assertEquals(2, $users[0]->countries[1]->country_id);
 
         $this->assertCount(1, $users[0]->posts);
         $this->assertInstanceOf(EloquentBuilderTestPost::class, $users[0]->posts[0]);
@@ -741,10 +742,10 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertCount(2, $users[0]->posts[0]->tags);
         $this->assertInstanceOf(EloquentBuilderTestTag::class, $users[0]->posts[0]->tags[0]);
-
-        $this->assertCount(2, $users[0]->posts[0]->tags[0]->users);
-        $this->assertInstanceOf(EloquentBuilderTestUser::class, $users[0]->posts[0]->tags[0]->users[0]);
         $this->assertInstanceOf(EloquentBuilderTestTag::class, $users[0]->posts[0]->tags[1]);
+
+        $this->assertCount(1, $users[0]->posts[0]->tags[0]->users);
+        $this->assertInstanceOf(EloquentBuilderTestUser::class, $users[0]->posts[0]->tags[0]->users[0]);
 
         $this->assertCount(2, $users[0]->subscribedTo);
         $this->assertInstanceOf(EloquentBuilderTestPost::class, $users[0]->subscribedTo[0]);
