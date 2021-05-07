@@ -587,7 +587,7 @@ class Builder
         if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
             [$name, $alias] = [$segments[0], $segments[2]];
         }
-        
+
         // Then we will "back up" the existing where conditions on the query so we can
         // add our eager constraints. Then we will merge the wheres that were on the
         // query back to it in order that any where conditions might be specified.
