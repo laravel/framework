@@ -46,7 +46,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileColumnListing($table)
     {
-        return "select col.name from sys.columns as col
+        return "select col.name from master.sys.columns as col
                 join sys.objects as obj on col.object_id = obj.object_id
                 where obj.type = 'U' and obj.name = '$table'";
     }
@@ -212,7 +212,7 @@ class SqlServerGrammar extends Grammar
 
         $sql = "DECLARE @sql NVARCHAR(MAX) = '';";
         $sql .= "SELECT @sql += 'ALTER TABLE [dbo].[{$tableName}] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
-        $sql .= 'FROM SYS.COLUMNS ';
+        $sql .= 'FROM MASTER.SYS.COLUMNS ';
         $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$tableName}]') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
         $sql .= 'EXEC(@sql)';
 
