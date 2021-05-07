@@ -1502,6 +1502,15 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testClear($collection)
+    {
+        $data = new $collection(1, 2, 3);
+        $this->assertEquals([], $data->clear()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testJoin($collection)
     {
         $this->assertSame('a, b, c', (new $collection(['a', 'b', 'c']))->join(', '));

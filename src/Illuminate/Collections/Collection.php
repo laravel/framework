@@ -178,6 +178,16 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Remove all of the items from the collection.
+     *
+     * @return static
+     */
+    public function clear()
+    {
+        return $this->slice(0, $this->count() - 1);
+    }
+
+    /**
      * Cross join with the given lists, returning all possible permutations.
      *
      * @param  mixed  ...$lists

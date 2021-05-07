@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
+use Exception;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
@@ -171,6 +172,16 @@ class LazyCollection implements Enumerable
                 }
             }
         });
+    }
+
+    /**
+     * Remove all of the items from the collection.
+     *
+     * @return static
+     */
+    public function clear()
+    {
+        return $this->slice(0, $this->count() - 1);
     }
 
     /**
