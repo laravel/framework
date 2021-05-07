@@ -577,7 +577,18 @@ class Builder
      */
     protected function eagerLoadRelation(array $models, $name, Closure $constraints)
     {
-        // First we will "back up" the existing where conditions on the query so we can
+        // First we will determine if the name has been aliased using an "as" clause on the name
+        // and if it has we will extract the actual relationship name and the desired name of
+        // the resulting column. This allows multiple counts on the same relationship name.
+        $segments = explode(' ', $name);
+
+        unset($alias);
+
+        if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
+            [$name, $alias] = [$segments[0], $segments[2]];
+        }
+        
+        // Then we will "back up" the existing where conditions on the query so we can
         // add our eager constraints. Then we will merge the wheres that were on the
         // query back to it in order that any where conditions might be specified.
         $relation = $this->getRelation($name);
@@ -590,8 +601,8 @@ class Builder
         // using the relationship instance. Then we just return the finished arrays
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
-            $relation->initRelation($models, $name),
-            $relation->getEager(), $name
+            $relation->initRelation($models, $alias ?? $name),
+            $relation->getEager(), $alias ?? $name
         );
     }
 
