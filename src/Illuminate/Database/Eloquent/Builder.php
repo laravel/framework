@@ -411,6 +411,7 @@ class Builder
                     }
                 }
             }
+
             return $model;
         }, $items));
     }

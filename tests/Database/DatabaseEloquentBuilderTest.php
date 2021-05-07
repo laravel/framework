@@ -677,14 +677,14 @@ class DatabaseEloquentBuilderTest extends TestCase
                         'title' => 'Post 2',
                         'pivot' => [
                             'created_at' => '2010-01-01 00:00:00',
-                        ]
+                        ],
                     ],
                     [
                         'post_id' => 3,
                         'title' => 'Post 3',
                     ],
                 ],
-            ]
+            ],
         ];
 
         /** @var \Mockery\MockInterface|Grammar */
