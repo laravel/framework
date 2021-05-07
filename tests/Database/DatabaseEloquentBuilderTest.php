@@ -606,7 +606,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['hydrated'], $models);
     }
 
-    public function testGetModelsProperlyHydratesModelsWithRelations()
+    public function testGetModelsProperlyHydratesWithModels()
     {
         $users = [
             [
@@ -616,23 +616,58 @@ class DatabaseEloquentBuilderTest extends TestCase
                     'avatar_id' => 1,
                     'filename' => 'avatar1.png',
                 ],
+                'countries' => [ // hasManyThrough
+                    [
+                        'country_id' => 1,
+                        'name' => 'USA',
+                    ],
+                    [
+                        'country_id' => 2,
+                        'name' => 'Mexico',
+                    ],
+                    [
+                        'country_id' => 3,
+                        'name' => 'Canada',
+                    ],
+                ],
                 'posts' => [ // hasMany
                     [
                         'post_id' => 1,
                         'title' => 'Post 1',
-                        'image' => [ // morphOne
-                            'image_id' => 1,
-                            'filename' => 'image.png',
+                        'tags' => [ // morphToMany
+                            [
+                                'tag_id' => 1,
+                                'name' => 'tag1',
+                                'users' => [ // morphedByMany
+                                    [
+                                        'user_id' => 1,
+                                    ],
+                                ],
+                            ],
+                            [
+                                'tag_id' => 2,
+                                'name' => 'tag2',
+                            ],
                         ],
                         'comments' => [ // morphMany
                             [
                                 'comment_id' => 1,
                                 'comment' => 'Comment 1',
+                                'commentable_type' => EloquentBuilderTestPost::class,
+                                'commentable_id' => 1,
                                 'image' => [ // belongsTo
                                     'image_id' => 2,
                                     'filename' => 'image2.png',
+                                    'imageable_type' => null,
+                                    'imageable_id' => null,
                                 ],
                             ],
+                        ],
+                        'image' => [ // morphOne
+                            'image_id' => 1,
+                            'filename' => 'image.png',
+                            'imageable_type' => EloquentBuilderTestPost::class,
+                            'imageable_id' => 1,
                         ],
                     ],
                 ],
@@ -652,17 +687,71 @@ class DatabaseEloquentBuilderTest extends TestCase
             ]
         ];
 
-        // Most likely this is where mocking needs to happen
-        // getting error "Error: Call to a member function connection() on null"
+        /** @var \Mockery\MockInterface|Grammar */
+        $grammar = m::mock(Grammar::class);
+
+        /** @var \Mockery\MockInterface|Processor */
+        $processor = m::mock(Processor::class);
+
+        /** @var \Mockery\MockInterface|ConnectionInterface */
+        $connection = m::mock(ConnectionInterface::class, ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
+        $connection->shouldReceive('getName')->andReturn('foo');
+        $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
+            return new BaseBuilder($connection, $grammar, $processor);
+        });
+
+        /** @var \Mockery\MockInterface|ConnectionResolverInterface */
+        $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
+        Model::setConnectionResolver($resolver);
+
         $users = EloquentBuilderTestUser::hydrateWith($users, [
+            'avatar',
+            'countries',
             'posts',
-            'posts.image',
-            'posts.country',
             'posts.comments.image',
-            'subscribeTo',
+            'posts.country',
+            'posts.image',
+            'posts.tags',
+            'subscribedTo',
+            'nonExistant',
+            'other.nonExistant.relation',
         ]);
 
-        // $this->assertEquals(['hydrated'], $models);
+        $this->assertCount(1, $users);
+        $this->assertInstanceOf(EloquentBuilderTestUser::class, $users[0]);
+
+        $this->assertInstanceOf(EloquentBuilderTestAvatar::class, $users[0]->avatar);
+
+        $this->assertCount(3, $users[0]->countries);
+        $this->assertInstanceOf(EloquentBuilderTestCountry::class, $users[0]->countries[0]);
+        $this->assertEquals('USA', $users[0]->countries[0]->name);
+        $this->assertInstanceOf(EloquentBuilderTestCountry::class, $users[0]->countries[1]);
+        $this->assertEquals(2, $users[0]->countries[1]->country_id);
+        $this->assertInstanceOf(EloquentBuilderTestCountry::class, $users[0]->countries[2]);
+
+        $this->assertCount(1, $users[0]->posts);
+        $this->assertInstanceOf(EloquentBuilderTestPost::class, $users[0]->posts[0]);
+
+        $this->assertInstanceOf(EloquentBuilderTestImage::class, $users[0]->posts[0]->image);
+
+        $this->assertCount(1, $users[0]->posts[0]->comments);
+        $this->assertInstanceOf(EloquentBuilderTestComment::class, $users[0]->posts[0]->comments[0]);
+
+        $this->assertInstanceOf(EloquentBuilderTestImage::class, $users[0]->posts[0]->comments[0]->image);
+
+        $this->assertCount(2, $users[0]->posts[0]->tags);
+        $this->assertInstanceOf(EloquentBuilderTestTag::class, $users[0]->posts[0]->tags[0]);
+
+        $this->assertCount(2, $users[0]->posts[0]->tags[0]->users);
+        $this->assertInstanceOf(EloquentBuilderTestUser::class, $users[0]->posts[0]->tags[0]->users[0]);
+        $this->assertInstanceOf(EloquentBuilderTestTag::class, $users[0]->posts[0]->tags[1]);
+
+        $this->assertCount(2, $users[0]->subscribedTo);
+        $this->assertInstanceOf(EloquentBuilderTestPost::class, $users[0]->subscribedTo[0]);
+        $this->assertInstanceOf(EloquentBuilderTestPost::class, $users[0]->subscribedTo[1]);
+
+        $this->assertObjectNotHasAttribute('country', $users[0]->posts[0]);
+        $this->assertObjectNotHasAttribute('nonExistant', $users[0]);
     }
 
     public function testEagerLoadRelationsLoadTopLevelRelationships()
@@ -1821,6 +1910,11 @@ class EloquentBuilderTestUser extends Model
         return $this->hasOne(EloquentBuilderTestAvatar::class, 'user_id');
     }
 
+    public function countries()
+    {
+        return $this->hasManyThrough(EloquentBuilderTestCountry::class, EloquentBuilderTestPost::class, 'country_id', 'post_id');
+    }
+
     public function posts()
     {
         return $this->hasMany(EloquentBuilderTestPost::class, 'user_id');
@@ -1868,6 +1962,11 @@ class EloquentBuilderTestPost extends Model
         return $this->belongsToMany(EloquentBuilderTestUser::class, 'post_user', 'post_id', 'user_id');
     }
 
+    public function tags()
+    {
+        return $this->morphToMany(EloquentBuilderTestTag::class, 'taggable');
+    }
+
     public function image()
     {
         return $this->morphOne(EloquentBuilderTestImage::class, 'imageable');
@@ -1883,16 +1982,6 @@ class EloquentBuilderTestCountry extends Model
 {
     protected $table = 'countries';
     protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasManyThrough(EloquentBuilderTestPost::class, EloquentBuilderTestUser::class, 'country_id', 'user_id');
-    }
-
-    public function users()
-    {
-        return $this->hasMany(EloquentBuilderTestUser::class, 'country_id');
-    }
 }
 
 class EloquentBuilderTestImage extends Model
@@ -1929,6 +2018,9 @@ class EloquentBuilderTestComment extends Model
 
 class EloquentBuilderTestTag extends Model
 {
+    protected $table = 'tags';
+    protected $guarded = [];
+
     public function posts()
     {
         return $this->morphedByMany(EloquentBuilderTestPost::class, 'taggable');

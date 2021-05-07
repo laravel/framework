@@ -385,22 +385,28 @@ class Builder
                     }
                 }
                 foreach ($results as $key => $value) {
-                    if (method_exists($model, $key)) {
+                    if (method_exists($model, $key) && array_key_exists($key, $model->getAttributes())) {
                         $result = $model->$key();
                         if ($result instanceof \Illuminate\Database\Eloquent\Relations\Relation) {
                             if ($result instanceof \Illuminate\Database\Eloquent\Relations\HasOne
-                                || $result instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
-                                $relation = $result->getModel()::hydrateWith([$model->getAttributes()[$key]] ?? null, $value)->first();
+                                || $result instanceof \Illuminate\Database\Eloquent\Relations\HasOneThrough
+                                || $result instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo
+                                || $result instanceof \Illuminate\Database\Eloquent\Relations\MorphOne) {
+                                $relation = $result->getModel()::hydrateWith([$model->getAttributes()[$key]], $value)->first();
                                 $model->offsetUnset($key);
                                 $model->setRelation($key, $relation);
                             } elseif ($result instanceof \Illuminate\Database\Eloquent\Relations\HasMany
-                                || $result instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany) {
-                                $relation = $result->getModel()::hydrateWith($model->getAttributes()[$key] ?? null, $value);
+                                || $result instanceof \Illuminate\Database\Eloquent\Relations\HasManyThrough
+                                || $result instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany
+                                || $result instanceof \Illuminate\Database\Eloquent\Relations\MorphMany) {
+                                $relation = $result->getModel()::hydrateWith($model->getAttributes()[$key], $value);
                                 $model->offsetUnset($key);
                                 $model->setRelation($key, $relation);
                             } else {
                                 throw new \RuntimeException('Relation '.get_class($result).' is not hydratable.');
                             }
+                        } else {
+                            throw new \RuntimeException($key.' is not a relation.');
                         }
                     }
                 }
