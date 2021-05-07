@@ -651,7 +651,7 @@ class Arr
     {
         $query = http_build_query($array, '', '&', PHP_QUERY_RFC3986);
 
-        foreach(['%5B' => '[', '%5D' => ']'] as $quote => $value) {
+        foreach (['%5B' => '[', '%5D' => ']'] as $quote => $value) {
             $query = Str::replace($quote, $value, $query);
         }
 
