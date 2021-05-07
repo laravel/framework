@@ -11,6 +11,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
+use RuntimeException;
 
 trait BuildsQueries
 {
@@ -133,6 +134,10 @@ trait BuildsQueries
             }
 
             $lastId = $results->last()->{$alias};
+            
+            if ($lastId === null) {
+                throw new RuntimeException('Unable to determine last id using alias:'.$alias);
+            }
 
             unset($results);
 
