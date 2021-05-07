@@ -4100,6 +4100,16 @@ class ValidationValidatorTest extends TestCase
         ]);
         $this->assertFalse($v->passes());
 
+        // array rules with array elements
+        $v = new Validator($trans, $data, [
+            'foo' => 'Array',
+            'foo.*' => ['Numeric', 'Min:6'],
+            'foo.0' => ['Max:8'],
+            'foo.1' => ['Max:9'],
+            'foo.2' => ['Max:16'],
+        ]);
+        $this->assertFalse($v->passes());
+
         // array rules passes
         $v = new Validator($trans, $data, [
             'foo' => 'Array',

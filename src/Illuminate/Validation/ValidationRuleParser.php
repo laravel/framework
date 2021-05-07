@@ -62,7 +62,7 @@ class ValidationRuleParser
      */
     protected function explodeRules($rules)
     {
-        foreach ($rules as $key => $rule) {
+        foreach ($rules as $key => &$rule) {
             if (Str::contains($key, '*')) {
                 $rules = $this->explodeWildcardRules($rules, $key, [$rule]);
 
