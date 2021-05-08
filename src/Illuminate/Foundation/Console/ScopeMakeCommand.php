@@ -60,5 +60,4 @@ class ScopeMakeCommand extends GeneratorCommand
     {
         return $rootNamespace.'\Scopes';
     }
-
 }

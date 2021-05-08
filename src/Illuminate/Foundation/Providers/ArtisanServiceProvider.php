@@ -927,7 +927,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
-
     /**
      * Register the command.
      *
