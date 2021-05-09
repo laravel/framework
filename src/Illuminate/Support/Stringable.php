@@ -709,6 +709,25 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Apply the callback's string changes if the given "value" is false.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return mixed|$this
+     */
+    public function unless($value, $callback, $default = null)
+    {
+        if (! $value) {
+            return $this->when(true, $callback);
+        } elseif ($default) {
+            return $this->when(false, $callback, $default);
+        }
+
+        return $this;
+    }
+
+    /**
      * Apply the callback's string changes if the given "value" is true.
      *
      * @param  mixed  $value
