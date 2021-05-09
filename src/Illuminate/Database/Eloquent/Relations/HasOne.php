@@ -22,7 +22,7 @@ class HasOne extends HasOneOrMany
             return $this->getDefaultFor($this->parent);
         }
 
-        return $this->query->first() ?: $this->getDefaultFor($this->parent);
+        return $this->setReverseRelation($this->query->first()) ?: $this->getDefaultFor($this->parent);
     }
 
     /**

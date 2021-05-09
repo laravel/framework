@@ -273,11 +273,31 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($colin, $instances[1]);
     }
 
+    public function testHasManyWithReverse()
+    {
+        $relation = $this->getRelation()->withReverse('reverse');
+        $related = $relation->getRelated();
+        $relatedCollection = new Collection([$related]);
+        $relation->getQuery()->shouldReceive('get')->andReturn($relatedCollection);
+        $related->shouldReceive('setRelation')->once()->with('reverse', $relation->getParent());
+
+        $this->assertSame($relatedCollection, $relation->getResults());
+
+        $relation = $this->getRelation()->withReverse('reverse');
+        $related = $relation->getRelated();
+        $relatedCollection = new Collection([$related, $related]);
+        $relation->getQuery()->shouldReceive('get')->andReturn($relatedCollection);
+        $related->shouldReceive('setRelation')->twice()->with('reverse', $relation->getParent());
+
+        $this->assertSame($relatedCollection, $relation->getResults());
+    }
+
     protected function getRelation()
     {
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
         $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        $builder->shouldReceive('without')->with(['reverse'])->andReturn($builder);
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);

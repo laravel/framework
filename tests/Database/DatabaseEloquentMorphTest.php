@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -353,11 +354,41 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertFalse($relation->is($model));
     }
 
+    public function testMorphOneWithReverse()
+    {
+        $relation = $this->getOneRelation()->withReverse('reverse');
+        $related = $relation->getRelated();
+        $relation->getQuery()->shouldReceive('first')->once()->andReturn($related);
+        $related->shouldReceive('setRelation')->once()->with('reverse', $relation->getParent());
+
+        $this->assertSame($related, $relation->getResults());
+    }
+
+    public function testMorphManyWithReverse()
+    {
+        $relation = $this->getManyRelation()->withReverse('reverse');
+        $related = $relation->getRelated();
+        $relatedCollection = new Collection([$related]);
+        $relation->getQuery()->shouldReceive('get')->andReturn($relatedCollection);
+        $related->shouldReceive('setRelation')->once()->with('reverse', $relation->getParent());
+
+        $this->assertSame($relatedCollection, $relation->getResults());
+
+        $relation = $this->getManyRelation()->withReverse('reverse');
+        $related = $relation->getRelated();
+        $relatedCollection = new Collection([$related, $related]);
+        $relation->getQuery()->shouldReceive('get')->andReturn($relatedCollection);
+        $related->shouldReceive('setRelation')->twice()->with('reverse', $relation->getParent());
+
+        $this->assertSame($relatedCollection, $relation->getResults());
+    }
+
     protected function getOneRelation()
     {
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        $builder->shouldReceive('without')->with(['reverse'])->andReturn($builder);
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
@@ -373,6 +404,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        $builder->shouldReceive('without')->with(['reverse'])->andReturn($builder);
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);

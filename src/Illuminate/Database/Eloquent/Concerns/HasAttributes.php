@@ -131,6 +131,13 @@ trait HasAttributes
     public static $encrypter;
 
     /**
+     * Array of model relations that should be ignored.
+     *
+     * @var array
+     */
+    protected $ignoreRelations = [];
+
+    /**
      * Convert the model's attributes to an array.
      *
      * @return array
@@ -305,7 +312,11 @@ trait HasAttributes
             // toArray method on the instances which will convert both models and
             // collections to their proper array form and we'll set the values.
             if ($value instanceof Arrayable) {
-                $relation = $value->toArray();
+                if (! in_array($key, $this->ignoreRelations)) {
+                    array_push($this->ignoreRelations, $key);
+                    $relation = $value->toArray();
+                    array_pop($this->ignoreRelations);
+                }
             }
 
             // If the value is null, we'll still go ahead and set it in this list of

@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Database\Eloquent\Relations\Concerns\SupportsReverseRelations;
 
 abstract class HasOneOrMany extends Relation
 {
-    use InteractsWithDictionary;
+    use InteractsWithDictionary, SupportsReverseRelations;
 
     /**
      * The foreign key of the parent model.
@@ -145,9 +146,12 @@ abstract class HasOneOrMany extends Relation
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
             if (isset($dictionary[$key = $this->getDictionaryKey($model->getAttribute($this->localKey))])) {
-                $model->setRelation(
-                    $relation, $this->getRelationValue($dictionary, $key, $type)
+                $relationValue = $this->setReverseRelation(
+                    $this->getRelationValue($dictionary, $key, $type),
+                    $model
                 );
+
+                $model->setRelation($relation, $relationValue);
             }
         }
 

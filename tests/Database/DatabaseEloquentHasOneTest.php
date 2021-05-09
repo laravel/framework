@@ -307,11 +307,21 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertFalse($relation->is($model));
     }
 
+    public function testHasOneWithReverse()
+    {
+        $relation = $this->getRelation()->withReverse('reverse');
+        $this->builder->shouldReceive('first')->once()->andReturn($this->related);
+        $this->related->shouldReceive('setRelation')->once()->with('reverse', $this->parent);
+
+        $this->assertSame($this->related, $relation->getResults());
+    }
+
     protected function getRelation()
     {
         $this->builder = m::mock(Builder::class);
         $this->builder->shouldReceive('whereNotNull')->with('table.foreign_key');
         $this->builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        $this->builder->shouldReceive('without')->with(['reverse'])->andReturn($this->builder);
         $this->related = m::mock(Model::class);
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $this->parent = m::mock(Model::class);
