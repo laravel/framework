@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -38,7 +38,7 @@ trait SupportsReverseRelations
     /**
      * Determine if the related model has any reverse relation.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasReverse()
     {
@@ -71,8 +71,8 @@ trait SupportsReverseRelations
                 foreach ($this->withReverses as $reverseRelation) {
                     $results->setRelation($reverseRelation, $parent);
                 }
-            } elseif ($results instanceof Collection || $results instanceof LengthAwarePaginator) {
-                $items = $results instanceof LengthAwarePaginator ? $results->items() : $results;
+            } elseif ($results instanceof Collection || $results instanceof Paginator) {
+                $items = $results instanceof Paginator ? $results->items() : $results;
                 foreach ($items as $item) {
                     if ($item instanceof Model) {
                         foreach ($this->withReverses as $reverseRelation) {
