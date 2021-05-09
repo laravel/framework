@@ -172,7 +172,7 @@ abstract class GeneratorCommand extends Command
         $name = ltrim($name, '\\/');
 
         $name = str_replace('/', '\\', $name);
-        
+
         $name = Str::studly($name);
 
         $rootNamespace = $this->rootNamespace();
