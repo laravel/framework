@@ -42,7 +42,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => '',
-            'strictLoadEloquent' => true
+            'strict_load' => true
         ]);
     }
 
