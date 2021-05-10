@@ -192,19 +192,19 @@ class Password implements Rule, DataAwareRule
         $value = (string) $value;
 
         if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
-            $this->fail('The :attribute must contain at least one uppercase and one lowercase letter.');
+            $this->fail(__('validation.password_rules.mixedCase'));
         }
 
         if ($this->letters && ! preg_match('/\pL/u', $value)) {
-            $this->fail('The :attribute must contain at least one letter.');
+            $this->fail(__('validation.password_rules.letters'));
         }
 
         if ($this->symbols && ! preg_match('/\p{Z}|\p{S}|\p{P}/u', $value)) {
-            $this->fail('The :attribute must contain at least one symbol.');
+            $this->fail(__('validation.password_rules.symbols'));
         }
 
         if ($this->numbers && ! preg_match('/\pN/u', $value)) {
-            $this->fail('The :attribute must contain at least one number.');
+            $this->fail('validation.password_rules.numbers');
         }
 
         if (! empty($this->messages)) {
@@ -216,7 +216,7 @@ class Password implements Rule, DataAwareRule
             'threshold' => $this->compromisedThreshold,
         ])) {
             return $this->fail(
-                'The given :attribute has appeared in a data leak. Please choose a different :attribute.'
+                'validation.password_rules.uncompromised'
             );
         }
 
