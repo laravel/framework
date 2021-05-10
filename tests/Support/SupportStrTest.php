@@ -184,23 +184,20 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
     }
 
-    public function testStrContains()
+    /**
+     * @dataProvider strContainsProvider
+     */
+    public function testStrContains($haystack, $needles, $expected, $ignoreCase = false)
     {
-        $this->assertTrue(Str::contains('taylor', 'ylo'));
-        $this->assertTrue(Str::contains('taylor', 'taylor'));
-        $this->assertTrue(Str::contains('taylor', ['ylo']));
-        $this->assertTrue(Str::contains('taylor', ['xxx', 'ylo']));
-        $this->assertFalse(Str::contains('taylor', 'xxx'));
-        $this->assertFalse(Str::contains('taylor', ['xxx']));
-        $this->assertFalse(Str::contains('taylor', ''));
-        $this->assertFalse(Str::contains('', ''));
+        $this->assertEquals($expected, Str::contains($haystack, $needles, $ignoreCase));
     }
 
-    public function testStrContainsAll()
+    /**
+     * @dataProvider strContainsAllProvider
+     */
+    public function testStrContainsAll($haystack, $needles, $expected, $ignoreCase = false)
     {
-        $this->assertTrue(Str::containsAll('taylor otwell', ['taylor', 'otwell']));
-        $this->assertTrue(Str::containsAll('taylor otwell', ['taylor']));
-        $this->assertFalse(Str::containsAll('taylor otwell', ['taylor', 'xxx']));
+        $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
     }
 
     public function testParseCallback()
@@ -550,6 +547,36 @@ class SupportStrTest extends TestCase
             ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
+        ];
+    }
+
+    public function strContainsProvider()
+    {
+        return [
+            ['Taylor', 'ylo', true, true],
+            ['Taylor', 'ylo', true, false],
+            ['Taylor', 'taylor', true, true],
+            ['Taylor', 'taylor', false, false],
+            ['Taylor', ['ylo'], true, true],
+            ['Taylor', ['ylo'], true, false],
+            ['Taylor', ['xxx', 'ylo'], true, true],
+            ['Taylor', ['xxx', 'ylo'], true, false],
+            ['Taylor', 'xxx', false],
+            ['Taylor', ['xxx'], false],
+            ['Taylor', '', false],
+            ['', '', false],
+        ];
+    }
+
+    public function strContainsAllProvider()
+    {
+        return [
+            ['Taylor Otwell', ['taylor', 'otwell'], false, false],
+            ['Taylor Otwell', ['taylor', 'otwell'], true, true],
+            ['Taylor Otwell', ['taylor'], false, false],
+            ['Taylor Otwell', ['taylor'], true, true],
+            ['Taylor Otwell', ['taylor', 'xxx'], false, false],
+            ['Taylor Otwell', ['taylor', 'xxx'], false, true],
         ];
     }
 
