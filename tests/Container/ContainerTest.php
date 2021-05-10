@@ -565,6 +565,13 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
 
+    public function testContainerCanAutoWirePublicProperties() {
+        $container = new Container;
+        $class = $container->get(AutoWiredPropertyStub::class);
+
+        $this->assertInstanceOf(FrameWorkAuthorStub::class, $class->author);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(CircularDependencyException::class);
@@ -682,4 +689,14 @@ class ContainerInjectVariableStubWithInterfaceImplementation implements IContain
     {
         $this->something = $something;
     }
+}
+
+class AutoWiredPropertyStub implements IContainerContractStub
+{
+    /** @required */
+    public FrameWorkAuthorStub $author;
+}
+
+class FrameWorkAuthorStub {
+    public string $name = 'Taylor Otwell';
 }

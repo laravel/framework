@@ -12,6 +12,7 @@ use LogicException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
+use ReflectionProperty;
 
 class Container implements ArrayAccess, ContainerContract
 {
@@ -849,32 +850,90 @@ class Container implements ArrayAccess, ContainerContract
         $this->buildStack[] = $concrete;
 
         $constructor = $reflector->getConstructor();
+        $autowired = $this->hasPropertiesToWire($reflector->getProperties());
 
         // If there are no constructors, that means there are no dependencies then
         // we can just resolve the instances of the objects right away, without
         // resolving any other types or dependencies out of these containers.
-        if (is_null($constructor)) {
+        if (is_null($constructor) && empty($autowired)) {
             array_pop($this->buildStack);
 
             return new $concrete;
         }
 
-        $dependencies = $constructor->getParameters();
+        $instances = [];
 
-        // Once we have all the constructor's parameters we can create each of the
-        // dependency instances and then use the reflection instances to make a
-        // new instance of this class, injecting the created dependencies in.
+        if (!is_null($constructor)) {
+            $dependencies = $constructor->getParameters();
+            // Once we have all the constructor's parameters we can create each of the
+            // dependency instances and then use the reflection instances to make a
+            // new instance of this class, injecting the created dependencies in.
+            try {
+                $instances = $this->resolveDependencies($dependencies);
+            } catch (BindingResolutionException $e) {
+                array_pop($this->buildStack);
+
+                throw $e;
+            }
+
+            array_pop($this->buildStack);
+        }
+
         try {
-            $instances = $this->resolveDependencies($dependencies);
+            $resolvedProperties = $this->wireAndResolveProperties($reflector->getProperties());
         } catch (BindingResolutionException $e) {
             array_pop($this->buildStack);
 
             throw $e;
         }
 
-        array_pop($this->buildStack);
+        $instance =  $reflector->newInstanceArgs($instances);
 
-        return $reflector->newInstanceArgs($instances);
+        foreach($resolvedProperties as $propertyName => $resolvedInstance) {
+            $instance->{$propertyName} = $resolvedInstance;
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @param array $properties
+     * @return array
+     * @throws BindingResolutionException
+     * @throws CircularDependencyException
+     */
+    private function wireAndResolveProperties(array $properties)
+    {
+        $resolved = [];
+
+        /** @var ReflectionProperty $property */
+        foreach($properties as $property) {
+            if (false === $doc = $property->getDocComment()) {
+                continue;
+            }
+            if (false === stripos($doc, '@required') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
+                continue;
+            }
+
+            $resolved[$property->getName()] = $this->resolve($property->getType()->getName());
+        }
+
+        return $resolved;
+    }
+
+    private function hasPropertiesToWire(array $properties)
+    {
+        /** @var ReflectionProperty $property */
+        foreach ($properties as $property) {
+            if (false === $doc = $property->getDocComment()) {
+                continue;
+            }
+            if (false === stripos($doc, '@required') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
+                continue;
+            }
+
+            return true;
+        }
     }
 
     /**
