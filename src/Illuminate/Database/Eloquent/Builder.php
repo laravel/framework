@@ -631,7 +631,8 @@ class Builder
      */
     public function configureStrictLoading(array $models)
     {
-        if ($this->getConnection()->getConfig('strict_load')) {
+        if ($this->getConnection() &&
+            $this->getConnection()->getConfig('strict_load')) {
             foreach ($models as $model) {
                 $model->strictLoading = true;
             }

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
 use Closure;
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -202,6 +203,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('applyScopes')->andReturnSelf();
         $builder->shouldReceive('getModels')->with(['foo'])->andReturn(['bar']);
         $builder->shouldReceive('eagerLoadRelations')->with(['bar'])->andReturn(['bar', 'baz']);
+        $builder->shouldReceive('getConnection')->andReturnNull();
         $builder->setModel($this->getMockModel());
         $builder->getModel()->shouldReceive('newCollection')->with(['bar', 'baz'])->andReturn(new Collection(['bar', 'baz']));
 
