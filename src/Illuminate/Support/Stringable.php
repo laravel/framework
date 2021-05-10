@@ -718,13 +718,7 @@ class Stringable implements JsonSerializable
      */
     public function unless($value, $callback, $default = null)
     {
-        if (! $value) {
-            return $this->when(true, $callback);
-        } elseif ($default) {
-            return $this->when(false, $callback, $default);
-        }
-
-        return $this;
+        return $this->when(! $value, $callback, $default);
     }
 
     /**
