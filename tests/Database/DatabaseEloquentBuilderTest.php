@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
 use Closure;
-use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
