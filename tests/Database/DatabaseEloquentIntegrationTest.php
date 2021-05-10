@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
+use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
@@ -317,6 +319,86 @@ class DatabaseEloquentIntegrationTest extends TestCase
         ])->groupBy('email')->getQuery();
 
         $this->assertEquals(4, $query->getCountForPagination());
+    }
+
+    public function testCursorPaginatedModelCollectionRetrieval()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create($secondParams = ['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        CursorPaginator::currentCursorResolver(function () {
+            return null;
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(2, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertSame('taylorotwell@gmail.com', $models[0]->email);
+        $this->assertSame('abigailotwell@gmail.com', $models[1]->email);
+        $this->assertTrue($models->hasMorePages());
+        $this->assertTrue($models->hasPages());
+
+        CursorPaginator::currentCursorResolver(function () use ($secondParams) {
+            return new Cursor($secondParams);
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(1, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertSame('foo@gmail.com', $models[0]->email);
+        $this->assertFalse($models->hasMorePages());
+        $this->assertTrue($models->hasPages());
+    }
+
+    public function testPreviousCursorPaginatedModelCollectionRetrieval()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create($thirdParams = ['id' => 3, 'email' => 'foo@gmail.com']);
+
+        CursorPaginator::currentCursorResolver(function () use ($thirdParams) {
+            return new Cursor($thirdParams, false);
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(2, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertSame('taylorotwell@gmail.com', $models[0]->email);
+        $this->assertSame('abigailotwell@gmail.com', $models[1]->email);
+        $this->assertTrue($models->hasMorePages());
+        $this->assertTrue($models->hasPages());
+    }
+
+    public function testCursorPaginatedModelCollectionRetrievalWhenNoElements()
+    {
+        CursorPaginator::currentCursorResolver(function () {
+            return null;
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(0, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+
+        Paginator::currentPageResolver(function () {
+            return new Cursor(['id' => 1]);
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(0, $models);
+    }
+
+    public function testCursorPaginatedModelCollectionRetrievalWhenNoElementsAndDefaultPerPage()
+    {
+        $models = EloquentTestUser::oldest('id')->cursorPaginate();
+
+        $this->assertCount(0, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
     }
 
     public function testFirstOrCreate()

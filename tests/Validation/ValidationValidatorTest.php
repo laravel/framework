@@ -1206,6 +1206,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => '1'], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['bar' => 'required_unless:foo,null']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => true], ['bar' => 'required_unless:foo,null']);
         $this->assertTrue($v->fails());
 
@@ -5960,6 +5972,16 @@ class ValidationValidatorTest extends TestCase
         );
         $this->assertTrue($validator->passes());
         $this->assertSame(['foo' => true], $validator->validated());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => 'Hello'], ['bar' => 'exclude_unless:foo,true']);
+        $this->assertTrue($v->passes());
+        $this->assertSame([], $v->validated());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => 'Hello'], ['bar' => 'exclude_unless:foo,null']);
+        $this->assertTrue($v->passes());
+        $this->assertSame(['bar' => 'Hello'], $v->validated());
     }
 
     public function testExcludeWithout()
