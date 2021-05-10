@@ -66,7 +66,6 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         EloquentStrictLoadingTestModel1::create();
         EloquentStrictLoadingTestModel1::create();
 
-
         $models = EloquentStrictLoadingTestModel1::with('modelTwos')->get();
 
         $this->assertInstanceOf(Collection::class, $models[0]->modelTwos);
