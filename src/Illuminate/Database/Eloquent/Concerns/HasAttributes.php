@@ -110,6 +110,13 @@ trait HasAttributes
     protected $appends = [];
 
     /**
+     * Array of relationships that should be ignored when converting relations to array.
+     *
+     * @var array
+     */
+    protected $ignoreRelations = [];
+
+    /**
      * Indicates whether attributes are snake cased on arrays.
      *
      * @var bool
@@ -305,7 +312,11 @@ trait HasAttributes
             // toArray method on the instances which will convert both models and
             // collections to their proper array form and we'll set the values.
             if ($value instanceof Arrayable) {
-                $relation = $value->toArray();
+                if (! in_array($key, $this->ignoreRelations)) {
+                    array_push($this->ignoreRelations, $key);
+                    $relation = $value->toArray();
+                    array_pop($this->ignoreRelations);
+                }
             }
 
             // If the value is null, we'll still go ahead and set it in this list of

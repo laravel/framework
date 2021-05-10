@@ -865,6 +865,50 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('appended', $array['appendable']);
     }
 
+    public function testToArrayWithRelationsReferencingEachOther()
+    {
+        $model = new EloquentModelStub(['name' => 'model']);
+        $related1 = (new EloquentModelStubWithTrait(['name' => 'related 1']))->setRelation('parentModel', $model);
+        $related2 = (new EloquentModelStubWithTrait(['name' => 'related 2']))->setRelation('parentModel', $model);
+
+        $model->setRelation('foo', $related1);
+        $model->setRelation('bars', new BaseCollection([
+            $related1, $related2,
+        ]));
+
+        $array = $model->toArray();
+        $this->assertIsArray($array);
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('foo', $array);
+        $this->assertArrayHasKey('bars', $array);
+        $this->assertEquals('model', $array['name']);
+
+        $this->assertIsArray($array['foo']);
+        $this->assertArrayHasKey('name', $array['foo']);
+        $this->assertArrayHasKey('parent_model', $array['foo']);
+        $this->assertEquals('related 1', $array['foo']['name']);
+        $this->assertIsArray($array['foo']['parent_model']);
+        $this->assertArrayHasKey('name', $array['foo']['parent_model']);
+        $this->assertEquals('model', $array['foo']['parent_model']['name']);
+        $this->assertArrayNotHasKey('foo', $array['foo']['parent_model']);
+
+        $this->assertIsArray($array['bars']);
+        $this->assertIsArray($array['bars']);
+        $this->assertCount(2, $array['bars']);
+        $this->assertIsArray($array['bars'][0]);
+        $this->assertIsArray($array['bars'][1]);
+        $this->assertArrayHasKey('name', $array['bars'][0]);
+        $this->assertArrayHasKey('name', $array['bars'][1]);
+        $this->assertArrayHasKey('parent_model', $array['bars'][0]);
+        $this->assertArrayHasKey('parent_model', $array['bars'][1]);
+        $this->assertArrayHasKey('name', $array['bars'][0]['parent_model']);
+        $this->assertArrayHasKey('name', $array['bars'][1]['parent_model']);
+        $this->assertArrayNotHasKey('bars', $array['bars'][0]['parent_model']);
+        $this->assertArrayNotHasKey('bars', $array['bars'][1]['parent_model']);
+        $this->assertEquals('related 1', $array['bars'][0]['name']);
+        $this->assertEquals('related 2', $array['bars'][1]['name']);
+    }
+
     public function testVisibleCreatesArrayWhitelist()
     {
         $model = new EloquentModelStub;
