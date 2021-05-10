@@ -136,7 +136,7 @@ trait BuildsQueries
             $lastId = $results->last()->{$alias};
 
             if ($lastId === null) {
-                throw new RuntimeException('Unable to determine last id using alias:'.$alias);
+                throw new RuntimeException("The chunkById operation was aborted because the [{$alias}] column is not present in the query result.");
             }
 
             unset($results);
