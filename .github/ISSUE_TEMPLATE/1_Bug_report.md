@@ -14,3 +14,5 @@ about: "Report something that's broken. Please ensure your Laravel version is st
 
 
 ### Steps To Reproduce:
+
+<!-- If possible, please provide a GitHub repository to demonstrate your issue -->
