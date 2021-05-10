@@ -176,10 +176,16 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|string[]  $needles
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function contains($haystack, $needles)
+    public static function contains($haystack, $needles, $ignoreCase = false)
     {
+        if ($ignoreCase) {
+            $haystack = mb_strtolower($haystack);
+            $needles = array_map('mb_strtolower', (array) $needles);
+        }
+
         foreach ((array) $needles as $needle) {
             if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
@@ -194,10 +200,16 @@ class Str
      *
      * @param  string  $haystack
      * @param  string[]  $needles
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function containsAll($haystack, array $needles)
+    public static function containsAll($haystack, array $needles, $ignoreCase = false)
     {
+        if ($ignoreCase) {
+            $haystack = mb_strtolower($haystack);
+            $needles = array_map('mb_strtolower', $needles);
+        }
+
         foreach ($needles as $needle) {
             if (! static::contains($haystack, $needle)) {
                 return false;
