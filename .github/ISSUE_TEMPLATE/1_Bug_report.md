@@ -14,3 +14,6 @@ about: "Report something that's broken. Please ensure your Laravel version is st
 
 
 ### Steps To Reproduce:
+
+<!-- Preferable, please provide a GitHub repo by using the installer: -->
+<!-- laravel new bug-report --github="--public" -->
