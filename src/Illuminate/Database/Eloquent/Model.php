@@ -82,6 +82,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     protected $withCount = [];
 
     /**
+     * Indicates whether the lazy loading should be prevented.
+     *
+     * @var bool
+     */
+    public $strictLoading;
+
+    /**
      * The number of models to return for pagination.
      *
      * @var int
