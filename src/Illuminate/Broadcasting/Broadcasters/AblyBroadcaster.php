@@ -76,7 +76,7 @@ class AblyBroadcaster extends Broadcaster
             $request->channel_name,
             $request->socket_id,
             $userData = array_filter([
-                'user_id' => $this->retrieveUser($request, $channelName)->getAuthIdentifier(),
+                'user_id' => (string) $this->retrieveUser($request, $channelName)->getAuthIdentifier(),
                 'user_info' => $result,
             ])
         );

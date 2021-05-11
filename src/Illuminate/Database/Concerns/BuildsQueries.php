@@ -5,6 +5,7 @@ namespace Illuminate\Database\Concerns;
 use Illuminate\Container\Container;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
@@ -345,6 +346,22 @@ trait BuildsQueries
     {
         return Container::getInstance()->makeWith(Paginator::class, compact(
             'items', 'perPage', 'currentPage', 'options'
+        ));
+    }
+
+    /**
+     * Create a new cursor paginator instance.
+     *
+     * @param  \Illuminate\Support\Collection  $items
+     * @param  int  $perPage
+     * @param  \Illuminate\Pagination\Cursor  $cursor
+     * @param  array  $options
+     * @return \Illuminate\Pagination\Paginator
+     */
+    protected function cursorPaginator($items, $perPage, $cursor, $options)
+    {
+        return Container::getInstance()->makeWith(CursorPaginator::class, compact(
+            'items', 'perPage', 'cursor', 'options'
         ));
     }
 }

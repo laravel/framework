@@ -16,6 +16,8 @@ use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
+use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use InvalidArgumentException;
 use Mockery as m;
@@ -3562,6 +3564,143 @@ SQL;
         $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
             'path' => $path,
             'pageName' => $pageName,
+        ]), $result);
+    }
+
+    public function testCursorPaginate()
+    {
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['test' => 'bar']);
+        $builder = $this->getMockQueryBuilder()->orderBy('test');
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('where')->with('test', '>', 'bar')->once()->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['test'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateMultipleOrderColumns()
+    {
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['test' => 'bar', 'another' => 'foo']);
+        $builder = $this->getMockQueryBuilder()->orderBy('test')->orderBy('another');
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('whereRowValues')->with(['test', 'another'], '>', ['bar', 'foo'])->once()->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['test', 'another'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithDefaultArguments()
+    {
+        $perPage = 15;
+        $cursorName = 'cursor';
+        $cursor = new Cursor(['test' => 'bar']);
+        $builder = $this->getMockQueryBuilder()->orderBy('test');
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        CursorPaginator::currentCursorResolver(function () use ($cursor) {
+            return $cursor;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate();
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['test'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWhenNoResults()
+    {
+        $perPage = 15;
+        $cursorName = 'cursor';
+        $builder = $this->getMockQueryBuilder()->orderBy('test');
+        $path = 'http://foo.bar?cursor=3';
+
+        $results = [];
+
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        CursorPaginator::currentCursorResolver(function () {
+            return null;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate();
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, null, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['test'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithSpecificColumns()
+    {
+        $perPage = 16;
+        $columns = ['id', 'name'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['id' => 2]);
+        $builder = $this->getMockQueryBuilder()->orderBy('id');
+        $path = 'http://foo.bar?cursor=3';
+
+        $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
+
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['id'],
         ]), $result);
     }
 

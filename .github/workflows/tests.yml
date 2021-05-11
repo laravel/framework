@@ -28,6 +28,7 @@ jobs:
         ports:
           - 6379:6379
         options: --entrypoint redis-server
+
     strategy:
       fail-fast: true
       matrix:
@@ -37,7 +38,6 @@ jobs:
           - php: '8.1'
             flags: "--ignore-platform-req=php"
             stability: prefer-stable
-
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
