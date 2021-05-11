@@ -64,7 +64,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select * from sys.sysobjects where id = object_id(?, 'U')";
+        return "select * from sys.sysobjects where id = object_id(?) and xtype in ('U', 'V')";
     }
 
     /**
@@ -75,7 +75,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileColumnListing($table)
     {
-        return "select name from sys.columns where object_id = object_id('$table', 'U')";
+        return "select name from sys.columns where object_id = object_id('$table')";
     }
 
     /**
