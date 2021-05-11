@@ -7,26 +7,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
-use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
-class EloquentDeleteTest extends TestCase
+class EloquentDeleteTest extends DatabaseTestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();

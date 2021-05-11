@@ -9,6 +9,7 @@ use Orchestra\Testbench\TestCase;
 
 /**
  * @requires extension pdo_mysql
+ * @group MySQL
  */
 class DatabaseMySqlConnectionTest extends TestCase
 {
