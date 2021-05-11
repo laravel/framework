@@ -37,7 +37,9 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     protected function registerFlysystem()
     {
-        $this->registerManager();
+        $this->app->singleton('filesystem', function ($app) {
+            return new FilesystemManager($app);
+        });
 
         $this->app->singleton('filesystem.disk', function ($app) {
             return $app['filesystem']->disk($this->getDefaultDriver());
@@ -45,18 +47,6 @@ class FilesystemServiceProvider extends ServiceProvider
 
         $this->app->singleton('filesystem.cloud', function ($app) {
             return $app['filesystem']->disk($this->getCloudDriver());
-        });
-    }
-
-    /**
-     * Register the filesystem manager.
-     *
-     * @return void
-     */
-    protected function registerManager()
-    {
-        $this->app->singleton('filesystem', function ($app) {
-            return new FilesystemManager($app);
         });
     }
 
