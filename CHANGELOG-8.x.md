@@ -1,6 +1,20 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.39.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.40.0...8.x)
+
+
+## [v8.40.0 (2021-04-28)](https://github.com/laravel/framework/compare/v8.39.0...v8.40.0)
+
+### Added
+- Added `Illuminate\Database\Eloquent\Builder::withOnly()` ([#37144](https://github.com/laravel/framework/pull/37144))
+- Added `Illuminate\Bus\PendingBatch::add()` ([#37151](https://github.com/laravel/framework/pull/37151))
+
+### Fixed
+- Fixed Cache store with a name other than 'dynamodb' ([#37145](https://github.com/laravel/framework/pull/37145))
+
+### Changed
+- Added has environment variable to startProcess method in `ServeCommand` ([#37142](https://github.com/laravel/framework/pull/37142))
+- Some cast to int in `Illuminate\Database\Query\Grammars\SqlServerGrammar` ([09bf145](https://github.com/laravel/framework/commit/09bf1457e9df53e172e6fd5929cbafb539677c7c))
 
 
 ## [v8.39.0 (2021-04-27)](https://github.com/laravel/framework/compare/v8.38.0...v8.39.0)
