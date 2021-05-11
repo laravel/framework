@@ -156,7 +156,8 @@ class CallQueuedHandlerTestJobWithMiddleware
     public function middleware()
     {
         return [
-            new class {
+            new class
+            {
                 public function handle($command, $next)
                 {
                     CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = $command;

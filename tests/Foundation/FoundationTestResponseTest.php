@@ -39,7 +39,8 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertViewHasModel()
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
             public function is($model)
             {
                 return $this == $model;

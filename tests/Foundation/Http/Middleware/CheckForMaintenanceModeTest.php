@@ -105,7 +105,8 @@ class CheckForMaintenanceModeTest extends TestCase
     {
         $app = $this->createMaintenanceApplication();
 
-        $middleware = new class($app) extends CheckForMaintenanceMode {
+        $middleware = new class($app) extends CheckForMaintenanceMode
+        {
             public function __construct($app)
             {
                 parent::__construct($app);

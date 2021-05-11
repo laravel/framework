@@ -29,7 +29,8 @@ class FoundationHelpersTest extends TestCase
             return 'no need to rescue';
         }, 'rescued!'), 'no need to rescue');
 
-        $testClass = new class {
+        $testClass = new class
+        {
             public function test(int $a)
             {
                 return $a;

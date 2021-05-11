@@ -1157,12 +1157,28 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,false']);
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,true']);
         $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => '1'], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['bar' => 'required_unless:foo,null']);
+        $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => true], ['bar' => 'required_unless:foo,null']);
@@ -2403,7 +2419,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, [
-            'x' => new class {
+            'x' => new class
+            {
                 public function __toString()
                 {
                     return 'aslsdlks';
@@ -2413,7 +2430,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, [
-            'x' => new class {
+            'x' => new class
+            {
                 public function __toString()
                 {
                     return 'foo@gmail.com';
@@ -4792,7 +4810,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
             [
-                'name' => new class implements Rule {
+                'name' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return $value === 'taylor';
@@ -4814,7 +4833,8 @@ class ValidationValidatorTest extends TestCase
             ['name' => 'adam'],
             [
                 'name' => [
-                    new class implements Rule {
+                    new class implements Rule
+                    {
                         public function passes($attribute, $value)
                         {
                             return $value === 'taylor';
@@ -4868,7 +4888,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
             [
-                'states.*' => new class implements Rule {
+                'states.*' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return in_array($value, ['AK', 'HI']);
@@ -4906,7 +4927,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 42],
             [
-                'name' => new class implements Rule {
+                'name' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return $value === 'taylor';
@@ -4930,7 +4952,8 @@ class ValidationValidatorTest extends TestCase
             ['name' => 42],
             [
                 'name' => [
-                    new class implements Rule {
+                    new class implements Rule
+                    {
                         public function passes($attribute, $value)
                         {
                             return $value === 'taylor';
@@ -4958,7 +4981,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => ''],
             [
-                'name' => $rule = new class implements ImplicitRule {
+                'name' => $rule = new class implements ImplicitRule
+                {
                     public $called = false;
 
                     public function passes($attribute, $value)
@@ -5516,6 +5540,16 @@ class ValidationValidatorTest extends TestCase
         );
         $this->assertTrue($validator->passes());
         $this->assertSame(['foo' => true], $validator->validated());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => 'Hello'], ['bar' => 'exclude_unless:foo,true']);
+        $this->assertTrue($v->passes());
+        $this->assertSame([], $v->validated());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => 'Hello'], ['bar' => 'exclude_unless:foo,null']);
+        $this->assertTrue($v->passes());
+        $this->assertSame(['bar' => 'Hello'], $v->validated());
     }
 
     public function testExcludeValuesAreReallyRemoved()
