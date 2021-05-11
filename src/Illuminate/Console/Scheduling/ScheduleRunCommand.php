@@ -9,6 +9,7 @@ use Illuminate\Console\Events\ScheduledTaskSkipped;
 use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Throwable;
 
@@ -133,7 +134,8 @@ class ScheduleRunCommand extends Command
      */
     protected function runEvent($event)
     {
-        $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
+        $datetime = Carbon::now()->utc()->toDateTimeString();
+        $this->line('<info>['.$datetime.'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
         $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
 
