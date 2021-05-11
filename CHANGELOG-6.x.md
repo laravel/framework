@@ -1,6 +1,19 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.26...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.27...6.x)
+
+
+## [v6.20.27 (2021-05-11)](https://github.com/laravel/framework/compare/v6.20.26...v6.20.27)
+
+### Added
+- Support mass assignment to SQL Server views ([#37307](https://github.com/laravel/framework/pull/37307))
+
+### Fixed
+- Fixed `Illuminate\Database\Query\Builder::offset()` with non numbers $value ([#37164](https://github.com/laravel/framework/pull/37164))
+- Fixed unless rules ([#37291](https://github.com/laravel/framework/pull/37291))
+
+### Changed
+- Allow reporting reportable exceptions with the default logger ([#37235](https://github.com/laravel/framework/pull/37235))
 
 
 ## [v6.20.26 (2021-04-28)](https://github.com/laravel/framework/compare/v6.20.25...v6.20.26)
