@@ -357,7 +357,9 @@ class Builder
         $instance = $this->newModelInstance();
 
         return $instance->newCollection(array_map(function ($item) use ($instance) {
-            return $instance->newFromBuilder($item);
+            return tap($instance->newFromBuilder($item), function ($instance) {
+                $instance->strictLoading = optional($this->getConnection())->getConfig('strict_load');
+            });
         }, $items));
     }
 
@@ -586,7 +588,6 @@ class Builder
         // n+1 query issue for the developers to avoid running a lot of queries.
         if (count($models = $builder->getModels($columns)) > 0) {
             $models = $builder->eagerLoadRelations($models);
-            $models = $builder->configureStrictLoading($models);
         }
 
         return $builder->getModel()->newCollection($models);
@@ -619,24 +620,6 @@ class Builder
             // loaded on that query, because that is where they get hydrated as models.
             if (strpos($name, '.') === false) {
                 $models = $this->eagerLoadRelation($models, $name, $constraints);
-            }
-        }
-
-        return $models;
-    }
-
-    /**
-     * Configure strict loading for the models.
-     *
-     * @param  array  $models
-     * @return array
-     */
-    public function configureStrictLoading(array $models)
-    {
-        if ($this->getConnection() &&
-            $this->getConnection()->getConfig('strict_load')) {
-            foreach ($models as $model) {
-                $model->strictLoading = true;
             }
         }
 

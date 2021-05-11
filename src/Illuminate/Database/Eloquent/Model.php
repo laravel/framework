@@ -86,7 +86,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      *
      * @var bool
      */
-    public $strictLoading;
+    public $strictLoading = false;
 
     /**
      * The number of models to return for pagination.
