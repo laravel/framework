@@ -1,6 +1,33 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.40.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.41.0...8.x)
+
+
+## [v8.41.0 (2021-05-11)](https://github.com/laravel/framework/compare/v8.40.0...v8.41.0)
+
+### Added
+- Added `Illuminate\Database\Eloquent\Model::updateQuietly()` ([#37169](https://github.com/laravel/framework/pull/37169))
+- Added `Illuminate\Support\Str::replace()` ([#37186](https://github.com/laravel/framework/pull/37186))
+- Added Model key extraction to id on whereKey() and whereKeyNot() ([#37184](https://github.com/laravel/framework/pull/37184))
+- Added support for Pusher 6.x ([#37223](https://github.com/laravel/framework/pull/37223), [819db15](https://github.com/laravel/framework/commit/819db15a79621a93f26b4790dc944a74f7a04489))
+- Added `Illuminate/Foundation/Http/Kernel::getMiddlewarePriority()` ([#37271](https://github.com/laravel/framework/pull/37271))
+- Added cursor pagination (aka keyset pagination) ([#37216](https://github.com/laravel/framework/pull/37216), [#37315](https://github.com/laravel/framework/pull/37315))
+- Support mass assignment to SQL Server views ([#37307](https://github.com/laravel/framework/pull/37307))
+- Added `Illuminate/Support/Stringable::unless()` ([#37326](https://github.com/laravel/framework/pull/37326))
+
+### Fixed
+- Fixed `Illuminate\Database\Query\Builder::offset()` with non numbers $value ([#37164](https://github.com/laravel/framework/pull/37164))
+- Treat missing UUID in failed Queue Job as empty string (failed driver = database) ([#37251](https://github.com/laravel/framework/pull/37251))
+- Fixed fields not required with required_unless ([#37262](https://github.com/laravel/framework/pull/37262))
+- SqlServer Grammar: Bugfixes for hasTable and dropIfExists / support for using schema names in these functions ([#37280](https://github.com/laravel/framework/pull/37280))
+- Fix PostgreSQL dump and load for Windows ([#37320](https://github.com/laravel/framework/pull/37320))
+
+### Changed
+- Add fallback when migration is not anonymous class ([#37166](https://github.com/laravel/framework/pull/37166))
+- Ably expects clientId as string in `Illuminate\Broadcasting\Broadcasters\AblyBroadcaster::validAuthenticationResponse()` ([#37249](https://github.com/laravel/framework/pull/37249))
+- Computing controller middleware before getting excluding middleware ([#37259](https://github.com/laravel/framework/pull/37259))
+- Update mime extension check ([#37332](https://github.com/laravel/framework/pull/37332))
+- Added exception to chunkById() when last id cannot be determined ([#37294](https://github.com/laravel/framework/pull/37294))
 
 
 ## [v8.40.0 (2021-04-28)](https://github.com/laravel/framework/compare/v8.39.0...v8.40.0)
