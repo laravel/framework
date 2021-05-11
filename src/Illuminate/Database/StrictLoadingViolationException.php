@@ -14,7 +14,7 @@ class StrictLoadingViolationException extends RuntimeException
     public $model;
 
     /**
-     * The name of the column.
+     * The name of the relation.
      *
      * @var string
      */
