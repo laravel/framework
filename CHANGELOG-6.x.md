@@ -1,6 +1,15 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.25...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.26...6.x)
+
+
+## [v6.20.26 (2021-04-28)](https://github.com/laravel/framework/compare/v6.20.25...v6.20.26)
+
+### Fixed
+- Fixed Cache store with a name other than 'dynamodb' ([#37145](https://github.com/laravel/framework/pull/37145))
+
+### Changed
+- Some cast to int in `Illuminate\Database\Query\Grammars\SqlServerGrammar` ([09bf145](https://github.com/laravel/framework/commit/09bf1457e9df53e172e6fd5929cbafb539677c7c))
 
 
 ## [v6.20.25 (2021-04-27)](https://github.com/laravel/framework/compare/v6.20.24...v6.20.25)
