@@ -36,18 +36,18 @@ class BusFake implements QueueingDispatcher
     protected $commands = [];
 
     /**
+     * The commands that have been dispatched synchronously.
+     *
+     * @var array
+     */
+    protected $commandsSync = [];
+
+    /**
      * The commands that have been dispatched after the response has been sent.
      *
      * @var array
      */
     protected $commandsAfterResponse = [];
-
-    /**
-     * The commands that have been explicitly dispatched synchronously.
-     *
-     * @var array
-     */
-    protected $commandsSync = [];
 
     /**
      * The batches that have been dispatched.
@@ -136,65 +136,6 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
-     * Assert if a job was dispatched after the response was sent based on a truth-test callback.
-     *
-     * @param  string|\Closure  $command
-     * @param  callable|int|null  $callback
-     * @return void
-     */
-    public function assertDispatchedAfterResponse($command, $callback = null)
-    {
-        if ($command instanceof Closure) {
-            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
-        }
-
-        if (is_numeric($callback)) {
-            return $this->assertDispatchedAfterResponseTimes($command, $callback);
-        }
-
-        PHPUnit::assertTrue(
-            $this->dispatchedAfterResponse($command, $callback)->count() > 0,
-            "The expected [{$command}] job was not dispatched for after sending the response."
-        );
-    }
-
-    /**
-     * Assert if a job was pushed after the response was sent a number of times.
-     *
-     * @param  string  $command
-     * @param  int  $times
-     * @return void
-     */
-    public function assertDispatchedAfterResponseTimes($command, $times = 1)
-    {
-        $count = $this->dispatchedAfterResponse($command)->count();
-
-        PHPUnit::assertSame(
-            $times, $count,
-            "The expected [{$command}] job was pushed {$count} times instead of {$times} times."
-        );
-    }
-
-    /**
-     * Determine if a job was dispatched based on a truth-test callback.
-     *
-     * @param  string|\Closure  $command
-     * @param  callable|null  $callback
-     * @return void
-     */
-    public function assertNotDispatchedAfterResponse($command, $callback = null)
-    {
-        if ($command instanceof Closure) {
-            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
-        }
-
-        PHPUnit::assertCount(
-            0, $this->dispatchedAfterResponse($command, $callback),
-            "The unexpected [{$command}] job was dispatched for after sending the response."
-        );
-    }
-
-    /**
      * Assert if a job was explicitly dispatched synchronously based on a truth-test callback.
      *
      * @param  string|\Closure  $command
@@ -250,6 +191,65 @@ class BusFake implements QueueingDispatcher
         PHPUnit::assertCount(
             0, $this->dispatchedSync($command, $callback),
             "The unexpected [{$command}] job was dispatched synchronously."
+        );
+    }
+
+    /**
+     * Assert if a job was dispatched after the response was sent based on a truth-test callback.
+     *
+     * @param  string|\Closure  $command
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public function assertDispatchedAfterResponse($command, $callback = null)
+    {
+        if ($command instanceof Closure) {
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        }
+
+        if (is_numeric($callback)) {
+            return $this->assertDispatchedAfterResponseTimes($command, $callback);
+        }
+
+        PHPUnit::assertTrue(
+            $this->dispatchedAfterResponse($command, $callback)->count() > 0,
+            "The expected [{$command}] job was not dispatched for after sending the response."
+        );
+    }
+
+    /**
+     * Assert if a job was pushed after the response was sent a number of times.
+     *
+     * @param  string  $command
+     * @param  int  $times
+     * @return void
+     */
+    public function assertDispatchedAfterResponseTimes($command, $times = 1)
+    {
+        $count = $this->dispatchedAfterResponse($command)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
+            "The expected [{$command}] job was pushed {$count} times instead of {$times} times."
+        );
+    }
+
+    /**
+     * Determine if a job was dispatched based on a truth-test callback.
+     *
+     * @param  string|\Closure  $command
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertNotDispatchedAfterResponse($command, $callback = null)
+    {
+        if ($command instanceof Closure) {
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        }
+
+        PHPUnit::assertCount(
+            0, $this->dispatchedAfterResponse($command, $callback),
+            "The unexpected [{$command}] job was dispatched for after sending the response."
         );
     }
 
@@ -426,28 +426,6 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
-     * Get all of the jobs dispatched after the response was sent matching a truth-test callback.
-     *
-     * @param  string  $command
-     * @param  callable|null  $callback
-     * @return \Illuminate\Support\Collection
-     */
-    public function dispatchedAfterResponse(string $command, $callback = null)
-    {
-        if (! $this->hasDispatchedAfterResponse($command)) {
-            return collect();
-        }
-
-        $callback = $callback ?: function () {
-            return true;
-        };
-
-        return collect($this->commandsAfterResponse[$command])->filter(function ($command) use ($callback) {
-            return $callback($command);
-        });
-    }
-
-    /**
      * Get all of the jobs dispatched synchronously matching a truth-test callback.
      *
      * @param  string  $command
@@ -465,6 +443,28 @@ class BusFake implements QueueingDispatcher
         };
 
         return collect($this->commandsSync[$command])->filter(function ($command) use ($callback) {
+            return $callback($command);
+        });
+    }
+
+    /**
+     * Get all of the jobs dispatched after the response was sent matching a truth-test callback.
+     *
+     * @param  string  $command
+     * @param  callable|null  $callback
+     * @return \Illuminate\Support\Collection
+     */
+    public function dispatchedAfterResponse(string $command, $callback = null)
+    {
+        if (! $this->hasDispatchedAfterResponse($command)) {
+            return collect();
+        }
+
+        $callback = $callback ?: function () {
+            return true;
+        };
+
+        return collect($this->commandsAfterResponse[$command])->filter(function ($command) use ($callback) {
             return $callback($command);
         });
     }
@@ -503,9 +503,9 @@ class BusFake implements QueueingDispatcher
      * @param  string  $command
      * @return bool
      */
-    public function hasDispatchedAfterResponse($command)
+    public function hasDispatchedSync($command)
     {
-        return isset($this->commandsAfterResponse[$command]) && ! empty($this->commandsAfterResponse[$command]);
+        return isset($this->commandsSync[$command]) && ! empty($this->commandsSync[$command]);
     }
 
     /**
@@ -514,9 +514,9 @@ class BusFake implements QueueingDispatcher
      * @param  string  $command
      * @return bool
      */
-    public function hasDispatchedSync($command)
+    public function hasDispatchedAfterResponse($command)
     {
-        return isset($this->commandsSync[$command]) && ! empty($this->commandsSync[$command]);
+        return isset($this->commandsAfterResponse[$command]) && ! empty($this->commandsAfterResponse[$command]);
     }
 
     /**
