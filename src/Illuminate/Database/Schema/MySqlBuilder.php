@@ -76,7 +76,7 @@ class MySqlBuilder extends Builder
 
             $tables[] = reset($row);
         }
-        
+
         $tables = array_filter($tables, function ($table) {
             return str_starts_with($table, $this->connection->getTablePrefix());
         });
@@ -108,7 +108,7 @@ class MySqlBuilder extends Builder
 
             $views[] = reset($row);
         }
-        
+
         $views = array_filter($views, function ($view) {
             return str_starts_with($view, $this->connection->getTablePrefix());
         });
