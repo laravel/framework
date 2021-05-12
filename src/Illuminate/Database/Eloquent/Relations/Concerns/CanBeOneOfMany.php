@@ -31,7 +31,7 @@ trait CanBeOneOfMany
      * @param  string|null $relation
      * @return $this
      */
-    public function ofMany($column = null, $aggregate = 'MAX', $relation = null)
+    public function ofMany($column = 'id', $aggregate = 'MAX', $relation = null)
     {
         $this->isOneOfMany = true;
 
