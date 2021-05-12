@@ -27,25 +27,33 @@ trait CanBeOneOfMany
     /**
      * Wether the relation is a partial of a one-to-many relationship.
      *
-     * @param  string|null $ofMany
+     * @param  Closure|string|null $column
+     * @param  string|null $relation
      * @return $this
      */
-    public function ofMany(Closure $closure = null)
+    public function ofMany($column = null, $aggregate = 'MAX', $relation = null)
     {
         $this->isOneOfMany = true;
 
-        $this->relationName = $this->guessRelationship();
+        if (is_null($this->relationName = $relation)) {
+            $this->relationName = $this->guessRelationship();
+        }
 
         $sub = $this->query->getModel()->newQuery()
             ->groupBy($this->foreignKey);
 
-        if ($closure instanceof Closure) {
-            $closure($sub);
+        $keyName = $this->query->getModel()->getKeyName();
+
+        if ($column instanceof Closure) {
+            $column($sub);
+        } else {
+            $sub->selectRaw(
+                $aggregate.'('.$column.')' . $column == $keyName ? " as {$column}" : ", {$keyName}"
+            );
         }
 
-        $this->query->joinSub($sub, $this->relationName, function ($join) {
-            $key = $this->query->getModel()->getKeyName();
-            $join->on($this->qualifySubSelectColumn($key), '=', $this->query->getModel()->getTable() . '.'.$key);
+        $this->query->joinSub($sub, $this->relationName, function ($join) use ($keyName) {
+            $join->on($this->qualifySubSelectColumn($keyName), '=', $this->query->getModel()->getTable() . '.'.$keyName);
         });
 
         return $this;
