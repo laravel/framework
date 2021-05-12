@@ -4,6 +4,7 @@ namespace Illuminate\Http\Resources\Json;
 
 use Countable;
 use Illuminate\Http\Resources\CollectsResources;
+use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use IteratorAggregate;
 
@@ -108,7 +109,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      */
     public function toResponse($request)
     {
-        if ($this->resource instanceof AbstractPaginator) {
+        if ($this->resource instanceof AbstractPaginator || $this->resource instanceof AbstractCursorPaginator) {
             return $this->preparePaginatedResponse($request);
         }
 
