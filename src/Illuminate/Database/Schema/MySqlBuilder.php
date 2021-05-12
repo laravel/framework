@@ -78,7 +78,7 @@ class MySqlBuilder extends Builder
         }
         
         $tables = array_filter($tables, function ($table) {
-             return str_starts_with($table, $this->connection->getTablePrefix());
+            return str_starts_with($table, $this->connection->getTablePrefix());
         });
 
         if (empty($tables)) {
@@ -110,7 +110,7 @@ class MySqlBuilder extends Builder
         }
         
         $views = array_filter($views, function ($view) {
-             return str_starts_with($view, $this->connection->getTablePrefix());
+            return str_starts_with($view, $this->connection->getTablePrefix());
         });
 
         if (empty($views)) {
