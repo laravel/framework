@@ -107,7 +107,7 @@ class ScheduleRunCommand extends Command
         }
 
         if (! $this->eventsRan) {
-            $this->info('No scheduled commands are ready to run.');
+            $this->info('['.$this->getStartedAtAsString().'] No scheduled commands are ready to run.');
         }
     }
 
@@ -122,7 +122,7 @@ class ScheduleRunCommand extends Command
         if ($this->schedule->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
-            $this->line('<info>Skipping command (has already run on another server):</info> '.$event->getSummaryForDisplay());
+            $this->line('<info>['.$this->getStartedAtAsString().'] Skipping command (has already run on another server):</info> '.$event->getSummaryForDisplay());
         }
     }
 
@@ -134,8 +134,7 @@ class ScheduleRunCommand extends Command
      */
     protected function runEvent($event)
     {
-        $datetime = Carbon::now()->utc()->toDateTimeString();
-        $this->line('<info>['.$datetime.'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
+        $this->line('<info>['.$this->getStartedAtAsString().'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
         $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
 
@@ -155,5 +154,15 @@ class ScheduleRunCommand extends Command
 
             $this->handler->report($e);
         }
+    }
+
+    /**
+     * Return started at time as string
+     *
+     * @return string
+     */
+    private function getStartedAtAsString()
+    {
+        return $this->startedAt->format('Y-m-d H:i:s');
     }
 }
