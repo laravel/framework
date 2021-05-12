@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Database\Eloquent;
 
+use Closure;
+
 interface PartialRelation
 {
     /**
@@ -10,7 +12,7 @@ interface PartialRelation
      * @param  string|null $relation
      * @return $this
      */
-    public function ofMany($relation = null);
+    public function ofMany(Closure $closure = null);
 
     /**
      * Determines wether the relationship is one-of-many.
@@ -18,12 +20,4 @@ interface PartialRelation
      * @return bool
      */
     public function isOneOfMany();
-
-    /**
-     * Resolve the one-of-many query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder|null $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function resolveOneOfManyQuery();
 }

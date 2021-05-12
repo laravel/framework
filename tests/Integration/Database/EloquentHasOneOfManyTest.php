@@ -63,7 +63,9 @@ class User extends Model
 
     public function latest_login()
     {
-        return $this->hasOne(Login::class)->ofMany()->orderByDesc('id');
+        return $this->hasOne(Login::class)->ofMany(function($q) {
+            $q->selectRaw('MAX(id) as id');
+        });
     }
 }
 

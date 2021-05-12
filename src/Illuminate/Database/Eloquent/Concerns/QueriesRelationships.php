@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
-use Illuminate\Contracts\Database\Eloquent\PartialRelation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -47,7 +46,8 @@ trait QueriesRelationships
                         : 'getRelationExistenceCountQuery';
 
         $hasQuery = $relation->{$method}(
-            $relation->getRelated()->newQueryWithoutRelationships(), $this
+            $relation->getRelated()->newQueryWithoutRelationships(),
+            $this
         );
 
         // Next we will call any given callback as an "anonymous" scope so they can get the
@@ -58,7 +58,11 @@ trait QueriesRelationships
         }
 
         return $this->addHasWhere(
-            $hasQuery, $relation, $operator, $count, $boolean
+            $hasQuery,
+            $relation,
+            $operator,
+            $count,
+            $boolean
         );
     }
 
@@ -399,7 +403,9 @@ trait QueriesRelationships
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // sub-query. We'll format this relationship name and append this column if needed.
             $query = $relation->getRelationExistenceQuery(
-                $relation->getRelated()->newQuery(), $this, new Expression($expression)
+                $relation->getRelated()->newQuery(),
+                $this,
+                new Expression($expression)
             )->setBindings([], 'select');
 
             $query->callScope($constraints);
@@ -412,7 +418,7 @@ trait QueriesRelationships
             $query->orders = null;
             $query->setBindings([], 'order');
 
-            if (count($query->columns) > 1 && ! $this->isOneOfMany($relation)) {
+            if (count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];
                 $query->bindings['select'] = [];
             }
@@ -431,18 +437,6 @@ trait QueriesRelationships
         }
 
         return $this;
-    }
-
-    /**
-     * Determines whether the given relation is one-of-many.
-     *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
-     * @return bool
-     */
-    protected function isOneOfMany($relation)
-    {
-        return $relation instanceof PartialRelation
-            && $relation->isOneOfMany();
     }
 
     /**
@@ -516,9 +510,7 @@ trait QueriesRelationships
      */
     protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
     {
-        if (! $this->isOneOfMany($relation)) {
-            $hasQuery->mergeConstraintsFrom($relation->getQuery());
-        }
+        $hasQuery->mergeConstraintsFrom($relation->getQuery());
 
         return $this->canUseExistsForExistenceCheck($operator, $count)
                 ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $operator === '<' && $count === 1)
@@ -541,7 +533,8 @@ trait QueriesRelationships
         return $this->withoutGlobalScopes(
             $from->removedScopes()
         )->mergeWheres(
-            $from->getQuery()->wheres, $whereBindings
+            $from->getQuery()->wheres,
+            $whereBindings
         );
     }
 

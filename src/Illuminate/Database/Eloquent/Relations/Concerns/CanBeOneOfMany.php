@@ -2,9 +2,11 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait CanBeOneOfMany
 {
@@ -16,13 +18,6 @@ trait CanBeOneOfMany
     protected $isOneOfMany = false;
 
     /**
-     * The one-of-many parent query builder.
-     *
-     * @var \Illuminate\Database\Eloquent\Builder
-     */
-    protected $oneOfManyQuery;
-
-    /**
      * The name of the relationship.
      *
      * @var string
@@ -30,30 +25,28 @@ trait CanBeOneOfMany
     protected $relationName;
 
     /**
-     * The methods that should be forwarded to the one-of-many query builder
-     * instance.
-     *
-     * @var array
-     */
-    protected $forwardToOneOfManyQuery = [
-        'get', 'exists', 'count', 'sum', 'avg', 'first', 'join', 'crossJoin',
-    ];
-
-    /**
      * Wether the relation is a partial of a one-to-many relationship.
      *
      * @param  string|null $ofMany
      * @return $this
      */
-    public function ofMany($relation = null)
+    public function ofMany(Closure $closure = null)
     {
         $this->isOneOfMany = true;
 
-        $this->setOneOfManyQuery();
+        $this->relationName = $this->guessRelationship();
 
-        if (! $this->relationName = $relation) {
-            $this->relationName = $this->guessRelationship();
+        $sub = $this->query->getModel()->newQuery()
+            ->groupBy($this->foreignKey);
+
+        if ($closure instanceof Closure) {
+            $closure($sub);
         }
+
+        $this->query->joinSub($sub, $this->relationName, function ($join) {
+            $key = $this->query->getModel()->getKeyName();
+            $join->on($this->qualifySubSelectColumn($key), '=', $this->query->getModel()->getTable() . '.'.$key);
+        });
 
         return $this;
     }
@@ -78,20 +71,6 @@ trait CanBeOneOfMany
     public function getRelationName()
     {
         return $this->relationName;
-    }
-
-    /**
-     * Initially set one-of-many parent query.
-     *
-     * @return void
-     */
-    protected function setOneOfManyQuery()
-    {
-        if ($this->oneOfManyQuery) {
-            return;
-        }
-
-        $this->oneOfManyQuery = $this->newOneOfManyQuery();
     }
 
     /**
@@ -122,21 +101,6 @@ trait CanBeOneOfMany
     public function isOneOfMany()
     {
         return $this->isOneOfMany;
-    }
-
-    /**
-     * Add subselect contstraints to the given query builder.
-     *
-     * @param  Builder $query
-     * @return void
-     */
-    protected function addSubSelectConstraintsTo(Builder $query)
-    {
-        $query
-            ->from($this->getRelatedTableName(), $this->getSubSelectTableAlias())
-            ->whereColumn($this->qualifySubSelectColumn($this->foreignKey), $this->foreignKey)
-            ->select($this->qualifySubSelectColumn($query->getModel()->getKeyName()))
-            ->take(1);
     }
 
     /**
@@ -180,76 +144,5 @@ trait CanBeOneOfMany
     protected function newOneOfManyQuery()
     {
         return $this->query->getModel()->newQuery();
-    }
-
-    /**
-     * Resolve the one-of-many query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder|null $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function resolveOneOfManyQuery(Builder $query = null)
-    {
-        if (is_null($query)) {
-            $query = $this->query;
-        }
-
-        $this->addSubSelectConstraintsTo($query);
-
-        return $this->oneOfManyQuery
-            ->whereExists(function ($existsQuery) use ($query) {
-                $existsQuery->selectSub($query, $this->getSubSelectAlias());
-
-                if ($query->getConnection() instanceof SQLiteConnection) {
-                    $existsQuery->whereColumn(
-                        $this->getSubSelectAlias(),
-                        $this->getRelatedKeyName()
-                    );
-                } else {
-                    $existsQuery->havingRaw(
-                        $this->getSubSelectAlias().' = '.$this->getRelatedKeyName()
-                    );
-                }
-            });
-    }
-
-    /**
-     * Determines wether the given query method should be forwarded to the
-     * one-of-many query.
-     *
-     * @param string $method
-     * @return bool
-     */
-    protected function shouldForwardedToOneOfManyQuery($method)
-    {
-        return $this->isOneOfMany()
-            && in_array($method, $this->forwardToOneOfManyQuery);
-    }
-
-    /**
-     * Handle dynamic method calls to the relationship.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        if (static::hasMacro($method)) {
-            return $this->macroCall($method, $parameters);
-        }
-
-        $query = $this->query;
-        if ($this->shouldForwardedToOneOfManyQuery($method)) {
-            $query = $this->resolveOneOfManyQuery();
-        }
-
-        $result = $this->forwardCallTo($query, $method, $parameters);
-
-        if ($result === $query) {
-            return $this;
-        }
-
-        return $result;
     }
 }

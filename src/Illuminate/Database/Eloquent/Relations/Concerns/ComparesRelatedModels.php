@@ -84,7 +84,7 @@ trait ComparesRelatedModels
             return true;
         }
 
-        return $this->resolveOneOfManyQuery()
+        return $this->query
             ->whereKey($model->getKey())
             ->exists();
     }

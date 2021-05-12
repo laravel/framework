@@ -25,13 +25,7 @@ class HasOne extends HasOneOrMany implements PartialRelation
             return $this->getDefaultFor($this->parent);
         }
 
-        if ($this->isOneOfMany()) {
-            $result = $this->resolveOneOfManyQuery()->first();
-        } else {
-            $result = $this->query->first();
-        }
-
-        return $result ?: $this->getDefaultFor($this->parent);
+        return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
     /**
@@ -88,25 +82,6 @@ class HasOne extends HasOneOrMany implements PartialRelation
     }
 
     /**
-     * Set the constraints for an eager load of the relation.
-     *
-     * @param  array $models
-     * @return void
-     */
-    public function addEagerConstraints(array $models)
-    {
-        if (! $this->isOneOfMany()) {
-            return parent::addEagerConstraints($models);
-        }
-
-        $whereIn = $this->whereInMethod($this->parent, $this->localKey);
-
-        $this->oneOfManyQuery->{$whereIn}(
-            $this->foreignKey, $this->getKeys($models, $this->localKey)
-        );
-    }
-
-    /**
      * Add the constraints for an internal relationship existence query.
      *
      * Essentially, these queries compare on column names like whereColumn.
@@ -122,29 +97,10 @@ class HasOne extends HasOneOrMany implements PartialRelation
             return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
         }
 
-        $query->whereColumn(
+        $query->getQuery()->joins = $this->query->getQuery()->joins;
+
+        return $query->select($columns)->whereColumn(
             $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
         );
-
-        $query->getQuery()->orders = $this->query->getQuery()->orders;
-
-        $this->oneOfManyQuery->select($columns);
-
-        return $this->resolveOneOfManyQuery($query);
-    }
-
-    /**
-     * Execute the query as a "select" statement.
-     *
-     * @param  array                                    $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function get($columns = ['*'])
-    {
-        if (! $this->isOneOfMany()) {
-            return parent::get($columns);
-        }
-
-        return $this->resolveOneOfManyQuery()->get($columns);
     }
 }
