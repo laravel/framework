@@ -46,8 +46,7 @@ trait QueriesRelationships
                         : 'getRelationExistenceCountQuery';
 
         $hasQuery = $relation->{$method}(
-            $relation->getRelated()->newQueryWithoutRelationships(),
-            $this
+            $relation->getRelated()->newQueryWithoutRelationships(), $this
         );
 
         // Next we will call any given callback as an "anonymous" scope so they can get the
@@ -58,11 +57,7 @@ trait QueriesRelationships
         }
 
         return $this->addHasWhere(
-            $hasQuery,
-            $relation,
-            $operator,
-            $count,
-            $boolean
+            $hasQuery, $relation, $operator, $count, $boolean
         );
     }
 
@@ -403,9 +398,7 @@ trait QueriesRelationships
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // sub-query. We'll format this relationship name and append this column if needed.
             $query = $relation->getRelationExistenceQuery(
-                $relation->getRelated()->newQuery(),
-                $this,
-                new Expression($expression)
+                $relation->getRelated()->newQuery(), $this, new Expression($expression)
             )->setBindings([], 'select');
 
             $query->callScope($constraints);
@@ -533,8 +526,7 @@ trait QueriesRelationships
         return $this->withoutGlobalScopes(
             $from->removedScopes()
         )->mergeWheres(
-            $from->getQuery()->wheres,
-            $whereBindings
+            $from->getQuery()->wheres, $whereBindings
         );
     }
 
