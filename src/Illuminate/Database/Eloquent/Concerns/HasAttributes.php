@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\StrictLoadingViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
@@ -426,6 +427,10 @@ trait HasAttributes
      */
     public function getRelationValue($key)
     {
+        if ($this->withStrictLoading && ! $this->relationLoaded($key)) {
+            throw new StrictLoadingViolationException($this, $key);
+        }
+
         // If the key already exists in the relationships array, it just means the
         // relationship has already been loaded, so we'll just return it out of
         // here because there is no need to query within the relations twice.

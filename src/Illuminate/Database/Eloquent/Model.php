@@ -82,6 +82,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     protected $withCount = [];
 
     /**
+     * Indicates whether strict loading should be enforced on this model.
+     *
+     * @var bool
+     */
+    public $withStrictLoading = false;
+
+    /**
      * The number of models to return for pagination.
      *
      * @var int
@@ -143,6 +150,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @var array
      */
     protected static $ignoreOnTouch = [];
+
+    /**
+     * Indicates whether strict loading should be enforced on all models.
+     *
+     * @var bool
+     */
+    protected static $strictLoading = false;
 
     /**
      * The name of the "created at" column.
@@ -331,6 +345,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         }
 
         return false;
+    }
+
+    /**
+     * Enable the strict loading mode.
+     *
+     * @return void
+     */
+    public static function enableStrictLoading()
+    {
+        static::$strictLoading = true;
     }
 
     /**
@@ -1761,6 +1785,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         } else {
             return $relationship->where($field, $value)->first();
         }
+    }
+
+    /**
+     * Determine if strict loading is enabled.
+     *
+     * @return bool
+     */
+    public static function strictLoadingEnabled()
+    {
+        return static::$strictLoading;
     }
 
     /**
