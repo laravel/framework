@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 trait CanBeOneOfMany
 {
@@ -39,11 +39,11 @@ trait CanBeOneOfMany
         }
 
         $keyName = $this->query->getModel()->getKeyName();
-        
+
         if (is_string($columns = $column)) {
             $columns = [
                 $column => $aggregate,
-                $keyName => $aggregate
+                $keyName => $aggregate,
             ];
         }
 
@@ -68,10 +68,9 @@ trait CanBeOneOfMany
 
             $previous = [
                 'sub'       => $sub,
-                'column'    => $column
+                'column'    => $column,
             ];
         }
-
 
         return $this;
     }
@@ -90,10 +89,10 @@ trait CanBeOneOfMany
             ->newQuery()
             ->groupBy($this->qualifyRelatedColumn($groupBy));
 
-        if (!is_null($column)) {
+        if (! is_null($column)) {
             $sub->selectRaw($aggregate.'('.$column.') as '.$column.','.$this->foreignKey);
         }
-            
+
         return $sub;
     }
 
@@ -184,7 +183,7 @@ trait CanBeOneOfMany
      */
     protected function qualifyRelatedColumn($column)
     {
-        return Str::contains($column, '.') ? $column : $this->getRelatedTableName().".".$column;
+        return Str::contains($column, '.') ? $column : $this->getRelatedTableName().'.'.$column;
     }
 
     /**
