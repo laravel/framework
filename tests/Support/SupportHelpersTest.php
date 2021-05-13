@@ -704,6 +704,39 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('From $_SERVER', env('foo'));
     }
 
+    public function testLetExecuteWhenValueNotNull()
+    {
+
+        $person = new PersonTestLet(new TitleLetTest());
+        $person->name = 'Gildas Tema';
+
+        let($person->name , function ($name) use($person){
+            $this->assertSame('Mr'.$name , $person->AddTitleToYourName($name) );
+        });
+    }
+
+    public function testLetNoExecuteCallBackWhenValueIsNotNull()
+    {
+        $titleMock = m::mock(TitleLetTest::class);
+        $titleMock->expects('getTitle')->andReturn('Mrs')->times(0);
+        $person = new PersonTestLet($titleMock);
+        $person->name =null;
+        let($person->name, function ($name) use($person){
+            $person->AddTitleToYourName($name);
+        });
+    }
+
+    public function testtestLetExecuteWhenValueNotNullWithMock()
+    {
+        $titleMock = m::mock(TitleLetTest::class);
+        $titleMock->expects('getTitle')->andReturn('Mrs')->times(1);
+        $person = new PersonTestLet($titleMock);
+        $person->name ='Gildas Tema';
+        let($person->name, function ($name) use($person){
+            $person->AddTitleToYourName($name);
+        });
+    }
+
     public function providesPregReplaceArrayData()
     {
         $pointerArray = ['Taylor', 'Otwell'];
@@ -790,5 +823,31 @@ class SupportTestArrayAccess implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
+    }
+}
+
+
+class PersonTestLet {
+    public $name;
+
+    public $title;
+    public function __construct(TitleLetTest $title)
+    {
+        $this->title = $title;
+    }
+
+    public function AddTitleToYourName($name)
+    {
+        return $this->title->getTitle(). $name;
+    }
+}
+
+
+
+
+class TitleLetTest
+{
+    public function  getTitle(){
+        return 'Mr';
     }
 }

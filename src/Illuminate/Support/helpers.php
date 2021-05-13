@@ -377,3 +377,15 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if( ! function_exists('let')) {
+    /**
+     * Execute the callback if the value passed is not null
+     *
+     * @param  mixed $value
+     * @param callable $callback
+     */
+    function let($value , callable $callback){
+        if (! is_null($value)) $callback($value);
+    }
+}
