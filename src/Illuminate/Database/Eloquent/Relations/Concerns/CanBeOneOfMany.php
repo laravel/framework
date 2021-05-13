@@ -3,10 +3,8 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Closure;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\JoinClause;
-use Illuminate\Database\SQLiteConnection;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait CanBeOneOfMany
 {
@@ -27,7 +25,8 @@ trait CanBeOneOfMany
     /**
      * Wether the relation is a partial of a one-to-many relationship.
      *
-     * @param  Closure|string|null $column
+     * @param  string|array|null $column
+     * @param  string|Closure|null $aggregate
      * @param  string|null $relation
      * @return $this
      */
@@ -39,24 +38,80 @@ trait CanBeOneOfMany
             $this->relationName = $this->guessRelationship();
         }
 
-        $sub = $this->query->getModel()->newQuery()
-            ->groupBy($this->foreignKey);
-
         $keyName = $this->query->getModel()->getKeyName();
-
-        if ($column instanceof Closure) {
-            $column($sub);
-        } else {
-            $sub->selectRaw(
-                $aggregate.'('.$column.')' . $column == $keyName ? " as {$column}" : ", {$keyName}"
-            );
+        
+        if (is_string($columns = $column)) {
+            $columns = [
+                $column => $aggregate,
+                $keyName => $aggregate
+            ];
         }
 
-        $this->query->joinSub($sub, $this->relationName, function ($join) use ($keyName) {
-            $join->on($this->qualifySubSelectColumn($keyName), '=', $this->query->getModel()->getTable() . '.'.$keyName);
-        });
+        if ($aggregate instanceof Closure) {
+            $closure = $aggregate;
+        }
+
+        foreach ($columns as $column => $aggregate) {
+            $groupBy = isset($previous) ? $previous['column'] : $this->foreignKey;
+
+            $sub = $this->newSubQuery($groupBy, $column, $aggregate);
+
+            if (isset($previous)) {
+                $this->addJoinSub($sub, $previous['sub'], $previous['column']);
+            } elseif (isset($closure)) {
+                $closure($sub);
+            }
+
+            if (array_key_last($columns) == $column) {
+                $this->addJoinSub($this->query, $sub, $column);
+            }
+
+            $previous = [
+                'sub'       => $sub,
+                'column'    => $column
+            ];
+        }
+
 
         return $this;
+    }
+
+    /**
+     * Get new grouped sub query for inner join clause.
+     *
+     * @param string $groupBy
+     * @param string|null $column
+     * @param string|null $aggregate
+     * @return void
+     */
+    protected function newSubQuery($groupBy, $column = null, $aggregate = null)
+    {
+        $sub = $this->query->getModel()
+            ->newQuery()
+            ->groupBy($this->qualifyRelatedColumn($groupBy));
+
+        if (!is_null($column)) {
+            $sub->selectRaw($aggregate.'('.$column.') as '.$column.','.$this->foreignKey);
+        }
+            
+        return $sub;
+    }
+
+    /**
+     * Add join sub.
+     *
+     * @param Builder $parent
+     * @param Builder $sub
+     * @param string $on
+     * @return void
+     */
+    protected function addJoinSub(Builder $parent, Builder $sub, $on)
+    {
+        $parent->joinSub($sub, $this->relationName, function ($join) use ($on) {
+            $join
+                ->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on))
+                ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
+        });
     }
 
     /**
@@ -119,6 +174,17 @@ trait CanBeOneOfMany
     public function getSubSelectTableAlias()
     {
         return $this->getRelationName();
+    }
+
+    /**
+     * Qualify related column.
+     *
+     * @param string $column
+     * @return string
+     */
+    protected function qualifyRelatedColumn($column)
+    {
+        return Str::contains($column, '.') ? $column : $this->getRelatedTableName().".".$column;
     }
 
     /**

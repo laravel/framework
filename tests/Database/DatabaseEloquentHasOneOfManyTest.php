@@ -16,8 +16,8 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $db = new DB;
 
         $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver'   => 'sqlite',
+            'database' => ':memory:',
         ]);
 
         $db->bootEloquent();
@@ -39,6 +39,19 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
         $this->schema()->create('logins', function ($table) {
             $table->increments('id');
+            $table->foreignId('user_id');
+        });
+
+        $this->schema()->create('states', function ($table) {
+            $table->increments('id');
+            $table->string('state');
+            $table->string('type');
+            $table->foreignId('user_id');
+        });
+
+        $this->schema()->create('prices', function ($table) {
+            $table->increments('id');
+            $table->dateTime('published_at');
             $table->foreignId('user_id');
         });
     }
@@ -188,6 +201,51 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame(1, $user->latest_login()->count());
     }
 
+    public function testAggregate()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $firstLogin = $user->logins()->create();
+        $user->logins()->create();
+
+        $user = HasOneOfManyTestUser::first();
+        $this->assertSame($firstLogin->id, $user->first_login->id);
+    }
+
+    public function testJoinConstraints()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $user->states()->create([
+            'type'  => 'foo',
+            'state' => 'draft',
+        ]);
+        $currentForState = $user->states()->create([
+            'type'  => 'foo',
+            'state' => 'active',
+        ]);
+        $user->states()->create([
+            'type'  => 'bar',
+            'state' => 'baz',
+        ]);
+
+        $user = HasOneOfManyTestUser::first();
+        $this->assertSame($currentForState->id, $user->foo_state->id);
+    }
+
+    public function testMultipleAggregates()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $user->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+        $price = $user->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+
+        $user = HasOneOfManyTestUser::first();
+        $this->assertSame($price->id, $user->price->id);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -225,15 +283,41 @@ class HasOneOfManyTestUser extends Eloquent
 
     public function latest_login()
     {
-        return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany(function($q) {
-            $q->selectRaw('MAX(id) as id');
-        });
+        return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany();
     }
 
-    public function latest_login_with_other_name()
+    public function first_login()
     {
-        return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany(function($q) {
-            $q->selectRaw('MAX(id) as id');
+        return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany('id', 'min');
+    }
+
+    public function states()
+    {
+        return $this->hasMany(HasOneOfManyTestState::class, 'user_id');
+    }
+
+    public function foo_state()
+    {
+        return $this->hasOne(HasOneOfManyTestState::class, 'user_id')->ofMany(
+            ['id' => 'max'],
+            function ($q) {
+                $q->where('type', 'foo');
+            }
+        );
+    }
+
+    public function prices()
+    {
+        return $this->hasMany(HasOneOfManyTestPrice::class, 'user_id');
+    }
+
+    public function price()
+    {
+        return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->ofMany([
+            'published_at' => 'max',
+            'id'           => 'max',
+        ], function ($q) {
+            $q->where('published_at', '<', now());
         });
     }
 }
@@ -243,4 +327,21 @@ class HasOneOfManyTestLogin extends Eloquent
     protected $table = 'logins';
     protected $guarded = [];
     public $timestamps = false;
+}
+
+class HasOneOfManyTestState extends Eloquent
+{
+    protected $table = 'states';
+    protected $guarded = [];
+    public $timestamps = false;
+    protected $fillable = ['type', 'state'];
+}
+
+class HasOneOfManyTestPrice extends Eloquent
+{
+    protected $table = 'prices';
+    protected $guarded = [];
+    public $timestamps = false;
+    protected $fillable = ['published_at'];
+    protected $casts = ['published_at' => 'datetime'];
 }
