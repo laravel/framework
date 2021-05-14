@@ -23,7 +23,7 @@ trait CanBeOneOfMany
     protected $relationName;
 
     /**
-     * whether the relation is a partial of a one-to-many relationship.
+     * Indicate that the relation is a single result of a larger one-to-many relationship.
      *
      * @param  string|array|null  $column
      * @param  string|Closure|null  $aggregate

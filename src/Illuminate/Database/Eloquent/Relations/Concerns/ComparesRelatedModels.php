@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use Illuminate\Contracts\Database\Eloquent\PartialRelation;
+use Illuminate\Contracts\Database\Eloquent\SupportsPartialRelations;
 use Illuminate\Database\Eloquent\Model;
 
 trait ComparesRelatedModels
@@ -20,7 +20,7 @@ trait ComparesRelatedModels
                $this->related->getTable() === $model->getTable() &&
                $this->related->getConnectionName() === $model->getConnectionName();
 
-        if ($match && $this instanceof PartialRelation && $this->isOneOfMany()) {
+        if ($match && $this instanceof SupportsPartialRelations && $this->isOneOfMany()) {
             return $this->query
                         ->whereKey($model->getKey())
                         ->exists();
