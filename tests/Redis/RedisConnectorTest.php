@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Redis;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\RedisManager;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class RedisConnectorTest extends TestCase
@@ -23,8 +22,6 @@ class RedisConnectorTest extends TestCase
         parent::tearDown();
 
         $this->tearDownRedis();
-
-        m::close();
     }
 
     public function testDefaultConfiguration()
