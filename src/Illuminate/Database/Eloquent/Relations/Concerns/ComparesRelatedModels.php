@@ -29,7 +29,6 @@ trait ComparesRelatedModels
         return $match;
     }
 
-
     /**
      * Determine if the model is not the related instance of the relationship.
      *
