@@ -15,12 +15,26 @@ trait ComparesRelatedModels
      */
     public function is($model)
     {
-        return ! is_null($model) &&
+        $match = ! is_null($model) &&
                $this->compareKeys($this->getParentKey(), $this->getRelatedKeyFrom($model)) &&
                $this->related->getTable() === $model->getTable() &&
-               $this->related->getConnectionName() === $model->getConnectionName() &&
-               $this->compareOneOfMany($model);
+               $this->related->getConnectionName() === $model->getConnectionName();
+        
+        if(! $match) {
+            return false;
+        }
+        
+        if(! $this instanceof PartialRelation && ! $this->isOneOfMany()) {
+            return $match;
+        }
+        
+        // For "one-of-many" relationships, existence must be checked since keys 
+        // also match for models that are not the related instance of the relationship.
+        return $this->query
+            ->whereKey($model->getKey())
+            ->exists();
     }
+
 
     /**
      * Determine if the model is not the related instance of the relationship.
@@ -66,26 +80,5 @@ trait ComparesRelatedModels
         }
 
         return $parentKey === $relatedKey;
-    }
-
-    /**
-     * Determine if the given model is the correct relationship model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|null  $model
-     * @return bool
-     */
-    protected function compareOneOfMany($model)
-    {
-        if (! $this instanceof PartialRelation) {
-            return true;
-        }
-
-        if (! $this->isOneOfMany()) {
-            return true;
-        }
-
-        return $this->query
-            ->whereKey($model->getKey())
-            ->exists();
     }
 }
