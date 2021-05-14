@@ -7,16 +7,17 @@ use Closure;
 interface PartialRelation
 {
     /**
-     * Wether the relation is a partial of a one-to-many relationship.
+     * Indicate that the relation is a partial of a one-to-many relationship.
      *
      * @param  Closure|string|null $column
      * @param  string|null $relation
+     * @param  string  $relation
      * @return $this
      */
     public function ofMany($column = 'id', $aggregate = 'MAX', $relation = null);
 
     /**
-     * Determines wether the relationship is one-of-many.
+     * Determine whether the relationship is a one-of-many relationship.
      *
      * @return bool
      */

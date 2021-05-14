@@ -84,11 +84,11 @@ class HasOne extends HasOneOrMany implements PartialRelation
     /**
      * Add the constraints for an internal relationship existence query.
      *
-     * Essentially, these queries compare on column names like whereColumn.
+     * Essentially, these queries compare on column names like "whereColumn".
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @param  \Illuminate\Database\Eloquent\Builder $parentQuery
-     * @param  array|mixed                           $columns
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])

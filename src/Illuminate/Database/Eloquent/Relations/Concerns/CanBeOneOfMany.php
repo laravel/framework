@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 trait CanBeOneOfMany
 {
     /**
-     * Determines wether the relationship is one-of-many.
+     * Determines whether the relationship is one-of-many.
      *
      * @var bool
      */
@@ -23,52 +23,49 @@ trait CanBeOneOfMany
     protected $relationName;
 
     /**
-     * Wether the relation is a partial of a one-to-many relationship.
+     * whether the relation is a partial of a one-to-many relationship.
      *
-     * @param  string|array|null $column
-     * @param  string|Closure|null $aggregate
-     * @param  string|null $relation
+     * @param  string|array|null  $column
+     * @param  string|Closure|null  $aggregate
+     * @param  string|null  $relation
      * @return $this
      */
     public function ofMany($column = 'id', $aggregate = 'MAX', $relation = null)
     {
         $this->isOneOfMany = true;
 
-        if (is_null($this->relationName = $relation)) {
-            $this->relationName = $this->guessRelationship();
-        }
+        $this->relationName = $relation ?: $this->guessRelationship();
 
         $keyName = $this->query->getModel()->getKeyName();
 
-        if (is_string($columns = $column)) {
-            $columns = [
-                $column => $aggregate,
-                $keyName => $aggregate,
-            ];
-        }
+        $columns = is_string($columns = $column) ? [
+            $column => $aggregate,
+            $keyName => $aggregate,
+        ] : $column;
 
         if ($aggregate instanceof Closure) {
             $closure = $aggregate;
         }
 
         foreach ($columns as $column => $aggregate) {
-            $groupBy = isset($previous) ? $previous['column'] : $this->foreignKey;
-
-            $sub = $this->newSubQuery($groupBy, $column, $aggregate);
+            $subQuery = $this->newSubQuery(
+                isset($previous) ? $previous['column'] : $this->foreignKey,
+                $column, $aggregate
+            );
 
             if (isset($previous)) {
-                $this->addJoinSub($sub, $previous['sub'], $previous['column']);
+                $this->addJoinSub($subQuery, $previous['sub'], $previous['column']);
             } elseif (isset($closure)) {
-                $closure($sub);
+                $closure($subQuery);
             }
 
             if (array_key_last($columns) == $column) {
-                $this->addJoinSub($this->query, $sub, $column);
+                $this->addJoinSub($this->query, $subQuery, $column);
             }
 
             $previous = [
-                'sub'       => $sub,
-                'column'    => $column,
+                'sub' => $subQuery,
+                'column' => $column,
             ];
         }
 
@@ -76,53 +73,82 @@ trait CanBeOneOfMany
     }
 
     /**
-     * Get new grouped sub query for inner join clause.
+     * Get a new query for the related model, grouping the query by the given column, often the foreign key of the relationship.
      *
-     * @param string $groupBy
-     * @param string|null $column
-     * @param string|null $aggregate
+     * @param  string  $groupBy
+     * @param  string|null  $column
+     * @param  string|null  $aggregate
      * @return void
      */
     protected function newSubQuery($groupBy, $column = null, $aggregate = null)
     {
-        $sub = $this->query->getModel()
+        $subQuery = $this->query->getModel()
             ->newQuery()
             ->groupBy($this->qualifyRelatedColumn($groupBy));
 
         if (! is_null($column)) {
-            $sub->selectRaw($aggregate.'('.$column.') as '.$column.','.$this->foreignKey);
+            $subQuery->selectRaw($aggregate.'('.$column.') as '.$column.', '.$this->foreignKey);
         }
 
-        return $sub;
+        return $subQuery;
     }
 
     /**
-     * Add join sub.
+     * Add the join subquery to the given query on the given column and the relationship's foreign key.
      *
-     * @param Builder $parent
-     * @param Builder $sub
-     * @param string $on
+     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $subQuery
+     * @param  string  $on
      * @return void
      */
-    protected function addJoinSub(Builder $parent, Builder $sub, $on)
+    protected function addJoinSub(Builder $parent, Builder $subQuery, $on)
     {
-        $parent->joinSub($sub, $this->relationName, function ($join) use ($on) {
-            $join
-                ->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on))
-                ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
+        $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
+            $join->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on))
+                 ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
         });
     }
 
     /**
-     * Guess the "hasOne" relationship name.
+     * Get the qualified column name for the one-of-many relationship using the subselect join query's alias.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function qualifySubSelectColumn($column)
+    {
+        return $this->getRelationName().'.'.last(explode('.', $column));
+    }
+
+    /**
+     * Qualify related column using the related table name if it is not already qualified.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    protected function qualifyRelatedColumn($column)
+    {
+        return Str::contains($column, '.') ? $column : $this->query->getModel()->getTable().'.'.$column;
+    }
+
+    /**
+     * Guess the "hasOne" relationship's name via backtrace.
      *
      * @return string
      */
     protected function guessRelationship()
     {
-        [$one, $two, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
+    }
 
-        return $caller['function'];
+    /**
+     * Determine whether the relationship is a one-of-many relationship.
+     *
+     * @return bool
+     */
+    public function isOneOfMany()
+    {
+        return $this->isOneOfMany;
     }
 
     /**
@@ -133,89 +159,5 @@ trait CanBeOneOfMany
     public function getRelationName()
     {
         return $this->relationName;
-    }
-
-    /**
-     * Get related key name.
-     *
-     * @return string
-     */
-    protected function getRelatedKeyName()
-    {
-        return $this->getRelatedTableName().'.'.$this->query->getModel()->getKeyName();
-    }
-
-    /**
-     * Get sub select alias.
-     *
-     * @return string
-     */
-    public function getSubSelectAlias()
-    {
-        return $this->getRelationName()."_{$this->localKey}";
-    }
-
-    /**
-     * Determines wether the relationship is one-of-many.
-     *
-     * @return bool
-     */
-    public function isOneOfMany()
-    {
-        return $this->isOneOfMany;
-    }
-
-    /**
-     * Get the subselect table alias.
-     *
-     * @return string
-     */
-    public function getSubSelectTableAlias()
-    {
-        return $this->getRelationName();
-    }
-
-    /**
-     * Qualify related column.
-     *
-     * @param string $column
-     * @return string
-     */
-    protected function qualifyRelatedColumn($column)
-    {
-        return Str::contains($column, '.') ? $column : $this->getRelatedTableName().'.'.$column;
-    }
-
-    /**
-     * Get the qualified column name for the one-of-many subselect.
-     *
-     * @param  string $column
-     * @return string
-     */
-    public function qualifySubSelectColumn($column)
-    {
-        $segments = explode('.', $column);
-
-        return $this->getSubSelectTableAlias().'.'.end($segments);
-    }
-
-    /**
-     * Get the related table name.
-     *
-     * @return string
-     */
-    protected function getRelatedTableName()
-    {
-        return $this->query->getModel()->getTable();
-    }
-
-    /**
-     * Get the result query builder instance for the given query builder.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function newOneOfManyQuery()
-    {
-        return $this->query->getModel()->newQuery();
     }
 }
