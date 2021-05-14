@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\CanBeOneOfMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
+use Illuminate\Database\Query\JoinClause;
 
 class HasOne extends HasOneOrMany implements SupportsPartialRelations
 {
@@ -102,5 +103,39 @@ class HasOne extends HasOneOrMany implements SupportsPartialRelations
         return $query->select($columns)->whereColumn(
             $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
         );
+    }
+
+    /**
+     * Add join sub constraints.
+     *
+     * @param JoinClause $join
+     * @return void
+     */
+    public function addJoinSubConstraints(JoinClause $join)
+    {
+        $join->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
+    }
+
+    /**
+     * Add constraints for inner join subselect.
+     *
+     * @param Builder $query
+     * @param string|null $column
+     * @param string|null $aggregate
+     * @return void
+     */
+    public function addSubQueryConstraints(Builder $query, $column = null, $aggregate = null)
+    {
+        $query->addSelect($this->foreignKey);
+    }
+
+    /**
+     * Get the columns the determine the relationship groups.
+     *
+     * @return array|string
+     */
+    public function getGroups()
+    {
+        return $this->foreignKey;
     }
 }

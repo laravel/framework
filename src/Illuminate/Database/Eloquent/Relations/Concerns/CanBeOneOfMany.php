@@ -4,6 +4,8 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 trait CanBeOneOfMany
@@ -21,6 +23,31 @@ trait CanBeOneOfMany
      * @var string
      */
     protected $relationName;
+
+    /**
+     * Add join sub constraints.
+     *
+     * @param JoinClause $join
+     * @return void
+     */
+    abstract public function addJoinSubConstraints(JoinClause $join);
+
+    /**
+     * Get the columns the determine the relationship groups.
+     *
+     * @return array|string
+     */
+    abstract public function getGroups();
+
+    /**
+     * Add constraints for inner join subselect.
+     *
+     * @param Builder $query
+     * @param string|null $column
+     * @param string|null $aggregate
+     * @return void
+     */
+    abstract public function addSubQueryConstraints(Builder $query, $column = null, $aggregate = null);
 
     /**
      * Indicate that the relation is a single result of a larger one-to-many relationship.
@@ -49,7 +76,7 @@ trait CanBeOneOfMany
 
         foreach ($columns as $column => $aggregate) {
             $subQuery = $this->newSubQuery(
-                isset($previous) ? $previous['column'] : $this->foreignKey,
+                isset($previous) ? $previous['column'] : $this->getGroups(),
                 $column, $aggregate
             );
 
@@ -75,7 +102,7 @@ trait CanBeOneOfMany
     /**
      * Get a new query for the related model, grouping the query by the given column, often the foreign key of the relationship.
      *
-     * @param  string  $groupBy
+     * @param  string|array  $groupBy
      * @param  string|null  $column
      * @param  string|null  $aggregate
      * @return void
@@ -83,12 +110,17 @@ trait CanBeOneOfMany
     protected function newSubQuery($groupBy, $column = null, $aggregate = null)
     {
         $subQuery = $this->query->getModel()
-            ->newQuery()
-            ->groupBy($this->qualifyRelatedColumn($groupBy));
+            ->newQuery();
+
+        foreach (Arr::wrap($groupBy) as $group) {
+            $subQuery->groupBy($this->qualifyRelatedColumn($group));
+        }
 
         if (! is_null($column)) {
-            $subQuery->selectRaw($aggregate.'('.$column.') as '.$column.', '.$this->foreignKey);
+            $subQuery->selectRaw($aggregate.'('.$column.') as '.$column);
         }
+
+        $this->addSubQueryConstraints($subQuery, $groupBy, $column, $aggregate);
 
         return $subQuery;
     }
@@ -104,8 +136,9 @@ trait CanBeOneOfMany
     protected function addJoinSub(Builder $parent, Builder $subQuery, $on)
     {
         $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
-            $join->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on))
-                 ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
+            $join->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on));
+
+            $this->addJoinSubConstraints($join, $on);
         });
     }
 
