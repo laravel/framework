@@ -54,7 +54,7 @@ trait CanBeOneOfMany
             );
 
             if (isset($previous)) {
-                $this->addJoinSub($subQuery, $previous['sub'], $previous['column']);
+                $this->addJoinSub($subQuery, $previous['subQuery'], $previous['column']);
             } elseif (isset($closure)) {
                 $closure($subQuery);
             }
@@ -64,7 +64,7 @@ trait CanBeOneOfMany
             }
 
             $previous = [
-                'sub' => $subQuery,
+                'subQuery' => $subQuery,
                 'column' => $column,
             ];
         }
