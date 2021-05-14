@@ -704,15 +704,14 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('From $_SERVER', env('foo'));
     }
 
-    public function testLetExecuteWhenValueNotNull()
+    public function testLetExecuteWhenValueNotNullAndReturnValue()
     {
-
         $person = new PersonTestLet(new TitleLetTest());
         $person->name = 'Gildas Tema';
-
-        let($person->name , function ($name) use($person){
-            $this->assertSame('Mr'.$name , $person->AddTitleToYourName($name) );
+        $resp =  let($person->name , function ($name) use($person){
+           return $person->AddTitleToYourName($name);
         });
+        $this->assertSame('Mr'.$person->name, $resp);
     }
 
     public function testLetNoExecuteCallBackWhenValueIsNotNull()

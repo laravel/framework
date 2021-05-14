@@ -386,6 +386,6 @@ if( ! function_exists('let')) {
      * @param callable $callback
      */
     function let($value , callable $callback){
-        if (! is_null($value)) $callback($value);
+        if (! is_null($value)) return $callback($value);
     }
 }
