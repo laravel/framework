@@ -59,10 +59,10 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
     {
         $product = MorphOneOfManyTestProduct::create();
         $product->states()->create([
-            'state' => 'draft'
+            'state' => 'draft',
         ]);
         $product->states()->create([
-            'state' => 'active'
+            'state' => 'active',
         ]);
 
         $this->assertNotNull($product->current_state);
@@ -73,13 +73,13 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
     {
         $product = MorphOneOfManyTestProduct::create();
         $product->states()->create([
-            'state' => 'draft'
+            'state' => 'draft',
         ]);
         $product->states()->create([
-            'state' => 'active'
+            'state' => 'active',
         ]);
         $state = $product->states()->make([
-            'state' => 'foo'
+            'state' => 'foo',
         ]);
         $state->stateful_type = 'bar';
         $state->save();
@@ -92,18 +92,18 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
     {
         $product = MorphOneOfManyTestProduct::create();
         $previousState = $product->states()->create([
-            'state' => 'draft'
+            'state' => 'draft',
         ]);
         $currentState = $product->states()->create([
-            'state' => 'active'
+            'state' => 'active',
         ]);
 
-        $exists = MorphOneOfManyTestProduct::whereHas('current_state', function($q) use($previousState){
+        $exists = MorphOneOfManyTestProduct::whereHas('current_state', function ($q) use ($previousState) {
             $q->whereKey($previousState->getKey());
         })->exists();
         $this->assertFalse($exists);
 
-        $exists = MorphOneOfManyTestProduct::whereHas('current_state', function($q) use($currentState){
+        $exists = MorphOneOfManyTestProduct::whereHas('current_state', function ($q) use ($currentState) {
             $q->whereKey($currentState->getKey());
         })->exists();
         $this->assertTrue($exists);
