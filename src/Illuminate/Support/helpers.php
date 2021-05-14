@@ -384,6 +384,7 @@ if( ! function_exists('let')) {
      *
      * @param  mixed $value
      * @param callable $callback
+     * @return mixed
      */
     function let($value , callable $callback){
         if (! is_null($value)) return $callback($value);
