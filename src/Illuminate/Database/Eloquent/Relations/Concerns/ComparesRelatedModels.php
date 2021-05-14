@@ -19,22 +19,21 @@ trait ComparesRelatedModels
                $this->compareKeys($this->getParentKey(), $this->getRelatedKeyFrom($model)) &&
                $this->related->getTable() === $model->getTable() &&
                $this->related->getConnectionName() === $model->getConnectionName();
-        
-        if(! $match) {
+
+        if (! $match) {
             return false;
         }
-        
-        if(! $this instanceof PartialRelation && ! $this->isOneOfMany()) {
+
+        if (! $this instanceof PartialRelation && ! $this->isOneOfMany()) {
             return $match;
         }
-        
-        // For "one-of-many" relationships, existence must be checked since keys 
+
+        // For "one-of-many" relationships, existence must be checked since keys
         // also match for models that are not the related instance of the relationship.
         return $this->query
             ->whereKey($model->getKey())
             ->exists();
     }
-
 
     /**
      * Determine if the model is not the related instance of the relationship.
