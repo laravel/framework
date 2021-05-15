@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Events\Dispatcher;
 
 class ScheduleFinishCommand extends Command
 {
@@ -40,12 +41,17 @@ class ScheduleFinishCommand extends Command
      * Execute the console command.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public function handle(Schedule $schedule)
+    public function handle(Schedule $schedule, Dispatcher $dispatcher)
     {
         collect($schedule->events())->filter(function ($value) {
             return $value->mutexName() == $this->argument('id');
-        })->each->callAfterCallbacksWithExitCode($this->laravel, $this->argument('code'));
+        })->each(function ($event) use ($dispatcher) {
+            $event->callafterCallbacksWithExitCode($this->laravel, $this->argument('code'));
+
+            $dispatcher->dispatch(new ScheduledBackgroundTaskFinished($event));
+        });
     }
 }
