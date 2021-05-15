@@ -4,7 +4,6 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\Events\ScheduledBackgroundTaskFinished;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class ScheduleFinishCommand extends Command
