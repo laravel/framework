@@ -1951,4 +1951,15 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         $this->bootIfNotBooted();
     }
+
+    /**
+     * Set the table alias name
+     * @param $value
+     * @return Builder
+     */
+    public static function alias($value)
+    {
+        return static::query()->from((new static)->getTable(), $value);
+    }
+
 }
