@@ -2,6 +2,8 @@
 
 namespace Illuminate\View;
 
+use Illuminate\Support\Str;
+
 class ViewName
 {
     /**
@@ -14,8 +16,8 @@ class ViewName
     {
         $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
 
-        if (strpos($name, $delimiter) === false) {
-            return str_replace('/', '.', $name);
+        if (Str::contains($name, $delimiter) === false) {
+            return Str::replace('/', '.', $name);
         }
 
         [$namespace, $name] = explode($delimiter, $name);
