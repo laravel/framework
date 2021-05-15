@@ -22,6 +22,6 @@ class ViewName
 
         [$namespace, $name] = explode($delimiter, $name);
 
-        return $namespace.$delimiter.SupportString::replace('/', '.', $name);
+        return $namespace.$delimiter.Str::replace('/', '.', $name);
     }
 }
