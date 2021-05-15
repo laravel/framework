@@ -105,7 +105,7 @@ trait CanBeOneOfMany
      * @param  string|array  $groupBy
      * @param  string|null  $column
      * @param  string|null  $aggregate
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function newSubQuery($groupBy, $column = null, $aggregate = null)
     {
