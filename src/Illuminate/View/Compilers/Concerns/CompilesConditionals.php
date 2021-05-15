@@ -304,4 +304,15 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
+
+    /**
+     * Compile the has-slot statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileHasSlot($expression)
+    {
+        return "<?php if (\$__env->hasSlot{$expression}): ?>";
+    }
 }

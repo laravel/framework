@@ -152,6 +152,17 @@ trait ManagesComponents
     }
 
     /**
+     * Check if the slot exists.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function hasSlot($name)
+    {
+        return array_key_exists($name, $this->slots[max(0, $this->currentComponent())]);
+    }
+
+    /**
      * Get the index for the current component.
      *
      * @return int

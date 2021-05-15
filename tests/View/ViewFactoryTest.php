@@ -764,6 +764,24 @@ class ViewFactoryTest extends TestCase
         $this->assertSame('Hello World', $factory->getFoo());
     }
 
+    public function testHasSlot()
+    {
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new PhpEngine(new Filesystem));
+        $factory->getDispatcher()->shouldReceive('dispatch');
+        $factory->startComponent('component', ['name' => 'Taylor']);
+        $factory->slot('title');
+        $factory->slot('website', 'laravel.com');
+        echo 'title<hr>';
+        $factory->endSlot();
+        echo 'component';
+
+        $this->assertTrue($factory->hasSlot('title'));
+        $this->assertTrue($factory->hasSlot('website'));
+        $this->assertFalse($factory->hasSlot('bar'));
+    }
+
     protected function getFactory()
     {
         return new Factory(
