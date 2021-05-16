@@ -59,6 +59,36 @@ class UrlSigningTest extends TestCase
         $this->assertSame('invalid', $this->get('/foo/1')->original);
     }
 
+    public function testSignedUrlWithQueryParameters()
+    {
+        Route::get('/foo', function (Request $request) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1, 'order' => 'asc']));
+        $this->assertSame('valid', $this->get($url)->original);
+    }
+
+    public function testSignedUrlWithEmptyQueryParameters()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1, 'order']));
+        $this->assertSame('valid', $this->get($url)->original);
+    }
+
+    public function testSignedUrlCantBeAppendedQueryStringKeys()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]));
+        $this->assertSame('invalid', $this->get($url.'&additional&keys')->original);
+    }
+
     public function testSignedMiddleware()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {

@@ -388,13 +388,16 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $url = $absolute ? $request->url() : '/'.$request->path();
 
-        $original = rtrim($url.'?'.Arr::query(
-            Arr::except($request->query(), 'signature')
-        ), '?');
+        $queryString = '';
+        foreach (Arr::except($request->query(), 'signature') as $key => $value) {
+            $queryString .= '&'.(is_null($value) ? \urlencode($key) : \urlencode($key).'='.\urlencode($value));
+        }
 
-        $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
+        $original = \rtrim($url.'?'.\ltrim($queryString, '&'), '?');
 
-        return hash_equals($signature, (string) $request->query('signature', ''));
+        $signature = \hash_hmac('sha256', $original, \call_user_func($this->keyResolver));
+
+        return \hash_equals($signature, (string) $request->query('signature', ''));
     }
 
     /**
