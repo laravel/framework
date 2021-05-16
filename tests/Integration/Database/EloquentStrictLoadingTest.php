@@ -19,6 +19,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
 
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('number')->default(1);
         });
 
         Schema::create('test_model2', function (Blueprint $table) {
@@ -45,6 +46,15 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $models = EloquentStrictLoadingTestModel1::get();
 
         $models[0]->modelTwos;
+    }
+
+    public function testStrictModeDoesntThrowAnExceptionOnAttributes()
+    {
+        EloquentStrictLoadingTestModel1::create();
+
+        $models = EloquentStrictLoadingTestModel1::get(['id']);
+
+        $this->assertNull($models[0]->number);
     }
 
     public function testStrictModeDoesntThrowAnExceptionOnEagerLoading()

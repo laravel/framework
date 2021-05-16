@@ -427,7 +427,8 @@ trait HasAttributes
      */
     public function getRelationValue($key)
     {
-        if ($this->withStrictLoading && ! $this->relationLoaded($key)) {
+        if ($this->withStrictLoading && ! $this->relationLoaded($key) &&
+            method_exists($this, $key)) {
             throw new StrictLoadingViolationException($this, $key);
         }
 
