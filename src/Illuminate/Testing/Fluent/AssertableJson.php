@@ -79,14 +79,14 @@ class AssertableJson implements Arrayable
      * @param  \Closure  $callback
      * @return $this
      */
-    protected function scope(string $key, Closure $callback): self
+    protected function scope(string $key, Closure $callback): static
     {
         $props = $this->prop($key);
         $path = $this->dotPath($key);
 
         PHPUnit::assertIsArray($props, sprintf('Property [%s] is not scopeable.', $path));
 
-        $scope = new self($props, $path);
+        $scope = new static($props, $path);
         $callback($scope);
         $scope->interacted();
 
@@ -99,7 +99,7 @@ class AssertableJson implements Arrayable
      * @param  \Closure  $callback
      * @return $this
      */
-    public function first(Closure $callback): self
+    public function first(Closure $callback): static
     {
         $props = $this->prop();
 
@@ -123,9 +123,9 @@ class AssertableJson implements Arrayable
      * @param  array  $data
      * @return static
      */
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
-        return new self($data);
+        return new static($data);
     }
 
     /**
@@ -134,9 +134,9 @@ class AssertableJson implements Arrayable
      * @param  \Illuminate\Testing\AssertableJsonString  $json
      * @return static
      */
-    public static function fromAssertableJsonString(AssertableJsonString $json): self
+    public static function fromAssertableJsonString(AssertableJsonString $json): static
     {
-        return self::fromArray($json->json());
+        return static::fromArray($json->json());
     }
 
     /**
