@@ -177,6 +177,28 @@ class ValidationPasswordRuleTest extends TestCase
         );
     }
 
+    public function testItCanSetDefaultUsing()
+    {
+        $password = Password::min(2)->numbers();
+
+        Password::defaultUsing(function () use ($password) {
+            return $password;
+        });
+
+        $this->assertSame([$password], Password::fromDefault());
+
+        Password::defaultUsing(['required', 'password']);
+        $this->assertSame(['required', 'password'], Password::fromDefault());
+    }
+
+    public function testItCannotSetDefaultUsingGivenString()
+    {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('$callback should either be callable or an array');
+
+        Password::defaultUsing('required|password');
+    }
+
     protected function passes($rule, $values)
     {
         $this->testRule($rule, $values, true, []);
@@ -227,5 +249,7 @@ class ValidationPasswordRuleTest extends TestCase
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
+
+        Password::$defaultCallback = null;
     }
 }

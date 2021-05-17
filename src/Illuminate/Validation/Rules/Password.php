@@ -8,6 +8,7 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use InvalidArgumentException;
 
 class Password implements Rule, DataAwareRule
 {
@@ -75,6 +76,13 @@ class Password implements Rule, DataAwareRule
     protected $messages = [];
 
     /**
+     * The callback to be used for the Password's default rules.
+     *
+     * @var string|array|callable|null
+     */
+    public static $defaultCallback;
+
+    /**
      * Create a new rule instance.
      *
      * @param  int  $min
@@ -83,6 +91,31 @@ class Password implements Rule, DataAwareRule
     public function __construct($min)
     {
         $this->min = max((int) $min, 1);
+    }
+
+    /**
+     * Set the default callback to be used for determining the Password's default rules.
+     *
+     * @param  string|array|callable $callback
+     * @return $this
+     */
+    public static function defaultUsing($callback)
+    {
+        if (! is_array($callback) && ! is_callable($callback)) {
+            throw new InvalidArgumentException('$callback should either be callable or an array');
+        }
+
+        static::$defaultCallback = $callback;
+    }
+
+    /**
+     * Get Password's default rules.
+     *
+     * @return array
+     */
+    public static function fromDefault()
+    {
+        return Arr::wrap(value(static::$defaultCallback));
     }
 
     /**
