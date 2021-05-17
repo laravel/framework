@@ -5,6 +5,7 @@ namespace Illuminate\Auth\Middleware;
 use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class Authorize
 {
@@ -38,7 +39,7 @@ class Authorize
      * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function handle($request, Closure $next, $ability, ...$models)
+    public function handle(Request $request, Closure $next, $ability, ...$models)
     {
         $this->gate->authorize($ability, $this->getGateArguments($request, $models));
 

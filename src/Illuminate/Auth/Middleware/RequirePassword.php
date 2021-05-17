@@ -5,6 +5,7 @@ namespace Illuminate\Auth\Middleware;
 use Closure;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Http\Request;
 
 class RequirePassword
 {
@@ -52,7 +53,7 @@ class RequirePassword
      * @param  string|null  $redirectToRoute
      * @return mixed
      */
-    public function handle($request, Closure $next, $redirectToRoute = null)
+    public function handle(Request $request, Closure $next, $redirectToRoute = null)
     {
         if ($this->shouldConfirmPassword($request)) {
             if ($request->expectsJson()) {
@@ -75,7 +76,7 @@ class RequirePassword
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    protected function shouldConfirmPassword($request)
+    protected function shouldConfirmPassword(Request $request)
     {
         $confirmedAt = time() - $request->session()->get('auth.password_confirmed_at', 0);
 
