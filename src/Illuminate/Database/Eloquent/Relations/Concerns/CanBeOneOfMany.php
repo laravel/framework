@@ -111,7 +111,7 @@ trait CanBeOneOfMany
     {
         $aggregates = [];
 
-        foreach(Arr::wrap($column) as $col) {
+        foreach (Arr::wrap($column) as $col) {
             $aggregates[$col] = 'MAX';
         }
 
@@ -130,7 +130,7 @@ trait CanBeOneOfMany
     {
         $aggregates = [];
 
-        foreach(Arr::wrap($column) as $col) {
+        foreach (Arr::wrap($column) as $col) {
             $aggregates[$col] = 'MIN';
         }
 
