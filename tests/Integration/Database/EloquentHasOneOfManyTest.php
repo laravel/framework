@@ -54,6 +54,29 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
 
         $this->assertSame(2, $this->retrievedLogins);
     }
+
+    public function testItOnlyEagerLoadsRequiredModelsUsingShortcutMethod()
+    {
+        $this->retrievedLogins = 0;
+        User::getEventDispatcher()->listen('eloquent.retrieved:*', function ($event, $models) {
+            foreach ($models as $model) {
+                if (get_class($model) == Login::class) {
+                    $this->retrievedLogins++;
+                }
+            }
+        });
+
+        $user = User::create();
+        $user->latest_login_shortcut()->create();
+        $user->latest_login_shortcut()->create();
+        $user = User::create();
+        $user->latest_login_shortcut()->create();
+        $user->latest_login_shortcut()->create();
+
+        User::with('latest_login_shortcut')->get();
+
+        $this->assertSame(2, $this->retrievedLogins);
+    }
 }
 
 class User extends Model
@@ -64,6 +87,11 @@ class User extends Model
     public function latest_login()
     {
         return $this->hasOne(Login::class)->ofMany();
+    }
+
+    public function latest_login_shortcut()
+    {
+        return $this->hasOne(Login::class)->latestOfMany();
     }
 }
 

@@ -100,6 +100,32 @@ trait CanBeOneOfMany
     }
 
     /**
+     * Indicate that the relation is the latest single result of a larger one-to-many relationship.
+     *
+     * @param  string|array|null  $column
+     * @param  string|Closure|null  $aggregate
+     * @param  string|null  $relation
+     * @return $this
+     */
+    public function latestOfMany($column = 'id', $relation = null)
+    {
+        return $this->ofMany($column, 'MAX', $relation ?: $this->guessRelationship());
+    }
+
+    /**
+     * Indicate that the relation is the oldest single result of a larger one-to-many relationship.
+     *
+     * @param  string|array|null  $column
+     * @param  string|Closure|null  $aggregate
+     * @param  string|null  $relation
+     * @return $this
+     */
+    public function oldestOfMany($column = 'id', $relation = null)
+    {
+        return $this->ofMany($column, 'MIN', $relation ?: $this->guessRelationship());
+    }
+
+    /**
      * Get a new query for the related model, grouping the query by the given column, often the foreign key of the relationship.
      *
      * @param  string|array  $groupBy
