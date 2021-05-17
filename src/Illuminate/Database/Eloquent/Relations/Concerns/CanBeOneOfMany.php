@@ -70,6 +70,10 @@ trait CanBeOneOfMany
             $keyName => $aggregate,
         ] : $column;
 
+        if(! array_key_exists($keyName, $columns)) {
+            $columns[$keyName] = 'MAX';
+        }
+
         if ($aggregate instanceof Closure) {
             $closure = $aggregate;
         }

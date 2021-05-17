@@ -122,6 +122,21 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($price->id, $result->id);
     }
 
+    public function testKeyIsAddedToAggregatesWhenMissing()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $user->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+        $price = $user->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+
+        $result = $user->price_without_key_in_aggregates()->getResults();
+        $this->assertNotNull($result);
+        $this->assertSame($price->id, $result->id);
+    }
+
     public function testItGetsWithConstraintsCorrectResults()
     {
         $user = HasOneOfManyTestUser::create();
@@ -350,6 +365,11 @@ class HasOneOfManyTestUser extends Eloquent
         ], function ($q) {
             $q->where('published_at', '<', now());
         });
+    }
+
+    public function price_without_key_in_aggregates()
+    {
+        return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->ofMany(['published_at' => 'MAX']);
     }
 
     public function price_with_shortcut()
