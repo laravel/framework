@@ -454,7 +454,7 @@ trait HasAttributes
      * @param  string  $key
      * @return bool
      */
-    protected function isRelation($key)
+    public function isRelation($key)
     {
         return method_exists($this, $key) ||
             (static::$relationResolvers[get_class($this)][$key] ?? null);
