@@ -89,7 +89,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     public function testItFailsWhenUsingInvalidAggregate()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid aggregate [count] to use in ofMany. Available aggregates: MIN, MAX");
+        $this->expectExceptionMessage('Invalid aggregate [count] to use in ofMany. Available aggregates: MIN, MAX');
         $user = HasOneOfManyTestUser::make();
         $user->latest_login_with_invalid_aggregate();
     }

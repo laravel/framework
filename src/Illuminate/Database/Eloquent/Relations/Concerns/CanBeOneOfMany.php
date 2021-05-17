@@ -82,7 +82,7 @@ trait CanBeOneOfMany
         }
 
         foreach ($columns as $column => $aggregate) {
-            if(! in_array(strtolower($aggregate), ['min', 'max'])) {
+            if (! in_array(strtolower($aggregate), ['min', 'max'])) {
                 throw new InvalidArgumentException("Invalid aggregate [{$aggregate}] to use in ofMany. Available aggregates: MIN, MAX");
             }
 
