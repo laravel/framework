@@ -427,8 +427,11 @@ trait HasAttributes
      */
     public function getRelationValue($key)
     {
-        if ($this->withStrictLoading && ! $this->relationLoaded($key) &&
-            method_exists($this, $key)) {
+        if (! $this->isRelation($key)) {
+            return;
+        }
+
+        if ($this->withStrictLoading && ! $this->relationLoaded($key)) {
             throw new StrictLoadingViolationException($this, $key);
         }
 
@@ -442,10 +445,19 @@ trait HasAttributes
         // If the "attribute" exists as a method on the model, we will just assume
         // it is a relationship and will load and return results from the query
         // and hydrate the relationship's value on the "relationships" array.
-        if (method_exists($this, $key) ||
-            (static::$relationResolvers[get_class($this)][$key] ?? null)) {
-            return $this->getRelationshipFromMethod($key);
-        }
+        return $this->getRelationshipFromMethod($key);
+    }
+
+    /**
+     * Determine if the given key is a relation.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isRelation($key)
+    {
+        return method_exists($this, $key) ||
+            (static::$relationResolvers[get_class($this)][$key] ?? null);
     }
 
     /**
