@@ -74,6 +74,42 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
     }
 
     /**
+     * Add constraints for inner join subselect for one of many relationships.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string|null  $column
+     * @param  string|null  $aggregate
+     * @return void
+     */
+    public function addOneOfManySubQueryConstraints(Builder $query, $column = null, $aggregate = null)
+    {
+        $query->addSelect($this->foreignKey, $this->morphType);
+    }
+
+    /**
+     * Get the columns that should be selected by the one of many subquery.
+     *
+     * @return array|string
+     */
+    public function getOneOfManySubQuerySelectColumns()
+    {
+        return [$this->foreignKey, $this->morphType];
+    }
+
+    /**
+     * Add join query constraints for one of many relationships.
+     *
+     * @param  \Illuminate\Database\Eloquent\JoinClause  $join
+     * @return void
+     */
+    public function addOneOfManyJoinSubQueryConstraints(JoinClause $join)
+    {
+        $join
+            ->on($this->qualifySubSelectColumn($this->morphType), '=', $this->qualifyRelatedColumn($this->morphType))
+            ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
+    }
+
+    /**
      * Make a new related instance for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
@@ -95,41 +131,5 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
     protected function getRelatedKeyFrom(Model $model)
     {
         return $model->getAttribute($this->getForeignKeyName());
-    }
-
-    /**
-     * Add join sub constraints.
-     *
-     * @param JoinClause $join
-     * @return void
-     */
-    public function addJoinSubConstraints(JoinClause $join)
-    {
-        $join
-            ->on($this->qualifySubSelectColumn($this->morphType), '=', $this->qualifyRelatedColumn($this->morphType))
-            ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
-    }
-
-    /**
-     * Add constraints for inner join subselect.
-     *
-     * @param Builder $query
-     * @param string|null $column
-     * @param string|null $aggregate
-     * @return void
-     */
-    public function addSubQueryConstraints(Builder $query, $column = null, $aggregate = null)
-    {
-        $query->addSelect($this->foreignKey, $this->morphType);
-    }
-
-    /**
-     * Get the columns the determine the relationship groups.
-     *
-     * @return array|string
-     */
-    public function getGroups()
-    {
-        return [$this->foreignKey, $this->morphType];
     }
 }

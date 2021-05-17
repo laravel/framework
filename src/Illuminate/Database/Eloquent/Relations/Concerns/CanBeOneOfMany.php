@@ -25,29 +25,29 @@ trait CanBeOneOfMany
     protected $relationName;
 
     /**
-     * Add join sub constraints.
+     * Add constraints for inner join subselect for one of many relationships.
      *
-     * @param JoinClause $join
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string|null  $column
+     * @param  string|null  $aggregate
      * @return void
      */
-    abstract public function addJoinSubConstraints(JoinClause $join);
+    abstract public function addOneOfManySubQueryConstraints(Builder $query, $column = null, $aggregate = null);
 
     /**
      * Get the columns the determine the relationship groups.
      *
      * @return array|string
      */
-    abstract public function getGroups();
+    abstract public function getOneOfManySubQuerySelectColumns();
 
     /**
-     * Add constraints for inner join subselect.
+     * Add join query constraints for one of many relationships.
      *
-     * @param Builder $query
-     * @param string|null $column
-     * @param string|null $aggregate
+     * @param  \Illuminate\Database\Eloquent\JoinClause  $join
      * @return void
      */
-    abstract public function addSubQueryConstraints(Builder $query, $column = null, $aggregate = null);
+    abstract public function addOneOfManyJoinSubQueryConstraints(JoinClause $join);
 
     /**
      * Indicate that the relation is a single result of a larger one-to-many relationship.
@@ -76,7 +76,7 @@ trait CanBeOneOfMany
 
         foreach ($columns as $column => $aggregate) {
             $subQuery = $this->newSubQuery(
-                isset($previous) ? $previous['column'] : $this->getGroups(),
+                isset($previous) ? $previous['column'] : $this->getOneOfManySubQuerySelectColumns(),
                 $column, $aggregate
             );
 
@@ -120,7 +120,7 @@ trait CanBeOneOfMany
             $subQuery->selectRaw($aggregate.'('.$column.') as '.$column);
         }
 
-        $this->addSubQueryConstraints($subQuery, $groupBy, $column, $aggregate);
+        $this->addOneOfManySubQueryConstraints($subQuery, $groupBy, $column, $aggregate);
 
         return $subQuery;
     }
@@ -138,7 +138,7 @@ trait CanBeOneOfMany
         $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
             $join->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on));
 
-            $this->addJoinSubConstraints($join, $on);
+            $this->addOneOfManyJoinSubQueryConstraints($join, $on);
         });
     }
 
