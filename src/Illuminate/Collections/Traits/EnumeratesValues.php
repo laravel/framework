@@ -344,7 +344,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Map the values into a new class.
+     * Map the values and keys into a new class.
      *
      * @param  string  $class
      * @return static
@@ -353,6 +353,19 @@ trait EnumeratesValues
     {
         return $this->map(function ($value, $key) use ($class) {
             return new $class($value, $key);
+        });
+    }
+
+    /**
+     * Map the values into a new class.
+     *
+     * @param  string  $class
+     * @return static
+     */
+    public function mapValuesInto($class)
+    {
+        return $this->map(function ($value) use ($class) {
+            return new $class($value);
         });
     }
 

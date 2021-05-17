@@ -592,6 +592,17 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testMapValuesIntoIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->mapValuesInto(stdClass::class);
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->mapValuesInto(stdClass::class)->take(2)->all();
+        });
+    }
+
     public function testMapSpreadIsLazy()
     {
         $data = $this->make([[1, 2], [3, 4], [5, 6], [7, 8]]);

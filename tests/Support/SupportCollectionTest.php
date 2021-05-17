@@ -2675,6 +2675,23 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame('first', $data->get(0)->value);
         $this->assertSame('second', $data->get(1)->value);
+        $this->assertSame(0, $data->get(0)->key);
+        $this->assertSame(1, $data->get(1)->key);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMapValuesInto($collection)
+    {
+        $data = new $collection([
+            'first', 'second',
+        ]);
+
+        $data = $data->mapValuesInto(TestCollectionMapValuesIntoObject::class);
+
+        $this->assertSame('first', $data->get(0)->value);
+        $this->assertSame('second', $data->get(1)->value);
     }
 
     /**
@@ -4745,6 +4762,18 @@ class TestJsonSerializeWithScalarValueObject implements JsonSerializable
 }
 
 class TestCollectionMapIntoObject
+{
+    public $value;
+    public $key;
+
+    public function __construct($value, $key)
+    {
+        $this->value = $value;
+        $this->key = $key;
+    }
+}
+
+class TestCollectionMapValuesIntoObject
 {
     public $value;
 

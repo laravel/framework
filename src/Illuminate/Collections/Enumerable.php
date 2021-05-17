@@ -609,12 +609,20 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function flatMap(callable $callback);
 
     /**
-     * Map the values into a new class.
+     * Map the values and keys into a new class.
      *
      * @param  string  $class
      * @return static
      */
     public function mapInto($class);
+
+    /**
+     * Map the values into a new class.
+     *
+     * @param  string  $class
+     * @return static
+     */
+    public function mapValuesInto($class);
 
     /**
      * Merge the collection with the given items.
