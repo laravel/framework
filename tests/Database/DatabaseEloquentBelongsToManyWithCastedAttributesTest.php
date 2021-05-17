@@ -24,14 +24,14 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $model1->shouldReceive('getAttribute')->with('foo')->passthru();
         $model1->shouldReceive('hasGetMutator')->andReturn(false);
         $model1->shouldReceive('getCasts')->andReturn([]);
-        $model1->shouldReceive('getRelationValue', 'relationLoaded', 'setRelation')->passthru();
+        $model1->shouldReceive('getRelationValue', 'relationLoaded', 'setRelation', 'isRelation')->passthru();
 
         $model2 = m::mock(Model::class);
         $model2->shouldReceive('getAttribute')->with('parent_key')->andReturn(2);
         $model2->shouldReceive('getAttribute')->with('foo')->passthru();
         $model2->shouldReceive('hasGetMutator')->andReturn(false);
         $model2->shouldReceive('getCasts')->andReturn([]);
-        $model2->shouldReceive('getRelationValue', 'relationLoaded', 'setRelation')->passthru();
+        $model2->shouldReceive('getRelationValue', 'relationLoaded', 'setRelation', 'isRelation')->passthru();
 
         $result1 = (object) [
             'pivot' => (object) [
