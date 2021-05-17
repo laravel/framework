@@ -138,7 +138,7 @@ class PreventRequestsDuringMaintenance
     }
 
     /**
-     * Determine the response headers.
+     * Get the headers that should be sent with the response.
      *
      * @param  array  $data
      * @return array
