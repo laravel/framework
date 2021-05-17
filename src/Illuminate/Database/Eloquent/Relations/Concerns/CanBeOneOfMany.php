@@ -113,13 +113,9 @@ trait CanBeOneOfMany
      */
     public function latestOfMany($column = 'id', $relation = null)
     {
-        $aggregates = [];
-
-        foreach (Arr::wrap($column) as $col) {
-            $aggregates[$col] = 'MAX';
-        }
-
-        return $this->ofMany($aggregates, 'MAX', $relation ?: $this->guessRelationship());
+        return $this->ofMany(collect(Arr::wrap($column))->mapWithKeys(function ($column) {
+            return [$column => 'MAX'];
+        })->all(), 'MAX', $relation ?: $this->guessRelationship());
     }
 
     /**
@@ -132,13 +128,9 @@ trait CanBeOneOfMany
      */
     public function oldestOfMany($column = 'id', $relation = null)
     {
-        $aggregates = [];
-
-        foreach (Arr::wrap($column) as $col) {
-            $aggregates[$col] = 'MIN';
-        }
-
-        return $this->ofMany($aggregates, 'MIN', $relation ?: $this->guessRelationship());
+        return $this->ofMany(collect(Arr::wrap($column))->mapWithKeys(function ($column) {
+            return [$column => 'MIN'];
+        })->all(), 'MIN', $relation ?: $this->guessRelationship());
     }
 
     /**
