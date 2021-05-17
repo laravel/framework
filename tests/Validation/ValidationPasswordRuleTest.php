@@ -204,15 +204,15 @@ class ValidationPasswordRuleTest extends TestCase
 
     protected function passes($rule, $values)
     {
-        $this->testRule($rule, $values, true, []);
+        $this->assertValidationRules($rule, $values, true, []);
     }
 
     protected function fails($rule, $values, $messages)
     {
-        $this->testRule($rule, $values, false, $messages);
+        $this->assertValidationRules($rule, $values, false, $messages);
     }
 
-    protected function testRule($rule, $values, $result, $messages)
+    protected function assertValidationRules($rule, $values, $result, $messages)
     {
         foreach ($values as $value) {
             $v = new Validator(
