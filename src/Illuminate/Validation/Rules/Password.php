@@ -97,7 +97,7 @@ class Password implements Rule, DataAwareRule
      * Set the default callback to be used for determining the Password's default rules.
      *
      * @param  static|callable $callback
-     * @return $this
+     * @return void
      */
     public static function defaultUsing($callback)
     {
