@@ -113,7 +113,7 @@ class Password implements Rule, DataAwareRule
      *
      * @return array
      */
-    public static function fromDefault()
+    public static function default()
     {
         return Arr::wrap(value(static::$defaultCallback));
     }
