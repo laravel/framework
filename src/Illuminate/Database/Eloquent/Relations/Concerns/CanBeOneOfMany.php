@@ -83,7 +83,7 @@ trait CanBeOneOfMany
 
         foreach ($columns as $column => $aggregate) {
             if (! in_array(strtolower($aggregate), ['min', 'max'])) {
-                throw new InvalidArgumentException("Invalid aggregate [{$aggregate}] to use in ofMany. Available aggregates: MIN, MAX");
+                throw new InvalidArgumentException("Invalid aggregate [{$aggregate}] used within ofMany relation. Available aggregates: MIN, MAX");
             }
 
             $subQuery = $this->newSubQuery(
