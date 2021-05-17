@@ -146,17 +146,6 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Load a set of related existences onto the collection.
-     *
-     * @param  array|string  $relations
-     * @return $this
-     */
-    public function loadExists($relations)
-    {
-        return $this->loadAggregate($relations, '*', 'exists');
-    }
-
-    /**
      * Load a set of relationship's average column values onto the collection.
      *
      * @param  array|string  $relations
@@ -166,6 +155,17 @@ class Collection extends BaseCollection implements QueueableCollection
     public function loadAvg($relations, $column)
     {
         return $this->loadAggregate($relations, $column, 'avg');
+    }
+
+    /**
+     * Load a set of related existences onto the collection.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadExists($relations)
+    {
+        return $this->loadAggregate($relations, '*', 'exists');
     }
 
     /**
