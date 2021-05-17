@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -83,6 +84,14 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     {
         $user = HasOneOfManyTestUser::create();
         $this->assertSame('latest_login.id', $user->latest_login()->qualifySubSelectColumn('id'));
+    }
+
+    public function testItFailsWhenUsingInvalidAggregate()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid aggregate [count] to use in ofMany. Available aggregates: MIN, MAX");
+        $user = HasOneOfManyTestUser::make();
+        $user->latest_login_with_invalid_aggregate();
     }
 
     public function testItGetsCorrectResults()
@@ -330,6 +339,11 @@ class HasOneOfManyTestUser extends Eloquent
     public function latest_login_with_shortcut()
     {
         return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->latestOfMany();
+    }
+
+    public function latest_login_with_invalid_aggregate()
+    {
+        return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany('id', 'count');
     }
 
     public function first_login()

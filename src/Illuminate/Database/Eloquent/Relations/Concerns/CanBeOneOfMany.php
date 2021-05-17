@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 trait CanBeOneOfMany
 {
@@ -56,6 +57,8 @@ trait CanBeOneOfMany
      * @param  string|Closure|null  $aggregate
      * @param  string|null  $relation
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function ofMany($column = 'id', $aggregate = 'MAX', $relation = null)
     {
@@ -79,6 +82,10 @@ trait CanBeOneOfMany
         }
 
         foreach ($columns as $column => $aggregate) {
+            if(! in_array(strtolower($aggregate), ['min', 'max'])) {
+                throw new InvalidArgumentException("Invalid aggregate [{$aggregate}] to use in ofMany. Available aggregates: MIN, MAX");
+            }
+
             $subQuery = $this->newSubQuery(
                 isset($previous) ? $previous['column'] : $this->getOneOfManySubQuerySelectColumns(),
                 $column, $aggregate
