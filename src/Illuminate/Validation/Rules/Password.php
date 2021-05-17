@@ -96,13 +96,13 @@ class Password implements Rule, DataAwareRule
     /**
      * Set the default callback to be used for determining the Password's default rules.
      *
-     * @param  string|array|callable $callback
+     * @param  static|callable $callback
      * @return $this
      */
     public static function defaultUsing($callback)
     {
-        if (! is_array($callback) && ! is_callable($callback)) {
-            throw new InvalidArgumentException('$callback should either be callable or an array');
+        if (! is_callable($callback) && ! $callback instanceof self) {
+            throw new InvalidArgumentException('$callback should either be callable or an instance of '.self::class);
         }
 
         static::$defaultCallback = $callback;
@@ -111,11 +111,11 @@ class Password implements Rule, DataAwareRule
     /**
      * Get Password's default rules.
      *
-     * @return array
+     * @return static
      */
     public static function default()
     {
-        return Arr::wrap(value(static::$defaultCallback));
+        return value(static::$defaultCallback);
     }
 
     /**
