@@ -107,6 +107,21 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($latestLogin->id, $result->id);
     }
 
+    public function testItGetsCorrectResultsUsingShortcutReceivingMultipleColumnsMethod()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $user->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+        $price = $user->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+
+        $result = $user->price_with_shortcut()->getResults();
+        $this->assertNotNull($result);
+        $this->assertSame($price->id, $result->id);
+    }
+
     public function testItGetsWithConstraintsCorrectResults()
     {
         $user = HasOneOfManyTestUser::create();
@@ -335,6 +350,11 @@ class HasOneOfManyTestUser extends Eloquent
         ], function ($q) {
             $q->where('published_at', '<', now());
         });
+    }
+
+    public function price_with_shortcut()
+    {
+        return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->latestOfMany(['published_at', 'id']);
     }
 }
 
