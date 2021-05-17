@@ -185,10 +185,10 @@ class ValidationPasswordRuleTest extends TestCase
             return $password;
         });
 
-        $this->assertSame([$password], Password::fromDefault());
+        $this->assertSame([$password], Password::default());
 
         Password::defaultUsing(['required', 'password']);
-        $this->assertSame(['required', 'password'], Password::fromDefault());
+        $this->assertSame(['required', 'password'], Password::default());
     }
 
     public function testItCannotSetDefaultUsingGivenString()
