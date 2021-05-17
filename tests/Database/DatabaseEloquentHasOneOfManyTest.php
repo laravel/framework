@@ -96,6 +96,17 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($latestLogin->id, $result->id);
     }
 
+    public function testItGetsCorrectResultsUsingShortcutMethod()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $previousLogin = $user->logins()->create();
+        $latestLogin = $user->logins()->create();
+
+        $result = $user->latest_login_with_shortcut()->getResults();
+        $this->assertNotNull($result);
+        $this->assertSame($latestLogin->id, $result->id);
+    }
+
     public function testItGetsWithConstraintsCorrectResults()
     {
         $user = HasOneOfManyTestUser::create();
@@ -284,6 +295,11 @@ class HasOneOfManyTestUser extends Eloquent
     public function latest_login()
     {
         return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany();
+    }
+
+    public function latest_login_with_shortcut()
+    {
+        return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->latestOfMany();
     }
 
     public function first_login()
