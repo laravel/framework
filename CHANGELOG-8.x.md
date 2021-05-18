@@ -1,6 +1,23 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.41.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.42.0...8.x)
+
+
+## [v8.42.0 (2021-05-18)](https://github.com/laravel/framework/compare/v8.41.0...v8.42.0)
+
+### Added
+- Support views in SQLServerGrammar ([#37348](https://github.com/laravel/framework/pull/37348))
+- Added new assertDispatchedSync methods to BusFake ([#37350](https://github.com/laravel/framework/pull/37350), [414f382](https://github.com/laravel/framework/commit/414f38247a084fad3dd63b2106968eb119a3d447))
+- Added withExists method to QueriesRelationships ([#37302](https://github.com/laravel/framework/pull/37302))
+- Added ability to define default Password Rule ([#37387](https://github.com/laravel/framework/pull/37387), [f7e5b1c](https://github.com/laravel/framework/commit/f7e5b1c105dec980b3206c0b9bc7db735756b8d5))
+- Allow sending a refresh header with maintenance mode response ([#37385](https://github.com/laravel/framework/pull/37385))
+- Added loadExists on Model and Eloquent Collection ([#37388](https://github.com/laravel/framework/pull/37388))
+- Added one-of-many relationship (inner join) ([#37362](https://github.com/laravel/framework/pull/37362))
+
+### Changed
+- Avoid deprecated guzzle code ([#37349](https://github.com/laravel/framework/pull/37349))
+- Make AssertableJson easier to extend by replacing self with static ([#37380](https://github.com/laravel/framework/pull/37380))
+- Raise ScheduledBackgroundTaskFinished event to signal when a run in background task finishes ([#37377](https://github.com/laravel/framework/pull/37377))
 
 
 ## [v8.41.0 (2021-05-11)](https://github.com/laravel/framework/compare/v8.40.0...v8.41.0)
