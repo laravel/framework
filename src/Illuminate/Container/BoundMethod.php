@@ -156,6 +156,8 @@ class BoundMethod
      * @param  array  $parameters
      * @param  array  $dependencies
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected static function addDependencyForCallParameter($container, $parameter,
                                                             array &$parameters, &$dependencies)

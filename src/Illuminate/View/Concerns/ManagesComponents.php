@@ -121,6 +121,8 @@ trait ManagesComponents
      * @param  string  $name
      * @param  string|null  $content
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function slot($name, $content = null)
     {

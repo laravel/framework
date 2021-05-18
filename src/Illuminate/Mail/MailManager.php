@@ -156,6 +156,8 @@ class MailManager implements FactoryContract
      *
      * @param  array  $config
      * @return \Swift_Transport
+     *
+     * @throws \InvalidArgumentException
      */
     public function createTransport(array $config)
     {

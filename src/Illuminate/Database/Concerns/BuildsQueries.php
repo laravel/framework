@@ -81,6 +81,8 @@ trait BuildsQueries
      * @param  callable  $callback
      * @param  int  $count
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function each(callable $callback, $count = 1000)
     {
@@ -172,6 +174,8 @@ trait BuildsQueries
      *
      * @param  int  $chunkSize
      * @return \Illuminate\Support\LazyCollection
+     *
+     * @throws \InvalidArgumentException
      */
     public function lazy($chunkSize = 1000)
     {
@@ -205,6 +209,8 @@ trait BuildsQueries
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return \Illuminate\Support\LazyCollection
+     *
+     * @throws \InvalidArgumentException
      */
     public function lazyById($chunkSize = 1000, $column = null, $alias = null)
     {

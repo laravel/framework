@@ -47,6 +47,8 @@ class DbCommand extends Command
      * Get the database connection configuration.
      *
      * @return array
+     *
+     * @throws \UnexpectedValueException
      */
     public function getConnection()
     {
