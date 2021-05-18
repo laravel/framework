@@ -177,17 +177,53 @@ class ValidationPasswordRuleTest extends TestCase
         );
     }
 
+    public function testItCanUseDefault()
+    {
+        $this->assertInstanceOf(Password::class, Password::default());
+    }
+
+    public function testItCanSetDefaultUsing()
+    {
+        $this->assertInstanceOf(Password::class, Password::default());
+
+        $password = Password::min(3);
+        $password2 = Password::min(2)->mixedCase();
+
+        Password::defaults(function () use ($password) {
+            return $password;
+        });
+
+        $this->passes(Password::default(), ['abcd', '454qb^', '接2133手田']);
+        $this->assertSame($password, Password::default());
+        $this->assertSame(['required', $password], Password::required());
+        $this->assertSame(['sometimes', $password], Password::sometimes());
+
+        Password::defaults($password2);
+        $this->passes(Password::default(), ['Nn', 'Mn', 'âA']);
+        $this->assertSame($password2, Password::default());
+        $this->assertSame(['required', $password2], Password::required());
+        $this->assertSame(['sometimes', $password2], Password::sometimes());
+    }
+
+    public function testItCannotSetDefaultUsingGivenString()
+    {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('given callback should be callable');
+
+        Password::defaults('required|password');
+    }
+
     protected function passes($rule, $values)
     {
-        $this->testRule($rule, $values, true, []);
+        $this->assertValidationRules($rule, $values, true, []);
     }
 
     protected function fails($rule, $values, $messages)
     {
-        $this->testRule($rule, $values, false, $messages);
+        $this->assertValidationRules($rule, $values, false, $messages);
     }
 
-    protected function testRule($rule, $values, $result, $messages)
+    protected function assertValidationRules($rule, $values, $result, $messages)
     {
         foreach ($values as $value) {
             $v = new Validator(
@@ -227,5 +263,7 @@ class ValidationPasswordRuleTest extends TestCase
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
+
+        Password::$defaultCallback = null;
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use InvalidArgumentException;
 
 class Password implements Rule, DataAwareRule
 {
@@ -75,6 +76,13 @@ class Password implements Rule, DataAwareRule
     protected $messages = [];
 
     /**
+     * The callback that will generate the "default" version of the password rule.
+     *
+     * @var string|array|callable|null
+     */
+    public static $defaultCallback;
+
+    /**
      * Create a new rule instance.
      *
      * @param  int  $min
@@ -83,6 +91,59 @@ class Password implements Rule, DataAwareRule
     public function __construct($min)
     {
         $this->min = max((int) $min, 1);
+    }
+
+    /**
+     * Set the default callback to be used for determining a password's default rules.
+     *
+     * If no arguments are passed, the default password rule configuration will be returned.
+     *
+     * @param  static|callable|null  $callback
+     * @return static|null
+     */
+    public static function defaults($callback = null)
+    {
+        if (is_null($callback)) {
+            return static::default();
+        }
+
+        if (! is_callable($callback) && ! $callback instanceof static) {
+            throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
+        }
+
+        static::$defaultCallback = $callback;
+    }
+
+    /**
+     * Get the default configuration of the password rule.
+     *
+     * @return static
+     */
+    public static function default()
+    {
+        $password = value(static::$defaultCallback);
+
+        return $password instanceof static ? $password : static::min(8);
+    }
+
+    /**
+     * Get the default configuration of the password rule and mark the field as required.
+     *
+     * @return array
+     */
+    public static function required()
+    {
+        return ['required', static::default()];
+    }
+
+    /**
+     * Get the default configuration of the password rule and mark the field as sometimes being required.
+     *
+     * @return array
+     */
+    public static function sometimes()
+    {
+        return ['sometimes', static::default()];
     }
 
     /**
