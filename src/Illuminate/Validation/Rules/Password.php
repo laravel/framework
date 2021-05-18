@@ -115,7 +115,29 @@ class Password implements Rule, DataAwareRule
      */
     public static function default()
     {
-        return value(static::$defaultCallback);
+        $password = value(static::$defaultCallback);
+
+        return $password instanceof static ? $password : static::min(8);
+    }
+
+    /**
+     * Get Password's default rules as required.
+     *
+     * @return array
+     */
+    public static function required()
+    {
+        return ['required', static::default()];
+    }
+
+    /**
+     * Get Password's default rules as sometimes.
+     *
+     * @return array
+     */
+    public static function sometimes()
+    {
+        return ['sometimes', static::default()];
     }
 
     /**
