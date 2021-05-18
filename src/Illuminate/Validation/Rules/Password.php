@@ -76,7 +76,7 @@ class Password implements Rule, DataAwareRule
     protected $messages = [];
 
     /**
-     * The callback to be used for the Password's default rules.
+     * The callback that will generate the "default" version of the password rule.
      *
      * @var string|array|callable|null
      */
@@ -94,22 +94,28 @@ class Password implements Rule, DataAwareRule
     }
 
     /**
-     * Set the default callback to be used for determining the Password's default rules.
+     * Set the default callback to be used for determining a password's default rules.
      *
-     * @param  static|callable $callback
-     * @return void
+     * If no arguments are passed, the default password rule configuration will be returned.
+     *
+     * @param  static|callable|null  $callback
+     * @return static|null
      */
-    public static function defaultUsing($callback)
+    public static function defaults($callback = null)
     {
-        if (! is_callable($callback) && ! $callback instanceof self) {
-            throw new InvalidArgumentException('$callback should either be callable or an instance of '.self::class);
+        if (is_null($callback)) {
+            return static::default();
+        }
+
+        if (! is_callable($callback) && ! $callback instanceof static) {
+            throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
         }
 
         static::$defaultCallback = $callback;
     }
 
     /**
-     * Get Password's default rules.
+     * Get the default configuration of the password rule.
      *
      * @return static
      */
@@ -121,7 +127,7 @@ class Password implements Rule, DataAwareRule
     }
 
     /**
-     * Get Password's default rules as required.
+     * Get the default configuration of the password rule and mark the field as required.
      *
      * @return array
      */
@@ -131,7 +137,7 @@ class Password implements Rule, DataAwareRule
     }
 
     /**
-     * Get Password's default rules as sometimes.
+     * Get the default configuration of the password rule and mark the field as sometimes being required.
      *
      * @return array
      */

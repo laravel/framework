@@ -189,7 +189,7 @@ class ValidationPasswordRuleTest extends TestCase
         $password = Password::min(3);
         $password2 = Password::min(2)->mixedCase();
 
-        Password::defaultUsing(function () use ($password) {
+        Password::defaults(function () use ($password) {
             return $password;
         });
 
@@ -198,7 +198,7 @@ class ValidationPasswordRuleTest extends TestCase
         $this->assertSame(['required', $password], Password::required());
         $this->assertSame(['sometimes', $password], Password::sometimes());
 
-        Password::defaultUsing($password2);
+        Password::defaults($password2);
         $this->passes(Password::default(), ['Nn', 'Mn', 'âA']);
         $this->assertSame($password2, Password::default());
         $this->assertSame(['required', $password2], Password::required());
@@ -208,9 +208,9 @@ class ValidationPasswordRuleTest extends TestCase
     public function testItCannotSetDefaultUsingGivenString()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('$callback should either be callable or an instance of '.Password::class);
+        $this->expectExceptionMessage('given callback should be callable');
 
-        Password::defaultUsing('required|password');
+        Password::defaults('required|password');
     }
 
     protected function passes($rule, $values)
