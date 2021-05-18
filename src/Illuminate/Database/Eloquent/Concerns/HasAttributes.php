@@ -1187,6 +1187,8 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return bool
+     *
+     * @throws \Illuminate\Database\Eloquent\InvalidCastException
      */
     protected function isClassCastable($key)
     {

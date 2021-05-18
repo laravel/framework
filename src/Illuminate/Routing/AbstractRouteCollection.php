@@ -194,6 +194,8 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      * @param  \Symfony\Component\Routing\RouteCollection  $symfonyRoutes
      * @param  \Illuminate\Routing\Route  $route
      * @return \Symfony\Component\Routing\RouteCollection
+     *
+     * @throws \LogicException
      */
     protected function addToSymfonyRoutesCollection(SymfonyRouteCollection $symfonyRoutes, Route $route)
     {

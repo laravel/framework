@@ -186,6 +186,8 @@ abstract class AbstractCursorPaginator implements Htmlable
      *
      * @param  \ArrayAccess|\stdClass  $item
      * @return array
+     *
+     * @throws \Exception
      */
     public function getParametersForItem($item)
     {
