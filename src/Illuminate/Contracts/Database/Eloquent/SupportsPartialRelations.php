@@ -2,8 +2,6 @@
 
 namespace Illuminate\Contracts\Database\Eloquent;
 
-use Closure;
-
 interface SupportsPartialRelations
 {
     /**
