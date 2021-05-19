@@ -70,15 +70,11 @@ class HasOne extends HasOneOrMany implements SupportsPartialRelations
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        if (! $this->isOneOfMany()) {
-            return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+        if($this->isOneOfMany()) {
+            $this->mergeJoinsTo($query);
         }
-
-        $query->getQuery()->joins = $this->query->getQuery()->joins;
-
-        return $query->select($columns)->whereColumn(
-            $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
-        );
+        
+        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
     }
 
     /**

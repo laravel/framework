@@ -41,6 +41,7 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
             $table->increments('id');
             $table->morphs('stateful');
             $table->string('state');
+            $table->string('type')->nullable();
         });
     }
 
@@ -109,6 +110,35 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
         $this->assertTrue($exists);
     }
 
+    public function testWithExists()
+    {
+        $product = MorphOneOfManyTestProduct::create();
+
+        $product = MorphOneOfManyTestProduct::withExists('current_state')->first();
+        $this->assertFalse($product->current_state_exists);
+
+        $product->states()->create([
+            'state' => 'draft',
+        ]);
+        $product = MorphOneOfManyTestProduct::withExists('current_state')->first();
+        $this->assertTrue($product->current_state_exists);
+    }
+
+    public function testWithExistsWithConstraintsInJoinSubSelect()
+    {
+        $product = MorphOneOfManyTestProduct::create();
+
+        $product = MorphOneOfManyTestProduct::withExists('current_foo_state')->first();
+        $this->assertFalse($product->current_foo_state_exists);
+
+        $product->states()->create([
+            'state' => 'draft',
+            'type' => 'foo'
+        ]);
+        $product = MorphOneOfManyTestProduct::withExists('current_foo_state')->first();
+        $this->assertTrue($product->current_foo_state_exists);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -148,6 +178,16 @@ class MorphOneOfManyTestProduct extends Eloquent
     {
         return $this->morphOne(MorphOneOfManyTestState::class, 'stateful')->ofMany();
     }
+
+    public function current_foo_state()
+    {
+        return $this->morphOne(MorphOneOfManyTestState::class, 'stateful')->ofMany(
+            ['id' => 'max'],
+            function($q) {
+                $q->where('type', 'foo');
+            }
+        );
+    }
 }
 
 class MorphOneOfManyTestState extends Eloquent
@@ -155,5 +195,5 @@ class MorphOneOfManyTestState extends Eloquent
     protected $table = 'states';
     protected $guarded = [];
     public $timestamps = false;
-    protected $fillable = ['state'];
+    protected $fillable = ['state', 'type'];
 }

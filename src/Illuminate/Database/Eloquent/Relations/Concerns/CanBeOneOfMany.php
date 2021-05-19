@@ -184,6 +184,19 @@ trait CanBeOneOfMany
     }
 
     /**
+     * Merge relation ship query joins to the given query builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    protected function mergeJoinsTo(Builder $query)
+    {
+        $query->getQuery()->joins = $this->query->getQuery()->joins;
+
+        $query->addBinding($this->query->getBindings(), 'join');
+    }
+
+    /**
      * Get the qualified column name for the one-of-many relationship using the subselect join query's alias.
      *
      * @param  string  $column
