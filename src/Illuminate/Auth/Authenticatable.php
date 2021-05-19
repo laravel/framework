@@ -32,7 +32,7 @@ trait Authenticatable
     }
 
     /**
-     * Get the unique broadcast identifier for the user .
+     * Get the unique broadcast identifier for the user.
      *
      * @return mixed
      */
