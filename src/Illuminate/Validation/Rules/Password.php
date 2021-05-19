@@ -123,7 +123,7 @@ class Password implements Rule, DataAwareRule
     {
         $password = value(static::$defaultCallback);
 
-        return $password instanceof static ? $password : static::min(8);
+        return $password instanceof Rule ? $password : static::min(8);
     }
 
     /**
