@@ -1248,9 +1248,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function newQueryWithoutScopes()
     {
-        return $this->newModelQuery()
+        $query = $this->newModelQuery()
                     ->with($this->with)
                     ->withCount($this->withCount);
+
+        foreach (($this->withSum ?: []) as $x) {
+            list($relation, $column) = explode('.', $x);
+            $query->withSum($relation, $column);
+        }
+
+        return $query;
     }
 
     /**
