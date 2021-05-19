@@ -891,9 +891,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
         // finished. This is useful when ordering the boot-up processes we run.
         $this->fireAppCallbacks($this->bootingCallbacks);
 
-        foreach ($this->serviceProviders as $provider) {
-            $this->bootProvider($provider);
-        }
+        array_walk($this->serviceProviders, function ($p) {
+            $this->bootProvider($p);
+        });
 
         $this->booted = true;
 
