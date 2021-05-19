@@ -133,7 +133,7 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
 
         $product->states()->create([
             'state' => 'draft',
-            'type' => 'foo'
+            'type' => 'foo',
         ]);
         $product = MorphOneOfManyTestProduct::withExists('current_foo_state')->first();
         $this->assertTrue($product->current_foo_state_exists);
@@ -183,7 +183,7 @@ class MorphOneOfManyTestProduct extends Eloquent
     {
         return $this->morphOne(MorphOneOfManyTestState::class, 'stateful')->ofMany(
             ['id' => 'max'],
-            function($q) {
+            function ($q) {
                 $q->where('type', 'foo');
             }
         );

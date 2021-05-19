@@ -68,7 +68,7 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        if($this->isOneOfMany()) {
+        if ($this->isOneOfMany()) {
             $this->mergeJoinsTo($query);
         }
 
