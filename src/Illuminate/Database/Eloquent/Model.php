@@ -1253,7 +1253,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
                     ->withCount($this->withCount);
 
         foreach (($this->withSum ?: []) as $x) {
-            list($relation, $column) = explode('.', $x);
+            [$relation, $column] = explode('.', $x);
             $query->withSum($relation, $column);
         }
 
