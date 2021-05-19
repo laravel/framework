@@ -113,7 +113,7 @@ trait CanBeOneOfMany
     }
 
     /**
-     * Get default alias for one of many inner join clause.
+     * Get the default alias for one of many inner join clause.
      *
      * @param  string  $relation
      * @return string
