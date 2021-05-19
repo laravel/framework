@@ -170,7 +170,7 @@ class RedisBroadcasterTest extends TestCase
         $request->channel_name = $channel;
 
         $user = m::mock('User');
-        $user->shouldReceive('getAuthIdentifier')
+        $user->shouldReceive('getAuthIdentifierForBroadcasting')
              ->andReturn(42);
 
         $request->shouldReceive('user')

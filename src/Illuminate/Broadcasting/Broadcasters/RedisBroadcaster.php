@@ -87,7 +87,7 @@ class RedisBroadcaster extends Broadcaster
         $channelName = $this->normalizeChannelName($request->channel_name);
 
         return json_encode(['channel_data' => [
-            'user_id' => $this->retrieveUser($request, $channelName)->getAuthIdentifier(),
+            'user_id' => $this->retrieveUser($request, $channelName)->getAuthIdentifierForBroadcasting(),
             'user_info' => $result,
         ]]);
     }

@@ -75,7 +75,7 @@ class PusherBroadcaster extends Broadcaster
             $request,
             $this->pusher->presence_auth(
                 $request->channel_name, $request->socket_id,
-                $this->retrieveUser($request, $channelName)->getAuthIdentifier(), $result
+                $this->retrieveUser($request, $channelName)->getAuthIdentifierForBroadcasting(), $result
             )
         );
     }

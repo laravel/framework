@@ -161,7 +161,7 @@ class PusherBroadcasterTest extends TestCase
                 ->andReturn(false);
 
         $user = m::mock('User');
-        $user->shouldReceive('getAuthIdentifier')
+        $user->shouldReceive('getAuthIdentifierForBroadcasting')
              ->andReturn(42);
 
         $request->shouldReceive('user')
