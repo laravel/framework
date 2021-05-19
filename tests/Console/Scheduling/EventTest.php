@@ -61,7 +61,7 @@ class EventTest extends TestCase
 
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
 
-        $this->assertSame('start /b cmd /c "(php -i & "'.PHP_BINARY.'" artisan schedule:finish '.$scheduleId.' "%errorlevel%") > "NUL" 2>&1"', $event->buildCommand());
+        $this->assertSame('start /b cmd /c "(php -i && "'.PHP_BINARY.'" artisan schedule:finish '.$scheduleId.' "0" || "'.PHP_BINARY.'" artisan schedule:finish '.$scheduleId.' "1") > "NUL" 2>&1"', $event->buildCommand());
     }
 
     public function testBuildCommandSendOutputTo()
