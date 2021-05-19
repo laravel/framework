@@ -356,7 +356,6 @@ class Builder
 
             $model->preventsLazyLoading = Model::preventsLazyLoading();
 
-
             return $model;
         }, $items));
     }
