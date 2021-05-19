@@ -10,13 +10,6 @@ use Orchestra\Testbench\TestCase;
  */
 class FoundationServiceProvidersTest extends TestCase
 {
-    /**
-     * Get package providers.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     *
-     * @return array
-     */
     protected function getPackageProviders($app)
     {
         return [HeadServiceProvider::class];
@@ -37,11 +30,6 @@ class HeadServiceProvider extends ServiceProvider
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
     public function boot()
     {
         $this->app->register(TailServiceProvider::class);
