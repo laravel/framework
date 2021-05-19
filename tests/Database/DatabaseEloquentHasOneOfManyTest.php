@@ -66,6 +66,8 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     {
         $this->schema()->drop('users');
         $this->schema()->drop('logins');
+        $this->schema()->drop('states');
+        $this->schema()->drop('prices');
     }
 
     public function testItGuessesRelationName()
@@ -308,6 +310,34 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
         $user = HasOneOfManyTestUser::first();
         $this->assertSame($price->id, $user->price->id);
+    }
+
+    public function testWithExists()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $user = HasOneOfManyTestUser::withExists('latest_login')->first();
+        $this->assertFalse($user->latest_login_exists);
+
+        $user->logins()->create();
+        $user = HasOneOfManyTestUser::withExists('latest_login')->first();
+        $this->assertTrue($user->latest_login_exists);
+    }
+
+    public function testWithExistsWithConstraintsInJoinSubSelect()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $user = HasOneOfManyTestUser::withExists('foo_state')->first();
+
+        $this->assertFalse($user->foo_state_exists);
+
+        $user->states()->create([
+            'type'  => 'foo',
+            'state' => 'bar',
+        ]);
+        $user = HasOneOfManyTestUser::withExists('foo_state')->first();
+        $this->assertTrue($user->foo_state_exists);
     }
 
     /**
