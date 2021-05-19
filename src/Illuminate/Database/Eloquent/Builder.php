@@ -352,9 +352,12 @@ class Builder
         $instance = $this->newModelInstance();
 
         return $instance->newCollection(array_map(function ($item) use ($instance) {
-            return tap($instance->newFromBuilder($item), function ($instance) {
-                $instance->withStrictLoading = Model::strictLoadingEnabled();
-            });
+            $model = $instance->newFromBuilder($item);
+
+            $model->preventsLazyLoading = Model::preventsLazyLoading();
+
+
+            return $model;
         }, $items));
     }
 

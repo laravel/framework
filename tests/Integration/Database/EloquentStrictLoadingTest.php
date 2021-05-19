@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\StrictLoadingViolationException;
+use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -32,13 +32,13 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
             $table->foreignId('model_2_id');
         });
 
-        Model::enableStrictLoading();
+        Model::preventLazyLoading();
     }
 
     public function testStrictModeThrowsAnExceptionOnLazyLoading()
     {
-        $this->expectException(StrictLoadingViolationException::class);
-        $this->expectExceptionMessage('Trying to lazy load [modelTwos] in model [Illuminate\Tests\Integration\Database\EloquentStrictLoadingTestModel1] is restricted');
+        $this->expectException(LazyLoadingViolationException::class);
+        $this->expectExceptionMessage('Attempted to lazy load');
 
         EloquentStrictLoadingTestModel1::create();
         EloquentStrictLoadingTestModel1::create();
@@ -90,8 +90,8 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
 
     public function testStrictModeThrowsAnExceptionOnLazyLoadingInRelations()
     {
-        $this->expectException(StrictLoadingViolationException::class);
-        $this->expectExceptionMessage('Trying to lazy load [modelThrees] in model [Illuminate\Tests\Integration\Database\EloquentStrictLoadingTestModel2] is restricted');
+        $this->expectException(LazyLoadingViolationException::class);
+        $this->expectExceptionMessage('Attempted to lazy load');
 
         $model1 = EloquentStrictLoadingTestModel1::create();
         EloquentStrictLoadingTestModel2::create(['model_1_id' => $model1->id]);

@@ -82,11 +82,11 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     protected $withCount = [];
 
     /**
-     * Indicates whether strict loading should be enforced on this model.
+     * Indicates whether lazy loading will be prevented on this model.
      *
      * @var bool
      */
-    public $withStrictLoading = false;
+    public $preventsLazyLoading = false;
 
     /**
      * The number of models to return for pagination.
@@ -152,11 +152,11 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     protected static $ignoreOnTouch = [];
 
     /**
-     * Indicates whether strict loading should be enforced on all models.
+     * Indicates whether lazy loading should be restricted on all models.
      *
      * @var bool
      */
-    protected static $strictLoading = false;
+    protected static $modelsShouldPreventLazyLoading = false;
 
     /**
      * The name of the "created at" column.
@@ -348,13 +348,14 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
-     * Enable the strict loading mode.
+     * Prevent model relationships from being lazy loaded.
      *
+     * @param  bool  $value
      * @return void
      */
-    public static function enableStrictLoading()
+    public static function preventLazyLoading($value = true)
     {
-        static::$strictLoading = true;
+        static::$modelsShouldPreventLazyLoading = $value;
     }
 
     /**
@@ -1788,16 +1789,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
-     * Determine if strict loading is enabled.
-     *
-     * @return bool
-     */
-    public static function strictLoadingEnabled()
-    {
-        return static::$strictLoading;
-    }
-
-    /**
      * Get the default foreign key name for the model.
      *
      * @return string
@@ -1828,6 +1819,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         $this->perPage = $perPage;
 
         return $this;
+    }
+
+    /**
+     * Determine if lazy loading is disabled.
+     *
+     * @return bool
+     */
+    public static function preventsLazyLoading()
+    {
+        return static::$modelsShouldPreventLazyLoading;
     }
 
     /**

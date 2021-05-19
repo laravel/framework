@@ -4,7 +4,7 @@ namespace Illuminate\Database;
 
 use RuntimeException;
 
-class StrictLoadingViolationException extends RuntimeException
+class LazyLoadingViolationException extends RuntimeException
 {
     /**
      * The name of the affected Eloquent model.
@@ -31,7 +31,7 @@ class StrictLoadingViolationException extends RuntimeException
     {
         $class = get_class($model);
 
-        parent::__construct("Trying to lazy load [{$relation}] in model [{$class}] is restricted.");
+        parent::__construct("Attempted to lazy load [{$relation}] on model [{$class}] but lazy loading is disabled.");
 
         $this->model = $class;
         $this->relation = $relation;

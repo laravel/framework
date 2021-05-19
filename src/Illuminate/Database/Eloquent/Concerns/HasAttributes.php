@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Database\StrictLoadingViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -438,8 +439,8 @@ trait HasAttributes
             return;
         }
 
-        if ($this->withStrictLoading) {
-            throw new StrictLoadingViolationException($this, $key);
+        if ($this->preventsLazyLoading) {
+            throw new LazyLoadingViolationException($this, $key);
         }
 
         // If the "attribute" exists as a method on the model, we will just assume
@@ -449,7 +450,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the given key is a relation.
+     * Determine if the given key is a relationship method on the model.
      *
      * @param  string  $key
      * @return bool
