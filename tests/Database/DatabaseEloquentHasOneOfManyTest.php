@@ -70,15 +70,32 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
     public function testItGuessesRelationName()
     {
-        $user = HasOneOfManyTestUser::create();
+        $user = HasOneOfManyTestUser::make();
         $this->assertSame('latest_login', $user->latest_login()->getRelationName());
     }
 
-    // public function testRelationNameCanBeSet()
-    // {
-    //     $user = HasOneOfManyTestUser::create();
-    //     $this->assertSame('foo', $user->latest_login_with_other_name()->getRelationName());
-    // }
+    public function testItGuessesRelationNameAndAddsOfManyWhenTableNameIsRelationName()
+    {
+        $model = HasOneOfManyTestModel::make();
+        $this->assertSame('logins_of_many', $model->logins()->getRelationName());
+    }
+
+    public function testRelationNameCanBeSet()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        // Using "ofMany"
+        $relation = $user->latest_login()->ofMany('id', 'max', 'foo');
+        $this->assertSame('foo', $relation->getRelationName());
+
+        // Using "latestOfMAny"
+        $relation = $user->latest_login()->latestOfMAny('id', 'bar');
+        $this->assertSame('bar', $relation->getRelationName());
+
+        // Using "oldestOfMAny"
+        $relation = $user->latest_login()->oldestOfMAny('id', 'baz');
+        $this->assertSame('baz', $relation->getRelationName());
+    }
 
     public function testQualifyingSubSelectColumn()
     {
@@ -225,9 +242,6 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertFalse($user->latest_login()->isNot($login2));
     }
 
-    /**
-     * @group fail
-     */
     public function testGet()
     {
         $user = HasOneOfManyTestUser::create();
@@ -389,6 +403,14 @@ class HasOneOfManyTestUser extends Eloquent
     public function price_with_shortcut()
     {
         return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->latestOfMany(['published_at', 'id']);
+    }
+}
+
+class HasOneOfManyTestModel extends Eloquent
+{
+    public function logins()
+    {
+        return $this->hasOne(HasOneOfManyTestLogin::class)->ofMany();
     }
 }
 
