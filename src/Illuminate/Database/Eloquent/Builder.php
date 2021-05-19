@@ -352,7 +352,12 @@ class Builder
         $instance = $this->newModelInstance();
 
         return $instance->newCollection(array_map(function ($item) use ($instance) {
-            return $instance->newFromBuilder($item);
+            $model = $instance->newFromBuilder($item);
+
+            $model->preventsLazyLoading = Model::preventsLazyLoading();
+
+
+            return $model;
         }, $items));
     }
 
