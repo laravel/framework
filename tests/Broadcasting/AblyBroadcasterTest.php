@@ -125,6 +125,8 @@ class AblyBroadcasterTest extends TestCase
         $user = m::mock('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
              ->andReturn(42);
+        $user->shouldReceive('getAuthIdentifier')
+             ->andReturn(42);
 
         $request->shouldReceive('user')
                 ->andReturn($user);

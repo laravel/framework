@@ -22,7 +22,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param  \Ably\AblyRest  $ably
+     * @param \Ably\AblyRest $ably
      * @return void
      */
     public function __construct(AblyRest $ably)
@@ -33,7 +33,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Authenticate the incoming request for a given channel.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
@@ -44,7 +44,7 @@ class AblyBroadcaster extends Broadcaster
 
         if (empty($request->channel_name) ||
             ($this->isGuardedChannel($request->channel_name) &&
-            ! $this->retrieveUser($request, $channelName))) {
+                !$this->retrieveUser($request, $channelName))) {
             throw new AccessDeniedHttpException;
         }
 
@@ -56,8 +56,8 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Return the valid authentication response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $result
+     * @param \Illuminate\Http\Request $request
+     * @param mixed $result
      * @return mixed
      */
     public function validAuthenticationResponse($request, $result)
@@ -67,22 +67,25 @@ class AblyBroadcaster extends Broadcaster
                 $request->channel_name, $request->socket_id
             );
 
-            return ['auth' => $this->getPublicToken().':'.$signature];
+            return ['auth' => $this->getPublicToken() . ':' . $signature];
         }
 
         $channelName = $this->normalizeChannelName($request->channel_name);
+
+        $user = $this->retrieveUser($request, $channelName);
+        $broadcastIdentifier = method_exists($user, 'getAuthIdentifierForBroadcasting') ? $user->getAuthIdentifierForBroadcasting() : $user->getAuthIdentifier();
 
         $signature = $this->generateAblySignature(
             $request->channel_name,
             $request->socket_id,
             $userData = array_filter([
-                'user_id' => (string) $this->retrieveUser($request, $channelName)->getAuthIdentifierForBroadcasting(),
+                'user_id' => (string)$broadcastIdentifier,
                 'user_info' => $result,
             ])
         );
 
         return [
-            'auth' => $this->getPublicToken().':'.$signature,
+            'auth' => $this->getPublicToken() . ':' . $signature,
             'channel_data' => json_encode($userData),
         ];
     }
@@ -90,16 +93,16 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Generate the signature needed for Ably authentication headers.
      *
-     * @param  string  $channelName
-     * @param  string  $socketId
-     * @param  array|null  $userData
+     * @param string $channelName
+     * @param string $socketId
+     * @param array|null $userData
      * @return string
      */
     public function generateAblySignature($channelName, $socketId, $userData = null)
     {
         return hash_hmac(
             'sha256',
-            sprintf('%s:%s%s', $socketId, $channelName, $userData ? ':'.json_encode($userData) : ''),
+            sprintf('%s:%s%s', $socketId, $channelName, $userData ? ':' . json_encode($userData) : ''),
             $this->getPrivateToken(),
         );
     }
@@ -107,9 +110,9 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Broadcast the given event.
      *
-     * @param  array  $channels
-     * @param  string  $event
-     * @param  array  $payload
+     * @param array $channels
+     * @param string $event
+     * @param array $payload
      * @return void
      */
     public function broadcast(array $channels, $event, array $payload = [])
@@ -122,7 +125,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Return true if the channel is protected by authentication.
      *
-     * @param  string  $channel
+     * @param string $channel
      * @return bool
      */
     public function isGuardedChannel($channel)
@@ -133,15 +136,15 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Remove prefix from channel name.
      *
-     * @param  string  $channel
+     * @param string $channel
      * @return string
      */
     public function normalizeChannelName($channel)
     {
         if ($this->isGuardedChannel($channel)) {
             return Str::startsWith($channel, 'private-')
-                        ? Str::replaceFirst('private-', '', $channel)
-                        : Str::replaceFirst('presence-', '', $channel);
+                ? Str::replaceFirst('private-', '', $channel)
+                : Str::replaceFirst('presence-', '', $channel);
         }
 
         return $channel;
@@ -150,13 +153,13 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Format the channel array into an array of strings.
      *
-     * @param  array  $channels
+     * @param array $channels
      * @return array
      */
     protected function formatChannels(array $channels)
     {
         return array_map(function ($channel) {
-            $channel = (string) $channel;
+            $channel = (string)$channel;
 
             if (Str::startsWith($channel, ['private-', 'presence-'])) {
                 return Str::startsWith($channel, 'private-')
@@ -164,7 +167,7 @@ class AblyBroadcaster extends Broadcaster
                     : Str::replaceFirst('presence-', 'presence:', $channel);
             }
 
-            return 'public:'.$channel;
+            return 'public:' . $channel;
         }, $channels);
     }
 
