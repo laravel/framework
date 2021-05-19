@@ -34,9 +34,9 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param \Illuminate\Contracts\Redis\Factory $redis
-     * @param string|null $connection
-     * @param string $prefix
+     * @param  \Illuminate\Contracts\Redis\Factory  $redis
+     * @param  string|null  $connection
+     * @param  string  $prefix
      * @return void
      */
     public function __construct(Redis $redis, $connection = null, $prefix = '')
@@ -49,7 +49,7 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Authenticate the incoming request for a given channel.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
@@ -62,7 +62,7 @@ class RedisBroadcaster extends Broadcaster
 
         if (empty($request->channel_name) ||
             ($this->isGuardedChannel($request->channel_name) &&
-                !$this->retrieveUser($request, $channelName))) {
+            ! $this->retrieveUser($request, $channelName))) {
             throw new AccessDeniedHttpException;
         }
 
@@ -74,8 +74,8 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Return the valid authentication response.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param mixed $result
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $result
      * @return mixed
      */
     public function validAuthenticationResponse($request, $result)
@@ -98,9 +98,9 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Broadcast the given event.
      *
-     * @param array $channels
-     * @param string $event
-     * @param array $payload
+     * @param  array  $channels
+     * @param  string  $event
+     * @param  array  $payload
      * @return void
      */
     public function broadcast(array $channels, $event, array $payload = [])
@@ -143,13 +143,13 @@ LUA;
     /**
      * Format the channel array into an array of strings.
      *
-     * @param array $channels
+     * @param  array  $channels
      * @return array
      */
     protected function formatChannels(array $channels)
     {
         return array_map(function ($channel) {
-            return $this->prefix . $channel;
+            return $this->prefix.$channel;
         }, parent::formatChannels($channels));
     }
 }

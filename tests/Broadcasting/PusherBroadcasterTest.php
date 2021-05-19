@@ -164,7 +164,7 @@ class PusherBroadcasterTest extends TestCase
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
              ->andReturn(42);
         $user->shouldReceive('getAuthIdentifier')
-            ->andReturn(42);
+             ->andReturn(42);
 
         $request->shouldReceive('user')
                 ->andReturn($user);
