@@ -64,7 +64,9 @@ trait CanBeOneOfMany
     {
         $this->isOneOfMany = true;
 
-        $this->relationName = $relation ?: $this->guessRelationship();
+        $this->relationName = $relation ?: $this->getDefaultOneOfManyJoinAlias(
+            $this->guessRelationship()
+        );
 
         $keyName = $this->query->getModel()->getKeyName();
 
@@ -108,6 +110,19 @@ trait CanBeOneOfMany
         }
 
         return $this;
+    }
+
+    /**
+     * Get the default alias for one of many inner join clause.
+     *
+     * @param  string  $relation
+     * @return string
+     */
+    protected function getDefaultOneOfManyJoinAlias($relation)
+    {
+        return $relation == $this->query->getModel()->getTable()
+            ? $relation.'_of_many'
+            : $relation;
     }
 
     /**
