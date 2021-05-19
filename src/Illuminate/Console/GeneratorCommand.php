@@ -4,6 +4,7 @@ namespace Illuminate\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
+use ReflectionClass;
 use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command
@@ -117,6 +118,22 @@ abstract class GeneratorCommand extends Command
      * @return string
      */
     abstract protected function getStub();
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        $reflection = new ReflectionClass(get_class($this));
+        $directory = dirname($reflection->getFileName());
+
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : $directory.$stub;
+    }
 
     /**
      * Execute the console command.

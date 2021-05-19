@@ -49,7 +49,7 @@ class ChannelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/channel.stub';
+        return $this->resolveStubPath('/stubs/channel.stub');
     }
 
     /**

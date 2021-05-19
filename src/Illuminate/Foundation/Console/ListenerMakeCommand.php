@@ -65,13 +65,13 @@ class ListenerMakeCommand extends GeneratorCommand
     {
         if ($this->option('queued')) {
             return $this->option('event')
-                        ? __DIR__.'/stubs/listener-queued.stub'
-                        : __DIR__.'/stubs/listener-queued-duck.stub';
+                ? $this->resolveStubPath('/stubs/listener-queued.stub')
+                : $this->resolveStubPath('/stubs/listener-queued-duck.stub');
         }
 
         return $this->option('event')
-                    ? __DIR__.'/stubs/listener.stub'
-                    : __DIR__.'/stubs/listener-duck.stub';
+            ? $this->resolveStubPath('/stubs/listener.stub')
+            : $this->resolveStubPath('/stubs/listener-duck.stub');
     }
 
     /**
