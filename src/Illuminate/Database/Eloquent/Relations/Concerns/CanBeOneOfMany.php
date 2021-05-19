@@ -113,19 +113,6 @@ trait CanBeOneOfMany
     }
 
     /**
-     * Get the default alias for one of many inner join clause.
-     *
-     * @param  string  $relation
-     * @return string
-     */
-    protected function getDefaultOneOfManyJoinAlias($relation)
-    {
-        return $relation == $this->query->getModel()->getTable()
-            ? $relation.'_of_many'
-            : $relation;
-    }
-
-    /**
      * Indicate that the relation is the latest single result of a larger one-to-many relationship.
      *
      * @param  string|array|null  $column
@@ -153,6 +140,19 @@ trait CanBeOneOfMany
         return $this->ofMany(collect(Arr::wrap($column))->mapWithKeys(function ($column) {
             return [$column => 'MIN'];
         })->all(), 'MIN', $relation ?: $this->guessRelationship());
+    }
+
+    /**
+     * Get the default alias for the one of many inner join clause.
+     *
+     * @param  string  $relation
+     * @return string
+     */
+    protected function getDefaultOneOfManyJoinAlias($relation)
+    {
+        return $relation == $this->query->getModel()->getTable()
+            ? $relation.'_of_many'
+            : $relation;
     }
 
     /**
