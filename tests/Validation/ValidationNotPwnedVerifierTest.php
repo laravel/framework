@@ -46,6 +46,12 @@ class ValidationNotPwnedVerifierTest extends TestCase
             ->with(['Add-Padding' => true])
             ->andReturn($httpFactory);
 
+        $httpFactory
+            ->shouldReceive('timeout')
+            ->once()
+            ->with(15)
+            ->andReturn($httpFactory);
+
         $httpFactory->shouldReceive('get')
             ->once()
             ->andReturn($response);
@@ -75,6 +81,12 @@ class ValidationNotPwnedVerifierTest extends TestCase
             ->shouldReceive('withHeaders')
             ->once()
             ->with(['Add-Padding' => true])
+            ->andReturn($httpFactory);
+
+        $httpFactory
+            ->shouldReceive('timeout')
+            ->once()
+            ->with(15)
             ->andReturn($httpFactory);
 
         $httpFactory->shouldReceive('get')
@@ -110,6 +122,12 @@ class ValidationNotPwnedVerifierTest extends TestCase
             ->shouldReceive('withHeaders')
             ->once()
             ->with(['Add-Padding' => true])
+            ->andReturn($httpFactory);
+
+        $httpFactory
+            ->shouldReceive('timeout')
+            ->once()
+            ->with(15)
             ->andReturn($httpFactory);
 
         $httpFactory
