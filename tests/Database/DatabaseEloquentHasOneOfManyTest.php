@@ -312,6 +312,37 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($price->id, $user->price->id);
     }
 
+    public function testEagerLoadingWithMultipleAggregates()
+    {
+        $user1 = HasOneOfManyTestUser::create();
+        $user2 = HasOneOfManyTestUser::create();
+
+        $user1->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+        $user1Price = $user1->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+        $user1->prices()->create([
+            'published_at' => '2021-04-01 00:00:00',
+        ]);
+
+        $user2Price = $user2->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+        $user2->prices()->create([
+            'published_at' => '2021-04-01 00:00:00',
+        ]);
+
+        $users = HasOneOfManyTestUser::with('price')->get();
+
+        $this->assertNotNull($users[0]->price);
+        $this->assertSame($user1Price->id, $users[0]->price->id);
+
+        $this->assertNotNull($users[1]->price);
+        $this->assertSame($user2Price->id, $users[1]->price->id);
+    }
+
     public function testWithExists()
     {
         $user = HasOneOfManyTestUser::create();

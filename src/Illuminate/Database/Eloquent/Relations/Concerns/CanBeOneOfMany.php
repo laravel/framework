@@ -89,7 +89,7 @@ trait CanBeOneOfMany
             }
 
             $subQuery = $this->newOneOfManySubQuery(
-                isset($previous) ? $previous['column'] : $this->getOneOfManySubQuerySelectColumns(),
+                $this->getOneOfManySubQuerySelectColumns(),
                 $column, $aggregate
             );
 
