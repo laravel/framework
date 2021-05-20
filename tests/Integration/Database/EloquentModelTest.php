@@ -25,7 +25,7 @@ class EloquentModelTest extends DatabaseTestCase
         Schema::create('test_model2', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('title');
+            $table->string('title')->nullable();
         });
     }
 
@@ -68,6 +68,39 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertEquals(['name' => $name], $user->getChanges());
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
+    }
+
+    public function testAttributeChangesFromTo()
+    {
+        $user = TestModel2::create([
+            'name' => 'mohamed'
+        ]);
+
+        $user->refresh();
+
+        $user->name = 'zain';
+        $user->title = 'A';
+
+        $this->assertFalse($user->wasChangedTo('name', 'zain'));
+        $this->assertFalse($user->wasChangedTo('title', 'A'));
+
+        $user->save();
+
+        $this->assertTrue($user->wasChangedTo('name', 'zain'));
+        $this->assertTrue($user->wasChangedTo('name', 'zain', 'mohamed'));
+        $this->assertFalse($user->wasChangedTo('name', 'zain', 'said'));
+
+        $this->assertTrue($user->wasChangedTo('title', 'A'));
+        $this->assertTrue($user->wasChangedTo('title', 'A', null));
+        $this->assertFalse($user->wasChangedTo('title', 'A', 'B'));
+
+        $user->title = null;
+
+        $user->save();
+
+        $this->assertTrue($user->wasChangedTo('title', null));
+        $this->assertTrue($user->wasChangedTo('title', null, 'A'));
+        $this->assertFalse($user->wasChangedTo('title', null, 'B'));
     }
 }
 

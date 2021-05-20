@@ -44,6 +44,13 @@ trait HasAttributes
     protected $changes = [];
 
     /**
+     * The model attribute's old state.
+     *
+     * @var array
+     */
+    protected $old = [];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array
@@ -1484,6 +1491,8 @@ trait HasAttributes
      */
     public function syncChanges()
     {
+        $this->old = Arr::only($this->original, array_keys($this->getDirty()));
+
         $this->changes = $this->getDirty();
 
         return $this;
@@ -1524,6 +1533,26 @@ trait HasAttributes
         return $this->hasChanges(
             $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
         );
+    }
+
+    /**
+     * Determine if the attribute has changed to a given value.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    public function wasChangedTo($attribute, $to, $from = null)
+    {
+        if (! array_key_exists($attribute, $this->old) ||
+            ! array_key_exists($attribute, $this->changes)) {
+            return false;
+        }
+
+        if (func_num_args() == 3 && $this->old[$attribute] !== $from) {
+            return false;
+        }
+
+        return $this->changes[$attribute] === $to;
     }
 
     /**
