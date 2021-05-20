@@ -26,6 +26,13 @@ trait CanBeOneOfMany
     protected $relationName;
 
     /**
+     * One of many inner join subselect builder instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Builder|null
+     */
+    protected $oneOfManySubQuery;
+
+    /**
      * Add constraints for inner join subselect for one of many relationships.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -97,6 +104,10 @@ trait CanBeOneOfMany
                 $this->addOneOfManyJoinSubQuery($subQuery, $previous['subQuery'], $previous['column']);
             } elseif (isset($closure)) {
                 $closure($subQuery);
+            }
+
+            if (! isset($previous)) {
+                $this->oneOfManySubQuery = $subQuery;
             }
 
             if (array_key_last($columns) == $column) {
@@ -191,11 +202,35 @@ trait CanBeOneOfMany
      */
     protected function addOneOfManyJoinSubQuery(Builder $parent, Builder $subQuery, $on)
     {
-        $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
-            $join->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on));
+        $parent->preserve(function($parent) use($subQuery, $on) {
+            $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
+                $join->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on));
 
-            $this->addOneOfManyJoinSubQueryConstraints($join, $on);
+                $this->addOneOfManyJoinSubQueryConstraints($join, $on);
+            });
         });
+    }
+
+    /**
+     * Get the query builder to restrict relationship models.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function getRestrictionQuery()
+    {
+        return $this->isOneOfMany()
+            ? $this->oneOfManySubQuery
+            : $this->query;
+    }
+
+    /**
+     * Get one of many inner join subselect builder instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|void
+     */
+    public function getOneOfManySubQuery()
+    {
+        return $this->oneOfManySubQuery;
     }
 
     /**
@@ -206,9 +241,8 @@ trait CanBeOneOfMany
      */
     protected function mergeOneOfManyJoinsTo(Builder $query)
     {
-        $query->getQuery()->joins = $this->query->getQuery()->joins;
-
-        $query->addBinding($this->query->getBindings(), 'join');
+        $query->getQuery()->preserved = $this->query->getQuery()->preserved;
+        $query->applyPreserved();
     }
 
     /**

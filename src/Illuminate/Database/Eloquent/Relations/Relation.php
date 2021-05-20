@@ -367,6 +367,16 @@ abstract class Relation
     }
 
     /**
+     * Get the query builder to restrict relationship models.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function getRestrictionQuery()
+    {
+        return $this->query;
+    }
+
+    /**
      * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map
