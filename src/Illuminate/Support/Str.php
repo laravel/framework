@@ -533,7 +533,7 @@ class Str
      * @param  string|string[]  $search
      * @param  string|string[]  $replace
      * @param  string|string[]  $subject
-     * @return static
+     * @return string
      */
     public static function replace($search, $replace, $subject)
     {
