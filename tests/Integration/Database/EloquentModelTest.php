@@ -73,7 +73,7 @@ class EloquentModelTest extends DatabaseTestCase
     public function testAttributeChangesFromTo()
     {
         $user = TestModel2::create([
-            'name' => 'mohamed'
+            'name' => 'mohamed',
         ]);
 
         $user->refresh();
