@@ -204,6 +204,13 @@ class Builder
     public $useWritePdo = false;
 
     /**
+     * Preserved query modifiers.
+     *
+     * @var array
+     */
+    public $preserved = [];
+
+    /**
      * Create a new query builder instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -2257,12 +2264,41 @@ class Builder
     }
 
     /**
+     * Preserve query modification to be applied before rendering the builder.
+     *
+     * @param  Closure  $closure
+     * @return $this
+     */
+    public function preserve(Closure $closure)
+    {
+        $this->preserved[] = $closure;
+
+        return $this;
+    }
+
+    /**
+     * Apply preserved query modifications.
+     *
+     * @return void
+     */
+    public function applyPreserved()
+    {
+        foreach ($this->preserved as $modifier) {
+            $modifier($this);
+        }
+
+        $this->preserved = [];
+    }
+
+    /**
      * Get the SQL representation of the query.
      *
      * @return string
      */
     public function toSql()
     {
+        $this->applyPreserved();
+
         return $this->grammar->compileSelect($this);
     }
 
@@ -2663,6 +2699,8 @@ class Builder
      */
     public function exists()
     {
+        $this->applyPreserved();
+
         $results = $this->connection->select(
             $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
         );
@@ -2901,6 +2939,8 @@ class Builder
             }
         }
 
+        $this->applyPreserved();
+
         // Finally, we will run this query against the database connection and return
         // the results. We will need to also flatten these bindings before running
         // the query so they are all in one huge, flattened array for execution.
@@ -2931,6 +2971,8 @@ class Builder
             }
         }
 
+        $this->applyPreserved();
+
         return $this->connection->affectingStatement(
             $this->grammar->compileInsertOrIgnore($this, $values),
             $this->cleanBindings(Arr::flatten($values, 1))
@@ -2946,6 +2988,8 @@ class Builder
      */
     public function insertGetId(array $values, $sequence = null)
     {
+        $this->applyPreserved();
+
         $sql = $this->grammar->compileInsertGetId($this, $values, $sequence);
 
         $values = $this->cleanBindings($values);
@@ -2962,6 +3006,8 @@ class Builder
      */
     public function insertUsing(array $columns, $query)
     {
+        $this->applyPreserved();
+
         [$sql, $bindings] = $this->createSub($query);
 
         return $this->connection->affectingStatement(
@@ -2978,6 +3024,8 @@ class Builder
      */
     public function update(array $values)
     {
+        $this->applyPreserved();
+
         $sql = $this->grammar->compileUpdate($this, $values);
 
         return $this->connection->update($sql, $this->cleanBindings(
@@ -3034,6 +3082,8 @@ class Builder
         if (is_null($update)) {
             $update = array_keys(reset($values));
         }
+
+        $this->applyPreserved();
 
         $bindings = $this->cleanBindings(array_merge(
             Arr::flatten($values, 1),
@@ -3109,6 +3159,8 @@ class Builder
             $this->where($this->from.'.id', '=', $id);
         }
 
+        $this->applyPreserved();
+
         return $this->connection->delete(
             $this->grammar->compileDelete($this), $this->cleanBindings(
                 $this->grammar->prepareBindingsForDelete($this->bindings)
@@ -3123,6 +3175,8 @@ class Builder
      */
     public function truncate()
     {
+        $this->applyPreserved();
+
         foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
             $this->connection->statement($sql, $bindings);
         }
