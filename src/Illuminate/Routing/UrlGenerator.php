@@ -388,9 +388,9 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $url = $absolute ? $request->url() : '/'.$request->path();
 
-        $original = rtrim($url.'?'.Arr::query(
-            Arr::except($request->query(), 'signature')
-        ), '?');
+        $querystring = ltrim(preg_replace('/(^|&)signature=[^&]+/', '', $request->server->get('QUERY_STRING')), '&');
+
+        $original = rtrim($url.'?'.$querystring, '?');
 
         $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
 
