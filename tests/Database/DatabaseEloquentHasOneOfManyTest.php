@@ -335,7 +335,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         ]);
 
         $users = HasOneOfManyTestUser::with('price')->get();
-        
+
         $this->assertNotNull($users[0]->price);
         $this->assertSame($user1Price->id, $users[0]->price->id);
 
