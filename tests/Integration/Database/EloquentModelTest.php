@@ -26,6 +26,7 @@ class EloquentModelTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('name');
             $table->string('title')->nullable();
+            $table->integer('score')->default(0);
         });
     }
 
@@ -101,6 +102,12 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->wasChangedTo('title', null));
         $this->assertTrue($user->wasChangedTo('title', null, 'A'));
         $this->assertFalse($user->wasChangedTo('title', null, 'B'));
+
+        $user->increment('score');
+
+        $this->assertTrue($user->wasChangedTo('score', 1));
+        $this->assertTrue($user->wasChangedTo('score', 1, 0));
+        $this->assertFalse($user->wasChangedTo('score', 1, 2));
     }
 }
 
@@ -117,4 +124,5 @@ class TestModel2 extends Model
     public $table = 'test_model2';
     public $timestamps = false;
     protected $guarded = [];
+    protected $casts = ['score' => 'integer'];
 }

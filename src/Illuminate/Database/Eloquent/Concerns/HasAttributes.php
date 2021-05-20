@@ -1548,11 +1548,12 @@ trait HasAttributes
             return false;
         }
 
-        if (func_num_args() == 3 && $this->old[$attribute] !== $from) {
+        if (func_num_args() == 3 &&
+            ! $this->attributeValueIsEquivalent($attribute, $this->old[$attribute], $from)) {
             return false;
         }
 
-        return $this->changes[$attribute] === $to;
+        return $this->attributeValueIsEquivalent($attribute, $this->changes[$attribute], $to);
     }
 
     /**
@@ -1623,32 +1624,46 @@ trait HasAttributes
             return false;
         }
 
-        $attribute = Arr::get($this->attributes, $key);
-        $original = Arr::get($this->original, $key);
+        return $this->attributeValueIsEquivalent(
+            $key,
+            Arr::get($this->attributes, $key),
+            Arr::get($this->original, $key)
+        );
+    }
 
-        if ($attribute === $original) {
+    /**
+     * Determine if two values of a given attribute are equivalent.
+     *
+     * @param  string  $key
+     * @param  array  $newValues
+     * @param  array  $oldValues
+     * @return bool
+     */
+    public function attributeValueIsEquivalent($key, $value1, $value2)
+    {
+        if ($value1 === $value2) {
             return true;
-        } elseif (is_null($attribute)) {
+        } elseif (is_null($value1)) {
             return false;
         } elseif ($this->isDateAttribute($key)) {
-            return $this->fromDateTime($attribute) ===
-                   $this->fromDateTime($original);
+            return $this->fromDateTime($value1) ===
+                   $this->fromDateTime($value2);
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
-            return $this->castAttribute($key, $attribute) ==
-                $this->castAttribute($key, $original);
+            return $this->castAttribute($key, $value1) ==
+                $this->castAttribute($key, $value2);
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
-            if (($attribute === null && $original !== null) || ($attribute !== null && $original === null)) {
+            if (($value1 === null && $value2 !== null) || ($value1 !== null && $value2 === null)) {
                 return false;
             }
 
-            return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
+            return abs($this->castAttribute($key, $value1) - $this->castAttribute($key, $value2)) < PHP_FLOAT_EPSILON * 4;
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
-            return $this->castAttribute($key, $attribute) ===
-                   $this->castAttribute($key, $original);
+            return $this->castAttribute($key, $value1) ===
+                   $this->castAttribute($key, $value2);
         }
 
-        return is_numeric($attribute) && is_numeric($original)
-               && strcmp((string) $attribute, (string) $original) === 0;
+        return is_numeric($value1) && is_numeric($value2)
+               && strcmp((string) $value1, (string) $value2) === 0;
     }
 
     /**
