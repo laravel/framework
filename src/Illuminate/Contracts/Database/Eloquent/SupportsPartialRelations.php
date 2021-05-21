@@ -22,7 +22,7 @@ interface SupportsPartialRelations
     public function isOneOfMany();
 
     /**
-     * Get one of many inner join subselect builder instance.
+     * Get the one of many inner join subselect query builder instance.
      *
      * @return \Illuminate\Database\Eloquent\Builder|void
      */

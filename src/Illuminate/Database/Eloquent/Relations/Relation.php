@@ -272,6 +272,16 @@ abstract class Relation
     }
 
     /**
+     * Get the query builder that will contain the relationship constraints.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function getRelationQuery()
+    {
+        return $this->query;
+    }
+
+    /**
      * Get the underlying query for the relation.
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -364,16 +374,6 @@ abstract class Relation
                     && in_array($model->getKeyType(), ['int', 'integer'])
                         ? 'whereIntegerInRaw'
                         : 'whereIn';
-    }
-
-    /**
-     * Get the query builder to restrict relationship models.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function getRestrictionQuery()
-    {
-        return $this->query;
     }
 
     /**

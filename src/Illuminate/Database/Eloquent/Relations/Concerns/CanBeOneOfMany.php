@@ -26,7 +26,7 @@ trait CanBeOneOfMany
     protected $relationName;
 
     /**
-     * One of many inner join subselect builder instance.
+     * The one of many inner join subselect query builder instance.
      *
      * @var \Illuminate\Database\Eloquent\Builder|null
      */
@@ -214,28 +214,6 @@ trait CanBeOneOfMany
     }
 
     /**
-     * Get the query builder to restrict relationship models.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function getRestrictionQuery()
-    {
-        return $this->isOneOfMany()
-            ? $this->oneOfManySubQuery
-            : $this->query;
-    }
-
-    /**
-     * Get one of many inner join subselect builder instance.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|void
-     */
-    public function getOneOfManySubQuery()
-    {
-        return $this->oneOfManySubQuery;
-    }
-
-    /**
      * Merge the relationship query joins to the given query builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
@@ -244,7 +222,30 @@ trait CanBeOneOfMany
     protected function mergeOneOfManyJoinsTo(Builder $query)
     {
         $query->getQuery()->beforeQueryCallbacks = $this->query->getQuery()->beforeQueryCallbacks;
+
         $query->applyBeforeQueryCallbacks();
+    }
+
+    /**
+     * Get the query builder that will contain the relationship constraints.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function getRelationQuery()
+    {
+        return $this->isOneOfMany()
+            ? $this->oneOfManySubQuery
+            : $this->query;
+    }
+
+    /**
+     * Get the one of many inner join subselect builder instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|void
+     */
+    public function getOneOfManySubQuery()
+    {
+        return $this->oneOfManySubQuery;
     }
 
     /**
