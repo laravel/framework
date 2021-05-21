@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
@@ -751,6 +752,10 @@ class Validator implements ValidatorContract
 
         if ($rule instanceof DataAwareRule) {
             $rule->setData($this->data);
+        }
+
+        if ($rule instanceof ValidatorAwareRule) {
+            $rule->setValidator($this);
         }
 
         if (! $rule->passes($attribute, $value)) {
