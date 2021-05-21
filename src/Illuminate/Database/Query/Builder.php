@@ -183,6 +183,13 @@ class Builder
     public $lock;
 
     /**
+     * The callbacks that should be invoked before the query is executed.
+     *
+     * @var array
+     */
+    public $beforeQueryCallbacks = [];
+
+    /**
      * All of the available clause operators.
      *
      * @var string[]
@@ -2264,30 +2271,30 @@ class Builder
     }
 
     /**
-     * Preserve query modification to be applied before rendering the builder.
+     * Register a closure to be invoked before the query is executed.
      *
-     * @param  Closure  $closure
+     * @param  callable  $callback
      * @return $this
      */
-    public function preserve(Closure $closure)
+    public function beforeQuery(callable $callback)
     {
-        $this->preserved[] = $closure;
+        $this->beforeQueryCallbacks[] = $callback;
 
         return $this;
     }
 
     /**
-     * Apply preserved query modifications.
+     * Invoke the "before query" modification callbacks.
      *
      * @return void
      */
-    public function applyPreserved()
+    public function applyBeforeQueryCallbacks()
     {
-        foreach ($this->preserved as $modifier) {
-            $modifier($this);
+        foreach ($this->beforeQueryCallbacks as $callback) {
+            $callback($this);
         }
 
-        $this->preserved = [];
+        $this->beforeQueryCallbacks = [];
     }
 
     /**
@@ -2297,7 +2304,7 @@ class Builder
      */
     public function toSql()
     {
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         return $this->grammar->compileSelect($this);
     }
@@ -2699,7 +2706,7 @@ class Builder
      */
     public function exists()
     {
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         $results = $this->connection->select(
             $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
@@ -2939,7 +2946,7 @@ class Builder
             }
         }
 
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         // Finally, we will run this query against the database connection and return
         // the results. We will need to also flatten these bindings before running
@@ -2971,7 +2978,7 @@ class Builder
             }
         }
 
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         return $this->connection->affectingStatement(
             $this->grammar->compileInsertOrIgnore($this, $values),
@@ -2988,7 +2995,7 @@ class Builder
      */
     public function insertGetId(array $values, $sequence = null)
     {
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         $sql = $this->grammar->compileInsertGetId($this, $values, $sequence);
 
@@ -3006,7 +3013,7 @@ class Builder
      */
     public function insertUsing(array $columns, $query)
     {
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         [$sql, $bindings] = $this->createSub($query);
 
@@ -3024,7 +3031,7 @@ class Builder
      */
     public function update(array $values)
     {
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         $sql = $this->grammar->compileUpdate($this, $values);
 
@@ -3083,7 +3090,7 @@ class Builder
             $update = array_keys(reset($values));
         }
 
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         $bindings = $this->cleanBindings(array_merge(
             Arr::flatten($values, 1),
@@ -3159,7 +3166,7 @@ class Builder
             $this->where($this->from.'.id', '=', $id);
         }
 
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         return $this->connection->delete(
             $this->grammar->compileDelete($this), $this->cleanBindings(
@@ -3175,7 +3182,7 @@ class Builder
      */
     public function truncate()
     {
-        $this->applyPreserved();
+        $this->applyBeforeQueryCallbacks();
 
         foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
             $this->connection->statement($sql, $bindings);

@@ -96,7 +96,7 @@ trait CanBeOneOfMany
             }
 
             $subQuery = $this->newOneOfManySubQuery(
-                isset($previous) ? $previous['column'] : $this->getOneOfManySubQuerySelectColumns(),
+                $this->getOneOfManySubQuerySelectColumns(),
                 $column, $aggregate
             );
 
@@ -202,7 +202,7 @@ trait CanBeOneOfMany
      */
     protected function addOneOfManyJoinSubQuery(Builder $parent, Builder $subQuery, $on)
     {
-        $parent->preserve(function($parent) use($subQuery, $on) {
+        $parent->beforeQuery(function($parent) use($subQuery, $on) {
             $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
                 $join->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on));
 
@@ -241,8 +241,8 @@ trait CanBeOneOfMany
      */
     protected function mergeOneOfManyJoinsTo(Builder $query)
     {
-        $query->getQuery()->preserved = $this->query->getQuery()->preserved;
-        $query->applyPreserved();
+        $query->getQuery()->beforeQueryCallbacks = $this->query->getQuery()->beforeQueryCallbacks;
+        $query->applyBeforeQueryCallbacks();
     }
 
     /**
