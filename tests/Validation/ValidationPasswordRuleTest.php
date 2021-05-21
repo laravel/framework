@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\UncompromisedVerifier;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\Password;
@@ -112,6 +113,22 @@ class ValidationPasswordRuleTest extends TestCase
             'rundeliekend',
             '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
             'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
+        ]);
+    }
+
+    public function testUncompromisedFake()
+    {
+        UncompromisedVerifier::fake();
+
+        $this->passes(Password::min(2)->uncompromised(), [
+            '123456',
+            'password',
+            'welcome',
+            'ninja',
+            'abc123',
+            '123456789',
+            '12345678',
+            'nuno',
         ]);
     }
 
