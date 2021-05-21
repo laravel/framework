@@ -31,6 +31,8 @@ class HandleExceptions
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
+     *
+     * @throws \ErrorException
      */
     public function bootstrap(Application $app)
     {
@@ -48,6 +50,10 @@ class HandleExceptions
 
         if (! $app->environment('testing')) {
             ini_set('display_errors', 'Off');
+        }
+
+        if (($error = error_get_last()) !== null) {
+            $this->handleError($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }
 
