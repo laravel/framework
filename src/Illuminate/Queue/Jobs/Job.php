@@ -266,6 +266,16 @@ abstract class Job
     }
 
     /**
+     * Determine if the job should fail when it timeouts.
+     *
+     * @return bool
+     */
+    public function shouldFailOnTimeout()
+    {
+        return $this->payload()['failOnTimeout'] ?? false;
+    }
+
+    /**
      * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
      * @return int|null
