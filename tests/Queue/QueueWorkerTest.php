@@ -477,6 +477,7 @@ class WorkerFakeJob implements QueueJobContract
     public $released = false;
     public $maxTries;
     public $maxExceptions;
+    public $shouldFailOnTimeouts = false;
     public $uuid;
     public $backoff;
     public $retryUntil;
@@ -518,6 +519,11 @@ class WorkerFakeJob implements QueueJobContract
     public function maxExceptions()
     {
         return $this->maxExceptions;
+    }
+
+    public function shouldFailOnTimeouts()
+    {
+        return $this->shouldFailOnTimeouts;
     }
 
     public function uuid()
