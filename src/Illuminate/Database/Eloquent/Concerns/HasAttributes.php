@@ -1536,31 +1536,6 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the attribute has transitioned to a given value.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $to
-     * @param  mixed  $from
-     * @return bool
-     */
-    public function transitionedTo($attribute, ?string $to, ?string $from = null)
-    {
-        if (! array_key_exists($attribute, $this->old) ||
-            ! array_key_exists($attribute, $this->changes)) {
-            return false;
-        }
-
-        $oldValue = is_null($this->old[$attribute]) ? null : (string) $this->old[$attribute];
-        $newValue = is_null($this->changes[$attribute]) ? null : (string) $this->changes[$attribute];
-
-        if (func_num_args() == 3 && $oldValue !== $from) {
-            return false;
-        }
-
-        return $newValue === $to;
-    }
-
-    /**
      * Determine if any of the given attributes were changed.
      *
      * @param  array  $changes
@@ -1586,6 +1561,55 @@ trait HasAttributes
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the attribute has transitioned to a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $to
+     * @param  mixed  $from
+     * @return bool
+     */
+    public function transitionedTo($attribute, ?string $to, ?string $from = null)
+    {
+        if (! array_key_exists($attribute, $this->old) ||
+            ! array_key_exists($attribute, $this->changes)) {
+            return false;
+        }
+
+        $oldValue = is_null($this->old[$attribute]) ? null : (string) $this->old[$attribute];
+        $newValue = is_null($this->changes[$attribute]) ? null : (string) $this->changes[$attribute];
+
+        if (func_num_args() == 3 && $oldValue !== $from) {
+            return false;
+        }
+
+        return $newValue === $to;
+    }
+
+    /**
+     * Determine if the attribute is transitioning to a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $to
+     * @param  mixed  $from
+     * @return bool
+     */
+    public function transitioningTo($attribute, ?string $to, ?string $from = null)
+    {
+        if (! $this->isDirty($attribute)) {
+            return false;
+        }
+
+        $oldValue = is_null($this->original[$attribute]) ? null : (string) $this->original[$attribute];
+        $newValue = is_null($this->attributes[$attribute]) ? null : (string) $this->attributes[$attribute];
+
+        if (func_num_args() == 3 && $oldValue !== $from) {
+            return false;
+        }
+
+        return $newValue === $to;
     }
 
     /**
