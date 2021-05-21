@@ -203,7 +203,7 @@ class Worker
                     $job->getConnectionName(), $job, $e
                 );
 
-                $this->markJobAsFailedIfItShouldFailOnTimeouts(
+                $this->markJobAsFailedIfItShouldFailOnTimeout(
                     $job->getConnectionName(), $job, $e
                 );
             }
@@ -548,9 +548,9 @@ class Worker
      * @param  \Throwable  $e
      * @return void
      */
-    protected function markJobAsFailedIfItShouldFailOnTimeouts($connectionName, $job, Throwable $e)
+    protected function markJobAsFailedIfItShouldFailOnTimeout($connectionName, $job, Throwable $e)
     {
-        if (method_exists($job, 'shouldFailOnTimeouts') ? $job->shouldFailOnTimeouts() : false) {
+        if (method_exists($job, 'shouldFailOnTimeout') ? $job->shouldFailOnTimeout() : false) {
             $this->failJob($job, $e);
         }
     }
