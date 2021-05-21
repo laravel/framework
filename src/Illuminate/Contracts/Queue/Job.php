@@ -114,13 +114,6 @@ interface Job
     public function maxExceptions();
 
     /**
-     * Determine if the job should fail when it timeouts.
-     *
-     * @return bool
-     */
-    public function shouldFailOnTimeouts();
-
-    /**
      * Get the number of seconds the job can run.
      *
      * @return int|null
