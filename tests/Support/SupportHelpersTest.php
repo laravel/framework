@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
+use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
+use IteratorAggregate;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -87,9 +89,17 @@ class SupportHelpersTest extends TestCase
             ['name' => 'abigail'],
             ['name' => 'dayle'],
         ];
+        $arrayIterable = new SupportTestArrayIterable([
+            ['name' => 'taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['name' => 'abigail'],
+            ['name' => 'dayle'],
+        ]);
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
+
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($arrayIterable, '*.name'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($arrayIterable, '*.email', 'irrelevant'));
 
         $array = [
             'users' => [
@@ -790,5 +800,20 @@ class SupportTestArrayAccess implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
+    }
+}
+
+class SupportTestArrayIterable implements IteratorAggregate
+{
+    protected $items = [];
+
+    public function __construct($items = [])
+    {
+        $this->items = $items;
+    }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->items);
     }
 }
