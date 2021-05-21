@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Exceptions\Whoops;
 
 use Illuminate\Contracts\Foundation\ExceptionRenderer;
-use Illuminate\Foundation\Exceptions\Whoops\WhoopsHandler;
 use Whoops\Run as Whoops;
 use function tap;
 
