@@ -99,6 +99,14 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame('baz', $relation->getRelationName());
     }
 
+    public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $relation = $user->latest_login();
+        $relation->addEagerConstraints([$user]);
+        $this->assertSame('select MAX(id) as id, "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
+    }
+
     public function testQualifyingSubSelectColumn()
     {
         $user = HasOneOfManyTestUser::create();
