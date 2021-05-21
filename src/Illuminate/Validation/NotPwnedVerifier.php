@@ -20,7 +20,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
      *
      * @var int
      */
-    public $timeout;
+    protected $timeout;
 
     /**
      * Create a new uncompromised verifier.
@@ -32,7 +32,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
     public function __construct($factory, $timeout = null)
     {
         $this->factory = $factory;
-        $this->timeout = $timeout ?? 15;
+        $this->timeout = $timeout ?? 10;
     }
 
     /**
