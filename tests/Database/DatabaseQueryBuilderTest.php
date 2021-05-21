@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
+use Closure;
 use DateTime;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -2561,6 +2562,116 @@ class DatabaseQueryBuilderTest extends TestCase
             'delete from sqlite_sequence where name = ?' => ['users'],
             'delete from "users"' => [],
         ], $sqlite->compileTruncate($builder));
+    }
+
+    public function testPreserveAddsClosureToArray()
+    {
+        $builder = $this->getBuilder();
+        $builder->beforeQuery(function () {
+        });
+        $this->assertCount(1, $builder->beforeQueryCallbacks);
+        $this->assertInstanceOf(Closure::class, $builder->beforeQueryCallbacks[0]);
+    }
+
+    public function testApplyPreserveCleansArray()
+    {
+        $builder = $this->getBuilder();
+        $builder->beforeQuery(function () {
+        });
+        $this->assertCount(1, $builder->beforeQueryCallbacks);
+        $builder->applyBeforeQueryCallbacks();
+        $this->assertCount(0, $builder->beforeQueryCallbacks);
+    }
+
+    public function testPreservedAreAppliedByToSql()
+    {
+        $builder = $this->getBuilder();
+        $builder->beforeQuery(function ($builder) {
+            $builder->where('foo', 'bar');
+        });
+        $this->assertSame('select * where "foo" = ?', $builder->toSql());
+        $this->assertEquals(['bar'], $builder->getBindings());
+    }
+
+    public function testPreservedAreAppliedByInsert()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (?)', ['foo']);
+        $builder->beforeQuery(function ($builder) {
+            $builder->from('users');
+        });
+        $builder->insert(['email' => 'foo']);
+    }
+
+    public function testPreservedAreAppliedByInsertGetId()
+    {
+        $this->called = false;
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email") values (?)', ['foo'], 'id');
+        $builder->beforeQuery(function ($builder) {
+            $builder->from('users');
+        });
+        $builder->insertGetId(['email' => 'foo'], 'id');
+    }
+
+    public function testPreservedAreAppliedByInsertUsing()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" () select *', []);
+        $builder->beforeQuery(function ($builder) {
+            $builder->from('users');
+        });
+        $builder->insertUsing([], $this->getBuilder());
+    }
+
+    public function testPreservedAreAppliedByUpsert()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`) values (?) on duplicate key update `email` = values(`email`)', ['foo']);
+        $builder->beforeQuery(function ($builder) {
+            $builder->from('users');
+        });
+        $builder->upsert(['email' => 'foo'], 'id');
+    }
+
+    public function testPreservedAreAppliedByUpdate()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ? where "id" = ?', ['foo', 1]);
+        $builder->from('users')->beforeQuery(function ($builder) {
+            $builder->where('id', 1);
+        });
+        $builder->update(['email' => 'foo']);
+    }
+
+    public function testPreservedAreAppliedByDelete()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users"', []);
+        $builder->beforeQuery(function ($builder) {
+            $builder->from('users');
+        });
+        $builder->delete();
+    }
+
+    public function testPreservedAreAppliedByTruncate()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('statement')->once()->with('truncate table "users"', []);
+        $builder->beforeQuery(function ($builder) {
+            $builder->from('users');
+        });
+        $builder->truncate();
+    }
+
+    public function testPreservedAreAppliedByExists()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select exists(select * from "users") as "exists"', [], true);
+        $builder->beforeQuery(function ($builder) {
+            $builder->from('users');
+        });
+        $builder->exists();
     }
 
     public function testPostgresInsertGetId()
