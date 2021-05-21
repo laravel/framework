@@ -120,6 +120,8 @@ trait CanBeOneOfMany
             ];
         }
 
+        $this->addConstraints();
+
         return $this;
     }
 
