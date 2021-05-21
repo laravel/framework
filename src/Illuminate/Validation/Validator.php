@@ -750,12 +750,12 @@ class Validator implements ValidatorContract
 
         $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
 
-        if ($rule instanceof DataAwareRule) {
-            $rule->setData($this->data);
-        }
-
         if ($rule instanceof ValidatorAwareRule) {
             $rule->setValidator($this);
+        }
+
+        if ($rule instanceof DataAwareRule) {
+            $rule->setData($this->data);
         }
 
         if (! $rule->passes($attribute, $value)) {
