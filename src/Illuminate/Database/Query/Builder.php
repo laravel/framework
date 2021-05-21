@@ -211,13 +211,6 @@ class Builder
     public $useWritePdo = false;
 
     /**
-     * Preserved query modifiers.
-     *
-     * @var array
-     */
-    public $preserved = [];
-
-    /**
      * Create a new query builder instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
