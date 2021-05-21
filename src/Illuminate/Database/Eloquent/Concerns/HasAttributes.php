@@ -1640,7 +1640,7 @@ trait HasAttributes
                    $this->fromDateTime($original);
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
             return $this->castAttribute($key, $attribute) ==
-                   $this->castAttribute($key, $original);
+                $this->castAttribute($key, $original);
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
             if (($attribute === null && $original !== null) || ($attribute !== null && $original === null)) {
                 return false;
