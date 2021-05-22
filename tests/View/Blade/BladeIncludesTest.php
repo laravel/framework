@@ -16,6 +16,12 @@ class BladeIncludesTest extends AbstractBladeTestCase
         $this->assertSame('<?php echo $__env->make(name(foo), \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@include(name(foo))'));
     }
 
+    public function testIncludeScopesAreCompiled()
+    {
+        $this->assertSame('<?php echo $__env->make(\'foo\')->render(); ?>', $this->compiler->compileString('@includeScoped(\'foo\')'));
+        $this->assertSame('<?php echo $__env->make(name(foo))->render(); ?>', $this->compiler->compileString('@includeScoped(name(foo))'));
+    }
+
     public function testIncludeIfsAreCompiled()
     {
         $this->assertSame('<?php if ($__env->exists(\'foo\')) echo $__env->make(\'foo\', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@includeIf(\'foo\')'));
