@@ -29,6 +29,19 @@ trait CompilesIncludes
     }
 
     /**
+     * Compile the include-scoped statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileIncludeScoped($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        return "<?php echo \$__env->make({$expression})->render(); ?>";
+    }
+
+    /**
      * Compile the include-if statements into valid PHP.
      *
      * @param  string  $expression
