@@ -789,10 +789,68 @@ class BelongsToMany extends Relation
         // have been specified as needing to be eager loaded. This will solve the
         // n + 1 query problem for the developer and also increase performance.
         if (count($models) > 0) {
+            $pivotEagerLoad = $this->getPivotEagerLoads($builder);
+
+            if (!empty($pivotEagerLoad)) {
+                $this->eagerLoadPivotRelations($models, $pivotEagerLoad);
+            }
+
             $models = $builder->eagerLoadRelations($models);
         }
 
         return $this->related->newCollection($models);
+    }
+
+    /**
+     * Get the pivot eager load relations.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     * @return array
+     */
+    protected function getPivotEagerLoads($builder)
+    {
+        // Only return the eagerLoad `pivot.*` but not the `pivot`
+        $pivotEagerLoad = array_filter($builder->getEagerLoads(), function ($relation) {
+            return Str::startsWith($relation, $this->accessor.'.');
+        }, ARRAY_FILTER_USE_KEY);
+
+        $builder->without(array_merge(
+            [$this->accessor], // we make sure to also remove the `pivot` in the eagerLoad
+            array_keys($pivotEagerLoad)
+        ));
+
+        return $pivotEagerLoad;
+    }
+
+    /**
+     * Eager load the relations of the pivot of the models.
+     *
+     * @param  array  $models
+     * @param  array $eagerLoad
+     * @return void
+     */
+    protected function eagerLoadPivotRelations(array $models, array $eagerLoad)
+    {
+        $pivots = \Illuminate\Support\Arr::pluck($models, $this->accessor);
+        $eagerLoad = $this->removePivotFromEagerLoadKeys($eagerLoad);
+        $builder = head($pivots)->query();
+        $builder->with($eagerLoad)->eagerLoadRelations($pivots);
+    }
+
+    /**
+     * Remove the `pivot.` part of the eager load relations.
+     *
+     * @param  array $eagerLoad
+     * @return array
+     */
+    protected function removePivotFromEagerLoadKeys(array $eagerLoad)
+    {
+        $newEagerLoad = [];
+        foreach ($eagerLoad as $name => $callback) {
+            $name = str_replace($this->accessor.'.', '', $name);
+            $newEagerLoad[$name] = $callback;
+        }
+        return $newEagerLoad;
     }
 
     /**
