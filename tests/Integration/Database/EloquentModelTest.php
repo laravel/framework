@@ -84,6 +84,58 @@ class EloquentModelTest extends DatabaseTestCase
         $user->name = 'zain';
         $user->title = 'A';
 
+        $user->save();
+
+        $this->assertTrue($user->transitionedTo('name', 'zain'));
+        $this->assertTrue($user->transitionedTo('name', 'zain', 'mohamed'));
+        $this->assertFalse($user->transitionedTo('name', 'zain', 'said'));
+
+        $this->assertTrue($user->transitionedTo('title', 'A'));
+        $this->assertTrue($user->transitionedTo('title', 'A', null));
+        $this->assertFalse($user->transitionedTo('title', 'A', 'B'));
+
+        $user->title = null;
+
+        $user->save();
+
+        $this->assertTrue($user->transitionedTo('title', null));
+        $this->assertTrue($user->transitionedTo('title', null, 'A'));
+        $this->assertFalse($user->transitionedTo('title', null, 'B'));
+
+        $user->title = 'B';
+
+        $user->save();
+
+        $this->assertTrue($user->transitionedTo('title', 'B'));
+        $this->assertTrue($user->transitionedTo('title', 'B', null));
+        $this->assertFalse($user->transitionedTo('title', 'B', 'A'));
+
+        $user->increment('score');
+
+        $this->assertTrue($user->transitionedTo('score', 1));
+        $this->assertTrue($user->transitionedTo('score', 1, 0));
+        $this->assertFalse($user->transitionedTo('score', 1, 2));
+
+        $user->items = [1, 2];
+
+        $user->save();
+
+        $this->assertTrue($user->transitionedTo('items', json_encode([1, 2])));
+        $this->assertTrue($user->transitionedTo('items', json_encode([1, 2]), json_encode([0, 1])));
+    }
+
+    public function testAttributeTransitioningFromTo()
+    {
+        $user = TestModel2::create([
+            'name' => 'mohamed',
+            'items' => [0, 1],
+        ]);
+
+        $user->refresh();
+
+        $user->name = 'zain';
+        $user->title = 'A';
+
         $this->assertTrue($user->transitioningTo('name', 'zain'));
         $this->assertTrue($user->transitioningTo('name', 'zain', 'mohamed'));
         $this->assertFalse($user->transitioningTo('name', 'zain', 'said'));
