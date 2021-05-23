@@ -4,6 +4,7 @@ namespace Illuminate\Session\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Session\Session;
+use Illuminate\Foundation\Http\StatelessDetector;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Session\SessionManager;
@@ -22,6 +23,13 @@ class StartSession
     protected $manager;
 
     /**
+     * Detects whether the request is stateless.
+     *
+     * @var \Illuminate\Foundation\Http\StatelessDetector
+     */
+    protected StatelessDetector $statelessDetector;
+
+    /**
      * The callback that can resolve an instance of the cache factory.
      *
      * @var callable|null
@@ -32,12 +40,14 @@ class StartSession
      * Create a new session middleware.
      *
      * @param  \Illuminate\Session\SessionManager  $manager
+     * @param  \Illuminate\Foundation\Http\StatelessDetector  $statelessDetector
      * @param  callable|null  $cacheFactoryResolver
      * @return void
      */
-    public function __construct(SessionManager $manager, callable $cacheFactoryResolver = null)
+    public function __construct(SessionManager $manager, StatelessDetector $statelessDetector, callable $cacheFactoryResolver = null)
     {
         $this->manager = $manager;
+        $this->statelessDetector = $statelessDetector;
         $this->cacheFactoryResolver = $cacheFactoryResolver;
     }
 
@@ -50,7 +60,7 @@ class StartSession
      */
     public function handle($request, Closure $next)
     {
-        if (! $this->sessionConfigured()) {
+        if ($this->statelessDetector->isStateless($request) || ! $this->sessionConfigured()) {
             return $next($request);
         }
 

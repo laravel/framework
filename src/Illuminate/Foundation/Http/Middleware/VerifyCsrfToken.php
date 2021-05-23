@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\StatelessDetector;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -32,6 +33,13 @@ class VerifyCsrfToken
     protected $encrypter;
 
     /**
+     * Detects whether the request is stateless.
+     *
+     * @var \Illuminate\Foundation\Http\StatelessDetector
+     */
+    protected StatelessDetector $statelessDetector;
+
+    /**
      * The URIs that should be excluded from CSRF verification.
      *
      * @var array
@@ -50,12 +58,14 @@ class VerifyCsrfToken
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
+     * @param  \Illuminate\Foundation\Http\StatelessDetector $statelessDetector
      * @return void
      */
-    public function __construct(Application $app, Encrypter $encrypter)
+    public function __construct(Application $app, Encrypter $encrypter, StatelessDetector $statelessDetector)
     {
         $this->app = $app;
         $this->encrypter = $encrypter;
+        $this->statelessDetector = $statelessDetector;
     }
 
     /**
@@ -69,6 +79,9 @@ class VerifyCsrfToken
      */
     public function handle($request, Closure $next)
     {
+        if ($this->statelessDetector->isStateless($request)) {
+            return $next($request);
+        }
         if (
             $this->isReading($request) ||
             $this->runningUnitTests() ||
