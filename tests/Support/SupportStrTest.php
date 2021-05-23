@@ -516,6 +516,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
     }
 
+    public function testMd5()
+    {
+        $this->assertEquals(md5('Hello, world!'), Str::md5('Hello, world!'));
+        $this->assertEquals(md5('My name is Jeroen!'), Str::md5('My name is Jeroen!'));
+    }
+
     public function validUuidList()
     {
         return [

@@ -652,4 +652,10 @@ class SupportStringableTest extends TestCase
         $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
     }
+
+    public function testMd5()
+    {
+        $this->assertEquals(md5('Hello, world!'), $this->stringable('Hello, world!')->md5());
+        $this->assertEquals(md5('My name is Jeroen!'), $this->stringable('My name is Jeroen!')->md5());
+    }
 }

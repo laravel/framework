@@ -395,6 +395,17 @@ class Str
     }
 
     /**
+     * Returns the md5 hash from a string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function md5($string)
+    {
+        return md5($string);
+    }
+
+    /**
      * Pad both sides of a string with another.
      *
      * @param  string  $value

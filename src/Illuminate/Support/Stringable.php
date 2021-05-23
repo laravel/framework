@@ -366,6 +366,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Returns the md5 hash from a string.
+     *
+     * @return string
+     */
+    public function md5()
+    {
+        return md5($this->value);
+    }
+
+    /**
      * Determine if the string matches the given pattern.
      *
      * @param  string  $pattern
