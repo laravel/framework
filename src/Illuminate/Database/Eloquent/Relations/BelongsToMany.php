@@ -791,7 +791,7 @@ class BelongsToMany extends Relation
         if (count($models) > 0) {
             $pivotEagerLoad = $this->getPivotEagerLoads($builder);
 
-            if (!empty($pivotEagerLoad)) {
+            if (! empty($pivotEagerLoad)) {
                 $this->eagerLoadPivotRelations($models, $pivotEagerLoad);
             }
 
@@ -850,6 +850,7 @@ class BelongsToMany extends Relation
             $name = str_replace($this->accessor.'.', '', $name);
             $newEagerLoad[$name] = $callback;
         }
+
         return $newEagerLoad;
     }
 

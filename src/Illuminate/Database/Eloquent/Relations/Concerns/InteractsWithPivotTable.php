@@ -511,6 +511,8 @@ trait InteractsWithPivotTable
             $this->parent, $attributes, $this->table, $exists, $this->using
         );
 
+        $pivot->preventsLazyLoading = Pivot::preventsLazyLoading();
+
         return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
     }
 
