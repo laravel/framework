@@ -53,6 +53,12 @@ class EloquentBelongsToManyEagerLoadPivotRelationsTest extends DatabaseTestCase
         });
     }
 
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        Model::preventLazyLoading(false);
+    }
+
     public function testCanEagerLoadPivotRelations()
     {
         $employee = Employee::create(['name' => Str::random()]);
@@ -62,8 +68,6 @@ class EloquentBelongsToManyEagerLoadPivotRelationsTest extends DatabaseTestCase
             'payroll_period_id' => $payrollPeriod->id,
             'amount' => 100,
         ]);
-
-        Model::preventLazyLoading();
 
         $employee = Employee::with('deductions.pivot.payrollPeriod')->get()->first();
 
@@ -85,8 +89,6 @@ class EloquentBelongsToManyEagerLoadPivotRelationsTest extends DatabaseTestCase
             'user_id' => $user->id,
             'amount' => 100,
         ]);
-
-        Model::preventLazyLoading();
 
         $employee = Employee::with([
             'deductions.pivot.payrollPeriod',
