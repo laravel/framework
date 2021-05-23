@@ -253,31 +253,54 @@ class Password implements Rule, DataAwareRule
         $value = (string) $value;
 
         if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
-            $this->fail('The :attribute must contain at least one uppercase and one lowercase letter.');
+            $this->fail(
+                $this->localize(
+                    'password_strength.mixed_case',
+                    'The :attribute must contain at least one uppercase and one lowercase letter.'
+                )
+            );
         }
 
         if ($this->letters && ! preg_match('/\pL/u', $value)) {
-            $this->fail('The :attribute must contain at least one letter.');
+            $this->fail(
+                $this->localize(
+                    'password_strength.letters',
+                    'The :attribute must contain at least one letter.'
+                )
+            );
         }
 
         if ($this->symbols && ! preg_match('/\p{Z}|\p{S}|\p{P}/u', $value)) {
-            $this->fail('The :attribute must contain at least one symbol.');
+            $this->fail(
+                $this->localize(
+                    'password_strength.symbols',
+                    'The :attribute must contain at least one symbol.'
+                )
+            );
         }
 
         if ($this->numbers && ! preg_match('/\pN/u', $value)) {
-            $this->fail('The :attribute must contain at least one number.');
+            $this->fail(
+                $this->localize(
+                    'password_strength.numbers',
+                    'The :attribute must contain at least one number.'
+                )
+            );
         }
 
-        if (! empty($this->messages)) {
+        if (!empty($this->messages)) {
             return false;
         }
 
         if ($this->uncompromised && ! Container::getInstance()->make(UncompromisedVerifier::class)->verify([
-            'value' => $value,
-            'threshold' => $this->compromisedThreshold,
-        ])) {
+                'value' => $value,
+                'threshold' => $this->compromisedThreshold,
+            ])) {
             return $this->fail(
-                'The given :attribute has appeared in a data leak. Please choose a different :attribute.'
+                $this->localize(
+                    'password_strength.uncompromised',
+                    'The given :attribute has appeared in a data leak. Please choose a different :attribute.'
+                )
             );
         }
 
@@ -302,12 +325,22 @@ class Password implements Rule, DataAwareRule
      */
     protected function fail($messages)
     {
-        $messages = collect(Arr::wrap($messages))->map(function ($message) {
-            return __($message);
-        })->all();
-
-        $this->messages = array_merge($this->messages, $messages);
+        $this->messages = array_merge($this->messages, Arr::wrap($messages));
 
         return false;
+    }
+
+    /**
+     * Get localized error message.
+     *
+     * @param  string  $key
+     * @param  string  $defaultMessage
+     * @return string
+     */
+    protected function localize($key, $defaultMessage)
+    {
+        return trans("validation.$key") === "validation.$key"
+            ? trans($defaultMessage)
+            : trans("validation.$key");
     }
 }
