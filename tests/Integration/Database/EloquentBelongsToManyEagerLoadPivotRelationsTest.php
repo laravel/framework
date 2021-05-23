@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
+namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyEagerLoadPivotRelationsTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
