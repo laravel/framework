@@ -17,7 +17,7 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition exists in the database.
      *
-     * @param  string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
@@ -25,7 +25,7 @@ trait InteractsWithDatabase
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
         $this->assertThat(
-            $table, new HasInDatabase($this->getConnection($connection), $data)
+            $this->getTable($table), new HasInDatabase($this->getConnection($connection), $data)
         );
 
         return $this;
@@ -34,7 +34,7 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition does not exist in the database.
      *
-     * @param  string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
@@ -45,7 +45,7 @@ trait InteractsWithDatabase
             new HasInDatabase($this->getConnection($connection), $data)
         );
 
-        $this->assertThat($table, $constraint);
+        $this->assertThat($this->getTable($table), $constraint);
 
         return $this;
     }
@@ -53,7 +53,7 @@ trait InteractsWithDatabase
     /**
      * Assert the count of table entries.
      *
-     * @param  string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  int  $count
      * @param  string|null  $connection
      * @return $this
@@ -61,7 +61,7 @@ trait InteractsWithDatabase
     protected function assertDatabaseCount($table, int $count, $connection = null)
     {
         $this->assertThat(
-            $table, new CountInDatabase($this->getConnection($connection), $count)
+            $this->getTable($table), new CountInDatabase($this->getConnection($connection), $count)
         );
 
         return $this;
@@ -81,7 +81,7 @@ trait InteractsWithDatabase
             return $this->assertDatabaseMissing($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName());
         }
 
-        $this->assertDatabaseMissing($table, $data, $connection);
+        $this->assertDatabaseMissing($this->getTable($table), $data, $connection);
 
         return $this;
     }
@@ -102,7 +102,7 @@ trait InteractsWithDatabase
         }
 
         $this->assertThat(
-            $table, new SoftDeletedInDatabase($this->getConnection($connection), $data, $deletedAtColumn)
+            $this->getTable($table), new SoftDeletedInDatabase($this->getConnection($connection), $data, $deletedAtColumn)
         );
 
         return $this;
@@ -150,6 +150,21 @@ trait InteractsWithDatabase
         $connection = $connection ?: $database->getDefaultConnection();
 
         return $database->connection($connection);
+    }
+
+    /**
+     * Get the table name.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @return string
+     */
+    protected function getTable($table)
+    {
+        if (is_subclass_of($table, Model::class)) {
+            return (new $table)->getTable();
+        }
+
+        return $table;
     }
 
     /**
