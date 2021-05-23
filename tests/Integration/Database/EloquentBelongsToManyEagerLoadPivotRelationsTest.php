@@ -67,10 +67,11 @@ class EloquentBelongsToManyEagerLoadPivotRelationsTest extends DatabaseTestCase
 
         $employee = Employee::with('deductions.pivot.payrollPeriod')->get()->first();
 
-        $this->assertInstanceOf(
-            PayrollPeriod::class,
-            $employee->deductions->first()->pivot->payrollPeriod
-        );
+        $pivot = $employee->deductions->first()->pivot;
+
+        $this->assertTrue($pivot->relationLoaded('payrollPeriod'));
+
+        $this->assertInstanceOf(PayrollPeriod::class, $pivot->payrollPeriod);
     }
 
     public function testCanEagerLoadManyPivotRelations()
@@ -92,15 +93,13 @@ class EloquentBelongsToManyEagerLoadPivotRelationsTest extends DatabaseTestCase
             'deductions.pivot.user',
         ])->get()->first();
 
-        $this->assertInstanceOf(
-            PayrollPeriod::class,
-            $employee->deductions->first()->pivot->payrollPeriod
-        );
+        $pivot = $employee->deductions->first()->pivot;
 
-        $this->assertInstanceOf(
-            User::class,
-            $employee->deductions->first()->pivot->user
-        );
+        $this->assertTrue($pivot->relationLoaded('payrollPeriod'));
+        $this->assertInstanceOf(PayrollPeriod::class, $pivot->payrollPeriod);
+
+        $this->assertTrue($pivot->relationLoaded('user'));
+        $this->assertInstanceOf(User::class, $pivot->user);
     }
 
     public function testAccessOnPivotRelationsWillThrowLazyLoadingViolationExceptionIfNotEagerLoaded()
