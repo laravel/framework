@@ -55,11 +55,11 @@ class EloquentBelongsToManyEagerLoadPivotRelationsTest extends DatabaseTestCase
         Schema::create('payroll_periods_users', function (Blueprint $table) {
             $table->foreignId('payroll_period_id');
             $table->foreignId('user_id');
-            $table->foreignId('note_id');
+            $table->foreignId('tag_id');
             $table->timestamps();
         });
 
-        Schema::create('notes', function (Blueprint $table) {
+        Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
@@ -117,7 +117,6 @@ class EloquentBelongsToManyEagerLoadPivotRelationsTest extends DatabaseTestCase
         $this->assertInstanceOf(User::class, $pivot->user);
     }
 
-
     public function testCanEagerLoadNestedPivotRelations()
     {
         $employee = Employee::create(['name' => Str::random()]);
@@ -130,12 +129,12 @@ class EloquentBelongsToManyEagerLoadPivotRelationsTest extends DatabaseTestCase
         ]);
 
         $user = User::create(['name' => Str::random()]);
-        $note = Note::create(['name' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
         $payrollPeriod->users()->attach($user->id, [
-            'note_id' => $note->id,
+            'tag_id' => $tag->id,
         ]);
 
-        $employee = Employee::with('deductions.pivot.payrollPeriod.users.pivot.note')->get()->first();
+        $employee = Employee::with('deductions.pivot.payrollPeriod.users.pivot.tag')->get()->first();
 
         $pivot = $employee->deductions->first()->pivot;
 
@@ -144,7 +143,7 @@ class EloquentBelongsToManyEagerLoadPivotRelationsTest extends DatabaseTestCase
 
         $payrollPeriodUserPivot = $pivot->payrollPeriod->users->first()->pivot;
 
-        $this->assertTrue($payrollPeriodUserPivot->relationLoaded('note'));
+        $this->assertTrue($payrollPeriodUserPivot->relationLoaded('tag'));
     }
 
     public function testAccessOnPivotRelationsWillThrowLazyLoadingViolationExceptionIfNotEagerLoaded()
@@ -216,7 +215,7 @@ class PayrollPeriod extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'payroll_periods_users')
-            ->withPivot('note_id')
+            ->withPivot('tag_id')
             ->using(PayrollPeriodUser::class)
             ->withTimestamps();
     }
@@ -244,9 +243,9 @@ class User extends Model
     protected $guarded = [];
 }
 
-class Note extends Model
+class Tag extends Model
 {
-    public $table = 'notes';
+    public $table = 'tags';
     public $timestamps = true;
     protected $guarded = [];
 }
@@ -255,8 +254,8 @@ class PayrollPeriodUser extends Pivot
 {
     protected $table = 'payroll_periods_users';
 
-    public function note()
+    public function tag()
     {
-        return $this->belongsTo(Note::class);
+        return $this->belongsTo(Tag::class);
     }
 }
