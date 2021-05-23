@@ -6,6 +6,7 @@ use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
+use Illuminate\Console\GeneratorCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
@@ -46,6 +47,7 @@ use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
+use Illuminate\Foundation\Console\ScopeMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
@@ -159,6 +161,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueTable' => 'command.queue.table',
         'QueueBatchesTable' => 'command.queue.batches-table',
         'RequestMake' => 'command.request.make',
+        'ScopeMake' => 'command.request.scope',
         'ResourceMake' => 'command.resource.make',
         'RuleMake' => 'command.rule.make',
         'SeederMake' => 'command.seeder.make',
@@ -803,6 +806,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.request.make', function ($app) {
             return new RequestMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerScopeMakeCommand()
+    {
+        $this->app->singleton('command.request.scope', function ($app) {
+            return new ScopeMakeCommand($app['files']);
         });
     }
 
