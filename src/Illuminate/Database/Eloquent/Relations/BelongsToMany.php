@@ -847,7 +847,7 @@ class BelongsToMany extends Relation
     {
         $newEagerLoad = [];
         foreach ($eagerLoad as $name => $callback) {
-            $name = str_replace($this->accessor.'.', '', $name);
+            $name = substr($name, strlen($this->accessor)+1);
             $newEagerLoad[$name] = $callback;
         }
 
