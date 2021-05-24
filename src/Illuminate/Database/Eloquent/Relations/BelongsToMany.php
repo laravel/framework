@@ -839,7 +839,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Remove the `pivot.` part of the eager load relations 
+     * Remove the `pivot.` part of the eager load relations
      * to get the actual relations of the pivot model.
      *
      * @param  array $eagerLoad
