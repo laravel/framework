@@ -153,18 +153,14 @@ trait InteractsWithDatabase
     }
 
     /**
-     * Get the table name.
+     * Get the table name from the given model or string.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @return string
      */
     protected function getTable($table)
     {
-        if (is_subclass_of($table, Model::class)) {
-            return (new $table)->getTable();
-        }
-
-        return $table;
+        return is_subclass_of($table, Model::class) ? (new $table)->getTable() : $table;
     }
 
     /**
