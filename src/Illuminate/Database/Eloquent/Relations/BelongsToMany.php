@@ -810,12 +810,13 @@ class BelongsToMany extends Relation
     protected function getPivotEagerLoads($builder)
     {
         // Only return the eagerLoad `pivot.*` but not the `pivot`
+        // because `pivot.*` contains the actual relations we want to eager load from the pivot model.
         $pivotEagerLoad = array_filter($builder->getEagerLoads(), function ($relation) {
             return Str::startsWith($relation, $this->accessor.'.');
         }, ARRAY_FILTER_USE_KEY);
 
         $builder->without(array_merge(
-            [$this->accessor], // we make sure to also remove the `pivot` in the eagerLoad
+            [$this->accessor], // We make sure to also remove the `pivot` in the eagerLoad.
             array_keys($pivotEagerLoad)
         ));
 
@@ -838,7 +839,8 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Remove the `pivot.` part of the eager load relations.
+     * Remove the `pivot.` part of the eager load relations 
+     * to get the actual relations of the pivot model.
      *
      * @param  array $eagerLoad
      * @return array
