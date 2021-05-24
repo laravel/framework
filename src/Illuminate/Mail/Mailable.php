@@ -1010,6 +1010,26 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Get the Markdown template for the message.
+     *
+     * @return string|null
+     */
+    public function getMarkdown()
+    {
+        return $this->markdown;
+    }
+
+    /**
+     * Get the rendered HTML content for the message.
+     *
+     * @return string|null
+     */
+    public function getHtml()
+    {
+        return $this->html;
+    }
+
+    /**
      * Dynamically bind parameters to the message.
      *
      * @param  string  $method
