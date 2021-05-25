@@ -10,15 +10,15 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
     {
         parent::setUp();
 
-        $this->compiler->handle(Fluent::class, function($object) {
+        $this->compiler->handle(Fluent::class, function ($object) {
             return 'Hello World';
         });
     }
 
     public function testBladeHandlersCanBeAddedForAGivenClass()
     {
-        $this->compiler->handle(Fluent::class, function($object) {
-            return "Hello World";
+        $this->compiler->handle(Fluent::class, function ($object) {
+            return 'Hello World';
         });
 
         $this->assertSame('Hello World', $this->compiler->echoHandlers[Fluent::class](new Fluent()));
@@ -26,7 +26,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
     public function testBladeHandlerCanInterceptEscapedEchos()
     {
-        $echoHandlerArray = get_class($this->compiler) . "->echoHandlers";
+        $echoHandlerArray = get_class($this->compiler).'->echoHandlers';
 
         $this->assertSame(
             "<?php echo e(is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)])
@@ -38,7 +38,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
     public function testBladeHandlerCanInterceptRawEchos()
     {
-        $echoHandlerArray = get_class($this->compiler) . "->echoHandlers";
+        $echoHandlerArray = get_class($this->compiler).'->echoHandlers';
 
         $this->assertSame(
             "<?php echo is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)])
