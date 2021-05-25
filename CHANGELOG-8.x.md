@@ -1,6 +1,19 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.42.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.42.1...8.x)
+
+
+## [v8.42.1 (2021-05-19)](https://github.com/laravel/framework/compare/v8.42.0...v8.42.1)
+
+### Added
+- Add default "_of_many" to join alias when relation name is table name ([#37411](https://github.com/laravel/framework/pull/37411))
+
+### Changed
+- Allow dababase password to be null in `MySqlSchemaState` ([#37418](https://github.com/laravel/framework/pull/37418))
+- Accept any instance of Rule and not just Password in password rule ([#37407](https://github.com/laravel/framework/pull/37407))
+
+### Fixed
+- Fixed aggregates (e.g.: withExists) for one of many relationships ([#37413](https://github.com/laravel/framework/pull/37413), [498e1a0](https://github.com/laravel/framework/commit/498e1a064f0a60b68047a1d3f7c544d14c356503))
 
 
 ## [v8.42.0 (2021-05-18)](https://github.com/laravel/framework/compare/v8.41.0...v8.42.0)
