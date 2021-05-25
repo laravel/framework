@@ -62,7 +62,7 @@ class DatabaseManager implements ConnectionResolverInterface
         $this->factory = $factory;
 
         $this->reconnector = function ($connection) {
-            $this->reconnect($connection->getFullName());
+            $this->reconnect($connection->getNameWithReadWriteType());
         };
     }
 
@@ -165,7 +165,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function configure(Connection $connection, $type)
     {
-        $connection = $this->setPdoForType($connection, $type)->setType($type);
+        $connection = $this->setPdoForType($connection, $type)->setReadWriteType($type);
 
         // First we'll set the fetch mode and a few other dependencies of the database
         // connection. This method basically just configures and prepares it to get
@@ -282,8 +282,8 @@ class DatabaseManager implements ConnectionResolverInterface
         );
 
         return $this->connections[$name]
-                                ->setPdo($fresh->getRawPdo())
-                                ->setReadPdo($fresh->getRawReadPdo());
+                    ->setPdo($fresh->getRawPdo())
+                    ->setReadPdo($fresh->getRawReadPdo());
     }
 
     /**
