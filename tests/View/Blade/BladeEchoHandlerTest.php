@@ -17,10 +17,6 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
     public function testBladeHandlersCanBeAddedForAGivenClass()
     {
-        $this->compiler->handle(Fluent::class, function ($object) {
-            return 'Hello World';
-        });
-
         $this->assertSame('Hello World', $this->compiler->echoHandlers[Fluent::class](new Fluent()));
     }
 
