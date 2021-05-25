@@ -100,7 +100,7 @@ trait CompilesEchos
     {
         $echoHandlerArray = static::class . "::\$echoHandlers";
 
-        return "array_key_exists(get_class($data), $echoHandlerArray)
+        return "isset({$echoHandlerArray}[get_class($data)])
             ? call_user_func_array({$echoHandlerArray}[get_class($data)], [$data])
             : $data";
     }
