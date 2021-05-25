@@ -50,6 +50,13 @@ class Connection implements ConnectionInterface
     protected $database;
 
     /**
+     * The type of the connection.
+     *
+     * @var string|null
+     */
+    protected $type;
+
+    /**
      * The table prefix for the connection.
      *
      * @var string
@@ -1046,6 +1053,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the database connection full name.
+     *
+     * @return string|null
+     */
+    public function getNameWithReadWriteType()
+    {
+        return $this->getName().($this->readWriteType ? '::'.$this->readWriteType : '');
+    }
+
+    /**
      * Get an option from the configuration options.
      *
      * @param  string|null  $option
@@ -1270,6 +1287,19 @@ class Connection implements ConnectionInterface
     public function setDatabaseName($database)
     {
         $this->database = $database;
+
+        return $this;
+    }
+
+    /**
+     * Set the read / write type of the connection.
+     *
+     * @param  string|null  $readWriteType
+     * @return $this
+     */
+    public function setReadWriteType($readWriteType)
+    {
+        $this->readWriteType = $readWriteType;
 
         return $this;
     }
