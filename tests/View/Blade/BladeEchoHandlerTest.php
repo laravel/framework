@@ -20,7 +20,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         $echoHandlerArray = get_class($this->compiler) . "::\$echoHandlers";
 
         $this->assertSame(
-            "<?php echo e(isset({$echoHandlerArray}[get_class(\$exampleObject)])
+            "<?php echo e(is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)])
             ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject])
             : \$exampleObject); ?>",
             $this->compiler->compileString('{{$exampleObject}}')
@@ -32,7 +32,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         $echoHandlerArray = get_class($this->compiler) . "::\$echoHandlers";
 
         $this->assertSame(
-            "<?php echo isset({$echoHandlerArray}[get_class(\$exampleObject)])
+            "<?php echo is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)])
             ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject])
             : \$exampleObject; ?>",
             $this->compiler->compileString('{!!$exampleObject!!}')
