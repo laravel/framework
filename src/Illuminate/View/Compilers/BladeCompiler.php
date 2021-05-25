@@ -132,7 +132,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @var array
      */
-    public static $echoHandlers = [];
+    public $echoHandlers = [];
 
     /**
      * Indicates if component tags should be compiled.
@@ -767,6 +767,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function handle(string $className, callable $handler)
     {
-        static::$echoHandlers[$className] = $handler;
+        $this->echoHandlers[$className] = $handler;
     }
 }

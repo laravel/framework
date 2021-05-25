@@ -98,11 +98,11 @@ trait CompilesEchos
 
     protected function applyEchoHandlerFor($data)
     {
-        if (empty(static::$echoHandlers)) {
+        if (empty($this->echoHandlers)) {
             return $data;
         }
 
-        $echoHandlerArray = static::class . "::\$echoHandlers";
+        $echoHandlerArray = static::class . "->echoHandlers";
 
         return "is_object($data) && isset({$echoHandlerArray}[get_class($data)])
             ? call_user_func_array({$echoHandlerArray}[get_class($data)], [$data])
