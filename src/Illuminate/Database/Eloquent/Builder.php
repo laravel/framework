@@ -270,6 +270,10 @@ class Builder
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
+            if ($value === null && in_array($operator,['>','<'])) {
+                $operator = '=';
+            }
+            
             $this->query->where(...func_get_args());
         }
 
