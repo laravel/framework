@@ -439,7 +439,7 @@ trait HasAttributes
         }
 
         if ($this->preventsLazyLoading) {
-            throw new LazyLoadingViolationException($this, $key);
+            $this->violatedLazyLoading($key);
         }
 
         // If the "attribute" exists as a method on the model, we will just assume
@@ -458,6 +458,17 @@ trait HasAttributes
     {
         return method_exists($this, $key) ||
             (static::$relationResolvers[get_class($this)][$key] ?? null);
+    }
+
+    /**
+     * Handle a lazy loading violation, for example by throwing an exception.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    protected function violatedLazyLoading($key)
+    {
+        throw new LazyLoadingViolationException($this, $key);
     }
 
     /**
