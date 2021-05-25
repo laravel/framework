@@ -12,26 +12,76 @@ trait BroadcastsEvents
     public static function bootBroadcastsEvents()
     {
         static::created(function ($model) {
-            broadcast($model->newBroadcastableModelEvent('created'));
+            $model->broadcastCreated();
         });
 
         static::updated(function ($model) {
-            broadcast($model->newBroadcastableModelEvent('updated'));
+            $model->broadcastUpdated();
         });
 
         if (method_exists(static::class, 'bootSoftDeletes')) {
             static::trashed(function ($model) {
-                broadcast($model->newBroadcastableModelEvent('trashed'));
+                $model->broadcastTrashed();
             });
 
             static::restored(function ($model) {
-                broadcast($model->newBroadcastableModelEvent('restored'));
+                $model->broadcastRestored();
             });
         }
 
         static::deleted(function ($model) {
-            broadcast($model->newBroadcastableModelEvent('deleted'));
+            $model->broadcastDeleted();
         });
+    }
+
+    /**
+     * Broadcast that the model was created.
+     *
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    public function broadcastCreated()
+    {
+        return broadcast($this->newBroadcastableModelEvent('created'));
+    }
+
+    /**
+     * Broadcast that the model was updated.
+     *
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    public function broadcastUpdated()
+    {
+        return broadcast($this->newBroadcastableModelEvent('updated'));
+    }
+
+    /**
+     * Broadcast that the model was trashed.
+     *
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    public function broadcastTrashed()
+    {
+        return broadcast($this->newBroadcastableModelEvent('trashed'));
+    }
+
+    /**
+     * Broadcast that the model was restored.
+     *
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    public function broadcastRestored()
+    {
+        return broadcast($this->newBroadcastableModelEvent('restored'));
+    }
+
+    /**
+     * Broadcast that the model was deleted.
+     *
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    public function broadcastDeleted()
+    {
+        return broadcast($this->newBroadcastableModelEvent('deleted'));
     }
 
     /**
