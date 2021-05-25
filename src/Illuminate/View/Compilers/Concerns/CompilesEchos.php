@@ -98,6 +98,10 @@ trait CompilesEchos
 
     protected function applyEchoHandlerFor($data)
     {
+        if (empty(static::$echoHandlers)) {
+            return $data;
+        }
+
         $echoHandlerArray = static::class . "::\$echoHandlers";
 
         return "is_object($data) && isset({$echoHandlerArray}[get_class($data)])

@@ -6,6 +6,21 @@ use Illuminate\Support\Fluent;
 
 class BladeEchoHandlerTest extends AbstractBladeTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->compiler->handle(Fluent::class, function($object) {
+            return 'Hello World';
+        });
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        $this->compiler::$echoHandlers = [];
+    }
+
     public function testBladeHandlersCanBeAddedForAGivenClass()
     {
         $this->compiler->handle(Fluent::class, function($object) {
