@@ -1,0 +1,41 @@
+<?php
+
+namespace Illuminate\Tests\View\Blade;
+
+use Illuminate\Support\Fluent;
+
+class BladeEchoHandlerTest extends AbstractBladeTestCase
+{
+    public function testBladeHandlersCanBeAddedForAGivenClass()
+    {
+        $this->compiler->handle(Fluent::class, function($object) {
+            return "Hello World";
+        });
+
+        $this->assertSame('Hello World', $this->compiler::$echoHandlers[Fluent::class](new Fluent()));
+    }
+
+    public function testBladeHandlerCanInterceptEscapedEchos()
+    {
+        $echoHandlerArray = get_class($this->compiler) . "::\$echoHandlers";
+
+        $this->assertSame(
+            "<?php echo e(array_key_exists(get_class(\$exampleObject), $echoHandlerArray)
+            ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject])
+            : \$exampleObject); ?>",
+            $this->compiler->compileString('{{$exampleObject}}')
+        );
+    }
+
+    public function testBladeHandlerCanInterceptRawEchos()
+    {
+        $echoHandlerArray = get_class($this->compiler) . "::\$echoHandlers";
+
+        $this->assertSame(
+            "<?php echo array_key_exists(get_class(\$exampleObject), $echoHandlerArray)
+            ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject])
+            : \$exampleObject; ?>",
+            $this->compiler->compileString('{!!$exampleObject!!}')
+        );
+    }
+}

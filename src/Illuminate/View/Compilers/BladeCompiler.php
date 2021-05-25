@@ -128,6 +128,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $classComponentNamespaces = [];
 
     /**
+     * The array of handlers objects should be passed through.
+     *
+     * @var array
+     */
+    public static $echoHandlers = [];
+
+    /**
      * Indicates if component tags should be compiled.
      *
      * @var bool
@@ -751,5 +758,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function withoutComponentTags()
     {
         $this->compilesComponentTags = false;
+    }
+
+    /**
+     * Add a handler to be executed before echoing a given class.
+     *
+     * @return void
+     */
+    public function handle(string $className, callable $handler)
+    {
+        static::$echoHandlers[$className] = $handler;
     }
 }

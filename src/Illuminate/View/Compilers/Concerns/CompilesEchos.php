@@ -46,6 +46,8 @@ trait CompilesEchos
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
+            $matches[2] = $this->applyEchoHandlerFor($matches[2]);
+
             return $matches[1] ? substr($matches[0], 1) : "<?php echo {$matches[2]}; ?>{$whitespace}";
         };
 
@@ -64,6 +66,8 @@ trait CompilesEchos
 
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
+
+            $matches[2] = $this->applyEchoHandlerFor($matches[2]);
 
             $wrapped = sprintf($this->echoFormat, $matches[2]);
 
@@ -90,5 +94,14 @@ trait CompilesEchos
         };
 
         return preg_replace_callback($pattern, $callback, $value);
+    }
+
+    protected function applyEchoHandlerFor($data)
+    {
+        $echoHandlerArray = static::class . "::\$echoHandlers";
+
+        return "array_key_exists(get_class($data), $echoHandlerArray)
+            ? call_user_func_array({$echoHandlerArray}[get_class($data)], [$data])
+            : $data";
     }
 }
