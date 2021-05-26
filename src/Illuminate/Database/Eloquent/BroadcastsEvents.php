@@ -41,7 +41,9 @@ trait BroadcastsEvents
      */
     public function broadcastCreated()
     {
-        return broadcast($this->newBroadcastableModelEvent('created'));
+        return $this->broadcastIfBroadcastChannelsExistForEvent(
+            $this->newBroadcastableModelEvent('created'), 'created'
+        );
     }
 
     /**
@@ -51,7 +53,9 @@ trait BroadcastsEvents
      */
     public function broadcastUpdated()
     {
-        return broadcast($this->newBroadcastableModelEvent('updated'));
+        return $this->broadcastIfBroadcastChannelsExistForEvent(
+            $this->newBroadcastableModelEvent('updated'), 'updated'
+        );
     }
 
     /**
@@ -61,7 +65,9 @@ trait BroadcastsEvents
      */
     public function broadcastTrashed()
     {
-        return broadcast($this->newBroadcastableModelEvent('trashed'));
+        return $this->broadcastIfBroadcastChannelsExistForEvent(
+            $this->newBroadcastableModelEvent('trashed'), 'trashed'
+        );
     }
 
     /**
@@ -71,7 +77,9 @@ trait BroadcastsEvents
      */
     public function broadcastRestored()
     {
-        return broadcast($this->newBroadcastableModelEvent('restored'));
+        return $this->broadcastIfBroadcastChannelsExistForEvent(
+            $this->newBroadcastableModelEvent('restored'), 'restored'
+        );
     }
 
     /**
@@ -81,7 +89,23 @@ trait BroadcastsEvents
      */
     public function broadcastDeleted()
     {
-        return broadcast($this->newBroadcastableModelEvent('deleted'));
+        return $this->broadcastIfBroadcastChannelsExistForEvent(
+            $this->newBroadcastableModelEvent('deleted'), 'deleted'
+        );
+    }
+
+    /**
+     * Broadcast the given event instance if channels are configured for the model event.
+     *
+     * @param  mixed  $instance
+     * @param  string  $event
+     * @return \Illuminate\Broadcasting\PendingBroadcast|null
+     */
+    protected function broadcastIfBroadcastChannelsExistForEvent($instance, $event)
+    {
+        if (! empty($this->broadcastOn($event))) {
+            return broadcast($instance);
+        }
     }
 
     /**
