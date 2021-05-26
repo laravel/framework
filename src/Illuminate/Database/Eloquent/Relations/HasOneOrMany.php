@@ -187,6 +187,7 @@ abstract class HasOneOrMany extends Relation
             if (! isset($result->{$foreign})) {
                 throw new InvalidArgumentException('Relation needs foreign key "'.$result->qualifyColumn($foreign).'" to be fetched');
             }
+
             return [$this->getDictionaryKey($result->{$foreign}) => $result];
         })->all();
     }
