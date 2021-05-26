@@ -184,7 +184,7 @@ abstract class HasOneOrMany extends Relation
         $foreign = $this->getForeignKeyName();
 
         return $results->mapToDictionary(function ($result) use ($foreign) {
-            if (!isset($result->{$foreign})) {
+            if (! isset($result->{$foreign})) {
                 throw new InvalidArgumentException('Relation needs foreign key "'.$result->qualifyColumn($foreign).'" to be fetched');
             }
             return [$this->getDictionaryKey($result->{$foreign}) => $result];
