@@ -12,6 +12,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
@@ -262,11 +263,15 @@ abstract class Relation
      *
      * @param  array  $models
      * @param  string|null  $key
+     * @throws \InvalidArgumentException
      * @return array
      */
     protected function getKeys(array $models, $key = null)
     {
         return collect($models)->map(function ($value) use ($key) {
+            if (!isset($value->{$key})) {
+                throw new InvalidArgumentException('Relation needs parent key "'.$value->qualifyColumn($key).'" to be fetched');
+            }
             return $key ? $value->getAttribute($key) : $value->getKey();
         })->values()->unique(null, true)->sort()->all();
     }
