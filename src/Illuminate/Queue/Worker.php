@@ -194,20 +194,7 @@ class Worker
         // process if it is running too long because it has frozen. This uses the async
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options) {
-            if ($job) {
-                $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->maxAttemptsExceededException($job)
-                );
-
-                $this->markJobAsFailedIfWillExceedMaxExceptions(
-                    $job->getConnectionName(), $job, $e
-                );
-
-                $this->markJobAsFailedIfItShouldFailOnTimeout(
-                    $job->getConnectionName(), $job, $e
-                );
-            }
-
+            // No extra logic should be placed here or the process may stuck forever.
             $this->kill(static::EXIT_ERROR);
         });
 
@@ -716,8 +703,6 @@ class Worker
      */
     public function kill($status = 0)
     {
-        $this->events->dispatch(new WorkerStopping($status));
-
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
         }
