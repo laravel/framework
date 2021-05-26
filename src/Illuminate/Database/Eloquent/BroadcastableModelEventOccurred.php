@@ -5,10 +5,11 @@ namespace Illuminate\Database\Eloquent;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
 
 class BroadcastableModelEventOccurred implements ShouldBroadcast
 {
-    use InteractsWithSockets;
+    use InteractsWithSockets, SerializesModels;
 
     /**
      * The model instance corresponding to the event.
