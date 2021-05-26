@@ -90,6 +90,8 @@ trait CompilesEchos
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
+            $matches[2] = $this->applyEchoHandlerFor($matches[2]);
+
             return $matches[1] ? $matches[0] : "<?php echo e({$matches[2]}); ?>{$whitespace}";
         };
 
