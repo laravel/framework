@@ -1850,7 +1850,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      */
     public function broadcastChannelRoute()
     {
-        return str_replace('\\', '.', get_class($this)).'.{'.$this->getKeyName().'}';
+        return str_replace('\\', '.', get_class($this)).'.{'.Str::camel(class_basename($this)).'}';
     }
 
     /**
