@@ -1844,6 +1844,16 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     }
 
     /**
+     * Get the broadcast channel route definition that is associated with the given entity.
+     *
+     * @return string
+     */
+    public function broadcastChannelRoute()
+    {
+        return str_replace('\\', '.', get_class($this)).'.{'.$this->getKeyName().'}';
+    }
+
+    /**
      * Get the broadcast channel name that is associated with the given entity.
      *
      * @return string
