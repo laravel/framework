@@ -16,5 +16,5 @@ interface HasBroadcastChannel
      *
      * @return string
      */
-    public function broadcastChannelName();
+    public function broadcastChannel();
 }

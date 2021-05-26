@@ -21,7 +21,7 @@ class Channel
      */
     public function __construct($name)
     {
-        $this->name = $name instanceof HasBroadcastChannel ? $name->broadcastChannelName() : $name;
+        $this->name = $name instanceof HasBroadcastChannel ? $name->broadcastChannel() : $name;
     }
 
     /**

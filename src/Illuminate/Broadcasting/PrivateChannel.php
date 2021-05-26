@@ -14,7 +14,7 @@ class PrivateChannel extends Channel
      */
     public function __construct($name)
     {
-        $name = $name instanceof HasBroadcastChannel ? $name->broadcastChannelName() : $name;
+        $name = $name instanceof HasBroadcastChannel ? $name->broadcastChannel() : $name;
 
         parent::__construct('private-'.$name);
     }

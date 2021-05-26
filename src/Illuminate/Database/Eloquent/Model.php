@@ -1858,7 +1858,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      *
      * @return string
      */
-    public function broadcastChannelName()
+    public function broadcastChannel()
     {
         return str_replace('\\', '.', get_class($this)).'.'.$this->getKey();
     }
