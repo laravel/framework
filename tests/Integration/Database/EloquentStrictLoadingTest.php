@@ -100,6 +100,35 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
 
         $models[0]->modelTwos[0]->modelThrees;
     }
+
+    public function testStrictModeWithCustomCallbackOnLazyLoading()
+    {
+        $this->expectsEvents(ViolatedLazyLoadingEvent::class);
+
+        Model::handleLazyLoadingViolationUsing(function ($model, $key) {
+            event(new ViolatedLazyLoadingEvent($model, $key));
+        });
+
+        EloquentStrictLoadingTestModel1::create();
+        EloquentStrictLoadingTestModel1::create();
+
+        $models = EloquentStrictLoadingTestModel1::get();
+
+        $models[0]->modelTwos;
+    }
+
+    public function testStrictModeWithOverriddenHandlerOnLazyLoading()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Violated');
+
+        EloquentStrictLoadingTestModel1WithCustomHandler::create();
+        EloquentStrictLoadingTestModel1WithCustomHandler::create();
+
+        $models = EloquentStrictLoadingTestModel1WithCustomHandler::get();
+
+        $models[0]->modelTwos;
+    }
 }
 
 class EloquentStrictLoadingTestModel1 extends Model
@@ -111,6 +140,23 @@ class EloquentStrictLoadingTestModel1 extends Model
     public function modelTwos()
     {
         return $this->hasMany(EloquentStrictLoadingTestModel2::class, 'model_1_id');
+    }
+}
+
+class EloquentStrictLoadingTestModel1WithCustomHandler extends Model
+{
+    public $table = 'test_model1';
+    public $timestamps = false;
+    protected $guarded = [];
+
+    public function modelTwos()
+    {
+        return $this->hasMany(EloquentStrictLoadingTestModel2::class, 'model_1_id');
+    }
+
+    protected function handleLazyLoadingViolation($key)
+    {
+        throw new \RuntimeException("Violated {$key}");
     }
 }
 
@@ -131,4 +177,16 @@ class EloquentStrictLoadingTestModel3 extends Model
     public $table = 'test_model3';
     public $timestamps = false;
     protected $guarded = [];
+}
+
+class ViolatedLazyLoadingEvent
+{
+    public $model;
+    public $key;
+
+    public function __construct($model, $key)
+    {
+        $this->model = $model;
+        $this->key = $key;
+    }
 }

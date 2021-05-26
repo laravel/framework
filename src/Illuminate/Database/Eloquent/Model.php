@@ -159,6 +159,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     protected static $modelsShouldPreventLazyLoading = false;
 
     /**
+     * The callback that is responsible for handling lazy loading violations.
+     *
+     * @var callable|null
+     */
+    protected static $lazyLoadingViolationCallback;
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -356,6 +363,17 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public static function preventLazyLoading($value = true)
     {
         static::$modelsShouldPreventLazyLoading = $value;
+    }
+
+    /**
+     * Register a callback that is responsible for handling lazy loading violations.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function handleLazyLoadingViolationUsing(callable $callback)
+    {
+        static::$lazyLoadingViolationCallback = $callback;
     }
 
     /**
