@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use InvalidArgumentException;
 
 abstract class HasOneOrMany extends Relation
 {
@@ -175,6 +176,7 @@ abstract class HasOneOrMany extends Relation
      * Build model dictionary keyed by the relation's foreign key.
      *
      * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @throws \InvalidArgumentException
      * @return array
      */
     protected function buildDictionary(Collection $results)
@@ -182,6 +184,9 @@ abstract class HasOneOrMany extends Relation
         $foreign = $this->getForeignKeyName();
 
         return $results->mapToDictionary(function ($result) use ($foreign) {
+            if (!isset($result->{$foreign})) {
+                throw new InvalidArgumentException('Relation needs foreign key "'.$result->qualifyColumn($foreign).'" to be fetched');
+            }
             return [$this->getDictionaryKey($result->{$foreign}) => $result];
         })->all();
     }
