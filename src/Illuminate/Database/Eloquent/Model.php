@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -208,9 +209,11 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
             $this->fireModelEvent('booting', false);
 
-            static::booting();
-            static::boot();
-            static::booted();
+            Relation::withConstraints(function () {
+                static::booting();
+                static::boot();
+                static::booted();
+            });
 
             $this->fireModelEvent('booted', false);
         }
