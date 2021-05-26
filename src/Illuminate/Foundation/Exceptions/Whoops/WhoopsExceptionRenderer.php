@@ -8,6 +8,12 @@ use Whoops\Run as Whoops;
 
 class WhoopsExceptionRenderer implements ExceptionRenderer
 {
+    /**
+     * Renders the given exception as HTML.
+     *
+     * @param  \Throwable  $throwable
+     * @return string
+     */
     public function render($throwable)
     {
         return tap(new Whoops, function ($whoops) {
