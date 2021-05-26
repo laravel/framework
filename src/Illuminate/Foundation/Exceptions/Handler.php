@@ -225,7 +225,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         if (Reflector::isCallable($reportCallable = [$e, 'report'])) {
-            if ($this->container->call($reportCallable) !== false) {
+            if ($this->container->call($reportCallable) === false) {
                 return;
             }
         }
