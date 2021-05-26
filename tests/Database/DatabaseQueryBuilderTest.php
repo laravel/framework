@@ -1034,6 +1034,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('posts')->union($this->getSqlServerBuilder()->from('videos'))->count();
     }
 
+    public function testHavingAggregate()
+    {
+        $expected = 'select count(*) as aggregate from (select (select `count(*)` from `videos` where `posts`.`id` = `videos`.`post_id`) as `videos_count` from `posts` having `videos_count` > ?) as `temp_table`';
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [0 => 1], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+
+        $builder->from('posts')->selectSub(function ($query) {
+            $query->from('videos')->select('count(*)')->whereColumn('posts.id', '=', 'videos.post_id');
+        }, 'videos_count')->having('videos_count', '>', 1);
+        $builder->count();
+    }
+
     public function testSubSelectWhereIns()
     {
         $builder = $this->getBuilder();
