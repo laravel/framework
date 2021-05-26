@@ -439,7 +439,7 @@ trait HasAttributes
         }
 
         if ($this->preventsLazyLoading) {
-            $this->violatedLazyLoading($key);
+            $this->handleLazyLoadingViolation($key);
         }
 
         // If the "attribute" exists as a method on the model, we will just assume
@@ -461,17 +461,15 @@ trait HasAttributes
     }
 
     /**
-     * Handle a lazy loading violation, for example by throwing an exception.
+     * Handle a lazy loading violation.
      *
      * @param  string  $key
-     * @return void
+     * @return mixed
      */
-    protected function violatedLazyLoading($key)
+    protected function handleLazyLoadingViolation($key)
     {
-        if (isset(static::$violatedLazyLoadingCallback)) {
-            call_user_func(static::$violatedLazyLoadingCallback, $this, $key);
-
-            return;
+        if (isset(static::$lazyLoadingViolationCallback)) {
+            return call_user_func(static::$lazyLoadingViolationCallback, $this, $key);
         }
 
         throw new LazyLoadingViolationException($this, $key);

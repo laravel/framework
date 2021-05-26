@@ -154,7 +154,7 @@ class EloquentStrictLoadingTestModel1WithCustomHandler extends Model
         return $this->hasMany(EloquentStrictLoadingTestModel2::class, 'model_1_id');
     }
 
-    protected function violatedLazyLoading($key)
+    protected function handleLazyLoadingViolation($key)
     {
         throw new \RuntimeException("Violated {$key}");
     }
