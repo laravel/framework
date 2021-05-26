@@ -468,6 +468,11 @@ trait HasAttributes
      */
     protected function violatedLazyLoading($key)
     {
+        if (isset(static::$violatedLazyLoadingCallback)) {
+            call_user_func(static::$violatedLazyLoadingCallback, $this, $key);
+            return;
+        }
+
         throw new LazyLoadingViolationException($this, $key);
     }
 
