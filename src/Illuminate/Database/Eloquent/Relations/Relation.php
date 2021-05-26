@@ -269,9 +269,10 @@ abstract class Relation
     protected function getKeys(array $models, $key = null)
     {
         return collect($models)->map(function ($value) use ($key) {
-            if (!isset($value->{$key})) {
+            if (! isset($value->{$key})) {
                 throw new InvalidArgumentException('Relation needs parent key "'.$value->qualifyColumn($key).'" to be fetched');
             }
+
             return $key ? $value->getAttribute($key) : $value->getKey();
         })->values()->unique(null, true)->sort()->all();
     }
