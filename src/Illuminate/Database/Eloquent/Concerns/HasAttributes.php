@@ -470,6 +470,7 @@ trait HasAttributes
     {
         if (isset(static::$violatedLazyLoadingCallback)) {
             call_user_func(static::$violatedLazyLoadingCallback, $this, $key);
+
             return;
         }
 
