@@ -98,16 +98,22 @@ trait CompilesEchos
         return preg_replace_callback($pattern, $callback, $value);
     }
 
-    protected function applyEchoHandlerFor($data)
+    /**
+     * Wrap the value in a handler if applicable.
+     *
+     * @param  string $data
+     * @return string
+     */
+    protected function applyEchoHandlerFor($value)
     {
         if (empty($this->echoHandlers)) {
-            return $data;
+            return $value;
         }
 
         $echoHandlerArray = static::class.'->echoHandlers';
 
-        return "is_object($data) && isset({$echoHandlerArray}[get_class($data)])
-            ? call_user_func_array({$echoHandlerArray}[get_class($data)], [$data])
-            : $data";
+        return "is_object($value) && isset({$echoHandlerArray}[get_class($value)])
+            ? call_user_func_array({$echoHandlerArray}[get_class($value)], [$value])
+            : $value";
     }
 }
