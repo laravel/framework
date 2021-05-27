@@ -39,6 +39,13 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
                    $event->broadcastOn()[0]->name == 'private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.'.$event->model->id;
         });
     }
+
+    public function testChannelRouteFormatting()
+    {
+        $model = new TestEloquentBroadcastUser;
+
+        $this->assertEquals('Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{testEloquentBroadcastUser}', $model->broadcastChannelRoute());
+    }
 }
 
 class TestEloquentBroadcastUser extends Model
