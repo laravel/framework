@@ -117,6 +117,29 @@ trait BroadcastsEvents
     }
 
     /**
+     * Create a new broadcastable model event event.
+     *
+     * @param  string  $event
+     * @return mixed
+     */
+    public function newBroadcastableModelEvent($event)
+    {
+        return tap(new BroadcastableModelEventOccurred($this, $event), function ($event) {
+            $event->connection = property_exists($this, 'broadcastConnection')
+                            ? $this->broadcastConnection
+                            : $this->broadcastConnection();
+
+            $event->queue = property_exists($this, 'broadcastQueue')
+                            ? $this->broadcastQueue
+                            : $this->broadcastQueue();
+
+            $event->afterCommit = property_exists($this, 'broadcastAfterCommit')
+                            ? $this->broadcastAfterCommit
+                            : $this->broadcastAfterCommit();
+        });
+    }
+
+    /**
      * Get the channels that model events should broadcast on.
      *
      * @param  string  $event
@@ -128,13 +151,32 @@ trait BroadcastsEvents
     }
 
     /**
-     * Create a new broadcastable model event event.
+     * Get the queue connection that should be used to broadcast model events.
      *
-     * @param  string  $event
-     * @return mixed
+     * @return string|null
      */
-    public function newBroadcastableModelEvent($event)
+    public function broadcastConnection()
     {
-        return new BroadcastableModelEventOccurred($this, $event);
+        //
+    }
+
+    /**
+     * Get the queue that should be used to broadcast model events.
+     *
+     * @return string|null
+     */
+    public function broadcastQueue()
+    {
+        //
+    }
+
+    /**
+     * Determine if the model event broadcast queued job should be dispatched after all transactions are committed.
+     *
+     * @return string|null
+     */
+    public function broadcastAfterCommit()
+    {
+        return false;
     }
 }

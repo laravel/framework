@@ -33,6 +33,20 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     protected $channels = [];
 
     /**
+     * The queue connection that should be used to queue the broadcast job.
+     *
+     * @var string
+     */
+    public $connection;
+
+    /**
+     * The queue that should be used to queue the broadcast job.
+     *
+     * @var string
+     */
+    public $queue;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
