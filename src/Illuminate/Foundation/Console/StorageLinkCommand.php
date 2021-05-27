@@ -33,7 +33,7 @@ class StorageLinkCommand extends Command
         $force = $this->option('force');
 
         foreach ($this->links() as $link => $target) {
-            if (file_exists($link) && ! (is_link($link) && $force)) {
+            if (file_exists($link) && ! $this->removableSymlink($link, $force)) {
                 $this->error("The [$link] link already exists.");
                 continue;
             }
@@ -63,5 +63,17 @@ class StorageLinkCommand extends Command
     {
         return $this->laravel['config']['filesystems.links'] ??
                [public_path('storage') => storage_path('app/public')];
+    }
+
+    /**
+     * Checks that the provided path is a symlink and force option is turned on.
+     *
+     * @param  string  $link
+     * @param  bool  $force
+     * @return bool
+     */
+    protected function removableSymlink(string $link, bool $force): bool
+    {
+        return is_link($link) && $force;
     }
 }
