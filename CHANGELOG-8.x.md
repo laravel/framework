@@ -1,6 +1,21 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.43.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.44.0...8.x)
+
+
+## [v8.44.0 (2021-05-27)](https://github.com/laravel/framework/compare/v8.43.0...v8.44.0)
+
+### Added
+- Delegate lazy loading violation to method ([#37480](https://github.com/laravel/framework/pull/37480))
+- Added `force` option to `Illuminate/Foundation/Console/StorageLinkCommand` ([#37501](https://github.com/laravel/framework/pull/37501), [3e547d2](https://github.com/laravel/framework/commit/3e547d2f276f9242d3856ff9cb02418560ae9a1b))
+
+### Fixed
+- Fixed aggregates with having ([#37487](https://github.com/laravel/framework/pull/37487), [c986e12](https://github.com/laravel/framework/commit/c986e12b00e9569cca5e24e5072e7770ffc25efa))
+- Bugfix passing errorlevel when command is run in background ([#37479](https://github.com/laravel/framework/pull/37479))
+
+### Changed
+- Init the traits when the model is being unserialized ([#37492](https://github.com/laravel/framework/pull/37492))
+- Relax the lazy loading restrictions ([#37503](https://github.com/laravel/framework/pull/37503))
 
 
 ## [v8.43.0 (2021-05-25)](https://github.com/laravel/framework/compare/v8.42.1...v8.43.0)
