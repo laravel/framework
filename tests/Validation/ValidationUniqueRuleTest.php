@@ -42,10 +42,10 @@ class ValidationUniqueRuleTest extends TestCase
 
         $rule = new Unique(EloquentModelStub::class, 'column');
         $rule->where('foo', 'bar');
-        $rule->when(true, function($rule) {
+        $rule->when(true, function ($rule) {
             $rule->ignore('Taylor, Otwell', 'id_column');
         });
-        $rule->unless(true, function($rule) {
+        $rule->unless(true, function ($rule) {
             $rule->ignore('Chris', 'id_column');
         });
         $this->assertSame('unique:table,column,"Taylor, Otwell",id_column,foo,"bar"', (string) $rule);

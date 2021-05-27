@@ -44,20 +44,20 @@ class ValidationPasswordRuleTest extends TestCase
     public function testConditional()
     {
         $is_privileged_user = true;
-        $rule = (new Password(8))->when($is_privileged_user, function($rule) {
+        $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
             $rule->symbols();
         });
 
-        $this->fails($rule, [ 'aaaaaaaa', '11111111' ], [
+        $this->fails($rule, ['aaaaaaaa', '11111111'], [
             'The my password must contain at least one symbol.',
         ]);
 
         $is_privileged_user = false;
-        $rule = (new Password(8))->when($is_privileged_user, function($rule) {
+        $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
             $rule->symbols();
         });
 
-        $this->passes($rule, [ 'aaaaaaaa', '11111111' ]);
+        $this->passes($rule, ['aaaaaaaa', '11111111']);
     }
 
     public function testMixedCase()

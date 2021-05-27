@@ -2,11 +2,6 @@
 
 namespace Illuminate\Support\Traits;
 
-use BadMethodCallException;
-use Closure;
-use ReflectionClass;
-use ReflectionMethod;
-
 trait Conditional
 {
     /**
