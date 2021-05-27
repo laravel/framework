@@ -3,11 +3,8 @@
 namespace Illuminate\Tests\View\Blade;
 
 use Exception;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
-use Mockery as m;
 
 class BladeEchoHandlerTest extends AbstractBladeTestCase
 {
@@ -59,13 +56,15 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
     public function testHandlerLogicWorksCorrectly()
     {
-        $this->expectExceptionMessage("The fluent object has been successfully handled!");
+        $this->expectExceptionMessage('The fluent object has been successfully handled!');
 
-        $this->compiler->handle(Fluent::class, function($object) {
-            throw new Exception("The fluent object has been successfully handled!");
+        $this->compiler->handle(Fluent::class, function ($object) {
+            throw new Exception('The fluent object has been successfully handled!');
         });
 
-        app()->singleton('blade.compiler', function() { return $this->compiler; });
+        app()->singleton('blade.compiler', function () {
+            return $this->compiler;
+        });
 
         $exampleObject = new Fluent();
 
