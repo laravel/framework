@@ -351,10 +351,12 @@ class Builder
     {
         $instance = $this->newModelInstance();
 
-        return $instance->newCollection(array_map(function ($item) use ($instance) {
+        return $instance->newCollection(array_map(function ($item) use ($items, $instance) {
             $model = $instance->newFromBuilder($item);
 
-            $model->preventsLazyLoading = Model::preventsLazyLoading();
+            if (count($items) > 1) {
+                $model->preventsLazyLoading = Model::preventsLazyLoading();
+            }
 
             return $model;
         }, $items));
