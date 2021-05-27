@@ -110,8 +110,6 @@ trait CompilesEchos
 
         $echoHandlerArray = static::class.'->echoHandlers';
 
-        return "is_object($value) && isset({$echoHandlerArray}[get_class($value)])
-            ? call_user_func_array({$echoHandlerArray}[get_class($value)], [$value])
-            : $value";
+        return "is_object($value) && isset({$echoHandlerArray}[get_class($value)]) ? call_user_func_array({$echoHandlerArray}[get_class($value)], [$value]) : $value";
     }
 }
