@@ -13,7 +13,7 @@ class StorageLinkCommand extends Command
      */
     protected $signature = 'storage:link
                 {--relative : Create the symbolic link using relative paths}
-                {--force : Recreate already existing symbolic links}';
+                {--force : Recreate existing symbolic links}';
 
     /**
      * The console command description.
@@ -30,10 +30,9 @@ class StorageLinkCommand extends Command
     public function handle()
     {
         $relative = $this->option('relative');
-        $force = $this->option('force');
 
         foreach ($this->links() as $link => $target) {
-            if (file_exists($link) && ! $this->removableSymlink($link, $force)) {
+            if (file_exists($link) && ! $this->removableSymlink($link, $this->option('force'))) {
                 $this->error("The [$link] link already exists.");
                 continue;
             }
@@ -66,7 +65,7 @@ class StorageLinkCommand extends Command
     }
 
     /**
-     * Checks that the provided path is a symlink and force option is turned on.
+     * Determine if the provided path is a symlink that can be removed.
      *
      * @param  string  $link
      * @param  bool  $force
