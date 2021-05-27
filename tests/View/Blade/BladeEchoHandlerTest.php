@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\Support\Fluent;
-use Illuminate\Support\Str;
 
 class BladeEchoHandlerTest extends AbstractBladeTestCase
 {
