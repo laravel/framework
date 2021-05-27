@@ -1,6 +1,27 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.42.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.43.0...8.x)
+
+
+## [v8.43.0 (2021-05-25)](https://github.com/laravel/framework/compare/v8.42.1...v8.43.0)
+
+### Added
+- Added `Illuminate\Auth\Authenticatable::getAuthIdentifierForBroadcasting()` ([#37408](https://github.com/laravel/framework/pull/37408))
+- Added eloquent strict loading mode ([#37363](https://github.com/laravel/framework/pull/37363))
+- Added default timeout to NotPwnedVerifier validator ([#37440](https://github.com/laravel/framework/pull/37440), [45567e0](https://github.com/laravel/framework/commit/45567e0c0707bb2b418a4218e62fa85e478a68d9))
+- Added beforeQuery to base query builder ([#37431](https://github.com/laravel/framework/pull/37431))
+- Added `Illuminate\Queue\Jobs\Job::shouldFailOnTimeout()` ([#37450](https://github.com/laravel/framework/pull/37450))
+- Added `ValidatorAwareRule` interface ([#37442](https://github.com/laravel/framework/pull/37442))
+- Added model support for database assertions ([#37459](https://github.com/laravel/framework/pull/37459))
+
+### Fixed
+- Fixed eager loading one-of-many relationships with multiple aggregates ([#37436](https://github.com/laravel/framework/pull/37436))
+
+### Changed
+- Improve signed url signature verification ([#37432](https://github.com/laravel/framework/pull/37432))
+- Improve one-of-many performance ([#37451](https://github.com/laravel/framework/pull/37451)) 
+- Update `Illuminate/Pagination/Cursor::parameter()` ([#37458](https://github.com/laravel/framework/pull/37458))
+- Reconnect the correct connection when using ::read or ::write ([#37471](https://github.com/laravel/framework/pull/37471), [d1a32f9](https://github.com/laravel/framework/commit/d1a32f9acb225b6b7b360736f3c717461220dac9))
 
 
 ## [v8.42.1 (2021-05-19)](https://github.com/laravel/framework/compare/v8.42.0...v8.42.1)
