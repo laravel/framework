@@ -22,7 +22,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
     public function testBladeHandlerCanInterceptRegularEchos()
     {
-        $echoHandlerArray = get_class($this->compiler).'->echoHandlers';
+        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
 
         $this->assertSame(
             "<?php echo e(is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)]) ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>",
@@ -32,7 +32,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
     public function testBladeHandlerCanInterceptRawEchos()
     {
-        $echoHandlerArray = get_class($this->compiler).'->echoHandlers';
+        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
 
         $this->assertSame(
             "<?php echo is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)]) ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject; ?>",
@@ -42,7 +42,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
     public function testBladeHandlerCanInterceptEscapedEchos()
     {
-        $echoHandlerArray = get_class($this->compiler).'->echoHandlers';
+        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
 
         $this->assertSame(
             "<?php echo e(is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)]) ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>",
@@ -52,7 +52,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
     public function testWhitespaceIsPreservedCorrectly()
     {
-        $echoHandlerArray = get_class($this->compiler).'->echoHandlers';
+        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
 
         $this->assertSame(
             "<?php echo e(is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)]) ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>\n\n",
