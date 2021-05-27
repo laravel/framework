@@ -97,9 +97,9 @@ trait CompilesEchos
     }
 
     /**
-     * Wrap the value in a handler if applicable.
+     * Wrap the echoable value in an echo handler if applicable.
      *
-     * @param  string $value
+     * @param  string  $value
      * @return string
      */
     protected function applyEchoHandlerFor($value)

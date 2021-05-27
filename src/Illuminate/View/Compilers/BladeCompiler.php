@@ -2,8 +2,10 @@
 
 namespace Illuminate\View\Compilers;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ReflectsClosures;
 use InvalidArgumentException;
 
 class BladeCompiler extends Compiler implements CompilerInterface
@@ -22,7 +24,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesLoops,
         Concerns\CompilesRawPhp,
         Concerns\CompilesStacks,
-        Concerns\CompilesTranslations;
+        Concerns\CompilesTranslations,
+        ReflectsClosures;
 
     /**
      * All of the registered extensions.
@@ -100,6 +103,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $echoFormat = 'e(%s)';
 
     /**
+     * Custom rendering callbacks for stringable objects.
+     *
+     * @var array
+     */
+    public $echoHandlers = [];
+
+    /**
      * Array of footer lines to be added to the template.
      *
      * @var array
@@ -126,13 +136,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var array
      */
     protected $classComponentNamespaces = [];
-
-    /**
-     * The array of handlers objects should be passed through.
-     *
-     * @var array
-     */
-    public $echoHandlers = [];
 
     /**
      * Indicates if component tags should be compiled.
@@ -709,6 +712,22 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Add a handler to be executed before echoing a given class.
+     *
+     * @param  string|callable  $class
+     * @param  callable|null  $handler
+     * @return void
+     */
+    public function stringable($class, $handler = null)
+    {
+        if ($class instanceof Closure) {
+            [$class, $handler] = [$this->firstClosureParameterType($class), $class];
+        }
+
+        $this->echoHandlers[$class] = $handler;
+    }
+
+    /**
      * Register a new precompiler.
      *
      * @param  callable  $precompiler
@@ -758,15 +777,5 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function withoutComponentTags()
     {
         $this->compilesComponentTags = false;
-    }
-
-    /**
-     * Add a handler to be executed before echoing a given class.
-     *
-     * @return void
-     */
-    public function addEchoHandler(string $className, callable $handler)
-    {
-        $this->echoHandlers[$className] = $handler;
     }
 }
