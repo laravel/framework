@@ -11,7 +11,8 @@ class StorageLinkCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'storage:link {--relative : Create the symbolic link using relative paths}
+    protected $signature = 'storage:link
+                {--relative : Create the symbolic link using relative paths}
                 {--force : Recreate already existing symbolic links}';
 
     /**
