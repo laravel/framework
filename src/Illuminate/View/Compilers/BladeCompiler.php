@@ -765,7 +765,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @return void
      */
-    public function handle(string $className, callable $handler)
+    public function addEchoHandler(string $className, callable $handler)
     {
         $this->echoHandlers[$className] = $handler;
     }

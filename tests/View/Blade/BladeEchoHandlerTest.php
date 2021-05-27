@@ -12,7 +12,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
     {
         parent::setUp();
 
-        $this->compiler->handle(Fluent::class, function ($object) {
+        $this->compiler->addEchoHandler(Fluent::class, function ($object) {
             return 'Hello World';
         });
     }
@@ -58,7 +58,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
     {
         $this->expectExceptionMessage('The fluent object has been successfully handled!');
 
-        $this->compiler->handle(Fluent::class, function ($object) {
+        $this->compiler->addEchoHandler(Fluent::class, function ($object) {
             throw new Exception('The fluent object has been successfully handled!');
         });
 

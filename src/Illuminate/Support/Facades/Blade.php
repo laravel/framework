@@ -26,7 +26,7 @@ namespace Illuminate\Support\Facades;
  * @method static void withDoubleEncoding()
  * @method static void withoutComponentTags()
  * @method static void withoutDoubleEncoding()
- * @method static void handle(string $className, callable $handler)
+ * @method static void addEchoHandler(string $className, callable $handler)
  *
  * @see \Illuminate\View\Compilers\BladeCompiler
  */
