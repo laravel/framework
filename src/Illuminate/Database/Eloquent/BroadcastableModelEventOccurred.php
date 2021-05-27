@@ -26,6 +26,13 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     protected $event;
 
     /**
+     * The channels that the event should be broadcast on.
+     *
+     * @var array
+     */
+    protected $channels = [];
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
@@ -45,7 +52,11 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return collect($this->model->broadcastOn($this->event) ?: [])->map(function ($channel) {
+        $channels = empty($this->channels)
+                ? ($this->model->broadcastOn($this->event) ?: [])
+                : $this->channels;
+
+        return collect($channels)->map(function ($channel) {
             return $channel instanceof Model ? new PrivateChannel($channel) : $channel;
         })->all();
     }
@@ -58,5 +69,18 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     public function broadcastAs()
     {
         return class_basename($this->model).ucfirst($this->event);
+    }
+
+    /**
+     * Manually specify the channels the event should broadcast on.
+     *
+     * @param  array  $channels
+     * @return $this
+     */
+    public function onChannels(array $channels)
+    {
+        $this->channels = $channels;
+
+        return $this;
     }
 }
