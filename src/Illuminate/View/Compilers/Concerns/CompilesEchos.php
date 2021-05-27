@@ -108,7 +108,7 @@ trait CompilesEchos
             return $value;
         }
 
-        $echoHandlerArray = static::class.'->echoHandlers';
+        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
 
         return "is_object($value) && isset({$echoHandlerArray}[get_class($value)]) ? call_user_func_array({$echoHandlerArray}[get_class($value)], [$value]) : $value";
     }
