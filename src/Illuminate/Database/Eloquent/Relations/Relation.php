@@ -103,6 +103,25 @@ abstract class Relation
     }
 
     /**
+     * Run a callback with constraints enabled on the relation.
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public static function withConstraints(Closure $callback)
+    {
+        $previous = static::$constraints;
+
+        static::$constraints = true;
+
+        try {
+            return $callback();
+        } finally {
+            static::$constraints = $previous;
+        }
+    }
+
+    /**
      * Set the base constraints on the relation query.
      *
      * @return void

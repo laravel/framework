@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -206,13 +207,15 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         if (! isset(static::$booted[static::class])) {
             static::$booted[static::class] = true;
 
-            $this->fireModelEvent('booting', false);
+            Relation::withConstraints(function () {
+                $this->fireModelEvent('booting', false);
 
-            static::booting();
-            static::boot();
-            static::booted();
+                static::booting();
+                static::boot();
+                static::booted();
 
-            $this->fireModelEvent('booted', false);
+                $this->fireModelEvent('booted', false);
+            });
         }
     }
 
@@ -275,9 +278,11 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     protected function initializeTraits()
     {
-        foreach (static::$traitInitializers[static::class] as $method) {
-            $this->{$method}();
-        }
+        Relation::withConstraints(function () {
+            foreach (static::$traitInitializers[static::class] as $method) {
+                $this->{$method}();
+            }
+        });
     }
 
     /**
