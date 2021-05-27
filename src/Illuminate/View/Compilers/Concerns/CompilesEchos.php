@@ -99,7 +99,7 @@ trait CompilesEchos
     /**
      * Wrap the value in a handler if applicable.
      *
-     * @param  string $data
+     * @param  string $value
      * @return string
      */
     protected function applyEchoHandlerFor($value)
