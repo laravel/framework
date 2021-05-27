@@ -8,10 +8,13 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Traits\Conditional;
 use InvalidArgumentException;
 
 class Password implements Rule, DataAwareRule
 {
+    use Conditional;
+
     /**
      * The data under validation.
      *

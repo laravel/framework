@@ -3,10 +3,12 @@
 namespace Illuminate\Validation\Rules;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Traits\Conditional;
 
 class Unique
 {
     use DatabaseRule;
+    use Conditional;
 
     /**
      * The ID that should be ignored.
