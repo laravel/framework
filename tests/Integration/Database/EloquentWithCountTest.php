@@ -51,6 +51,13 @@ class EloquentWithCountTest extends DatabaseTestCase
         $this->assertEquals([
             ['id' => 1, 'twos_count' => 1],
         ], $results->get()->toArray());
+
+        $one = Model1::create();
+        $one->twos()->create();
+
+        Model1::with('fours')->first();
+
+        $this->assertEquals(1, Model4::$twosCount);
     }
 
     public function testGlobalScopes()
@@ -138,6 +145,7 @@ class Model3 extends Model
 
 class Model4 extends Model
 {
+    public static $twosCount = 0;
     public $table = 'four';
     public $timestamps = false;
     protected $guarded = [];
@@ -145,6 +153,8 @@ class Model4 extends Model
     protected static function boot()
     {
         parent::boot();
+
+        self::$twosCount = Model1::first()->twos()->count();
 
         static::addGlobalScope('app', function ($builder) {
             $builder->where('id', '>', 1);
