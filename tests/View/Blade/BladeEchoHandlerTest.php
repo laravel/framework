@@ -2,7 +2,12 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Exception;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
+use Mockery as m;
 
 class BladeEchoHandlerTest extends AbstractBladeTestCase
 {
@@ -49,6 +54,25 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         $this->assertSame(
             "<?php echo e(is_object(\$exampleObject) && isset(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>\n\n",
             $this->compiler->compileString("{{\$exampleObject}}\n")
+        );
+    }
+
+    public function testHandlerLogicWorksCorrectly()
+    {
+        $this->expectExceptionMessage("The fluent object has been successfully handled!");
+
+        $this->compiler->handle(Fluent::class, function($object) {
+            throw new Exception("The fluent object has been successfully handled!");
+        });
+
+        app()->singleton('blade.compiler', function() { return $this->compiler; });
+
+        $exampleObject = new Fluent();
+
+        eval(
+            Str::of($this->compiler->compileString('{{$exampleObject}}'))
+            ->after('<?php')
+            ->beforeLast('?>')
         );
     }
 }
