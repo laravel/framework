@@ -104,12 +104,8 @@ trait CompilesEchos
      */
     protected function applyEchoHandlerFor($value)
     {
-        if (empty($this->echoHandlers)) {
-            return $value;
-        }
-
-        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
-
-        return "is_object($value) && isset({$echoHandlerArray}[get_class($value)]) ? call_user_func_array({$echoHandlerArray}[get_class($value)], [$value]) : $value";
+        return empty($this->echoHandlers)
+            ? $value
+            : "is_object($value) && isset(app('blade.compiler')->echoHandlers[get_class($value)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class($value)], [$value]) : $value";
     }
 }

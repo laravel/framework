@@ -22,40 +22,32 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
     public function testBladeHandlerCanInterceptRegularEchos()
     {
-        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
-
         $this->assertSame(
-            "<?php echo e(is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)]) ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>",
+            "<?php echo e(is_object(\$exampleObject) && isset(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>",
             $this->compiler->compileString('{{$exampleObject}}')
         );
     }
 
     public function testBladeHandlerCanInterceptRawEchos()
     {
-        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
-
         $this->assertSame(
-            "<?php echo is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)]) ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject; ?>",
+            "<?php echo is_object(\$exampleObject) && isset(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject; ?>",
             $this->compiler->compileString('{!!$exampleObject!!}')
         );
     }
 
     public function testBladeHandlerCanInterceptEscapedEchos()
     {
-        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
-
         $this->assertSame(
-            "<?php echo e(is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)]) ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>",
+            "<?php echo e(is_object(\$exampleObject) && isset(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>",
             $this->compiler->compileString('{{{$exampleObject}}}')
         );
     }
 
     public function testWhitespaceIsPreservedCorrectly()
     {
-        $echoHandlerArray = "app('blade.compiler')->echoHandlers";
-
         $this->assertSame(
-            "<?php echo e(is_object(\$exampleObject) && isset({$echoHandlerArray}[get_class(\$exampleObject)]) ? call_user_func_array({$echoHandlerArray}[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>\n\n",
+            "<?php echo e(is_object(\$exampleObject) && isset(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>\n\n",
             $this->compiler->compileString("{{\$exampleObject}}\n")
         );
     }
