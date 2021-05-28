@@ -166,7 +166,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                 return $this->app->isDownForMaintenance();
             };
 
-            $scopeResetter = function () use ($app){
+            $scopeResetter = function () use ($app) {
                 return $app->resetScope();
             };
 
