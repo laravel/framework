@@ -32,7 +32,7 @@ class StorageLinkCommand extends Command
         $relative = $this->option('relative');
 
         foreach ($this->links() as $link => $target) {
-            if (file_exists($link) && ! $this->removableSymlink($link, $this->option('force'))) {
+            if (file_exists($link) && ! $this->isRemovableSymlink($link, $this->option('force'))) {
                 $this->error("The [$link] link already exists.");
                 continue;
             }
@@ -71,7 +71,7 @@ class StorageLinkCommand extends Command
      * @param  bool  $force
      * @return bool
      */
-    protected function removableSymlink(string $link, bool $force): bool
+    protected function isRemovableSymlink(string $link, bool $force): bool
     {
         return is_link($link) && $force;
     }
