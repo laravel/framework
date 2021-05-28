@@ -23,6 +23,7 @@ class MigrateCommand extends BaseCommand
                 {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
                 {--schema-path= : The path to a schema dump file}
                 {--pretend : Dump the SQL queries that would be run}
+                {--fake : Create migration records without running the migrations}
                 {--seed : Indicates if the seed task should be re-run}
                 {--step : Force the migrations to be run so they can be rolled back individually}';
 
@@ -82,13 +83,14 @@ class MigrateCommand extends BaseCommand
             $this->migrator->setOutput($this->output)
                     ->run($this->getMigrationPaths(), [
                         'pretend' => $this->option('pretend'),
+                        'fake' => $this->option('fake'),
                         'step' => $this->option('step'),
                     ]);
 
             // Finally, if the "seed" option has been given, we will re-run the database
             // seed task to re-populate the database, which is convenient when adding
             // a migration and a seed at the same time, as it is only this command.
-            if ($this->option('seed') && ! $this->option('pretend')) {
+            if ($this->option('seed') && ! $this->option('pretend') && ! $this->option('fake')) {
                 $this->call('db:seed', ['--force' => true]);
             }
         });

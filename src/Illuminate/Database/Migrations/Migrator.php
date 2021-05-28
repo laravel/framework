@@ -155,6 +155,8 @@ class Migrator
 
         $pretend = $options['pretend'] ?? false;
 
+        $fake = $options['fake'] ?? false;
+
         $step = $options['step'] ?? false;
 
         $this->fireMigrationEvent(new MigrationsStarted);
@@ -163,7 +165,7 @@ class Migrator
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
+            $this->runUp($file, $batch, $pretend, $fake);
 
             if ($step) {
                 $batch++;
@@ -179,9 +181,10 @@ class Migrator
      * @param  string  $file
      * @param  int  $batch
      * @param  bool  $pretend
+     * @param  bool  $fake
      * @return void
      */
-    protected function runUp($file, $batch, $pretend)
+    protected function runUp($file, $batch, $pretend, $fake)
     {
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
@@ -198,7 +201,9 @@ class Migrator
 
         $startTime = microtime(true);
 
-        $this->runMigration($migration, 'up');
+        if (!$fake) {
+            $this->runMigration($migration, 'up');
+        }
 
         $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
 
@@ -282,7 +287,8 @@ class Migrator
 
             $this->runDown(
                 $file, $migration,
-                $options['pretend'] ?? false
+                $options['pretend'] ?? false,
+                $options['fake'] ?? false
             );
         }
 
@@ -342,9 +348,10 @@ class Migrator
      * @param  string  $file
      * @param  object  $migration
      * @param  bool  $pretend
+     * @param  bool  $fake
      * @return void
      */
-    protected function runDown($file, $migration, $pretend)
+    protected function runDown($file, $migration, $pretend, $fake)
     {
         // First we will get the file name of the migration so we can resolve out an
         // instance of the migration. Once we get an instance we can either run a
@@ -361,7 +368,9 @@ class Migrator
 
         $startTime = microtime(true);
 
-        $this->runMigration($instance, 'down');
+        if (!$fake) {
+            $this->runMigration($instance, 'down');
+        }
 
         $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
 
