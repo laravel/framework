@@ -57,6 +57,7 @@ class EloquentWithCountTest extends DatabaseTestCase
 
         Model1::with('fours')->first();
 
+        $this->assertEquals(1, Model1::first()->twos()->count());
         $this->assertEquals(1, Model4::$twosCount);
     }
 
