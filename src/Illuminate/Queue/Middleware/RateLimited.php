@@ -52,11 +52,11 @@ class RateLimited
      */
     public function handle($job, $next)
     {
-        if (is_null($limiter = $this->limiter->limiter($this->limiterName))) {
+        if (\is_null($limiter = $this->limiter->limiter($this->limiterName))) {
             return $next($job);
         }
 
-        $limiterResponse = call_user_func($limiter, $job);
+        $limiterResponse = \call_user_func($limiter, $job);
 
         if ($limiterResponse instanceof Unlimited) {
             return $next($job);

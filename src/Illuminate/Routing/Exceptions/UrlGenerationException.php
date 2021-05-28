@@ -17,7 +17,7 @@ class UrlGenerationException extends Exception
      */
     public static function forMissingParameters(Route $route, array $parameters = [])
     {
-        $parameterLabel = Str::plural('parameter', count($parameters));
+        $parameterLabel = Str::plural('parameter', \count($parameters));
 
         $message = sprintf(
             'Missing required %s for [Route: %s] [URI: %s]',
@@ -26,7 +26,7 @@ class UrlGenerationException extends Exception
             $route->uri()
         );
 
-        if (count($parameters) > 0) {
+        if (\count($parameters) > 0) {
             $message .= sprintf(' [Missing %s: %s]', $parameterLabel, implode(', ', $parameters));
         }
 

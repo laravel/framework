@@ -72,7 +72,7 @@ class WithoutOverlapping
             } finally {
                 $lock->release();
             }
-        } elseif (! is_null($this->releaseAfter)) {
+        } elseif (! \is_null($this->releaseAfter)) {
             $job->release($this->releaseAfter);
         }
     }
@@ -136,6 +136,6 @@ class WithoutOverlapping
      */
     public function getLockKey($job)
     {
-        return $this->prefix.get_class($job).':'.$this->key;
+        return $this->prefix.\get_class($job).':'.$this->key;
     }
 }

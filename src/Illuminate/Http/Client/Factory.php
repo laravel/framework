@@ -102,7 +102,7 @@ class Factory
      */
     public static function response($body = null, $status = 200, $headers = [])
     {
-        if (is_array($body)) {
+        if (\is_array($body)) {
             $body = json_encode($body);
 
             $headers['Content-Type'] = 'application/json';
@@ -136,13 +136,13 @@ class Factory
     {
         $this->record();
 
-        if (is_null($callback)) {
+        if (\is_null($callback)) {
             $callback = function () {
                 return static::response();
             };
         }
 
-        if (is_array($callback)) {
+        if (\is_array($callback)) {
             foreach ($callback as $url => $callable) {
                 $this->stubUrl($url, $callable);
             }
@@ -242,10 +242,10 @@ class Factory
      */
     public function assertSentInOrder($callbacks)
     {
-        $this->assertSentCount(count($callbacks));
+        $this->assertSentCount(\count($callbacks));
 
         foreach ($callbacks as $index => $url) {
-            $callback = is_callable($url) ? $url : function ($request) use ($url) {
+            $callback = \is_callable($url) ? $url : function ($request) use ($url) {
                 return $request->url() == $url;
             };
 

@@ -133,7 +133,7 @@ abstract class Component
      */
     protected function extractPublicProperties()
     {
-        $class = get_class($this);
+        $class = \get_class($this);
 
         if (! isset(static::$propertyCache[$class])) {
             $reflection = new ReflectionClass($this);
@@ -166,7 +166,7 @@ abstract class Component
      */
     protected function extractPublicMethods()
     {
-        $class = get_class($this);
+        $class = \get_class($this);
 
         if (! isset(static::$methodCache[$class])) {
             $reflection = new ReflectionClass($this);
@@ -224,7 +224,7 @@ abstract class Component
     protected function shouldIgnore($name)
     {
         return Str::startsWith($name, '__') ||
-               in_array($name, $this->ignoredMethods());
+               \in_array($name, $this->ignoredMethods());
     }
 
     /**

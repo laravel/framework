@@ -17,7 +17,7 @@ class RouteBinding
      */
     public static function forCallback($container, $binder)
     {
-        if (is_string($binder)) {
+        if (\is_string($binder)) {
             return static::createClassBinding($container, $binder);
         }
 
@@ -58,7 +58,7 @@ class RouteBinding
     public static function forModel($container, $class, $callback = null)
     {
         return function ($value) use ($container, $class, $callback) {
-            if (is_null($value)) {
+            if (\is_null($value)) {
                 return;
             }
 

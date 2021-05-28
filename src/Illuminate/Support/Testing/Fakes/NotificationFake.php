@@ -43,8 +43,8 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      */
     public function assertSentTo($notifiable, $notification, $callback = null)
     {
-        if (is_array($notifiable) || $notifiable instanceof Collection) {
-            if (count($notifiable) === 0) {
+        if (\is_array($notifiable) || $notifiable instanceof Collection) {
+            if (\count($notifiable) === 0) {
                 throw new Exception('No notifiable given.');
             }
 
@@ -99,8 +99,8 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      */
     public function assertNotSentTo($notifiable, $notification, $callback = null)
     {
-        if (is_array($notifiable) || $notifiable instanceof Collection) {
-            if (count($notifiable) === 0) {
+        if (\is_array($notifiable) || $notifiable instanceof Collection) {
+            if (\count($notifiable) === 0) {
                 throw new Exception('No notifiable given.');
             }
 
@@ -143,7 +143,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
         $actualCount = collect($this->notifications)
             ->flatten(1)
             ->reduce(function ($count, $sent) use ($notification) {
-                return $count + count($sent[$notification] ?? []);
+                return $count + \count($sent[$notification] ?? []);
             }, 0);
 
         PHPUnit::assertSame(
@@ -198,7 +198,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      */
     protected function notificationsFor($notifiable, $notification)
     {
-        return $this->notifications[get_class($notifiable)][$notifiable->getKey()][$notification] ?? [];
+        return $this->notifications[\get_class($notifiable)][$notifiable->getKey()][$notification] ?? [];
     }
 
     /**
@@ -223,7 +223,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      */
     public function sendNow($notifiables, $notification, array $channels = null)
     {
-        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+        if (! $notifiables instanceof Collection && ! \is_array($notifiables)) {
             $notifiables = [$notifiables];
         }
 
@@ -232,7 +232,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
                 $notification->id = Str::uuid()->toString();
             }
 
-            $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
+            $this->notifications[\get_class($notifiable)][$notifiable->getKey()][\get_class($notification)][] = [
                 'notification' => $notification,
                 'channels' => $channels ?: $notification->via($notifiable),
                 'notifiable' => $notifiable,

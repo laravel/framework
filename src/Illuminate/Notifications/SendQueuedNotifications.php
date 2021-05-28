@@ -111,7 +111,7 @@ class SendQueuedNotifications implements ShouldQueue
      */
     public function displayName()
     {
-        return get_class($this->notification);
+        return \get_class($this->notification);
     }
 
     /**

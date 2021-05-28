@@ -372,7 +372,7 @@ class ComponentTagCompiler
                     : [];
 
         return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
-            return in_array(Str::camel($key), $parameterNames);
+            return \in_array(Str::camel($key), $parameterNames);
         })->all();
     }
 
@@ -444,7 +444,7 @@ class ComponentTagCompiler
             $attribute = $match['attribute'];
             $value = $match['value'] ?? null;
 
-            if (is_null($value)) {
+            if (\is_null($value)) {
                 $value = 'true';
 
                 $attribute = Str::start($attribute, 'bind:');
@@ -531,7 +531,7 @@ class ComponentTagCompiler
     protected function escapeSingleQuotesOutsideOfPhpBlocks(string $value)
     {
         return collect(token_get_all($value))->map(function ($token) {
-            if (! is_array($token)) {
+            if (! \is_array($token)) {
                 return $token;
             }
 

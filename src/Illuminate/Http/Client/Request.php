@@ -63,7 +63,7 @@ class Request implements ArrayAccess
      */
     public function hasHeader($key, $value = null)
     {
-        if (is_null($value)) {
+        if (\is_null($value)) {
             return ! empty($this->request->getHeaders()[$key]);
         }
 
@@ -73,7 +73,7 @@ class Request implements ArrayAccess
             return false;
         }
 
-        $value = is_array($value) ? $value : [$value];
+        $value = \is_array($value) ? $value : [$value];
 
         return empty(array_diff($value, $headers[$key]));
     }
@@ -86,7 +86,7 @@ class Request implements ArrayAccess
      */
     public function hasHeaders($headers)
     {
-        if (is_string($headers)) {
+        if (\is_string($headers)) {
             $headers = [$headers => null];
         }
 

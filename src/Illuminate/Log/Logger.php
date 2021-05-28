@@ -219,7 +219,7 @@ class Logger implements LoggerInterface
      */
     protected function formatMessage($message)
     {
-        if (is_array($message)) {
+        if (\is_array($message)) {
             return var_export($message, true);
         } elseif ($message instanceof Jsonable) {
             return $message->toJson();

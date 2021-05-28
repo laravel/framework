@@ -68,7 +68,7 @@ trait InteractsWithIO
      */
     public function argument($key = null)
     {
-        if (is_null($key)) {
+        if (\is_null($key)) {
             return $this->input->getArguments();
         }
 
@@ -104,7 +104,7 @@ trait InteractsWithIO
      */
     public function option($key = null)
     {
-        if (is_null($key)) {
+        if (\is_null($key)) {
             return $this->input->getOptions();
         }
 
@@ -170,7 +170,7 @@ trait InteractsWithIO
     {
         $question = new Question($question, $default);
 
-        is_callable($choices)
+        \is_callable($choices)
             ? $question->setAutocompleterCallback($choices)
             : $question->setAutocompleterValues($choices);
 
@@ -248,7 +248,7 @@ trait InteractsWithIO
     public function withProgressBar($totalSteps, Closure $callback)
     {
         $bar = $this->output->createProgressBar(
-            is_iterable($totalSteps) ? count($totalSteps) : $totalSteps
+            is_iterable($totalSteps) ? \count($totalSteps) : $totalSteps
         );
 
         $bar->start();
@@ -422,7 +422,7 @@ trait InteractsWithIO
     {
         if (isset($this->verbosityMap[$level])) {
             $level = $this->verbosityMap[$level];
-        } elseif (! is_int($level)) {
+        } elseif (! \is_int($level)) {
             $level = $this->verbosity;
         }
 

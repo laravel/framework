@@ -179,7 +179,7 @@ class SupportStringableTest extends TestCase
 
     public function testWithoutWordsDoesntProduceError()
     {
-        $nbsp = chr(0xC2).chr(0xA0);
+        $nbsp = \chr(0xC2).\chr(0xA0);
         $this->assertSame(' ', (string) $this->stringable(' ')->words());
         $this->assertEquals($nbsp, (string) $this->stringable($nbsp)->words());
     }

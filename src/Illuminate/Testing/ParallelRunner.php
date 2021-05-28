@@ -150,6 +150,6 @@ class ParallelRunner implements RunnerInterface
             throw new RuntimeException('Parallel Runner unable to resolve application.');
         };
 
-        return call_user_func($applicationResolver);
+        return \call_user_func($applicationResolver);
     }
 }

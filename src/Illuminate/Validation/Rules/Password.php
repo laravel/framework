@@ -103,11 +103,11 @@ class Password implements Rule, DataAwareRule
      */
     public static function defaults($callback = null)
     {
-        if (is_null($callback)) {
+        if (\is_null($callback)) {
             return static::default();
         }
 
-        if (! is_callable($callback) && ! $callback instanceof static) {
+        if (! \is_callable($callback) && ! $callback instanceof static) {
             throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
         }
 

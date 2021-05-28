@@ -164,8 +164,8 @@ class Builder
      */
     public function withoutGlobalScope($scope)
     {
-        if (! is_string($scope)) {
-            $scope = get_class($scope);
+        if (! \is_string($scope)) {
+            $scope = \get_class($scope);
         }
 
         unset($this->scopes[$scope]);
@@ -183,7 +183,7 @@ class Builder
      */
     public function withoutGlobalScopes(array $scopes = null)
     {
-        if (! is_array($scopes)) {
+        if (! \is_array($scopes)) {
             $scopes = array_keys($this->scopes);
         }
 
@@ -216,7 +216,7 @@ class Builder
             $id = $id->getKey();
         }
 
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (\is_array($id) || $id instanceof Arrayable) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -241,7 +241,7 @@ class Builder
             $id = $id->getKey();
         }
 
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (\is_array($id) || $id instanceof Arrayable) {
             $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -265,12 +265,12 @@ class Builder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        if ($column instanceof Closure && is_null($operator)) {
+        if ($column instanceof Closure && \is_null($operator)) {
             $column($query = $this->model->newQueryWithoutRelationships());
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
-            $this->query->where(...func_get_args());
+            $this->query->where(...\func_get_args());
         }
 
         return $this;
@@ -301,7 +301,7 @@ class Builder
     public function orWhere($column, $operator = null, $value = null)
     {
         [$value, $operator] = $this->query->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value, $operator, \func_num_args() === 2
         );
 
         return $this->where($column, $operator, $value, 'or');
@@ -315,7 +315,7 @@ class Builder
      */
     public function latest($column = null)
     {
-        if (is_null($column)) {
+        if (\is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
@@ -332,7 +332,7 @@ class Builder
      */
     public function oldest($column = null)
     {
-        if (is_null($column)) {
+        if (\is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
@@ -354,7 +354,7 @@ class Builder
         return $instance->newCollection(array_map(function ($item) use ($items, $instance) {
             $model = $instance->newFromBuilder($item);
 
-            if (count($items) > 1) {
+            if (\count($items) > 1) {
                 $model->preventsLazyLoading = Model::preventsLazyLoading();
             }
 
@@ -385,7 +385,7 @@ class Builder
      */
     public function find($id, $columns = ['*'])
     {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (\is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
 
@@ -425,16 +425,16 @@ class Builder
 
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
-        if (is_array($id)) {
-            if (count($result) === count(array_unique($id))) {
+        if (\is_array($id)) {
+            if (\count($result) === \count(array_unique($id))) {
                 return $result;
             }
-        } elseif (! is_null($result)) {
+        } elseif (! \is_null($result)) {
             return $result;
         }
 
         throw (new ModelNotFoundException)->setModel(
-            get_class($this->model), $id
+            \get_class($this->model), $id
         );
     }
 
@@ -447,7 +447,7 @@ class Builder
      */
     public function findOrNew($id, $columns = ['*'])
     {
-        if (! is_null($model = $this->find($id, $columns))) {
+        if (! \is_null($model = $this->find($id, $columns))) {
             return $model;
         }
 
@@ -463,7 +463,7 @@ class Builder
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! \is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -479,7 +479,7 @@ class Builder
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! \is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -512,11 +512,11 @@ class Builder
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
+        if (! \is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->model));
+        throw (new ModelNotFoundException)->setModel(\get_class($this->model));
     }
 
     /**
@@ -534,7 +534,7 @@ class Builder
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->first($columns))) {
+        if (! \is_null($model = $this->first($columns))) {
             return $model;
         }
 
@@ -555,7 +555,7 @@ class Builder
         try {
             return $this->baseSole($columns);
         } catch (RecordsNotFoundException $exception) {
-            throw (new ModelNotFoundException)->setModel(get_class($this->model));
+            throw (new ModelNotFoundException)->setModel(\get_class($this->model));
         }
     }
 
@@ -585,7 +585,7 @@ class Builder
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
         // n+1 query issue for the developers to avoid running a lot of queries.
-        if (count($models = $builder->getModels($columns)) > 0) {
+        if (\count($models = $builder->getModels($columns)) > 0) {
             $models = $builder->eagerLoadRelations($models);
         }
 
@@ -677,7 +677,7 @@ class Builder
         // If there are nested relationships set on the query, we will put those onto
         // the query instances so that they can be handled after this relationship
         // is loaded. In this way they will all trickle down as they are loaded.
-        if (count($nested) > 0) {
+        if (\count($nested) > 0) {
             $relation->getQuery()->with($nested);
         }
 
@@ -699,7 +699,7 @@ class Builder
         // that start with the given top relations and adds them to our arrays.
         foreach ($this->eagerLoad as $name => $constraints) {
             if ($this->isNestedUnder($relation, $name)) {
-                $nested[substr($name, strlen($relation.'.'))] = $constraints;
+                $nested[substr($name, \strlen($relation.'.'))] = $constraints;
             }
         }
 
@@ -758,7 +758,7 @@ class Builder
         // columns are returned as you would expect from these Eloquent models.
         if (! $this->model->hasGetMutator($column) &&
             ! $this->model->hasCast($column) &&
-            ! in_array($column, $this->model->getDates())) {
+            ! \in_array($column, $this->model->getDates())) {
             return $results;
         }
 
@@ -836,7 +836,7 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
+        $orders = $this->ensureOrderForCursorPagination(! \is_null($cursor) && $cursor->pointsToPreviousItems());
 
         $orderDirection = $orders->first()['direction'] ?? 'asc';
 
@@ -844,10 +844,10 @@ class Builder
 
         $parameters = $orders->pluck('column')->toArray();
 
-        if (! is_null($cursor)) {
-            if (count($parameters) === 1) {
+        if (! \is_null($cursor)) {
+            if (\count($parameters) === 1) {
                 $this->where($column = $parameters[0], $comparisonOperator, $cursor->parameter($column));
-            } elseif (count($parameters) > 1) {
+            } elseif (\count($parameters) > 1) {
                 $this->whereRowValues($parameters, $comparisonOperator, $cursor->parameters($parameters));
             }
         }
@@ -943,11 +943,11 @@ class Builder
             return 0;
         }
 
-        if (! is_array(reset($values))) {
+        if (! \is_array(reset($values))) {
             $values = [$values];
         }
 
-        if (is_null($update)) {
+        if (\is_null($update)) {
             $update = array_keys(reset($values));
         }
 
@@ -997,7 +997,7 @@ class Builder
     protected function addUpdatedAtColumn(array $values)
     {
         if (! $this->model->usesTimestamps() ||
-            is_null($this->model->getUpdatedAtColumn())) {
+            \is_null($this->model->getUpdatedAtColumn())) {
             return $values;
         }
 
@@ -1061,9 +1061,9 @@ class Builder
 
         $column = $this->model->getUpdatedAtColumn();
 
-        if (! is_null($column) &&
-            ! array_key_exists($column, $update) &&
-            ! in_array($column, $update)) {
+        if (! \is_null($column) &&
+            ! \array_key_exists($column, $update) &&
+            ! \in_array($column, $update)) {
             $update[] = $column;
         }
 
@@ -1078,7 +1078,7 @@ class Builder
     public function delete()
     {
         if (isset($this->onDelete)) {
-            return call_user_func($this->onDelete, $this);
+            return \call_user_func($this->onDelete, $this);
         }
 
         return $this->toBase()->delete();
@@ -1132,7 +1132,7 @@ class Builder
             // If the scope key is an integer, then the scope was passed as the value and
             // the parameter list is empty, so we will format the scope name and these
             // parameters here. Then, we'll be ready to call the scope on the model.
-            if (is_int($scope)) {
+            if (\is_int($scope)) {
                 [$scope, $parameters] = [$parameters, []];
             }
 
@@ -1199,12 +1199,12 @@ class Builder
         // We will keep track of how many wheres are on the query before running the
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
-        $originalWhereCount = is_null($query->wheres)
-                    ? 0 : count($query->wheres);
+        $originalWhereCount = \is_null($query->wheres)
+                    ? 0 : \count($query->wheres);
 
         $result = $scope(...array_values($parameters)) ?? $this;
 
-        if (count((array) $query->wheres) > $originalWhereCount) {
+        if (\count((array) $query->wheres) > $originalWhereCount) {
             $this->addNewWheresWithinGroup($query, $originalWhereCount);
         }
 
@@ -1242,11 +1242,11 @@ class Builder
         $query->wheres = [];
 
         $this->groupWhereSliceForScope(
-            $query, array_slice($allWheres, 0, $originalWhereCount)
+            $query, \array_slice($allWheres, 0, $originalWhereCount)
         );
 
         $this->groupWhereSliceForScope(
-            $query, array_slice($allWheres, $originalWhereCount)
+            $query, \array_slice($allWheres, $originalWhereCount)
         );
     }
 
@@ -1301,7 +1301,7 @@ class Builder
         if ($callback instanceof Closure) {
             $eagerLoad = $this->parseWithRelations([$relations => $callback]);
         } else {
-            $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+            $eagerLoad = $this->parseWithRelations(\is_string($relations) ? \func_get_args() : $relations);
         }
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
@@ -1318,7 +1318,7 @@ class Builder
     public function without($relations)
     {
         $this->eagerLoad = array_diff_key($this->eagerLoad, array_flip(
-            is_string($relations) ? func_get_args() : $relations
+            \is_string($relations) ? \func_get_args() : $relations
         ));
 
         return $this;
@@ -1644,7 +1644,7 @@ class Builder
             return $this->callNamedScope($method, $parameters);
         }
 
-        if (in_array($method, $this->passthru)) {
+        if (\in_array($method, $this->passthru)) {
             return $this->toBase()->{$method}(...$parameters);
         }
 

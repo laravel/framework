@@ -91,7 +91,7 @@ class Blueprint
         $this->table = $table;
         $this->prefix = $prefix;
 
-        if (! is_null($callback)) {
+        if (! \is_null($callback)) {
             $callback($this);
         }
     }
@@ -132,7 +132,7 @@ class Blueprint
             $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {
-                if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
+                if (! \is_null($sql = $grammar->$method($this, $command, $connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
             }
@@ -175,7 +175,7 @@ class Blueprint
     protected function commandsNamed(array $names)
     {
         return collect($this->commands)->filter(function ($command) use ($names) {
-            return in_array($command->name, $names);
+            return \in_array($command->name, $names);
         });
     }
 
@@ -187,11 +187,11 @@ class Blueprint
      */
     protected function addImpliedCommands(Grammar $grammar)
     {
-        if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
+        if (\count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
 
-        if (count($this->getChangedColumns()) > 0 && ! $this->creating()) {
+        if (\count($this->getChangedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
@@ -317,7 +317,7 @@ class Blueprint
      */
     public function dropColumn($columns)
     {
-        $columns = is_array($columns) ? $columns : func_get_args();
+        $columns = \is_array($columns) ? $columns : \func_get_args();
 
         return $this->addCommand('dropColumn', compact('columns'));
     }
@@ -567,7 +567,7 @@ class Blueprint
             $this->indexCommand('foreign', $columns, $name)->getAttributes()
         );
 
-        $this->commands[count($this->commands) - 1] = $command;
+        $this->commands[\count($this->commands) - 1] = $command;
 
         return $command;
     }
@@ -871,7 +871,7 @@ class Blueprint
      */
     public function foreignIdFor($model, $column = null)
     {
-        if (is_string($model)) {
+        if (\is_string($model)) {
             $model = new $model;
         }
 
@@ -1489,7 +1489,7 @@ class Blueprint
         // If the given "index" is actually an array of columns, the developer means
         // to drop an index merely by specifying the columns involved without the
         // conventional name, so we will build the index name from the columns.
-        if (is_array($index)) {
+        if (\is_array($index)) {
             $index = $this->createIndexName($type, $columns = $index);
         }
 
@@ -1662,7 +1662,7 @@ class Blueprint
      */
     public function hasAutoIncrementColumn()
     {
-        return ! is_null(collect($this->getAddedColumns())->first(function ($column) {
+        return ! \is_null(collect($this->getAddedColumns())->first(function ($column) {
             return $column->autoIncrement === true;
         }));
     }

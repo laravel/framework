@@ -121,9 +121,9 @@ class DateFactory
      */
     public static function use($handler)
     {
-        if (is_callable($handler) && is_object($handler)) {
+        if (\is_callable($handler) && \is_object($handler)) {
             return static::useCallable($handler);
-        } elseif (is_string($handler)) {
+        } elseif (\is_string($handler)) {
             return static::useClass($handler);
         } elseif ($handler instanceof Factory) {
             return static::useFactory($handler);
@@ -201,7 +201,7 @@ class DateFactory
 
         // Using callable to generate dates...
         if (static::$callable) {
-            return call_user_func(static::$callable, $defaultClassName::$method(...$parameters));
+            return \call_user_func(static::$callable, $defaultClassName::$method(...$parameters));
         }
 
         // Using Carbon factory to generate dates...

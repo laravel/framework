@@ -32,7 +32,7 @@ class ViewController extends Controller
      */
     public function __invoke(...$args)
     {
-        [$view, $data, $status, $headers] = array_slice($args, -4);
+        [$view, $data, $status, $headers] = \array_slice($args, -4);
 
         return $this->response->view($view, $data, $status, $headers);
     }

@@ -9,7 +9,7 @@ class HttpTestingFileFactoryTest extends TestCase
 {
     public function testImagePng()
     {
-        if (! function_exists('imagepng')) {
+        if (! \function_exists('imagepng')) {
             $this->markTestSkipped('The extension gd is missing from your system or was compiled without PNG support.');
         }
 
@@ -24,7 +24,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageJpeg()
     {
-        if (! function_exists('imagejpeg')) {
+        if (! \function_exists('imagejpeg')) {
             $this->markTestSkipped('The extension gd is missing from your system or was compiled without JPEG support.');
         }
 

@@ -101,7 +101,7 @@ abstract class Transport implements Swift_Transport
      */
     protected function numberOfRecipients(Swift_Mime_SimpleMessage $message)
     {
-        return count(array_merge(
+        return \count(array_merge(
             (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
         ));
     }

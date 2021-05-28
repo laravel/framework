@@ -112,11 +112,11 @@ abstract class Grammar extends BaseGrammar
         // Once we have the basic foreign key creation statement constructed we can
         // build out the syntax for what should happen on an update or delete of
         // the affected columns, which will get something like "cascade", etc.
-        if (! is_null($command->onDelete)) {
+        if (! \is_null($command->onDelete)) {
             $sql .= " on delete {$command->onDelete}";
         }
 
-        if (! is_null($command->onUpdate)) {
+        if (! \is_null($command->onUpdate)) {
             $sql .= " on update {$command->onUpdate}";
         }
 
@@ -199,7 +199,7 @@ abstract class Grammar extends BaseGrammar
     {
         $commands = $this->getCommandsByName($blueprint, $name);
 
-        if (count($commands) > 0) {
+        if (\count($commands) > 0) {
             return reset($commands);
         }
     }
@@ -271,7 +271,7 @@ abstract class Grammar extends BaseGrammar
             return $value;
         }
 
-        return is_bool($value)
+        return \is_bool($value)
                     ? "'".(int) $value."'"
                     : "'".(string) $value."'";
     }

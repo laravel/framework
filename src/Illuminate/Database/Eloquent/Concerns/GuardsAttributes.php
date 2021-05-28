@@ -175,7 +175,7 @@ trait GuardsAttributes
         // If the key is in the "fillable" array, we can of course assume that it's
         // a fillable attribute. Otherwise, we will check the guarded array when
         // we need to determine if the attribute is black-listed on the model.
-        if (in_array($key, $this->getFillable())) {
+        if (\in_array($key, $this->getFillable())) {
             return true;
         }
 
@@ -216,13 +216,13 @@ trait GuardsAttributes
      */
     protected function isGuardableColumn($key)
     {
-        if (! isset(static::$guardableColumns[get_class($this)])) {
-            static::$guardableColumns[get_class($this)] = $this->getConnection()
+        if (! isset(static::$guardableColumns[\get_class($this)])) {
+            static::$guardableColumns[\get_class($this)] = $this->getConnection()
                         ->getSchemaBuilder()
                         ->getColumnListing($this->getTable());
         }
 
-        return in_array($key, static::$guardableColumns[get_class($this)]);
+        return \in_array($key, static::$guardableColumns[\get_class($this)]);
     }
 
     /**
@@ -232,7 +232,7 @@ trait GuardsAttributes
      */
     public function totallyGuarded()
     {
-        return count($this->getFillable()) === 0 && $this->getGuarded() == ['*'];
+        return \count($this->getFillable()) === 0 && $this->getGuarded() == ['*'];
     }
 
     /**
@@ -243,7 +243,7 @@ trait GuardsAttributes
      */
     protected function fillableFromArray(array $attributes)
     {
-        if (count($this->getFillable()) > 0 && ! static::$unguarded) {
+        if (\count($this->getFillable()) > 0 && ! static::$unguarded) {
             return array_intersect_key($attributes, array_flip($this->getFillable()));
         }
 

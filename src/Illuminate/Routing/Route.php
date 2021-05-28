@@ -163,11 +163,11 @@ class Route
         $this->methods = (array) $methods;
         $this->action = Arr::except($this->parseAction($action), ['prefix']);
 
-        if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
+        if (\in_array('GET', $this->methods) && ! \in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
         }
 
-        $this->prefix(is_array($action) ? Arr::get($action, 'prefix') : '');
+        $this->prefix(\is_array($action) ? Arr::get($action, 'prefix') : '');
     }
 
     /**
@@ -210,7 +210,7 @@ class Route
      */
     protected function isControllerAction()
     {
-        return is_string($this->action['uses']) && ! $this->isSerializedClosure();
+        return \is_string($this->action['uses']) && ! $this->isSerializedClosure();
     }
 
     /**
@@ -366,7 +366,7 @@ class Route
     public function hasParameter($name)
     {
         if ($this->hasParameters()) {
-            return array_key_exists($name, $this->parameters());
+            return \array_key_exists($name, $this->parameters());
         }
 
         return false;
@@ -463,7 +463,7 @@ class Route
     public function parametersWithoutNulls()
     {
         return array_filter($this->parameters(), function ($p) {
-            return ! is_null($p);
+            return ! \is_null($p);
         });
     }
 
@@ -514,7 +514,7 @@ class Route
      */
     public function bindingFieldFor($parameter)
     {
-        $fields = is_int($parameter) ? array_values($this->bindingFields) : $this->bindingFields;
+        $fields = \is_int($parameter) ? array_values($this->bindingFields) : $this->bindingFields;
 
         return $fields[$parameter] ?? null;
     }
@@ -611,7 +611,7 @@ class Route
      */
     protected function parseWhere($name, $expression)
     {
-        return is_array($name) ? $name : [$name => $expression];
+        return \is_array($name) ? $name : [$name => $expression];
     }
 
     /**
@@ -671,7 +671,7 @@ class Route
      */
     public function httpOnly()
     {
-        return in_array('http', $this->action, true);
+        return \in_array('http', $this->action, true);
     }
 
     /**
@@ -691,7 +691,7 @@ class Route
      */
     public function secure()
     {
-        return in_array('https', $this->action, true);
+        return \in_array('https', $this->action, true);
     }
 
     /**
@@ -702,7 +702,7 @@ class Route
      */
     public function domain($domain = null)
     {
-        if (is_null($domain)) {
+        if (\is_null($domain)) {
             return $this->getDomain();
         }
 
@@ -837,7 +837,7 @@ class Route
      */
     public function named(...$patterns)
     {
-        if (is_null($routeName = $this->getName())) {
+        if (\is_null($routeName = $this->getName())) {
             return false;
         }
 
@@ -858,11 +858,11 @@ class Route
      */
     public function uses($action)
     {
-        if (is_array($action)) {
+        if (\is_array($action)) {
             $action = $action[0].'@'.$action[1];
         }
 
-        $action = is_string($action) ? $this->addGroupNamespaceToStringUses($action) : $action;
+        $action = \is_string($action) ? $this->addGroupNamespaceToStringUses($action) : $action;
 
         return $this->setAction(array_merge($this->action, $this->parseAction([
             'uses' => $action,
@@ -944,7 +944,7 @@ class Route
     {
         $missing = $this->action['missing'] ?? null;
 
-        return is_string($missing) &&
+        return \is_string($missing) &&
             Str::startsWith($missing, 'C:32:"Opis\\Closure\\SerializableClosure')
                 ? unserialize($missing)
                 : $missing;
@@ -970,7 +970,7 @@ class Route
      */
     public function gatherMiddleware()
     {
-        if (! is_null($this->computedMiddleware)) {
+        if (! \is_null($this->computedMiddleware)) {
             return $this->computedMiddleware;
         }
 
@@ -989,12 +989,12 @@ class Route
      */
     public function middleware($middleware = null)
     {
-        if (is_null($middleware)) {
+        if (\is_null($middleware)) {
             return (array) ($this->action['middleware'] ?? []);
         }
 
-        if (is_string($middleware)) {
-            $middleware = func_get_args();
+        if (\is_string($middleware)) {
+            $middleware = \func_get_args();
         }
 
         $this->action['middleware'] = array_merge(

@@ -221,7 +221,7 @@ trait AsPivot
      */
     public function hasTimestampAttributes($attributes = null)
     {
-        return array_key_exists($this->getCreatedAtColumn(), $attributes ?? $this->attributes);
+        return \array_key_exists($this->getCreatedAtColumn(), $attributes ?? $this->attributes);
     }
 
     /**
@@ -274,7 +274,7 @@ trait AsPivot
      */
     public function newQueryForRestoration($ids)
     {
-        if (is_array($ids)) {
+        if (\is_array($ids)) {
             return $this->newQueryForCollectionRestoration($ids);
         }
 

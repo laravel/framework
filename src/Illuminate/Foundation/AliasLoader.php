@@ -51,7 +51,7 @@ class AliasLoader
      */
     public static function getInstance(array $aliases = [])
     {
-        if (is_null(static::$instance)) {
+        if (\is_null(static::$instance)) {
             return static::$instance = new static($aliases);
         }
 
@@ -121,9 +121,9 @@ class AliasLoader
     protected function formatFacadeStub($alias, $stub)
     {
         $replacements = [
-            str_replace('/', '\\', dirname(str_replace('\\', '/', $alias))),
+            str_replace('/', '\\', \dirname(str_replace('\\', '/', $alias))),
             class_basename($alias),
-            substr($alias, strlen(static::$facadeNamespace)),
+            substr($alias, \strlen(static::$facadeNamespace)),
         ];
 
         return str_replace(

@@ -79,7 +79,7 @@ class QueueFake extends QueueManager implements Queue
                 return false;
             }
 
-            return $callback ? $callback(...func_get_args()) : true;
+            return $callback ? $callback(...\func_get_args()) : true;
         });
     }
 
@@ -159,7 +159,7 @@ class QueueFake extends QueueManager implements Queue
     {
         $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
             return collect($chain)->map(function ($job) {
-                return get_class(unserialize($job));
+                return \get_class(unserialize($job));
             });
         })->filter(function ($chain) use ($expectedChain) {
             return $chain->all() === $expectedChain;
@@ -179,7 +179,7 @@ class QueueFake extends QueueManager implements Queue
     protected function isChainOfObjects($chain)
     {
         return ! collect($chain)->contains(function ($job) {
-            return ! is_object($job);
+            return ! \is_object($job);
         });
     }
 
@@ -279,7 +279,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function push($job, $data = '', $queue = null)
     {
-        $this->jobs[is_object($job) ? get_class($job) : $job][] = [
+        $this->jobs[\is_object($job) ? \get_class($job) : $job][] = [
             'job' => $job,
             'queue' => $queue,
         ];

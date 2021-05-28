@@ -127,7 +127,7 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
          */
         private function toArray(iterable $other): array
         {
-            if (is_array($other)) {
+            if (\is_array($other)) {
                 return $other;
             }
 
@@ -260,7 +260,7 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
          */
         private function toArray(iterable $other): array
         {
-            if (is_array($other)) {
+            if (\is_array($other)) {
                 return $other;
             }
 

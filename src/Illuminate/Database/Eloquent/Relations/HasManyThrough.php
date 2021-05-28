@@ -134,7 +134,7 @@ class HasManyThrough extends Relation
      */
     public function throughParentSoftDeletes()
     {
-        return in_array(SoftDeletes::class, class_uses_recursive($this->throughParent));
+        return \in_array(SoftDeletes::class, class_uses_recursive($this->throughParent));
     }
 
     /**
@@ -234,7 +234,7 @@ class HasManyThrough extends Relation
      */
     public function firstOrNew(array $attributes)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (\is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes);
         }
 
@@ -281,7 +281,7 @@ class HasManyThrough extends Relation
     {
         $results = $this->take(1)->get($columns);
 
-        return count($results) > 0 ? $results->first() : null;
+        return \count($results) > 0 ? $results->first() : null;
     }
 
     /**
@@ -294,11 +294,11 @@ class HasManyThrough extends Relation
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
+        if (! \is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
+        throw (new ModelNotFoundException)->setModel(\get_class($this->related));
     }
 
     /**
@@ -310,7 +310,7 @@ class HasManyThrough extends Relation
      */
     public function find($id, $columns = ['*'])
     {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (\is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
 
@@ -354,15 +354,15 @@ class HasManyThrough extends Relation
 
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
-        if (is_array($id)) {
-            if (count($result) === count(array_unique($id))) {
+        if (\is_array($id)) {
+            if (\count($result) === \count(array_unique($id))) {
                 return $result;
             }
-        } elseif (! is_null($result)) {
+        } elseif (! \is_null($result)) {
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related), $id);
+        throw (new ModelNotFoundException)->setModel(\get_class($this->related), $id);
     }
 
     /**
@@ -372,7 +372,7 @@ class HasManyThrough extends Relation
      */
     public function getResults()
     {
-        return ! is_null($this->farParent->{$this->localKey})
+        return ! \is_null($this->farParent->{$this->localKey})
                 ? $this->get()
                 : $this->related->newCollection();
     }
@@ -392,7 +392,7 @@ class HasManyThrough extends Relation
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded. This will solve the
         // n + 1 query problem for the developer and also increase performance.
-        if (count($models) > 0) {
+        if (\count($models) > 0) {
             $models = $builder->eagerLoadRelations($models);
         }
 

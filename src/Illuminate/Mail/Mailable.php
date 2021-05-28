@@ -318,7 +318,7 @@ class Mailable implements MailableContract, Renderable
         $data = $this->viewData;
 
         if (static::$viewDataCallback) {
-            $data = array_merge($data, call_user_func(static::$viewDataCallback, $this));
+            $data = array_merge($data, \call_user_func(static::$viewDataCallback, $this));
         }
 
         foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
@@ -634,8 +634,8 @@ class Mailable implements MailableContract, Renderable
      */
     protected function addressesToArray($address, $name)
     {
-        if (! is_array($address) && ! $address instanceof Collection) {
-            $address = is_string($name) ? [['name' => $name, 'email' => $address]] : [$address];
+        if (! \is_array($address) && ! $address instanceof Collection) {
+            $address = \is_string($name) ? [['name' => $name, 'email' => $address]] : [$address];
         }
 
         return $address;
@@ -649,7 +649,7 @@ class Mailable implements MailableContract, Renderable
      */
     protected function normalizeRecipient($recipient)
     {
-        if (is_array($recipient)) {
+        if (\is_array($recipient)) {
             if (array_values($recipient) === $recipient) {
                 return (object) array_map(function ($email) {
                     return compact('email');
@@ -657,7 +657,7 @@ class Mailable implements MailableContract, Renderable
             }
 
             return (object) $recipient;
-        } elseif (is_string($recipient)) {
+        } elseif (\is_string($recipient)) {
             return (object) ['email' => $recipient];
         }
 
@@ -772,7 +772,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function with($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             $this->viewData = array_merge($this->viewData, $key);
         } else {
             $this->viewData[$key] = $value;
@@ -937,7 +937,7 @@ class Mailable implements MailableContract, Renderable
                 $view = $this->buildView(), $this->buildViewData()
             );
 
-            if (is_array($view) && isset($view[1])) {
+            if (\is_array($view) && isset($view[1])) {
                 $text = $view[1];
             }
 

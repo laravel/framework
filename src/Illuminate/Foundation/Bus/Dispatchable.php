@@ -14,7 +14,7 @@ trait Dispatchable
      */
     public static function dispatch()
     {
-        return new PendingDispatch(new static(...func_get_args()));
+        return new PendingDispatch(new static(...\func_get_args()));
     }
 
     /**
@@ -54,7 +54,7 @@ trait Dispatchable
      */
     public static function dispatchSync()
     {
-        return app(Dispatcher::class)->dispatchSync(new static(...func_get_args()));
+        return app(Dispatcher::class)->dispatchSync(new static(...\func_get_args()));
     }
 
     /**
@@ -66,7 +66,7 @@ trait Dispatchable
      */
     public static function dispatchNow()
     {
-        return app(Dispatcher::class)->dispatchNow(new static(...func_get_args()));
+        return app(Dispatcher::class)->dispatchNow(new static(...\func_get_args()));
     }
 
     /**
@@ -76,7 +76,7 @@ trait Dispatchable
      */
     public static function dispatchAfterResponse()
     {
-        return app(Dispatcher::class)->dispatchAfterResponse(new static(...func_get_args()));
+        return app(Dispatcher::class)->dispatchAfterResponse(new static(...\func_get_args()));
     }
 
     /**

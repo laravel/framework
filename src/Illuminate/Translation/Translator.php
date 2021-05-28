@@ -122,7 +122,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             $locales = $fallback ? $this->localeArray($locale) : [$locale];
 
             foreach ($locales as $locale) {
-                if (! is_null($line = $this->getLine(
+                if (! \is_null($line = $this->getLine(
                     $namespace, $group, $locale, $item, $replace
                 ))) {
                     return $line;
@@ -154,8 +154,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // If the given "number" is actually an array or countable we will simply count the
         // number of elements in an instance. This allows developers to pass an array of
         // items without having to count it on their end first which gives bad syntax.
-        if (is_array($number) || $number instanceof Countable) {
-            $number = count($number);
+        if (\is_array($number) || $number instanceof Countable) {
+            $number = \count($number);
         }
 
         $replace['count'] = $number;
@@ -192,9 +192,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
 
-        if (is_string($line)) {
+        if (\is_string($line)) {
             return $this->makeReplacements($line, $replace);
-        } elseif (is_array($line) && count($line) > 0) {
+        } elseif (\is_array($line) && \count($line) > 0) {
             foreach ($line as $key => $value) {
                 $line[$key] = $this->makeReplacements($value, $replace);
             }
@@ -327,7 +327,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $segments = parent::parseKey($key);
 
-        if (is_null($segments[0])) {
+        if (\is_null($segments[0])) {
             $segments[0] = '*';
         }
 

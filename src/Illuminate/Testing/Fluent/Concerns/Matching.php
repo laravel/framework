@@ -24,7 +24,7 @@ trait Matching
 
         if ($expected instanceof Closure) {
             PHPUnit::assertTrue(
-                $expected(is_array($actual) ? Collection::make($actual) : $actual),
+                $expected(\is_array($actual) ? Collection::make($actual) : $actual),
                 sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
             );
 
@@ -75,12 +75,12 @@ trait Matching
 
         $actual = $this->prop($key);
 
-        if (! is_array($expected)) {
+        if (! \is_array($expected)) {
             $expected = explode('|', $expected);
         }
 
         PHPUnit::assertContains(
-            strtolower(gettype($actual)),
+            strtolower(\gettype($actual)),
             $expected,
             sprintf('Property [%s] is not of expected type [%s].', $this->dotPath($key), implode('|', $expected))
         );
@@ -111,7 +111,7 @@ trait Matching
      */
     protected function ensureSorted(&$value): void
     {
-        if (! is_array($value)) {
+        if (! \is_array($value)) {
             return;
         }
 

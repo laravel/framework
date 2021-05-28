@@ -42,7 +42,7 @@ class PostgresBuilder extends Builder
 
         $table = $this->connection->getTablePrefix().$table;
 
-        return count($this->connection->select(
+        return \count($this->connection->select(
             $this->grammar->compileTableExists(), [$schema, $table]
         )) > 0;
     }
@@ -63,7 +63,7 @@ class PostgresBuilder extends Builder
 
             $table = reset($row);
 
-            if (! in_array($table, $excludedTables)) {
+            if (! \in_array($table, $excludedTables)) {
                 $tables[] = $table;
             }
         }
@@ -190,8 +190,8 @@ class PostgresBuilder extends Builder
     {
         $table = explode('.', $table);
 
-        if (is_array($schema = $this->connection->getConfig('schema'))) {
-            if (in_array($table[0], $schema)) {
+        if (\is_array($schema = $this->connection->getConfig('schema'))) {
+            if (\in_array($table[0], $schema)) {
                 return [array_shift($table), implode('.', $table)];
             }
 

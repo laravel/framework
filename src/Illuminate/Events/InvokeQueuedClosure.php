@@ -13,7 +13,7 @@ class InvokeQueuedClosure
      */
     public function handle($closure, array $arguments)
     {
-        call_user_func($closure->getClosure(), ...$arguments);
+        \call_user_func($closure->getClosure(), ...$arguments);
     }
 
     /**

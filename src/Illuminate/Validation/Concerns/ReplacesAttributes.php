@@ -273,7 +273,7 @@ trait ReplacesAttributes
      */
     protected function replaceGt($message, $attribute, $rule, $parameters)
     {
-        if (is_null($value = $this->getValue($parameters[0]))) {
+        if (\is_null($value = $this->getValue($parameters[0]))) {
             return str_replace(':value', $this->getDisplayableAttribute($parameters[0]), $message);
         }
 
@@ -291,7 +291,7 @@ trait ReplacesAttributes
      */
     protected function replaceLt($message, $attribute, $rule, $parameters)
     {
-        if (is_null($value = $this->getValue($parameters[0]))) {
+        if (\is_null($value = $this->getValue($parameters[0]))) {
             return str_replace(':value', $this->getDisplayableAttribute($parameters[0]), $message);
         }
 
@@ -309,7 +309,7 @@ trait ReplacesAttributes
      */
     protected function replaceGte($message, $attribute, $rule, $parameters)
     {
-        if (is_null($value = $this->getValue($parameters[0]))) {
+        if (\is_null($value = $this->getValue($parameters[0]))) {
             return str_replace(':value', $this->getDisplayableAttribute($parameters[0]), $message);
         }
 
@@ -327,7 +327,7 @@ trait ReplacesAttributes
      */
     protected function replaceLte($message, $attribute, $rule, $parameters)
     {
-        if (is_null($value = $this->getValue($parameters[0]))) {
+        if (\is_null($value = $this->getValue($parameters[0]))) {
             return str_replace(':value', $this->getDisplayableAttribute($parameters[0]), $message);
         }
 
@@ -367,7 +367,7 @@ trait ReplacesAttributes
 
         $values = [];
 
-        foreach (array_slice($parameters, 1) as $value) {
+        foreach (\array_slice($parameters, 1) as $value) {
             $values[] = $this->getDisplayableValue($parameters[0], $value);
         }
 
@@ -407,7 +407,7 @@ trait ReplacesAttributes
 
         $values = [];
 
-        foreach (array_slice($parameters, 1) as $value) {
+        foreach (\array_slice($parameters, 1) as $value) {
             $values[] = $this->getDisplayableValue($parameters[0], $value);
         }
 
@@ -515,7 +515,7 @@ trait ReplacesAttributes
     {
         $parameters = $this->parseNamedParameters($parameters);
 
-        if (is_array($parameters)) {
+        if (\is_array($parameters)) {
             foreach ($parameters as $key => $value) {
                 $message = str_replace(':'.$key, $value, $message);
             }

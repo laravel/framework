@@ -64,7 +64,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function has($key)
     {
-        return array_key_exists($key, $this->attributes);
+        return \array_key_exists($key, $this->attributes);
     }
 
     /**
@@ -75,7 +75,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function only($keys)
     {
-        if (is_null($keys)) {
+        if (\is_null($keys)) {
             $values = $this->attributes;
         } else {
             $keys = Arr::wrap($keys);
@@ -94,7 +94,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function except($keys)
     {
-        if (is_null($keys)) {
+        if (\is_null($keys)) {
             $values = $this->attributes;
         } else {
             $keys = Arr::wrap($keys);
@@ -242,9 +242,9 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             return false;
         }
 
-        return ! is_object($value) &&
-               ! is_null($value) &&
-               ! is_bool($value);
+        return ! \is_object($value) &&
+               ! \is_null($value) &&
+               ! \is_bool($value);
     }
 
     /**
@@ -391,7 +391,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         $string = '';
 
         foreach ($this->attributes as $key => $value) {
-            if ($value === false || is_null($value)) {
+            if ($value === false || \is_null($value)) {
                 continue;
             }
 

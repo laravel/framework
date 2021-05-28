@@ -196,7 +196,7 @@ class Kernel implements KernelContract
         );
 
         foreach ($middlewares as $middleware) {
-            if (! is_string($middleware)) {
+            if (! \is_string($middleware)) {
                 continue;
             }
 
@@ -235,7 +235,7 @@ class Kernel implements KernelContract
     {
         [$name, $parameters] = array_pad(explode(':', $middleware, 2), 2, []);
 
-        if (is_string($parameters)) {
+        if (\is_string($parameters)) {
             $parameters = explode(',', $parameters);
         }
 
@@ -250,7 +250,7 @@ class Kernel implements KernelContract
      */
     public function hasMiddleware($middleware)
     {
-        return in_array($middleware, $this->middleware);
+        return \in_array($middleware, $this->middleware);
     }
 
     /**
@@ -339,7 +339,7 @@ class Kernel implements KernelContract
      */
     public function prependToMiddlewarePriority($middleware)
     {
-        if (! in_array($middleware, $this->middlewarePriority)) {
+        if (! \in_array($middleware, $this->middlewarePriority)) {
             array_unshift($this->middlewarePriority, $middleware);
         }
 
@@ -356,7 +356,7 @@ class Kernel implements KernelContract
      */
     public function appendToMiddlewarePriority($middleware)
     {
-        if (! in_array($middleware, $this->middlewarePriority)) {
+        if (! \in_array($middleware, $this->middlewarePriority)) {
             $this->middlewarePriority[] = $middleware;
         }
 

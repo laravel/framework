@@ -78,8 +78,8 @@ class Kernel implements KernelContract
      */
     public function __construct(Application $app, Dispatcher $events)
     {
-        if (! defined('ARTISAN_BINARY')) {
-            define('ARTISAN_BINARY', 'artisan');
+        if (! \defined('ARTISAN_BINARY')) {
+            \define('ARTISAN_BINARY', 'artisan');
         }
 
         $this->app = $app;
@@ -272,7 +272,7 @@ class Kernel implements KernelContract
      */
     public function queue($command, array $parameters = [])
     {
-        return QueuedCommand::dispatch(func_get_args());
+        return QueuedCommand::dispatch(\func_get_args());
     }
 
     /**
@@ -326,7 +326,7 @@ class Kernel implements KernelContract
      */
     protected function getArtisan()
     {
-        if (is_null($this->artisan)) {
+        if (\is_null($this->artisan)) {
             return $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
                                 ->resolveCommands($this->commands);
         }

@@ -30,7 +30,7 @@ class ParallelTestingTest extends TestCase
         $this->assertFalse($state);
 
         $parallelTesting->{$callback}(function ($token, $testCase = null) use ($callback, &$state) {
-            if (in_array($callback, ['setUpTestCase', 'tearDownTestCase'])) {
+            if (\in_array($callback, ['setUpTestCase', 'tearDownTestCase'])) {
                 $this->assertSame($this, $testCase);
             } else {
                 $this->assertNull($testCase);

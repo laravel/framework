@@ -60,7 +60,7 @@ class StatusCommand extends BaseCommand
 
             $batches = $this->migrator->getRepository()->getMigrationBatches();
 
-            if (count($migrations = $this->getStatusFor($ran, $batches)) > 0) {
+            if (\count($migrations = $this->getStatusFor($ran, $batches)) > 0) {
                 $this->table(['Ran?', 'Migration', 'Batch'], $migrations);
             } else {
                 $this->error('No migrations found');
@@ -81,7 +81,7 @@ class StatusCommand extends BaseCommand
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 
-                        return in_array($migrationName, $ran)
+                        return \in_array($migrationName, $ran)
                                 ? ['<info>Yes</info>', $migrationName, $batches[$migrationName]]
                                 : ['<fg=red>No</fg=red>', $migrationName];
                     });

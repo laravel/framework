@@ -454,7 +454,7 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__test.route_inject']);
         $router = $this->getRouter();
         $router->get('foo/{var}', function (stdClass $foo, $var) {
-            $_SERVER['__test.route_inject'] = func_get_args();
+            $_SERVER['__test.route_inject'] = \func_get_args();
 
             return 'hello';
         });
@@ -1226,7 +1226,7 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
         $router->bind('bar', function ($value) {
-            return strlen($value);
+            return \strlen($value);
         });
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
@@ -2051,7 +2051,7 @@ class RouteTestControllerMiddleware
     {
         $_SERVER['route.test.controller.middleware'] = true;
         $response = $next($request);
-        $_SERVER['route.test.controller.middleware.class'] = get_class($response);
+        $_SERVER['route.test.controller.middleware.class'] = \get_class($response);
 
         return $response;
     }

@@ -38,7 +38,7 @@ abstract class Seeder
         foreach ($classes as $class) {
             $seeder = $this->resolve($class);
 
-            $name = get_class($seeder);
+            $name = \get_class($seeder);
 
             if ($silent === false && isset($this->command)) {
                 $this->command->getOutput()->writeln("<comment>Seeding:</comment> {$name}");
@@ -142,7 +142,7 @@ abstract class Seeder
     public function __invoke(array $parameters = [])
     {
         if (! method_exists($this, 'run')) {
-            throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
+            throw new InvalidArgumentException('Method [run] missing from '.\get_class($this));
         }
 
         return isset($this->container)

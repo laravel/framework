@@ -23,7 +23,7 @@ class HasherTest extends TestCase
 
     public function testBasicArgon2iHashing()
     {
-        if (! defined('PASSWORD_ARGON2I')) {
+        if (! \defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('PHP not compiled with Argon2i hashing support.');
         }
 
@@ -38,7 +38,7 @@ class HasherTest extends TestCase
 
     public function testBasicArgon2idHashing()
     {
-        if (! defined('PASSWORD_ARGON2ID')) {
+        if (! \defined('PASSWORD_ARGON2ID')) {
             $this->markTestSkipped('PHP not compiled with Argon2id hashing support.');
         }
 
@@ -58,7 +58,7 @@ class HasherTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-        if (! defined('PASSWORD_ARGON2I')) {
+        if (! \defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('PHP not compiled with Argon2i hashing support.');
         }
 

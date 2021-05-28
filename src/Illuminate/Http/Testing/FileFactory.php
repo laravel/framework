@@ -16,7 +16,7 @@ class FileFactory
      */
     public function create($name, $kilobytes = 0, $mimeType = null)
     {
-        if (is_string($kilobytes)) {
+        if (\is_string($kilobytes)) {
             return $this->createWithContent($name, $kilobytes);
         }
 

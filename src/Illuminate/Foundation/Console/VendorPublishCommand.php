@@ -112,7 +112,7 @@ class VendorPublishCommand extends Command
             $choices = $this->publishableChoices()
         );
 
-        if ($choice == $choices[0] || is_null($choice)) {
+        if ($choice == $choices[0] || \is_null($choice)) {
             return;
         }
 
@@ -216,7 +216,7 @@ class VendorPublishCommand extends Command
     protected function publishFile($from, $to)
     {
         if (! $this->files->exists($to) || $this->option('force')) {
-            $this->createParentDirectory(dirname($to));
+            $this->createParentDirectory(\dirname($to));
 
             $this->files->copy($from, $to);
 

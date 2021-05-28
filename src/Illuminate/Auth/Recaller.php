@@ -71,7 +71,7 @@ class Recaller
      */
     protected function properString()
     {
-        return is_string($this->recaller) && Str::contains($this->recaller, '|');
+        return \is_string($this->recaller) && Str::contains($this->recaller, '|');
     }
 
     /**
@@ -83,6 +83,6 @@ class Recaller
     {
         $segments = explode('|', $this->recaller);
 
-        return count($segments) === 3 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
+        return \count($segments) === 3 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
     }
 }

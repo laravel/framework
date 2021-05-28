@@ -140,7 +140,7 @@ class UploadedFile extends SymfonyUploadedFile
      */
     protected function parseOptions($options)
     {
-        if (is_string($options)) {
+        if (\is_string($options)) {
             $options = ['disk' => $options];
         }
 

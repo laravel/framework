@@ -108,7 +108,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function formatSchema($schema)
     {
-        if (is_array($schema)) {
+        if (\is_array($schema)) {
             return '"'.implode('", "', $schema).'"';
         }
 

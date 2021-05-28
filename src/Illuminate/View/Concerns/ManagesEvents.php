@@ -77,7 +77,7 @@ trait ManagesEvents
             $this->addEventListener($prefix.$view, $callback);
 
             return $callback;
-        } elseif (is_string($callback)) {
+        } elseif (\is_string($callback)) {
             return $this->addClassEvent($view, $callback, $prefix);
         }
     }
@@ -121,7 +121,7 @@ trait ManagesEvents
         // the instance out of the IoC container and call the method on it with the
         // given arguments that are passed to the Closure as the composer's data.
         return function () use ($class, $method) {
-            return $this->container->make($class)->{$method}(...func_get_args());
+            return $this->container->make($class)->{$method}(...\func_get_args());
         };
     }
 

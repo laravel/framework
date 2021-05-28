@@ -229,7 +229,7 @@ class ValidationPasswordRuleTest extends TestCase
             $v = new Validator(
                 resolve('translator'),
                 ['my_password' => $value, 'my_password_confirmation' => $value],
-                ['my_password' => is_object($rule) ? clone $rule : $rule]
+                ['my_password' => \is_object($rule) ? clone $rule : $rule]
             );
 
             $this->assertSame($result, $v->passes());

@@ -51,11 +51,11 @@ class PhpRedisLock extends RedisLock
         // https://github.com/phpredis/phpredis/issues/1938
         if ($this->compressed()) {
             if ($this->lzfCompressed()) {
-                $owner = \lzf_compress($owner);
+                $owner = lzf_compress($owner);
             } elseif ($this->zstdCompressed()) {
-                $owner = \zstd_compress($owner, $client->getOption(Redis::OPT_COMPRESSION_LEVEL));
+                $owner = zstd_compress($owner, $client->getOption(Redis::OPT_COMPRESSION_LEVEL));
             } elseif ($this->lz4Compressed()) {
-                $owner = \lz4_compress($owner, $client->getOption(Redis::OPT_COMPRESSION_LEVEL));
+                $owner = lz4_compress($owner, $client->getOption(Redis::OPT_COMPRESSION_LEVEL));
             } else {
                 throw new UnexpectedValueException(sprintf(
                     'Unknown phpredis compression in use [%d]. Unable to release lock.',
@@ -84,7 +84,7 @@ class PhpRedisLock extends RedisLock
      */
     protected function lzfCompressed(): bool
     {
-        return defined('Redis::COMPRESSION_LZF') &&
+        return \defined('Redis::COMPRESSION_LZF') &&
                $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZF;
     }
 
@@ -95,7 +95,7 @@ class PhpRedisLock extends RedisLock
      */
     protected function zstdCompressed(): bool
     {
-        return defined('Redis::COMPRESSION_ZSTD') &&
+        return \defined('Redis::COMPRESSION_ZSTD') &&
                $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_ZSTD;
     }
 
@@ -106,7 +106,7 @@ class PhpRedisLock extends RedisLock
      */
     protected function lz4Compressed(): bool
     {
-        return defined('Redis::COMPRESSION_LZ4') &&
+        return \defined('Redis::COMPRESSION_LZ4') &&
                $this->redis->client()->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZ4;
     }
 }

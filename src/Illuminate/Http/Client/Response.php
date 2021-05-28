@@ -61,7 +61,7 @@ class Response implements ArrayAccess
             $this->decoded = json_decode($this->body(), true);
         }
 
-        if (is_null($key)) {
+        if (\is_null($key)) {
             return $this->decoded;
         }
 
@@ -259,11 +259,11 @@ class Response implements ArrayAccess
      */
     public function throw()
     {
-        $callback = func_get_args()[0] ?? null;
+        $callback = \func_get_args()[0] ?? null;
 
         if ($this->failed()) {
             throw tap($this->toException(), function ($exception) use ($callback) {
-                if ($callback && is_callable($callback)) {
+                if ($callback && \is_callable($callback)) {
                     $callback($this, $exception);
                 }
             });

@@ -339,7 +339,7 @@ class Event
      */
     public function runsInEnvironment($environment)
     {
-        return empty($this->environments) || in_array($environment, $this->environments);
+        return empty($this->environments) || \in_array($environment, $this->environments);
     }
 
     /**
@@ -461,7 +461,7 @@ class Event
      */
     protected function ensureOutputIsBeingCaptured()
     {
-        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
+        if (\is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
         }
     }
@@ -619,7 +619,7 @@ class Event
      */
     public function environments($environments)
     {
-        $this->environments = is_array($environments) ? $environments : func_get_args();
+        $this->environments = \is_array($environments) ? $environments : \func_get_args();
 
         return $this;
     }
@@ -873,7 +873,7 @@ class Event
      */
     public function getSummaryForDisplay()
     {
-        if (is_string($this->description)) {
+        if (\is_string($this->description)) {
             return $this->description;
         }
 

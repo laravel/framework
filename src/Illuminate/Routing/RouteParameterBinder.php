@@ -37,7 +37,7 @@ class RouteParameterBinder
         // If the route has a regular expression for the host part of the URI, we will
         // compile that and get the parameter matches for this domain. We will then
         // merge them into this parameters array so that this array is completed.
-        if (! is_null($this->route->compiled->getHostRegex())) {
+        if (! \is_null($this->route->compiled->getHostRegex())) {
             $parameters = $this->bindHostParameters(
                 $request, $parameters
             );
@@ -58,7 +58,7 @@ class RouteParameterBinder
 
         preg_match($this->route->compiled->getRegex(), $path, $matches);
 
-        return $this->matchToKeys(array_slice($matches, 1));
+        return $this->matchToKeys(\array_slice($matches, 1));
     }
 
     /**
@@ -72,7 +72,7 @@ class RouteParameterBinder
     {
         preg_match($this->route->compiled->getHostRegex(), $request->getHost(), $matches);
 
-        return array_merge($this->matchToKeys(array_slice($matches, 1)), $parameters);
+        return array_merge($this->matchToKeys(\array_slice($matches, 1)), $parameters);
     }
 
     /**
@@ -90,7 +90,7 @@ class RouteParameterBinder
         $parameters = array_intersect_key($matches, array_flip($parameterNames));
 
         return array_filter($parameters, function ($value) {
-            return is_string($value) && strlen($value) > 0;
+            return \is_string($value) && \strlen($value) > 0;
         });
     }
 

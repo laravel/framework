@@ -38,6 +38,6 @@ class RequestException extends HttpClientException
             ? \GuzzleHttp\Psr7\Message::bodySummary($response->toPsrResponse())
             : \GuzzleHttp\Psr7\get_message_body_summary($response->toPsrResponse());
 
-        return is_null($summary) ? $message : $message .= ":\n{$summary}\n";
+        return \is_null($summary) ? $message : $message .= ":\n{$summary}\n";
     }
 }

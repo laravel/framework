@@ -117,7 +117,7 @@ trait InteractsWithDatabase
     protected function isSoftDeletableModel($model)
     {
         return $model instanceof Model
-            && in_array(SoftDeletes::class, class_uses_recursive($model));
+            && \in_array(SoftDeletes::class, class_uses_recursive($model));
     }
 
     /**
@@ -130,7 +130,7 @@ trait InteractsWithDatabase
     {
         if ($value instanceof Jsonable) {
             $value = $value->toJson();
-        } elseif (is_array($value)) {
+        } elseif (\is_array($value)) {
             $value = json_encode($value);
         }
 

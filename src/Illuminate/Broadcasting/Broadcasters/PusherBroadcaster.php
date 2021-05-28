@@ -134,7 +134,7 @@ class PusherBroadcaster extends Broadcaster
                 $this->formatChannels($channels), $event, $payload, $socket, true
             );
 
-            if ((is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)
+            if ((\is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)
                 || $response === true) {
                 return;
             }

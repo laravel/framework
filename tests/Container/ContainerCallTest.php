@@ -125,14 +125,14 @@ class ContainerCallTest extends TestCase
     {
         $container = new Container;
         $result = $container->call(function (stdClass $foo, $bar = []) {
-            return func_get_args();
+            return \func_get_args();
         });
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertEquals([], $result[1]);
 
         $result = $container->call(function (stdClass $foo, $bar = []) {
-            return func_get_args();
+            return \func_get_args();
         }, ['bar' => 'taylor']);
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
@@ -140,7 +140,7 @@ class ContainerCallTest extends TestCase
 
         $stub = new ContainerCallConcreteStub;
         $result = $container->call(function (stdClass $foo, ContainerCallConcreteStub $bar) {
-            return func_get_args();
+            return \func_get_args();
         }, [ContainerCallConcreteStub::class => $stub]);
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
@@ -150,7 +150,7 @@ class ContainerCallTest extends TestCase
          * Wrap a function...
          */
         $result = $container->wrap(function (stdClass $foo, $bar = []) {
-            return func_get_args();
+            return \func_get_args();
         }, ['bar' => 'taylor']);
 
         $this->assertInstanceOf(Closure::class, $result);
@@ -212,17 +212,17 @@ class ContainerTestCallStub
 {
     public function work()
     {
-        return func_get_args();
+        return \func_get_args();
     }
 
     public function inject(ContainerCallConcreteStub $stub, $default = 'taylor')
     {
-        return func_get_args();
+        return \func_get_args();
     }
 
     public function unresolvable($foo, $bar)
     {
-        return func_get_args();
+        return \func_get_args();
     }
 }
 
@@ -233,14 +233,14 @@ class ContainerCallConcreteStub
 
 function containerTestInject(ContainerCallConcreteStub $stub, $default = 'taylor')
 {
-    return func_get_args();
+    return \func_get_args();
 }
 
 class ContainerStaticMethodStub
 {
     public static function inject(ContainerCallConcreteStub $stub, $default = 'taylor')
     {
-        return func_get_args();
+        return \func_get_args();
     }
 }
 
@@ -248,7 +248,7 @@ class ContainerCallCallableStub
 {
     public function __invoke(ContainerCallConcreteStub $stub, $default = 'jeffrey')
     {
-        return func_get_args();
+        return \func_get_args();
     }
 }
 

@@ -102,7 +102,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     public function linkCollection()
     {
         return collect($this->elements())->flatMap(function ($item) {
-            if (! is_array($item)) {
+            if (! \is_array($item)) {
                 return [['url' => null, 'label' => '...', 'active' => false]];
             }
 
@@ -115,11 +115,11 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
             });
         })->prepend([
             'url' => $this->previousPageUrl(),
-            'label' => function_exists('__') ? __('pagination.previous') : 'Previous',
+            'label' => \function_exists('__') ? __('pagination.previous') : 'Previous',
             'active' => false,
         ])->push([
             'url' => $this->nextPageUrl(),
-            'label' => function_exists('__') ? __('pagination.next') : 'Next',
+            'label' => \function_exists('__') ? __('pagination.next') : 'Next',
             'active' => false,
         ]);
     }
@@ -135,9 +135,9 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
 
         return array_filter([
             $window['first'],
-            is_array($window['slider']) ? '...' : null,
+            \is_array($window['slider']) ? '...' : null,
             $window['slider'],
-            is_array($window['last']) ? '...' : null,
+            \is_array($window['last']) ? '...' : null,
             $window['last'],
         ]);
     }

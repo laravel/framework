@@ -169,7 +169,7 @@ trait ManagesFrequencies
      */
     public function hourlyAt($offset)
     {
-        $offset = is_array($offset) ? implode(',', $offset) : $offset;
+        $offset = \is_array($offset) ? implode(',', $offset) : $offset;
 
         return $this->spliceIntoPosition(1, $offset);
     }
@@ -251,7 +251,7 @@ trait ManagesFrequencies
         $segments = explode(':', $time);
 
         return $this->spliceIntoPosition(2, (int) $segments[0])
-                    ->spliceIntoPosition(1, count($segments) === 2 ? (int) $segments[1] : '0');
+                    ->spliceIntoPosition(1, \count($segments) === 2 ? (int) $segments[1] : '0');
     }
 
     /**
@@ -491,7 +491,7 @@ trait ManagesFrequencies
      */
     public function days($days)
     {
-        $days = is_array($days) ? $days : func_get_args();
+        $days = \is_array($days) ? $days : \func_get_args();
 
         return $this->spliceIntoPosition(5, implode(',', $days));
     }

@@ -87,7 +87,7 @@ abstract class Facade
                     ? static::$resolvedInstance[$name]
                     : static::createFreshMockInstance();
 
-        return $mock->shouldReceive(...func_get_args());
+        return $mock->shouldReceive(...\func_get_args());
     }
 
     /**
@@ -137,7 +137,7 @@ abstract class Facade
     protected static function getMockableClass()
     {
         if ($root = static::getFacadeRoot()) {
-            return get_class($root);
+            return \get_class($root);
         }
     }
 
@@ -186,7 +186,7 @@ abstract class Facade
      */
     protected static function resolveFacadeInstance($name)
     {
-        if (is_object($name)) {
+        if (\is_object($name)) {
             return $name;
         }
 

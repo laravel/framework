@@ -34,7 +34,7 @@ trait InteractsWithPivotTable
             array_keys($records)
         ));
 
-        if (count($detach) > 0) {
+        if (\count($detach) > 0) {
             $this->detach($detach, false);
 
             $changes['detached'] = $this->castKeys($detach);
@@ -45,7 +45,7 @@ trait InteractsWithPivotTable
         // this change list and get ready to return these results to the callers.
         $attach = array_diff_key($records, array_flip($detach));
 
-        if (count($attach) > 0) {
+        if (\count($attach) > 0) {
             $this->attach($attach, [], false);
 
             $changes['attached'] = array_keys($attach);
@@ -54,8 +54,8 @@ trait InteractsWithPivotTable
         // Once we have finished attaching or detaching the records, we will see if we
         // have done any attaching or detaching, and if we have we will touch these
         // relationships if they are configured to touch on any database updates.
-        if ($touch && (count($changes['attached']) ||
-                       count($changes['detached']))) {
+        if ($touch && (\count($changes['attached']) ||
+                       \count($changes['detached']))) {
             $this->touchIfTouching();
         }
 
@@ -99,7 +99,7 @@ trait InteractsWithPivotTable
         // Next, we will take the differences of the currents and given IDs and detach
         // all of the entities that exist in the "current" array but are not in the
         // array of the new IDs given to the method which will complete the sync.
-        if ($detaching && count($detach) > 0) {
+        if ($detaching && \count($detach) > 0) {
             $this->detach($detach);
 
             $changes['detached'] = $this->castKeys($detach);
@@ -115,8 +115,8 @@ trait InteractsWithPivotTable
         // Once we have finished attaching or detaching the records, we will see if we
         // have done any attaching or detaching, and if we have we will touch these
         // relationships if they are configured to touch on any database updates.
-        if (count($changes['attached']) ||
-            count($changes['updated'])) {
+        if (\count($changes['attached']) ||
+            \count($changes['updated'])) {
             $this->touchIfTouching();
         }
 
@@ -147,7 +147,7 @@ trait InteractsWithPivotTable
     protected function formatRecordsList(array $records)
     {
         return collect($records)->mapWithKeys(function ($attributes, $id) {
-            if (! is_array($attributes)) {
+            if (! \is_array($attributes)) {
                 [$id, $attributes] = [$attributes, []];
             }
 
@@ -171,7 +171,7 @@ trait InteractsWithPivotTable
             // If the ID is not in the list of existing pivot IDs, we will insert a new pivot
             // record, otherwise, we will just update this existing record on this joining
             // table, so that the developers will easily update these records pain free.
-            if (! in_array($id, $current)) {
+            if (! \in_array($id, $current)) {
                 $this->attach($id, $attributes, $touch);
 
                 $changes['attached'][] = $this->castKey($id);
@@ -180,7 +180,7 @@ trait InteractsWithPivotTable
             // Now we'll try to update an existing pivot record with the attributes that were
             // given to the method. If the model is actually updated we will add it to the
             // list of updated pivot records so we return them back out to the consumer.
-            elseif (count($attributes) > 0 &&
+            elseif (\count($attributes) > 0 &&
                 $this->updateExistingPivot($id, $attributes, $touch)) {
                 $changes['updated'][] = $this->castKey($id);
             }
@@ -206,7 +206,7 @@ trait InteractsWithPivotTable
             return $this->updateExistingPivotUsingCustomClass($id, $attributes, $touch);
         }
 
-        if (in_array($this->updatedAt(), $this->pivotColumns)) {
+        if (\in_array($this->updatedAt(), $this->pivotColumns)) {
             $attributes = $this->addTimestampsToAttachment($attributes, true);
         }
 
@@ -347,7 +347,7 @@ trait InteractsWithPivotTable
      */
     protected function extractAttachIdAndAttributes($key, $value, array $attributes)
     {
-        return is_array($value)
+        return \is_array($value)
                     ? [$key, array_merge($value, $attributes)]
                     : [$value, $attributes];
     }
@@ -415,7 +415,7 @@ trait InteractsWithPivotTable
      */
     public function hasPivotColumn($column)
     {
-        return in_array($column, $this->pivotColumns);
+        return \in_array($column, $this->pivotColumns);
     }
 
     /**
@@ -439,7 +439,7 @@ trait InteractsWithPivotTable
             // If associated IDs were passed to the method we will only delete those
             // associations, otherwise all of the association ties will be broken.
             // We'll return the numbers of affected rows when we do the deletes.
-            if (! is_null($ids)) {
+            if (! \is_null($ids)) {
                 $ids = $this->parseIds($ids);
 
                 if (empty($ids)) {
@@ -579,7 +579,7 @@ trait InteractsWithPivotTable
     public function withPivot($columns)
     {
         $this->pivotColumns = array_merge(
-            $this->pivotColumns, is_array($columns) ? $columns : func_get_args()
+            $this->pivotColumns, \is_array($columns) ? $columns : \func_get_args()
         );
 
         return $this;

@@ -124,7 +124,7 @@ class Migrator
     {
         return Collection::make($files)
                 ->reject(function ($file) use ($ran) {
-                    return in_array($this->getMigrationName($file), $ran);
+                    return \in_array($this->getMigrationName($file), $ran);
                 })->values()->all();
     }
 
@@ -140,7 +140,7 @@ class Migrator
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware
         // that all of the migrations have been run against this database system.
-        if (count($migrations) === 0) {
+        if (\count($migrations) === 0) {
             $this->fireMigrationEvent(new NoPendingMigrations('up'));
 
             $this->note('<info>Nothing to migrate.</info>');
@@ -224,7 +224,7 @@ class Migrator
         // of them "down" to reverse the last migration "operation" which ran.
         $migrations = $this->getMigrationsForRollback($options);
 
-        if (count($migrations) === 0) {
+        if (\count($migrations) === 0) {
             $this->fireMigrationEvent(new NoPendingMigrations('down'));
 
             $this->note('<info>Nothing to rollback.</info>');
@@ -305,7 +305,7 @@ class Migrator
         // the database back into its "empty" state ready for the migrations.
         $migrations = array_reverse($this->repository->getRan());
 
-        if (count($migrations) === 0) {
+        if (\count($migrations) === 0) {
             $this->note('<info>Nothing to rollback.</info>');
 
             return [];
@@ -412,7 +412,7 @@ class Migrator
     protected function pretendToRun($migration, $method)
     {
         foreach ($this->getQueries($migration, $method) as $query) {
-            $name = get_class($migration);
+            $name = \get_class($migration);
 
             $reflectionClass = new ReflectionClass($migration);
 
@@ -476,7 +476,7 @@ class Migrator
 
         $migration = $this->files->getRequire($path);
 
-        return is_object($migration) ? $migration : new $class;
+        return \is_object($migration) ? $migration : new $class;
     }
 
     /**
@@ -487,7 +487,7 @@ class Migrator
      */
     protected function getMigrationClass(string $migrationName): string
     {
-        return Str::studly(implode('_', array_slice(explode('_', $migrationName), 4)));
+        return Str::studly(implode('_', \array_slice(explode('_', $migrationName), 4)));
     }
 
     /**
@@ -588,7 +588,7 @@ class Migrator
      */
     public function setConnection($name)
     {
-        if (! is_null($name)) {
+        if (! \is_null($name)) {
             $this->resolver->setDefaultConnection($name);
         }
 
@@ -616,7 +616,7 @@ class Migrator
      */
     protected function getSchemaGrammar($connection)
     {
-        if (is_null($grammar = $connection->getSchemaGrammar())) {
+        if (\is_null($grammar = $connection->getSchemaGrammar())) {
             $connection->useDefaultSchemaGrammar();
 
             $grammar = $connection->getSchemaGrammar();
@@ -652,7 +652,7 @@ class Migrator
      */
     public function hasRunAnyMigrations()
     {
-        return $this->repositoryExists() && count($this->repository->getRan()) > 0;
+        return $this->repositoryExists() && \count($this->repository->getRan()) > 0;
     }
 
     /**

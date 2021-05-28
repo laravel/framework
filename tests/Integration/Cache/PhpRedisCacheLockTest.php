@@ -93,7 +93,7 @@ class PhpRedisCacheLockTest extends TestCase
 
     public function testRedisLockCanBeAcquiredAndReleasedWithIgbinarySerialization()
     {
-        if (! defined('Redis::SERIALIZER_IGBINARY')) {
+        if (! \defined('Redis::SERIALIZER_IGBINARY')) {
             $this->markTestSkipped('Redis extension is not configured to support the igbinary serializer.');
         }
 
@@ -118,7 +118,7 @@ class PhpRedisCacheLockTest extends TestCase
 
     public function testRedisLockCanBeAcquiredAndReleasedWithMsgpackSerialization()
     {
-        if (! defined('Redis::SERIALIZER_MSGPACK')) {
+        if (! \defined('Redis::SERIALIZER_MSGPACK')) {
             $this->markTestSkipped('Redis extension is not configured to support the msgpack serializer.');
         }
 
@@ -143,11 +143,11 @@ class PhpRedisCacheLockTest extends TestCase
 
     public function testRedisLockCanBeAcquiredAndReleasedWithLzfCompression()
     {
-        if (! defined('Redis::COMPRESSION_LZF')) {
+        if (! \defined('Redis::COMPRESSION_LZF')) {
             $this->markTestSkipped('Redis extension is not configured to support the lzf compression.');
         }
 
-        if (! extension_loaded('lzf')) {
+        if (! \extension_loaded('lzf')) {
             $this->markTestSkipped('Lzf extension is not installed.');
         }
 
@@ -173,11 +173,11 @@ class PhpRedisCacheLockTest extends TestCase
 
     public function testRedisLockCanBeAcquiredAndReleasedWithZstdCompression()
     {
-        if (! defined('Redis::COMPRESSION_ZSTD')) {
+        if (! \defined('Redis::COMPRESSION_ZSTD')) {
             $this->markTestSkipped('Redis extension is not configured to support the zstd compression.');
         }
 
-        if (! extension_loaded('zstd')) {
+        if (! \extension_loaded('zstd')) {
             $this->markTestSkipped('Zstd extension is not installed.');
         }
 
@@ -222,11 +222,11 @@ class PhpRedisCacheLockTest extends TestCase
 
     public function testRedisLockCanBeAcquiredAndReleasedWithLz4Compression()
     {
-        if (! defined('Redis::COMPRESSION_LZ4')) {
+        if (! \defined('Redis::COMPRESSION_LZ4')) {
             $this->markTestSkipped('Redis extension is not configured to support the lz4 compression.');
         }
 
-        if (! extension_loaded('lz4')) {
+        if (! \extension_loaded('lz4')) {
             $this->markTestSkipped('Lz4 extension is not installed.');
         }
 
@@ -276,11 +276,11 @@ class PhpRedisCacheLockTest extends TestCase
 
     public function testRedisLockCanBeAcquiredAndReleasedWithSerializationAndCompression()
     {
-        if (! defined('Redis::COMPRESSION_LZF')) {
+        if (! \defined('Redis::COMPRESSION_LZF')) {
             $this->markTestSkipped('Redis extension is not configured to support the lzf compression.');
         }
 
-        if (! extension_loaded('lzf')) {
+        if (! \extension_loaded('lzf')) {
             $this->markTestSkipped('Lzf extension is not installed.');
         }
 

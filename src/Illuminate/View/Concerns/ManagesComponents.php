@@ -105,12 +105,12 @@ trait ManagesComponents
 
         $slots = array_merge([
             '__default' => $defaultSlot,
-        ], $this->slots[count($this->componentStack)]);
+        ], $this->slots[\count($this->componentStack)]);
 
         return array_merge(
-            $this->componentData[count($this->componentStack)],
+            $this->componentData[\count($this->componentStack)],
             ['slot' => $defaultSlot],
-            $this->slots[count($this->componentStack)],
+            $this->slots[\count($this->componentStack)],
             ['__laravel_slots' => $slots]
         );
     }
@@ -126,9 +126,9 @@ trait ManagesComponents
      */
     public function slot($name, $content = null)
     {
-        if (func_num_args() > 2) {
+        if (\func_num_args() > 2) {
             throw new InvalidArgumentException('You passed too many arguments to the ['.$name.'] slot.');
-        } elseif (func_num_args() === 2) {
+        } elseif (\func_num_args() === 2) {
             $this->slots[$this->currentComponent()][$name] = $content;
         } elseif (ob_start()) {
             $this->slots[$this->currentComponent()][$name] = '';
@@ -160,6 +160,6 @@ trait ManagesComponents
      */
     protected function currentComponent()
     {
-        return count($this->componentStack) - 1;
+        return \count($this->componentStack) - 1;
     }
 }

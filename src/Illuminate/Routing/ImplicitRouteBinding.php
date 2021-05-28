@@ -37,14 +37,14 @@ class ImplicitRouteBinding
 
             $parent = $route->parentOfParameter($parameterName);
 
-            if ($parent instanceof UrlRoutable && in_array($parameterName, array_keys($route->bindingFields()))) {
+            if ($parent instanceof UrlRoutable && \in_array($parameterName, array_keys($route->bindingFields()))) {
                 if (! $model = $parent->resolveChildRouteBinding(
                     $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
                 )) {
-                    throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                    throw (new ModelNotFoundException)->setModel(\get_class($instance), [$parameterValue]);
                 }
             } elseif (! $model = $instance->resolveRouteBinding($parameterValue, $route->bindingFieldFor($parameterName))) {
-                throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                throw (new ModelNotFoundException)->setModel(\get_class($instance), [$parameterValue]);
             }
 
             $route->setParameter($parameterName, $model);
@@ -60,11 +60,11 @@ class ImplicitRouteBinding
      */
     protected static function getParameterName($name, $parameters)
     {
-        if (array_key_exists($name, $parameters)) {
+        if (\array_key_exists($name, $parameters)) {
             return $name;
         }
 
-        if (array_key_exists($snakedName = Str::snake($name), $parameters)) {
+        if (\array_key_exists($snakedName = Str::snake($name), $parameters)) {
             return $snakedName;
         }
     }

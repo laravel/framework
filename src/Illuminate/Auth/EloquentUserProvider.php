@@ -106,7 +106,7 @@ class EloquentUserProvider implements UserProvider
     public function retrieveByCredentials(array $credentials)
     {
         if (empty($credentials) ||
-           (count($credentials) === 1 &&
+           (\count($credentials) === 1 &&
             Str::contains($this->firstCredentialKey($credentials), 'password'))) {
             return;
         }
@@ -121,7 +121,7 @@ class EloquentUserProvider implements UserProvider
                 continue;
             }
 
-            if (is_array($value) || $value instanceof Arrayable) {
+            if (\is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } else {
                 $query->where($key, $value);
@@ -166,7 +166,7 @@ class EloquentUserProvider implements UserProvider
      */
     protected function newModelQuery($model = null)
     {
-        return is_null($model)
+        return \is_null($model)
                 ? $this->createModel()->newQuery()
                 : $model->newQuery();
     }

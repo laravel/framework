@@ -75,7 +75,7 @@ class MigrateMakeCommand extends BaseCommand
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
         // to pass a table name into this option as a short-cut for creating.
-        if (! $table && is_string($create)) {
+        if (! $table && \is_string($create)) {
             $table = $create;
 
             $create = true;
@@ -124,7 +124,7 @@ class MigrateMakeCommand extends BaseCommand
      */
     protected function getMigrationPath()
     {
-        if (! is_null($targetPath = $this->input->getOption('path'))) {
+        if (! \is_null($targetPath = $this->input->getOption('path'))) {
             return ! $this->usingRealPath()
                             ? $this->laravel->basePath().'/'.$targetPath
                             : $targetPath;

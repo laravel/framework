@@ -178,7 +178,7 @@ class RedisTaggedCache extends TaggedCache
     {
         $values = array_unique($this->store->connection()->smembers($referenceKey));
 
-        if (count($values) > 0) {
+        if (\count($values) > 0) {
             foreach (array_chunk($values, 1000) as $valuesChunk) {
                 $this->store->connection()->del(...$valuesChunk);
             }

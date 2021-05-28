@@ -314,21 +314,21 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function parseView($view)
     {
-        if (is_string($view)) {
+        if (\is_string($view)) {
             return [$view, null, null];
         }
 
         // If the given view is an array with numeric keys, we will just assume that
         // both a "pretty" and "plain" view were provided, so we will return this
         // array as is, since it should contain both views with numerical keys.
-        if (is_array($view) && isset($view[0])) {
+        if (\is_array($view) && isset($view[0])) {
             return [$view[0], $view[1], null];
         }
 
         // If this view is an array but doesn't contain numeric keys, we will assume
         // the views are being explicitly specified and will extract them via the
         // named keys instead, allowing the developers to use one or the other.
-        if (is_array($view)) {
+        if (\is_array($view)) {
             return [
                 $view['html'] ?? null,
                 $view['text'] ?? null,
@@ -410,7 +410,7 @@ class Mailer implements MailerContract, MailQueueContract
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        if (is_string($queue)) {
+        if (\is_string($queue)) {
             $view->onQueue($queue);
         }
 
@@ -460,7 +460,7 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         return $view->mailer($this->name)->later(
-            $delay, is_null($queue) ? $this->queue : $queue
+            $delay, \is_null($queue) ? $this->queue : $queue
         );
     }
 

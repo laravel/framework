@@ -23,12 +23,12 @@ trait CreatesUserProviders
      */
     public function createUserProvider($provider = null)
     {
-        if (is_null($config = $this->getProviderConfiguration($provider))) {
+        if (\is_null($config = $this->getProviderConfiguration($provider))) {
             return;
         }
 
         if (isset($this->customProviderCreators[$driver = ($config['driver'] ?? null)])) {
-            return call_user_func(
+            return \call_user_func(
                 $this->customProviderCreators[$driver], $this->app, $config
             );
         }

@@ -19,7 +19,7 @@ trait ConditionallyLoadsAttributes
         foreach ($data as $key => $value) {
             $index++;
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $data[$key] = $this->filter($value);
 
                 continue;
@@ -32,7 +32,7 @@ trait ConditionallyLoadsAttributes
                 );
             }
 
-            if ($value instanceof self && is_null($value->resource)) {
+            if ($value instanceof self && \is_null($value->resource)) {
                 $data[$key] = null;
             }
         }
@@ -53,14 +53,14 @@ trait ConditionallyLoadsAttributes
     {
         if ($numericKeys) {
             return $this->removeMissingValues(array_merge(
-                array_merge(array_slice($data, 0, $index, true), $merge),
-                $this->filter(array_values(array_slice($data, $index + 1, null, true)))
+                array_merge(\array_slice($data, 0, $index, true), $merge),
+                $this->filter(array_values(\array_slice($data, $index + 1, null, true)))
             ));
         }
 
-        return $this->removeMissingValues(array_slice($data, 0, $index, true) +
+        return $this->removeMissingValues(\array_slice($data, 0, $index, true) +
                 $merge +
-                $this->filter(array_slice($data, $index + 1, null, true)));
+                $this->filter(\array_slice($data, $index + 1, null, true)));
     }
 
     /**
@@ -105,7 +105,7 @@ trait ConditionallyLoadsAttributes
             return value($value);
         }
 
-        return func_num_args() === 3 ? value($default) : new MissingValue;
+        return \func_num_args() === 3 ? value($default) : new MissingValue;
     }
 
     /**
@@ -155,10 +155,10 @@ trait ConditionallyLoadsAttributes
     protected function whenAppended($attribute, $value = null, $default = null)
     {
         if ($this->resource->hasAppended($attribute)) {
-            return func_num_args() >= 2 ? value($value) : $this->resource->$attribute;
+            return \func_num_args() >= 2 ? value($value) : $this->resource->$attribute;
         }
 
-        return func_num_args() === 3 ? value($default) : new MissingValue;
+        return \func_num_args() === 3 ? value($default) : new MissingValue;
     }
 
     /**
@@ -171,7 +171,7 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenLoaded($relationship, $value = null, $default = null)
     {
-        if (func_num_args() < 3) {
+        if (\func_num_args() < 3) {
             $default = new MissingValue;
         }
 
@@ -179,7 +179,7 @@ trait ConditionallyLoadsAttributes
             return value($default);
         }
 
-        if (func_num_args() === 1) {
+        if (\func_num_args() === 1) {
             return $this->resource->{$relationship};
         }
 
@@ -200,7 +200,7 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenPivotLoaded($table, $value, $default = null)
     {
-        return $this->whenPivotLoadedAs('pivot', ...func_get_args());
+        return $this->whenPivotLoadedAs('pivot', ...\func_get_args());
     }
 
     /**
@@ -214,7 +214,7 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenPivotLoadedAs($accessor, $table, $value, $default = null)
     {
-        if (func_num_args() === 3) {
+        if (\func_num_args() === 3) {
             $default = new MissingValue;
         }
 
@@ -237,7 +237,7 @@ trait ConditionallyLoadsAttributes
     protected function transform($value, callable $callback, $default = null)
     {
         return transform(
-            $value, $callback, func_num_args() === 3 ? $default : new MissingValue
+            $value, $callback, \func_num_args() === 3 ? $default : new MissingValue
         );
     }
 }

@@ -77,7 +77,7 @@ class Collection implements ArrayAccess, Enumerable
         $items = $this->map(function ($value) use ($callback) {
             return $callback($value);
         })->filter(function ($value) {
-            return ! is_null($value);
+            return ! \is_null($value);
         });
 
         if ($count = $items->count()) {
@@ -95,7 +95,7 @@ class Collection implements ArrayAccess, Enumerable
     {
         $values = (isset($key) ? $this->pluck($key) : $this)
             ->filter(function ($item) {
-                return ! is_null($item);
+                return ! \is_null($item);
             })->sort()->values();
 
         $count = $values->count();
@@ -164,17 +164,17 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() === 1) {
+        if (\func_num_args() === 1) {
             if ($this->useAsCallable($key)) {
                 $placeholder = new stdClass;
 
                 return $this->first($key, $placeholder) !== $placeholder;
             }
 
-            return in_array($key, $this->items);
+            return \in_array($key, $this->items);
         }
 
-        return $this->contains($this->operatorForWhere(...func_get_args()));
+        return $this->contains($this->operatorForWhere(...\func_get_args()));
     }
 
     /**
@@ -327,8 +327,8 @@ class Collection implements ArrayAccess, Enumerable
     {
         if ($keys instanceof Enumerable) {
             $keys = $keys->all();
-        } elseif (! is_array($keys)) {
-            $keys = func_get_args();
+        } elseif (! \is_array($keys)) {
+            $keys = \func_get_args();
         }
 
         return new static(Arr::except($this->items, $keys));
@@ -406,7 +406,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function get($key, $default = null)
     {
-        if (array_key_exists($key, $this->items)) {
+        if (\array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
 
@@ -422,7 +422,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
-        if (! $this->useAsCallable($groupBy) && is_array($groupBy)) {
+        if (! $this->useAsCallable($groupBy) && \is_array($groupBy)) {
             $nextGroups = $groupBy;
 
             $groupBy = array_shift($nextGroups);
@@ -435,14 +435,14 @@ class Collection implements ArrayAccess, Enumerable
         foreach ($this->items as $key => $value) {
             $groupKeys = $groupBy($value, $key);
 
-            if (! is_array($groupKeys)) {
+            if (! \is_array($groupKeys)) {
                 $groupKeys = [$groupKeys];
             }
 
             foreach ($groupKeys as $groupKey) {
-                $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
+                $groupKey = \is_bool($groupKey) ? (int) $groupKey : $groupKey;
 
-                if (! array_key_exists($groupKey, $results)) {
+                if (! \array_key_exists($groupKey, $results)) {
                     $results[$groupKey] = new static;
                 }
 
@@ -474,7 +474,7 @@ class Collection implements ArrayAccess, Enumerable
         foreach ($this->items as $key => $item) {
             $resolvedKey = $keyBy($item, $key);
 
-            if (is_object($resolvedKey)) {
+            if (\is_object($resolvedKey)) {
                 $resolvedKey = (string) $resolvedKey;
             }
 
@@ -492,10 +492,10 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function has($key)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : \func_get_args();
 
         foreach ($keys as $value) {
-            if (! array_key_exists($value, $this->items)) {
+            if (! \array_key_exists($value, $this->items)) {
                 return false;
             }
         }
@@ -514,7 +514,7 @@ class Collection implements ArrayAccess, Enumerable
     {
         $first = $this->first();
 
-        if (is_array($first) || (is_object($first) && ! $first instanceof Stringable)) {
+        if (\is_array($first) || (\is_object($first) && ! $first instanceof Stringable)) {
             return implode($glue ?? '', $this->pluck($value)->all());
         }
 
@@ -772,7 +772,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function only($keys)
     {
-        if (is_null($keys)) {
+        if (\is_null($keys)) {
             return new static($this->items);
         }
 
@@ -780,7 +780,7 @@ class Collection implements ArrayAccess, Enumerable
             $keys = $keys->all();
         }
 
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = \is_array($keys) ? $keys : \func_get_args();
 
         return new static(Arr::only($this->items, $keys));
     }
@@ -804,7 +804,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function prepend($value, $key = null)
     {
-        $this->items = Arr::prepend($this->items, ...func_get_args());
+        $this->items = Arr::prepend($this->items, ...\func_get_args());
 
         return $this;
     }
@@ -877,7 +877,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function random($number = null)
     {
-        if (is_null($number)) {
+        if (\is_null($number)) {
             return Arr::random($this->items);
         }
 
@@ -1001,7 +1001,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function slice($offset, $length = null)
     {
-        return new static(array_slice($this->items, $offset, $length, true));
+        return new static(\array_slice($this->items, $offset, $length, true));
     }
 
     /**
@@ -1032,7 +1032,7 @@ class Collection implements ArrayAccess, Enumerable
             }
 
             if ($size) {
-                $groups->push(new static(array_slice($this->items, $start, $size)));
+                $groups->push(new static(\array_slice($this->items, $start, $size)));
 
                 $start += $size;
             }
@@ -1065,8 +1065,8 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function sole($key = null, $operator = null, $value = null)
     {
-        $filter = func_num_args() > 1
-            ? $this->operatorForWhere(...func_get_args())
+        $filter = \func_num_args() > 1
+            ? $this->operatorForWhere(...\func_get_args())
             : $key;
 
         $items = $this->when($filter)->filter($filter);
@@ -1126,7 +1126,7 @@ class Collection implements ArrayAccess, Enumerable
     {
         $items = $this->items;
 
-        $callback && is_callable($callback)
+        $callback && \is_callable($callback)
             ? uasort($items, $callback)
             : asort($items, $callback ?? SORT_REGULAR);
 
@@ -1158,7 +1158,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
     {
-        if (is_array($callback) && ! is_callable($callback)) {
+        if (\is_array($callback) && ! \is_callable($callback)) {
             return $this->sortByMany($callback);
         }
 
@@ -1207,7 +1207,7 @@ class Collection implements ArrayAccess, Enumerable
 
                 $result = 0;
 
-                if (is_callable($prop)) {
+                if (\is_callable($prop)) {
                     $result = $prop($a, $b);
                 } else {
                     $values = [data_get($a, $prop), data_get($b, $prop)];
@@ -1279,7 +1279,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function splice($offset, $length = null, $replacement = [])
     {
-        if (func_num_args() === 1) {
+        if (\func_num_args() === 1) {
             return new static(array_splice($this->items, $offset));
         }
 
@@ -1359,10 +1359,10 @@ class Collection implements ArrayAccess, Enumerable
     {
         $arrayableItems = array_map(function ($items) {
             return $this->getArrayableItems($items);
-        }, func_get_args());
+        }, \func_get_args());
 
         $params = array_merge([function () {
-            return new static(func_get_args());
+            return new static(\func_get_args());
         }, $this->items], $arrayableItems);
 
         return new static(array_map(...$params));
@@ -1397,7 +1397,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function count()
     {
-        return count($this->items);
+        return \count($this->items);
     }
 
     /**
@@ -1465,7 +1465,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function offsetSet($key, $value)
     {
-        if (is_null($key)) {
+        if (\is_null($key)) {
             $this->items[] = $value;
         } else {
             $this->items[$key] = $value;

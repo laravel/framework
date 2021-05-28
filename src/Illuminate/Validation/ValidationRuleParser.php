@@ -83,9 +83,9 @@ class ValidationRuleParser
      */
     protected function explodeExplicitRule($rule)
     {
-        if (is_string($rule)) {
+        if (\is_string($rule)) {
             return explode('|', $rule);
-        } elseif (is_object($rule)) {
+        } elseif (\is_object($rule)) {
             return [$this->prepareRule($rule)];
         }
 
@@ -104,7 +104,7 @@ class ValidationRuleParser
             $rule = new ClosureValidationRule($rule);
         }
 
-        if (! is_object($rule) ||
+        if (! \is_object($rule) ||
             $rule instanceof RuleContract ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
@@ -151,7 +151,7 @@ class ValidationRuleParser
      */
     public function mergeRules($results, $attribute, $rules = [])
     {
-        if (is_array($attribute)) {
+        if (\is_array($attribute)) {
             foreach ((array) $attribute as $innerAttribute => $innerRules) {
                 $results = $this->mergeRulesForAttribute($results, $innerAttribute, $innerRules);
             }
@@ -195,7 +195,7 @@ class ValidationRuleParser
             return [$rule, []];
         }
 
-        if (is_array($rule)) {
+        if (\is_array($rule)) {
             $rule = static::parseArrayRule($rule);
         } else {
             $rule = static::parseStringRule($rule);
@@ -214,7 +214,7 @@ class ValidationRuleParser
      */
     protected static function parseArrayRule(array $rule)
     {
-        return [Str::studly(trim(Arr::get($rule, 0, ''))), array_slice($rule, 1)];
+        return [Str::studly(trim(Arr::get($rule, 0, ''))), \array_slice($rule, 1)];
     }
 
     /**
@@ -250,7 +250,7 @@ class ValidationRuleParser
     {
         $rule = strtolower($rule);
 
-        if (in_array($rule, ['regex', 'not_regex', 'notregex'], true)) {
+        if (\in_array($rule, ['regex', 'not_regex', 'notregex'], true)) {
             return [$parameter];
         }
 

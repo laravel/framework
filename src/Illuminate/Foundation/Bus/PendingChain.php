@@ -135,8 +135,8 @@ class PendingChain
      */
     public function dispatch()
     {
-        if (is_string($this->job)) {
-            $firstJob = new $this->job(...func_get_args());
+        if (\is_string($this->job)) {
+            $firstJob = new $this->job(...\func_get_args());
         } elseif ($this->job instanceof Closure) {
             $firstJob = CallQueuedClosure::create($this->job);
         } else {
@@ -154,7 +154,7 @@ class PendingChain
         }
 
         if ($this->delay) {
-            $firstJob->delay = ! is_null($firstJob->delay) ? $firstJob->delay : $this->delay;
+            $firstJob->delay = ! \is_null($firstJob->delay) ? $firstJob->delay : $this->delay;
         }
 
         $firstJob->chain($this->chain);

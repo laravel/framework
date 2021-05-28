@@ -100,7 +100,7 @@ class LogManagerTest extends TestCase
         $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
 
-        $url = new ReflectionProperty(get_class($handlers[0]), 'url');
+        $url = new ReflectionProperty(\get_class($handlers[0]), 'url');
         $url->setAccessible(true);
         $this->assertSame('php://stderr', $url->getValue($handlers[0]));
 
@@ -116,7 +116,7 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('logentries');
         $handlers = $logger->getLogger()->getHandlers();
 
-        $logToken = new ReflectionProperty(get_class($handlers[0]), 'logToken');
+        $logToken = new ReflectionProperty(\get_class($handlers[0]), 'logToken');
         $logToken->setAccessible(true);
 
         $this->assertInstanceOf(LogEntriesHandler::class, $handlers[0]);
@@ -159,7 +159,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(NewRelicHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
 
-        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat = new ReflectionProperty(\get_class($formatter), 'dateFormat');
         $dateFormat->setAccessible(true);
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
@@ -239,7 +239,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(StreamHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
 
-        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat = new ReflectionProperty(\get_class($formatter), 'dateFormat');
         $dateFormat->setAccessible(true);
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
@@ -281,7 +281,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(StreamHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
 
-        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat = new ReflectionProperty(\get_class($formatter), 'dateFormat');
         $dateFormat->setAccessible(true);
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
@@ -321,7 +321,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(SyslogHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
 
-        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat = new ReflectionProperty(\get_class($formatter), 'dateFormat');
         $dateFormat->setAccessible(true);
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));

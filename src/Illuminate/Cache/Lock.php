@@ -49,7 +49,7 @@ abstract class Lock implements LockContract
      */
     public function __construct($name, $seconds, $owner = null)
     {
-        if (is_null($owner)) {
+        if (\is_null($owner)) {
             $owner = Str::random();
         }
 
@@ -89,7 +89,7 @@ abstract class Lock implements LockContract
     {
         $result = $this->acquire();
 
-        if ($result && is_callable($callback)) {
+        if ($result && \is_callable($callback)) {
             try {
                 return $callback();
             } finally {
@@ -121,7 +121,7 @@ abstract class Lock implements LockContract
             }
         }
 
-        if (is_callable($callback)) {
+        if (\is_callable($callback)) {
             try {
                 return $callback();
             } finally {
