@@ -938,6 +938,16 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testModelBindingArray()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}/{baz}', ['middleware' => SubstituteBindings::class, 'uses' => function ($firstName, $lastName) {
+            return $firstName.' '.$lastName;
+        }]);
+        $router->model(['bar', 'baz'], RouteModelBindingStub::class);
+        $this->assertSame('TAYLOR OTWELL', $router->dispatch(Request::create('foo/taylor/otwell', 'GET'))->getContent());
+    }
+
     public function testModelBindingWithNullReturn()
     {
         $this->expectException(ModelNotFoundException::class);

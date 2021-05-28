@@ -16,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Events\RouteMatched;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
@@ -986,14 +987,16 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Register a model binder for a wildcard.
      *
-     * @param  string  $key
+     * @param  string|array  $keys
      * @param  string  $class
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function model($key, $class, Closure $callback = null)
+    public function model($keys, $class, Closure $callback = null)
     {
-        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
+        foreach (Arr::wrap($keys) as $key) {
+            $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
+        }
     }
 
     /**
