@@ -91,7 +91,7 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
     {
         return $this->cache;
     }
-    
+
     /**
      * Set minutes until expiration.
      *
