@@ -93,12 +93,13 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
     }
     
     /**
-     * Set minutes until expiration
-     * 
-     * @param  mixed  $minutes 
-     * @return void 
+     * Set minutes until expiration.
+     *
+     * @param  int  $minutes
+     * @return void
      */
-    public function setMinutes($minutes) {
+    public function setMinutes($minutes)
+    {
         $this->minutes = $minutes;
     }
 }
