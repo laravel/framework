@@ -7,11 +7,11 @@ trait Conditional
     /**
      * Apply the callback if the given "value" is true.
      *
-     * @param mixed         $value
-     * @param callable      $callback
-     * @param callable|null $default
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  callable|null  $default
      *
-     * @return mixed|$this
+     * @return mixed
      */
     public function when($value, $callback, $default = null)
     {
@@ -27,11 +27,11 @@ trait Conditional
     /**
      * Apply the callback if the given "value" is false.
      *
-     * @param mixed         $value
-     * @param callable      $callback
-     * @param callable|null $default
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  callable|null  $default
      *
-     * @return mixed|$this
+     * @return mixed
      */
     public function unless($value, $callback, $default = null)
     {
