@@ -646,7 +646,7 @@ class Connection implements ConnectionInterface
         // then log the query, bindings, and execution time so we will report them on
         // the event that the developer needs them. We'll log time in milliseconds.
         $this->logQuery(
-            $query, $bindings, $this->getElapsedTime($start)
+            $query, $bindings, $this->getElapsedTime($start), $start
         );
 
         return $result;
@@ -689,14 +689,15 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  float|null  $time
+     * @param  float|null  $started
      * @return void
      */
-    public function logQuery($query, $bindings, $time = null)
+    public function logQuery($query, $bindings, $time = null, $started = null)
     {
-        $this->event(new QueryExecuted($query, $bindings, $time, $this));
+        $this->event(new QueryExecuted($query, $bindings, $time, $this, $started));
 
         if ($this->loggingQueries) {
-            $this->queryLog[] = compact('query', 'bindings', 'time');
+            $this->queryLog[] = compact('query', 'bindings', 'time', 'started');
         }
     }
 
