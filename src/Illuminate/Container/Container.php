@@ -463,7 +463,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  mixed  $instance
      * @return mixed
      */
-    public function  instance($abstract, $instance)
+    public function instance($abstract, $instance)
     {
         $this->removeAbstractAlias($abstract);
 
