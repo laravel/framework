@@ -176,17 +176,17 @@ class Handler implements ExceptionHandlerContract
      */
     public function map($from, $to = null)
     {
-        if (is_string($to)) {
+        if (\is_string($to)) {
             $to = function ($exception) use ($to) {
                 return new $to('', 0, $exception);
             };
         }
 
-        if (is_callable($from) && is_null($to)) {
+        if (\is_callable($from) && \is_null($to)) {
             $from = $this->firstClosureParameterType($to = $from);
         }
 
-        if (! is_string($from) || ! $to instanceof Closure) {
+        if (! \is_string($from) || ! $to instanceof Closure) {
             throw new InvalidArgumentException('Invalid exception mapping.');
         }
 
@@ -275,7 +275,7 @@ class Handler implements ExceptionHandlerContract
     {
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
-        return ! is_null(Arr::first($dontReport, function ($type) use ($e) {
+        return ! \is_null(Arr::first($dontReport, function ($type) use ($e) {
             return $e instanceof $type;
         }));
     }
@@ -335,7 +335,7 @@ class Handler implements ExceptionHandlerContract
             if (is_a($e, $this->firstClosureParameterType($renderCallback))) {
                 $response = $renderCallback($e, $request);
 
-                if (! is_null($response)) {
+                if (! \is_null($response)) {
                     return $response;
                 }
             }
@@ -644,7 +644,7 @@ class Handler implements ExceptionHandlerContract
     {
         return config('app.debug') ? [
             'message' => $e->getMessage(),
-            'exception' => get_class($e),
+            'exception' => \get_class($e),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
             'trace' => collect($e->getTrace())->map(function ($trace) {

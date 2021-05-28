@@ -214,7 +214,7 @@ class PendingRequest
      */
     public function attach($name, $contents = '', $filename = null, array $headers = [])
     {
-        if (is_array($name)) {
+        if (\is_array($name)) {
             foreach ($name as $file) {
                 $this->attach(...$file);
             }
@@ -484,7 +484,7 @@ class PendingRequest
      */
     public function dump()
     {
-        $values = func_get_args();
+        $values = \func_get_args();
 
         return $this->beforeSending(function (Request $request, array $options) use ($values) {
             foreach (array_merge($values, [$request, $options]) as $value) {
@@ -500,7 +500,7 @@ class PendingRequest
      */
     public function dd()
     {
-        $values = func_get_args();
+        $values = \func_get_args();
 
         return $this->beforeSending(function (Request $request, array $options) use ($values) {
             foreach (array_merge($values, [$request, $options]) as $value) {
@@ -637,7 +637,7 @@ class PendingRequest
                 $options[$this->bodyFormat] = $this->pendingBody;
             }
 
-            if (is_array($options[$this->bodyFormat])) {
+            if (\is_array($options[$this->bodyFormat])) {
                 $options[$this->bodyFormat] = array_merge(
                     $options[$this->bodyFormat], $this->pendingFiles
                 );
@@ -676,7 +676,7 @@ class PendingRequest
     protected function parseMultipartBodyFormat(array $data)
     {
         return collect($data)->map(function ($value, $key) {
-            return is_array($value) ? $value : ['name' => $key, 'contents' => $value];
+            return \is_array($value) ? $value : ['name' => $key, 'contents' => $value];
         })->values()->all();
     }
 
@@ -741,10 +741,10 @@ class PendingRequest
             $laravelData = (string) $urlString->after('?');
         }
 
-        if (is_string($laravelData)) {
+        if (\is_string($laravelData)) {
             parse_str($laravelData, $parsedData);
 
-            $laravelData = is_array($parsedData) ? $parsedData : [];
+            $laravelData = \is_array($parsedData) ? $parsedData : [];
         }
 
         return $laravelData;
@@ -848,11 +848,11 @@ class PendingRequest
                      ->filter()
                      ->first();
 
-                if (is_null($response)) {
+                if (\is_null($response)) {
                     return $handler($request, $options);
                 }
 
-                $response = is_array($response) ? Factory::response($response) : $response;
+                $response = \is_array($response) ? Factory::response($response) : $response;
 
                 $sink = $options['sink'] ?? null;
 
@@ -876,7 +876,7 @@ class PendingRequest
         return function ($response) use ($sink) {
             $body = $response->getBody()->getContents();
 
-            if (is_string($sink)) {
+            if (\is_string($sink)) {
                 file_put_contents($sink, $body);
 
                 return;

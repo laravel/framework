@@ -77,7 +77,7 @@ class ConcurrencyLimiter
             usleep(250 * 1000);
         }
 
-        if (is_callable($callback)) {
+        if (\is_callable($callback)) {
             try {
                 return tap($callback(), function () use ($slot, $id) {
                     $this->release($slot, $id);
@@ -105,7 +105,7 @@ class ConcurrencyLimiter
         }, range(1, $this->maxLocks));
 
         return $this->redis->eval(...array_merge(
-            [$this->lockScript(), count($slots)],
+            [$this->lockScript(), \count($slots)],
             array_merge($slots, [$this->name, $this->releaseAfter, $id])
         ));
     }

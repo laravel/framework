@@ -126,7 +126,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $count = 0;
         $query = SoftDeletesTestUser::query();
         $query->chunk(2, function ($user) use (&$count) {
-            $count += count($user);
+            $count += \count($user);
         });
         $this->assertEquals(1, $count);
 

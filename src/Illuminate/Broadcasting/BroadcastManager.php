@@ -279,7 +279,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        if (! is_null($name) && $name !== 'null') {
+        if (! \is_null($name) && $name !== 'null') {
             return $this->app['config']["broadcasting.connections.{$name}"];
         }
 

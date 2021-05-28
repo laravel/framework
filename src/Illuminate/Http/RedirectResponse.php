@@ -41,7 +41,7 @@ class RedirectResponse extends BaseRedirectResponse
      */
     public function with($key, $value = null)
     {
-        $key = is_array($key) ? $key : [$key => $value];
+        $key = \is_array($key) ? $key : [$key => $value];
 
         foreach ($key as $k => $v) {
             $this->session->flash($k, $v);
@@ -74,7 +74,7 @@ class RedirectResponse extends BaseRedirectResponse
     public function withInput(array $input = null)
     {
         $this->session->flashInput($this->removeFilesFromInput(
-            ! is_null($input) ? $input : $this->request->input()
+            ! \is_null($input) ? $input : $this->request->input()
         ));
 
         return $this;
@@ -89,7 +89,7 @@ class RedirectResponse extends BaseRedirectResponse
     protected function removeFilesFromInput(array $input)
     {
         foreach ($input as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $input[$key] = $this->removeFilesFromInput($value);
             }
 
@@ -108,7 +108,7 @@ class RedirectResponse extends BaseRedirectResponse
      */
     public function onlyInput()
     {
-        return $this->withInput($this->request->only(func_get_args()));
+        return $this->withInput($this->request->only(\func_get_args()));
     }
 
     /**
@@ -118,7 +118,7 @@ class RedirectResponse extends BaseRedirectResponse
      */
     public function exceptInput()
     {
-        return $this->withInput($this->request->except(func_get_args()));
+        return $this->withInput($this->request->except(\func_get_args()));
     }
 
     /**

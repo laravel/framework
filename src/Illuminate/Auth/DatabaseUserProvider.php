@@ -100,8 +100,8 @@ class DatabaseUserProvider implements UserProvider
     public function retrieveByCredentials(array $credentials)
     {
         if (empty($credentials) ||
-           (count($credentials) === 1 &&
-            array_key_exists('password', $credentials))) {
+           (\count($credentials) === 1 &&
+            \array_key_exists('password', $credentials))) {
             return;
         }
 
@@ -115,7 +115,7 @@ class DatabaseUserProvider implements UserProvider
                 continue;
             }
 
-            if (is_array($value) || $value instanceof Arrayable) {
+            if (\is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } else {
                 $query->where($key, $value);
@@ -138,7 +138,7 @@ class DatabaseUserProvider implements UserProvider
      */
     protected function getGenericUser($user)
     {
-        if (! is_null($user)) {
+        if (! \is_null($user)) {
             return new GenericUser((array) $user);
         }
     }

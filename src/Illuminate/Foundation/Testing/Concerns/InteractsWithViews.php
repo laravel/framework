@@ -33,7 +33,7 @@ trait InteractsWithViews
     {
         $tempDirectory = sys_get_temp_dir();
 
-        if (! in_array($tempDirectory, ViewFacade::getFinder()->getPaths())) {
+        if (! \in_array($tempDirectory, ViewFacade::getFinder()->getPaths())) {
             ViewFacade::addLocation(sys_get_temp_dir());
         }
 

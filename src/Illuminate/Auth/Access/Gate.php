@@ -106,7 +106,7 @@ class Gate implements GateContract
      */
     public function has($ability)
     {
-        $abilities = is_array($ability) ? $ability : func_get_args();
+        $abilities = \is_array($ability) ? $ability : \func_get_args();
 
         foreach ($abilities as $ability) {
             if (! isset($this->abilities[$ability])) {
@@ -128,13 +128,13 @@ class Gate implements GateContract
      */
     public function define($ability, $callback)
     {
-        if (is_array($callback) && isset($callback[0]) && is_string($callback[0])) {
+        if (\is_array($callback) && isset($callback[0]) && \is_string($callback[0])) {
             $callback = $callback[0].'@'.$callback[1];
         }
 
-        if (is_callable($callback)) {
+        if (\is_callable($callback)) {
             $this->abilities[$ability] = $callback;
-        } elseif (is_string($callback)) {
+        } elseif (\is_string($callback)) {
             $this->stringCallbacks[$ability] = $callback;
 
             $this->abilities[$ability] = $this->buildAbilityCallback($ability, $callback);
@@ -188,7 +188,7 @@ class Gate implements GateContract
 
             $policy = $this->resolvePolicy($class);
 
-            $arguments = func_get_args();
+            $arguments = \func_get_args();
 
             $user = array_shift($arguments);
 
@@ -196,13 +196,13 @@ class Gate implements GateContract
                 $policy, $user, $ability, $arguments
             );
 
-            if (! is_null($result)) {
+            if (! \is_null($result)) {
                 return $result;
             }
 
             return isset($method)
-                    ? $policy->{$method}(...func_get_args())
-                    : $policy(...func_get_args());
+                    ? $policy->{$method}(...\func_get_args())
+                    : $policy(...\func_get_args());
         };
     }
 
@@ -368,7 +368,7 @@ class Gate implements GateContract
             $user, $ability, $arguments
         );
 
-        if (is_null($result)) {
+        if (\is_null($result)) {
             $result = $this->callAuthCallback($user, $ability, $arguments);
         }
 
@@ -392,16 +392,16 @@ class Gate implements GateContract
      */
     protected function canBeCalledWithUser($user, $class, $method = null)
     {
-        if (! is_null($user)) {
+        if (! \is_null($user)) {
             return true;
         }
 
-        if (! is_null($method)) {
+        if (! \is_null($method)) {
             return $this->methodAllowsGuests($class, $method);
         }
 
-        if (is_array($class)) {
-            $className = is_string($class[0]) ? $class[0] : get_class($class[0]);
+        if (\is_array($class)) {
+            $className = \is_string($class[0]) ? $class[0] : \get_class($class[0]);
 
             return $this->methodAllowsGuests($className, $class[1]);
         }
@@ -459,7 +459,7 @@ class Gate implements GateContract
     protected function parameterAllowsGuests($parameter)
     {
         return ($parameter->hasType() && $parameter->allowsNull()) ||
-               ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
+               ($parameter->isDefaultValueAvailable() && \is_null($parameter->getDefaultValue()));
     }
 
     /**
@@ -492,7 +492,7 @@ class Gate implements GateContract
                 continue;
             }
 
-            if (! is_null($result = $before($user, $ability, $arguments))) {
+            if (! \is_null($result = $before($user, $ability, $arguments))) {
                 return $result;
             }
         }
@@ -551,7 +551,7 @@ class Gate implements GateContract
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
         if (isset($arguments[0]) &&
-            ! is_null($policy = $this->getPolicyFor($arguments[0])) &&
+            ! \is_null($policy = $this->getPolicyFor($arguments[0])) &&
             $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
             return $callback;
         }
@@ -582,11 +582,11 @@ class Gate implements GateContract
      */
     public function getPolicyFor($class)
     {
-        if (is_object($class)) {
-            $class = get_class($class);
+        if (\is_object($class)) {
+            $class = \get_class($class);
         }
 
-        if (! is_string($class)) {
+        if (! \is_string($class)) {
             return;
         }
 
@@ -616,15 +616,15 @@ class Gate implements GateContract
     protected function guessPolicyName($class)
     {
         if ($this->guessPolicyNamesUsingCallback) {
-            return Arr::wrap(call_user_func($this->guessPolicyNamesUsingCallback, $class));
+            return Arr::wrap(\call_user_func($this->guessPolicyNamesUsingCallback, $class));
         }
 
-        $classDirname = str_replace('/', '\\', dirname(str_replace('\\', '/', $class)));
+        $classDirname = str_replace('/', '\\', \dirname(str_replace('\\', '/', $class)));
 
         $classDirnameSegments = explode('\\', $classDirname);
 
-        return Arr::wrap(Collection::times(count($classDirnameSegments), function ($index) use ($class, $classDirnameSegments) {
-            $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
+        return Arr::wrap(Collection::times(\count($classDirnameSegments), function ($index) use ($class, $classDirnameSegments) {
+            $classDirname = implode('\\', \array_slice($classDirnameSegments, 0, $index));
 
             return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
         })->reverse()->values()->first(function ($class) {
@@ -669,7 +669,7 @@ class Gate implements GateContract
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
-        if (! is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
+        if (! \is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
             return false;
         }
 
@@ -684,7 +684,7 @@ class Gate implements GateContract
             // When we receive a non-null result from this before method, we will return it
             // as the "final" results. This will allow developers to override the checks
             // in this policy to return the result for all rules defined in the class.
-            if (! is_null($result)) {
+            if (! \is_null($result)) {
                 return $result;
             }
 
@@ -728,11 +728,11 @@ class Gate implements GateContract
         // If this first argument is a string, that means they are passing a class name
         // to the policy. We will remove the first argument from this argument array
         // because this policy already knows what type of models it can authorize.
-        if (isset($arguments[0]) && is_string($arguments[0])) {
+        if (isset($arguments[0]) && \is_string($arguments[0])) {
             array_shift($arguments);
         }
 
-        if (! is_callable([$policy, $method])) {
+        if (! \is_callable([$policy, $method])) {
             return;
         }
 
@@ -778,7 +778,7 @@ class Gate implements GateContract
      */
     protected function resolveUser()
     {
-        return call_user_func($this->userResolver);
+        return \call_user_func($this->userResolver);
     }
 
     /**

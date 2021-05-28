@@ -250,8 +250,8 @@ abstract class GeneratorCommand extends Command
      */
     protected function makeDirectory($path)
     {
-        if (! $this->files->isDirectory(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0777, true, true);
+        if (! $this->files->isDirectory(\dirname($path))) {
+            $this->files->makeDirectory(\dirname($path), 0777, true, true);
         }
 
         return $path;
@@ -306,7 +306,7 @@ abstract class GeneratorCommand extends Command
      */
     protected function getNamespace($name)
     {
-        return trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
+        return trim(implode('\\', \array_slice(explode('\\', $name), 0, -1)), '\\');
     }
 
     /**
@@ -386,7 +386,7 @@ abstract class GeneratorCommand extends Command
     {
         $name = strtolower($name);
 
-        return in_array($name, $this->reservedNames);
+        return \in_array($name, $this->reservedNames);
     }
 
     /**

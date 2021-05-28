@@ -135,7 +135,7 @@ trait MakesHttpRequests
      */
     public function withoutMiddleware($middleware = null)
     {
-        if (is_null($middleware)) {
+        if (\is_null($middleware)) {
             $this->app->instance('middleware.disable', true);
 
             return $this;
@@ -162,7 +162,7 @@ trait MakesHttpRequests
      */
     public function withMiddleware($middleware = null)
     {
-        if (is_null($middleware)) {
+        if (\is_null($middleware)) {
             unset($this->app['middleware.disable']);
 
             return $this;
@@ -580,7 +580,7 @@ trait MakesHttpRequests
                 unset($data[$key]);
             }
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $files[$key] = $this->extractFilesFromDataArray($value);
 
                 $data[$key] = $value;

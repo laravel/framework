@@ -28,7 +28,7 @@ class FilesystemAdapterTest extends TestCase
 
     protected function tearDown(): void
     {
-        $filesystem = new Filesystem(new Local(dirname($this->tempDir)));
+        $filesystem = new Filesystem(new Local(\dirname($this->tempDir)));
         $filesystem->deleteDir(basename($this->tempDir));
         m::close();
     }
@@ -290,7 +290,7 @@ class FilesystemAdapterTest extends TestCase
 
         $storagePath = $filesystemAdapter->putFile('/', $uploadedFile);
 
-        $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
+        $this->assertSame(44, \strlen($storagePath)); // random 40 characters + ".txt"
 
         $this->assertFileExists($filePath);
 
@@ -310,7 +310,7 @@ class FilesystemAdapterTest extends TestCase
 
         $storagePath = $filesystemAdapter->putFile('/', $filePath);
 
-        $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
+        $this->assertSame(44, \strlen($storagePath)); // random 40 characters + ".txt"
 
         $filesystemAdapter->assertExists($storagePath);
 

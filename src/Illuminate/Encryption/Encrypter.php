@@ -87,7 +87,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         // First we will encrypt the value using OpenSSL. After this is encrypted we
         // will proceed to calculating a MAC for the encrypted value so that this
         // value can be verified later as not having been changed by the users.
-        $value = \openssl_encrypt(
+        $value = openssl_encrypt(
             $serialize ? serialize($value) : $value,
             $this->cipher, $this->key, 0, $iv
         );
@@ -141,7 +141,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
-        $decrypted = \openssl_decrypt(
+        $decrypted = openssl_decrypt(
             $payload['value'], $this->cipher, $this->key, 0, $iv
         );
 
@@ -211,8 +211,8 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function validPayload($payload)
     {
-        return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
-               strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
+        return \is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
+               \strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
     }
 
     /**

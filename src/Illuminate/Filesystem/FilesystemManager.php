@@ -249,7 +249,7 @@ class FilesystemManager implements FactoryContract
             $adapter = new CachedAdapter($adapter, $this->createCacheStore($cache));
         }
 
-        return new Flysystem($adapter, count($config) > 0 ? $config : null);
+        return new Flysystem($adapter, \count($config) > 0 ? $config : null);
     }
 
     /**

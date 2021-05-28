@@ -30,7 +30,7 @@ trait SerializesAndRestoresModelIdentifiers
 
         if ($value instanceof QueueableEntity) {
             return new ModelIdentifier(
-                get_class($value),
+                \get_class($value),
                 $value->getQueueableId(),
                 $value->getQueueableRelations(),
                 $value->getQueueableConnection()
@@ -52,7 +52,7 @@ trait SerializesAndRestoresModelIdentifiers
             return $value;
         }
 
-        return is_array($value->id)
+        return \is_array($value->id)
                 ? $this->restoreCollection($value)
                 : $this->restoreModel($value);
     }
@@ -65,7 +65,7 @@ trait SerializesAndRestoresModelIdentifiers
      */
     protected function restoreCollection($value)
     {
-        if (! $value->class || count($value->id) === 0) {
+        if (! $value->class || \count($value->id) === 0) {
             return new EloquentCollection;
         }
 
@@ -74,13 +74,13 @@ trait SerializesAndRestoresModelIdentifiers
         )->useWritePdo()->get();
 
         if (is_a($value->class, Pivot::class, true) ||
-            in_array(AsPivot::class, class_uses($value->class))) {
+            \in_array(AsPivot::class, class_uses($value->class))) {
             return $collection;
         }
 
         $collection = $collection->keyBy->getKey();
 
-        $collectionClass = get_class($collection);
+        $collectionClass = \get_class($collection);
 
         return new $collectionClass(
             collect($value->id)->map(function ($id) use ($collection) {

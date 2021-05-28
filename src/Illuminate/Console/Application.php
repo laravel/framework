@@ -115,7 +115,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public static function artisanBinary()
     {
-        return defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
+        return \defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
     }
 
     /**
@@ -268,7 +268,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function resolveCommands($commands)
     {
-        $commands = is_array($commands) ? $commands : func_get_args();
+        $commands = \is_array($commands) ? $commands : \func_get_args();
 
         foreach ($commands as $command) {
             $this->resolve($command);

@@ -245,11 +245,11 @@ class PendingCommand
      */
     protected function verifyExpectations()
     {
-        if (count($this->test->expectedQuestions)) {
+        if (\count($this->test->expectedQuestions)) {
             $this->test->fail('Question "'.Arr::first($this->test->expectedQuestions)[0].'" was not asked.');
         }
 
-        if (count($this->test->expectedChoices) > 0) {
+        if (\count($this->test->expectedChoices) > 0) {
             foreach ($this->test->expectedChoices as $question => $answers) {
                 $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
 
@@ -261,7 +261,7 @@ class PendingCommand
             }
         }
 
-        if (count($this->test->expectedOutput)) {
+        if (\count($this->test->expectedOutput)) {
             $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
         }
 

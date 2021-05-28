@@ -78,7 +78,7 @@ class ResponseFactory implements FactoryContract
      */
     public function view($view, $data = [], $status = 200, array $headers = [])
     {
-        if (is_array($view)) {
+        if (\is_array($view)) {
             return $this->make($this->view->first($view, $data), $status, $headers);
         }
 
@@ -140,7 +140,7 @@ class ResponseFactory implements FactoryContract
     {
         $response = new StreamedResponse($callback, 200, $headers);
 
-        if (! is_null($name)) {
+        if (! \is_null($name)) {
             $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
                 $disposition,
                 $name,
@@ -164,7 +164,7 @@ class ResponseFactory implements FactoryContract
     {
         $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 
-        if (! is_null($name)) {
+        if (! \is_null($name)) {
             return $response->setContentDisposition($disposition, $name, $this->fallbackName($name));
         }
 

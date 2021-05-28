@@ -34,7 +34,7 @@ class Sequence
     public function __construct(...$sequence)
     {
         $this->sequence = $sequence;
-        $this->count = count($sequence);
+        $this->count = \count($sequence);
     }
 
     /**

@@ -66,7 +66,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
             'threads' => $this->threads($options),
         ]);
 
-        if (! is_string($hash)) {
+        if (! \is_string($hash)) {
             throw new RuntimeException('Argon2 hashing not supported.');
         }
 

@@ -66,7 +66,7 @@ class FilesystemAdapter implements CloudFilesystemContract
                 $this->exists($path), "Unable to find a file at path [{$path}]."
             );
 
-            if (! is_null($content)) {
+            if (! \is_null($content)) {
                 $actual = $this->get($path);
 
                 PHPUnit::assertSame(
@@ -223,7 +223,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function put($path, $contents, $options = [])
     {
-        $options = is_string($options)
+        $options = \is_string($options)
                      ? ['visibility' => $options]
                      : (array) $options;
 
@@ -239,7 +239,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->driver->putStream($path, $contents->detach(), $options);
         }
 
-        return is_resource($contents)
+        return \is_resource($contents)
                 ? $this->driver->putStream($path, $contents, $options)
                 : $this->driver->put($path, $contents, $options);
     }
@@ -254,7 +254,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function putFile($path, $file, $options = [])
     {
-        $file = is_string($file) ? new File($file) : $file;
+        $file = \is_string($file) ? new File($file) : $file;
 
         return $this->putFileAs($path, $file, $file->hashName(), $options);
     }
@@ -270,7 +270,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function putFileAs($path, $file, $name, $options = [])
     {
-        $stream = fopen(is_string($file) ? $file : $file->getRealPath(), 'r');
+        $stream = fopen(\is_string($file) ? $file : $file->getRealPath(), 'r');
 
         // Next, we will format the path of the file and store the file using a stream since
         // they provide better performance than alternatives. Once we write the file this
@@ -279,7 +279,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             $path = trim($path.'/'.$name, '/'), $stream, $options
         );
 
-        if (is_resource($stream)) {
+        if (\is_resource($stream)) {
             fclose($stream);
         }
 
@@ -355,7 +355,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function delete($paths)
     {
-        $paths = is_array($paths) ? $paths : func_get_args();
+        $paths = \is_array($paths) ? $paths : \func_get_args();
 
         $success = true;
 
@@ -496,7 +496,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         // If an explicit base URL has been set on the disk configuration then we will use
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
-        if (! is_null($url = $this->driver->getConfig()->get('url'))) {
+        if (! \is_null($url = $this->driver->getConfig()->get('url'))) {
             return $this->concatPathToUrl($url, $adapter->getPathPrefix().$path);
         }
 
@@ -601,7 +601,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         // If an explicit base URL has been set on the disk configuration then we will use
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
-        if (! is_null($url = $this->driver->getConfig()->get('temporary_url'))) {
+        if (! \is_null($url = $this->driver->getConfig()->get('temporary_url'))) {
             $uri = $this->replaceBaseUrl($uri, $url);
         }
 
@@ -759,7 +759,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     protected function parseVisibility($visibility)
     {
-        if (is_null($visibility)) {
+        if (\is_null($visibility)) {
             return;
         }
 

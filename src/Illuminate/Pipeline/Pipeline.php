@@ -70,7 +70,7 @@ class Pipeline implements PipelineContract
      */
     public function through($pipes)
     {
-        $this->pipes = is_array($pipes) ? $pipes : func_get_args();
+        $this->pipes = \is_array($pipes) ? $pipes : \func_get_args();
 
         return $this;
     }
@@ -142,12 +142,12 @@ class Pipeline implements PipelineContract
         return function ($stack, $pipe) {
             return function ($passable) use ($stack, $pipe) {
                 try {
-                    if (is_callable($pipe)) {
+                    if (\is_callable($pipe)) {
                         // If the pipe is a callable, then we will call it directly, but otherwise we
                         // will resolve the pipes out of the dependency container and call it with
                         // the appropriate method and arguments, returning the results back out.
                         return $pipe($passable, $stack);
-                    } elseif (! is_object($pipe)) {
+                    } elseif (! \is_object($pipe)) {
                         [$name, $parameters] = $this->parsePipeString($pipe);
 
                         // If the pipe is a string we will parse the string and resolve the class out
@@ -185,7 +185,7 @@ class Pipeline implements PipelineContract
     {
         [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
 
-        if (is_string($parameters)) {
+        if (\is_string($parameters)) {
             $parameters = explode(',', $parameters);
         }
 

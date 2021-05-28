@@ -251,7 +251,7 @@ class ParallelTesting
             return $_SERVER[$option] ?? false;
         };
 
-        return call_user_func($optionsResolver, $option);
+        return \call_user_func($optionsResolver, $option);
     }
 
     /**
@@ -262,7 +262,7 @@ class ParallelTesting
     public function token()
     {
         return $token = $this->tokenResolver
-            ? call_user_func($this->tokenResolver)
+            ? \call_user_func($this->tokenResolver)
             : ($_SERVER['TEST_TOKEN'] ?? false);
     }
 

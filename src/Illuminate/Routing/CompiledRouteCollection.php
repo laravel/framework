@@ -290,9 +290,9 @@ class CompiledRouteCollection extends AbstractRouteCollection
             $prefix = trim($attributes['action']['prefix'], '/');
 
             $baseUri = trim(implode(
-                '/', array_slice(
+                '/', \array_slice(
                     explode('/', trim($attributes['uri'], '/')),
-                    count($prefix !== '' ? explode('/', $prefix) : [])
+                    \count($prefix !== '' ? explode('/', $prefix) : [])
                 )
             ), '/');
         }

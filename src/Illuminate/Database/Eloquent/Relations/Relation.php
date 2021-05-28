@@ -167,7 +167,7 @@ abstract class Relation
         $result = $this->take(2)->get($columns);
 
         if ($result->isEmpty()) {
-            throw (new ModelNotFoundException)->setModel(get_class($this->related));
+            throw (new ModelNotFoundException)->setModel(\get_class($this->related));
         }
 
         if ($result->count() > 1) {
@@ -371,7 +371,7 @@ abstract class Relation
     protected function whereInMethod(Model $model, $key)
     {
         return $model->getKeyName() === last(explode('.', $key))
-                    && in_array($model->getKeyType(), ['int', 'integer'])
+                    && \in_array($model->getKeyType(), ['int', 'integer'])
                         ? 'whereIntegerInRaw'
                         : 'whereIn';
     }
@@ -387,7 +387,7 @@ abstract class Relation
     {
         $map = static::buildMorphMapFromModels($map);
 
-        if (is_array($map)) {
+        if (\is_array($map)) {
             static::$morphMap = $merge && static::$morphMap
                             ? $map + static::$morphMap : $map;
         }
@@ -403,7 +403,7 @@ abstract class Relation
      */
     protected static function buildMorphMapFromModels(array $models = null)
     {
-        if (is_null($models) || Arr::isAssoc($models)) {
+        if (\is_null($models) || Arr::isAssoc($models)) {
             return $models;
         }
 

@@ -201,15 +201,15 @@ class PostgresGrammar extends Grammar
     {
         $sql = parent::compileForeign($blueprint, $command);
 
-        if (! is_null($command->deferrable)) {
+        if (! \is_null($command->deferrable)) {
             $sql .= $command->deferrable ? ' deferrable' : ' not deferrable';
         }
 
-        if ($command->deferrable && ! is_null($command->initiallyImmediate)) {
+        if ($command->deferrable && ! \is_null($command->initiallyImmediate)) {
             $sql .= $command->initiallyImmediate ? ' initially immediate' : ' initially deferred';
         }
 
-        if (! is_null($command->notValid)) {
+        if (! \is_null($command->notValid)) {
             $sql .= ' not valid';
         }
 
@@ -580,11 +580,11 @@ class PostgresGrammar extends Grammar
      */
     protected function generatableColumn($type, Fluent $column)
     {
-        if (! $column->autoIncrement && is_null($column->generatedAs)) {
+        if (! $column->autoIncrement && \is_null($column->generatedAs)) {
             return $type;
         }
 
-        if ($column->autoIncrement && is_null($column->generatedAs)) {
+        if ($column->autoIncrement && \is_null($column->generatedAs)) {
             return with([
                 'integer' => 'serial',
                 'bigint' => 'bigserial',
@@ -594,7 +594,7 @@ class PostgresGrammar extends Grammar
 
         $options = '';
 
-        if (! is_bool($column->generatedAs) && ! empty($column->generatedAs)) {
+        if (! \is_bool($column->generatedAs) && ! empty($column->generatedAs)) {
             $options = sprintf(' (%s)', $column->generatedAs);
         }
 
@@ -739,7 +739,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time'.(is_null($column->precision) ? '' : "($column->precision)").' without time zone';
+        return 'time'.(\is_null($column->precision) ? '' : "($column->precision)").' without time zone';
     }
 
     /**
@@ -750,7 +750,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time'.(is_null($column->precision) ? '' : "($column->precision)").' with time zone';
+        return 'time'.(\is_null($column->precision) ? '' : "($column->precision)").' with time zone';
     }
 
     /**
@@ -761,7 +761,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $columnType = 'timestamp'.(is_null($column->precision) ? '' : "($column->precision)").' without time zone';
+        $columnType = 'timestamp'.(\is_null($column->precision) ? '' : "($column->precision)").' without time zone';
 
         return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
@@ -774,7 +774,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        $columnType = 'timestamp'.(is_null($column->precision) ? '' : "($column->precision)").' with time zone';
+        $columnType = 'timestamp'.(\is_null($column->precision) ? '' : "($column->precision)").' with time zone';
 
         return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
@@ -962,7 +962,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->collation)) {
+        if (! \is_null($column->collation)) {
             return ' collate '.$this->wrapValue($column->collation);
         }
     }
@@ -988,7 +988,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
+        if (! \is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }
@@ -1002,7 +1002,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if ((in_array($column->type, $this->serials) || ($column->generatedAs !== null)) && $column->autoIncrement) {
+        if ((\in_array($column->type, $this->serials) || ($column->generatedAs !== null)) && $column->autoIncrement) {
             return ' primary key';
         }
     }

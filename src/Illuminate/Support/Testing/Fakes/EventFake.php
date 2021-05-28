@@ -93,7 +93,7 @@ class EventFake implements Dispatcher
             [$event, $callback] = [$this->firstClosureParameterType($event), $event];
         }
 
-        if (is_int($callback)) {
+        if (\is_int($callback)) {
             return $this->assertDispatchedTimes($event, $callback);
         }
 
@@ -146,7 +146,7 @@ class EventFake implements Dispatcher
      */
     public function assertNothingDispatched()
     {
-        $count = count(Arr::flatten($this->events));
+        $count = \count(Arr::flatten($this->events));
 
         PHPUnit::assertSame(
             0, $count,
@@ -254,10 +254,10 @@ class EventFake implements Dispatcher
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
-        $name = is_object($event) ? get_class($event) : (string) $event;
+        $name = \is_object($event) ? \get_class($event) : (string) $event;
 
         if ($this->shouldFakeEvent($name, $payload)) {
-            $this->events[$name][] = func_get_args();
+            $this->events[$name][] = \func_get_args();
         } else {
             return $this->dispatcher->dispatch($event, $payload, $halt);
         }

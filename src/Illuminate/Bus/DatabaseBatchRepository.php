@@ -188,7 +188,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
                         ->lockForUpdate()
                         ->first();
 
-            return is_null($batch) ? [] : tap($callback($batch), function ($values) use ($batchId) {
+            return \is_null($batch) ? [] : tap($callback($batch), function ($values) use ($batchId) {
                 $this->connection->table($this->table)->where('id', $batchId)->update($values);
             });
         });

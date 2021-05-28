@@ -38,7 +38,7 @@ class Optional implements ArrayAccess
      */
     public function __get($key)
     {
-        if (is_object($this->value)) {
+        if (\is_object($this->value)) {
             return $this->value->{$key} ?? null;
         }
     }
@@ -51,11 +51,11 @@ class Optional implements ArrayAccess
      */
     public function __isset($name)
     {
-        if (is_object($this->value)) {
+        if (\is_object($this->value)) {
             return isset($this->value->{$name});
         }
 
-        if (is_array($this->value) || $this->value instanceof ArrayObject) {
+        if (\is_array($this->value) || $this->value instanceof ArrayObject) {
             return isset($this->value[$name]);
         }
 
@@ -124,7 +124,7 @@ class Optional implements ArrayAccess
             return $this->macroCall($method, $parameters);
         }
 
-        if (is_object($this->value)) {
+        if (\is_object($this->value)) {
             return $this->value->{$method}(...$parameters);
         }
     }

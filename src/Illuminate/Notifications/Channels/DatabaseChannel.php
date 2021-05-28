@@ -33,7 +33,7 @@ class DatabaseChannel
     protected function getData($notifiable, Notification $notification)
     {
         if (method_exists($notification, 'toDatabase')) {
-            return is_array($data = $notification->toDatabase($notifiable))
+            return \is_array($data = $notification->toDatabase($notifiable))
                                 ? $data : $data->data;
         }
 
@@ -55,7 +55,7 @@ class DatabaseChannel
     {
         return [
             'id' => $notification->id,
-            'type' => get_class($notification),
+            'type' => \get_class($notification),
             'data' => $this->getData($notifiable, $notification),
             'read_at' => null,
         ];

@@ -97,11 +97,11 @@ class PostgresGrammar extends Grammar
         // If the query is actually performing an aggregating select, we will let that
         // compiler handle the building of the select clauses, as it will need some
         // more syntax that is best handled by that function to keep things neat.
-        if (! is_null($query->aggregate)) {
+        if (! \is_null($query->aggregate)) {
             return;
         }
 
-        if (is_array($query->distinct)) {
+        if (\is_array($query->distinct)) {
             $select = 'select distinct on ('.$this->columnize($query->distinct).') ';
         } elseif ($query->distinct) {
             $select = 'select distinct ';
@@ -150,7 +150,7 @@ class PostgresGrammar extends Grammar
      */
     protected function compileLock(Builder $query, $value)
     {
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             return $value ? 'for update' : 'for share';
         }
 
@@ -290,7 +290,7 @@ class PostgresGrammar extends Grammar
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $values = collect($values)->map(function ($value, $column) {
-            return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
+            return \is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
                 ? json_encode($value)
                 : $value;
         })->all();

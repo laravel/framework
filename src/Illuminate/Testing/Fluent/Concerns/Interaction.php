@@ -24,7 +24,7 @@ trait Interaction
     {
         $prop = Str::before($key, '.');
 
-        if (! in_array($prop, $this->interacted, true)) {
+        if (! \in_array($prop, $this->interacted, true)) {
             $this->interacted[] = $prop;
         }
     }

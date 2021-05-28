@@ -49,7 +49,7 @@ trait AuthorizesRequests
      */
     protected function parseAbilityAndArguments($ability, $arguments)
     {
-        if (is_string($ability) && strpos($ability, '\\') === false) {
+        if (\is_string($ability) && strpos($ability, '\\') === false) {
             return [$ability, $arguments];
         }
 
@@ -87,7 +87,7 @@ trait AuthorizesRequests
         $middleware = [];
 
         foreach ($this->resourceAbilityMap() as $method => $ability) {
-            $modelName = in_array($method, $this->resourceMethodsWithoutModels()) ? $model : $parameter;
+            $modelName = \in_array($method, $this->resourceMethodsWithoutModels()) ? $model : $parameter;
 
             $middleware["can:{$ability},{$modelName}"][] = $method;
         }

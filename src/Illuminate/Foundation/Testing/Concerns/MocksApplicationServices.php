@@ -53,7 +53,7 @@ trait MocksApplicationServices
      */
     public function expectsEvents($events)
     {
-        $events = is_array($events) ? $events : func_get_args();
+        $events = \is_array($events) ? $events : \func_get_args();
 
         $this->withoutEvents();
 
@@ -79,7 +79,7 @@ trait MocksApplicationServices
      */
     public function doesntExpectEvents($events)
     {
-        $events = is_array($events) ? $events : func_get_args();
+        $events = \is_array($events) ? $events : \func_get_args();
 
         $this->withoutEvents();
 
@@ -134,7 +134,7 @@ trait MocksApplicationServices
      */
     protected function expectsJobs($jobs)
     {
-        $jobs = is_array($jobs) ? $jobs : func_get_args();
+        $jobs = \is_array($jobs) ? $jobs : \func_get_args();
 
         $this->withoutJobs();
 
@@ -160,7 +160,7 @@ trait MocksApplicationServices
      */
     protected function doesntExpectJobs($jobs)
     {
-        $jobs = is_array($jobs) ? $jobs : func_get_args();
+        $jobs = \is_array($jobs) ? $jobs : \func_get_args();
 
         $this->withoutJobs();
 
@@ -229,7 +229,7 @@ trait MocksApplicationServices
     protected function wasDispatched($needle, array $haystack)
     {
         foreach ($haystack as $dispatched) {
-            if ((is_string($dispatched) && ($dispatched === $needle || is_subclass_of($dispatched, $needle))) ||
+            if ((\is_string($dispatched) && ($dispatched === $needle || is_subclass_of($dispatched, $needle))) ||
                 $dispatched instanceof $needle) {
                 return true;
             }
@@ -275,7 +275,7 @@ trait MocksApplicationServices
 
                 if (($notified === $notifiable ||
                      $notified->getKey() == $notifiable->getKey()) &&
-                    get_class($dispatched['instance']) === $notification
+                    \get_class($dispatched['instance']) === $notification
                 ) {
                     return $this;
                 }

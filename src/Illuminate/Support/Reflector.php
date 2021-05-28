@@ -17,22 +17,22 @@ class Reflector
      */
     public static function isCallable($var, $syntaxOnly = false)
     {
-        if (! is_array($var)) {
-            return is_callable($var, $syntaxOnly);
+        if (! \is_array($var)) {
+            return \is_callable($var, $syntaxOnly);
         }
 
         if ((! isset($var[0]) || ! isset($var[1])) ||
-            ! is_string($var[1] ?? null)) {
+            ! \is_string($var[1] ?? null)) {
             return false;
         }
 
         if ($syntaxOnly &&
-            (is_string($var[0]) || is_object($var[0])) &&
-            is_string($var[1])) {
+            (\is_string($var[0]) || \is_object($var[0])) &&
+            \is_string($var[1])) {
             return true;
         }
 
-        $class = is_object($var[0]) ? get_class($var[0]) : $var[0];
+        $class = \is_object($var[0]) ? \get_class($var[0]) : $var[0];
 
         $method = $var[1];
 
@@ -44,11 +44,11 @@ class Reflector
             return (new ReflectionMethod($class, $method))->isPublic();
         }
 
-        if (is_object($var[0]) && method_exists($class, '__call')) {
+        if (\is_object($var[0]) && method_exists($class, '__call')) {
             return (new ReflectionMethod($class, '__call'))->isPublic();
         }
 
-        if (! is_object($var[0]) && method_exists($class, '__callStatic')) {
+        if (! \is_object($var[0]) && method_exists($class, '__callStatic')) {
             return (new ReflectionMethod($class, '__callStatic'))->isPublic();
         }
 
@@ -71,7 +71,7 @@ class Reflector
 
         $name = $type->getName();
 
-        if (! is_null($class = $parameter->getDeclaringClass())) {
+        if (! \is_null($class = $parameter->getDeclaringClass())) {
             if ($name === 'self') {
                 return $class->getName();
             }

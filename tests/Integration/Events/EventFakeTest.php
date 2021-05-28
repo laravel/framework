@@ -167,7 +167,7 @@ class PostEventSubscriber
     {
         $events->listen(
             'post-created',
-            [PostEventSubscriber::class, 'handlePostCreated']
+            [self::class, 'handlePostCreated']
         );
     }
 }

@@ -92,7 +92,7 @@ class CallQueuedClosure implements ShouldQueue
     public function failed($e)
     {
         foreach ($this->failureCallbacks as $callback) {
-            call_user_func($callback instanceof SerializableClosure ? $callback->getClosure() : $callback, $e);
+            \call_user_func($callback instanceof SerializableClosure ? $callback->getClosure() : $callback, $e);
         }
     }
 

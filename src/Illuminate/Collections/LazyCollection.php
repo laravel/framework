@@ -31,7 +31,7 @@ class LazyCollection implements Enumerable
     {
         if ($source instanceof Closure || $source instanceof self) {
             $this->source = $source;
-        } elseif (is_null($source)) {
+        } elseif (\is_null($source)) {
             $this->source = static::empty();
         } else {
             $this->source = $this->getArrayableItems($source);
@@ -67,7 +67,7 @@ class LazyCollection implements Enumerable
      */
     public function all()
     {
-        if (is_array($this->source)) {
+        if (\is_array($this->source)) {
             return $this->source;
         }
 
@@ -99,7 +99,7 @@ class LazyCollection implements Enumerable
 
         return new static(function () use ($iterator, &$iteratorIndex, &$cache) {
             for ($index = 0; true; $index++) {
-                if (array_key_exists($index, $cache)) {
+                if (\array_key_exists($index, $cache)) {
                     yield $cache[$index][0] => $cache[$index][1];
 
                     continue;
@@ -164,7 +164,7 @@ class LazyCollection implements Enumerable
     {
         return new static(function () {
             foreach ($this as $values) {
-                if (is_array($values) || $values instanceof Enumerable) {
+                if (\is_array($values) || $values instanceof Enumerable) {
                     foreach ($values as $value) {
                         yield $value;
                     }
@@ -183,13 +183,13 @@ class LazyCollection implements Enumerable
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() === 1 && $this->useAsCallable($key)) {
+        if (\func_num_args() === 1 && $this->useAsCallable($key)) {
             $placeholder = new stdClass;
 
             return $this->first($key, $placeholder) !== $placeholder;
         }
 
-        if (func_num_args() === 1) {
+        if (\func_num_args() === 1) {
             $needle = $key;
 
             foreach ($this as $value) {
@@ -201,7 +201,7 @@ class LazyCollection implements Enumerable
             return false;
         }
 
-        return $this->contains($this->operatorForWhere(...func_get_args()));
+        return $this->contains($this->operatorForWhere(...\func_get_args()));
     }
 
     /**
@@ -212,7 +212,7 @@ class LazyCollection implements Enumerable
      */
     public function crossJoin(...$arrays)
     {
-        return $this->passthru('crossJoin', func_get_args());
+        return $this->passthru('crossJoin', \func_get_args());
     }
 
     /**
@@ -223,7 +223,7 @@ class LazyCollection implements Enumerable
      */
     public function countBy($countBy = null)
     {
-        $countBy = is_null($countBy)
+        $countBy = \is_null($countBy)
             ? $this->identity()
             : $this->valueRetriever($countBy);
 
@@ -252,7 +252,7 @@ class LazyCollection implements Enumerable
      */
     public function diff($items)
     {
-        return $this->passthru('diff', func_get_args());
+        return $this->passthru('diff', \func_get_args());
     }
 
     /**
@@ -264,7 +264,7 @@ class LazyCollection implements Enumerable
      */
     public function diffUsing($items, callable $callback)
     {
-        return $this->passthru('diffUsing', func_get_args());
+        return $this->passthru('diffUsing', \func_get_args());
     }
 
     /**
@@ -275,7 +275,7 @@ class LazyCollection implements Enumerable
      */
     public function diffAssoc($items)
     {
-        return $this->passthru('diffAssoc', func_get_args());
+        return $this->passthru('diffAssoc', \func_get_args());
     }
 
     /**
@@ -287,7 +287,7 @@ class LazyCollection implements Enumerable
      */
     public function diffAssocUsing($items, callable $callback)
     {
-        return $this->passthru('diffAssocUsing', func_get_args());
+        return $this->passthru('diffAssocUsing', \func_get_args());
     }
 
     /**
@@ -298,7 +298,7 @@ class LazyCollection implements Enumerable
      */
     public function diffKeys($items)
     {
-        return $this->passthru('diffKeys', func_get_args());
+        return $this->passthru('diffKeys', \func_get_args());
     }
 
     /**
@@ -310,7 +310,7 @@ class LazyCollection implements Enumerable
      */
     public function diffKeysUsing($items, callable $callback)
     {
-        return $this->passthru('diffKeysUsing', func_get_args());
+        return $this->passthru('diffKeysUsing', \func_get_args());
     }
 
     /**
@@ -322,7 +322,7 @@ class LazyCollection implements Enumerable
      */
     public function duplicates($callback = null, $strict = false)
     {
-        return $this->passthru('duplicates', func_get_args());
+        return $this->passthru('duplicates', \func_get_args());
     }
 
     /**
@@ -333,7 +333,7 @@ class LazyCollection implements Enumerable
      */
     public function duplicatesStrict($callback = null)
     {
-        return $this->passthru('duplicatesStrict', func_get_args());
+        return $this->passthru('duplicatesStrict', \func_get_args());
     }
 
     /**
@@ -344,7 +344,7 @@ class LazyCollection implements Enumerable
      */
     public function except($keys)
     {
-        return $this->passthru('except', func_get_args());
+        return $this->passthru('except', \func_get_args());
     }
 
     /**
@@ -355,7 +355,7 @@ class LazyCollection implements Enumerable
      */
     public function filter(callable $callback = null)
     {
-        if (is_null($callback)) {
+        if (\is_null($callback)) {
             $callback = function ($value) {
                 return (bool) $value;
             };
@@ -381,7 +381,7 @@ class LazyCollection implements Enumerable
     {
         $iterator = $this->getIterator();
 
-        if (is_null($callback)) {
+        if (\is_null($callback)) {
             if (! $iterator->valid()) {
                 return value($default);
             }
@@ -408,7 +408,7 @@ class LazyCollection implements Enumerable
     {
         $instance = new static(function () use ($depth) {
             foreach ($this as $item) {
-                if (! is_array($item) && ! $item instanceof Enumerable) {
+                if (! \is_array($item) && ! $item instanceof Enumerable) {
                     yield $item;
                 } elseif ($depth === 1) {
                     yield from $item;
@@ -444,7 +444,7 @@ class LazyCollection implements Enumerable
      */
     public function get($key, $default = null)
     {
-        if (is_null($key)) {
+        if (\is_null($key)) {
             return;
         }
 
@@ -466,7 +466,7 @@ class LazyCollection implements Enumerable
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
-        return $this->passthru('groupBy', func_get_args());
+        return $this->passthru('groupBy', \func_get_args());
     }
 
     /**
@@ -483,7 +483,7 @@ class LazyCollection implements Enumerable
             foreach ($this as $key => $item) {
                 $resolvedKey = $keyBy($item, $key);
 
-                if (is_object($resolvedKey)) {
+                if (\is_object($resolvedKey)) {
                     $resolvedKey = (string) $resolvedKey;
                 }
 
@@ -500,11 +500,11 @@ class LazyCollection implements Enumerable
      */
     public function has($key)
     {
-        $keys = array_flip(is_array($key) ? $key : func_get_args());
-        $count = count($keys);
+        $keys = array_flip(\is_array($key) ? $key : \func_get_args());
+        $count = \count($keys);
 
         foreach ($this as $key => $value) {
-            if (array_key_exists($key, $keys) && --$count == 0) {
+            if (\array_key_exists($key, $keys) && --$count == 0) {
                 return true;
             }
         }
@@ -521,7 +521,7 @@ class LazyCollection implements Enumerable
      */
     public function implode($value, $glue = null)
     {
-        return $this->collect()->implode(...func_get_args());
+        return $this->collect()->implode(...\func_get_args());
     }
 
     /**
@@ -532,7 +532,7 @@ class LazyCollection implements Enumerable
      */
     public function intersect($items)
     {
-        return $this->passthru('intersect', func_get_args());
+        return $this->passthru('intersect', \func_get_args());
     }
 
     /**
@@ -543,7 +543,7 @@ class LazyCollection implements Enumerable
      */
     public function intersectByKeys($items)
     {
-        return $this->passthru('intersectByKeys', func_get_args());
+        return $this->passthru('intersectByKeys', \func_get_args());
     }
 
     /**
@@ -575,7 +575,7 @@ class LazyCollection implements Enumerable
      */
     public function join($glue, $finalGlue = '')
     {
-        return $this->collect()->join(...func_get_args());
+        return $this->collect()->join(...\func_get_args());
     }
 
     /**
@@ -604,7 +604,7 @@ class LazyCollection implements Enumerable
         $needle = $placeholder = new stdClass;
 
         foreach ($this as $key => $value) {
-            if (is_null($callback) || $callback($value, $key)) {
+            if (\is_null($callback) || $callback($value, $key)) {
                 $needle = $value;
             }
         }
@@ -627,12 +627,12 @@ class LazyCollection implements Enumerable
             foreach ($this as $item) {
                 $itemValue = data_get($item, $value);
 
-                if (is_null($key)) {
+                if (\is_null($key)) {
                     yield $itemValue;
                 } else {
                     $itemKey = data_get($item, $key);
 
-                    if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
+                    if (\is_object($itemKey) && method_exists($itemKey, '__toString')) {
                         $itemKey = (string) $itemKey;
                     }
 
@@ -667,7 +667,7 @@ class LazyCollection implements Enumerable
      */
     public function mapToDictionary(callable $callback)
     {
-        return $this->passthru('mapToDictionary', func_get_args());
+        return $this->passthru('mapToDictionary', \func_get_args());
     }
 
     /**
@@ -695,7 +695,7 @@ class LazyCollection implements Enumerable
      */
     public function merge($items)
     {
-        return $this->passthru('merge', func_get_args());
+        return $this->passthru('merge', \func_get_args());
     }
 
     /**
@@ -706,7 +706,7 @@ class LazyCollection implements Enumerable
      */
     public function mergeRecursive($items)
     {
-        return $this->passthru('mergeRecursive', func_get_args());
+        return $this->passthru('mergeRecursive', \func_get_args());
     }
 
     /**
@@ -748,7 +748,7 @@ class LazyCollection implements Enumerable
      */
     public function union($items)
     {
-        return $this->passthru('union', func_get_args());
+        return $this->passthru('union', \func_get_args());
     }
 
     /**
@@ -783,18 +783,18 @@ class LazyCollection implements Enumerable
     {
         if ($keys instanceof Enumerable) {
             $keys = $keys->all();
-        } elseif (! is_null($keys)) {
-            $keys = is_array($keys) ? $keys : func_get_args();
+        } elseif (! \is_null($keys)) {
+            $keys = \is_array($keys) ? $keys : \func_get_args();
         }
 
         return new static(function () use ($keys) {
-            if (is_null($keys)) {
+            if (\is_null($keys)) {
                 yield from $this;
             } else {
                 $keys = array_flip($keys);
 
                 foreach ($this as $key => $value) {
-                    if (array_key_exists($key, $keys)) {
+                    if (\array_key_exists($key, $keys)) {
                         yield $key => $value;
 
                         unset($keys[$key]);
@@ -832,9 +832,9 @@ class LazyCollection implements Enumerable
      */
     public function random($number = null)
     {
-        $result = $this->collect()->random(...func_get_args());
+        $result = $this->collect()->random(...\func_get_args());
 
-        return is_null($number) ? $result : new static($result);
+        return \is_null($number) ? $result : new static($result);
     }
 
     /**
@@ -849,7 +849,7 @@ class LazyCollection implements Enumerable
             $items = $this->getArrayableItems($items);
 
             foreach ($this as $key => $value) {
-                if (array_key_exists($key, $items)) {
+                if (\array_key_exists($key, $items)) {
                     yield $key => $items[$key];
 
                     unset($items[$key]);
@@ -872,7 +872,7 @@ class LazyCollection implements Enumerable
      */
     public function replaceRecursive($items)
     {
-        return $this->passthru('replaceRecursive', func_get_args());
+        return $this->passthru('replaceRecursive', \func_get_args());
     }
 
     /**
@@ -882,7 +882,7 @@ class LazyCollection implements Enumerable
      */
     public function reverse()
     {
-        return $this->passthru('reverse', func_get_args());
+        return $this->passthru('reverse', \func_get_args());
     }
 
     /**
@@ -917,7 +917,7 @@ class LazyCollection implements Enumerable
      */
     public function shuffle($seed = null)
     {
-        return $this->passthru('shuffle', func_get_args());
+        return $this->passthru('shuffle', \func_get_args());
     }
 
     /**
@@ -991,12 +991,12 @@ class LazyCollection implements Enumerable
     public function slice($offset, $length = null)
     {
         if ($offset < 0 || $length < 0) {
-            return $this->passthru('slice', func_get_args());
+            return $this->passthru('slice', \func_get_args());
         }
 
         $instance = $this->skip($offset);
 
-        return is_null($length) ? $instance : $instance->take($length);
+        return \is_null($length) ? $instance : $instance->take($length);
     }
 
     /**
@@ -1007,7 +1007,7 @@ class LazyCollection implements Enumerable
      */
     public function split($numberOfGroups)
     {
-        return $this->passthru('split', func_get_args());
+        return $this->passthru('split', \func_get_args());
     }
 
     /**
@@ -1023,8 +1023,8 @@ class LazyCollection implements Enumerable
      */
     public function sole($key = null, $operator = null, $value = null)
     {
-        $filter = func_num_args() > 1
-            ? $this->operatorForWhere(...func_get_args())
+        $filter = \func_num_args() > 1
+            ? $this->operatorForWhere(...\func_get_args())
             : $key;
 
         return $this
@@ -1056,7 +1056,7 @@ class LazyCollection implements Enumerable
                 while (true) {
                     $chunk[$iterator->key()] = $iterator->current();
 
-                    if (count($chunk) < $size) {
+                    if (\count($chunk) < $size) {
                         $iterator->next();
 
                         if (! $iterator->valid()) {
@@ -1130,7 +1130,7 @@ class LazyCollection implements Enumerable
      */
     public function sort($callback = null)
     {
-        return $this->passthru('sort', func_get_args());
+        return $this->passthru('sort', \func_get_args());
     }
 
     /**
@@ -1141,7 +1141,7 @@ class LazyCollection implements Enumerable
      */
     public function sortDesc($options = SORT_REGULAR)
     {
-        return $this->passthru('sortDesc', func_get_args());
+        return $this->passthru('sortDesc', \func_get_args());
     }
 
     /**
@@ -1154,7 +1154,7 @@ class LazyCollection implements Enumerable
      */
     public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
     {
-        return $this->passthru('sortBy', func_get_args());
+        return $this->passthru('sortBy', \func_get_args());
     }
 
     /**
@@ -1166,7 +1166,7 @@ class LazyCollection implements Enumerable
      */
     public function sortByDesc($callback, $options = SORT_REGULAR)
     {
-        return $this->passthru('sortByDesc', func_get_args());
+        return $this->passthru('sortByDesc', \func_get_args());
     }
 
     /**
@@ -1178,7 +1178,7 @@ class LazyCollection implements Enumerable
      */
     public function sortKeys($options = SORT_REGULAR, $descending = false)
     {
-        return $this->passthru('sortKeys', func_get_args());
+        return $this->passthru('sortKeys', \func_get_args());
     }
 
     /**
@@ -1189,7 +1189,7 @@ class LazyCollection implements Enumerable
      */
     public function sortKeysDesc($options = SORT_REGULAR)
     {
-        return $this->passthru('sortKeysDesc', func_get_args());
+        return $this->passthru('sortKeysDesc', \func_get_args());
     }
 
     /**
@@ -1201,7 +1201,7 @@ class LazyCollection implements Enumerable
     public function take($limit)
     {
         if ($limit < 0) {
-            return $this->passthru('take', func_get_args());
+            return $this->passthru('take', \func_get_args());
         }
 
         return new static(function () use ($limit) {
@@ -1314,7 +1314,7 @@ class LazyCollection implements Enumerable
      */
     public function zip($items)
     {
-        $iterables = func_get_args();
+        $iterables = \func_get_args();
 
         return new static(function () use ($iterables) {
             $iterators = Collection::make($iterables)->map(function ($iterable) {
@@ -1339,7 +1339,7 @@ class LazyCollection implements Enumerable
     public function pad($size, $value)
     {
         if ($size < 0) {
-            return $this->passthru('pad', func_get_args());
+            return $this->passthru('pad', \func_get_args());
         }
 
         return new static(function () use ($size, $value) {
@@ -1374,8 +1374,8 @@ class LazyCollection implements Enumerable
      */
     public function count()
     {
-        if (is_array($this->source)) {
-            return count($this->source);
+        if (\is_array($this->source)) {
+            return \count($this->source);
         }
 
         return iterator_count($this->getIterator());
@@ -1393,7 +1393,7 @@ class LazyCollection implements Enumerable
             return $source->getIterator();
         }
 
-        if (is_array($source)) {
+        if (\is_array($source)) {
             return new ArrayIterator($source);
         }
 
@@ -1409,9 +1409,9 @@ class LazyCollection implements Enumerable
      */
     protected function explodePluckParameters($value, $key)
     {
-        $value = is_string($value) ? explode('.', $value) : $value;
+        $value = \is_string($value) ? explode('.', $value) : $value;
 
-        $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
+        $key = \is_null($key) || \is_array($key) ? $key : explode('.', $key);
 
         return [$value, $key];
     }

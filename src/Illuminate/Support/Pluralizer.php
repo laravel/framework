@@ -99,7 +99,7 @@ class Pluralizer
      */
     protected static function uncountable($value)
     {
-        return in_array(strtolower($value), static::$uncountable);
+        return \in_array(strtolower($value), static::$uncountable);
     }
 
     /**
@@ -131,7 +131,7 @@ class Pluralizer
     {
         static $inflector;
 
-        if (is_null($inflector)) {
+        if (\is_null($inflector)) {
             $inflector = new Inflector(
                 new CachedWordInflector(new RulesetInflector(
                     English\Rules::getSingularRuleset()

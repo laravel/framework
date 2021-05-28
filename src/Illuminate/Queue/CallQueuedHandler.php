@@ -149,7 +149,7 @@ class CallQueuedHandler
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array(InteractsWithQueue::class, class_uses_recursive($instance))) {
+        if (\in_array(InteractsWithQueue::class, class_uses_recursive($instance))) {
             $instance->setJob($job);
         }
 
@@ -179,9 +179,9 @@ class CallQueuedHandler
     {
         $uses = class_uses_recursive($command);
 
-        if (! in_array(Batchable::class, $uses) ||
-            ! in_array(InteractsWithQueue::class, $uses) ||
-            is_null($command->batch())) {
+        if (! \in_array(Batchable::class, $uses) ||
+            ! \in_array(InteractsWithQueue::class, $uses) ||
+            \is_null($command->batch())) {
             return;
         }
 
@@ -209,7 +209,7 @@ class CallQueuedHandler
                     : $this->container->make(Cache::class);
 
         $cache->lock(
-            'laravel_unique_job:'.get_class($command).$uniqueId
+            'laravel_unique_job:'.\get_class($command).$uniqueId
         )->forceRelease();
     }
 
@@ -274,8 +274,8 @@ class CallQueuedHandler
      */
     protected function ensureFailedBatchJobIsRecorded(string $uuid, $command, $e)
     {
-        if (! in_array(Batchable::class, class_uses_recursive($command)) ||
-            is_null($command->batch())) {
+        if (! \in_array(Batchable::class, class_uses_recursive($command)) ||
+            \is_null($command->batch())) {
             return;
         }
 

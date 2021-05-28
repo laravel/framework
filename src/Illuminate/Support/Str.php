@@ -84,7 +84,7 @@ class Str
             return $subject;
         }
 
-        return substr($subject, $position + strlen($search));
+        return substr($subject, $position + \strlen($search));
     }
 
     /**
@@ -219,7 +219,7 @@ class Str
         foreach ((array) $needles as $needle) {
             if (
                 $needle !== '' && $needle !== null
-                && substr($haystack, -strlen($needle)) === (string) $needle
+                && substr($haystack, -\strlen($needle)) === (string) $needle
             ) {
                 return true;
             }
@@ -299,7 +299,7 @@ class Str
      */
     public static function isUuid($value)
     {
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             return false;
         }
 
@@ -483,7 +483,7 @@ class Str
     {
         $string = '';
 
-        while (($len = strlen($string)) < $length) {
+        while (($len = \strlen($string)) < $length) {
             $size = $length - $len;
 
             $bytes = random_bytes($size);
@@ -557,7 +557,7 @@ class Str
         $position = strpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return substr_replace($subject, $replace, $position, \strlen($search));
         }
 
         return $subject;
@@ -580,7 +580,7 @@ class Str
         $position = strrpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return substr_replace($subject, $replace, $position, \strlen($search));
         }
 
         return $subject;
@@ -713,7 +713,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
+            if ((string) $needle !== '' && strncmp($haystack, $needle, \strlen($needle)) === 0) {
                 return true;
             }
         }
@@ -764,7 +764,7 @@ class Str
      */
     public static function substrCount($haystack, $needle, $offset = 0, $length = null)
     {
-        if (! is_null($length)) {
+        if (! \is_null($length)) {
             return substr_count($haystack, $needle, $offset, $length);
         } else {
             return substr_count($haystack, $needle, $offset);
@@ -801,7 +801,7 @@ class Str
     public static function uuid()
     {
         return static::$uuidFactory
-                    ? call_user_func(static::$uuidFactory)
+                    ? \call_user_func(static::$uuidFactory)
                     : Uuid::uuid4();
     }
 
@@ -813,7 +813,7 @@ class Str
     public static function orderedUuid()
     {
         if (static::$uuidFactory) {
-            return call_user_func(static::$uuidFactory);
+            return \call_user_func(static::$uuidFactory);
         }
 
         $factory = new UuidFactory;

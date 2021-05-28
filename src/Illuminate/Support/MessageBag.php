@@ -90,7 +90,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $messages = (array) $this->messages;
 
-        return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
+        return ! isset($messages[$key]) || ! \in_array($message, $messages[$key]);
     }
 
     /**
@@ -122,11 +122,11 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
             return false;
         }
 
-        if (is_null($key)) {
+        if (\is_null($key)) {
             return $this->any();
         }
 
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : \func_get_args();
 
         foreach ($keys as $key) {
             if ($this->first($key) === '') {
@@ -149,7 +149,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
             return false;
         }
 
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = \is_array($keys) ? $keys : \func_get_args();
 
         foreach ($keys as $key) {
             if ($this->has($key)) {
@@ -169,11 +169,11 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function first($key = null, $format = null)
     {
-        $messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
+        $messages = \is_null($key) ? $this->all($format) : $this->get($key, $format);
 
         $firstMessage = Arr::first($messages, null, '');
 
-        return is_array($firstMessage) ? Arr::first($firstMessage) : $firstMessage;
+        return \is_array($firstMessage) ? Arr::first($firstMessage) : $firstMessage;
     }
 
     /**
@@ -188,7 +188,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
         // If the message exists in the message bag, we will transform it and return
         // the message. Otherwise, we will check if the key is implicit & collect
         // all the messages that match the given key and output it as an array.
-        if (array_key_exists($key, $this->messages)) {
+        if (\array_key_exists($key, $this->messages)) {
             return $this->transform(
                 $this->messages[$key], $this->checkFormat($format), $key
             );
@@ -371,7 +371,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function count()
     {
-        return count($this->messages, COUNT_RECURSIVE) - count($this->messages);
+        return \count($this->messages, COUNT_RECURSIVE) - \count($this->messages);
     }
 
     /**

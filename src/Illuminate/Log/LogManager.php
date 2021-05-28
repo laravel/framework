@@ -188,7 +188,7 @@ class LogManager implements LoggerInterface
     {
         $config = $this->configurationFor($name);
 
-        if (is_null($config)) {
+        if (\is_null($config)) {
             throw new InvalidArgumentException("Log [{$name}] is not defined.");
         }
 
@@ -224,7 +224,7 @@ class LogManager implements LoggerInterface
      */
     protected function createCustomDriver(array $config)
     {
-        $factory = is_callable($via = $config['via']) ? $via : $this->app->make($via);
+        $factory = \is_callable($via = $config['via']) ? $via : $this->app->make($via);
 
         return $factory($config);
     }
@@ -237,7 +237,7 @@ class LogManager implements LoggerInterface
      */
     protected function createStackDriver(array $config)
     {
-        if (is_string($config['channels'])) {
+        if (\is_string($config['channels'])) {
             $config['channels'] = explode(',', $config['channels']);
         }
 

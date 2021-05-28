@@ -37,7 +37,7 @@ class SupportStrTest extends TestCase
 
     public function testStringWithoutWordsDoesntProduceError()
     {
-        $nbsp = chr(0xC2).chr(0xA0);
+        $nbsp = \chr(0xC2).\chr(0xA0);
         $this->assertSame(' ', Str::words(' '));
         $this->assertEquals($nbsp, Str::words($nbsp));
     }
@@ -330,9 +330,9 @@ class SupportStrTest extends TestCase
 
     public function testRandom()
     {
-        $this->assertEquals(16, strlen(Str::random()));
+        $this->assertEquals(16, \strlen(Str::random()));
         $randomInteger = random_int(1, 100);
-        $this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
+        $this->assertEquals($randomInteger, \strlen(Str::random($randomInteger)));
         $this->assertIsString(Str::random());
     }
 

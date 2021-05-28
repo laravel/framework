@@ -34,7 +34,7 @@ class SqlServerGrammar extends Grammar
         // If an offset is present on the query, we will need to wrap the query in
         // a big "ANSI" offset syntax block. This is very nasty compared to the
         // other database systems but is necessary for implementing features.
-        if (is_null($query->columns)) {
+        if (\is_null($query->columns)) {
             $query->columns = ['*'];
         }
 
@@ -52,7 +52,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileColumns(Builder $query, $columns)
     {
-        if (! is_null($query->aggregate)) {
+        if (! \is_null($query->aggregate)) {
             return;
         }
 
@@ -79,11 +79,11 @@ class SqlServerGrammar extends Grammar
     {
         $from = parent::compileFrom($query, $table);
 
-        if (is_string($query->lock)) {
+        if (\is_string($query->lock)) {
             return $from.' '.$query->lock;
         }
 
-        if (! is_null($query->lock)) {
+        if (! \is_null($query->lock)) {
             return $from.' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
         }
 
@@ -140,7 +140,7 @@ class SqlServerGrammar extends Grammar
      */
     public function prepareBindingForJsonContains($binding)
     {
-        return is_bool($binding) ? json_encode($binding) : $binding;
+        return \is_bool($binding) ? json_encode($binding) : $binding;
     }
 
     /**
@@ -245,7 +245,7 @@ class SqlServerGrammar extends Grammar
     {
         $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
 
-        return ! is_null($query->limit) && $query->limit > 0 && $query->offset <= 0
+        return ! \is_null($query->limit) && $query->limit > 0 && $query->offset <= 0
                         ? Str::replaceFirst('delete', 'delete top ('.$query->limit.')', $sql)
                         : $sql;
     }

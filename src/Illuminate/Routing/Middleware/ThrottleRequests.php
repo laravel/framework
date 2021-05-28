@@ -49,9 +49,9 @@ class ThrottleRequests
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
     {
-        if (is_string($maxAttempts)
-            && func_num_args() === 3
-            && ! is_null($limiter = $this->limiter->limiter($maxAttempts))) {
+        if (\is_string($maxAttempts)
+            && \func_num_args() === 3
+            && ! \is_null($limiter = $this->limiter->limiter($maxAttempts))) {
             return $this->handleRequestUsingNamedLimiter($request, $next, $maxAttempts, $limiter);
         }
 
@@ -82,7 +82,7 @@ class ThrottleRequests
      */
     protected function handleRequestUsingNamedLimiter($request, Closure $next, $limiterName, Closure $limiter)
     {
-        $limiterResponse = call_user_func($limiter, $request);
+        $limiterResponse = \call_user_func($limiter, $request);
 
         if ($limiterResponse instanceof Response) {
             return $limiterResponse;
@@ -195,7 +195,7 @@ class ThrottleRequests
             $retryAfter
         );
 
-        return is_callable($responseCallback)
+        return \is_callable($responseCallback)
                     ? new HttpResponseException($responseCallback($request, $headers))
                     : new ThrottleRequestsException('Too Many Attempts.', null, $headers);
     }
@@ -244,7 +244,7 @@ class ThrottleRequests
                                   ?Response $response = null)
     {
         if ($response &&
-            ! is_null($response->headers->get('X-RateLimit-Remaining')) &&
+            ! \is_null($response->headers->get('X-RateLimit-Remaining')) &&
             (int) $response->headers->get('X-RateLimit-Remaining') <= (int) $remainingAttempts) {
             return [];
         }
@@ -254,7 +254,7 @@ class ThrottleRequests
             'X-RateLimit-Remaining' => $remainingAttempts,
         ];
 
-        if (! is_null($retryAfter)) {
+        if (! \is_null($retryAfter)) {
             $headers['Retry-After'] = $retryAfter;
             $headers['X-RateLimit-Reset'] = $this->availableAt($retryAfter);
         }
@@ -272,6 +272,6 @@ class ThrottleRequests
      */
     protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
     {
-        return is_null($retryAfter) ? $this->limiter->retriesLeft($key, $maxAttempts) : 0;
+        return \is_null($retryAfter) ? $this->limiter->retriesLeft($key, $maxAttempts) : 0;
     }
 }

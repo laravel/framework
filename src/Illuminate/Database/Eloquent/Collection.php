@@ -29,7 +29,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $key = $key->toArray();
         }
 
-        if (is_array($key)) {
+        if (\is_array($key)) {
             if ($this->isEmpty()) {
                 return new static;
             }
@@ -51,8 +51,8 @@ class Collection extends BaseCollection implements QueueableCollection
     public function load($relations)
     {
         if ($this->isNotEmpty()) {
-            if (is_string($relations)) {
-                $relations = func_get_args();
+            if (\is_string($relations)) {
+                $relations = \func_get_args();
             }
 
             $query = $this->first()->newQueryWithoutRelationships()->with($relations);
@@ -176,8 +176,8 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function loadMissing($relations)
     {
-        if (is_string($relations)) {
-            $relations = func_get_args();
+        if (\is_string($relations)) {
+            $relations = \func_get_args();
         }
 
         foreach ($relations as $key => $value) {
@@ -188,7 +188,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $segments = explode('.', explode(':', $key)[0]);
 
             if (Str::contains($key, ':')) {
-                $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
+                $segments[\count($segments) - 1] .= ':'.explode(':', $key)[1];
             }
 
             $path = [];
@@ -197,8 +197,8 @@ class Collection extends BaseCollection implements QueueableCollection
                 $path[] = [$segment => $segment];
             }
 
-            if (is_callable($value)) {
-                $path[count($segments) - 1][end($segments)] = $value;
+            if (\is_callable($value)) {
+                $path[\count($segments) - 1][end($segments)] = $value;
             }
 
             $this->loadMissingRelation($this, $path);
@@ -220,12 +220,12 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $name = explode(':', key($relation))[0];
 
-        if (is_string(reset($relation))) {
+        if (\is_string(reset($relation))) {
             $relation = reset($relation);
         }
 
         $models->filter(function ($model) use ($name) {
-            return ! is_null($model) && ! $model->relationLoaded($name);
+            return ! \is_null($model) && ! $model->relationLoaded($name);
         })->load($relation);
 
         if (empty($path)) {
@@ -253,7 +253,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $this->pluck($relation)
             ->filter()
             ->groupBy(function ($model) {
-                return get_class($model);
+                return \get_class($model);
             })
             ->each(function ($models, $className) use ($relations) {
                 static::make($models)->load($relations[$className] ?? []);
@@ -274,7 +274,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $this->pluck($relation)
             ->filter()
             ->groupBy(function ($model) {
-                return get_class($model);
+                return \get_class($model);
             })
             ->each(function ($models, $className) use ($relations) {
                 static::make($models)->loadCount($relations[$className] ?? []);
@@ -293,8 +293,8 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() > 1 || $this->useAsCallable($key)) {
-            return parent::contains(...func_get_args());
+        if (\func_num_args() > 1 || $this->useAsCallable($key)) {
+            return parent::contains(...\func_get_args());
         }
 
         if ($key instanceof Model) {
@@ -384,7 +384,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $model = $this->first();
 
         $freshModels = $model->newQueryWithoutScopes()
-            ->with(is_string($with) ? func_get_args() : $with)
+            ->with(\is_string($with) ? \func_get_args() : $with)
             ->whereIn($model->getKeyName(), $this->modelKeys())
             ->get()
             ->getDictionary();
@@ -452,7 +452,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function unique($key = null, $strict = false)
     {
-        if (! is_null($key)) {
+        if (! \is_null($key)) {
             return parent::unique($key, $strict);
         }
 
@@ -467,7 +467,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function only($keys)
     {
-        if (is_null($keys)) {
+        if (\is_null($keys)) {
             return new static($this->items);
         }
 
@@ -530,7 +530,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function getDictionary($items = null)
     {
-        $items = is_null($items) ? $this->items : $items;
+        $items = \is_null($items) ? $this->items : $items;
 
         $dictionary = [];
 
@@ -575,7 +575,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function zip($items)
     {
-        return $this->toBase()->zip(...func_get_args());
+        return $this->toBase()->zip(...\func_get_args());
     }
 
     /**
@@ -647,10 +647,10 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $class = get_class($this->first());
+        $class = \get_class($this->first());
 
         $this->each(function ($model) use ($class) {
-            if (get_class($model) !== $class) {
+            if (\get_class($model) !== $class) {
                 throw new LogicException('Queueing collections with multiple model types is not supported.');
             }
         });
@@ -687,9 +687,9 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $relations = $this->map->getQueueableRelations()->all();
 
-        if (count($relations) === 0 || $relations === [[]]) {
+        if (\count($relations) === 0 || $relations === [[]]) {
             return [];
-        } elseif (count($relations) === 1) {
+        } elseif (\count($relations) === 1) {
             return reset($relations);
         } else {
             return array_intersect(...$relations);
@@ -735,7 +735,7 @@ class Collection extends BaseCollection implements QueueableCollection
             throw new LogicException('Unable to create query for empty collection.');
         }
 
-        $class = get_class($model);
+        $class = \get_class($model);
 
         if ($this->filter(function ($model) use ($class) {
             return ! $model instanceof $class;

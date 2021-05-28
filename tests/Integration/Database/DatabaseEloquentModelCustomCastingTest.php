@@ -322,7 +322,7 @@ class AddressCaster implements CastsAttributes
 {
     public function get($model, $key, $value, $attributes)
     {
-        if (is_null($attributes['address_line_one'])) {
+        if (\is_null($attributes['address_line_one'])) {
             return;
         }
 
@@ -331,7 +331,7 @@ class AddressCaster implements CastsAttributes
 
     public function set($model, $key, $value, $attributes)
     {
-        if (is_null($value)) {
+        if (\is_null($value)) {
             return [
                 'address_line_one' => null,
                 'address_line_two' => null,
@@ -473,7 +473,7 @@ final class Decimal
     {
         $parts = explode('.', (string) $value);
 
-        $this->scale = strlen($parts[1]);
+        $this->scale = \strlen($parts[1]);
         $this->value = (int) str_replace('.', '', $value);
     }
 

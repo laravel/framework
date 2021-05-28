@@ -40,7 +40,7 @@ class AssertableJsonString implements ArrayAccess, Countable
             $this->decoded = $jsonable->jsonSerialize();
         } elseif ($jsonable instanceof Jsonable) {
             $this->decoded = json_decode($jsonable->toJson(), true);
-        } elseif (is_array($jsonable)) {
+        } elseif (\is_array($jsonable)) {
             $this->decoded = $jsonable;
         } else {
             $this->decoded = json_decode($jsonable, true);
@@ -67,7 +67,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function assertCount(int $count, $key = null)
     {
-        if (! is_null($key)) {
+        if (! \is_null($key)) {
             PHPUnit::assertCount(
                 $count, data_get($this->decoded, $key),
                 "Failed to assert that the response count matched the expected {$count}"
@@ -230,22 +230,22 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function assertStructure(array $structure = null, $responseData = null)
     {
-        if (is_null($structure)) {
+        if (\is_null($structure)) {
             return $this->assertSimilar($this->decoded);
         }
 
-        if (! is_null($responseData)) {
+        if (! \is_null($responseData)) {
             return (new static($responseData))->assertStructure($structure);
         }
 
         foreach ($structure as $key => $value) {
-            if (is_array($value) && $key === '*') {
+            if (\is_array($value) && $key === '*') {
                 PHPUnit::assertIsArray($this->decoded);
 
                 foreach ($this->decoded as $responseDataItem) {
                     $this->assertStructure($structure['*'], $responseDataItem);
                 }
-            } elseif (is_array($value)) {
+            } elseif (\is_array($value)) {
                 PHPUnit::assertArrayHasKey($key, $this->decoded);
 
                 $this->assertStructure($structure[$key], $this->decoded[$key]);
@@ -336,7 +336,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function count()
     {
-        return count($this->decoded);
+        return \count($this->decoded);
     }
 
     /**

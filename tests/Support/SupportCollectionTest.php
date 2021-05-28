@@ -1324,7 +1324,7 @@ class SupportCollectionTest extends TestCase
         $result = [];
         $c->each(function ($item, $key) use (&$result) {
             $result[$key] = $item;
-            if (is_string($key)) {
+            if (\is_string($key)) {
                 return false;
             }
         });
@@ -3034,7 +3034,7 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertTrue($c->contains(function ($value) {
-            return is_null($value);
+            return \is_null($value);
         }));
     }
 
@@ -3075,7 +3075,7 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertTrue($c->some(function ($value) {
-            return is_null($value);
+            return \is_null($value);
         }));
     }
 
@@ -4670,7 +4670,7 @@ class TestAccessorEloquentTestStub
         $accessor = 'get'.lcfirst($attribute).'Attribute';
 
         if (method_exists($this, $accessor)) {
-            return ! is_null($this->$accessor());
+            return ! \is_null($this->$accessor());
         }
 
         return isset($this->$attribute);

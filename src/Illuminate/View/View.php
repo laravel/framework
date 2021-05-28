@@ -97,7 +97,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
             // another view gets rendered in the future by the application developer.
             $this->factory->flushStateIfDoneRendering();
 
-            return ! is_null($response) ? $response : $contents;
+            return ! \is_null($response) ? $response : $contents;
         } catch (Throwable $e) {
             $this->factory->flushState();
 
@@ -180,7 +180,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      */
     public function with($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             $this->data = array_merge($this->data, $key);
         } else {
             $this->data[$key] = $value;
@@ -308,7 +308,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      */
     public function offsetExists($key)
     {
-        return array_key_exists($key, $this->data);
+        return \array_key_exists($key, $this->data);
     }
 
     /**

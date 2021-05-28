@@ -106,7 +106,7 @@ class MailManager implements FactoryContract
     {
         $config = $this->getConfig($name);
 
-        if (is_null($config)) {
+        if (\is_null($config)) {
             throw new InvalidArgumentException("Mailer [{$name}] is not defined.");
         }
 
@@ -167,7 +167,7 @@ class MailManager implements FactoryContract
         $transport = $config['transport'] ?? $this->app['config']['mail.driver'];
 
         if (isset($this->customCreators[$transport])) {
-            return call_user_func($this->customCreators[$transport], $config);
+            return \call_user_func($this->customCreators[$transport], $config);
         }
 
         if (trim($transport ?? '') === '' || ! method_exists($this, $method = 'create'.ucfirst($transport).'Transport')) {
@@ -397,7 +397,7 @@ class MailManager implements FactoryContract
     {
         $address = Arr::get($config, $type, $this->app['config']['mail.'.$type]);
 
-        if (is_array($address) && isset($address['address'])) {
+        if (\is_array($address) && isset($address['address'])) {
             $mailer->{'always'.Str::studly($type)}($address['address'], $address['name']);
         }
     }

@@ -80,7 +80,7 @@ class InvokableComponentVariable implements DeferringDisplayableValue, IteratorA
      */
     public function __invoke()
     {
-        return call_user_func($this->callable);
+        return \call_user_func($this->callable);
     }
 
     /**

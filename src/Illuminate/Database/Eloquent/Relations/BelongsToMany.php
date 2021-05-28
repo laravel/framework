@@ -173,7 +173,7 @@ class BelongsToMany extends Relation
             return $table;
         }
 
-        if (in_array(AsPivot::class, class_uses_recursive($model))) {
+        if (\in_array(AsPivot::class, class_uses_recursive($model))) {
             $this->using($table);
         }
 
@@ -360,7 +360,7 @@ class BelongsToMany extends Relation
      */
     public function wherePivot($column, $operator = null, $value = null, $boolean = 'and')
     {
-        $this->pivotWheres[] = func_get_args();
+        $this->pivotWheres[] = \func_get_args();
 
         return $this->where($this->qualifyPivotColumn($column), $operator, $value, $boolean);
     }
@@ -427,7 +427,7 @@ class BelongsToMany extends Relation
      */
     public function wherePivotIn($column, $values, $boolean = 'and', $not = false)
     {
-        $this->pivotWhereIns[] = func_get_args();
+        $this->pivotWhereIns[] = \func_get_args();
 
         return $this->whereIn($this->qualifyPivotColumn($column), $values, $boolean, $not);
     }
@@ -458,7 +458,7 @@ class BelongsToMany extends Relation
      */
     public function withPivotValue($column, $value = null)
     {
-        if (is_array($column)) {
+        if (\is_array($column)) {
             foreach ($column as $name => $value) {
                 $this->withPivotValue($name, $value);
             }
@@ -466,7 +466,7 @@ class BelongsToMany extends Relation
             return $this;
         }
 
-        if (is_null($value)) {
+        if (\is_null($value)) {
             throw new InvalidArgumentException('The provided value may not be null.');
         }
 
@@ -522,7 +522,7 @@ class BelongsToMany extends Relation
      */
     public function wherePivotNull($column, $boolean = 'and', $not = false)
     {
-        $this->pivotWhereNulls[] = func_get_args();
+        $this->pivotWhereNulls[] = \func_get_args();
 
         return $this->whereNull($this->qualifyPivotColumn($column), $boolean, $not);
     }
@@ -583,7 +583,7 @@ class BelongsToMany extends Relation
      */
     public function findOrNew($id, $columns = ['*'])
     {
-        if (is_null($instance = $this->find($id, $columns))) {
+        if (\is_null($instance = $this->find($id, $columns))) {
             $instance = $this->related->newInstance();
         }
 
@@ -598,7 +598,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrNew(array $attributes)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (\is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes);
         }
 
@@ -615,7 +615,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrCreate(array $attributes, array $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (\is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->create($attributes, $joining, $touch);
         }
 
@@ -633,7 +633,7 @@ class BelongsToMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (\is_null($instance = $this->where($attributes)->first())) {
             return $this->create($values, $joining, $touch);
         }
 
@@ -653,7 +653,7 @@ class BelongsToMany extends Relation
      */
     public function find($id, $columns = ['*'])
     {
-        if (! $id instanceof Model && (is_array($id) || $id instanceof Arrayable)) {
+        if (! $id instanceof Model && (\is_array($id) || $id instanceof Arrayable)) {
             return $this->findMany($id, $columns);
         }
 
@@ -697,15 +697,15 @@ class BelongsToMany extends Relation
 
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
-        if (is_array($id)) {
-            if (count($result) === count(array_unique($id))) {
+        if (\is_array($id)) {
+            if (\count($result) === \count(array_unique($id))) {
                 return $result;
             }
-        } elseif (! is_null($result)) {
+        } elseif (! \is_null($result)) {
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related), $id);
+        throw (new ModelNotFoundException)->setModel(\get_class($this->related), $id);
     }
 
     /**
@@ -732,7 +732,7 @@ class BelongsToMany extends Relation
     {
         $results = $this->take(1)->get($columns);
 
-        return count($results) > 0 ? $results->first() : null;
+        return \count($results) > 0 ? $results->first() : null;
     }
 
     /**
@@ -745,11 +745,11 @@ class BelongsToMany extends Relation
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
+        if (! \is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
+        throw (new ModelNotFoundException)->setModel(\get_class($this->related));
     }
 
     /**
@@ -759,7 +759,7 @@ class BelongsToMany extends Relation
      */
     public function getResults()
     {
-        return ! is_null($this->parent->{$this->parentKey})
+        return ! \is_null($this->parent->{$this->parentKey})
                 ? $this->get()
                 : $this->related->newCollection();
     }
@@ -788,7 +788,7 @@ class BelongsToMany extends Relation
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded. This will solve the
         // n + 1 query problem for the developer and also increase performance.
-        if (count($models) > 0) {
+        if (\count($models) > 0) {
             $models = $builder->eagerLoadRelations($models);
         }
 
@@ -1080,7 +1080,7 @@ class BelongsToMany extends Relation
         // If we actually have IDs for the relation, we will run the query to update all
         // the related model's timestamps, to make sure these all reflect the changes
         // to the parent models. This will help us keep any caching synced up here.
-        if (count($ids = $this->allRelatedIds()) > 0) {
+        if (\count($ids = $this->allRelatedIds()) > 0) {
             $this->getRelated()->newQueryWithoutRelationships()->whereIn($key, $ids)->update($columns);
         }
     }

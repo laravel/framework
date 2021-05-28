@@ -25,7 +25,7 @@ class SetCacheHeaders
             return $response;
         }
 
-        if (is_string($options)) {
+        if (\is_string($options)) {
             $options = $this->parseOptions($options);
         }
 

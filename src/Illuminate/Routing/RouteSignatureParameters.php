@@ -22,11 +22,11 @@ class RouteSignatureParameters
                         ? unserialize($action['uses'])->getClosure()
                         : $action['uses'];
 
-        $parameters = is_string($callback)
+        $parameters = \is_string($callback)
                         ? static::fromClassMethodString($callback)
                         : (new ReflectionFunction($callback))->getParameters();
 
-        return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
+        return \is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
             return Reflector::isParameterSubclassOf($p, $subClass);
         });
     }

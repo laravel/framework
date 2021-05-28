@@ -169,7 +169,7 @@ class Stringable implements JsonSerializable
      */
     public function dirname($levels = 1)
     {
-        return new static(dirname($this->value, $levels));
+        return new static(\dirname($this->value, $levels));
     }
 
     /**
@@ -431,7 +431,7 @@ class Stringable implements JsonSerializable
      */
     public function pipe(callable $callback)
     {
-        return new static(call_user_func($callback, $this));
+        return new static(\call_user_func($callback, $this));
     }
 
     /**
@@ -673,7 +673,7 @@ class Stringable implements JsonSerializable
      */
     public function trim($characters = null)
     {
-        return new static(trim(...array_merge([$this->value], func_get_args())));
+        return new static(trim(...array_merge([$this->value], \func_get_args())));
     }
 
     /**
@@ -684,7 +684,7 @@ class Stringable implements JsonSerializable
      */
     public function ltrim($characters = null)
     {
-        return new static(ltrim(...array_merge([$this->value], func_get_args())));
+        return new static(ltrim(...array_merge([$this->value], \func_get_args())));
     }
 
     /**
@@ -695,7 +695,7 @@ class Stringable implements JsonSerializable
      */
     public function rtrim($characters = null)
     {
-        return new static(rtrim(...array_merge([$this->value], func_get_args())));
+        return new static(rtrim(...array_merge([$this->value], \func_get_args())));
     }
 
     /**
@@ -751,7 +751,7 @@ class Stringable implements JsonSerializable
         if ($this->isEmpty()) {
             $result = $callback($this);
 
-            return is_null($result) ? $this : $result;
+            return \is_null($result) ? $this : $result;
         }
 
         return $this;
@@ -768,7 +768,7 @@ class Stringable implements JsonSerializable
         if ($this->isNotEmpty()) {
             $result = $callback($this);
 
-            return is_null($result) ? $this : $result;
+            return \is_null($result) ? $this : $result;
         }
 
         return $this;

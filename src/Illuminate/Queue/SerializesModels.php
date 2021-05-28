@@ -58,7 +58,7 @@ trait SerializesModels
 
         $properties = (new ReflectionClass($this))->getProperties();
 
-        $class = get_class($this);
+        $class = \get_class($this);
 
         foreach ($properties as $property) {
             if ($property->isStatic()) {
@@ -97,7 +97,7 @@ trait SerializesModels
     {
         $properties = (new ReflectionClass($this))->getProperties();
 
-        $class = get_class($this);
+        $class = \get_class($this);
 
         foreach ($properties as $property) {
             if ($property->isStatic()) {
@@ -112,7 +112,7 @@ trait SerializesModels
                 $name = "\0*\0{$name}";
             }
 
-            if (! array_key_exists($name, $values)) {
+            if (! \array_key_exists($name, $values)) {
                 continue;
             }
 

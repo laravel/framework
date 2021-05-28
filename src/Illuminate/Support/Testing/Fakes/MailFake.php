@@ -55,7 +55,7 @@ class MailFake implements Factory, Mailer, MailQueue
 
         $message = "The expected [{$mailable}] mailable was not sent.";
 
-        if (count($this->queuedMailables) > 0) {
+        if (\count($this->queuedMailables) > 0) {
             $message .= ' Did you mean to use assertQueued() instead?';
         }
 
@@ -105,7 +105,7 @@ class MailFake implements Factory, Mailer, MailQueue
     public function assertNothingSent()
     {
         $mailableNames = collect($this->mailables)->map(function ($mailable) {
-            return get_class($mailable);
+            return \get_class($mailable);
         })->join(', ');
 
         PHPUnit::assertEmpty($this->mailables, 'The following mailables were sent unexpectedly: '.$mailableNames);
@@ -174,7 +174,7 @@ class MailFake implements Factory, Mailer, MailQueue
     public function assertNothingQueued()
     {
         $mailableNames = collect($this->queuedMailables)->map(function ($mailable) {
-            return get_class($mailable);
+            return \get_class($mailable);
         })->join(', ');
 
         PHPUnit::assertEmpty($this->queuedMailables, 'The following mailables were queued unexpectedly: '.$mailableNames);

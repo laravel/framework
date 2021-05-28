@@ -29,8 +29,8 @@ class RequiredIf
      */
     public function __toString()
     {
-        if (is_callable($this->condition)) {
-            return call_user_func($this->condition) ? 'required' : '';
+        if (\is_callable($this->condition)) {
+            return \call_user_func($this->condition) ? 'required' : '';
         }
 
         return $this->condition ? 'required' : '';

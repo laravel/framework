@@ -113,7 +113,7 @@ class UrlSigningTest extends TestCase
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature()
-                && intval($id) === 1
+                && \intval($id) === 1
                 && $request->has('paramEmpty')
                 && $request->has('paramEmptyString')
                 && $request->query('paramWithValue') === 'value'

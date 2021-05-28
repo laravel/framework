@@ -123,7 +123,7 @@ abstract class Queue
      */
     protected function createPayloadArray($job, $queue, $data = '')
     {
-        return is_object($job)
+        return \is_object($job)
                     ? $this->createObjectPayload($job, $queue)
                     : $this->createStringPayload($job, $queue, $data);
     }
@@ -159,7 +159,7 @@ abstract class Queue
 
         return array_merge($payload, [
             'data' => array_merge($payload['data'], [
-                'commandName' => get_class($job),
+                'commandName' => \get_class($job),
                 'command' => $command,
             ]),
         ]);
@@ -174,7 +174,7 @@ abstract class Queue
     protected function getDisplayName($job)
     {
         return method_exists($job, 'displayName')
-                        ? $job->displayName() : get_class($job);
+                        ? $job->displayName() : \get_class($job);
     }
 
     /**
@@ -241,7 +241,7 @@ abstract class Queue
     {
         return $this->withCreatePayloadHooks($queue, [
             'uuid' => (string) Str::uuid(),
-            'displayName' => is_string($job) ? explode('@', $job)[0] : null,
+            'displayName' => \is_string($job) ? explode('@', $job)[0] : null,
             'job' => $job,
             'maxTries' => null,
             'maxExceptions' => null,
@@ -260,7 +260,7 @@ abstract class Queue
      */
     public static function createPayloadUsing($callback)
     {
-        if (is_null($callback)) {
+        if (\is_null($callback)) {
             static::$createPayloadCallbacks = [];
         } else {
             static::$createPayloadCallbacks[] = $callback;
@@ -278,7 +278,7 @@ abstract class Queue
     {
         if (! empty(static::$createPayloadCallbacks)) {
             foreach (static::$createPayloadCallbacks as $callback) {
-                $payload = array_merge($payload, call_user_func(
+                $payload = array_merge($payload, \call_user_func(
                     $callback, $this->getConnectionName(), $queue, $payload
                 ));
             }
@@ -323,7 +323,7 @@ abstract class Queue
      */
     protected function shouldDispatchAfterCommit($job)
     {
-        if (is_object($job) && isset($job->afterCommit)) {
+        if (\is_object($job) && isset($job->afterCommit)) {
             return $job->afterCommit;
         }
 
