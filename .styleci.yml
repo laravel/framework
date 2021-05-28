@@ -1,5 +1,8 @@
 php:
+  risky: true
   preset: laravel
+  enabled:
+    - native_function_invocation_symfony
 js:
   finder:
     not-name:
