@@ -26,6 +26,13 @@ class QueryExecuted
     public $time;
 
     /**
+     * The Unix timestamp with microseconds right before executing the query.
+     *
+     * @var float
+     */
+    public $started;
+
+    /**
      * The database connection instance.
      *
      * @var \Illuminate\Database\Connection
@@ -46,14 +53,16 @@ class QueryExecuted
      * @param  array  $bindings
      * @param  float|null  $time
      * @param  \Illuminate\Database\Connection  $connection
+     * @param  float|null  $started
      * @return void
      */
-    public function __construct($sql, $bindings, $time, $connection)
+    public function __construct($sql, $bindings, $time, $connection, $started)
     {
         $this->sql = $sql;
         $this->time = $time;
         $this->bindings = $bindings;
         $this->connection = $connection;
         $this->connectionName = $connection->getName();
+        $this->started = $started;
     }
 }
