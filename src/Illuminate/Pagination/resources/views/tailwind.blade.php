@@ -25,13 +25,7 @@
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
                 <p class="text-sm text-gray-700 leading-5">
-                    {!! __('Showing') !!}
-                    <span class="font-medium">{{ $paginator->firstItem() }}</span>
-                    {!! __('to') !!}
-                    <span class="font-medium">{{ $paginator->lastItem() }}</span>
-                    {!! __('of') !!}
-                    <span class="font-medium">{{ $paginator->total() }}</span>
-                    {!! __('results') !!}
+                    {!! __('<span>Showing <span class="font-medium">:firstItem</span> to <span class="font-medium">:lastItem</span> of <span class="font-medium">:total</span> results</span>', ['firstItem' => $paginator->firstItem(), 'lastItem' => $paginator->lastItem(), 'total' => $paginator->total()]) !!}
                 </p>
             </div>
 
