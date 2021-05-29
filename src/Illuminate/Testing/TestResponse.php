@@ -1077,6 +1077,44 @@ class TestResponse implements ArrayAccess
         return $this;
     }
 
+    public function assertDownloadOffered($filename = null)
+    {
+        $contentDisposition = explode(';', $this->headers->get('content-disposition'));
+
+        if (trim($contentDisposition[0]) !== 'attachment') {
+            PHPUnit::fail(
+                'Response does not offer a file download.'.PHP_EOL.
+                'Disposition param ['.trim($contentDisposition[0]).'] found in header, [attachment] expected.'
+            );
+        }
+
+        if (! is_null($filename)) {
+            if (isset($contentDisposition[1]) && trim(explode('=', $contentDisposition[1])[0]) !== 'filename') {
+                PHPUnit::fail(
+                    'Unsupported Content-Disposition header param provided.'.PHP_EOL.
+                    'Disposition param ['.trim(explode('=', $contentDisposition[1])[0]).'] found in header, [filename] expected.'
+                );
+            }
+
+            $message = "Expected file [{$filename}] is not present in Content-Disposition header.";
+            if (! isset($contentDisposition[1])) {
+                PHPUnit::fail($message);
+            } else {
+                PHPUnit::assertSame(
+                    $filename,
+                    isset(explode('=', $contentDisposition[1])[1])
+                        ? trim(explode('=', $contentDisposition[1])[1])
+                        : '',
+                    $message
+                );
+                return $this;
+            }
+        } else {
+            PHPUnit::assertTrue(true);
+            return $this;
+        }
+    }
+
     /**
      * Get the current session store.
      *
