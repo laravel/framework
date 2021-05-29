@@ -201,7 +201,7 @@ class Migrator
 
         $startTime = microtime(true);
 
-        if (!$fake) {
+        if (! $fake) {
             $this->runMigration($migration, 'up');
         }
 
@@ -368,7 +368,7 @@ class Migrator
 
         $startTime = microtime(true);
 
-        if (!$fake) {
+        if (! $fake) {
             $this->runMigration($instance, 'down');
         }
 
