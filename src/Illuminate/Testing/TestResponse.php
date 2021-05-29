@@ -1113,10 +1113,12 @@ class TestResponse implements ArrayAccess
                         : '',
                     $message
                 );
+
                 return $this;
             }
         } else {
             PHPUnit::assertTrue(true);
+
             return $this;
         }
     }
