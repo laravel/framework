@@ -1077,6 +1077,12 @@ class TestResponse implements ArrayAccess
         return $this;
     }
 
+    /**
+     * Assert that the response offers file download.
+     *
+     * @param  string|null  $filename
+     * @return $this
+     */
     public function assertDownloadOffered($filename = null)
     {
         $contentDisposition = explode(';', $this->headers->get('content-disposition'));
