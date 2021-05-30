@@ -165,7 +165,11 @@ class Migrator
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend, $fake);
+            if ($fake) {
+                $this->fakeRunUp($file, $batch, $pretend);
+            } else {
+                $this->runUp($file, $batch, $pretend);
+            }
 
             if ($step) {
                 $batch++;
@@ -181,10 +185,9 @@ class Migrator
      * @param  string  $file
      * @param  int  $batch
      * @param  bool  $pretend
-     * @param  bool  $fake
      * @return void
      */
-    protected function runUp($file, $batch, $pretend, $fake)
+    protected function runUp($file, $batch, $pretend)
     {
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
@@ -201,9 +204,8 @@ class Migrator
 
         $startTime = microtime(true);
 
-        if (! $fake) {
-            $this->runMigration($migration, 'up');
-        }
+        $this->runMigration($migration, 'up');
+
 
         $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
 
@@ -213,6 +215,35 @@ class Migrator
         $this->repository->log($name, $batch);
 
         $this->note("<info>Migrated:</info>  {$name} ({$runTime}ms)");
+    }
+
+    /**
+     * Fake runing "up" for migration instance.
+     *
+     * @param  string  $file
+     * @param  int  $batch
+     * @param  bool  $pretend
+     * @return void
+     */
+    protected function fakeRunUp($file, $batch, $pretend)
+    {
+        // First we will resolve a "real" instance of the migration class from this
+        // migration file name. Once we have the instances we can run the actual
+        // command such as "up" or "down", or we can just simulate the action.
+        $migration = $this->resolvePath($file);
+
+        $name = $this->getMigrationName($file);
+
+        if ($pretend) {
+            return $this->pretendToRun($migration, 'up');
+        }
+
+        $this->note("<comment>Migrating:</comment> {$name}");
+
+        // Log that the migration was run, even though it wasn't
+        $this->repository->log($name, $batch);
+
+        $this->note("<info>Migrated:</info>  {$name} (0ms)");
     }
 
     /**
@@ -267,6 +298,8 @@ class Migrator
     {
         $rolledBack = [];
 
+        $fake = $options['fake'] ?? false;
+
         $this->requireFiles($files = $this->getMigrationFiles($paths));
 
         $this->fireMigrationEvent(new MigrationsStarted);
@@ -285,11 +318,17 @@ class Migrator
 
             $rolledBack[] = $file;
 
-            $this->runDown(
-                $file, $migration,
-                $options['pretend'] ?? false,
-                $options['fake'] ?? false
-            );
+            if ($fake) {
+                $this->fakeRunDown(
+                    $file, $migration,
+                    $options['pretend'] ?? false,
+                );
+            } else {
+                $this->runDown(
+                    $file, $migration,
+                    $options['pretend'] ?? false,
+                );
+            }
         }
 
         $this->fireMigrationEvent(new MigrationsEnded);
@@ -348,10 +387,9 @@ class Migrator
      * @param  string  $file
      * @param  object  $migration
      * @param  bool  $pretend
-     * @param  bool  $fake
      * @return void
      */
-    protected function runDown($file, $migration, $pretend, $fake)
+    protected function runDown($file, $migration, $pretend)
     {
         // First we will get the file name of the migration so we can resolve out an
         // instance of the migration. Once we get an instance we can either run a
@@ -368,9 +406,7 @@ class Migrator
 
         $startTime = microtime(true);
 
-        if (! $fake) {
-            $this->runMigration($instance, 'down');
-        }
+        $this->runMigration($instance, 'down');
 
         $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
 
@@ -380,6 +416,35 @@ class Migrator
         $this->repository->delete($migration);
 
         $this->note("<info>Rolled back:</info>  {$name} ({$runTime}ms)");
+    }
+
+    /**
+     * Fake running "down" for migration instance.
+     *
+     * @param  string  $file
+     * @param  object  $migration
+     * @param  bool  $pretend
+     * @return void
+     */
+    protected function fakeRunDown($file, $migration, $pretend)
+    {
+        // First we will get the file name of the migration so we can resolve out an
+        // instance of the migration. Once we get an instance we can either run a
+        // pretend execution of the migration or we can run the real migration.
+        $instance = $this->resolvePath($file);
+
+        $name = $this->getMigrationName($file);
+
+        $this->note("<comment>Rolling back:</comment> {$name}");
+
+        if ($pretend) {
+            return $this->pretendToRun($instance, 'down');
+        }
+
+        // remove record of migration
+        $this->repository->delete($migration);
+
+        $this->note("<info>Rolled back:</info>  {$name} (0ms)");
     }
 
     /**
