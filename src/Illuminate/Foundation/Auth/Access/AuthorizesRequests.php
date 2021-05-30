@@ -168,7 +168,7 @@ trait AuthorizesRequests
     protected function resourceAbilityMap()
     {
         return array_filter($this->resourceAbilities, function ($ability) {
-            return !in_array($ability, $this->excludeResourceAbilities);
+            return ! in_array($ability, $this->excludeResourceAbilities);
         });
     }
 
