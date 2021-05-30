@@ -23,13 +23,6 @@ trait AuthorizesRequests
     ];
 
     /**
-     * Excluded resource abilities.
-     *
-     * @var array
-     */
-    protected $excludeResourceAbilities = [];
-
-    /**
      * Authorize a given action for the current user.
      *
      * @param  mixed  $ability
@@ -155,7 +148,11 @@ trait AuthorizesRequests
      */
     public function excludeResourceAbilities($abilities)
     {
-        $this->excludeResourceAbilities = is_array($abilities) ? $abilities : func_get_args();
+        $abilities = is_array($abilities) ? $abilities : func_get_args();
+
+        $this->resourceAbilities = array_filter($this->resourceAbilities, function ($ability) use ($abilities) {
+            return ! in_array($ability, $abilities);
+        });
 
         return $this;
     }
@@ -167,9 +164,7 @@ trait AuthorizesRequests
      */
     protected function resourceAbilityMap()
     {
-        return array_filter($this->resourceAbilities, function ($ability) {
-            return ! in_array($ability, $this->excludeResourceAbilities);
-        });
+        return $this->resourceAbilities;
     }
 
     /**
