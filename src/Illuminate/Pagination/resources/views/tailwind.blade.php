@@ -25,7 +25,7 @@
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
                 <p class="text-sm text-gray-700 leading-5">
-                    <span>{!! __('pagination.footer', ['firstItem' => $paginator->firstItem(), 'lastItem' => $paginator->lastItem(), 'total' => $paginator->total()]) !!}</span>
+                    {!! __('pagination.footer', ['firstItem' => '<span class="font-medium">'.$paginator->firstItem().'</span>', 'lastItem' => '<span class="font-medium">'.$paginator->lastItem().'</span>', 'total' => '<span class="font-medium">'.$paginator->total().'</span>']) !!}
                 </p>
             </div>
 
