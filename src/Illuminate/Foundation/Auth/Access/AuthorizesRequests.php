@@ -8,6 +8,28 @@ use Illuminate\Support\Str;
 trait AuthorizesRequests
 {
     /**
+     * Resource ability map.
+     *
+     * @var array
+     */
+    protected $resourceAbilities = [
+        'index' => 'viewAny',
+        'show' => 'view',
+        'create' => 'create',
+        'store' => 'create',
+        'edit' => 'update',
+        'update' => 'update',
+        'destroy' => 'delete',
+    ];
+
+    /**
+     * Excluded resource abilities.
+     *
+     * @var array
+     */
+    protected $excludeResourceAbilities = [];
+
+    /**
      * Authorize a given action for the current user.
      *
      * @param  mixed  $ability
@@ -98,21 +120,56 @@ trait AuthorizesRequests
     }
 
     /**
+     * Set resource abilities.
+     *
+     * @param array $resourceAbilities
+     */
+    public function setResourceAbilities(array $resourceAbilities)
+    {
+        $this->resourceAbilities = $resourceAbilities;
+
+        return $this;
+    }
+
+    /**
+     * Use only the given abilities.
+     *
+     * @param string|array $abilities
+     */
+    public function onlyResourceAbilities($abilities)
+    {
+        $abilities = is_array($abilities) ? $abilities : func_get_args();
+
+        $this->resourceAbilities = array_filter($this->resourceAbilities, function ($ability) use ($abilities) {
+            return in_array($ability, $abilities);
+        });
+
+        return $this;
+    }
+
+    /**
+     * Exclude resource abilities.
+     *
+     * @param  array $abilities
+     * @return this
+     */
+    public function excludeResourceAbilities($abilities)
+    {
+        $this->excludeResourceAbilities = is_array($abilities) ? $abilities : func_get_args();
+
+        return $this;
+    }
+
+    /**
      * Get the map of resource methods to ability names.
      *
      * @return array
      */
     protected function resourceAbilityMap()
     {
-        return [
-            'index' => 'viewAny',
-            'show' => 'view',
-            'create' => 'create',
-            'store' => 'create',
-            'edit' => 'update',
-            'update' => 'update',
-            'destroy' => 'delete',
-        ];
+        return array_filter($this->resourceAbilities, function ($ability) {
+            return !in_array($ability, $this->excludeResourceAbilities);
+        });
     }
 
     /**
