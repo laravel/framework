@@ -206,7 +206,6 @@ class Migrator
 
         $this->runMigration($migration, 'up');
 
-
         $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
 
         // Once we have run a migrations class, we will log that it was run in this
