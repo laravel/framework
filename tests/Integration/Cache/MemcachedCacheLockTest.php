@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 /**
  * @group integration
  */
-class MemcachedCacheLockTest extends MemcachedIntegrationTest
+class MemcachedCacheLockTest extends MemcachedIntegrationTestCase
 {
     public function testMemcachedLocksCanBeAcquiredAndReleased()
     {
