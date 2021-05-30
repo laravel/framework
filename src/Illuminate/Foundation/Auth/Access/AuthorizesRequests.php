@@ -127,7 +127,7 @@ trait AuthorizesRequests
     /**
      * Use only the given abilities.
      *
-     * @param string|array $abilities
+     * @param  string|array  $abilities
      * @return $this
      */
     public function onlyResourceAbilities($abilities)
@@ -144,7 +144,7 @@ trait AuthorizesRequests
     /**
      * Exclude resource abilities.
      *
-     * @param string|array $abilities
+     * @param  string|array  $abilities
      * @return $this
      */
     public function excludeResourceAbilities($abilities)
