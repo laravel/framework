@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
-use Illuminate\Support\Facades\View;
 
 class DownCommand extends Command
 {
