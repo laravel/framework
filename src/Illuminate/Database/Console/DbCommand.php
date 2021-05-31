@@ -4,7 +4,6 @@ namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\ConfigurationUrlParser;
-use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use UnexpectedValueException;
 
@@ -53,11 +52,9 @@ class DbCommand extends Command
      */
     public function getConnection()
     {
-        [$db, $type] = $this->parseConnectionName(
-            $this->argument('connection') ?? $this->laravel['config']['database.default']
-        );
-
-        $connection = $this->laravel['config']['database.connections.'.$db];
+        $connection = $this->laravel['config']['database.connections.'.
+            (($db = $this->argument('connection')) ?? $this->laravel['config']['database.default'])
+        ];
 
         if (empty($connection)) {
             throw new UnexpectedValueException("Invalid database connection [{$db}].");
@@ -67,25 +64,7 @@ class DbCommand extends Command
             $connection = (new ConfigurationUrlParser)->parseConfiguration($connection);
         }
 
-        if (isset($type)) {
-            $connection = array_merge($connection, $connection[$type]);
-        }
-
         return $connection;
-    }
-
-    /**
-     * Parse the connection into an array of the name and read / write type.
-     *
-     * @param  string  $name
-     * @return array
-     */
-    protected function parseConnectionName($name)
-    {
-        $name = $name ?: $this->getDefaultConnection();
-
-        return Str::endsWith($name, ['::read', '::write'])
-                            ? explode('::', $name, 2) : [$name, null];
     }
 
     /**
