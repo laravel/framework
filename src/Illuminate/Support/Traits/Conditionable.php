@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support\Traits;
 
-trait Conditional
+trait Conditionable
 {
     /**
      * Apply the callback if the given "value" is true.
