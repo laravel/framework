@@ -1984,8 +1984,9 @@ class Builder
         }
 
         if (is_array($this->{$this->unions ? 'unionOrders' : 'orders'})) {
-            foreach ($this->{$this->unions ? 'unionOrders' : 'orders'} as $value) {
+            foreach ($this->{$this->unions ? 'unionOrders' : 'orders'} as $key => $value) {
                 if ($value['column'] === $column) {
+                    $this->{$this->unions ? 'unionOrders' : 'orders'}[$key]['direction'] = $direction;
                     return $this;
                 }
             }

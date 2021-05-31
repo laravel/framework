@@ -1190,11 +1190,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->orderBy('name');
-        $builder->orderBy('email');
-        $builder->orderBy('name');
-        $builder->orderBy('email');
-        $this->assertSame('select * from "users" order by "name" asc, "email" asc', $builder->toSql());
+        $builder->select('*')->from('users')->orderBy('name', 'asc');
+        $builder->orderBy('name', 'desc');
+        $builder->orderBy('email', 'desc');
+        $builder->orderBy('email', 'asc');
+        $this->assertSame('select * from "users" order by "name" desc, "email" asc', $builder->toSql());
     }
 
     public function testReorder()
