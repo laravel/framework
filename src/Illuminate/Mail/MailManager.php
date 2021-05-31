@@ -262,11 +262,11 @@ class MailManager implements FactoryContract
      */
     protected function createSesTransport(array $config)
     {
-        $global = $this->app['config']->get('services.ses', []);
-
-        $default = ['version' => 'latest', 'service' => 'email'];
-
-        $config = array_merge($global, $default, $config);
+        $config = array_merge(
+            $this->app['config']->get('services.ses', []), 
+            ['version' => 'latest', 'service' => 'email'], 
+            $config
+        );
 
         $config = Arr::except($config, ['transport']);
 
