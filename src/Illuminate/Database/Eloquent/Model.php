@@ -1792,9 +1792,9 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function resolveRouteBinding($value, $field = null)
     {
-        try{
+        try {
             return $this->where($field ?? $this->getRouteKeyName(), $value)->first();
-        }catch (QueryException $e){
+        } catch (QueryException $e) {
             // URL type failed to cast into the DB type
             return null;
         }
