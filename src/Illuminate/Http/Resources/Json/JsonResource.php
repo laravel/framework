@@ -206,6 +206,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function wrapAs($value)
     {
         $this->wrap = $value;
+
         return $this;
     }
     
@@ -218,6 +219,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function preserveKeys($value = true)
     {
         $this->preserveKeys = $value;
+
         return $this;
     }
     
