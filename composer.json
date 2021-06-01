@@ -87,7 +87,7 @@
         "orchestra/testbench-core": "^6.8",
         "pda/pheanstalk": "^4.0",
         "phpunit/phpunit": "^8.5.8|^9.3.3",
-        "predis/predis": "^1.1.1",
+        "predis/predis": "^1.1.2",
         "symfony/cache": "^5.1.4"
     },
     "provide": {
