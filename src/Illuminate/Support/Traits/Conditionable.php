@@ -5,7 +5,7 @@ namespace Illuminate\Support\Traits;
 trait Conditionable
 {
     /**
-     * Apply the callback if the given "value" is true.
+     * Apply the callback if the given "value" is truthy.
      *
      * @param  mixed  $value
      * @param  callable  $callback
@@ -25,7 +25,7 @@ trait Conditionable
     }
 
     /**
-     * Apply the callback if the given "value" is false.
+     * Apply the callback if the given "value" is falsy.
      *
      * @param  mixed  $value
      * @param  callable  $callback
@@ -35,6 +35,12 @@ trait Conditionable
      */
     public function unless($value, $callback, $default = null)
     {
-        return $this->when(! $value, $callback, $default);
+        if (! $value) {
+            return $callback($this, $value) ?: $this;
+        } elseif ($default) {
+            return $default($this, $value) ?: $this;
+        }
+
+        return $this;
     }
 }
