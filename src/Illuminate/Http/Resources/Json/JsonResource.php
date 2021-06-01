@@ -198,6 +198,30 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
+     * Set the string that should wrap the outer-most resource array.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function wrapAs($value)
+    {
+        $this->wrap = $value;
+        return $this;
+    }
+    
+    /**
+     * Set whether to preserve collection keys.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function preserveKeys($value = true)
+    {
+        $this->preserveKeys = $value;
+        return $this;
+    }
+    
+    /**
      * Transform the resource into an HTTP response.
      *
      * @param  \Illuminate\Http\Request|null  $request
