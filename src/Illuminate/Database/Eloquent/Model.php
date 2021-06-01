@@ -1792,7 +1792,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function resolveRouteBinding($value, $field = null)
     {
-        return rescue(function () use ($field, value) {
+        return rescue(function () use ($field, $value) {
             return $this->where($field ?? $this->getRouteKeyName(), $value)->first();
         });
     }
