@@ -209,7 +209,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
 
         return $this;
     }
-    
+
     /**
      * Set whether to preserve collection keys.
      *
@@ -222,7 +222,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
 
         return $this;
     }
-    
+
     /**
      * Transform the resource into an HTTP response.
      *
