@@ -212,7 +212,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Set whether to preserve collection keys.
      *
-     * @param  string  $value
+     * @param  bool  $value
      * @return $this
      */
     public function preserveKeys($value = true)
