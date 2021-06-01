@@ -1201,7 +1201,7 @@ class TestResponseTest extends TestCase
                 'Content-Disposition' => 'attachment; filename=file.txt',
             ]
         ));
-        $testResponse->assertDownloadOffered();
+        $testResponse->assertDownload();
         $files->deleteDirectory($tempDir);
     }
 
@@ -1216,7 +1216,7 @@ class TestResponseTest extends TestCase
                 'Content-Disposition' => 'attachment; filename = file.txt',
             ]
         ));
-        $testResponse->assertDownloadOffered('file.txt');
+        $testResponse->assertDownload('file.txt');
         $files->deleteDirectory($tempDir);
     }
 
@@ -1229,7 +1229,7 @@ class TestResponseTest extends TestCase
         $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
             $tempDir.'/file.txt', 200, [], true, 'attachment'
         ));
-        $testResponse->assertDownloadOffered('file.txt');
+        $testResponse->assertDownload('file.txt');
         $files->deleteDirectory($tempDir);
     }
 
@@ -1243,7 +1243,7 @@ class TestResponseTest extends TestCase
         $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
             $tempDir.'/file.txt', 200, [], true, 'inline'
         ));
-        $testResponse->assertDownloadOffered();
+        $testResponse->assertDownload();
         $files->deleteDirectory($tempDir);
     }
 

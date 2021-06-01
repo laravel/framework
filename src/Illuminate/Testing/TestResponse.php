@@ -270,7 +270,7 @@ class TestResponse implements ArrayAccess
      * @param  string|null  $filename
      * @return $this
      */
-    public function assertDownloadOffered($filename = null)
+    public function assertDownload($filename = null)
     {
         $contentDisposition = explode(';', $this->headers->get('content-disposition'));
 
