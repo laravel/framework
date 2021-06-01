@@ -11,7 +11,7 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable implements JsonSerializable
 {
-    use Macroable, Tappable, Conditionable;
+    use Conditionable, Macroable, Tappable;
 
     /**
      * The underlying string value.

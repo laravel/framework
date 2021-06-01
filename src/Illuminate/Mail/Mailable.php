@@ -21,7 +21,7 @@ use ReflectionProperty;
 
 class Mailable implements MailableContract, Renderable
 {
-    use ForwardsCalls, Localizable, Conditionable;
+    use Conditionable, ForwardsCalls, Localizable;
 
     /**
      * The locale of the message.
