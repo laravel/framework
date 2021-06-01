@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -20,7 +21,7 @@ use ReflectionProperty;
 
 class Mailable implements MailableContract, Renderable
 {
-    use ForwardsCalls, Localizable;
+    use Conditionable, ForwardsCalls, Localizable;
 
     /**
      * The locale of the message.
@@ -988,25 +989,6 @@ class Mailable implements MailableContract, Renderable
     public static function buildViewDataUsing(callable $callback)
     {
         static::$viewDataCallback = $callback;
-    }
-
-    /**
-     * Apply the callback's message changes if the given "value" is true.
-     *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  mixed  $default
-     * @return mixed|$this
-     */
-    public function when($value, $callback, $default = null)
-    {
-        if ($value) {
-            return $callback($this, $value) ?: $this;
-        } elseif ($default) {
-            return $default($this, $value) ?: $this;
-        }
-
-        return $this;
     }
 
     /**
