@@ -2,18 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Illuminate\Contracts\Translation\HasLocalePreference;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Queue\Middleware\RateLimited;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
-use Illuminate\Testing\Assert;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -34,7 +28,7 @@ class SendingQueuedMailTest extends TestCase
 
         Mail::to('test@mail.com')->queue(new SendingQueuedMailTestMail);
 
-        Queue::assertPushed(SendQueuedMailable::class, function($job){
+        Queue::assertPushed(SendQueuedMailable::class, function ($job) {
             return $job->middleware[0] instanceof RateLimited;
         });
     }
