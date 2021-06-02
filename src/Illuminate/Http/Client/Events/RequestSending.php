@@ -2,41 +2,25 @@
 
 namespace Illuminate\Http\Client\Events;
 
+use Illuminate\Http\Client\Request;
+
 class RequestSending
 {
     /**
-     * The HTTP method used to send the request.
+     * The request object used by the Http Client.
      *
-     * @var string
+     * @var \Illuminate\Http\Client\Request
      */
-    public $method;
-
-    /**
-     * The URL that the request was sent to.
-     *
-     * @var string
-     */
-    public $url;
-
-    /**
-     * The options that were sent along with the request.
-     *
-     * @var array
-     */
-    public $options;
+    public $request;
 
     /**
      * Create a new event instance.
      *
-     * @param  string  $method
-     * @param  string  $url
-     * @param  array  $options
+     * @param  Request $request
      * @return void
      */
-    public function __construct(string $method, string $url, array $options)
+    public function __construct(Request $request)
     {
-        $this->method = $method;
-        $this->url = $url;
-        $this->options = $options;
+        $this->request = $request;
     }
 }

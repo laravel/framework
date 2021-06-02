@@ -9,7 +9,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use Illuminate\Http\Client\Events\RequestSending;
-use Illuminate\Http\Client\Events\RequestSent;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -152,6 +151,7 @@ class PendingRequest
 
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options) {
             $this->cookies = $options['cookies'];
+            $this->dispatchRequestSendingEvent($request);
         }]);
     }
 
@@ -716,8 +716,6 @@ class PendingRequest
      */
     protected function sendRequest(string $method, string $url, array $options = [])
     {
-        $this->dispatchRequestSendingEvent($method, $url, $options);
-
         $clientMethod = $this->async ? 'requestAsync' : 'request';
 
         $laravelData = $this->parseRequestData($method, $url, $options);
@@ -961,15 +959,13 @@ class PendingRequest
     /**
      * Dispatch the RequestSending event if a dispatcher is available.
      *
-     * @param  string  $method
-     * @param  string  $url
-     * @param  array  $options
+     * @param  \Illuminate\Http\Client\Request $request
      * @return void
      */
-    protected function dispatchRequestSendingEvent(string $method, string $url, array $options)
+    protected function dispatchRequestSendingEvent(Request $request)
     {
         if ($dispatcher = optional($this->factory)->getDispatcher()) {
-            $dispatcher->dispatch(new RequestSending($method, $url, $options));
+            $dispatcher->dispatch(new RequestSending($request));
         }
     }
 
