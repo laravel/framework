@@ -134,6 +134,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Get the weighted average value of a given key.
+     *
+     * @param  callable|string|null  $callback
+     * @return mixed
+     */
+    public function weightedAvg($callback = null)
+    {
+        return $this->collect()->weightedAvg($callback);
+    }
+
+    /**
      * Get the median of a given key.
      *
      * @param  string|array|null  $key

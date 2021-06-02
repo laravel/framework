@@ -125,6 +125,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function avg($callback = null);
 
     /**
+     * Get the weighted average value of a given key.
+     *
+     * @param  callable|string|null  $callback
+     * @return mixed
+     */
+    public function weightedAvg($callback = null);
+
+    /**
      * Determine if an item exists in the enumerable.
      *
      * @param  mixed  $key

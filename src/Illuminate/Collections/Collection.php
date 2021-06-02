@@ -86,6 +86,33 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get the weighted average value of a given key.
+     *
+     * @param  callable|string|null  $callback
+     * @return mixed
+     */
+    public function weightedAvg($callback = null)
+    {
+        $callback = $this->valueRetriever($callback);
+
+        $dividend = 0;
+        $divisor = 0;
+
+        $this->map(function ($value) use ($callback) {
+            return $callback($value) ?: $value;
+        })->filter(function ($value) {
+            return ! is_null($value);
+        })->each(function ($item) use (&$dividend, &$divisor) {
+            $divisor += current($item);
+            $dividend += current($item) * end($item);
+        });
+
+        if ($dividend) {
+            return $dividend / $divisor;
+        }
+    }
+
+    /**
      * Get the median of a given key.
      *
      * @param  string|array|null  $key

@@ -3555,6 +3555,33 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testGettingWeightedAvgItemsFromCollection($collection)
+    {
+        $c = new $collection([(object) ['foo' => 10, 'bar' => 15], (object) ['foo' => 20, 'bar' => 15]]);
+        $this->assertEquals(15, $c->weightedAvg(function ($item) {
+            return [$item->foo, $item->bar];
+        }));
+        $this->assertEquals(15, $c->weightedAvg(['foo', 'bar']));
+
+        $c = new $collection([(object) ['foo' => 10, 'bar' => 15], (object) ['foo' => 20, 'bar' => 15], (object) ['foo' => null, 'bar' => null]]);
+        $this->assertEquals(15, $c->weightedAvg(function ($item) {
+            return [$item->foo, $item->bar];
+        }));
+        $this->assertEquals(15, $c->weightedAvg(['foo', 'bar']));
+
+        $c = new $collection([['foo' => 10, 'bar' => 15], ['foo' => 20, 'bar' => 15]]);
+        $this->assertEquals(15, $c->weightedAvg(['foo', 'bar']));
+
+        $c = new $collection([[1, 2, 3, 4, 5]]);
+        $this->assertEquals(5, $c->weightedAvg());
+
+        $c = new $collection;
+        $this->assertNull($c->weightedAvg());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testJsonSerialize($collection)
     {
         $c = new $collection([
