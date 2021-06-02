@@ -4,7 +4,6 @@ namespace Illuminate\Http\Client\Events;
 
 class RequestSent
 {
-
     /**
      * The HTTP method used to send the request.
      *
