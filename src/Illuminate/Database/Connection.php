@@ -129,14 +129,14 @@ class Connection implements ConnectionInterface
     /**
      * Indicates if changes have been made to the database.
      *
-     * @var int
+     * @var bool
      */
     protected $recordsModified = false;
 
     /**
      * Indicates if the connection should use the write PDO for reads.
      *
-     * @var int
+     * @var bool
      */
     protected $readOnWritePDO = false;
 
