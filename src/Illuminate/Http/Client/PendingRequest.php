@@ -8,6 +8,8 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Http\Client\Events\RequestSent;
+use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -628,6 +630,8 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
+        $this->dispatchRequestSentEvent($method, $url, $options);
+
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
 
         if (isset($options[$this->bodyFormat])) {
@@ -660,6 +664,8 @@ class PendingRequest
                     if ($this->tries > 1 && ! $response->successful()) {
                         $response->throw();
                     }
+
+                    $this->dispatchResponseReceivedEvent($response);
                 });
             } catch (ConnectException $e) {
                 throw new ConnectionException($e->getMessage(), 0, $e);
@@ -962,5 +968,33 @@ class PendingRequest
         $this->client = $client;
 
         return $this;
+    }
+
+    /**
+     * Fire the RequestSent event if a dispatcher is available.
+     *
+     * @param string $method
+     * @param string $url
+     * @param array $options
+     * @return void
+     */
+    protected function dispatchRequestSentEvent(string $method, string $url, array $options)
+    {
+        if ($dispatcher = optional($this->factory)->getDispatcher()) {
+            $dispatcher->dispatch(new RequestSent($method, $url, $options));
+        }
+    }
+
+    /**
+     * Fire the ResponseReceived event if a dispatcher is available.
+     *
+     * @param Response $response
+     * @return void
+     */
+    protected function dispatchResponseReceivedEvent(Response $response)
+    {
+        if ($dispatcher = optional($this->factory)->getDispatcher()) {
+            $dispatcher->dispatch(new ResponseReceived($response));
+        }
     }
 }

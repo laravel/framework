@@ -4,6 +4,7 @@ namespace Illuminate\Http\Client;
 
 use Closure;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -55,6 +56,13 @@ class Factory
     }
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    protected $dispatcher;
+
+    /**
      * The stub callables that will handle requests.
      *
      * @var \Illuminate\Support\Collection
@@ -87,8 +95,9 @@ class Factory
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Dispatcher $dispatcher = null)
     {
+        $this->dispatcher = $dispatcher;
         $this->stubCallbacks = collect();
     }
 
@@ -356,5 +365,15 @@ class Factory
         return tap($this->newPendingRequest(), function ($request) {
             $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
+    }
+
+    /**
+     * Retrieve the currently set Dispatcher instance.
+     *
+     * @return Dispatcher|null
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
     }
 }

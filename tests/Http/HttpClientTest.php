@@ -2,8 +2,12 @@
 
 namespace Illuminate\Tests\Http;
 
+use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Client\Events\RequestSent;
+use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Pool;
@@ -17,11 +21,12 @@ use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
+use Mockery as m;
 
 class HttpClientTest extends TestCase
 {
     /**
-     * @var \Illuminate\Http\Client\Factory
+     * @var Factory
      */
     protected $factory;
 
@@ -367,7 +372,7 @@ class HttpClientTest extends TestCase
 
         $this->assertCount(1, $response->cookies()->toArray());
 
-        /** @var \GuzzleHttp\Cookie\CookieJarInterface $responseCookies */
+        /** @var CookieJarInterface $responseCookies */
         $responseCookie = $response->cookies()->toArray()[0];
 
         $this->assertSame('foo', $responseCookie['Name']);
@@ -916,5 +921,23 @@ class HttpClientTest extends TestCase
         $this->assertSame(200, $responses['test200']->status());
         $this->assertSame(400, $responses['test400']->status());
         $this->assertSame(500, $responses['test500']->status());
+    }
+
+    public function testTheRequestSentAndResponseReceivedEventsAreFiredWhenARequestIsSent()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(RequestSent::class));
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+        $factory->fake();
+
+        $factory->get("https://example.com");
+        $factory->head("https://example.com");
+        $factory->post("https://example.com");
+        $factory->patch("https://example.com");
+        $factory->delete("https://example.com");
+
+        m::close();
     }
 }
