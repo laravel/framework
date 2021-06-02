@@ -228,6 +228,18 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Close the stream and any underlying resources.
+     *
+     * @return $this
+     */
+    public function close()
+    {
+        $this->response->getBody()->close();
+
+        return $this;
+    }
+
+    /**
      * Get the underlying PSR response for the response.
      *
      * @return \Psr\Http\Message\ResponseInterface
