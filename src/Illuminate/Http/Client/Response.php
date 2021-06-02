@@ -208,6 +208,18 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Closes the stream and any underlying resources.
+     *
+     * @return $this
+     */
+    public function close()
+    {
+        $this->response->getBody()->close();
+
+        return $this;
+    }
+
+    /**
      * Get the response cookies.
      *
      * @return \GuzzleHttp\Cookie\CookieJar
