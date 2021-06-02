@@ -2,7 +2,7 @@
 
 namespace Illuminate\Http\Client\Events;
 
-class RequestSent
+class RequestSending
 {
     /**
      * The HTTP method used to send the request.
@@ -25,6 +25,14 @@ class RequestSent
      */
     public $options;
 
+    /**
+     * Create a new event instance.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return void
+     */
     public function __construct(string $method, string $url, array $options)
     {
         $this->method = $method;

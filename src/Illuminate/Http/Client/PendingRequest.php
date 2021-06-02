@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\RequestSent;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Support\Collection;
@@ -630,8 +631,6 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
-        $this->dispatchRequestSentEvent($method, $url, $options);
-
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
 
         if (isset($options[$this->bodyFormat])) {
@@ -717,6 +716,8 @@ class PendingRequest
      */
     protected function sendRequest(string $method, string $url, array $options = [])
     {
+        $this->dispatchRequestSendingEvent($method, $url, $options);
+
         $clientMethod = $this->async ? 'requestAsync' : 'request';
 
         $laravelData = $this->parseRequestData($method, $url, $options);
@@ -958,6 +959,34 @@ class PendingRequest
     }
 
     /**
+     * Dispatch the RequestSending event if a dispatcher is available.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return void
+     */
+    protected function dispatchRequestSendingEvent(string $method, string $url, array $options)
+    {
+        if ($dispatcher = optional($this->factory)->getDispatcher()) {
+            $dispatcher->dispatch(new RequestSending($method, $url, $options));
+        }
+    }
+
+    /**
+     * Dispatch the ResponseReceived event if a dispatcher is available.
+     *
+     * @param  \Illuminate\Http\Client\Response  $response
+     * @return void
+     */
+    protected function dispatchResponseReceivedEvent(Response $response)
+    {
+        if ($dispatcher = optional($this->factory)->getDispatcher()) {
+            $dispatcher->dispatch(new ResponseReceived($response));
+        }
+    }
+
+    /**
      * Set the client instance.
      *
      * @param  \GuzzleHttp\Client  $client
@@ -968,33 +997,5 @@ class PendingRequest
         $this->client = $client;
 
         return $this;
-    }
-
-    /**
-     * Fire the RequestSent event if a dispatcher is available.
-     *
-     * @param string $method
-     * @param string $url
-     * @param array $options
-     * @return void
-     */
-    protected function dispatchRequestSentEvent(string $method, string $url, array $options)
-    {
-        if ($dispatcher = optional($this->factory)->getDispatcher()) {
-            $dispatcher->dispatch(new RequestSent($method, $url, $options));
-        }
-    }
-
-    /**
-     * Fire the ResponseReceived event if a dispatcher is available.
-     *
-     * @param Response $response
-     * @return void
-     */
-    protected function dispatchResponseReceivedEvent(Response $response)
-    {
-        if ($dispatcher = optional($this->factory)->getDispatcher()) {
-            $dispatcher->dispatch(new ResponseReceived($response));
-        }
     }
 }

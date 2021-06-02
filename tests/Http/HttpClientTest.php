@@ -6,7 +6,7 @@ use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Http\Client\Events\RequestSent;
+use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
@@ -923,10 +923,10 @@ class HttpClientTest extends TestCase
         $this->assertSame(500, $responses['test500']->status());
     }
 
-    public function testTheRequestSentAndResponseReceivedEventsAreFiredWhenARequestIsSent()
+    public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
     {
         $events = m::mock(Dispatcher::class);
-        $events->shouldReceive('dispatch')->times(5)->with(m::type(RequestSent::class));
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(RequestSending::class));
         $events->shouldReceive('dispatch')->times(5)->with(m::type(ResponseReceived::class));
 
         $factory = new Factory($events);

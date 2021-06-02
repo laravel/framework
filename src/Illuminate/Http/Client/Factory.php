@@ -56,7 +56,7 @@ class Factory
     }
 
     /**
-     * The event dispatcher instance.
+     * The event dispatcher implementation.
      *
      * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
@@ -93,11 +93,13 @@ class Factory
     /**
      * Create a new factory instance.
      *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
     public function __construct(Dispatcher $dispatcher = null)
     {
         $this->dispatcher = $dispatcher;
+
         $this->stubCallbacks = collect();
     }
 
@@ -350,6 +352,16 @@ class Factory
     }
 
     /**
+     * Get the current event dispatcher implementation.
+     *
+     * @return \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
+    /**
      * Execute a method against a new pending request instance.
      *
      * @param  string  $method
@@ -365,15 +377,5 @@ class Factory
         return tap($this->newPendingRequest(), function ($request) {
             $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
-    }
-
-    /**
-     * Retrieve the currently set Dispatcher instance.
-     *
-     * @return Dispatcher|null
-     */
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
     }
 }
