@@ -235,12 +235,10 @@ class Mailable implements MailableContract, Renderable
     protected function newQueuedJob()
     {
         return (new SendQueuedMailable($this))
-                    ->through(
-                        array_merge(
-                            method_exists($this, 'middleware') ? $this->middleware() : [],
-                            $this->middleware ?? []
-                        )
-                    );
+                    ->through(array_merge(
+                        method_exists($this, 'middleware') ? $this->middleware() : [],
+                        $this->middleware ?? []
+                    ));
     }
 
     /**
