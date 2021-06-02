@@ -72,9 +72,35 @@ class ConnectionFactory
     {
         $pdo = $this->createPdoResolver($config);
 
-        return $this->createConnection(
+        $connection = $this->createConnection(
             $config['driver'], $pdo, $config['database'], $config['prefix'], $config
         );
+
+        return tap($connection, function ($connection) {
+            $this->readOnWritePdoIfNecessary($connection);
+        });
+    }
+
+    /**
+     * Configure reading on writing PDO if necessary.
+     *
+     * @param  \Illuminate\Database\Connection $connection
+     * @return void
+     */
+    protected function readOnWritePdoIfNecessary($connection)
+    {
+        if (! $connection->getConfig('sticky') ||
+            ! $connection->getConfig('sticky_ttl') ||
+            ! $this->container->resolved('session')) {
+            return;
+        }
+
+        $lastModification = $this->container->make('session')
+                        ->databaseRecordsHasBeenModified($connection->getName());
+
+        if (time() - $lastModification < $connection->getConfig('sticky_ttl')) {
+            $connection->readOnWritePdo();
+        }
     }
 
     /**

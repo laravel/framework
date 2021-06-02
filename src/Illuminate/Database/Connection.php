@@ -134,6 +134,13 @@ class Connection implements ConnectionInterface
     protected $recordsModified = false;
 
     /**
+     * Indicates if the connection should use the write PDO for reads.
+     *
+     * @var int
+     */
+    protected $readOnWritePDO = false;
+
+    /**
      * All of the queries run against the connection.
      *
      * @var array
@@ -875,6 +882,17 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Indicate if the connection should use the write PDO for reads.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public function readOnWritePdo($value = true)
+    {
+        $this->readOnWritePDO = $value;
+    }
+
+    /**
      * Reset the record modification state.
      *
      * @return void
@@ -882,6 +900,16 @@ class Connection implements ConnectionInterface
     public function forgetRecordModificationState()
     {
         $this->recordsModified = false;
+    }
+
+    /**
+     * Get the record modification state.
+     *
+     * @return bool
+     */
+    public function getRecordModificationState()
+    {
+        return $this->recordsModified;
     }
 
     /**
@@ -980,7 +1008,7 @@ class Connection implements ConnectionInterface
             return $this->getPdo();
         }
 
-        if ($this->recordsModified && $this->getConfig('sticky')) {
+        if ($this->readOnWritePDO || ($this->recordsModified && $this->getConfig('sticky'))) {
             return $this->getPdo();
         }
 

@@ -659,6 +659,28 @@ class Store implements Session
     }
 
     /**
+     * Specify that database records were modified on this connection.
+     *
+     * @param  string  $connection
+     * @return void
+     */
+    public function databaseRecordsModified($connection)
+    {
+        $this->put('db.'.$connection.'-mod', time());
+    }
+
+    /**
+     * Determine if that database records were modified on this connection.
+     *
+     * @param  string  $connection
+     * @return int|null
+     */
+    public function databaseRecordsHasBeenModified($connection)
+    {
+        return $this->get('db.'.$connection.'-mod');
+    }
+
+    /**
      * Get the underlying session handler implementation.
      *
      * @return \SessionHandlerInterface

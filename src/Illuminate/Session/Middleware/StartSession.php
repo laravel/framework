@@ -124,6 +124,12 @@ class StartSession
 
         $this->addCookieToResponse($response, $session);
 
+        foreach (app('db')->getConnections() as $connection) {
+            if ($connection->getRecordModificationState()) {
+                $session->databaseRecordsModified($connection->getName());
+            }
+        }
+
         // Again, if the session has been configured we will need to close out the session
         // so that the attributes may be persisted to some storage medium. We will also
         // add the session identifier cookie to the application response headers now.
