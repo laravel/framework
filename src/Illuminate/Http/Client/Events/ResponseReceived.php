@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Illuminate\Http\Client\Events;
-
 
 use Illuminate\Http\Client\Response;
 
@@ -19,5 +17,4 @@ class ResponseReceived
     {
         $this->response = $response;
     }
-
 }

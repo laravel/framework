@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Illuminate\Http\Client\Events;
-
 
 class RequestSent
 {
@@ -34,5 +32,4 @@ class RequestSent
         $this->url = $url;
         $this->options = $options;
     }
-
 }

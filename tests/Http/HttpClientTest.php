@@ -17,11 +17,11 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
-use Mockery as m;
 
 class HttpClientTest extends TestCase
 {
@@ -932,11 +932,11 @@ class HttpClientTest extends TestCase
         $factory = new Factory($events);
         $factory->fake();
 
-        $factory->get("https://example.com");
-        $factory->head("https://example.com");
-        $factory->post("https://example.com");
-        $factory->patch("https://example.com");
-        $factory->delete("https://example.com");
+        $factory->get('https://example.com');
+        $factory->head('https://example.com');
+        $factory->post('https://example.com');
+        $factory->patch('https://example.com');
+        $factory->delete('https://example.com');
 
         m::close();
     }
