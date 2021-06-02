@@ -125,7 +125,7 @@ class StartSession
         $this->addCookieToResponse($response, $session);
 
         foreach (app('db')->getConnections() as $connection) {
-            if ($connection->getRecordModificationState()) {
+            if ($connection->getConfig('sticky_ttl') && $connection->getRecordModificationState()) {
                 $session->databaseRecordsModified($connection->getName());
             }
         }
