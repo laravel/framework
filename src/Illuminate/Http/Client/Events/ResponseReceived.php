@@ -8,14 +8,14 @@ use Illuminate\Http\Client\Response;
 class ResponseReceived
 {
     /**
-     * The request object used by the Http Client.
+     * The request instance.
      *
      * @var \Illuminate\Http\Client\Request
      */
     public $request;
 
     /**
-     * The response returned from an HTTP request.
+     * The response instance.
      *
      * @var \Illuminate\Http\Client\Response
      */

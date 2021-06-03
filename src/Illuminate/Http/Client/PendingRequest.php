@@ -137,7 +137,7 @@ class PendingRequest
      *
      * @var \Illuminate\Http\Client\Request|null
      */
-    protected $request = null;
+    protected $request;
 
     /**
      * Create a new HTTP Client instance.
@@ -159,6 +159,7 @@ class PendingRequest
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options) {
             $this->request = $request;
             $this->cookies = $options['cookies'];
+
             $this->dispatchRequestSendingEvent();
         }]);
     }

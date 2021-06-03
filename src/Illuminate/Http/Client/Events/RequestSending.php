@@ -7,7 +7,7 @@ use Illuminate\Http\Client\Request;
 class RequestSending
 {
     /**
-     * The request object used by the Http Client.
+     * The request instance.
      *
      * @var \Illuminate\Http\Client\Request
      */
