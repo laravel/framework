@@ -26,7 +26,7 @@ use Symfony\Component\VarDumper\VarDumper;
 class HttpClientTest extends TestCase
 {
     /**
-     * @var Factory
+     * @var \Illuminate\Http\Client\Factory
      */
     protected $factory;
 
@@ -372,7 +372,7 @@ class HttpClientTest extends TestCase
 
         $this->assertCount(1, $response->cookies()->toArray());
 
-        /** @var CookieJarInterface $responseCookies */
+        /** @var \GuzzleHttp\Cookie\CookieJarInterface $responseCookies */
         $responseCookie = $response->cookies()->toArray()[0];
 
         $this->assertSame('foo', $responseCookie['Name']);
