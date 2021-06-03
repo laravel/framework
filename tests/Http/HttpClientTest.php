@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Http;
 
-use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Contracts\Events\Dispatcher;
