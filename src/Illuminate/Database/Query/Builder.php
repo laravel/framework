@@ -1987,6 +1987,7 @@ class Builder
             foreach ($this->{$this->unions ? 'unionOrders' : 'orders'} as $key => $value) {
                 if (isset($value['column']) && $value['column'] === $column) {
                     $this->{$this->unions ? 'unionOrders' : 'orders'}[$key]['direction'] = $direction;
+
                     return $this;
                 }
             }
