@@ -129,9 +129,16 @@ class Connection implements ConnectionInterface
     /**
      * Indicates if changes have been made to the database.
      *
-     * @var int
+     * @var bool
      */
     protected $recordsModified = false;
+
+    /**
+     * Indicates if the connection should use the "write" PDO connection.
+     *
+     * @var bool
+     */
+    protected $readOnWriteConnection = false;
 
     /**
      * All of the queries run against the connection.
@@ -862,6 +869,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Determine if the database connection has modified any database records.
+     *
+     * @return bool
+     */
+    public function hasModifiedRecords()
+    {
+        return $this->recordsModified;
+    }
+
+    /**
      * Indicate if any records have been modified.
      *
      * @param  bool  $value
@@ -882,6 +899,19 @@ class Connection implements ConnectionInterface
     public function forgetRecordModificationState()
     {
         $this->recordsModified = false;
+    }
+
+    /**
+     * Indicate that the connection should use the write PDO connection for reads.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function useWriteConnectionWhenReading($value = true)
+    {
+        $this->readOnWriteConnection = $value;
+
+        return $this;
     }
 
     /**
@@ -980,7 +1010,8 @@ class Connection implements ConnectionInterface
             return $this->getPdo();
         }
 
-        if ($this->recordsModified && $this->getConfig('sticky')) {
+        if ($this->readOnWriteConnection ||
+            ($this->recordsModified && $this->getConfig('sticky'))) {
             return $this->getPdo();
         }
 
