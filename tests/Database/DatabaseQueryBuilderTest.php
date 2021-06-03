@@ -1194,7 +1194,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->orderBy('name', 'desc');
         $builder->orderBy('email', 'desc');
         $builder->orderBy('email', 'asc');
-        $this->assertSame('select * from "users" order by "name" desc, "email" asc', $builder->toSql());
+        $builder->orderByRaw('"age" ? desc', ['foo']);
+        $this->assertSame('select * from "users" order by "name" desc, "email" asc, "age" ? desc', $builder->toSql());
     }
 
     public function testReorder()
