@@ -28,6 +28,11 @@ jobs:
         ports:
           - 6379:6379
         options: --entrypoint redis-server
+      dynamodb:
+        image: amazon/dynamodb-local:latest
+        ports:
+          - 8888:8000
+
     strategy:
       fail-fast: true
       matrix:
@@ -62,11 +67,6 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
-
-      - name: Setup DynamoDB Local
-        uses: rrainn/dynamodb-action@v2.0.0
-        with:
-          port: 8888
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
