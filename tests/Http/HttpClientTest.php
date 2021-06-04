@@ -951,4 +951,20 @@ class HttpClientTest extends TestCase
 
         $this->assertNull($effectiveUri);
     }
+
+    public function testClonedClientsWorkSuccessfullyWithTheRequestObject()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->once()->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+
+        $client = $factory->timeout(10);
+        $clonedClient = clone $client;
+
+        $clonedClient->get('https://example.com');
+
+        m::close();
+    }
 }
