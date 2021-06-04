@@ -393,9 +393,12 @@ class UrlGenerator implements UrlGeneratorContract
 
         $url = $absolute ? $request->url() : '/'.$request->path();
 
-        $original = rtrim($url.'?'.Arr::query(
-            Arr::except($request->query(), $ignoreQuery)
-        ), '?');
+        $queryString = $request->server->get('QUERY_STRING');
+        foreach ($ignoreQuery as $ignore) {
+            $queryString = ltrim(preg_replace("/(^|&){$ignore}=[^&]+/", '', $queryString), '&');
+        }
+
+        $original = rtrim($url.'?'.$queryString, '?');
 
         $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
 

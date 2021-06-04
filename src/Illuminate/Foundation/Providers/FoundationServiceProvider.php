@@ -85,5 +85,9 @@ class FoundationServiceProvider extends AggregateServiceProvider
         Request::macro('hasValidRelativeSignature', function () {
             return URL::hasValidSignature($this, $absolute = false);
         });
+
+        Request::macro('hasValidSignatureWithExceptions', function ($ignoreQuery = [], $absolute = true) {
+            return URL::hasValidSignature($this, $absolute, $ignoreQuery);
+        });
     }
 }
