@@ -1567,11 +1567,11 @@ trait HasAttributes
      * Determine if the attribute has transitioned to a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $to
-     * @param  mixed  $from
+     * @param  string|array  $to
+     * @param  string|array  $from
      * @return bool
      */
-    public function transitionedTo($attribute, ?string $to, ?string $from = null)
+    public function transitionedTo($attribute, $to, $from = null)
     {
         if (! array_key_exists($attribute, $this->old) ||
             ! array_key_exists($attribute, $this->changes)) {
@@ -1581,22 +1581,22 @@ trait HasAttributes
         $oldValue = is_null($this->old[$attribute]) ? null : (string) $this->old[$attribute];
         $newValue = is_null($this->changes[$attribute]) ? null : (string) $this->changes[$attribute];
 
-        if (func_num_args() == 3 && $oldValue !== $from) {
+        if (func_num_args() == 3 && ! in_array($oldValue, is_array($from) ? $from : [$from])) {
             return false;
         }
 
-        return $newValue === $to;
+        return in_array($newValue, is_array($to) ? $to : [$to]);
     }
 
     /**
      * Determine if the attribute is transitioning to a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $to
-     * @param  mixed  $from
+     * @param  string|array  $to
+     * @param  string|array  $from
      * @return bool
      */
-    public function transitioningTo($attribute, ?string $to, ?string $from = null)
+    public function transitioningTo($attribute, $to, $from = null)
     {
         if (! $this->isDirty($attribute)) {
             return false;
@@ -1605,11 +1605,11 @@ trait HasAttributes
         $oldValue = is_null($this->original[$attribute]) ? null : (string) $this->original[$attribute];
         $newValue = is_null($this->attributes[$attribute]) ? null : (string) $this->attributes[$attribute];
 
-        if (func_num_args() == 3 && $oldValue !== $from) {
+        if (func_num_args() == 3 && ! in_array($oldValue, is_array($from) ? $from : [$from])) {
             return false;
         }
 
-        return $newValue === $to;
+        return in_array($newValue, is_array($to) ? $to : [$to]);
     }
 
     /**

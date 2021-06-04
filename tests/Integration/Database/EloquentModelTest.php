@@ -88,10 +88,14 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertTrue($user->transitionedTo('name', 'zain'));
         $this->assertTrue($user->transitionedTo('name', 'zain', 'mohamed'));
+        $this->assertTrue($user->transitionedTo('name', 'zain', ['mohamed', 'said']));
+        $this->assertTrue($user->transitionedTo('name', ['zain', 'lara'], ['mohamed', 'said']));
+        $this->assertTrue($user->transitionedTo('name', ['zain', 'lara'], 'mohamed'));
         $this->assertFalse($user->transitionedTo('name', 'zain', 'said'));
 
         $this->assertTrue($user->transitionedTo('title', 'A'));
         $this->assertTrue($user->transitionedTo('title', 'A', null));
+        $this->assertTrue($user->transitionedTo('title', ['A', 'C'], ['BB', null]));
         $this->assertFalse($user->transitionedTo('title', 'A', 'B'));
 
         $user->title = null;
@@ -138,10 +142,12 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertTrue($user->transitioningTo('name', 'zain'));
         $this->assertTrue($user->transitioningTo('name', 'zain', 'mohamed'));
+        $this->assertTrue($user->transitioningTo('name', 'zain', ['mohamed', 'said']));
         $this->assertFalse($user->transitioningTo('name', 'zain', 'said'));
 
         $this->assertTrue($user->transitioningTo('title', 'A'));
         $this->assertTrue($user->transitioningTo('title', 'A', null));
+        $this->assertTrue($user->transitioningTo('title', ['A', 'C'], ['BB', null]));
         $this->assertFalse($user->transitioningTo('title', 'A', 'B'));
 
         $user->save();
