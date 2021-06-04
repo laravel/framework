@@ -233,9 +233,8 @@ class AssertableJsonString implements ArrayAccess, Countable
         $pathParts = explode('.', $path);
         $regexPathParts = [];
 
-        foreach($pathParts as $pathPart)
-        {
-            if($pathPart === '*') {
+        foreach ($pathParts as $pathPart) {
+            if ($pathPart === '*') {
                 $regexPathParts[] = '[0-9]+';
             } else {
                 $regexPathParts[] = $pathPart;
