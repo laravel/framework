@@ -1982,7 +1982,7 @@ class Builder
         if (! in_array($direction, ['asc', 'desc'], true)) {
             throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
         }
-        
+
         $unions = &$this->{$this->unions ? 'unionOrders' : 'orders'};
 
         if (is_array($unions)) {
