@@ -751,6 +751,17 @@ class TestResponseTest extends TestCase
         $response->assertJsonPathExists('*.foo');
     }
 
+    public function testAssertJsonPathExistFailsIfPathNotAtTheBeginning()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response([
+            ['foo' => 'bar'], // 0.foo
+        ]));
+
+        $response->assertJsonPathExists('foo');
+    }
+
     public function testAssertJsonPathExistCanFail()
     {
         $this->expectException(AssertionFailedError::class);
