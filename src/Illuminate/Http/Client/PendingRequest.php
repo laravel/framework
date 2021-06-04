@@ -137,7 +137,7 @@ class PendingRequest
      *
      * @var \Illuminate\Http\Client\Request|null
      */
-    protected $request = null;
+    protected $request;
 
     /**
      * Create a new HTTP Client instance.
@@ -156,11 +156,11 @@ class PendingRequest
             'http_errors' => false,
         ];
 
-        $this->beforeSendingCallbacks = collect([function (Request $request, array $options, PendingRequest $instance) {
-            $instance->request = $request;
-            $instance->cookies = $options['cookies'];
+        $this->beforeSendingCallbacks = collect([function (Request $request, array $options, PendingRequest $pendingRequest) {
+            $pendingRequest->request = $request;
+            $pendingRequest->cookies = $options['cookies'];
 
-            $instance->dispatchRequestSendingEvent();
+            $pendingRequest->dispatchRequestSendingEvent();
         }]);
     }
 
@@ -986,11 +986,8 @@ class PendingRequest
      */
     protected function dispatchResponseReceivedEvent(Response $response)
     {
-        if (! $dispatcher = optional($this->factory)->getDispatcher()) {
-            return;
-        }
-
-        if (! $this->request) {
+        if (! ($dispatcher = optional($this->factory)->getDispatcher()) ||
+            ! $this->request) {
             return;
         }
 
