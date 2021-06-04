@@ -125,11 +125,11 @@ class Response implements ArrayAccess
     /**
      * Get the effective URI of the response.
      *
-     * @return \Psr\Http\Message\UriInterface
+     * @return \Psr\Http\Message\UriInterface|null
      */
     public function effectiveUri()
     {
-        return $this->transferStats->getEffectiveUri();
+        return optional($this->transferStats)->getEffectiveUri();
     }
 
     /**
