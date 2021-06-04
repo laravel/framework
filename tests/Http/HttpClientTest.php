@@ -15,6 +15,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Mockery as m;
 use OutOfBoundsException;
@@ -938,5 +939,14 @@ class HttpClientTest extends TestCase
         $factory->delete('https://example.com');
 
         m::close();
+    }
+
+    public function testTheHandlerStatsReturnAnEmptyArrayWhenFakingTheRequest()
+    {
+        $this->factory->fake(['https://example.com' => $this->factory->response()]);
+        $stats = $this->factory->get('https://example.com')->handlerStats();
+
+        $this->assertIsArray($stats);
+        $this->assertEmpty($stats);
     }
 }

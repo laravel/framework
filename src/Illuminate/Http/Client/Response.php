@@ -224,7 +224,7 @@ class Response implements ArrayAccess
      */
     public function handlerStats()
     {
-        return $this->transferStats->getHandlerStats();
+        return optional($this->transferStats)->getHandlerStats() ?? [];
     }
 
     /**
