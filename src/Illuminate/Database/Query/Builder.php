@@ -1982,18 +1982,20 @@ class Builder
         if (! in_array($direction, ['asc', 'desc'], true)) {
             throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
         }
+        
+        $unions = &$this->{$this->unions ? 'unionOrders' : 'orders'};
 
-        if (is_array($this->{$this->unions ? 'unionOrders' : 'orders'})) {
-            foreach ($this->{$this->unions ? 'unionOrders' : 'orders'} as $key => $value) {
+        if (is_array($unions)) {
+            foreach ($unions as $key => $value) {
                 if (isset($value['column']) && $value['column'] === $column) {
-                    $this->{$this->unions ? 'unionOrders' : 'orders'}[$key]['direction'] = $direction;
+                    $unions[$key]['direction'] = $direction;
 
                     return $this;
                 }
             }
         }
 
-        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
+        $unions[] = [
             'column' => $column,
             'direction' => $direction,
         ];
