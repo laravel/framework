@@ -698,6 +698,29 @@ class TestResponseTest extends TestCase
         $response->assertJsonPath('0.id', '10');
     }
 
+    public function testAssertJsonPathExists()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonPathExists('0.foo');
+        $response->assertJsonPathExists('0.bar');
+        $response->assertJsonPathExists('0.foobar');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonPathExists('foo');
+
+        $response->assertJsonPathExists('foobar.foobar_foo');
+        $response->assertJsonPathExists('foobar.foobar_bar');
+
+        $response->assertJsonPathExists('foobar.foobar_foo')->assertJsonPathExists('foobar.foobar_bar');
+
+        $response->assertJsonPathExists('0.0');
+        $response->assertJsonPathExists('bars.0.bar');
+        $response->assertJsonPathExists('barfoo.0.bar.bar');
+        $response->assertJsonPathExists('numeric_keys.2.bar');
+    }
+
     public function testAssertJsonFragment()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));

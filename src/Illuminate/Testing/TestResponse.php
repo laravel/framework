@@ -594,6 +594,19 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the given path exists in the response.
+     *
+     * @param  string $path
+     * @return $this
+     */
+    public function assertJsonPathExists($path)
+    {
+        $this->decodeResponseJson()->assertPathExists($path);
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data
