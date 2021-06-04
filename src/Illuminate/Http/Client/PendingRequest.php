@@ -137,7 +137,7 @@ class PendingRequest
      *
      * @var \Illuminate\Http\Client\Request|null
      */
-    protected $request;
+    protected $request = null;
 
     /**
      * Create a new HTTP Client instance.
@@ -156,11 +156,11 @@ class PendingRequest
             'http_errors' => false,
         ];
 
-        $this->beforeSendingCallbacks = collect([function (Request $request, array $options) {
-            $this->request = $request;
-            $this->cookies = $options['cookies'];
+        $this->beforeSendingCallbacks = collect([function (Request $request, array $options, PendingRequest $instance) {
+            $instance->request = $request;
+            $instance->cookies = $options['cookies'];
 
-            $this->dispatchRequestSendingEvent();
+            $instance->dispatchRequestSendingEvent();
         }]);
     }
 
@@ -913,7 +913,8 @@ class PendingRequest
         return tap($request, function ($request) use ($options) {
             $this->beforeSendingCallbacks->each->__invoke(
                 (new Request($request))->withData($options['laravel_data']),
-                $options
+                $options,
+                $this
             );
         });
     }
@@ -985,9 +986,15 @@ class PendingRequest
      */
     protected function dispatchResponseReceivedEvent(Response $response)
     {
-        if ($dispatcher = optional($this->factory)->getDispatcher()) {
-            $dispatcher->dispatch(new ResponseReceived($this->request, $response));
+        if (! $dispatcher = optional($this->factory)->getDispatcher()) {
+            return;
         }
+
+        if (! $this->request) {
+            return;
+        }
+
+        $dispatcher->dispatch(new ResponseReceived($this->request, $response));
     }
 
     /**

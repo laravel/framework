@@ -15,6 +15,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Mockery as m;
 use OutOfBoundsException;
@@ -936,6 +937,22 @@ class HttpClientTest extends TestCase
         $factory->post('https://example.com');
         $factory->patch('https://example.com');
         $factory->delete('https://example.com');
+
+        m::close();
+    }
+
+    public function testClonedClientsWorkSuccessfullyWithTheRequestObject()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->once()->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+
+        $client = $factory->timeout(10);
+        $clonedClient = clone $client;
+
+        $clonedClient->get('https://example.com');
 
         m::close();
     }
