@@ -740,6 +740,15 @@ class TestResponseTest extends TestCase
         $response->assertJsonPathExists('numeric_keys.2');
         $response->assertJsonPathExists('numeric_keys.*.bar');
         $response->assertJsonPathExists('numeric_keys.2.bar');
+
+        // Test when using * and key is above 9
+        $response = TestResponse::fromBaseResponse(new Response([
+            10 => ['foo' => 'bar 10'],
+
+        ]));
+
+        $response->assertJsonPathExists('*');
+        $response->assertJsonPathExists('*.foo');
     }
 
     public function testAssertJsonPathExistCanFail()
