@@ -939,4 +939,16 @@ class HttpClientTest extends TestCase
 
         m::close();
     }
+
+    public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
+    {
+        $this->factory->fake(['https://example.com' => $this->factory->response()]);
+        $stats = $this->factory->get('https://example.com')->handlerStats();
+        $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
+
+        $this->assertIsArray($stats);
+        $this->assertEmpty($stats);
+
+        $this->assertNull($effectiveUri);
+    }
 }
