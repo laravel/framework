@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Assert as PHPUnit;
 use JsonSerializable;
+use PHPUnit\Framework\AssertionFailedError;
 
 class AssertableJsonString implements ArrayAccess, Countable
 {
@@ -229,9 +230,30 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function assertPathExists($path)
     {
-        PHPUnit::assertTrue(Arr::exists(Arr::dot($this->json()), $path));
+        $flatDotArray = Arr::dot($this->json());
+        $pathParts = explode('.', $path);
+        $regexPathParts = [];
 
-        return $this;
+        foreach($pathParts as $pathPart)
+        {
+            if($pathPart === '*') {
+                $regexPathParts[] = '[0-9]';
+            } else {
+                $regexPathParts[] = $pathPart;
+            }
+        }
+
+        $regexPath = '/^'.implode('\.', $regexPathParts).'/';
+
+        foreach ($flatDotArray as $key => $value) {
+            if (preg_match($regexPath, $key)) {
+                PHPUnit::assertTrue(true);
+
+                return $this;
+            }
+        }
+
+        throw new AssertionFailedError("Failed asserting the path $path was found in the response.");
     }
 
     /**

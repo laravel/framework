@@ -702,6 +702,10 @@ class TestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
+        $response->assertJsonPathExists('*');
+        $response->assertJsonPathExists('0');
+
+        $response->assertJsonPathExists('*.foo');
         $response->assertJsonPathExists('0.foo');
         $response->assertJsonPathExists('0.bar');
         $response->assertJsonPathExists('0.foobar');
@@ -710,15 +714,42 @@ class TestResponseTest extends TestCase
 
         $response->assertJsonPathExists('foo');
 
+        $response->assertJsonPathExists('foobar');
         $response->assertJsonPathExists('foobar.foobar_foo');
         $response->assertJsonPathExists('foobar.foobar_bar');
 
         $response->assertJsonPathExists('foobar.foobar_foo')->assertJsonPathExists('foobar.foobar_bar');
 
+        $response->assertJsonPathExists('0.*');
         $response->assertJsonPathExists('0.0');
+
+        $response->assertJsonPathExists('bars.*');
+        $response->assertJsonPathExists('bars.0');
         $response->assertJsonPathExists('bars.0.bar');
+
+        $response->assertJsonPathExists('barfoo.*.bar');
+        $response->assertJsonPathExists('barfoo.0.bar');
         $response->assertJsonPathExists('barfoo.0.bar.bar');
+
+        $response->assertJsonPathExists('barfoobaz.*.*');
+        $response->assertJsonPathExists('barfoobaz.*.*.baz');
+
+        $response->assertJsonPathExists('barfoobaz.*.baz.*');
+        $response->assertJsonPathExists('barfoobaz.*.baz.*.bar');
+
+        $response->assertJsonPathExists('numeric_keys.2');
+        $response->assertJsonPathExists('numeric_keys.*.bar');
         $response->assertJsonPathExists('numeric_keys.2.bar');
+    }
+
+    public function testAssertJsonPathExistCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting the path 0.notfound was found in the response.');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPathExists('0.notfound');
     }
 
     public function testAssertJsonFragment()
@@ -1426,6 +1457,10 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
                 ['bar' => ['bar' => 'foo 0']],
                 ['bar' => ['bar' => 'foo 0', 'foo' => 'foo 0']],
                 ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
+            ],
+            'barfoobaz' => [
+                ['bar' => 'foo 0', 'foo' => 'bar 0', ['baz' => 'foo 0'], 'baz' => [['bar' => 'foo 0']]],
+                ['bar' => 'foo 1', 'foo' => 'bar 1', ['baz' => 'foo 1'], 'baz' => [['bar' => 'foo 1']]],
             ],
             'numeric_keys' => [
                 2 => ['bar' => 'foo 0', 'foo' => 'bar 0'],
