@@ -4955,6 +4955,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertNull($explicit_no_connection[0]);
         $this->assertSame('explicits', $explicit_no_connection[1]);
 
+        $explicit_model_with_prefix = $v->parseTable(ExplicitPrefixedTableModel::class);
+        $this->assertNull($explicit_model_with_prefix[0]);
+        $this->assertSame('prefix.explicits', $explicit_model_with_prefix[1]);
+
+        $explicit_table_with_connection_prefix = $v->parseTable('connection.table');
+        $this->assertSame('connection', $explicit_table_with_connection_prefix[0]);
+        $this->assertSame('table', $explicit_table_with_connection_prefix[1]);
+
         $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
         $this->assertNull($noneloquent_no_connection[0]);
         $this->assertEquals(NonEloquentModel::class, $noneloquent_no_connection[1]);
@@ -6204,6 +6212,13 @@ class ImplicitTableModel extends Model
 class ExplicitTableModel extends Model
 {
     protected $table = 'explicits';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class ExplicitPrefixedTableModel extends Model
+{
+    protected $table = 'prefix.explicits';
     protected $guarded = [];
     public $timestamps = false;
 }
