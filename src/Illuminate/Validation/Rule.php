@@ -13,7 +13,7 @@ use Illuminate\Validation\Rules\Unique;
 
 class Rule
 {
-    use Macroable;
+    use Macroable, RuleGenerator;
 
     /**
      * Get a dimensions constraint builder instance.
