@@ -74,6 +74,8 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         return [
             ['{{$exampleObject}}'],
             ['{{$exampleObject;}}'],
+            ['{{{$exampleObject;}}}'],
+            ['{!!$exampleObject;!!}'],
         ];
     }
 
