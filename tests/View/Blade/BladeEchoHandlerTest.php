@@ -86,7 +86,6 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
             return $this->compiler;
         });
 
-        // We output to the buffer to avoid outputting in the test console.
         ob_start();
         eval(Str::of($this->compiler->compileString($blade))->remove(['<?php', '?>']));
         $output = ob_get_contents();
@@ -100,7 +99,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         return [
             ['{{"foo" . "bar"}}', 'foobar'],
             ['{{ 1 + 2 }}{{ "test"; }}', '3test'],
-            ['@php($test = "hi"){{ $test }}', 'hi']
+            ['@php($test = "hi"){{ $test }}', 'hi'],
         ];
     }
 }
