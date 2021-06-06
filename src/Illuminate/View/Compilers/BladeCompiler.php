@@ -103,13 +103,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $echoFormat = 'e(%s)';
 
     /**
-     * Custom rendering callbacks for stringable objects.
-     *
-     * @var array
-     */
-    public $echoHandlers = [];
-
-    /**
      * Array of footer lines to be added to the template.
      *
      * @var array
@@ -261,6 +254,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
         // template inheritance via the extends keyword that should be appended.
         if (count($this->footer) > 0) {
             $result = $this->addFooters($result);
+        }
+
+        // If there are blade echo handlers defined, we will prepend the file
+        // with a resolved instance of the blade compiler, stored inside a
+        // variable, so that it only has to be resolved a single time.
+        if (!empty($this->echoHandlers)) {
+            $result = $this->addBladeCompilerVariable($result);
         }
 
         return str_replace(
@@ -709,22 +709,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function getCustomDirectives()
     {
         return $this->customDirectives;
-    }
-
-    /**
-     * Add a handler to be executed before echoing a given class.
-     *
-     * @param  string|callable  $class
-     * @param  callable|null  $handler
-     * @return void
-     */
-    public function stringable($class, $handler = null)
-    {
-        if ($class instanceof Closure) {
-            [$class, $handler] = [$this->firstClosureParameterType($class), $class];
-        }
-
-        $this->echoHandlers[$class] = $handler;
     }
 
     /**
