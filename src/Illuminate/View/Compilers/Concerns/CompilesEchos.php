@@ -130,7 +130,7 @@ trait CompilesEchos
      */
     protected function addBladeCompilerVariable($result)
     {
-        return "<?php \$__bladeCompiler = app('blade.compiler'); ?>" . $result;
+        return "<?php \$__bladeCompiler = app('blade.compiler'); ?>".$result;
     }
 
     /**
@@ -141,7 +141,7 @@ trait CompilesEchos
      */
     protected function wrapInEchoHandler($value)
     {
-        return empty($this->echoHandlers) ? $value : '$__bladeCompiler->applyEchoHandler(' . Str::beforeLast($value, ';') . ')';
+        return empty($this->echoHandlers) ? $value : '$__bladeCompiler->applyEchoHandler('.Str::beforeLast($value, ';').')';
     }
 
     /**

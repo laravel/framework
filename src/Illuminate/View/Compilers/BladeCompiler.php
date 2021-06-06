@@ -2,7 +2,6 @@
 
 namespace Illuminate\View\Compilers;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -259,7 +258,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         // If there are blade echo handlers defined, we will prepend the file
         // with a resolved instance of the blade compiler, stored inside a
         // variable, so that it only has to be resolved a single time.
-        if (!empty($this->echoHandlers)) {
+        if (! empty($this->echoHandlers)) {
             $result = $this->addBladeCompilerVariable($result);
         }
 
