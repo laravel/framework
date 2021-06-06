@@ -17,15 +17,10 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         });
     }
 
-    public function testBladeHandlersCanBeAddedForAGivenClass()
-    {
-        $this->assertSame('Hello World', $this->compiler->echoHandlers[Fluent::class](new Fluent()));
-    }
-
     public function testBladeHandlerCanInterceptRegularEchos()
     {
         $this->assertSame(
-            "<?php echo e(is_object(\$exampleObject) && isset(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>",
+            "<?php \$__bladeCompiler = app('blade.compiler'); ?><?php echo e(\$__bladeCompiler->applyEchoHandler(\$exampleObject)); ?>",
             $this->compiler->compileString('{{$exampleObject}}')
         );
     }
@@ -33,7 +28,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
     public function testBladeHandlerCanInterceptRawEchos()
     {
         $this->assertSame(
-            "<?php echo is_object(\$exampleObject) && isset(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject; ?>",
+            "<?php \$__bladeCompiler = app('blade.compiler'); ?><?php echo \$__bladeCompiler->applyEchoHandler(\$exampleObject); ?>",
             $this->compiler->compileString('{!!$exampleObject!!}')
         );
     }
@@ -41,7 +36,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
     public function testBladeHandlerCanInterceptEscapedEchos()
     {
         $this->assertSame(
-            "<?php echo e(is_object(\$exampleObject) && isset(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>",
+            "<?php \$__bladeCompiler = app('blade.compiler'); ?><?php echo e(\$__bladeCompiler->applyEchoHandler(\$exampleObject)); ?>",
             $this->compiler->compileString('{{{$exampleObject}}}')
         );
     }
@@ -49,7 +44,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
     public function testWhitespaceIsPreservedCorrectly()
     {
         $this->assertSame(
-            "<?php echo e(is_object(\$exampleObject) && isset(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class(\$exampleObject)], [\$exampleObject]) : \$exampleObject); ?>\n\n",
+            "<?php \$__bladeCompiler = app('blade.compiler'); ?><?php echo e(\$__bladeCompiler->applyEchoHandler(\$exampleObject)); ?>\n\n",
             $this->compiler->compileString("{{\$exampleObject}}\n")
         );
     }
@@ -68,10 +63,23 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
         $exampleObject = new Fluent();
 
-        eval(
-            Str::of($this->compiler->compileString('{{$exampleObject}}'))
-            ->after('<?php')
-            ->beforeLast('?>')
-        );
+        eval(Str::of($this->compiler->compileString('{{$exampleObject}}'))->remove(['<?php', '?>']));
+    }
+
+    public function testHandlerLogicWorksCorrectlyWithSemicolon()
+    {
+        $this->expectExceptionMessage('The fluent object has been successfully handled!');
+
+        $this->compiler->stringable(Fluent::class, function ($object) {
+            throw new Exception('The fluent object has been successfully handled!');
+        });
+
+        app()->singleton('blade.compiler', function () {
+            return $this->compiler;
+        });
+
+        $exampleObject = new Fluent();
+
+        eval(Str::of($this->compiler->compileString('{{$exampleObject;}}'))->remove(['<?php', '?>']));
     }
 }
