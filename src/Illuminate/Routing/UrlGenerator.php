@@ -399,7 +399,9 @@ class UrlGenerator implements UrlGeneratorContract
                 continue;
             }
 
-            $queryString = ltrim(preg_replace('/(^|&)'.preg_quote($ignore).'=?[^&]*/', '', $queryString), '&');
+            $queryString = ltrim(
+                preg_replace('/(^|&)'.preg_quote($ignore).'((=[^&]*)|(=?(&|$)))/', '', $queryString),
+            '&');
         }
 
         $original = rtrim($url.'?'.$queryString, '?');

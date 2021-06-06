@@ -167,6 +167,20 @@ class UrlSigningTest extends TestCase
         $this->assertSame('valid', $this->get($url.'&*=value&[a-z]+=value')->original);
     }
 
+    public function testExceptedParameterCanBeAPrefixOrSuffixOfAnotherParameter()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignatureWithExceptions(['pre', 'fix']) ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+            'prefix' => 'value',
+            'suffix' => 'value',
+        ]));
+
+        $this->assertSame('valid', $this->get($url.'&pre=fix&fix=suff')->original);
+    }
+
     public function testSignedMiddleware()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
