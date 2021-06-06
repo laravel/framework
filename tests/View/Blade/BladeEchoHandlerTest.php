@@ -49,7 +49,10 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         );
     }
 
-    public function testHandlerLogicWorksCorrectly()
+    /**
+     * @dataProvider handlerLogicDataProvider
+     */
+    public function testHandlerLogicWorksCorrectly($blade)
     {
         $this->expectExceptionMessage('The fluent object has been successfully handled!');
 
@@ -63,23 +66,41 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
 
         $exampleObject = new Fluent();
 
-        eval(Str::of($this->compiler->compileString('{{$exampleObject}}'))->remove(['<?php', '?>']));
+        eval(Str::of($this->compiler->compileString($blade))->remove(['<?php', '?>']));
     }
 
-    public function testHandlerLogicWorksCorrectlyWithSemicolon()
+    public function handlerLogicDataProvider()
     {
-        $this->expectExceptionMessage('The fluent object has been successfully handled!');
+        return [
+            ['{{$exampleObject}}'],
+            ['{{$exampleObject;}}'],
+        ];
+    }
 
-        $this->compiler->stringable(Fluent::class, function ($object) {
-            throw new Exception('The fluent object has been successfully handled!');
-        });
-
+    /**
+     * @dataProvider nonStringableDataProvider
+     */
+    public function testHandlerWorksWithNonStringables($blade, $expectedOutput)
+    {
         app()->singleton('blade.compiler', function () {
             return $this->compiler;
         });
 
-        $exampleObject = new Fluent();
+        // We output to the buffer to avoid outputting in the test console.
+        ob_start();
+        eval(Str::of($this->compiler->compileString($blade))->remove(['<?php', '?>']));
+        $output = ob_get_contents();
+        ob_end_clean();
 
-        eval(Str::of($this->compiler->compileString('{{$exampleObject;}}'))->remove(['<?php', '?>']));
+        $this->assertSame($expectedOutput, $output);
+    }
+
+    public function nonStringableDataProvider()
+    {
+        return [
+            ['{{"foo" . "bar"}}', 'foobar'],
+            ['{{ 1 + 2 }}{{ "test"; }}', '3test'],
+            ['@php($test = "hi"){{ $test }}', 'hi']
+        ];
     }
 }
