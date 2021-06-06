@@ -395,7 +395,11 @@ class UrlGenerator implements UrlGeneratorContract
 
         $queryString = $request->server->get('QUERY_STRING');
         foreach ($ignoreQuery as $ignore) {
-            $queryString = ltrim(preg_replace("/(^|&){$ignore}=[^&]+/", '', $queryString), '&');
+            if (strlen($ignore) === 0) {
+                continue;
+            }
+
+            $queryString = ltrim(preg_replace('/(^|&)'.preg_quote($ignore).'=?[^&]*/', '', $queryString), '&');
         }
 
         $original = rtrim($url.'?'.$queryString, '?');

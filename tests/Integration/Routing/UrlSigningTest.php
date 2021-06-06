@@ -132,15 +132,39 @@ class UrlSigningTest extends TestCase
     public function testExceptedParametersCanBeAddedInAnyOrder()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
-            return $request->hasValidSignatureWithExceptions(['excepted1', 'excepted2']) ? 'valid' : 'invalid';
+            return $request->hasValidSignatureWithExceptions(['one', 'two', 'three']) ? 'valid' : 'invalid';
         })->name('foo');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
             'bar' => 'baz',
         ]));
 
-        $this->assertSame('valid', $this->get($url.'&excepted1=value&excepted2=another-value')->original);
-        $this->assertSame('valid', $this->get($url.'&excepted2=value&excepted1=another-value')->original);
+        $this->assertSame('valid', $this->get($url.'&one=value&two=another-value')->original);
+        $this->assertSame('valid', $this->get($url.'&two=value&one=&three')->original);
+    }
+
+    public function testUnusualExceptedParametersWorksAsExpexted()
+    {
+        $this->withoutExceptionHandling();
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignatureWithExceptions(['']) ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+            'bar' => 'baz',
+        ]));
+
+        $this->assertSame('valid', $this->get($url)->original);
+
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignatureWithExceptions(['*', '[a-z]+']) ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+            'bar' => 'baz',
+        ]));
+
+        $this->assertSame('valid', $this->get($url.'&*=value&[a-z]+=value')->original);
     }
 
     public function testSignedMiddleware()
