@@ -25,6 +25,13 @@ trait GuardHelpers
     protected $provider;
 
     /**
+     * Indicates if the Authenticated user checked for the current request.
+     *
+     * @var bool
+     */
+    protected $isUserChecked = false;
+
+    /**
      * Determine if the current user is authenticated. If not, throw an exception.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable
