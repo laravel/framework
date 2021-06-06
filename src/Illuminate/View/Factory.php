@@ -9,6 +9,7 @@ use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\View\Engines\EngineResolver;
 use InvalidArgumentException;
 
@@ -20,7 +21,9 @@ class Factory implements FactoryContract
         Concerns\ManagesLayouts,
         Concerns\ManagesLoops,
         Concerns\ManagesStacks,
-        Concerns\ManagesTranslations;
+        Concerns\ManagesTranslations,
+        Concerns\StringifyObjects,
+        ReflectsClosures;
 
     /**
      * The engine implementation.

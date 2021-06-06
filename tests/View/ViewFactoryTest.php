@@ -10,7 +10,9 @@ use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\MessageBag;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
@@ -762,6 +764,24 @@ class ViewFactoryTest extends TestCase
             return 'Hello World';
         });
         $this->assertSame('Hello World', $factory->getFoo());
+    }
+
+    public function testEchoForRegisteredClass()
+    {
+        $factory = $this->getFactory();
+
+        $factory->stringable(Fluent::class, function (Fluent $object) {
+            return 'String value for object';
+        });
+
+        $this->assertEquals('String value for object', $factory->stringifyObject(new Fluent));
+    }
+
+    public function testEchoForNotRegisteredClass()
+    {
+        $factory = $this->getFactory();
+
+        $this->assertEquals('[]', $factory->stringifyObject(new MessageBag));
     }
 
     protected function getFactory()

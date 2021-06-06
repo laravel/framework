@@ -48,7 +48,7 @@ trait CompilesEchos
 
             return $matches[1]
                 ? substr($matches[0], 1)
-                : "<?php echo {$this->applyEchoHandlerFor($matches[2])}; ?>{$whitespace}";
+                : "<?php echo {$this->wrapInEchoHandler($matches[2])}; ?>{$whitespace}";
         };
 
         return preg_replace_callback($pattern, $callback, $value);
@@ -67,7 +67,7 @@ trait CompilesEchos
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-            $wrapped = sprintf($this->echoFormat, $this->applyEchoHandlerFor($matches[2]));
+            $wrapped = sprintf($this->echoFormat, $this->wrapInEchoHandler($matches[2]));
 
             return $matches[1] ? substr($matches[0], 1) : "<?php echo {$wrapped}; ?>{$whitespace}";
         };
@@ -90,22 +90,22 @@ trait CompilesEchos
 
             return $matches[1]
                 ? $matches[0]
-                : "<?php echo e({$this->applyEchoHandlerFor($matches[2])}); ?>{$whitespace}";
+                : "<?php echo e({$this->wrapInEchoHandler($matches[2])}); ?>{$whitespace}";
         };
 
         return preg_replace_callback($pattern, $callback, $value);
     }
 
     /**
-     * Wrap the echoable value in an echo handler if applicable.
+     * Stringify the value if it's an object.
      *
      * @param  string  $value
      * @return string
      */
-    protected function applyEchoHandlerFor($value)
+    protected function wrapInEchoHandler($value)
     {
-        return empty($this->echoHandlers)
-            ? $value
-            : "is_object($value) && isset(app('blade.compiler')->echoHandlers[get_class($value)]) ? call_user_func_array(app('blade.compiler')->echoHandlers[get_class($value)], [$value]) : $value";
+        $value = trim($value, ';');
+
+        return "is_object($value) ? \$__env->stringifyObject($value) : ($value)";
     }
 }

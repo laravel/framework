@@ -99,9 +99,9 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $compiler->setEchoFormat('%s');
 
-        $this->assertSame('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
-        $this->assertSame('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
-        $this->assertSame('<?php echo $name; ?>', $compiler->compileString('{{
+        $this->assertSame('<?php echo e(is_object($name) ? $__env->stringifyObject($name) : ($name)); ?>', $compiler->compileString('{{{ $name }}}'));
+        $this->assertSame('<?php echo is_object($name) ? $__env->stringifyObject($name) : ($name); ?>', $compiler->compileString('{{ $name }}'));
+        $this->assertSame('<?php echo is_object($name) ? $__env->stringifyObject($name) : ($name); ?>', $compiler->compileString('{{
             $name
         }}'));
     }

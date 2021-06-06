@@ -2,7 +2,6 @@
 
 namespace Illuminate\View\Compilers;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -101,13 +100,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var string
      */
     protected $echoFormat = 'e(%s)';
-
-    /**
-     * Custom rendering callbacks for stringable objects.
-     *
-     * @var array
-     */
-    public $echoHandlers = [];
 
     /**
      * Array of footer lines to be added to the template.
@@ -712,22 +704,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Add a handler to be executed before echoing a given class.
-     *
-     * @param  string|callable  $class
-     * @param  callable|null  $handler
-     * @return void
-     */
-    public function stringable($class, $handler = null)
-    {
-        if ($class instanceof Closure) {
-            [$class, $handler] = [$this->firstClosureParameterType($class), $class];
-        }
-
-        $this->echoHandlers[$class] = $handler;
-    }
-
-    /**
      * Register a new precompiler.
      *
      * @param  callable  $precompiler
@@ -777,5 +753,19 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function withoutComponentTags()
     {
         $this->compilesComponentTags = false;
+    }
+
+    /**
+     * Add a handler to be executed before echoing a given class.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @param  string|callable  $class
+     * @param  callable|null  $handler
+     * @return void
+     */
+    public function stringable($class, $handler = null)
+    {
+        app('view')->stringable($class, $handler);
     }
 }

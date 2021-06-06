@@ -13,7 +13,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testMixingYieldAndEcho()
     {
-        $this->assertSame('<?php echo $__env->yieldContent(\'title\'); ?> - <?php echo e(Config::get(\'site.title\')); ?>', $this->compiler->compileString("@yield('title') - {{Config::get('site.title')}}"));
+        $this->assertSame('<?php echo $__env->yieldContent(\'title\'); ?> - <?php echo e(is_object(Config::get(\'site.title\')) ? $__env->stringifyObject(Config::get(\'site.title\')) : (Config::get(\'site.title\'))); ?>', $this->compiler->compileString("@yield('title') - {{Config::get('site.title')}}"));
     }
 
     public function testCustomExtensionsAreCompiled()

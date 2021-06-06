@@ -18,7 +18,7 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = '{{ "Ignore: @php" }}';
-        $expected = '<?php echo e("Ignore: @php"); ?>';
+        $expected = '<?php echo e(is_object("Ignore: @php") ? $__env->stringifyObject("Ignore: @php") : ("Ignore: @php")); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -38,7 +38,7 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
 
         $expected = " {{ Hello, I'm not blade! }}"
                 ."\n@php echo 'And I'm not PHP!' @endphp"
-                ."\n <?php echo e('I am Blade'); ?>"
+                ."\n <?php echo e(is_object('I am Blade') ? \$__env->stringifyObject('I am Blade') : ('I am Blade')); ?>"
                 ."\n\n<?php echo 'I am PHP {{ not Blade }}' ?>";
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
