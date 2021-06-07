@@ -381,7 +381,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertTrue($user->foo_state_exists);
     }
 
-    public function testWithSoftDelets()
+    public function testWithSoftDeletes()
     {
         $user = HasOneOfManyTestUser::create();
         $user->logins()->create();
