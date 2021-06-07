@@ -508,7 +508,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testRoutesWithDomainsThroughProxy()
     {
-        Request::setTrustedProxies(['10.0.0.1'], SymfonyRequest::HEADER_X_FORWARDED_ALL);
+        Request::setTrustedProxies(['10.0.0.1'], SymfonyRequest::HEADER_X_FORWARDED_FOR | SymfonyRequest::HEADER_X_FORWARDED_HOST | SymfonyRequest::HEADER_X_FORWARDED_PORT | SymfonyRequest::HEADER_X_FORWARDED_PROTO);
 
         $url = new UrlGenerator(
             $routes = new RouteCollection,
