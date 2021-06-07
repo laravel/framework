@@ -238,6 +238,7 @@ class User extends Eloquent
     protected $guarded = [];
     public $timestamps = false;
 }
+
 class UserWithPrefixedTable extends Eloquent
 {
     protected $table = 'public.users';
