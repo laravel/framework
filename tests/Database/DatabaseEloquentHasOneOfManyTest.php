@@ -380,22 +380,11 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertTrue($user->foo_state_exists);
     }
 
-    /**
-     * @group fix
-     */
     public function testSubqueryBindingsAreAdded()
     {
         $relation = HasOneOfManyTestUser::create()->latest_login_with_soft_deletes();
         $relation->applyBeforeQueryCallbacks();
         $this->assertCount(2, $relation->getBindings());
-    }
-
-    protected function getMySqlBuilder()
-    {
-        $grammar = new MySqlGrammar;
-        $processor = m::mock(Processor::class);
-
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }
 
     /**
