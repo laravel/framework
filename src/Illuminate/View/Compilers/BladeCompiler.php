@@ -255,9 +255,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $result = $this->addFooters($result);
         }
 
-        // If there are blade echo handlers defined, we will prepend the file
-        // with a resolved instance of the blade compiler, stored inside a
-        // variable, so that it only has to be resolved a single time.
         if (! empty($this->echoHandlers)) {
             $result = $this->addBladeCompilerVariable($result);
         }
