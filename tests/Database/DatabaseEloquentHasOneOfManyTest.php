@@ -42,6 +42,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->schema()->create('logins', function ($table) {
             $table->increments('id');
             $table->foreignId('user_id');
+            $table->dateTime('deleted_at')->nullable();
         });
 
         $this->schema()->create('states', function ($table) {
@@ -380,11 +381,12 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertTrue($user->foo_state_exists);
     }
 
-    public function testSubqueryBindingsAreAdded()
+    public function testWithSoftDelets()
     {
-        $relation = HasOneOfManyTestUser::create()->latest_login_with_soft_deletes();
-        $relation->applyBeforeQueryCallbacks();
-        $this->assertCount(2, $relation->getBindings());
+        $user = HasOneOfManyTestUser::create();
+        $user->logins()->create();
+        $user->latest_login_with_soft_deletes;
+        $this->assertNotNull($user->latest_login_with_soft_deletes);
     }
 
     /**
