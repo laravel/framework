@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -115,7 +116,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
 
     public function testStrictModeWithCustomCallbackOnLazyLoading()
     {
-        $this->expectsEvents(ViolatedLazyLoadingEvent::class);
+        Event::fake();
 
         Model::handleLazyLoadingViolationUsing(function ($model, $key) {
             event(new ViolatedLazyLoadingEvent($model, $key));
@@ -127,6 +128,8 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $models = EloquentStrictLoadingTestModel1::get();
 
         $models[0]->modelTwos;
+
+        Event::assertDispatched(ViolatedLazyLoadingEvent::class);
     }
 
     public function testStrictModeWithOverriddenHandlerOnLazyLoading()
