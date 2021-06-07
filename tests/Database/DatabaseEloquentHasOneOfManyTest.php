@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -380,6 +381,24 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     }
 
     /**
+     * @group fix
+     */
+    public function testSubqueryBindingsAreAdded()
+    {
+        $relation = HasOneOfManyTestUser::create()->latest_login_with_soft_deletes();
+        $relation->applyBeforeQueryCallbacks();
+        $this->assertCount(2, $relation->getBindings());
+    }
+
+    protected function getMySqlBuilder()
+    {
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
+
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+    }
+
+    /**
      * Get a database connection instance.
      *
      * @return \Illuminate\Database\Connection
@@ -417,6 +436,11 @@ class HasOneOfManyTestUser extends Eloquent
     public function latest_login()
     {
         return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany();
+    }
+
+    public function latest_login_with_soft_deletes()
+    {
+        return $this->hasOne(HasOneOfManyTestLoginWithSoftDeletes::class, 'user_id')->ofMany();
     }
 
     public function latest_login_with_shortcut()
@@ -485,6 +509,15 @@ class HasOneOfManyTestModel extends Eloquent
 
 class HasOneOfManyTestLogin extends Eloquent
 {
+    protected $table = 'logins';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class HasOneOfManyTestLoginWithSoftDeletes extends Eloquent
+{
+    use SoftDeletes;
+
     protected $table = 'logins';
     protected $guarded = [];
     public $timestamps = false;
