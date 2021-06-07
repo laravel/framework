@@ -132,7 +132,7 @@ class UrlSigningTest extends TestCase
     public function testExceptedParametersCanBeAddedInAnyOrder()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
-            return $request->hasValidSignatureWithExceptions(['one', 'two', 'three']) ? 'valid' : 'invalid';
+            return $request->hasValidSignatureWhileIgnoring(['one', 'two', 'three']) ? 'valid' : 'invalid';
         })->name('foo');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
@@ -147,7 +147,7 @@ class UrlSigningTest extends TestCase
     {
         $this->withoutExceptionHandling();
         Route::get('/foo/{id}', function (Request $request, $id) {
-            return $request->hasValidSignatureWithExceptions(['']) ? 'valid' : 'invalid';
+            return $request->hasValidSignatureWhileIgnoring(['']) ? 'valid' : 'invalid';
         })->name('foo');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
@@ -157,7 +157,7 @@ class UrlSigningTest extends TestCase
         $this->assertSame('valid', $this->get($url)->original);
 
         Route::get('/foo/{id}', function (Request $request, $id) {
-            return $request->hasValidSignatureWithExceptions(['*', '[a-z]+']) ? 'valid' : 'invalid';
+            return $request->hasValidSignatureWhileIgnoring(['*', '[a-z]+']) ? 'valid' : 'invalid';
         })->name('foo');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
@@ -170,7 +170,7 @@ class UrlSigningTest extends TestCase
     public function testExceptedParameterCanBeAPrefixOrSuffixOfAnotherParameter()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
-            return $request->hasValidSignatureWithExceptions(['pre', 'fix']) ? 'valid' : 'invalid';
+            return $request->hasValidSignatureWhileIgnoring(['pre', 'fix']) ? 'valid' : 'invalid';
         })->name('foo');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
