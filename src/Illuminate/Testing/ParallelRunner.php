@@ -126,6 +126,8 @@ class ParallelRunner implements RunnerInterface
      * Creates the application.
      *
      * @return \Illuminate\Contracts\Foundation\Application
+     *
+     * @throws \RuntimeException
      */
     protected function createApplication()
     {

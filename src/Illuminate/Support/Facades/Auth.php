@@ -50,6 +50,8 @@ class Auth extends Facade
      *
      * @param  array  $options
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public static function routes(array $options = [])
     {

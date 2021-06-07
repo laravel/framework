@@ -13,6 +13,7 @@ use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -4954,6 +4955,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertNull($explicit_no_connection[0]);
         $this->assertSame('explicits', $explicit_no_connection[1]);
 
+        $explicit_model_with_prefix = $v->parseTable(ExplicitPrefixedTableModel::class);
+        $this->assertNull($explicit_model_with_prefix[0]);
+        $this->assertSame('prefix.explicits', $explicit_model_with_prefix[1]);
+
+        $explicit_table_with_connection_prefix = $v->parseTable('connection.table');
+        $this->assertSame('connection', $explicit_table_with_connection_prefix[0]);
+        $this->assertSame('table', $explicit_table_with_connection_prefix[1]);
+
         $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
         $this->assertNull($noneloquent_no_connection[0]);
         $this->assertEquals(NonEloquentModel::class, $noneloquent_no_connection[1]);
@@ -5357,6 +5366,118 @@ class ValidationValidatorTest extends TestCase
 
         $this->assertTrue($v->fails());
         $this->assertSame('The password confirmation does not match.', $v->errors()->get('password')[0]);
+
+        // Test access to the validator
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['base' => 21, 'double' => 42],
+            [
+                'base' => ['integer'],
+                'double' => [
+                    'integer',
+                    new class implements Rule, ValidatorAwareRule
+                    {
+                        protected $validator;
+
+                        public function setValidator($validator)
+                        {
+                            $this->validator = $validator;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            if ($this->validator->errors()->hasAny(['base', $attribute])) {
+                                return true;
+                            }
+
+                            return $value === 2 * $this->validator->getData()['base'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute must be the double of base.'];
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['base' => 21, 'double' => 10],
+            [
+                'base' => ['integer'],
+                'double' => [
+                    'integer',
+                    new class implements Rule, ValidatorAwareRule
+                    {
+                        protected $validator;
+
+                        public function setValidator($validator)
+                        {
+                            $this->validator = $validator;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            if ($this->validator->errors()->hasAny(['base', $attribute])) {
+                                return true;
+                            }
+
+                            return $value === 2 * $this->validator->getData()['base'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute must be the double of base.'];
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertSame('The double must be the double of base.', $v->errors()->get('double')[0]);
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['base' => 21, 'double' => 'foo'],
+            [
+                'base' => ['integer'],
+                'double' => [
+                    'integer',
+                    new class implements Rule, ValidatorAwareRule
+                    {
+                        protected $validator;
+
+                        public function setValidator($validator)
+                        {
+                            $this->validator = $validator;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            if ($this->validator->errors()->hasAny(['base', $attribute])) {
+                                return true;
+                            }
+
+                            return $value === 2 * $this->validator->getData()['base'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute must be the double of base.'];
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertCount(1, $v->errors()->get('double'));
+        $this->assertSame('validation.integer', $v->errors()->get('double')[0]);
     }
 
     public function testCustomValidationObjectWithDotKeysIsCorrectlyPassedValue()
@@ -6091,6 +6212,13 @@ class ImplicitTableModel extends Model
 class ExplicitTableModel extends Model
 {
     protected $table = 'explicits';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class ExplicitPrefixedTableModel extends Model
+{
+    protected $table = 'prefix.explicits';
     protected $guarded = [];
     public $timestamps = false;
 }

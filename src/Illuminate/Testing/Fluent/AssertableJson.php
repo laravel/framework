@@ -86,7 +86,7 @@ class AssertableJson implements Arrayable
 
         PHPUnit::assertIsArray($props, sprintf('Property [%s] is not scopeable.', $path));
 
-        $scope = new self($props, $path);
+        $scope = new static($props, $path);
         $callback($scope);
         $scope->interacted();
 
@@ -125,7 +125,7 @@ class AssertableJson implements Arrayable
      */
     public static function fromArray(array $data): self
     {
-        return new self($data);
+        return new static($data);
     }
 
     /**
@@ -136,7 +136,7 @@ class AssertableJson implements Arrayable
      */
     public static function fromAssertableJsonString(AssertableJsonString $json): self
     {
-        return self::fromArray($json->json());
+        return static::fromArray($json->json());
     }
 
     /**

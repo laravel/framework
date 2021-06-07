@@ -169,6 +169,8 @@ class Handler implements ExceptionHandlerContract
      * @param  \Closure|string  $from
      * @param  \Closure|string|null  $to
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function map($from, $to = null)
     {

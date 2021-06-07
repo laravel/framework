@@ -4,6 +4,9 @@ namespace Illuminate\Tests\Http;
 
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Client\Events\RequestSending;
+use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Pool;
@@ -13,6 +16,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
@@ -916,5 +920,51 @@ class HttpClientTest extends TestCase
         $this->assertSame(200, $responses['test200']->status());
         $this->assertSame(400, $responses['test400']->status());
         $this->assertSame(500, $responses['test500']->status());
+    }
+
+    public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+        $factory->fake();
+
+        $factory->get('https://example.com');
+        $factory->head('https://example.com');
+        $factory->post('https://example.com');
+        $factory->patch('https://example.com');
+        $factory->delete('https://example.com');
+
+        m::close();
+    }
+
+    public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
+    {
+        $this->factory->fake(['https://example.com' => $this->factory->response()]);
+        $stats = $this->factory->get('https://example.com')->handlerStats();
+        $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
+
+        $this->assertIsArray($stats);
+        $this->assertEmpty($stats);
+
+        $this->assertNull($effectiveUri);
+    }
+
+    public function testClonedClientsWorkSuccessfullyWithTheRequestObject()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->once()->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+
+        $client = $factory->timeout(10);
+        $clonedClient = clone $client;
+
+        $clonedClient->get('https://example.com');
+
+        m::close();
     }
 }

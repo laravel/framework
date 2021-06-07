@@ -187,6 +187,23 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
     }
 
+    public function testItCanRunModelBootsAndTraitInitializations()
+    {
+        $model = new ModelBootTestWithTraitInitialization();
+
+        $this->assertTrue($model->fooBar);
+        $this->assertTrue($model::hasGlobalScope('foo_bar'));
+
+        $model::clearBootedModels();
+
+        $this->assertFalse($model::hasGlobalScope('foo_bar'));
+
+        $unSerializedModel = unserialize(serialize($model));
+
+        $this->assertFalse($unSerializedModel->fooBar);
+        $this->assertTrue($model::hasGlobalScope('foo_bar'));
+    }
+
     /**
      * Regression test for https://github.com/laravel/framework/issues/23068.
      */
@@ -317,6 +334,27 @@ class ModelSerializationTest extends TestCase
             'O:78:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationParentAccessibleTestClass":2:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}s:8:"'."\0".'*'."\0".'user2";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}}', $serialized
         );
     }
+}
+
+trait TraitBootsAndInitializersTest
+{
+    public $fooBar = false;
+
+    public function initializeTraitBootsAndInitializersTest()
+    {
+        $this->fooBar = ! $this->fooBar;
+    }
+
+    public static function bootTraitBootsAndInitializersTest()
+    {
+        static::addGlobalScope('foo_bar', function () {
+        });
+    }
+}
+
+class ModelBootTestWithTraitInitialization extends Model
+{
+    use TraitBootsAndInitializersTest;
 }
 
 class ModelSerializationTestUser extends Model
