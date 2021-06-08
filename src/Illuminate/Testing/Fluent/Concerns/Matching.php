@@ -10,6 +10,42 @@ use PHPUnit\Framework\Assert as PHPUnit;
 trait Matching
 {
     /**
+     * Assets that all values exist and match their expected values.
+     *
+     * @param string       $key
+     * @param array|string $expected
+     *
+     * @return $this
+     */
+    public function whereHas(string $key, $expected)
+    {
+        $actual = Collection::make(
+            $this->prop($key) ?? $this->prop()
+        );
+
+        $missing = Collection::make($expected)->reject(function ($search) use ($key, $actual) {
+            if ($actual->containsStrict($key, $search)) {
+                return true;
+            }
+
+            return $actual->containsStrict($search);
+        })->toArray();
+
+        $values = array_values($missing);
+
+        PHPUnit::assertEmpty(
+            $missing,
+            sprintf(
+                'Property [%s] does not contain [%s].',
+                $key,
+                implode(', ', $values)
+            )
+        );
+
+        return $this;
+    }
+
+    /**
      * Asserts that the property matches the expected value.
      *
      * @param  string  $key
