@@ -93,6 +93,18 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
+    public function testValidateThrowsCustomErrorMessageWhenValidationFails()
+    {
+        $message = "This is a custom error message";
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage($message);
+
+        $request = $this->createRequest(['no' => 'name'], FoundationTestFormRequestCustomErrorMessageStub::class);
+
+        $request->validateResolved();
+    }
+
     public function testValidateMethodThrowsWhenAuthorizationFails()
     {
         $this->expectException(AuthorizationException::class);
@@ -220,6 +232,21 @@ class FoundationFormRequestTest extends TestCase
 
 class FoundationTestFormRequestStub extends FormRequest
 {
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestCustomErrorMessageStub extends FormRequest
+{
+    protected $errorMessage = "This is a custom error message";
+
     public function rules()
     {
         return ['name' => 'required'];

@@ -73,6 +73,12 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $validator;
 
     /**
+     * The message to be shown if validation fails.
+     *
+     */
+    protected $errorMessage;
+
+    /**
      * Get the validator instance for the request.
      *
      * @return \Illuminate\Contracts\Validation\Validator
@@ -134,9 +140,15 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function failedValidation(Validator $validator)
     {
-        throw (new ValidationException($validator))
+        $error = (new ValidationException($validator))
                     ->errorBag($this->errorBag)
                     ->redirectTo($this->getRedirectUrl());
+
+        if($this->errorMessage) {
+            $error->setMessage($this->errorMessage);
+        }
+
+        throw $error;
     }
 
     /**

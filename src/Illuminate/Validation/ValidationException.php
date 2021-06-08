@@ -135,4 +135,16 @@ class ValidationException extends Exception
     {
         return $this->response;
     }
+
+    /**
+     * Set the message to be shown to on a validation error.
+     *
+     * @param  string  $message
+     * @return $this
+     */
+    public function setMessage($message){
+        $this->message = $message;
+
+        return $this;
+    }
 }
