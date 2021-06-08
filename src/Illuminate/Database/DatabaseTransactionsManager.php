@@ -58,15 +58,12 @@ class DatabaseTransactionsManager
      */
     public function commit($connection)
     {
-        $this->transactions = $this->transactions->reject(function ($transaction) use ($connection) {
-            if ($transaction->connection == $connection) {
-                $transaction->executeCallbacks();
+        [$passes, $fails] = $this->transactions->partition(function ($transaction) use ($connection) {
+            return $transaction->connection == $connection;
+        });
 
-                return true;
-            }
-
-            return false;
-        })->values();
+        $this->transactions = $fails->values();
+        $passes->map->executeCallbacks();
     }
 
     /**
