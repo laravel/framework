@@ -104,7 +104,7 @@ trait Matching
     }
 
     /**
-     * Asserts that the property matches their expected values.
+     * Asserts that the property matches the expected values.
      *
      * @param string       $key
      * @param array|string $expected
