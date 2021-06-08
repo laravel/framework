@@ -504,6 +504,14 @@ class AssertTest extends TestCase
         $assert->whereHas('baz', 4);
     }
 
+    public function testAssertWhereHasWithNullExpectation()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 1,
+        ]);
+
+        $assert->whereHas('foo', null);
+    }
     public function testAssertNestedWhereMatchesValue()
     {
         $assert = AssertableJson::fromArray([
