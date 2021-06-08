@@ -2,10 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Support\Optional;
 use Illuminate\Support\Traits\Conditionable;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class SupportConditionableTest extends TestCase
 {
@@ -15,11 +13,11 @@ class SupportConditionableTest extends TestCase
         $defaultTriggered = false;
 
         $object = (new CustomConditionableObject())
-            ->when(2, function($object, $condition) use (&$conditionTriggered) {
+            ->when(2, function ($object, $condition) use (&$conditionTriggered) {
                 $conditionTriggered = true;
                 $object->on();
                 $this->assertEquals(2, $condition);
-            }, function($object) use (&$defaultTriggered) {
+            }, function ($object) use (&$defaultTriggered) {
                 $defaultTriggered = true;
                 $object->off();
             });
