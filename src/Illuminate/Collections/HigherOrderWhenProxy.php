@@ -2,17 +2,14 @@
 
 namespace Illuminate\Support;
 
-/**
- * @mixin \Illuminate\Support\Enumerable
- */
 class HigherOrderWhenProxy
 {
     /**
-     * The collection being operated on.
+     * The target being conditionally operated on.
      *
-     * @var \Illuminate\Support\Enumerable
+     * @var mixed
      */
-    protected $collection;
+    protected $target;
 
     /**
      * The condition for proxying.
@@ -24,18 +21,18 @@ class HigherOrderWhenProxy
     /**
      * Create a new proxy instance.
      *
-     * @param  \Illuminate\Support\Enumerable  $collection
+     * @param  mixed  $target
      * @param  bool  $condition
      * @return void
      */
-    public function __construct(Enumerable $collection, $condition)
+    public function __construct($target, $condition)
     {
+        $this->target = $target;
         $this->condition = $condition;
-        $this->collection = $collection;
     }
 
     /**
-     * Proxy accessing an attribute onto the collection.
+     * Proxy accessing an attribute onto the target.
      *
      * @param  string  $key
      * @return mixed
@@ -43,12 +40,12 @@ class HigherOrderWhenProxy
     public function __get($key)
     {
         return $this->condition
-            ? $this->collection->{$key}
-            : $this->collection;
+            ? $this->target->{$key}
+            : $this->target;
     }
 
     /**
-     * Proxy a method call onto the collection.
+     * Proxy a method call on the target.
      *
      * @param  string  $method
      * @param  array  $parameters
@@ -57,7 +54,7 @@ class HigherOrderWhenProxy
     public function __call($method, $parameters)
     {
         return $this->condition
-            ? $this->collection->{$method}(...$parameters)
-            : $this->collection;
+            ? $this->target->{$method}(...$parameters)
+            : $this->target;
     }
 }

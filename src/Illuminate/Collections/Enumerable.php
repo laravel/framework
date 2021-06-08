@@ -271,11 +271,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Apply the callback if the value is truthy.
      *
      * @param  bool  $value
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  callable|null  $default
      * @return static|mixed
      */
-    public function when($value, callable $callback, callable $default = null);
+    public function when($value, callable $callback = null, callable $default = null);
 
     /**
      * Apply the callback if the collection is empty.
