@@ -125,7 +125,7 @@ class ContainerTest extends TestCase
         });
         $firstInstantiation = $container->make('class');
 
-        $container->resetScope();
+        $container->forgetScopedInstances();
 
         $secondInstantiation = $container->make('class');
         $this->assertNotSame($firstInstantiation, $secondInstantiation);
@@ -154,7 +154,7 @@ class ContainerTest extends TestCase
 
         $var1 = $container->make(ContainerConcreteStub::class);
 
-        $container->resetScope();
+        $container->forgetScopedInstances();
 
         $var2 = $container->make(ContainerConcreteStub::class);
 

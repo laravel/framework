@@ -1349,7 +1349,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @return void
      */
-    public function resetScope()
+    public function forgetScopedInstances()
     {
         foreach ($this->scopedInstances as $scoped) {
             unset($this->instances[$scoped]);

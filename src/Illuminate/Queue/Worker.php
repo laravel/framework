@@ -66,11 +66,11 @@ class Worker
     protected $isDownForMaintenance;
 
     /**
-     * The callback used to reset the application scope.
+     * The callback used to reset the application's scope.
      *
      * @var callable
      */
-    protected $scopeResetter;
+    protected $resetScope;
 
     /**
      * Indicates if the worker should exit.
@@ -100,20 +100,20 @@ class Worker
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
      * @param  callable  $isDownForMaintenance
-     * @param  callable|null  $scopeResetter
+     * @param  callable|null  $resetScope
      * @return void
      */
     public function __construct(QueueManager $manager,
                                 Dispatcher $events,
                                 ExceptionHandler $exceptions,
                                 callable $isDownForMaintenance,
-                                callable $scopeResetter = null)
+                                callable $resetScope = null)
     {
         $this->events = $events;
         $this->manager = $manager;
         $this->exceptions = $exceptions;
         $this->isDownForMaintenance = $isDownForMaintenance;
-        $this->scopeResetter = $scopeResetter;
+        $this->resetScope = $resetScope;
     }
 
     /**
@@ -148,8 +148,8 @@ class Worker
                 continue;
             }
 
-            if (isset($this->scopeResetter)) {
-                ($this->scopeResetter)();
+            if (isset($this->resetScope)) {
+                ($this->resetScope)();
             }
 
             // First, we will attempt to get the next job off of the queue. We will also
