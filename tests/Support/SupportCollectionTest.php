@@ -4298,8 +4298,8 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->whenEmpty(function ($data) {
-            return $data->concat(['adam']);
+        $data = $data->whenEmpty(function () {
+            throw new Exception('whenEmpty() should not trigger on a collection with items');
         });
 
         $this->assertSame(['michael', 'tom'], $data->toArray());

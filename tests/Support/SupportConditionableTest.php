@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Exception;
 use Illuminate\Support\Traits\Conditionable;
 use PHPUnit\Framework\TestCase;
 
@@ -9,84 +10,54 @@ class SupportConditionableTest extends TestCase
 {
     public function testWhenConditionCallback()
     {
-        $conditionTriggered = false;
-        $defaultTriggered = false;
-
         $object = (new CustomConditionableObject())
-            ->when(2, function ($object, $condition) use (&$conditionTriggered) {
-                $conditionTriggered = true;
+            ->when(2, function ($object, $condition) {
                 $object->on();
                 $this->assertEquals(2, $condition);
-            }, function ($object) use (&$defaultTriggered) {
-                $defaultTriggered = true;
-                $object->off();
+            }, function () {
+                throw new Exception('when() should not trigger default callback on a truthy value');
             });
 
         $this->assertTrue($object->enabled);
-        $this->assertTrue($conditionTriggered);
-        $this->assertFalse($defaultTriggered);
     }
 
     public function testWhenDefaultCallback()
     {
-        $conditionTriggered = false;
-        $defaultTriggered = false;
-
         $object = (new CustomConditionableObject())
-            ->when(null, function ($object) use (&$conditionTriggered) {
-                $conditionTriggered = true;
+            ->when(null, function () {
+                throw new Exception('when() should not trigger on a falsy value');
+            }, function ($object, $condition) {
                 $object->on();
-            }, function ($object, $condition) use (&$defaultTriggered) {
-                $defaultTriggered = true;
-                $object->up();
                 $this->assertNull($condition);
             });
 
-        $this->assertFalse($object->enabled);
-        $this->assertEquals('up', $object->direction);
-        $this->assertFalse($conditionTriggered);
-        $this->assertTrue($defaultTriggered);
+        $this->assertTrue($object->enabled);
     }
 
     public function testUnlessConditionCallback()
     {
-        $conditionTriggered = false;
-        $defaultTriggered = false;
-
         $object = (new CustomConditionableObject())
-            ->unless(null, function ($object, $condition) use (&$conditionTriggered) {
-                $conditionTriggered = true;
+            ->unless(null, function ($object, $condition) {
                 $object->on();
                 $this->assertNull($condition);
-            }, function ($object) use (&$defaultTriggered) {
-                $defaultTriggered = true;
-                $object->up();
+            }, function () {
+                throw new Exception('unless() should not trigger default callback on a falsy value');
             });
 
         $this->assertTrue($object->enabled);
-        $this->assertEquals('down', $object->direction);
-        $this->assertTrue($conditionTriggered);
-        $this->assertFalse($defaultTriggered);
     }
 
     public function testUnlessDefaultCallback()
     {
-        $conditionTriggered = false;
-        $defaultTriggered = false;
-
         $object = (new CustomConditionableObject())
-            ->unless(2, function ($object) use (&$conditionTriggered) {
-                $conditionTriggered = true;
+            ->unless(2, function () {
+                throw new Exception('unless() should not trigger on a truthy value');
+            }, function ($object, $condition) {
                 $object->on();
-            }, function ($object, $condition) use (&$defaultTriggered) {
-                $defaultTriggered = true;
-                $object->off();
                 $this->assertEquals(2, $condition);
             });
 
-        $this->assertFalse($object->enabled);
-        $this->assertFalse($conditionTriggered);
-        $this->assertTrue($defaultTriggered);
+        $this->assertTrue($object->enabled);
     }
 
     public function testWhenProxy()
@@ -122,8 +93,6 @@ class CustomConditionableObject
 
     public $enabled = false;
 
-    public $direction = 'down';
-
     public function on()
     {
         $this->enabled = true;
@@ -134,20 +103,6 @@ class CustomConditionableObject
     public function off()
     {
         $this->enabled = false;
-
-        return $this;
-    }
-
-    public function down()
-    {
-        $this->direction = 'down';
-
-        return $this;
-    }
-
-    public function up()
-    {
-        $this->direction = 'up';
 
         return $this;
     }
