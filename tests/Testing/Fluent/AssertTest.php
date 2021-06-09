@@ -401,6 +401,117 @@ class AssertTest extends TestCase
             ]);
     }
 
+    public function testAssertWhereContainsFailsWithEmptyValue()
+    {
+        $assert = AssertableJson::fromArray([]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain [1].');
+
+        $assert->whereContains('foo', ['1']);
+    }
+
+    public function testAssertWhereContainsFailsWithMissingValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => ['bar', 'baz'],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain [invalid].');
+
+        $assert->whereContains('foo', ['bar', 'baz', 'invalid']);
+    }
+
+    public function testAssertWhereContainsFailsWithMissingNestedValue()
+    {
+        $assert = AssertableJson::fromArray([
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3],
+            ['id' => 4],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [id] does not contain [5].');
+
+        $assert->whereContains('id', [1,2,3,4,5]);
+    }
+
+    public function testAssertWhereContainsFailsWhenDoesNotMatchType()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1,2,3,4]
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain [1].');
+
+        $assert->whereContains('foo', ['1']);
+    }
+
+    public function testAssertWhereContainsWithNestedValue()
+    {
+        $assert = AssertableJson::fromArray([
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3],
+            ['id' => 4],
+        ]);
+
+        $assert->whereContains('id', 1);
+        $assert->whereContains('id', [1,2,3,4]);
+        $assert->whereContains('id', [4,3,2,1]);
+    }
+
+    public function testAssertWhereContainsWithMatchingType()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1,2,3,4]
+        ]);
+
+        $assert->whereContains('foo', 1);
+        $assert->whereContains('foo', [1]);
+    }
+    
+    public function testAssertWhereContainsWithNullValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => null,
+        ]);
+
+        $assert->whereContains('foo', null);
+        $assert->whereContains('foo', [null]);
+    }
+
+    public function testAssertWhereContainsWithOutOfOrderMatchingType()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [4,1,7,3]
+        ]);
+
+        $assert->whereContains('foo', [1,7,4,3]);
+    }
+
+    public function testAssertWhereContainsWithOutOfOrderNestedMatchingType()
+    {
+        $assert = AssertableJson::fromArray([
+            ['bar' => 5],
+            ['baz' => 4],
+            ['zal' => 8],
+        ]);
+
+        $assert->whereContains('baz', 4);
+    }
+
+    public function testAssertWhereContainsWithNullExpectation()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 1,
+        ]);
+
+        $assert->whereContains('foo', null);
+    }
     public function testAssertNestedWhereMatchesValue()
     {
         $assert = AssertableJson::fromArray([
