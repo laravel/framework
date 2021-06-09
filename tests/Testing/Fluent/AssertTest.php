@@ -401,17 +401,17 @@ class AssertTest extends TestCase
             ]);
     }
 
-    public function testAssertWhereHasFailsWithEmptyValue()
+    public function testAssertWhereContainsFailsWithEmptyValue()
     {
         $assert = AssertableJson::fromArray([]);
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [foo] does not contain [1].');
 
-        $assert->whereHas('foo', ['1']);
+        $assert->whereContains('foo', ['1']);
     }
 
-    public function testAssertWhereHasFailsWithMissingValue()
+    public function testAssertWhereContainsFailsWithMissingValue()
     {
         $assert = AssertableJson::fromArray([
             'foo' => ['bar', 'baz'],
@@ -420,10 +420,10 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [foo] does not contain [invalid].');
 
-        $assert->whereHas('foo', ['bar', 'baz', 'invalid']);
+        $assert->whereContains('foo', ['bar', 'baz', 'invalid']);
     }
 
-    public function testAssertWhereHasFailsWithMissingNestedValue()
+    public function testAssertWhereContainsFailsWithMissingNestedValue()
     {
         $assert = AssertableJson::fromArray([
             ['id' => 1],
@@ -435,10 +435,10 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [id] does not contain [5].');
 
-        $assert->whereHas('id', [1,2,3,4,5]);
+        $assert->whereContains('id', [1,2,3,4,5]);
     }
 
-    public function testAssertWhereHasFailsWhenDoesNotMatchType()
+    public function testAssertWhereContainsFailsWhenDoesNotMatchType()
     {
         $assert = AssertableJson::fromArray([
             'foo' => [1,2,3,4]
@@ -447,10 +447,10 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [foo] does not contain [1].');
 
-        $assert->whereHas('foo', ['1']);
+        $assert->whereContains('foo', ['1']);
     }
 
-    public function testAssertWhereHasWithNestedValue()
+    public function testAssertWhereContainsWithNestedValue()
     {
         $assert = AssertableJson::fromArray([
             ['id' => 1],
@@ -459,41 +459,41 @@ class AssertTest extends TestCase
             ['id' => 4],
         ]);
 
-        $assert->whereHas('id', 1);
-        $assert->whereHas('id', [1,2,3,4]);
-        $assert->whereHas('id', [4,3,2,1]);
+        $assert->whereContains('id', 1);
+        $assert->whereContains('id', [1,2,3,4]);
+        $assert->whereContains('id', [4,3,2,1]);
     }
 
-    public function testAssertWhereHasWithMatchingType()
+    public function testAssertWhereContainsWithMatchingType()
     {
         $assert = AssertableJson::fromArray([
             'foo' => [1,2,3,4]
         ]);
 
-        $assert->whereHas('foo', 1);
-        $assert->whereHas('foo', [1]);
+        $assert->whereContains('foo', 1);
+        $assert->whereContains('foo', [1]);
     }
     
-    public function testAssertWhereHasWithNullValue()
+    public function testAssertWhereContainsWithNullValue()
     {
         $assert = AssertableJson::fromArray([
             'foo' => null,
         ]);
 
-        $assert->whereHas('foo', null);
-        $assert->whereHas('foo', [null]);
+        $assert->whereContains('foo', null);
+        $assert->whereContains('foo', [null]);
     }
 
-    public function testAssertWhereHasWithOutOfOrderMatchingType()
+    public function testAssertWhereContainsWithOutOfOrderMatchingType()
     {
         $assert = AssertableJson::fromArray([
             'foo' => [4,1,7,3]
         ]);
 
-        $assert->whereHas('foo', [1,7,4,3]);
+        $assert->whereContains('foo', [1,7,4,3]);
     }
 
-    public function testAssertWhereHasWithOutOfOrderNestedMatchingType()
+    public function testAssertWhereContainsWithOutOfOrderNestedMatchingType()
     {
         $assert = AssertableJson::fromArray([
             ['bar' => 5],
@@ -501,16 +501,16 @@ class AssertTest extends TestCase
             ['zal' => 8],
         ]);
 
-        $assert->whereHas('baz', 4);
+        $assert->whereContains('baz', 4);
     }
 
-    public function testAssertWhereHasWithNullExpectation()
+    public function testAssertWhereContainsWithNullExpectation()
     {
         $assert = AssertableJson::fromArray([
             'foo' => 1,
         ]);
 
-        $assert->whereHas('foo', null);
+        $assert->whereContains('foo', null);
     }
     public function testAssertNestedWhereMatchesValue()
     {

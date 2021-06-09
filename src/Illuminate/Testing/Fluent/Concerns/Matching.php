@@ -104,14 +104,14 @@ trait Matching
     }
 
     /**
-     * Asserts that the property matches the expected values.
+     * Asserts that the property contains the expected values.
      *
      * @param string       $key
      * @param array|string $expected
      *
      * @return $this
      */
-    public function whereHas(string $key, $expected)
+    public function whereContains(string $key, $expected)
     {
         $actual = Collection::make(
             $this->prop($key) ?? $this->prop()
@@ -125,14 +125,12 @@ trait Matching
             return $actual->containsStrict($search);
         })->toArray();
 
-        $values = array_values($missing);
-
         PHPUnit::assertEmpty(
             $missing,
             sprintf(
                 'Property [%s] does not contain [%s].',
                 $key,
-                implode(', ', $values)
+                implode(', ', array_values($missing))
             )
         );
 
