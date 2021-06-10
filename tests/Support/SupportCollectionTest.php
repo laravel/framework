@@ -4298,8 +4298,8 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->whenEmpty(function ($collection) {
-            return $data->concat(['adam']);
+        $data = $data->whenEmpty(function () {
+            throw new Exception('whenEmpty() should not trigger on a collection with items');
         });
 
         $this->assertSame(['michael', 'tom'], $data->toArray());
@@ -4365,6 +4365,30 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testHigherOrderWhenAndUnless($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->when(true)->concat(['chris']);
+
+        $this->assertSame(['michael', 'tom', 'chris'], $data->toArray());
+
+        $data = $data->when(false)->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'chris'], $data->toArray());
+
+        $data = $data->unless(false)->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'chris', 'adam'], $data->toArray());
+
+        $data = $data->unless(true)->concat(['bogdan']);
+
+        $this->assertSame(['michael', 'tom', 'chris', 'adam'], $data->toArray());
     }
 
     /**
