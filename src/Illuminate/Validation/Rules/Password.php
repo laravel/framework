@@ -158,19 +158,6 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Set the data under validation.
-     *
-     * @param  array  $data
-     * @return $this
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /**
      * Set the performing validator.
      *
      * @param \Illuminate\Contracts\Validation\Validator $validator
@@ -179,6 +166,19 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     public function setValidator($validator)
     {
         $this->validator = $validator;
+
+        return $this;
+    }    
+
+    /**
+     * Set the data under validation.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
 
         return $this;
     }
