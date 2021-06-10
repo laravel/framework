@@ -6,14 +6,22 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 
-class Password implements Rule, DataAwareRule
+class Password implements Rule, DataAwareRule, ValidatorAwareRule
 {
     use Conditionable;
+
+    /**
+     * The validator performing the validation.
+     *
+     * @var \Illuminate\Contracts\Validation\Validator
+     */
+    protected $validator;
 
     /**
      * The data under validation.
@@ -148,6 +156,19 @@ class Password implements Rule, DataAwareRule
     {
         return ['sometimes', static::default()];
     }
+
+    /**
+     * Set the performing validator.
+     *
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     * @return $this
+     */
+    public function setValidator($validator)
+    {
+        $this->validator = $validator;
+
+        return $this;
+    }    
 
     /**
      * Set the data under validation.
@@ -306,7 +327,7 @@ class Password implements Rule, DataAwareRule
     protected function fail($messages)
     {
         $messages = collect(Arr::wrap($messages))->map(function ($message) {
-            return __($message);
+            return $this->validator->getTranslator()->get($message);
         })->all();
 
         $this->messages = array_merge($this->messages, $messages);
