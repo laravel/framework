@@ -35,6 +35,16 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([1], $query->getBindings());
     }
 
+    public function testOrderByOverridesGlobalScope()
+    {
+        $model = new EloquentGlobalScopeOrderTestModel;
+        $query = $model->newQuery();
+        $this->assertSame('select * from "table" order by "name" asc', $query->toSql());
+
+        $query = $model->newQuery()->orderBy('name', 'desc');
+        $this->assertSame('select * from "table" order by "name" desc', $query->toSql());
+    }
+
     public function testGlobalScopeCanBeRemoved()
     {
         $model = new EloquentGlobalScopesTestModel;
@@ -149,6 +159,20 @@ class EloquentClosureGlobalScopesTestModel extends Model
     public function scopeOrApproved($query)
     {
         return $query->orWhere('approved', 1)->orWhere('should_approve', 0);
+    }
+}
+
+class EloquentGlobalScopeOrderTestModel extends Model
+{
+    protected $table = 'table';
+
+    public static function boot()
+    {
+        static::addGlobalScope(function ($query) {
+            $query->orderBy('name', 'asc');
+        });
+
+        parent::boot();
     }
 }
 
