@@ -168,7 +168,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         $this->validator = $validator;
 
         return $this;
-    }    
+    }
 
     /**
      * Set the data under validation.
