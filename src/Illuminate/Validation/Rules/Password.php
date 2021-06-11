@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
@@ -109,7 +110,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * If no arguments are passed, the default password rule configuration will be returned.
      *
-     * @param  static|callable|null  $callback
+     * @param  static|\Closure|null  $callback
      * @return static|null
      */
     public static function defaults($callback = null)
@@ -118,8 +119,8 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             return static::default();
         }
 
-        if (! is_callable($callback) && ! $callback instanceof static) {
-            throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
+        if (! $callback instanceof Closure && ! $callback instanceof static) {
+            throw new InvalidArgumentException('The given callback should be a Closure or an instance of '.static::class);
         }
 
         static::$defaultCallback = $callback;
