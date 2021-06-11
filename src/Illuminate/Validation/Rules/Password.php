@@ -120,7 +120,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         }
 
         if (! $callback instanceof Closure && ! $callback instanceof static) {
-            throw new InvalidArgumentException('The given callback should be a Closure or an instance of '.static::class);
+            throw new InvalidArgumentException('The given callback should be a closure or an instance of '.static::class);
         }
 
         static::$defaultCallback = $callback;
