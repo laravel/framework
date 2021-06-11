@@ -1752,9 +1752,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->floatAttribute = '4.0';
         $model->stringAttribute = 2.5;
         $model->boolTruthyAttribute = 1;
-        $model->booleanTruthyAttribute = "any-not-false-string";
+        $model->booleanTruthyAttribute = 'any-not-false-string';
         $model->boolFalsyAttribute = 0;
-        $model->booleanFalsyAttribute = "false";
+        $model->booleanFalsyAttribute = 'false';
         $model->objectAttribute = ['foo' => 'bar'];
         $obj = new stdClass;
         $obj->foo = 'bar';
