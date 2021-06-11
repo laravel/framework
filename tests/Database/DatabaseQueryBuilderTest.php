@@ -1199,14 +1199,6 @@ class DatabaseQueryBuilderTest extends TestCase
             ->orderByRaw('field(category, ?, ?) asc', ['news', 'opinion']);
         $this->assertSame('(select * from "posts" where "public" = ?) union all (select * from "videos" where "public" = ?) order by field(category, ?, ?) asc', $builder->toSql());
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
-
-        $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->orderBy('name', 'asc');
-        $builder->orderBy('name', 'desc');
-        $builder->orderBy('email', 'desc');
-        $builder->orderBy('email', 'asc');
-        $builder->orderByRaw('"age" ? desc', ['foo']);
-        $this->assertSame('select * from "users" order by "name" desc, "email" asc, "age" ? desc', $builder->toSql());
     }
 
     public function testReorder()

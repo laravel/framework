@@ -43,6 +43,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertSame('exists:users,NULL,foo,"bar"', (string) $rule);
 
+        $rule = new Exists(UserWithPrefixedTable::class);
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:'.UserWithPrefixedTable::class.',NULL,foo,"bar"', (string) $rule);
+
         $rule = new Exists('table', 'column');
         $rule->where('foo', 'bar');
         $this->assertSame('exists:table,column,foo,"bar"', (string) $rule);
@@ -231,6 +235,13 @@ class ValidationExistsRuleTest extends TestCase
 class User extends Eloquent
 {
     protected $table = 'users';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class UserWithPrefixedTable extends Eloquent
+{
+    protected $table = 'public.users';
     protected $guarded = [];
     public $timestamps = false;
 }

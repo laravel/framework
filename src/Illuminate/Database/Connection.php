@@ -892,6 +892,19 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Set the record modification state.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function setRecordModificationState(bool $value)
+    {
+        $this->recordsModified = $value;
+
+        return $this;
+    }
+
+    /**
      * Reset the record modification state.
      *
      * @return void
