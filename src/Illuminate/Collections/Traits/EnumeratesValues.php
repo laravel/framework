@@ -138,7 +138,7 @@ trait EnumeratesValues
         }
 
         return static::range(1, $number)
-            ->when($callback)
+            ->unless($callback == null)
             ->map($callback);
     }
 
