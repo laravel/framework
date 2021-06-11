@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Support;
 
-use Exception;
 use Illuminate\Support\Traits\Conditionable;
 use PHPUnit\Framework\TestCase;
 
@@ -10,99 +9,80 @@ class SupportConditionableTest extends TestCase
 {
     public function testWhenConditionCallback()
     {
-        $object = (new CustomConditionableObject())
-            ->when(2, function ($object, $condition) {
-                $object->on();
-                $this->assertEquals(2, $condition);
+        $logger = (new ConditionableLogger())
+            ->when(2, function ($logger, $condition) {
+                $logger->log('when', $condition);
             }, function () {
-                throw new Exception('when() should not trigger default callback on a truthy value');
+                $logger->log('default', $condition);
             });
 
-        $this->assertTrue($object->enabled);
+        $this->assertSame(['when', 2], $logger->values);
     }
 
     public function testWhenDefaultCallback()
     {
-        $object = (new CustomConditionableObject())
+        $logger = (new ConditionableLogger())
             ->when(null, function () {
-                throw new Exception('when() should not trigger on a falsy value');
-            }, function ($object, $condition) {
-                $object->on();
-                $this->assertNull($condition);
+                $logger->log('when', $condition);
+            }, function ($logger, $condition) {
+                $logger->log('default', $condition);
             });
 
-        $this->assertTrue($object->enabled);
+        $this->assertSame(['default', null], $logger->values);
     }
 
     public function testUnlessConditionCallback()
     {
-        $object = (new CustomConditionableObject())
-            ->unless(null, function ($object, $condition) {
-                $object->on();
-                $this->assertNull($condition);
+        $logger = (new ConditionableLogger())
+            ->unless(null, function ($logger, $condition) {
+                $logger->log('unless', $condition);
             }, function () {
-                throw new Exception('unless() should not trigger default callback on a falsy value');
+                $logger->log('default', $condition);
             });
 
-        $this->assertTrue($object->enabled);
+        $this->assertSame(['unless', null], $logger->values);
     }
 
     public function testUnlessDefaultCallback()
     {
-        $object = (new CustomConditionableObject())
+        $logger = (new ConditionableLogger())
             ->unless(2, function () {
-                throw new Exception('unless() should not trigger on a truthy value');
-            }, function ($object, $condition) {
-                $object->on();
-                $this->assertEquals(2, $condition);
+                $logger->log('unless', $condition);
+            }, function ($logger, $condition) {
+                $logger->log('default', $condition);
             });
 
-        $this->assertTrue($object->enabled);
+        $this->assertSame(['default', 2], $logger->values);
     }
 
     public function testWhenProxy()
     {
-        $object = (new CustomConditionableObject())->when(true)->on();
+        $logger = (new ConditionableLogger())
+            ->when(true)->log('one')
+            ->when(false)->log('two');
 
-        $this->assertInstanceOf(CustomConditionableObject::class, $object);
-        $this->assertTrue($object->enabled);
-
-        $object = (new CustomConditionableObject())->when(false)->on();
-
-        $this->assertInstanceOf(CustomConditionableObject::class, $object);
-        $this->assertFalse($object->enabled);
+        $this->assertSame(['one'], $logger->values);
     }
 
     public function testUnlessProxy()
     {
-        $object = (new CustomConditionableObject())->unless(false)->on();
+        $logger = (new ConditionableLogger())
+            ->unless(true)->log('one')
+            ->unless(false)->log('two');
 
-        $this->assertInstanceOf(CustomConditionableObject::class, $object);
-        $this->assertTrue($object->enabled);
-
-        $object = (new CustomConditionableObject())->unless(true)->on();
-
-        $this->assertInstanceOf(CustomConditionableObject::class, $object);
-        $this->assertFalse($object->enabled);
+        $this->assertSame(['two'], $logger->values);
     }
 }
 
-class CustomConditionableObject
+class ConditionableLogger
 {
     use Conditionable;
 
-    public $enabled = false;
+    public $values = [];
 
-    public function on()
+    public function log(...$values)
     {
-        $this->enabled = true;
-
-        return $this;
-    }
-
-    public function off()
-    {
-        $this->enabled = false;
+        array_push($this->values, ...$values);
 
         return $this;
     }
