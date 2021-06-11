@@ -1751,8 +1751,10 @@ class DatabaseEloquentModelTest extends TestCase
         $model->intAttribute = '3';
         $model->floatAttribute = '4.0';
         $model->stringAttribute = 2.5;
-        $model->boolAttribute = 1;
-        $model->booleanAttribute = 0;
+        $model->boolTruthyAttribute = 1;
+        $model->booleanTruthyAttribute = "any-not-false-string";
+        $model->boolFalsyAttribute = 0;
+        $model->booleanFalsyAttribute = "false";
         $model->objectAttribute = ['foo' => 'bar'];
         $obj = new stdClass;
         $obj->foo = 'bar';
@@ -1766,13 +1768,17 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertIsInt($model->intAttribute);
         $this->assertIsFloat($model->floatAttribute);
         $this->assertIsString($model->stringAttribute);
-        $this->assertIsBool($model->boolAttribute);
-        $this->assertIsBool($model->booleanAttribute);
+        $this->assertIsBool($model->boolTruthyAttribute);
+        $this->assertIsBool($model->booleanTruthyAttribute);
+        $this->assertIsBool($model->boolFalsyAttribute);
+        $this->assertIsBool($model->booleanFalsyAttribute);
         $this->assertIsObject($model->objectAttribute);
         $this->assertIsArray($model->arrayAttribute);
         $this->assertIsArray($model->jsonAttribute);
-        $this->assertTrue($model->boolAttribute);
-        $this->assertFalse($model->booleanAttribute);
+        $this->assertTrue($model->boolTruthyAttribute);
+        $this->assertTrue($model->booleanTruthyAttribute);
+        $this->assertFalse($model->boolFalsyAttribute);
+        $this->assertFalse($model->booleanFalsyAttribute);
         $this->assertEquals($obj, $model->objectAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->arrayAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->jsonAttribute);
@@ -1789,14 +1795,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertIsInt($arr['intAttribute']);
         $this->assertIsFloat($arr['floatAttribute']);
         $this->assertIsString($arr['stringAttribute']);
-        $this->assertIsBool($arr['boolAttribute']);
-        $this->assertIsBool($arr['booleanAttribute']);
+        $this->assertIsBool($arr['boolTruthyAttribute']);
+        $this->assertIsBool($arr['booleanTruthyAttribute']);
+        $this->assertIsBool($arr['boolFalsyAttribute']);
+        $this->assertIsBool($arr['booleanFalsyAttribute']);
         $this->assertIsObject($arr['objectAttribute']);
         $this->assertIsArray($arr['arrayAttribute']);
         $this->assertIsArray($arr['jsonAttribute']);
         $this->assertIsArray($arr['collectionAttribute']);
-        $this->assertTrue($arr['boolAttribute']);
-        $this->assertFalse($arr['booleanAttribute']);
+        $this->assertTrue($arr['boolTruthyAttribute']);
+        $this->assertTrue($arr['booleanTruthyAttribute']);
+        $this->assertFalse($arr['boolFalsyAttribute']);
+        $this->assertFalse($arr['booleanFalsyAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
@@ -2553,8 +2563,10 @@ class EloquentModelCastingStub extends Model
         'intAttribute' => 'int',
         'floatAttribute' => 'float',
         'stringAttribute' => 'string',
-        'boolAttribute' => 'bool',
-        'booleanAttribute' => 'boolean',
+        'boolTruthyAttribute' => 'bool',
+        'booleanTruthyAttribute' => 'boolean',
+        'boolFalsyAttribute' => 'bool',
+        'booleanFalsyAttribute' => 'boolean',
         'objectAttribute' => 'object',
         'arrayAttribute' => 'array',
         'jsonAttribute' => 'json',
