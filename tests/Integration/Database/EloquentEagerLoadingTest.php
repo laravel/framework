@@ -40,7 +40,7 @@ class EloquentEagerLoadingTest extends DatabaseTestCase
 
         $model = Post::with(['comments as activeComments' => function ($query) {
             return $query->where('status', 'active');
-        }])->with(['comments as inactiveComments' => function ($query){
+        }])->with(['comments as inactiveComments' => function ($query) {
             return $query->where('status', 'inactive');
         }])->find($post->id);
 
