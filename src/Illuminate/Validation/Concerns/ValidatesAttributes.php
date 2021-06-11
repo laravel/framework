@@ -349,7 +349,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that the current logged in user's password matches the given value.
+     * Validate that the password of the currently authenticated user matches the given value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -1347,7 +1347,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that the current logged in user's password matches the given value.
+     * Validate that the password of the currently authenticated user matches the given value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
