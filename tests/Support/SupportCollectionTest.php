@@ -4394,6 +4394,30 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testHigherOrderWhenAndUnlessWithProxy($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->when->contains('michael')->concat(['chris']);
+
+        $this->assertSame(['michael', 'tom', 'chris'], $data->toArray());
+
+        $data = $data->when->contains('missing')->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'chris'], $data->toArray());
+
+        $data = $data->unless->contains('missing')->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'chris', 'adam'], $data->toArray());
+
+        $data = $data->unless->contains('adam')->concat(['bogdan']);
+
+        $this->assertSame(['michael', 'tom', 'chris', 'adam'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testUnless($collection)
     {
         $data = new $collection(['michael', 'tom']);
