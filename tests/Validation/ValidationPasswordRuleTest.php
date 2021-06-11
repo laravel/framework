@@ -227,7 +227,7 @@ class ValidationPasswordRuleTest extends TestCase
     public function testItCannotSetDefaultUsingGivenString()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('given callback should be a Closure');
+        $this->expectExceptionMessage('given callback should be a closure');
 
         Password::defaults('required|password');
     }
