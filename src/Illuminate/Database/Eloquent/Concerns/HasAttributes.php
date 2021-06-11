@@ -594,7 +594,7 @@ trait HasAttributes
                 return (string) $value;
             case 'bool':
             case 'boolean':
-                return (bool) $value;
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN);
             case 'object':
                 return $this->fromJson($value, true);
             case 'array':
