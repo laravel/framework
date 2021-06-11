@@ -349,6 +349,28 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that the password of the currently authenticated user matches the given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function validateCurrentPassword($attribute, $value, $parameters)
+    {
+        $auth = $this->container->make('auth');
+        $hasher = $this->container->make('hash');
+
+        $guard = $auth->guard(Arr::first($parameters));
+
+        if ($guard->guest()) {
+            return false;
+        }
+
+        return $hasher->check($value, $guard->user()->getAuthPassword());
+    }
+
+    /**
      * Validate that an attribute is a valid date.
      *
      * @param  string  $attribute
@@ -1325,7 +1347,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that the current logged in user's password matches the given value.
+     * Validate that the password of the currently authenticated user matches the given value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -1334,16 +1356,7 @@ trait ValidatesAttributes
      */
     protected function validatePassword($attribute, $value, $parameters)
     {
-        $auth = $this->container->make('auth');
-        $hasher = $this->container->make('hash');
-
-        $guard = $auth->guard(Arr::first($parameters));
-
-        if ($guard->guest()) {
-            return false;
-        }
-
-        return $hasher->check($value, $guard->user()->getAuthPassword());
+        return $this->validateCurrentPassword($attribute, $value, $parameters);
     }
 
     /**
