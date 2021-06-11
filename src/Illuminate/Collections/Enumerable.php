@@ -268,7 +268,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function filter(callable $callback = null);
 
     /**
-     * Apply the callback if the value is truthy.
+     * Apply the callback if the given "value" is (or resolves to) truthy.
      *
      * @param  bool  $value
      * @param  callable|null  $callback
@@ -296,7 +296,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function whenNotEmpty(callable $callback, callable $default = null);
 
     /**
-     * Apply the callback if the value is falsy.
+     * Apply the callback if the given "value" is (or resolves to) truthy.
      *
      * @param  bool  $value
      * @param  callable  $callback
