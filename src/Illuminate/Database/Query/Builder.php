@@ -1988,6 +1988,11 @@ class Builder
         if (is_array($this->{$ordersProperty})) {
             foreach ($this->{$ordersProperty} as $key => $value) {
                 if (isset($value['column']) && $value['column'] === $column) {
+                    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 6);
+
+                    if($trace[5]['function'] === 'callScope')
+                        return $this;
+
                     $this->{$ordersProperty}[$key]['direction'] = $direction;
 
                     return $this;
