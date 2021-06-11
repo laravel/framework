@@ -167,7 +167,13 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             };
 
             $resetScope = function () use ($app) {
-                return $app->forgetScopedInstances();
+                $app->forgetScopedInstances();
+
+                if ($app->resolved('db')) {
+                    foreach ($app->make('db')->getConnections() as $connection) {
+                        $connection->forgetRecordModificationState();
+                    }
+                }
             };
 
             return new Worker(
