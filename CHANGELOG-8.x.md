@@ -1,6 +1,29 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.44.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.45.0...8.x)
+
+
+## [v8.45.0 (2021-06-03)](https://github.com/laravel/framework/compare/v8.44.0...v8.45.0)
+
+### Added
+- Introduce Conditional trait ([#37504](https://github.com/laravel/framework/pull/37504), [45ff23c](https://github.com/laravel/framework/commit/45ff23c6174416f63ea7dbd77bc7fe8aafced86b), [#37561](https://github.com/laravel/framework/pull/37561))
+- Allow multiple SES configuration with IAM Role authentication ([#37523](https://github.com/laravel/framework/pull/37523))
+- Adds class handling for Blade echo statements ([#37478](https://github.com/laravel/framework/pull/37478))
+- Added `Illuminate/Session/DatabaseSessionHandler::setContainer()` ([7a71c29](https://github.com/laravel/framework/commit/7a71c292c0ae656c622cff883638e77de6f0bfde))
+- Allow connecting to read or write connections with the db command ([#37548](https://github.com/laravel/framework/pull/37548))
+- Added assertDownloadOffered test method to TestResponse class ([#37532](https://github.com/laravel/framework/pull/37532))
+- Added `Illuminate/Http/Client/Response::close()` ([#37566](https://github.com/laravel/framework/pull/37566))
+- Allow setting middleware on queued Mailables ([#37568](https://github.com/laravel/framework/pull/37568))
+- Adds new RequestSent and ResponseReceived events to the HTTP Client ([#37572](https://github.com/laravel/framework/pull/37572))
+
+### Changed
+- Rename protected method `Illuminate/Foundation/Console/StorageLinkCommand::removableSymlink()` to `Illuminate/Foundation/Console/StorageLinkCommand::isRemovableSymlink()` ([#37508](https://github.com/laravel/framework/pull/37508))
+- Correct minimum Predis version to 1.1.2 ([#37554](https://github.com/laravel/framework/pull/37554))
+- Columns in the order by list must be unique ([#37550](https://github.com/laravel/framework/pull/37550))
+- More Convenient Model Broadcasting ([#37491](https://github.com/laravel/framework/pull/37491))
+
+### Fixed
+- Get queueable relationship when collection has non-numeric keys ([#37556](https://github.com/laravel/framework/pull/37556))
 
 
 ## [v8.44.0 (2021-05-27)](https://github.com/laravel/framework/compare/v8.43.0...v8.44.0)
