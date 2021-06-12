@@ -1,6 +1,28 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.45.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.46.0...8.x)
+
+
+## [v8.46.0 (2021-06-08)](https://github.com/laravel/framework/compare/v8.45.1...v8.46.0)
+
+### Added
+- Allow Custom Notification Stubs ([#37584](https://github.com/laravel/framework/pull/37584))
+- Added methods for indicating the write connection should be used ([94dbf76](https://github.com/laravel/framework/commit/94dbf768fa46917cb012a05b38cbc889dbd2e8a0))
+- Added timestamp reference to schedule:run artisan command output ([#37591](https://github.com/laravel/framework/pull/37591))
+- Columns in the order by list must be unique ([#37582](https://github.com/laravel/framework/pull/37582))
+
+### Changed
+- Fire a trashed model event and listen to it for broadcasting events ([#37618](https://github.com/laravel/framework/pull/37618))
+- Cast JSON strings containing single quotes ([#37619](https://github.com/laravel/framework/pull/37619))
+
+### Fixed
+- Fixed for cloning issues with PendingRequest object ([#37596](https://github.com/laravel/framework/pull/37596), [96518b9](https://github.com/laravel/framework/commit/96518b9bbbc6e984f879c535502c199ef022f52a))
+- Makes the retrieval of Http client transferStats safe ([#37597](https://github.com/laravel/framework/pull/37597))
+- Fixed inconsistency in table names in validator ([#37606](https://github.com/laravel/framework/pull/37606))
+- Fixes for Stringable for views ([#37613](https://github.com/laravel/framework/pull/37613))
+- Fixed one-of-many bindings ([#37616](https://github.com/laravel/framework/pull/37616))
+- Fixed infinity loop on transaction committed ([#37626](https://github.com/laravel/framework/pull/37626))
+- Added missing fix to DatabaseRule::resolveTableName fix #37580 ([#37621](https://github.com/laravel/framework/pull/37621))
 
 
 ## [v8.45.1 (2021-06-03)](https://github.com/laravel/framework/compare/v8.45.0...v8.45.1)
