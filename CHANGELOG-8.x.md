@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.45.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.45.1...8.x)
+
+
+## [v8.45.1 (2021-06-03)](https://github.com/laravel/framework/compare/v8.45.0...v8.45.1)
+
+### Revert
+- Revert of ["Columns in the order by list must be unique"](https://github.com/laravel/framework/pull/37550) ([dc2f0bb](https://github.com/laravel/framework/commit/dc2f0bb02c3eb4b27669d626bb3e810db8e7749d))
 
 
 ## [v8.45.0 (2021-06-03)](https://github.com/laravel/framework/compare/v8.44.0...v8.45.0)
