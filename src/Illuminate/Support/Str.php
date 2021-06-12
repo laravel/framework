@@ -748,6 +748,8 @@ class Str
             $value = preg_replace('/\s+/u', '', ucwords($value));
 
             $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
+            $value = static::lower(preg_replace('/(\d+)(?=[A-Za-z])/u', '$1'.$delimiter, $value));
+            $value = static::lower(preg_replace('/(?<=[a-z])(\d+)/u', $delimiter.'$1', $value));
         }
 
         return static::$snakeCache[$key][$delimiter] = $value;

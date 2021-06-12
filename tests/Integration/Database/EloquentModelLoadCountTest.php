@@ -22,12 +22,12 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
             $table->increments('id');
         });
 
-        Schema::create('related1s', function (Blueprint $table) {
+        Schema::create('related_1_s', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('base_model_id');
         });
 
-        Schema::create('related2s', function (Blueprint $table) {
+        Schema::create('related_2_s', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('base_model_id');
         });
@@ -55,7 +55,7 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
         $model->loadCount('related1');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(2, $model->related1_count);
+        $this->assertEquals(2, $model->related_1_count);
     }
 
     public function testLoadCountMultipleRelations()
@@ -67,8 +67,8 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
         $model->loadCount(['related1', 'related2']);
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(2, $model->related1_count);
-        $this->assertEquals(1, $model->related2_count);
+        $this->assertEquals(2, $model->related_1_count);
+        $this->assertEquals(1, $model->related_2_count);
     }
 
     public function testLoadCountDeletedRelations()
