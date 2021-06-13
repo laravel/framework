@@ -109,9 +109,30 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected function createDefaultValidator(ValidationFactory $factory)
     {
         return $factory->make(
-            $this->validationData(), $this->container->call([$this, 'rules']),
+            $this->validationData(), $this->callableRulesMethod(),
             $this->messages(), $this->attributes()
         )->stopOnFirstFailure($this->stopOnFirstFailure);
+    }
+
+    /**
+     * Get Callable Rules Method from Request.
+     *
+     * @return array
+     */
+    public function callableRulesMethod()
+    {
+        if(method_exists($this, 'rules')){
+            return $this->container->call([$this, 'rules']);
+        }
+
+        $method = match($this->getMethod()){
+            'POST' => 'store',
+            'PUT', 'PATCH' => 'update',
+            'DELETE' => 'destroy',
+            default => 'view'
+        };
+
+        return $this->container->call([$this, $method.'Rules']);
     }
 
     /**

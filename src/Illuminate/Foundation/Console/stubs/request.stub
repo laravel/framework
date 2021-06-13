@@ -17,11 +17,47 @@ class {{ class }} extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Get the validation rules that apply to the get request.
      *
      * @return array
      */
-    public function rules()
+    public function viewRules()
+    {
+        return [
+            //
+        ];
+    }
+
+    /**
+     * Get the validation rules that apply to the post request.
+     *
+     * @return array
+     */
+    public function storeRules()
+    {
+        return [
+            //
+        ];
+    }
+
+    /**
+     * Get the validation rules that apply to the put/patch request.
+     *
+     * @return array
+     */
+    public function updateRules()
+    {
+        return [
+            //
+        ];
+    }
+
+    /**
+     * Get the validation rules that apply to the detele request.
+     *
+     * @return array
+     */
+    public function destroyRules()
     {
         return [
             //

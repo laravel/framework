@@ -37,6 +37,49 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'specified'], $request->validated());
     }
 
+    public function testValidatedMethodReturnsTheViewValidatedData()
+    {
+        $request = $this->createRequest([], FoundationTestResourceFormRequestStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals([], $request->validated());
+    }
+
+    public function testValidatedMethodReturnsTheStoreValidatedData()
+    {
+        $request = $this->createRequest(
+            $requestPayload = ['name' => 'specified', 'password' => 'secret'],
+            FoundationTestResourceFormRequestStub::class,
+            'POST'
+        );
+
+        $request->validateResolved();
+
+        $this->assertEquals($requestPayload, $request->validated());
+    }
+
+    public function testValidatedMethodReturnsTheUpdateValidatedData()
+    {
+        $request = $this->createRequest(
+            $requestPayload = ['name' => 'specified', 'password' => NULL],
+            FoundationTestResourceFormRequestStub::class,
+            'PUT');
+
+        $request->validateResolved();
+
+        $this->assertEquals($requestPayload, $request->validated());
+    }
+
+    public function testValidatedMethodReturnsTheDestroyValidatedData()
+    {
+        $request = $this->createRequest(['id' => 1], FoundationTestResourceFormRequestStub::class, 'DELETE');
+
+        $request->validateResolved();
+
+        $this->assertEquals(['id' => 1], $request->validated());
+    }
+
     public function testValidatedMethodReturnsTheValidatedDataNestedRules()
     {
         $payload = ['nested' => ['foo' => 'bar', 'baz' => ''], 'array' => [1, 2]];
@@ -146,7 +189,7 @@ class FoundationFormRequestTest extends TestCase
      * @param  string  $class
      * @return \Illuminate\Foundation\Http\FormRequest
      */
-    protected function createRequest($payload = [], $class = FoundationTestFormRequestStub::class)
+    protected function createRequest($payload = [], $class = FoundationTestFormRequestStub::class, $method = 'GET')
     {
         $container = tap(new Container, function ($container) {
             $container->instance(
@@ -155,7 +198,7 @@ class FoundationFormRequestTest extends TestCase
             );
         });
 
-        $request = $class::create('/', 'GET', $payload);
+        $request = $class::create('/', $method, $payload);
 
         return $request->setRedirector($this->createMockRedirector($request))
                        ->setContainer($container);
@@ -223,6 +266,33 @@ class FoundationTestFormRequestStub extends FormRequest
     public function rules()
     {
         return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+class FoundationTestResourceFormRequestStub extends FormRequest
+{
+    public function viewRules()
+    {
+        return [];
+    }
+
+    public function storeRules()
+    {
+        return ['name' => 'required', 'password' => 'required'];
+    }
+    
+    public function updateRules()
+    {
+        return ['name' => 'required', 'password' => 'nullable'];
+    }
+
+    public function destroyRules()
+    {
+        return ['id' => 'required'];
     }
 
     public function authorize()
