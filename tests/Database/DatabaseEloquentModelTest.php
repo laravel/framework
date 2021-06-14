@@ -348,6 +348,18 @@ class DatabaseEloquentModelTest extends TestCase
         $closure($builder);
     }
 
+    public function testEagerLoadingWithWhitespacedColumns()
+    {
+        $model = new EloquentModelWithoutRelationStub;
+        $instance = $model->newInstance()->newQuery()->with('foo: bar, baz ', 'hadi');
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('select')->once()->with(['bar', 'baz']);
+        $this->assertNotNull($instance->getEagerLoads()['hadi']);
+        $this->assertNotNull($instance->getEagerLoads()['foo']);
+        $closure = $instance->getEagerLoads()['foo'];
+        $closure($builder);
+    }
+
     public function testWithMethodCallsQueryBuilderCorrectlyWithArray()
     {
         $result = EloquentModelWithStub::with(['foo', 'bar']);
