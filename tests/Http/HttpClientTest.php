@@ -973,6 +973,7 @@ class HttpClientTest extends TestCase
         $factory = new Factory();
         $factory->fake(function (Request $request) {
             $this->assertSame('', $request->body());
+
             return Factory::response();
         });
 
