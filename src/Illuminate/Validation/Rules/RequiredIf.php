@@ -19,7 +19,11 @@ class RequiredIf
      */
     public function __construct($condition)
     {
-        $this->condition = $condition;
+        if(!is_string($condition) && (is_bool($condition) || is_callable($condition))) {
+            $this->condition = $condition;
+        } else {
+            throw new InvalidArgumentException("Condition type must be 'callable' or 'bool'.");
+        }
     }
 
     /**
