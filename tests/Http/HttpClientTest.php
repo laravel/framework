@@ -967,4 +967,18 @@ class HttpClientTest extends TestCase
 
         m::close();
     }
+
+    public function testRequestsBodyIsEmptyIfNoDataIsProvided()
+    {
+        $factory = new Factory();
+        $factory->fake(function (Request $request) {
+            $this->assertSame('', $request->body());
+            return Factory::response();
+        });
+
+        $factory->post('https://example.com');
+        $factory->patch('https://example.com');
+        $factory->put('https://example.com');
+        $factory->delete('https://example.com');
+    }
 }
