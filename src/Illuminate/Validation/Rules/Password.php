@@ -132,7 +132,9 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function default()
     {
-        $password = value(static::$defaultCallback);
+        $password = is_callable(static::$defaultCallback)
+                            ? call_user_func(static::$defaultCallback)
+                            : static::$defaultCallback;
 
         return $password instanceof Rule ? $password : static::min(8);
     }
