@@ -91,6 +91,15 @@ interface Container extends ContainerInterface
     public function scoped($abstract, $concrete = null);
 
     /**
+     * Register a scoped binding if it hasn't already been registered.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function scopedIf($abstract, $concrete = null);
+
+    /**
      * "Extend" an abstract type in the container.
      *
      * @param  string  $abstract
