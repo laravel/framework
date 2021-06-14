@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Validation;
 
 use Exception;
+use InvalidArgumentException;
 use Illuminate\Validation\Rules\RequiredIf;
 use PHPUnit\Framework\TestCase;
 
