@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Closure;
 use Illuminate\Collections\ItemNotFoundException;
 use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Support\Traits\EnumeratesValues;
@@ -1420,6 +1421,27 @@ class Collection implements ArrayAccess, Enumerable
     public function add($item)
     {
         $this->items[] = $item;
+
+        return $this;
+    }
+
+    /**
+     * Add an item to this collection if the provided callback returns true.
+     * 
+     * @param  mixed  $items
+     * @return $this
+     */
+    public function addIf($items, Closure $callback)
+    {
+        $items = Arr::wrap($items);
+
+        foreach ($items as $item) {
+            $shouldAdd = $callback($item);
+
+            if ($shouldAdd) {
+                $this->add($item);
+            }
+        }
 
         return $this;
     }

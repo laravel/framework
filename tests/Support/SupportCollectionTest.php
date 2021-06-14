@@ -613,6 +613,21 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['a' => 4, 'b' => 3], $c->countBy('key')->all());
     }
 
+    public function testAddIf()
+    {
+        $c = new Collection();
+        $c->addIf('a', function($item) {
+            return $item == 'a';
+        });
+        $this->assertCount(1, $c);
+
+        $c = new Collection();
+        $c->addIf(['a', 1, 'b', 2, 'c', 3], function ($item) {
+            return is_int($item);
+        });
+        $this->assertCount(3, $c);
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
