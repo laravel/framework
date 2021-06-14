@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation\Rules;
 
+use InvalidArgumentException;
+
 class RequiredIf
 {
     /**
@@ -22,7 +24,7 @@ class RequiredIf
         if (! is_string($condition) && (is_bool($condition) || is_callable($condition))) {
             $this->condition = $condition;
         } else {
-            throw new \InvalidArgumentException("Condition type must be 'callable' or 'bool'.");
+            throw new InvalidArgumentException("The provided condition must be a callable or boolean.");
         }
     }
 
