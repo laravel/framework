@@ -616,7 +616,7 @@ class SupportCollectionTest extends TestCase
     public function testAddIf()
     {
         $c = new Collection();
-        $c->addIf('a', function($item) {
+        $c->addIf('a', function ($item) {
             return $item == 'a';
         });
         $this->assertCount(1, $c);

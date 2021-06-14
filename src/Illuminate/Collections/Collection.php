@@ -1427,7 +1427,7 @@ class Collection implements ArrayAccess, Enumerable
 
     /**
      * Add an item to this collection if the provided callback returns true.
-     * 
+     *
      * @param  mixed  $items
      * @return $this
      */
