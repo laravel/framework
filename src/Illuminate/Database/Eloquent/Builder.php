@@ -1393,8 +1393,8 @@ class Builder
      */
     protected function createSelectWithConstraint($name)
     {
-        $name =  preg_replace('/\s+/', '', $name);
-        
+        $name = preg_replace('/\s+/', '', $name);
+
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
                 if (Str::contains($column, '.')) {
