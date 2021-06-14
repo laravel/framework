@@ -107,10 +107,10 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request|null  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request = null)
     {
         if (is_null($this->resource)) {
             return [];
