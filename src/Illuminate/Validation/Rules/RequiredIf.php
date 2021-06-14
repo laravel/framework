@@ -24,7 +24,7 @@ class RequiredIf
         if (! is_string($condition) && (is_bool($condition) || is_callable($condition))) {
             $this->condition = $condition;
         } else {
-            throw new InvalidArgumentException("The provided condition must be a callable or boolean.");
+            throw new InvalidArgumentException('The provided condition must be a callable or boolean.');
         }
     }
 
