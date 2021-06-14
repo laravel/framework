@@ -927,34 +927,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $relationTag2 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', 'desc')->first();
         $this->assertEquals($relationTag2->getAttributes(), $tag3->getAttributes());
     }
-
-    public function testOrderByPivotIsConditionable()
-    {
-        $tag1 = Tag::create(['name' => Str::random()]);
-        $tag2 = Tag::create(['name' => Str::random()]);
-        $tag3 = Tag::create(['name' => Str::random()]);
-        $tag4 = Tag::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
-
-        DB::table('posts_tags')->insert([
-            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo3'],
-            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'foo1'],
-            ['post_id' => $post->id, 'tag_id' => $tag3->id, 'flag' => 'foo4'],
-            ['post_id' => $post->id, 'tag_id' => $tag4->id, 'flag' => 'foo2'],
-        ]);
-
-        $relationTag1 = $post->tagsWithCustomExtraPivot()
-            ->when(true, function ($query) {
-                $query->orderByPivot('flag', 'asc');
-            })->first();
-        $this->assertEquals($relationTag1->getAttributes(), $tag2->getAttributes());
-
-        $relationTag2 = $post->tagsWithCustomExtraPivot()
-            ->unless(false, function ($query) {
-                $query->orderByPivot('flag', 'desc');
-            })->first();
-        $this->assertEquals($relationTag2->getAttributes(), $tag3->getAttributes());
-    }
 }
 
 class User extends Model
