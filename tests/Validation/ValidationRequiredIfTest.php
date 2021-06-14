@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Exception;
 use Illuminate\Validation\Rules\RequiredIf;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ValidationRequiredIfTest extends TestCase
