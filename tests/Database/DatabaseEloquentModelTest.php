@@ -1873,10 +1873,13 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
 
+        Carbon::setTestNow();
+
         $scopes = [
             'published',
             'category' => 'Laravel',
             'framework' => ['Laravel', '5.3'],
+            'date' => Carbon::now(),
         ];
 
         $this->assertInstanceOf(Builder::class, $model->scopes($scopes));
@@ -2111,6 +2114,11 @@ class EloquentModelStub extends Model
     public function scopeFramework(Builder $builder, $framework, $version)
     {
         $this->scopesCalled['framework'] = [$framework, $version];
+    }
+
+    public function scopeDate(Builder $builder, Carbon $date)
+    {
+        $this->scopesCalled['date'] = $date;
     }
 }
 
