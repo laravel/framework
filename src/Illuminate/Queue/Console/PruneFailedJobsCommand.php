@@ -17,7 +17,7 @@ class PruneFailedJobsCommand extends Command
      * @var string
      */
     protected $signature = 'queue:prune-failed
-                {--hours=24 : The number of hours to retain batch data}';
+                {--hours=24 : The number of hours to retain failed jobs data}';
 
     /**
      * The console command description.
