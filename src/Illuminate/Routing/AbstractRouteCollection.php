@@ -171,7 +171,9 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     {
         $symfonyRoutes = new SymfonyRouteCollection;
 
-        $routes = $this->getRoutes();
+        // When there are multiple URL matches, symfony will return the first match,
+        // but in laravel, it should return the last matching route.
+        $routes = array_reverse($this->getRoutes());
 
         foreach ($routes as $route) {
             if (! $route->isFallback) {
