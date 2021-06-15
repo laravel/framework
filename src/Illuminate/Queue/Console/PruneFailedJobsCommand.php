@@ -3,9 +3,6 @@
 namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
-use Illuminate\Bus\BatchRepository;
-use Illuminate\Bus\DatabaseBatchRepository;
-use Illuminate\Bus\PrunableBatchRepository;
 use Illuminate\Console\Command;
 use Illuminate\Queue\Failed\PrunableFailedJobProvider;
 
