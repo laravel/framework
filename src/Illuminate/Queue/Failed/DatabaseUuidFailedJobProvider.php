@@ -2,10 +2,11 @@
 
 namespace Illuminate\Queue\Failed;
 
+use DateTimeInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Facades\Date;
 
-class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface
+class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider
 {
     /**
      * The connection resolver implementation.
@@ -126,5 +127,27 @@ class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface
     protected function getTable()
     {
         return $this->resolver->connection($this->database)->table($this->table);
+    }
+
+    /**
+     * Prune all of the entries older than the given date.
+     *
+     * @param  \DateTimeInterface  $before
+     * @return int
+     */
+    public function prune(DateTimeInterface $before)
+    {
+        $query = $this->getTable()
+            ->where('failed_at', '<', $before);
+
+        $totalDeleted = 0;
+
+        do {
+            $deleted = $query->take(1000)->delete();
+
+            $totalDeleted += $deleted;
+        } while ($deleted !== 0);
+
+        return $totalDeleted;
     }
 }
