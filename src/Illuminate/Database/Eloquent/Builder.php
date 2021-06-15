@@ -920,7 +920,7 @@ class Builder
             // messed up when adding scopes. Then we'll return back out the builder.
             $builder = $builder->callScope(
                 [$this->model, 'scope'.ucfirst($scope)],
-                (array) $parameters
+                Arr::wrap($parameters)
             );
         }
 
