@@ -143,7 +143,9 @@ trait CompilesEchos
     {
         $value = Str::of($value)
             ->trim()
-            ->when(Str::endsWith($value, ';'), function($str) { return $str->beforeLast(';'); });
+            ->when(Str::endsWith($value, ';'), function ($str) {
+                return $str->beforeLast(';');
+            });
 
         return empty($this->echoHandlers) ? $value : '$__bladeCompiler->applyEchoHandler('.$value.')';
     }
