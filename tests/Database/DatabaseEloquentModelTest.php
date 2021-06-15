@@ -1879,7 +1879,7 @@ class DatabaseEloquentModelTest extends TestCase
             'published',
             'category' => 'Laravel',
             'framework' => ['Laravel', '5.3'],
-            'date' => Carbon::now()
+            'date' => Carbon::now(),
         ];
 
         $this->assertInstanceOf(Builder::class, $model->scopes($scopes));
