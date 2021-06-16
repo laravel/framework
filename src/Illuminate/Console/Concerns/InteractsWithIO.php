@@ -219,14 +219,19 @@ trait InteractsWithIO
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  string  $tableStyle
      * @param  array  $columnStyles
+     * @param  boolean  $showFalsy
      * @return void
      */
-    public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
+    public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [], $showFalsy = false)
     {
         $table = new Table($this->output);
 
         if ($rows instanceof Arrayable) {
             $rows = $rows->toArray();
+        }
+
+        if ($showFalsy) {
+            $rows = $this->showFalsyValues($rows);
         }
 
         $table->setHeaders((array) $headers)->setRows($rows)->setStyle($tableStyle);
@@ -236,6 +241,28 @@ trait InteractsWithIO
         }
 
         $table->render();
+    }
+
+    
+    /**
+     * Show falsy values in tables.
+     *
+     * @param  array  $rows
+     * @return array
+     */
+    protected function showFalsyValues($rows)
+    {
+        return collect($rows)->map(function($row){
+            return collect($row)->map(function($element){
+                if (is_null($element)) {
+                    return "NULL";
+                }
+                if ($element == false) {
+                    return "FALSE";
+                }
+                return $element;
+            })->toArray();
+        })->toArray();
     }
 
     /**
