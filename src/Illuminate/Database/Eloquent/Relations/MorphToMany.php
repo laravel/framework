@@ -141,6 +141,19 @@ class MorphToMany extends BelongsToMany
     }
 
     /**
+     * Apply query for the pivot table from given query builder.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function newPivotQueryFrom($query)
+    {
+        return parent::newPivotQueryFrom(
+            $query->where($this->morphType, $this->morphClass)
+        );
+    }
+
+    /**
      * Query related where parent is attached.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -149,9 +162,7 @@ class MorphToMany extends BelongsToMany
     {
         return $this->related->newQuery()->whereExists(function ($query) {
             return $this->newPivotQueryFrom($query)
-                        ->from($this->getTable())
                         ->select($this->getRelatedPivotKeyName())
-                        ->where($this->getMorphType(), $this->getMorphClass())
                         ->whereColumn($this->getQualifiedRelatedKeyName(), $this->getQualifiedRelatedPivotKeyName());
         });
     }
@@ -165,9 +176,7 @@ class MorphToMany extends BelongsToMany
     {
         return $this->related->newQuery()->whereNotExists(function ($query) {
             return $this->newPivotQueryFrom($query)
-                        ->from($this->getTable())
                         ->select($this->getRelatedPivotKeyName())
-                        ->where($this->getMorphType(), $this->getMorphClass())
                         ->whereColumn($this->getQualifiedRelatedKeyName(), $this->getQualifiedRelatedPivotKeyName());
         });
     }

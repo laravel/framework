@@ -553,18 +553,29 @@ trait InteractsWithPivotTable
      */
     public function newPivotQuery()
     {
-        return $this->newPivotQueryFrom(
+        return $this->applyDefaultPivotQuery(
             $this->newPivotStatement()
         );
     }
 
     /**
-     * Apply query builder for the pivot table from given query builder.
+     * Apply query for the pivot table from given query builder.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return \Illuminate\Database\Query\Builder
      */
     public function newPivotQueryFrom($query)
+    {
+        return $this->applyDefaultPivotQuery($query->from($this->table));
+    }
+
+    /**
+     * Apply default query for the pivot table.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function applyDefaultPivotQuery($query)
     {
         foreach ($this->pivotWheres as $arguments) {
             $query->where(...$arguments);

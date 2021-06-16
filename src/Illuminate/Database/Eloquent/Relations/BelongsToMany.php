@@ -571,7 +571,6 @@ class BelongsToMany extends Relation
     {
         return $this->related->newQuery()->whereExists(function ($query) {
             return $this->newPivotQueryFrom($query)
-                        ->from($this->getTable())
                         ->select($this->getRelatedPivotKeyName())
                         ->whereColumn($this->getQualifiedRelatedKeyName(), $this->getQualifiedRelatedPivotKeyName());
         });
@@ -586,7 +585,6 @@ class BelongsToMany extends Relation
     {
         return $this->related->newQuery()->whereNotExists(function ($query) {
             return $this->newPivotQueryFrom($query)
-                        ->from($this->getTable())
                         ->select($this->getRelatedPivotKeyName())
                         ->whereColumn($this->getQualifiedRelatedKeyName(), $this->getQualifiedRelatedPivotKeyName());
         });
