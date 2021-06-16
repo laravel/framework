@@ -219,7 +219,7 @@ trait InteractsWithIO
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  string  $tableStyle
      * @param  array  $columnStyles
-     * @param  boolean  $showFalsy
+     * @param  bool  $showFalsy
      * @return void
      */
     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [], $showFalsy = false)
@@ -243,7 +243,6 @@ trait InteractsWithIO
         $table->render();
     }
 
-    
     /**
      * Show falsy values in tables.
      *
@@ -252,13 +251,13 @@ trait InteractsWithIO
      */
     protected function showFalsyValues($rows)
     {
-        return collect($rows)->map(function($row){
-            return collect($row)->map(function($element){
+        return collect($rows)->map(function ($row) {
+            return collect($row)->map(function ($element) {
                 if (is_null($element)) {
-                    return "NULL";
+                    return 'NULL';
                 }
                 if ($element == false) {
-                    return "FALSE";
+                    return 'FALSE';
                 }
                 return $element;
             })->toArray();
