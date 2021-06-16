@@ -5,6 +5,10 @@ namespace Illuminate\Contracts\Container;
 use Closure;
 use Psr\Container\ContainerInterface;
 
+/**
+ * @method scoped($abstract, $concrete = null)
+ * @method scopedIf($abstract, $concrete = null)
+ */
 interface Container extends ContainerInterface
 {
     /**

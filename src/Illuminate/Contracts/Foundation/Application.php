@@ -4,10 +4,6 @@ namespace Illuminate\Contracts\Foundation;
 
 use Illuminate\Contracts\Container\Container;
 
-/**
- * @method scoped($abstract, $concrete = null)
- * @method scopedIf($abstract, $concrete = null)
- */
 interface Application extends Container
 {
     /**
