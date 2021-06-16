@@ -47,7 +47,11 @@ class DatabaseEloquentMorphToManyTest extends TestCase
     {
         $relation = $this->getMockBuilder(MorphToMany::class)->onlyMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock(stdClass::class);
-        $query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
+        $query->shouldReceive('from')->once()->with('taggables')->andReturnUsing(function ($table) use ($query) {
+            $query->from = $table;
+
+            return $query;
+        });
         $query->shouldReceive('where')->once()->with('taggables.taggable_id', 1)->andReturn($query);
         $query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
         $query->shouldReceive('whereIn')->once()->with('taggables.tag_id', [1, 2, 3]);
@@ -63,7 +67,11 @@ class DatabaseEloquentMorphToManyTest extends TestCase
     {
         $relation = $this->getMockBuilder(MorphToMany::class)->onlyMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock(stdClass::class);
-        $query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
+        $query->shouldReceive('from')->once()->with('taggables')->andReturnUsing(function ($table) use ($query) {
+            $query->from = $table;
+
+            return $query;
+        });
         $query->shouldReceive('where')->once()->with('taggables.taggable_id', 1)->andReturn($query);
         $query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
         $query->shouldReceive('whereIn')->never();

@@ -927,6 +927,42 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $relationTag2 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', 'desc')->first();
         $this->assertEquals($relationTag2->getAttributes(), $tag3->getAttributes());
     }
+
+    public function testItQueryWhereExists()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->sync([
+            $tag->id => ['flag' => 'taylor'],
+            $tag2->id => ['flag' => ''],
+        ]);
+
+        $tags = $post->tags()->whereExists()->pluck('id');
+
+        $this->assertSame([$tag->getKey(), $tag2->getKey()], $tags->all());
+    }
+
+    public function testItQueryWhereNotExists()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->sync([
+            $tag->id => ['flag' => 'taylor'],
+            $tag2->id => ['flag' => ''],
+        ]);
+
+        $tags = $post->tags()->whereNotExists()->pluck('id');
+
+        $this->assertSame([$tag3->getKey()], $tags->all());
+    }
 }
 
 class User extends Model

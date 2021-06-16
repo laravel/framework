@@ -563,6 +563,36 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Query related where parent is attached.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function whereExists()
+    {
+        return $this->related->newQuery()->whereExists(function ($query) {
+            return $this->newPivotQueryFrom($query)
+                        ->from($this->getTable())
+                        ->select($this->getRelatedPivotKeyName())
+                        ->whereColumn($this->getQualifiedRelatedKeyName(), $this->getQualifiedRelatedPivotKeyName());
+        });
+    }
+
+    /**
+     * Query related where parent is not attached.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function whereNotExists()
+    {
+        return $this->related->newQuery()->whereNotExists(function ($query) {
+            return $this->newPivotQueryFrom($query)
+                        ->from($this->getTable())
+                        ->select($this->getRelatedPivotKeyName())
+                        ->whereColumn($this->getQualifiedRelatedKeyName(), $this->getQualifiedRelatedPivotKeyName());
+        });
+    }
+
+    /**
      * Add an "order by" clause for a pivot table column.
      *
      * @param  string  $column

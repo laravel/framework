@@ -553,8 +553,19 @@ trait InteractsWithPivotTable
      */
     public function newPivotQuery()
     {
-        $query = $this->newPivotStatement();
+        return $this->newPivotQueryFrom(
+            $this->newPivotStatement()
+        );
+    }
 
+    /**
+     * Apply query builder for the pivot table from given query builder.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function newPivotQueryFrom($query)
+    {
         foreach ($this->pivotWheres as $arguments) {
             $query->where(...$arguments);
         }
