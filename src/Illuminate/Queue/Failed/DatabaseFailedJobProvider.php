@@ -107,16 +107,6 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface, PrunableF
     }
 
     /**
-     * Get a new query builder instance for the table.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    protected function getTable()
-    {
-        return $this->resolver->connection($this->database)->table($this->table);
-    }
-
-    /**
      * Prune all of the entries older than the given date.
      *
      * @param  \DateTimeInterface  $before
@@ -124,8 +114,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface, PrunableF
      */
     public function prune(DateTimeInterface $before)
     {
-        $query = $this->getTable()
-            ->where('failed_at', '<', $before);
+        $query = $this->getTable()->where('failed_at', '<', $before);
 
         $totalDeleted = 0;
 
@@ -136,5 +125,15 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface, PrunableF
         } while ($deleted !== 0);
 
         return $totalDeleted;
+    }
+
+    /**
+     * Get a new query builder instance for the table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function getTable()
+    {
+        return $this->resolver->connection($this->database)->table($this->table);
     }
 }

@@ -708,7 +708,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueuePruneFailedJobsCommand()
     {
         $this->app->singleton('command.queue.prune-failed-jobs', function () {
-            return new PruneFailedJobsCommand();
+            return new PruneFailedJobsCommand;
         });
     }
 

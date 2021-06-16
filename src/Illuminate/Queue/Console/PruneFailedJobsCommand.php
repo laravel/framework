@@ -26,7 +26,7 @@ class PruneFailedJobsCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int|null
      */
     public function handle()
     {
@@ -36,6 +36,10 @@ class PruneFailedJobsCommand extends Command
 
         if ($failer instanceof PrunableFailedJobProvider) {
             $count = $failer->prune(Carbon::now()->subHours($this->option('hours')));
+        } else {
+            $this->error('The ['.class_basename($failer).'] failed job storage driver does not support pruning.');
+
+            return 1;
         }
 
         $this->info("{$count} entries deleted!");
