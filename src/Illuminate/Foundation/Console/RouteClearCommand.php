@@ -48,8 +48,16 @@ class RouteClearCommand extends Command
      */
     public function handle()
     {
-        $this->files->delete($this->laravel->getCachedRoutesPath());
+        if ($this->laravel->routesAreCached()) {
+            $result = $this->files->delete($this->laravel->getCachedRoutesPath());
 
-        $this->info('Route cache cleared!');
+            if ($result) {
+                $this->info('Route cache cleared!');
+            } else {
+                $this->info('Route cache was not cleared!');
+            }
+        } else {
+            $this->info('Route cache was not found!');
+        }
     }
 }
