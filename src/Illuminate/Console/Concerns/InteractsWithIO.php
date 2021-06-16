@@ -259,6 +259,7 @@ trait InteractsWithIO
                 if ($element == false) {
                     return 'FALSE';
                 }
+
                 return $element;
             })->toArray();
         })->toArray();
