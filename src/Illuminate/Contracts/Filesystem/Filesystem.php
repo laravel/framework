@@ -27,6 +27,14 @@ interface Filesystem
     public function exists($path);
 
     /**
+     * Determine if a file or directory is missing.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function missing($path);
+
+    /**
      * Get the contents of a file.
      *
      * @param  string  $path
