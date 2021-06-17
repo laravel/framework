@@ -7,12 +7,12 @@ class ConfirmHandler implements ConfirmHandlerInterface
     /**
      * Return if the the console should ask to confirm by default.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $larvel
+     * @param \Illuminate\Contracts\Foundation\Application $laravel
      * @return bool
      */
-    public static function handle($larvel)
+    public static function handle($laravel)
     {
-        return $larvel->environment() === 'production';
+        return $laravel->environment() === 'production';
     }
 
     /**
