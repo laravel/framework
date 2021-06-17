@@ -72,7 +72,7 @@ class ConfirmHelperTest extends TestCase
         $app['config'] = m::mock(Repository::class);
         $app['env'] = $env;
         if ($handlerClass !== null) {
-            $app->bind(ConfirmHandler::class, $handlerClass);
+            $app->bind(ConfirmHandlerContract::class, $handlerClass);
         }
 
         $mock = $this->getMockForTrait(

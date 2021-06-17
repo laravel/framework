@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Contracts\Console\ConfirmHandler as ConfirmHandlerContract;
+
 trait ConfirmableTrait
 {
     /**
@@ -15,7 +17,11 @@ trait ConfirmableTrait
      */
     public function confirmToProceed($warning = null, $callback = null)
     {
-        $handler = $this->laravel->make(ConfirmHandler::class);
+        if ($this->laravel->bound(ConfirmHandlerContract::class)) {
+            $handler = $this->laravel->make(ConfirmHandlerContract::class);
+        } else {
+            $handler = new ConfirmHandler();
+        }
         $shouldConfirm = $callback !== null ? value($callback) : $handler::handle($this->laravel);
 
         if ($shouldConfirm) {
