@@ -3,7 +3,8 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Console\ConfirmHandlerInterface;
+use Illuminate\Console\ConfirmHandler;
+use Illuminate\Contracts\Console\ConfirmHandler as ConfirmHandlerContract;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Mockery as m;
@@ -36,13 +37,9 @@ class ConfirmHelperTest extends TestCase
 
     public function testCustomConfirmHelper()
     {
-        $handler = m::mock(ConfirmHandlerInterface::class);
-        $handler->shouldReceive('warning')->andReturn('Application In Custom!');
-        $handler->shouldReceive('handle')->andReturn(true);
-
-        $mock = $this->setupMock('custom', $handler);
+        $mock = $this->setupMock('custom', CustomConfirmHandler::class);
         $mock->method('hasOption')->willReturn(false);
-        $mock->expects($this->exactly(1))->method('alert')->with('Application In Custom!');
+        $mock->expects($this->exactly(1))->method('alert')->with('Implementation Is Custom!');
 
         $this->assertSame(false, $mock->confirmToProceed());
     }
@@ -69,12 +66,14 @@ class ConfirmHelperTest extends TestCase
         }));
     }
 
-    protected function setupMock(string $env, $handler = null)
+    protected function setupMock(string $env, $handlerClass = null)
     {
         $app = new Application();
         $app['config'] = m::mock(Repository::class);
-        $app['config']->shouldReceive('get')->with('console.confirm_handler')->andReturn($handler);
         $app['env'] = $env;
+        if ($handlerClass !== null) {
+            $app->bind(ConfirmHandler::class, $handlerClass);
+        }
 
         $mock = $this->getMockForTrait(
             ConfirmableTrait::class,
@@ -93,5 +92,18 @@ class ConfirmHelperTest extends TestCase
         $mock->laravel = $app;
 
         return $mock;
+    }
+}
+
+class CustomConfirmHandler implements ConfirmHandlerContract
+{
+    public static function handle($laravel)
+    {
+        return $laravel->environment() === 'custom';
+    }
+
+    public static function warning()
+    {
+        return 'Implementation Is Custom!';
     }
 }

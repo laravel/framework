@@ -2,7 +2,9 @@
 
 namespace Illuminate\Console;
 
-class ConfirmHandler implements ConfirmHandlerInterface
+use Illuminate\Contracts\Console\ConfirmHandler as ConfirmHandlerContract;
+
+class ConfirmHandler implements ConfirmHandlerContract
 {
     /**
      * Return if the the console should ask to confirm by default.

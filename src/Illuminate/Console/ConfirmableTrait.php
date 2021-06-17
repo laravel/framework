@@ -15,12 +15,7 @@ trait ConfirmableTrait
      */
     public function confirmToProceed($warning = null, $callback = null)
     {
-        $config = $this->laravel['config'];
-        $handler = $config->get('console.confirm_handler');
-        if ($handler === null || ! is_a($handler, ConfirmHandlerInterface::class, true)) {
-            $handler = ConfirmHandler::class;
-        }
-
+        $handler = $this->laravel->make(ConfirmHandler::class);
         $shouldConfirm = $callback !== null ? value($callback) : $handler::handle($this->laravel);
 
         if ($shouldConfirm) {

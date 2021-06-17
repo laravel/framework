@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Console;
+namespace Illuminate\Contracts\Console;
 
-interface ConfirmHandlerInterface
+interface ConfirmHandler
 {
     /**
      * Return if the the console should ask to confirm by default.
