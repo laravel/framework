@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Console\ConfirmHandler;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Console\ConfirmHandler as ConfirmHandlerContract;
 use Illuminate\Foundation\Application;
