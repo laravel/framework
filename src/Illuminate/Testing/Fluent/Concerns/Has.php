@@ -127,7 +127,6 @@ trait Has
             sprintf('Property [%s] must be an Iterable.', $this->dotPath($key))
         );
 
-
         $this->interactsWith($key);
 
         foreach ($actual as $index => $value) {
