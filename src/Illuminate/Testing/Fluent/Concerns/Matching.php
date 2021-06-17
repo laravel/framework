@@ -85,10 +85,9 @@ trait Matching
             sprintf('Property [%s] must be an Iterable.', $this->dotPath($key))
         );
 
-
         $this->interactsWith($key);
 
-        foreach($actual as $index => $value){
+        foreach ($actual as $index => $value) {
             $actualKey = "{$key}.{$index}.{$property}";
             $this->where($actualKey, $expected);
         }

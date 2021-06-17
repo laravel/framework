@@ -832,6 +832,7 @@ class AssertTest extends TestCase
 
         $assert->eachWhere('foo', 'bar', 'value');
     }
+
     public function testAssertEachWhereMatchesValuesFailsWhenAtLeastOnePropDoesNotMatchValue()
     {
         $assert = AssertableJson::fromArray([
@@ -869,7 +870,6 @@ class AssertTest extends TestCase
             },
         ]);
     }
-
 
     public function testAssertWhereTypeString()
     {
@@ -1080,6 +1080,7 @@ class AssertTest extends TestCase
 
         $assert->eachHas('foo', 'bar');
     }
+
     public function testAssertEachHasMatchesValuesFailsWhenAtLeastOnePropDoesNotMatchValue()
     {
         $assert = AssertableJson::fromArray([

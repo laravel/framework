@@ -102,9 +102,9 @@ trait Has
 
         return $this;
     }
-    
+
     /**
-     * Assert that the prop is of the expected size inside all itens in an array
+     * Assert that the prop is of the expected size inside all itens in an array.
      *
      * @param  string|int  $key
      * @param  string|int  $property The property to verify
