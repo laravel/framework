@@ -9,22 +9,26 @@ trait ConfirmableTrait
      *
      * This method only asks for confirmation in production.
      *
-     * @param  string  $warning
+     * @param  ?string  $warning
      * @param  \Closure|bool|null  $callback
      * @return bool
      */
-    public function confirmToProceed($warning = 'Application In Production!', $callback = null)
+    public function confirmToProceed($warning = null, $callback = null)
     {
-        $callback = is_null($callback) ? $this->getDefaultConfirmCallback() : $callback;
+        $config = $this->laravel['config'];
+        $handler = $config->get('console.confirm_handler');
+        if ($handler === null || ! is_a($handler, ConfirmHandlerInterface::class, true)) {
+            $handler = ConfirmHandler::class;
+        }
 
-        $shouldConfirm = value($callback);
+        $shouldConfirm = $callback !== null ? value($callback) : $handler::handle($this->laravel);
 
         if ($shouldConfirm) {
             if ($this->hasOption('force') && $this->option('force')) {
                 return true;
             }
 
-            $this->alert($warning);
+            $this->alert($warning ?? $handler::warning());
 
             $confirmed = $this->confirm('Do you really wish to run this command?');
 
@@ -36,17 +40,5 @@ trait ConfirmableTrait
         }
 
         return true;
-    }
-
-    /**
-     * Get the default confirmation callback.
-     *
-     * @return \Closure
-     */
-    protected function getDefaultConfirmCallback()
-    {
-        return function () {
-            return $this->getLaravel()->environment() === 'production';
-        };
     }
 }
