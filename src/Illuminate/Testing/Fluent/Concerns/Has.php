@@ -102,6 +102,41 @@ trait Has
 
         return $this;
     }
+    
+    /**
+     * Assert that the prop is of the expected size inside all itens in an array
+     *
+     * @param  string|int  $key
+     * @param  string|int  $property The property to verify
+     * @param  int|null  $length
+     * @return $this
+     */
+    public function eachHas($key, $property, $length = null, Closure $callback = null): self
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertTrue(
+            Arr::has($this->prop(), $key),
+            sprintf('Property [%s] does not exist.', $this->dotPath($key))
+        );
+
+        PHPUnit::assertIsIterable(
+            $actual,
+            sprintf('Property [%s] must be an Iterable.', $this->dotPath($key))
+        );
+
+
+        $this->interactsWith($key);
+
+        foreach ($actual as $index => $value) {
+            $actualKey = "{$key}.{$index}.{$property}";
+            $this->has($actualKey, $length, $callback);
+        }
+
+        return $this;
+    }
 
     /**
      * Assert that none of the given props exist.
