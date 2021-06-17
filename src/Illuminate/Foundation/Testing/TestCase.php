@@ -7,6 +7,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Queue;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Str;
@@ -115,7 +116,9 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTraits()
     {
-        $uses = array_flip(class_uses_recursive(static::class));
+        $class = static::class;
+
+        $uses = array_flip(class_uses_recursive($class));
 
         if (isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();
@@ -139,6 +142,18 @@ abstract class TestCase extends BaseTestCase
 
         if (isset($uses[WithFaker::class])) {
             $this->setUpFaker();
+        }
+
+        $setUpped = [];
+
+        foreach ($uses as $trait) {
+            $method = 'setUp'.class_basename($trait);
+
+            if (method_exists($this, $method) && ! in_array($method, $setUpped)) {
+                call_user_func([$this, $method]);
+
+                $setUpped[] = $method;
+            }
         }
 
         return $uses;
