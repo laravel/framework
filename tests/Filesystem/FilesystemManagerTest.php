@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
@@ -19,5 +20,19 @@ class FilesystemManagerTest extends TestCase
         }));
 
         $filesystem->disk('local');
+    }
+
+    public function testCanBuildOnDemandDisk()
+    {
+        $filesystem = new FilesystemManager(new Application);
+
+        $this->assertInstanceOf(Filesystem::class, $filesystem->build('my-custom-path'));
+
+        $this->assertInstanceOf(Filesystem::class, $filesystem->build([
+            'driver'     => 'local',
+            'root'       => 'my-custom-path',
+            'url'        => 'my-custom-url',
+            'visibility' => 'public',
+        ]));
     }
 }
