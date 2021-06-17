@@ -47,6 +47,24 @@ class ConfirmHelperTest extends TestCase
         $this->assertSame(false, $mock->confirmToProceed());
     }
 
+    public function testCustomCallbackTrue()
+    {
+        $mock = $this->setupMock('production');
+        $mock->method('hasOption')->willReturn(false);
+        $mock->expects($this->exactly(1))->method('alert')->with('Passed Param String!');
+
+        $this->assertSame(false, $mock->confirmToProceed('Passed Param String!', function () { return true; }));
+    }
+
+    public function testCustomCallbackFalse()
+    {
+        $mock = $this->setupMock('production');
+        $mock->method('hasOption')->willReturn(false);
+        $mock->expects($this->exactly(0))->method('alert');
+
+        $this->assertSame(true, $mock->confirmToProceed('Passed Param String!', function () { return false; }));
+    }
+
     protected function setupMock(string $env, $handler = null)
     {
         $app = new Application();
