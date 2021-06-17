@@ -4,6 +4,7 @@ namespace Illuminate\Testing\Fluent\Concerns;
 
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -57,6 +58,39 @@ trait Matching
     {
         foreach ($bindings as $key => $value) {
             $this->where($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Asserts that all properties inside an Collection match their expected value.
+     *
+     * @param  string  $key
+     * @param  string  $property The property to verify
+     * @param  mixed|\Closure  $expected
+     * @return $this
+     */
+    public function eachWhere(string $key, string $property, $expected): self
+    {
+        $actual = $this->prop($key);
+
+        PHPUnit::assertTrue(
+            Arr::has($this->prop(), $key),
+            sprintf('Property [%s] does not exist.', $this->dotPath($key))
+        );
+
+        PHPUnit::assertIsIterable(
+            $actual,
+            sprintf('Property [%s] must be an Iterable.', $this->dotPath($key))
+        );
+
+
+        $this->interactsWith($key);
+
+        foreach($actual as $index => $value){
+            $actualKey = "{$key}.{$index}.{$property}";
+            $this->where($actualKey, $expected);
         }
 
         return $this;

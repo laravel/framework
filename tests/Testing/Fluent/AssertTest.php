@@ -816,6 +816,61 @@ class AssertTest extends TestCase
         ]);
     }
 
+    public function testAssertEachWhereMatchesValues()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [
+                'baz' => [
+                    'bar' => 'value',
+                ],
+                'example' => [
+                    'bar' => 'value',
+                ],
+            ],
+
+        ]);
+
+        $assert->eachWhere('foo', 'bar', 'value');
+    }
+    public function testAssertEachWhereMatchesValuesFailsWhenAtLeastOnePropDoesNotMatchValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [
+                'baz' => [
+                    'bar' => 'notvalue',
+                ],
+                'example' => [
+                    'bar' => 'value',
+                ],
+            ],
+
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo.baz.bar] does not match the expected value.');
+
+        $assert->eachWhere('foo', 'bar', 'value');
+    }
+
+    public function testAssertEachWhereFailsWhenAtLeastOnePropDoesNotMatchValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+            'baz' => 'example',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [baz] was marked as invalid using a closure.');
+
+        $assert->whereAll([
+            'foo' => 'bar',
+            'baz' => function ($value) {
+                return $value === 'foo';
+            },
+        ]);
+    }
+
+
     public function testAssertWhereTypeString()
     {
         $assert = AssertableJson::fromArray([
@@ -1007,6 +1062,42 @@ class AssertTest extends TestCase
         $this->expectExceptionMessage('Property [foo.baz] does not exist.');
 
         $assert->hasAll('foo.bar', 'foo.baz', 'baz');
+    }
+
+    public function testAssertEachHasMatchesValues()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [
+                'baz' => [
+                    'bar' => 'value',
+                ],
+                'example' => [
+                    'bar' => 'value',
+                ],
+            ],
+
+        ]);
+
+        $assert->eachHas('foo', 'bar');
+    }
+    public function testAssertEachHasMatchesValuesFailsWhenAtLeastOnePropDoesNotMatchValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [
+                'baz' => [
+                    'notbar' => 'notvalue',
+                ],
+                'example' => [
+                    'bar' => 'value',
+                ],
+            ],
+
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo.baz.bar] does not exist.');
+
+        $assert->eachHas('foo', 'bar');
     }
 
     public function testAssertCountMultipleProps()
