@@ -15,7 +15,7 @@ class MySqlGrammar extends Grammar
      * @var string[]
      */
     protected $modifiers = [
-        'Unsigned', 'Charset', 'Collate', 'VirtualAs', 'StoredAs', 'Nullable',
+        'Primary', 'Unsigned', 'Charset', 'Collate', 'VirtualAs', 'StoredAs', 'Nullable',
         'Srid', 'Default', 'Increment', 'Comment', 'After', 'First',
     ];
 
@@ -1011,6 +1011,20 @@ class MySqlGrammar extends Grammar
 
         if ($column->nullable === false) {
             return ' not null';
+        }
+    }
+
+    /**
+     * Get the SQL for a primary column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    public function modifyPrimary(Blueprint $blueprint, Fluent $column)
+    {
+        if (! $column->autoIncrement && ! is_null($column->primary)) {
+            return ' primary key';
         }
     }
 

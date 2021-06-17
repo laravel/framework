@@ -16,7 +16,7 @@ class SQLiteGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $modifiers = ['VirtualAs', 'StoredAs', 'Nullable', 'Default', 'Increment'];
+    protected $modifiers = ['Primary', 'VirtualAs', 'StoredAs', 'Nullable', 'Default', 'Increment'];
 
     /**
      * The columns available as serials.
@@ -55,12 +55,11 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('%s table %s (%s%s%s)',
+        return sprintf('%s table %s (%s%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
-            (string) $this->addForeignKeys($blueprint),
-            (string) $this->addPrimaryKeys($blueprint)
+            (string) $this->addForeignKeys($blueprint)
         );
     }
 
@@ -891,6 +890,20 @@ class SQLiteGrammar extends Grammar
 
         if ($column->nullable === false) {
             return ' not null';
+        }
+    }
+
+    /**
+     * Get the SQL for a primary column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    public function modifyPrimary(Blueprint $blueprint, Fluent $column)
+    {
+        if (! $column->autoIncrement && ! is_null($column->primary)) {
+            return ' primary key';
         }
     }
 
