@@ -5,7 +5,7 @@ namespace Illuminate\Console;
 class ConfirmHandler implements ConfirmHandlerInterface
 {
     /**
-     * Return if the the console should ask to confirm by default
+     * Return if the the console should ask to confirm by default.
      *
      * @param \Illuminate\Contracts\Foundation\Application $larvel
      * @return bool
@@ -16,7 +16,7 @@ class ConfirmHandler implements ConfirmHandlerInterface
     }
 
     /**
-     * Return warning message for console confirm
+     * Return warning message for console confirm.
      *
      * @return string
      */
