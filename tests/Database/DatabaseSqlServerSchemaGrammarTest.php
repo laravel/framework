@@ -45,6 +45,17 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('create table "prefix_users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
     }
 
+    public function testBasicCreateWithPrimaryKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('foo')->primary();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "users" ("foo" nvarchar(255) primary key not null)', $statements[0]);
+    }
+
     public function testCreateTemporaryTable()
     {
         $blueprint = new Blueprint('users');
