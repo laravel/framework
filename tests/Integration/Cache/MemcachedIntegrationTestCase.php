@@ -8,7 +8,7 @@ use Orchestra\Testbench\TestCase;
 /**
  * @group integration
  */
-abstract class MemcachedIntegrationTest extends TestCase
+abstract class MemcachedIntegrationTestCase extends TestCase
 {
     protected function setUp(): void
     {
