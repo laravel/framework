@@ -2,12 +2,13 @@
 
 namespace Illuminate\Support\Traits;
 
+use Closure;
 use Illuminate\Support\HigherOrderWhenProxy;
 
 trait Conditionable
 {
     /**
-     * Apply the callback if the given "value" is truthy.
+     * Apply the callback if the given "value" is (or resolves to) truthy.
      *
      * @param  mixed  $value
      * @param  callable|null  $callback
@@ -17,6 +18,8 @@ trait Conditionable
      */
     public function when($value, callable $callback = null, callable $default = null)
     {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
         if (! $callback) {
             return new HigherOrderWhenProxy($this, $value);
         }
@@ -31,7 +34,7 @@ trait Conditionable
     }
 
     /**
-     * Apply the callback if the given "value" is falsy.
+     * Apply the callback if the given "value" is (or resolves to) falsy.
      *
      * @param  mixed  $value
      * @param  callable|null  $callback
@@ -41,6 +44,8 @@ trait Conditionable
      */
     public function unless($value, callable $callback = null, callable $default = null)
     {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
         if (! $callback) {
             return new HigherOrderWhenProxy($this, ! $value);
         }

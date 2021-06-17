@@ -31,16 +31,18 @@ use Traversable;
  * @property-read HigherOrderCollectionProxy $min
  * @property-read HigherOrderCollectionProxy $partition
  * @property-read HigherOrderCollectionProxy $reject
+ * @property-read HigherOrderCollectionProxy $skipUntil
+ * @property-read HigherOrderCollectionProxy $skipWhile
  * @property-read HigherOrderCollectionProxy $some
  * @property-read HigherOrderCollectionProxy $sortBy
  * @property-read HigherOrderCollectionProxy $sortByDesc
- * @property-read HigherOrderCollectionProxy $skipUntil
- * @property-read HigherOrderCollectionProxy $skipWhile
  * @property-read HigherOrderCollectionProxy $sum
  * @property-read HigherOrderCollectionProxy $takeUntil
  * @property-read HigherOrderCollectionProxy $takeWhile
  * @property-read HigherOrderCollectionProxy $unique
+ * @property-read HigherOrderCollectionProxy $unless
  * @property-read HigherOrderCollectionProxy $until
+ * @property-read HigherOrderCollectionProxy $when
  */
 trait EnumeratesValues
 {
@@ -76,7 +78,9 @@ trait EnumeratesValues
         'takeUntil',
         'takeWhile',
         'unique',
+        'unless',
         'until',
+        'when',
     ];
 
     /**
@@ -138,7 +142,7 @@ trait EnumeratesValues
         }
 
         return static::range(1, $number)
-            ->when($callback)
+            ->unless($callback == null)
             ->map($callback);
     }
 
