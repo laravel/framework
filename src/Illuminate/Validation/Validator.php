@@ -280,7 +280,6 @@ class Validator implements ValidatorContract
     {
         $this->dotPlaceholder = Str::random();
 
-        $this->initialRules = $rules;
         $this->translator = $translator;
         $this->customMessages = $messages;
         $this->data = $this->parseData($data);
