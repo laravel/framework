@@ -12,6 +12,7 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
+use Throwable;
 
 class NotificationSender
 {
@@ -135,7 +136,7 @@ class NotificationSender
      * @param mixed $notification
      * @param string $channel
      * @return void
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function sendToNotifiable($notifiable, $id, $notification, $channel)
     {
@@ -153,7 +154,7 @@ class NotificationSender
             $this->events->dispatch(
                 new NotificationSent($notifiable, $notification, $channel, $response)
             );
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $this->events->dispatch(
                 new NotificationFailed($notifiable, $notification, $channel, [
                     'error' => $th->getMessage()
