@@ -833,6 +833,20 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Get the SQL for a primary column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    public function modifyPrimary(Blueprint $blueprint, Fluent $column)
+    {
+        if (! $column->autoIncrement && ! is_null($column->primary)) {
+            return ' primary key';
+        }
+    }
+
+    /**
      * Get the SQL for a collation column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -857,20 +871,6 @@ class SqlServerGrammar extends Grammar
     {
         if ($column->type !== 'computed') {
             return $column->nullable ? ' null' : ' not null';
-        }
-    }
-
-    /**
-     * Get the SQL for a primary column modifier.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
-     */
-    public function modifyPrimary(Blueprint $blueprint, Fluent $column)
-    {
-        if (! $column->autoIncrement && ! is_null($column->primary)) {
-            return ' primary key';
         }
     }
 
