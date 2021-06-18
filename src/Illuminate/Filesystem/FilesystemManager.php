@@ -100,7 +100,7 @@ class FilesystemManager implements FactoryContract
     {
         return $this->resolve('ondemand', is_array($config) ? $config : [
             'driver' => 'local',
-            'root' => $config
+            'root' => $config,
         ]);
     }
 
