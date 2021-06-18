@@ -20,6 +20,13 @@ interface Paginator
      * @return $this
      */
     public function appends($key, $value = null);
+    
+    /**
+     * Add all current query string values to the paginator.
+     *
+     * @return $this
+     */
+    public function withQueryString();
 
     /**
      * Get / set the URL fragment to be appended to URLs.
