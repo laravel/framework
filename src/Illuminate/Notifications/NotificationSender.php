@@ -131,10 +131,10 @@ class NotificationSender
     /**
      * Send the given notification to the given notifiable via a channel.
      *
-     * @param mixed $notifiable
-     * @param string $id
-     * @param mixed $notification
-     * @param string $channel
+     * @param  mixed  $notifiable
+     * @param  string  $id
+     * @param  mixed  $notification
+     * @param  string  $channel
      * @return void
      * @throws Throwable
      */
