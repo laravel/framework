@@ -185,7 +185,9 @@ class SqlServerGrammar extends Grammar
         // move the bindings to the right position: right after "select".
         if ($this->queryOrderContainsSubquery($query)) {
             $preferredBindingOrder = ['select', 'order', 'from', 'join', 'where', 'groupBy', 'having', 'union', 'unionOrder'];
-            $sortedBindings = Arr::sort($query->bindings, fn ($bindings, $key) => array_search($key, $preferredBindingOrder));
+            $sortedBindings = Arr::sort($query->bindings, function ($bindings, $key) use ($preferredBindingOrder) {
+                return array_search($key, $preferredBindingOrder);
+            });
             $query->bindings = $sortedBindings;
         }
 
