@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
@@ -129,11 +130,12 @@ class NotificationSender
     /**
      * Send the given notification to the given notifiable via a channel.
      *
-     * @param  mixed  $notifiable
-     * @param  string  $id
-     * @param  mixed  $notification
-     * @param  string  $channel
+     * @param mixed $notifiable
+     * @param string $id
+     * @param mixed $notification
+     * @param string $channel
      * @return void
+     * @throws \Throwable
      */
     protected function sendToNotifiable($notifiable, $id, $notification, $channel)
     {
@@ -145,11 +147,21 @@ class NotificationSender
             return;
         }
 
-        $response = $this->manager->driver($channel)->send($notifiable, $notification);
+        try {
+            $response = $this->manager->driver($channel)->send($notifiable, $notification);
 
-        $this->events->dispatch(
-            new NotificationSent($notifiable, $notification, $channel, $response)
-        );
+            $this->events->dispatch(
+                new NotificationSent($notifiable, $notification, $channel, $response)
+            );
+        } catch (\Throwable $th) {
+            $this->events->dispatch(
+                new NotificationFailed($notifiable, $notification, $channel, [
+                    'error' => $th->getMessage()
+                ])
+            );
+
+            throw $th;
+        }
     }
 
     /**
