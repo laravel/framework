@@ -185,6 +185,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->originalIsEquivalent('castedFloat'));
     }
 
+    public function testUpdateSingleFieldJsonAttributeWithGuard()
+    {
+        $model = new EloquentModelStub(['id' => 1, 'arrayAttribute' => '{"foo":"bar"}']);
+
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['id', 'arrayAttribute']);
+
+        $model->guard(['id']);
+
+        $model->fill(['arrayAttribute->foo' => 'baz']);
+
+        $this->assertEquals('{"foo":"baz"}', $model->arrayAttribute);
+    }
+
     public function testCalculatedAttributes()
     {
         $model = new EloquentModelStub;
