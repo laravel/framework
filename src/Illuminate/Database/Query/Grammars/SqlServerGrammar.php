@@ -181,6 +181,12 @@ class SqlServerGrammar extends Grammar
 
         unset($components['orders']);
 
+        // As this moves the order statement to be part of the "select" statement, we need to
+        // move the bindings to the right position: right after "select".
+        $preferredBindingOrder = ['select', 'order', 'from', 'join', 'where', 'groupBy', 'having', 'union', 'unionOrder'];
+        $sortedBindings = Arr::sort($query->bindings, fn($bindings, $key) => array_search($key, $preferredBindingOrder));
+        $query->bindings = $sortedBindings;
+
         // Next we need to calculate the constraints that should be placed on the query
         // to get the right offset and limit from our query but if there is no limit
         // set we will just handle the offset only since that is all that matters.
