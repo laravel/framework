@@ -157,7 +157,7 @@ class NotificationSender
         } catch (Throwable $th) {
             $this->events->dispatch(
                 new NotificationFailed($notifiable, $notification, $channel, [
-                    'error' => $th->getMessage()
+                    'error' => $th->getMessage(),
                 ])
             );
 
