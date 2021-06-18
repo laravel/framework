@@ -146,6 +146,15 @@ class MigrateCommand extends BaseCommand
 
         $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
 
+        // Next, we will ensure the "migrations" table was created by the stored database schema
+        // as it is possible for the schema file to be created in ways which would exclude it
+        // which would leave the database in an unexpected state and likely lead to errors
+        if (! $this->migrator->repositoryExists()) {
+            $this->call('migrate:install', array_filter([
+                '--database' => $this->option('database'),
+            ]));
+        }
+
         // Finally, we will fire an event that this schema has been loaded so developers
         // can perform any post schema load tasks that are necessary in listeners for
         // this event, which may seed the database tables with some necessary data.
