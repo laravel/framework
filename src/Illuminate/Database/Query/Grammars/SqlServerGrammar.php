@@ -205,7 +205,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function queryOrderContainsSubquery($query)
     {
-        if (!is_array($query->orders)) {
+        if (! is_array($query->orders)) {
             return false;
         }
 
