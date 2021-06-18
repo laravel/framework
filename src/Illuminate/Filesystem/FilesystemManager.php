@@ -119,6 +119,7 @@ class FilesystemManager implements FactoryContract
      * Resolve the given disk.
      *
      * @param  string  $name
+     * @param  array|null  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      *
      * @throws \InvalidArgumentException
