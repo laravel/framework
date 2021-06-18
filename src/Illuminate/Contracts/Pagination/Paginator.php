@@ -27,7 +27,7 @@ interface Paginator
      * @return $this
      */
     public function withQueryString();
-
+    
     /**
      * Get / set the URL fragment to be appended to URLs.
      *
