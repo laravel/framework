@@ -34,5 +34,7 @@ class FilesystemManagerTest extends TestCase
             'url'        => 'my-custom-url',
             'visibility' => 'public',
         ]));
+
+        rmdir(__DIR__.'/../../my-custom-path');
     }
 }
