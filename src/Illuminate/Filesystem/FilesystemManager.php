@@ -93,14 +93,15 @@ class FilesystemManager implements FactoryContract
     /**
      * Build an on-demand disk.
      *
-     * @param  string|array  $root
+     * @param  string|array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
-    public function build($root)
+    public function build($config)
     {
-        $config = is_array($root) ? $root : ['driver' => 'local', 'root' => $root];
-
-        return $this->disks['ondemand'] = $this->resolve('ondemand', $config);
+        return $this->resolve('ondemand', is_array($config) ? $config : [
+            'driver' => 'local',
+            'root' => $config
+        ]);
     }
 
     /**
