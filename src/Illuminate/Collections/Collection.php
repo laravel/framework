@@ -335,6 +335,27 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get all items excluding the specified values.
+     *
+     * @param  \Illuminate\Support\Collection|mixed $values
+     * @return static
+     */
+    public function exclude($values)
+    {
+        if (is_string($values) || is_numeric($values)) {
+            $values = Arr::wrap($values);
+        }
+
+        if ($values instanceof Enumerable) {
+            $values = $values->toArray();
+        }
+
+        return $this->reject(function ($item) use ($values) {
+            return in_array($item, $values);
+        });
+    }
+
+    /**
      * Run a filter over each of the items.
      *
      * @param  callable|null  $callback

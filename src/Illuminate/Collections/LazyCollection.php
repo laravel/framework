@@ -348,6 +348,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Get all items excluding the specified values.
+     *
+     * @param  mixed  $values
+     * @return static
+     */
+    public function exclude($keys)
+    {
+        return $this->passthru('exclude', func_get_args());
+    }
+
+    /**
      * Run a filter over each of the items.
      *
      * @param  callable|null  $callback

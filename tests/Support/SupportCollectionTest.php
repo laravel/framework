@@ -1858,6 +1858,38 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testExcludeValues($collection)
+    {
+        $data = new $collection(['laravel', 'not', 'best', 'framework', 'one', 'two', 'three', 1, 2, 3]);
+
+        $data = $data->exclude('not');
+        $this->assertEquals(
+            ['laravel', 'best', 'framework', 'one', 'two', 'three', 1, 2, 3],
+            $data->values()->toArray()
+        );
+
+        $data = $data->exclude(['one', 1, 'two']);
+        $this->assertEquals(
+            ['laravel', 'best', 'framework', 'three', 2, 3],
+            $data->values()->toArray()
+        );
+
+        $data = $data->exclude(2);
+        $this->assertEquals(
+            ['laravel', 'best', 'framework', 'three', 3],
+            $data->values()->toArray()
+        );
+
+        $data = $data->exclude(new $collection([3, 'three']));
+        $this->assertEquals(
+            ['laravel', 'best', 'framework'],
+            $data->values()->toArray()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testPluckWithArrayAndObjectValues($collection)
     {
         $data = new $collection([(object) ['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
