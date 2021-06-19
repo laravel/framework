@@ -177,7 +177,7 @@ class Factory
                 }
 
                 return $response;
-            }
+            },
         ]));
 
         return $this;
