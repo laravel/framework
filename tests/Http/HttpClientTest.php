@@ -942,7 +942,7 @@ class HttpClientTest extends TestCase
 
     public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
     {
-        $this->factory->fake(['https://example.com' => $this->factory->response()]);
+        $this->factory->fake(['https://example.com' => ['world' => 'Hello world']]);
         $stats = $this->factory->get('https://example.com')->handlerStats();
         $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
 
@@ -950,6 +950,14 @@ class HttpClientTest extends TestCase
         $this->assertEmpty($stats);
 
         $this->assertNull($effectiveUri);
+    }
+
+    public function testTransferStatsArePresentWhenFakingTheRequestUsingAPromiseResponse()
+    {
+        $this->factory->fake(['https://example.com' => $this->factory->response()]);
+        $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
+
+        $this->assertSame('https://example.com', (string) $effectiveUri);
     }
 
     public function testClonedClientsWorkSuccessfullyWithTheRequestObject()
