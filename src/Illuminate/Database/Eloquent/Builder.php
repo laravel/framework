@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
-use Illuminate\Pagination\CursorPaginationException;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
@@ -833,27 +832,30 @@ class Builder
      * @param  string  $cursorName
      * @param  string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
-     * @throws \Illuminate\Pagination\CursorPaginationException
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
-        $cursor = $cursor ?: CursorPaginator::resolveCurrentCursor($cursorName);
-
         $perPage = $perPage ?: $this->model->getPerPage();
+
+        $cursor = $cursor ?: CursorPaginator::resolveCurrentCursor($cursorName);
 
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
-        $orderDirection = $orders->first()['direction'] ?? 'asc';
-
-        $comparisonOperator = $orderDirection === 'asc' ? '>' : '<';
-
-        $parameters = $orders->pluck('column')->toArray();
-
-        if (! is_null($cursor)) {
-            if (count($parameters) === 1) {
-                $this->where($column = $parameters[0], $comparisonOperator, $cursor->parameter($column));
-            } elseif (count($parameters) > 1) {
-                $this->whereRowValues($parameters, $comparisonOperator, $cursor->parameters($parameters));
+        if ($cursor !== null) {
+            $builder = $this;
+            $prev = null;
+            foreach ($orders as ['column' => $column, 'direction' => $direction]) {
+                $operator = $direction === 'asc' ? '>' : '<';
+                if ($prev !== null) {
+                    $builder->orWhere(function ($query) use (&$builder, $column, $operator, $prev, $cursor) {
+                        $query->where($prev, '=', $cursor->parameter($prev))
+                            ->where($column, $operator, $cursor->parameter($column));
+                        $builder = $query;
+                    });
+                } else {
+                    $builder->where($column, $operator, $cursor->parameter($column));
+                }
+                $prev = $column;
             }
         }
 
@@ -862,7 +864,7 @@ class Builder
         return $this->cursorPaginator($this->get($columns), $perPage, $cursor, [
             'path' => Paginator::resolveCurrentPath(),
             'cursorName' => $cursorName,
-            'parameters' => $parameters,
+            'parameters' => $orders->pluck('column')->toArray(),
         ]);
     }
 
@@ -871,18 +873,12 @@ class Builder
      *
      * @param  bool  $shouldReverse
      * @return \Illuminate\Support\Collection
-     *
-     * @throws \Illuminate\Pagination\CursorPaginationException
      */
     protected function ensureOrderForCursorPagination($shouldReverse = false)
     {
-        $orderDirections = collect($this->query->orders)->pluck('direction')->unique();
+        $orders = collect($this->query->orders);
 
-        if ($orderDirections->count() > 1) {
-            throw new CursorPaginationException('Only a single order by direction is supported when using cursor pagination.');
-        }
-
-        if ($orderDirections->count() === 0) {
+        if ($orders->count() === 0) {
             $this->enforceOrderBy();
         }
 
