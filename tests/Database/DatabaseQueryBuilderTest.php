@@ -3651,7 +3651,21 @@ SQL;
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
-        $builder->shouldReceive('whereRowValues')->with(['test', 'another'], '>', ['bar', 'foo'])->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('test', '>', 'bar')->once()->andReturnSelf();
+        $nestedBuilder = $this->getMockQueryBuilder();
+        //$builder->shouldReceive('newQuery')->once()->andReturn($nestedBuilder);
+        $nested = null;
+        $builder->shouldReceive('orWhere')->with(m::on(function ($query) use (&$nested) {
+            $nested = $query;
+
+            return true;
+        }))->once()->andReturnUsing(function () use (&$nested, $nestedBuilder, $builder) {
+            $nested($nestedBuilder);
+
+            return $builder;
+        });
+        $nestedBuilder->shouldReceive('where')->with('test', '=', 'bar')->once()->andReturnSelf();
+        $nestedBuilder->shouldReceive('where')->with('another', '>', 'foo')->once()->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
         Paginator::currentPathResolver(function () use ($path) {
