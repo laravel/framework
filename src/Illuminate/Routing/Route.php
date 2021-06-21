@@ -143,6 +143,13 @@ class Route
     protected $bindingFields = [];
 
     /**
+     * Custom resolver for a given parameters
+     *
+     * @var array
+     */
+    protected $resolvers = [];
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -540,6 +547,53 @@ class Route
         $this->bindingFields = $bindingFields;
 
         return $this;
+    }
+
+    /**
+     * Attach custom route binding resolver
+     *
+     * @param  string  $parameter
+     * @param  \Closure|string  $resolver
+     * @return $this
+     */
+    public function resolve($parameter, $resolver)
+    {
+        $this->resolvers[$parameter] = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Include trashed models in route binding model query
+     *
+     * @param  string  $parameter
+     * @return $this
+     */
+    public function resolveWithTrashed($parameter)
+    {
+       return $this->resolve($parameter, 'resolveRouteBindingWithTrashed');
+    }
+
+    /**
+     * Determine if given parameter has custom resolver.
+     *
+     * @param  string  $parameter
+     * @return bool
+     */
+    public function hasResolver($parameter)
+    {
+        return array_key_exists($this->resolvers, $parameter);
+    }
+
+    /**
+     * Get the binding resolver for given parameter.
+     *
+     * @param  string  $parameter
+     * @return mixed|null
+     */
+    public function getResolver($parameter)
+    {
+        return $this->resolvers[$parameter] ?? null;
     }
 
     /**

@@ -211,4 +211,16 @@ trait SoftDeletes
     {
         return $this->qualifyColumn($this->getDeletedAtColumn());
     }
+
+    /**
+     * Retrieve the model for a bound value including trashed models.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBindingWithTrashed($value, $field = null)
+    {
+        return $this->withTrashed()->where($field ?? $this->getRouteKeyName(), $value)->first();
+    }
 }

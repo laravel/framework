@@ -43,7 +43,7 @@ class ImplicitRouteBinding
                 )) {
                     throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
                 }
-            } elseif (! $model = $instance->resolveRouteBinding($parameterValue, $route->bindingFieldFor($parameterName))) {
+            } elseif (! $model = static::resolveParameter($route, $instance, $parameterName, $parameterValue)) {
                 throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
             }
 
@@ -67,5 +67,31 @@ class ImplicitRouteBinding
         if (array_key_exists($snakedName = Str::snake($name), $parameters)) {
             return $snakedName;
         }
+    }
+
+    /**
+     * Resolve model instance using custom or default resolver
+     *
+     * @param $route
+     * @param $instance
+     * @param $parameterName
+     * @param $parameterValue
+     * @return false|mixed
+     */
+    protected static function resolveParameter($route, $instance, $parameterName, $parameterValue)
+    {
+        $binding = $route->bindingFieldFor($parameterName);
+
+        if ($resolver = $route->getResolver($parameterName)) {
+            $model = call_user_func_array(
+                is_callable($resolver) ? $resolver : [$instance, $resolver],
+                [$parameterValue, $binding]
+            );
+
+        } else {
+            $model = $instance->resolveRouteBinding($parameterValue, $binding);
+        }
+
+        return $model;
     }
 }
