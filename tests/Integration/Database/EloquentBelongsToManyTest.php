@@ -335,7 +335,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post = Post::create(['title' => Str::random()]);
 
-        $post->tags()->firstOrFail(['id' => 10]);
+        $post->tags()->firstOrFail(['id']);
     }
 
     public function testFindMethod()

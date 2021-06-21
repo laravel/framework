@@ -19,7 +19,7 @@ class PostgresGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $modifiers = ['Collate', 'Increment', 'Nullable', 'Default', 'VirtualAs', 'StoredAs'];
+    protected $modifiers = ['Primary', 'Collate', 'Increment', 'Nullable', 'Default', 'VirtualAs', 'StoredAs'];
 
     /**
      * The columns available as serials.
@@ -977,6 +977,20 @@ class PostgresGrammar extends Grammar
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
         return $column->nullable ? ' null' : ' not null';
+    }
+
+    /**
+     * Get the SQL for a primary column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    public function modifyPrimary(Blueprint $blueprint, Fluent $column)
+    {
+        if (! $column->autoIncrement && ! is_null($column->primary)) {
+            return ' primary key';
+        }
     }
 
     /**

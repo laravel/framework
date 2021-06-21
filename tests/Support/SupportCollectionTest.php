@@ -238,6 +238,65 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSliding($collection)
+    {
+        // Default parameters: $size = 2, $step = 1
+        $this->assertSame([], $collection::times(0)->sliding()->toArray());
+        $this->assertSame([], $collection::times(1)->sliding()->toArray());
+        $this->assertSame([[1, 2]], $collection::times(2)->sliding()->toArray());
+        $this->assertSame(
+            [[1, 2], [2, 3]],
+            $collection::times(3)->sliding()->map->values()->toArray()
+        );
+
+        // Custom step: $size = 2, $step = 3
+        $this->assertSame([], $collection::times(1)->sliding(2, 3)->toArray());
+        $this->assertSame([[1, 2]], $collection::times(2)->sliding(2, 3)->toArray());
+        $this->assertSame([[1, 2]], $collection::times(3)->sliding(2, 3)->toArray());
+        $this->assertSame([[1, 2]], $collection::times(4)->sliding(2, 3)->toArray());
+        $this->assertSame(
+            [[1, 2], [4, 5]],
+            $collection::times(5)->sliding(2, 3)->map->values()->toArray()
+        );
+
+        // Custom size: $size = 3, $step = 1
+        $this->assertSame([], $collection::times(2)->sliding(3)->toArray());
+        $this->assertSame([[1, 2, 3]], $collection::times(3)->sliding(3)->toArray());
+        $this->assertSame(
+            [[1, 2, 3], [2, 3, 4]],
+            $collection::times(4)->sliding(3)->map->values()->toArray()
+        );
+        $this->assertSame(
+            [[1, 2, 3], [2, 3, 4]],
+            $collection::times(4)->sliding(3)->map->values()->toArray()
+        );
+
+        // Custom size and custom step: $size = 3, $step = 2
+        $this->assertSame([], $collection::times(2)->sliding(3, 2)->toArray());
+        $this->assertSame([[1, 2, 3]], $collection::times(3)->sliding(3, 2)->toArray());
+        $this->assertSame([[1, 2, 3]], $collection::times(4)->sliding(3, 2)->toArray());
+        $this->assertSame(
+            [[1, 2, 3], [3, 4, 5]],
+            $collection::times(5)->sliding(3, 2)->map->values()->toArray()
+        );
+        $this->assertSame(
+            [[1, 2, 3], [3, 4, 5]],
+            $collection::times(6)->sliding(3, 2)->map->values()->toArray()
+        );
+
+        // Ensure keys are preserved, and inner chunks are also collections
+        $chunks = $collection::times(3)->sliding();
+
+        $this->assertSame([[0 => 1, 1 => 2], [1 => 2, 2 => 3]], $chunks->toArray());
+
+        $this->assertInstanceOf($collection, $chunks);
+        $this->assertInstanceOf($collection, $chunks->first());
+        $this->assertInstanceOf($collection, $chunks->skip(1)->first());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testEmptyCollectionIsEmpty($collection)
     {
         $c = new $collection;

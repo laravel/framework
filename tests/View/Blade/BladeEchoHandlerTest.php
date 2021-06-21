@@ -102,6 +102,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
             ['{{"foo" . "bar"}}', 'foobar'],
             ['{{ 1 + 2 }}{{ "test"; }}', '3test'],
             ['@php($test = "hi"){{ $test }}', 'hi'],
+            ['{!! "&nbsp;" !!}', '&nbsp;'],
         ];
     }
 }
