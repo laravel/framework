@@ -166,8 +166,8 @@ class Factory
         $this->stubCallbacks = $this->stubCallbacks->merge(collect([
             function ($request, $options) use ($callback) {
                 $response = $callback instanceof Closure
-                    ? $callback($request, $options)
-                    : $callback;
+                                ? $callback($request, $options)
+                                : $callback;
 
                 if ($response instanceof PromiseInterface) {
                     $options['on_stats'](new TransferStats(
