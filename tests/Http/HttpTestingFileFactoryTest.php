@@ -44,8 +44,9 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageGif()
     {
-        if (! function_exists('imagegif'))
+        if (! function_exists('imagegif')) {
             $this->markTestSkipped('The extension gd is missing from your system or was compiled without GIF support.');
+        }
 
         $image = (new FileFactory)->image('test.gif');
 
@@ -57,8 +58,9 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWebp()
     {
-        if (! function_exists('imagewebp'))
+        if (! function_exists('imagewebp')) {
             $this->markTestSkipped('The extension gd is missing from your system or was compiled without WEBP support.');
+        }
 
         $image = (new FileFactory)->image('test.webp');
 
@@ -70,8 +72,9 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWbmp()
     {
-        if (! function_exists('imagewbmp'))
+        if (! function_exists('imagewbmp')) {
             $this->markTestSkipped('The extension gd is missing from your system or was compiled without WBMP support.');
+        }
 
         $image = (new FileFactory)->image('test.wbmp');
 
@@ -83,8 +86,9 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageBmp()
     {
-        if (! function_exists('imagebmp'))
+        if (! function_exists('imagebmp')) {
             $this->markTestSkipped('The extension gd is missing from your system or was compiled without BMP support.');
+        }
 
         $image = (new FileFactory)->image('test.bmp');
 
