@@ -293,6 +293,52 @@ trait BuildsQueries
     }
 
     /**
+     * Paginate the given query into a cursor paginator.
+     *
+     * @param  int  $perPage
+     * @param  array  $columns
+     * @param  string  $cursorName
+     * @param  string|null  $cursor
+     * @return \Illuminate\Contracts\Pagination\CursorPaginator
+     */
+    protected function runCursorPaginate($perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
+    {
+        $cursor = $cursor ?: CursorPaginator::resolveCurrentCursor($cursorName);
+
+        $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
+
+        if ($cursor !== null) {
+            $addCursorConditions = function (self $builder, $prev, $i) use (&$addCursorConditions, $orders, $cursor) {
+                if ($prev !== null) {
+                    $builder->where($prev, '=', $cursor->parameter($prev));
+                }
+
+                $builder->where(function (self $builder) use ($orders, $cursor, $i, $addCursorConditions) {
+                    ['column' => $column, 'direction' => $direction] = $orders[$i];
+                    $operator = $direction === 'asc' ? '>' : '<';
+
+                    $builder->where($column, $operator, $cursor->parameter($column));
+
+                    if ($i < $orders->count() - 1) {
+                        $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
+                            $addCursorConditions($builder, $column, $i + 1);
+                        });
+                    }
+                });
+            };
+            $addCursorConditions($this, null, 0);
+        }
+
+        $this->limit($perPage + 1);
+
+        return $this->cursorPaginator($this->get($columns), $perPage, $cursor, [
+            'path' => Paginator::resolveCurrentPath(),
+            'cursorName' => $cursorName,
+            'parameters' => $orders->pluck('column')->toArray(),
+        ]);
+    }
+
+    /**
      * Create a new length-aware paginator instance.
      *
      * @param  \Illuminate\Support\Collection  $items
