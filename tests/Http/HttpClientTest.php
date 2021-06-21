@@ -967,4 +967,19 @@ class HttpClientTest extends TestCase
 
         m::close();
     }
+
+    public function testRequestIsMacroable()
+    {
+        Request::macro('customMethod', function () {
+            return 'yes!';
+        });
+
+        $this->factory->fake(function (Request $request) {
+            $this->assertSame('yes!', $request->customMethod());
+
+            return $this->factory->response();
+        });
+
+        $this->factory->get('https://example.com');
+    }
 }
