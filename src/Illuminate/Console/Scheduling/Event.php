@@ -455,6 +455,23 @@ class Event
     }
 
     /**
+     * E-mail the results of the scheduled operation if it success.
+     *
+     * @param  array|mixed  $addresses
+     * @return $this
+     */
+    public function emailOutputOnSuccess($addresses)
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        $addresses = Arr::wrap($addresses);
+
+        return $this->onSuccess(function (Mailer $mailer) use ($addresses) {
+            $this->emailOutput($mailer, $addresses, false);
+        });
+    }
+
+    /**
      * Ensure that the command output is being captured.
      *
      * @return void
