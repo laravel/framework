@@ -68,12 +68,8 @@ use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
 use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
-<<<<<<< HEAD
 use Illuminate\Queue\Console\PruneBatchesCommand as QueuePruneBatchesCommand;
-=======
-use Illuminate\Queue\Console\PruneBatchesCommand as PruneBatchesQueueCommand;
-use Illuminate\Queue\Console\PruneFailedJobsCommand;
->>>>>>> 8.x
+use Illuminate\Queue\Console\PruneFailedJobsCommand as QueuePruneFailedJobsCommand;
 use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
 use Illuminate\Queue\Console\RetryBatchCommand as QueueRetryBatchCommand;
 use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
@@ -99,7 +95,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConfigCache' => ConfigCacheCommand::class,
         'ConfigClear' => ConfigClearCommand::class,
         'Db' => DbCommand::class,
-<<<<<<< HEAD
         'DbWipe' => WipeCommand::class,
         'Down' => DownCommand::class,
         'Environment' => EnvironmentCommand::class,
@@ -116,6 +111,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueForget' => ForgetFailedQueueCommand::class,
         'QueueListen' => QueueListenCommand::class,
         'QueuePruneBatches' => QueuePruneBatchesCommand::class,
+        'QueuePruneFailedJobs' => QueuePruneFailedJobsCommand::class,
         'QueueRestart' => QueueRestartCommand::class,
         'QueueRetry' => QueueRetryCommand::class,
         'QueueRetryBatch' => QueueRetryBatchCommand::class,
@@ -125,34 +121,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'RouteList' => RouteListCommand::class,
         'SchemaDump' => DumpCommand::class,
         'Seed' => SeedCommand::class,
-=======
-        'DbWipe' => 'command.db.wipe',
-        'Down' => 'command.down',
-        'Environment' => 'command.environment',
-        'EventCache' => 'command.event.cache',
-        'EventClear' => 'command.event.clear',
-        'EventList' => 'command.event.list',
-        'KeyGenerate' => 'command.key.generate',
-        'Optimize' => 'command.optimize',
-        'OptimizeClear' => 'command.optimize.clear',
-        'PackageDiscover' => 'command.package.discover',
-        'QueueClear' => 'command.queue.clear',
-        'QueueFailed' => 'command.queue.failed',
-        'QueueFlush' => 'command.queue.flush',
-        'QueueForget' => 'command.queue.forget',
-        'QueueListen' => 'command.queue.listen',
-        'QueuePruneBatches' => 'command.queue.prune-batches',
-        'QueuePruneFailedJobs' => 'command.queue.prune-failed-jobs',
-        'QueueRestart' => 'command.queue.restart',
-        'QueueRetry' => 'command.queue.retry',
-        'QueueRetryBatch' => 'command.queue.retry-batch',
-        'QueueWork' => 'command.queue.work',
-        'RouteCache' => 'command.route.cache',
-        'RouteClear' => 'command.route.clear',
-        'RouteList' => 'command.route.list',
-        'SchemaDump' => 'command.schema.dump',
-        'Seed' => 'command.seed',
->>>>>>> 8.x
         'ScheduleFinish' => ScheduleFinishCommand::class,
         'ScheduleList' => ScheduleListCommand::class,
         'ScheduleRun' => ScheduleRunCommand::class,
@@ -712,7 +680,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueuePruneFailedJobsCommand()
     {
         $this->app->singleton('command.queue.prune-failed-jobs', function () {
-            return new PruneFailedJobsCommand;
+            return new QueuePruneFailedJobsCommand;
         });
     }
 
