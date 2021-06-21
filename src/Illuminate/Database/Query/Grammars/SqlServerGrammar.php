@@ -181,14 +181,8 @@ class SqlServerGrammar extends Grammar
 
         unset($components['orders']);
 
-        // As this moves the order statement to be part of the "select" statement, we might need to
-        // move the bindings to the right position: right after "select".
         if ($this->queryOrderContainsSubquery($query)) {
-            $preferredBindingOrder = ['select', 'order', 'from', 'join', 'where', 'groupBy', 'having', 'union', 'unionOrder'];
-            $sortedBindings = Arr::sort($query->bindings, function ($bindings, $key) use ($preferredBindingOrder) {
-                return array_search($key, $preferredBindingOrder);
-            });
-            $query->bindings = $sortedBindings;
+            $query->bindings = $this->sortBindingsForSubqueryOrderBy($query);
         }
 
         // Next we need to calculate the constraints that should be placed on the query
@@ -200,7 +194,18 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Check if the query order by clauses contain a subquery.
+     * Compile the over statement for a table expression.
+     *
+     * @param  string  $orderings
+     * @return string
+     */
+    protected function compileOver($orderings)
+    {
+        return ", row_number() over ({$orderings}) as row_num";
+    }
+
+    /**
+     * Determine if the query's order by clauses contain a subquery.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return bool
@@ -217,14 +222,16 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile the over statement for a table expression.
+     * Move the order bindings to be after the "select" statement to account for a order by subquery.
      *
-     * @param  string  $orderings
-     * @return string
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return array
      */
-    protected function compileOver($orderings)
+    protected function sortBindingsForSubqueryOrderBy($query)
     {
-        return ", row_number() over ({$orderings}) as row_num";
+        return Arr::sort($query->bindings, function ($bindings, $key) {
+            return array_search($key, ['select', 'order', 'from', 'join', 'where', 'groupBy', 'having', 'union', 'unionOrder']);
+        });
     }
 
     /**
