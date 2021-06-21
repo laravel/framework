@@ -130,7 +130,7 @@ trait InteractsWithDatabase
     {
         if ($value instanceof Jsonable) {
             $value = $value->toJson();
-        } elseif (is_array($value)) {
+        } elseif (is_array($value) || is_object($value)) {
             $value = json_encode($value);
         }
 
