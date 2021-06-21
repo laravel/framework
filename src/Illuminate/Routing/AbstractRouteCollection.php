@@ -144,6 +144,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
                 'defaults' => $route->defaults,
                 'wheres' => $route->wheres,
                 'bindingFields' => $route->bindingFields(),
+                'resolvers' => $route->resolvers(),
                 'lockSeconds' => $route->locksFor(),
                 'waitSeconds' => $route->waitsFor(),
             ];
