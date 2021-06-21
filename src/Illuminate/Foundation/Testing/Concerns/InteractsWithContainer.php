@@ -42,22 +42,6 @@ trait InteractsWithContainer
     }
 
     /**
-     * Register an instance of an object as a singleton in the container.
-     *
-     * @param $abstract
-     * @param $instance
-     * @return \Mockery\MockInterface
-     */
-    protected function singletonInstance($abstract, $instance)
-    {
-        $this->app->singleton($abstract, function () use ($instance) {
-            return $instance;
-        });
-
-        return $instance;
-    }
-
-    /**
      * Mock an instance of an object in the container.
      *
      * @param  string  $abstract
@@ -91,6 +75,22 @@ trait InteractsWithContainer
     protected function spy($abstract, Closure $mock = null)
     {
         return $this->singletonInstance($abstract, Mockery::spy(...array_filter(func_get_args())));
+    }
+
+    /**
+     * Register an instance of an object as a singleton in the container.
+     *
+     * @param  string  $abstract
+     * @param  \Mockery\MockInterface  $instance
+     * @return \Mockery\MockInterface
+     */
+    protected function singletonInstance($abstract, $instance)
+    {
+        $this->app->singleton($abstract, function () use ($instance) {
+            return $instance;
+        });
+
+        return $instance;
     }
 
     /**
