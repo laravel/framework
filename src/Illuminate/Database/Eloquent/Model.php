@@ -1474,6 +1474,22 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     }
 
     /**
+     * Reset the model's original attributes.
+     *
+     * @return $this
+     */
+    public function clean()
+    {
+        if (! $this->exists || $this->isClean()) {
+            return $this;
+        }
+
+        $this->setRawAttributes($this->getOriginal());
+
+        return $this;
+    }
+
+    /**
      * Clone the model into a new, non-existing instance.
      *
      * @param  array|null  $except
