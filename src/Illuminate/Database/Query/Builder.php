@@ -1802,6 +1802,21 @@ class Builder
     }
 
     /**
+     * Add "where column" clauses to the query when values are truthy.
+     *
+     * @param  array  $columns
+     * @return $this
+     */
+    public function whenWhere(array $columns)
+    {
+        collect($columns)->map(fn ($value, $column) =>
+              $this->when($value, fn ($query) => $query->where($column, $value))
+        );
+
+        return $this;
+    }
+
+    /**
      * Add a single dynamic where clause statement to the query.
      *
      * @param  string  $segment

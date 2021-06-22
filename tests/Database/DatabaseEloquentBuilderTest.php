@@ -1468,6 +1468,17 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($expected, $query->toSql());
     }
 
+    public function testWhenWhere()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $columnValues = ['foo' => 'bar', 'baz' => 'qux'];
+
+        $builder = $model->whenWhere($columnValues);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "foo" = ? and "baz" = ?', $builder->toSql());
+        $this->assertEquals(['bar', 'qux'], $builder->getBindings());
+    }
+
     public function testLatestWithoutColumnWithCreatedAt()
     {
         $model = $this->getMockModel();
