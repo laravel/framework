@@ -34,6 +34,7 @@ class StubPublishCommand extends Command
 
         $files = [
             __DIR__.'/stubs/cast.stub' => $stubsPath.'/cast.stub',
+            __DIR__.'/stubs/event.stub' => $stubsPath.'/event.stub',
             __DIR__.'/stubs/job.queued.stub' => $stubsPath.'/job.queued.stub',
             __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
             __DIR__.'/stubs/markdown-notification.stub' => $stubsPath.'/markdown-notification.stub',
