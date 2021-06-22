@@ -175,7 +175,7 @@ trait HasAttributes
     protected function addDateAttributesToArray(array $attributes)
     {
         foreach ($this->getDates() as $key) {
-            if (! isset($attributes[$key])) {
+            if (! is_string($key) || ! isset($attributes[$key])) {
                 continue;
             }
 
