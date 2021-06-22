@@ -143,7 +143,7 @@ class Route
     protected $bindingFields = [];
 
     /**
-     * Custom resolver for a given parameters
+     * Custom resolver for a given parameters.
      *
      * @var array
      */
@@ -550,7 +550,7 @@ class Route
     }
 
     /**
-     * Attach custom route binding resolver
+     * Attach custom route binding resolver.
      *
      * @param  string  $parameter
      * @param  \Closure|string  $resolver
@@ -571,7 +571,7 @@ class Route
      */
     public function resolveWithTrashed($parameter)
     {
-       return $this->resolve($parameter, 'resolveRouteBindingWithTrashed');
+        return $this->resolve($parameter, 'resolveRouteBindingWithTrashed');
     }
 
     /**

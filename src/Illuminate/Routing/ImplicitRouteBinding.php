@@ -70,7 +70,7 @@ class ImplicitRouteBinding
     }
 
     /**
-     * Resolve model instance using custom or default resolver
+     * Resolve model instance using custom or default resolver.
      *
      * @param $route
      * @param $instance
