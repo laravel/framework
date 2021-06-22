@@ -27,4 +27,12 @@ class InteractsWithContainerTest extends TestCase
         $this->assertSame($handler, resolve(Mix::class));
         $this->assertSame($this, $instance);
     }
+
+    public function testSingletonBoundInstancesCanBeResolved()
+    {
+        $this->singletonInstance('foo', 'bar');
+
+        $this->assertEquals('bar', $this->app->make('foo'));
+        $this->assertEquals('bar', $this->app->make('foo', ['with' => 'params']));
+    }
 }
