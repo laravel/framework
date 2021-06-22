@@ -624,8 +624,6 @@ class PendingRequest
             $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
         }
 
-        ksort($results);
-
         return $results;
     }
 
