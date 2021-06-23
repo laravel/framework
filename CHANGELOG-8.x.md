@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.48.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.48.1...8.x)
+
+
+## [v8.48.1 (2021-06-23)](https://github.com/laravel/framework/compare/v8.48.0...v8.48.1)
+
+### Fixed
+- Order of Modifiers Amended in MySqlGrammar ([#37782](https://github.com/laravel/framework/pull/37782))
 
 
 ## [v8.48.0 (2021-06-23)](https://github.com/laravel/framework/compare/v8.47.0...v8.48.0)
