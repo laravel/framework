@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.28...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.29...6.x)
+
+
+## [v6.20.29 (2021-06-22)](https://github.com/laravel/framework/compare/v6.20.28...v6.20.29)
+
+### Changed
+- Removed unnecessary checks in RequiredIf validation, fixed tests ([#37700](https://github.com/laravel/framework/pull/37700))
 
 
 ## [v6.20.28 (2021-06-15)](https://github.com/laravel/framework/compare/v6.20.27...v6.20.28)
