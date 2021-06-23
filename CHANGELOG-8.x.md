@@ -1,6 +1,30 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.47.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.48.0...8.x)
+
+
+## [v8.48.0 (2021-06-23)](https://github.com/laravel/framework/compare/v8.47.0...v8.48.0)
+
+### Added
+- Added a queue:prune-failed command ([#37696](https://github.com/laravel/framework/pull/37696), [7aca658](https://github.com/laravel/framework/commit/7aca65833887d0760fc61e320bc46b80c9cb3398))
+- Added `Illuminate/Filesystem/FilesystemManager::build()` ([#37720](https://github.com/laravel/framework/pull/37720), [c21fc12](https://github.com/laravel/framework/commit/c21fc126dc87ff357c7ae5c79014135f693d0ffe))
+- Allow customising the event.stub file ([#37761](https://github.com/laravel/framework/pull/37761))
+- Added `Illuminate/Collections/Collection::sliding()` and `Illuminate/Collections/LazyCollection::sliding()` ([#37751](https://github.com/laravel/framework/pull/37751))
+- Make `Illuminate\Http\Client\Request` macroable ([#37744](https://github.com/laravel/framework/pull/37744))
+- Added GIF, WEBP, WBMP, BMP support to FileFactory::image() ([#37743](https://github.com/laravel/framework/pull/37743))
+- Dispatch 'connection failed' event in http client ([#37740](https://github.com/laravel/framework/pull/37740))
+
+### Fixed
+- Adds a small fix for unicode with blade echo handlers ([#37697](https://github.com/laravel/framework/pull/37697))
+- Solve the Primary Key issue in databases with sql_require_primary_key enabled ([#37715](https://github.com/laravel/framework/pull/37715))
+
+### Changed
+- Removed unnecessary checks in RequiredIf validation, fixed tests ([#37700](https://github.com/laravel/framework/pull/37700))
+- Replace non ASCII apostrophe in the email notification template ([#37709](https://github.com/laravel/framework/pull/37709))
+- Change the order of the bindings for a Sql Server query with a offset and a subquery order by ([#37728](https://github.com/laravel/framework/pull/37728), [401928b](https://github.com/laravel/framework/commit/401928b4ba2be400687fdd3c81830b260b51500b))
+- Bind mock instances as singletons so they are not overwritten ([#37746](https://github.com/laravel/framework/pull/37746))
+- Encode objects when casting as JSON ([#37759](https://github.com/laravel/framework/pull/37759))
+- Call on_stats handler in Http stub callbacks ([#37738](https://github.com/laravel/framework/pull/37738))
 
 
 ## [v8.47.0 (2021-06-16)](https://github.com/laravel/framework/compare/v8.46.0...v8.47.0)
