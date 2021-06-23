@@ -196,13 +196,30 @@ abstract class AbstractCursorPaginator implements Htmlable
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
                 if ($item instanceof ArrayAccess || is_array($item)) {
-                    return $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')];
+                    return $this->castParameter($item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')]);
                 } elseif (is_object($item)) {
-                    return $item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')};
+                    return $this->castParameter($item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')});
                 }
 
                 throw new Exception('Only arrays and objects are supported when cursor paginating items.');
             })->toArray();
+    }
+
+    /**
+     * Casts the given item parameter. When the given parameter is an object and can
+     * be cast to a string, the stringified representation will be returned,
+     * otherwise the original parameter will be returned.
+     *
+     * @param  mixed  $parameter
+     * @return string
+     */
+    public function castParameter($parameter)
+    {
+        if (is_object($parameter) && method_exists($parameter, '__toString')) {
+            return (string) $parameter;
+        }
+
+        return $parameter;
     }
 
     /**
