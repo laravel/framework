@@ -7,6 +7,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Http\Client\CacheHandler;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -40,6 +41,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\PendingRequest withUserAgent(string $userAgent)
  * @method \Illuminate\Http\Client\PendingRequest withoutRedirecting()
  * @method \Illuminate\Http\Client\PendingRequest withoutVerifying()
+ * @method \Illuminate\Http\Client\CacheOptions cache()
  * @method array pool(callable $callback)
  * @method \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
@@ -63,6 +65,13 @@ class Factory
      * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $dispatcher;
+
+    /**
+     * The cache handler implementation.
+     *
+     * @var \Illuminate\Contracts\Http\Client\CacheHandler|null
+     */
+    protected $cacheHandler;
 
     /**
      * The stub callables that will handle requests.
@@ -96,11 +105,13 @@ class Factory
      * Create a new factory instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
+     * @param  \Illuminate\Contracts\Http\Client\CacheHandler|null $cacheHandler
      * @return void
      */
-    public function __construct(Dispatcher $dispatcher = null)
+    public function __construct(Dispatcher $dispatcher = null, CacheHandler $cacheHandler = null)
     {
         $this->dispatcher = $dispatcher;
+        $this->cacheHandler = $cacheHandler;
 
         $this->stubCallbacks = collect();
     }
@@ -370,6 +381,16 @@ class Factory
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * Get the current cache handler implementation.
+     *
+     * @return \Illuminate\Contracts\Http\Client\CacheHandler|null
+     */
+    public function getCacheHandler()
+    {
+        return $this->cacheHandler;
     }
 
     /**

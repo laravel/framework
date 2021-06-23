@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
@@ -15,6 +16,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
 class PendingRequest
@@ -139,6 +141,13 @@ class PendingRequest
      * @var \Illuminate\Http\Client\Request|null
      */
     protected $request;
+
+    /**
+     * The requested options for caching the response.
+     *
+     * @var \Illuminate\Http\Client\CacheOptions|null
+     */
+    protected $cacheOptions = null;
 
     /**
      * Create a new HTTP Client instance.
@@ -672,6 +681,7 @@ class PendingRequest
                         $response->throw();
                     }
 
+                    $this->cacheResponse($this->request, $response);
                     $this->dispatchResponseReceivedEvent($response);
                 });
             } catch (ConnectException $e) {
@@ -680,6 +690,24 @@ class PendingRequest
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
         }, $this->retryDelay ?? 100);
+    }
+
+    /**
+     * Cache the given response using the configured cache handler.
+     *
+     * @return void
+     */
+    protected function cacheResponse(Request $request, Response $response)
+    {
+        if (!$handler = optional($this->factory)->getCacheHandler()) {
+            return;
+        }
+
+        if ($handler->hasCachedResponse($request)) {
+            return;
+        }
+
+        return $handler->handleCaching($request, $response);
     }
 
     /**
@@ -803,6 +831,7 @@ class PendingRequest
         return tap(HandlerStack::create(), function ($stack) {
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());
+            $stack->push($this->buildCacheHandler());
             $stack->push($this->buildStubHandler());
 
             $this->middleware->each(function ($middleware) use ($stack) {
@@ -838,7 +867,7 @@ class PendingRequest
 
                 return $promise->then(function ($response) use ($request, $options) {
                     optional($this->factory)->recordRequestResponsePair(
-                        (new Request($request))->withData($options['laravel_data']),
+                        $this->buildRequest($request, $options),
                         new Response($response)
                     );
 
@@ -846,6 +875,41 @@ class PendingRequest
                 });
             };
         };
+    }
+
+    /**
+     * Build the cache handler.
+     *
+     * @return \Closure
+     */
+    public function buildCacheHandler()
+    {
+        return function ($handler) {
+            return function ($request, $options) use ($handler) {
+                $clientRequest = $this->buildRequest($request, $options);
+                $cacheHandler = optional($this->factory)->getCacheHandler();
+
+                if (!$clientRequest->cacheOptions() || !optional($cacheHandler)->hasCachedResponse($clientRequest)) {
+                    return $handler($request, $options);
+                }
+
+                $response = $cacheHandler->getCachedResponse($clientRequest);
+
+                return $response instanceof PromiseInterface ? $response : $this->wrapInPromise($response);
+            };
+        };
+    }
+
+    /**
+     * Safely wraps the given http client response in a guzzle promise.
+     *
+     * @return \GuzzleHttp\Promise\FulfilledPromise|\GuzzleHttp\Promise\Promise|PromiseInterface
+     */
+    protected function wrapInPromise(Response $response)
+    {
+        return class_exists(GuzzleHttp\Promise\Create::class)
+            ? \GuzzleHttp\Promise\Create::promiseFor($response->toPsrResponse())
+            : \GuzzleHttp\Promise\promise_for($response->toPsrResponse());
     }
 
     /**
@@ -859,7 +923,7 @@ class PendingRequest
             return function ($request, $options) use ($handler) {
                 $response = ($this->stubCallbacks ?? collect())
                      ->map
-                     ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
+                     ->__invoke($this->buildRequest($request, $options), $options)
                      ->filter()
                      ->first();
 
@@ -913,7 +977,7 @@ class PendingRequest
     {
         return tap($request, function ($request) use ($options) {
             $this->beforeSendingCallbacks->each->__invoke(
-                (new Request($request))->withData($options['laravel_data']),
+                $this->buildRequest($request, $options),
                 $options,
                 $this
             );
@@ -1008,6 +1072,16 @@ class PendingRequest
     }
 
     /**
+     * Build a Laravel Request object.
+     *
+     * @return \Illuminate\Http\Client\Request
+     */
+    protected function buildRequest(RequestInterface $request, array $options)
+    {
+        return (new Request($request))->withData($options['laravel_data'])->withCacheOptions($this->cacheOptions);
+    }
+
+    /**
      * Set the client instance.
      *
      * @param  \GuzzleHttp\Client  $client
@@ -1018,5 +1092,23 @@ class PendingRequest
         $this->client = $client;
 
         return $this;
+    }
+
+    /**
+     * Set the desired cache options to use.
+     *
+     * @param \Illuminate\Http\Client\CacheOptions $cacheOptions
+     * @return $this
+     */
+    public function withCacheOptions(CacheOptions $cacheOptions)
+    {
+        $this->cacheOptions = $cacheOptions;
+
+        return $this;
+    }
+
+    public function cache()
+    {
+        return new CacheOptions($this);
     }
 }

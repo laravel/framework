@@ -27,6 +27,13 @@ class Request implements ArrayAccess
     protected $data;
 
     /**
+     * The requested caching options.
+     *
+     * @var CacheOptions|null
+     */
+    protected $cacheOptions;
+
+    /**
      * Create a new request instance.
      *
      * @param  \Psr\Http\Message\RequestInterface  $request
@@ -243,6 +250,29 @@ class Request implements ArrayAccess
     public function withData(array $data)
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * The requested caching options.
+     *
+     * @return CacheOptions|null
+     */
+    public function cacheOptions()
+    {
+        return $this->cacheOptions;
+    }
+
+    /**
+     * Set the desired cache options to use.
+     *
+     * @param \Illuminate\Http\Client\CacheOptions $cacheOptions
+     * @return $this
+     */
+    public function withCacheOptions($cacheOptions)
+    {
+        $this->cacheOptions = $cacheOptions;
 
         return $this;
     }

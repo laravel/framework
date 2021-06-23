@@ -3,9 +3,19 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Closure;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Psr7\Utils;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
+
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\ResponseInterface;
+
+use Psr\Http\Message\UriInterface;
+
+use function GuzzleHttp\Psr7\stream_for;
 
 class Response implements ArrayAccess
 {
@@ -26,6 +36,13 @@ class Response implements ArrayAccess
      * @var array
      */
     protected $decoded;
+
+    /**
+     * The serializable contents of the response body.
+     *
+     * @var string|null
+     */
+    protected $storedBody;
 
     /**
      * Create a new response instance.
@@ -355,5 +372,19 @@ class Response implements ArrayAccess
         return static::hasMacro($method)
                     ? $this->macroCall($method, $parameters)
                     : $this->response->{$method}(...$parameters);
+    }
+
+    public function __sleep()
+    {
+        $this->storedBody = $this->response->getBody()->__toString();
+        $this->response->getBody()->rewind();
+
+        return array_keys(get_object_vars($this));
+    }
+
+    public function __wakeup()
+    {
+        $body = class_exists(Utils::class) ? Utils::streamFor($this->storedBody) : stream_for($this->storedBody);
+        $this->response = $this->response->withBody($body);
     }
 }

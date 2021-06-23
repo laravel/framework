@@ -967,6 +967,7 @@ class HttpClientTest extends TestCase
         $events->shouldReceive('dispatch')->once()->with(m::type(ResponseReceived::class));
 
         $factory = new Factory($events);
+        $factory->fake(['*' => $factory->response()]);
 
         $client = $factory->timeout(10);
         $clonedClient = clone $client;

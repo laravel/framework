@@ -2,7 +2,9 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Http\Client\CacheHandler as CacheHandlerContract;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Http\Client\CacheHandlers\CacheHandler;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 
@@ -32,6 +34,10 @@ class CacheServiceProvider extends ServiceProvider implements DeferrableProvider
         });
 
         $this->app->singleton(RateLimiter::class);
+
+        $this->app->singleton(CacheHandlerContract::class, function ($app) {
+            return new CacheHandler($app['cache']->driver());
+        });
     }
 
     /**
@@ -42,7 +48,7 @@ class CacheServiceProvider extends ServiceProvider implements DeferrableProvider
     public function provides()
     {
         return [
-            'cache', 'cache.store', 'cache.psr6', 'memcached.connector', RateLimiter::class,
+            'cache', 'cache.store', 'cache.psr6', 'memcached.connector', RateLimiter::class, CacheHandlerContract::class,
         ];
     }
 }
