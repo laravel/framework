@@ -40,7 +40,7 @@ trait ResponseTrait
     public function statusText()
     {
         return $this->statusText;
-    }    
+    }
 
     /**
      * Get the content of the response.

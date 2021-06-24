@@ -119,7 +119,7 @@ class HttpResponseTest extends TestCase
         $response->setStatusCode(404);
         $this->assertSame('Not Found', $response->statusText());
     }
-    
+
     public function testOnlyInputOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');
