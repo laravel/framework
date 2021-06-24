@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Mix;
+use Illuminate\Http\Request;
 use Mockery\MockInterface;
 use Orchestra\Testbench\TestCase;
 use stdClass;
@@ -43,7 +43,7 @@ class InteractsWithContainerTest extends TestCase
         $this->app->instance('request', Request::create('/example'));
 
         $this->mock(Request::class, function (MockInterface $mock) {
-
+            //
         });
 
         $this->assertInstanceOf(MockInterface::class, resolve(Request::class));
