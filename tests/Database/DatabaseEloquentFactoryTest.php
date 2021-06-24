@@ -406,7 +406,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         }));
 
         $users = FactoryTestUserFactory::times(2)->sequence(function ($sequence) {
-            return ['name' => 'index: ' . $sequence->index];
+            return ['name' => 'index: '.$sequence->index];
         })->create();
 
         $this->assertSame('index: 0', $users[0]->name);
