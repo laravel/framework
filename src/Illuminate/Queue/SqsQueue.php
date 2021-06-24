@@ -110,9 +110,20 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
-        ])->get('MessageId');
+        $args = [
+            'QueueUrl' => $this->getQueue($queue),
+            'MessageBody' => $payload, 
+        ];
+
+        /** Add MessageGroupId to a Fifo SQS Queue */
+        if (\strpos($queue, '.fifo')) {
+            $args = \array_merge($args, [
+                'MessageGroupId' => md5($queue)
+            ]);
+        }
+
+        return $this->sqs->sendMessage($args)
+            ->get('MessageId');
     }
 
     /**
@@ -132,11 +143,21 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $queue,
             $delay,
             function ($payload, $queue, $delay) {
-                return $this->sqs->sendMessage([
+                $args = [
                     'QueueUrl' => $this->getQueue($queue),
                     'MessageBody' => $payload,
                     'DelaySeconds' => $this->secondsUntil($delay),
-                ])->get('MessageId');
+                ];
+
+                /** Add MessageGroupId to a Fifo SQS Queue */
+                if (\strpos($queue, '.fifo')) {
+                    $args = \array_merge($args, [
+                        'MessageGroupId' => md5($queue)
+                    ]);
+                }
+
+                return $this->sqs->sendMessage($args)
+                    ->get('MessageId');
             }
         );
     }
