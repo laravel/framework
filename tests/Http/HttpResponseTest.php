@@ -117,7 +117,7 @@ class HttpResponseTest extends TestCase
     {
         $response = new Response('foo');
         $response->setStatusCode(404);
-        $this->assertSame('Not Found', $response->getStatusText());
+        $this->assertSame('Not Found', $response->statusText());
     }
     
     public function testOnlyInputOnRedirect()
