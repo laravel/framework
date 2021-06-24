@@ -596,7 +596,7 @@ class BelongsToMany extends Relation
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes)
+    public function firstOrNew(array $attributes = [])
     {
         if (is_null($instance = $this->related->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes);
@@ -614,7 +614,7 @@ class BelongsToMany extends Relation
      * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
+    public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true)
     {
         if (is_null($instance = $this->related->where($attributes)->first())) {
             $instance = $this->create($attributes + $values, $joining, $touch);
