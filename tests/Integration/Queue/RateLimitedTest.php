@@ -63,7 +63,7 @@ class RateLimitedTest extends TestCase
         $job = m::mock(Job::class);
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->once()->withArgs(function($delay) {
+        $job->shouldReceive('release')->once()->withArgs(function ($delay) {
             return $delay >= 0;
         });
         $job->shouldReceive('isReleased')->andReturn(true);
