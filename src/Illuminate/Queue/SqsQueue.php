@@ -112,13 +112,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     {
         $args = [
             'QueueUrl' => $this->getQueue($queue),
-            'MessageBody' => $payload, 
+            'MessageBody' => $payload,
         ];
 
         /** Add MessageGroupId to a Fifo SQS Queue */
         if (\strpos($queue, '.fifo')) {
             $args = \array_merge($args, [
-                'MessageGroupId' => md5($queue)
+                'MessageGroupId' => md5($queue),
             ]);
         }
 
@@ -152,7 +152,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
                 /** Add MessageGroupId to a Fifo SQS Queue */
                 if (\strpos($queue, '.fifo')) {
                     $args = \array_merge($args, [
-                        'MessageGroupId' => md5($queue)
+                        'MessageGroupId' => md5($queue),
                     ]);
                 }
 
