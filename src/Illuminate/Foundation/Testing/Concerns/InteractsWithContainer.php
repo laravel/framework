@@ -86,6 +86,8 @@ trait InteractsWithContainer
      */
     protected function singletonInstance($abstract, $instance)
     {
+        $abstract = $this->app->getAlias($abstract);
+
         $this->app->singleton($abstract, function () use ($instance) {
             return $instance;
         });
