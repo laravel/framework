@@ -66,4 +66,14 @@ class CacheRateLimiterTest extends TestCase
 
         $rateLimiter->clear('key');
     }
+
+    public function testAvailableInReturnsPositiveValues()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('get')->andReturn(now()->subSeconds(60)->getTimestamp(), null);
+        $rateLimiter = new RateLimiter($cache);
+
+        $this->assertTrue($rateLimiter->availableIn('key:timer') >= 0);
+        $this->assertTrue($rateLimiter->availableIn('key:timer') >= 0);
+    }
 }
