@@ -16,21 +16,14 @@ class Sequence
      *
      * @var int
      */
-    protected $count;
+    public $count;
 
     /**
-     * The current index of the sequence.
+     * The current index of the sequence iteration.
      *
      * @var int
      */
-    protected $index = 0;
-
-    /**
-     * The current loop of the sequence.
-     *
-     * @var int
-     */
-    protected $loop = 0;
+    public $index = 0;
 
     /**
      * Create a new sequence instance.
@@ -51,10 +44,8 @@ class Sequence
      */
     public function __invoke()
     {
-        $this->index = $this->loop % $this->count;
-
-        return tap(value($this->sequence[$this->index], $this->loop, $this->count), function () {
-            $this->loop = $this->loop + 1;
+        return tap(value($this->sequence[$this->index % $this->count], $this), function () {
+            $this->index = $this->index + 1;
         });
     }
 }
