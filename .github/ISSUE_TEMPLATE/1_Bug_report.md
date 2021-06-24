@@ -6,8 +6,8 @@ about: "Report something that's broken. Please ensure your Laravel version is st
 <!-- DO NOT THROW THIS AWAY -->
 <!-- Fill out the FULL versions with patch versions -->
 
-- Laravel Version: #.#.#
-- PHP Version: #.#.#
+- Laravel Version: #.#.# <!-- php artisan --version -->
+- PHP Version: #.#.# <!-- php --version -->
 - Database Driver & Version:
 
 ### Description:
