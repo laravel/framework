@@ -20,15 +20,14 @@ class RouteGroup
             unset($old['domain']);
         }
 
-        $new = array_merge(static::formatAs($new, $old), [
-            'namespace' => static::formatNamespace($new, $old),
-            'prefix' => static::formatPrefix($new, $old, $prependExistingPrefix),
-            'where' => static::formatWhere($new, $old),
-        ]);
+        $newAttributes = static::formatAs($new, $old);
+        $newAttributes['namespace'] = static::formatNamespace($new, $old);
+        $newAttributes['prefix'] = static::formatPrefix($new, $old, $prependExistingPrefix);
+        $newAttributes['where'] = static::formatWhere($new, $old);
 
-        return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
-        ), $new);
+        unset($old['namespace'], $old['prefix'], $old['where'], $old['as']);
+
+        return array_merge_recursive($old, $newAttributes);
     }
 
     /**
@@ -77,10 +76,13 @@ class RouteGroup
      */
     protected static function formatWhere($new, $old)
     {
-        return array_merge(
-            $old['where'] ?? [],
-            $new['where'] ?? []
-        );
+        $wheres = $old['where'] ?? [];
+
+        foreach ($new['where'] ?? [] as $key => $where) {
+            $wheres[$key] = $where;
+        }
+
+        return $wheres;
     }
 
     /**

@@ -161,13 +161,15 @@ class Route
     {
         $this->uri = $uri;
         $this->methods = (array) $methods;
-        $this->action = Arr::except($this->parseAction($action), ['prefix']);
+        $this->action = $this->parseAction($action);
+
+        unset($this->action['prefix']);
 
         if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
         }
 
-        $this->prefix(is_array($action) ? Arr::get($action, 'prefix') : '');
+        $this->prefix(is_array($action) ? $action['prefix'] ?? '' : '');
     }
 
     /**

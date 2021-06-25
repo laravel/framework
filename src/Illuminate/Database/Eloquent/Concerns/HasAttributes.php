@@ -1176,7 +1176,13 @@ trait HasAttributes
     public function getCasts()
     {
         if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+            $casts = $this->casts;
+
+            if (! isset($casts[$this->getKeyName()])) {
+                $casts[$this->getKeyName()] = $this->getKeyType();
+            }
+
+            return $casts;
         }
 
         return $this->casts;
