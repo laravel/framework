@@ -976,6 +976,107 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Return the key of the signed middleware.
+     *
+     * @param  bool $sign
+     * @return string
+     */
+    protected function getSignedMiddlewareKey($sign)
+    {
+        return $sign ? 'middleware.required' : 'middleware.ignored';
+    }
+
+    /**
+     * Return the required middleware list.
+     *
+     * @param  bool $sign
+     * @param  array $parentMiddleware
+     * @return array
+     */
+    public function getSignedMiddleware($sign = true, $parentMiddleware = null)
+    {
+        $key = $this->getSignedMiddlewareKey($sign);
+
+        $signedMiddleware = $this->app->bound($key) ? $this->app->make($key) : [];
+
+        if (is_null($parentMiddleware)) {
+            return $signedMiddleware;
+        }
+
+        foreach ($signedMiddleware as $index => $abstract) {
+            if (array_search($abstract, $parentMiddleware) === false) {
+                unset($signedMiddleware[$index]);
+            }
+        }
+
+        return $signedMiddleware;
+    }
+
+    /**
+     * Add a new item to the signed middleware list.
+     *
+     * @param  string|array  $middleware
+     * @param  bool $sign
+     * @return $this
+     */
+    public function pushSignedMiddleware($middleware, $sign = true)
+    {
+        $signedMiddleware = $this->getSignedMiddleware($sign);
+
+        foreach ((array) $middleware as $abstract) {
+            if (array_search($abstract, $signedMiddleware) === false) {
+                $signedMiddleware[] = $abstract;
+            }
+        }
+
+        $this->instance(
+            $this->getSignedMiddlewareKey($sign),
+            $signedMiddleware
+        );
+
+        $this->forgetSignedMiddleware($middleware, !$sign);
+
+        return $this;
+    }
+
+    /**
+     * Remove an item from the signed middleware list.
+     *
+     * @param  string|array|null  $middleware
+     * @param  bool $sign
+     * @return $this
+     */
+    public function forgetSignedMiddleware($middleware = null, $sign = true)
+    {
+        $key = $this->getSignedMiddlewareKey($sign);
+
+        if (is_null($middleware)) {
+            return $this->forgetSignedMiddleware(
+                $this->getSignedMiddleware($sign),
+                $sign
+            );
+        }
+
+        $signedMiddleware = $this->getSignedMiddleware($sign);
+
+        foreach ((array) $middleware as $abstract) {
+            $index = array_search($abstract, $signedMiddleware);
+
+            if ($index !== false) {
+                if (!$sign) {
+                    unset($this[$abstract]);
+                }
+
+                unset($signedMiddleware[$index]);
+            }
+        }
+
+        $this->instance($key, $signedMiddleware);
+
+        return $this;
+    }
+
+    /**
      * Get the path to the cached services.php file.
      *
      * @return string

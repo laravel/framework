@@ -685,7 +685,11 @@ class Router implements BindingRegistrar, RegistrarContract
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
+        $routeMiddleware = $this->gatherRouteMiddleware($route);
+
+        $middleware = $shouldSkipMiddleware
+            ? $this->container->getSignedMiddleware(true, $routeMiddleware)
+            : $routeMiddleware;
 
         return (new Pipeline($this->container))
                         ->send($request)

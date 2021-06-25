@@ -138,6 +138,8 @@ trait MakesHttpRequests
         if (is_null($middleware)) {
             $this->app->instance('middleware.disable', true);
 
+            $this->app->forgetSignedMiddleware();
+
             return $this;
         }
 
@@ -149,6 +151,8 @@ trait MakesHttpRequests
                     return $next($request);
                 }
             });
+
+            $this->app->pushSignedMiddleware($middleware, false);
         }
 
         return $this;
@@ -165,11 +169,13 @@ trait MakesHttpRequests
         if (is_null($middleware)) {
             unset($this->app['middleware.disable']);
 
+            $this->app->forgetSignedMiddleware(null, false);
+
             return $this;
         }
 
         foreach ((array) $middleware as $abstract) {
-            unset($this->app[$abstract]);
+            $this->app->pushSignedMiddleware($abstract);
         }
 
         return $this;
