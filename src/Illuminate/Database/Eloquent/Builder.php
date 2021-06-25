@@ -635,10 +635,21 @@ class Builder
      */
     protected function eagerLoadRelation(array $models, $name, Closure $constraints)
     {
-        // First we will "back up" the existing where conditions on the query so we can
+        // First we will determine if the name has been aliased using an "as" clause on the name
+        // and if it has we will extract the actual relationship name and the desired name of
+        // the resulting column. This allows multiple instances on the same relationship name.
+        $segments = explode(' ', $name);
+
+        unset($alias);
+
+        if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
+            [$name, $alias] = [$segments[0], $segments[2]];
+        }
+
+        // Then we will "back up" the existing where conditions on the query so we can
         // add our eager constraints. Then we will merge the wheres that were on the
         // query back to it in order that any where conditions might be specified.
-        $relation = $this->getRelation($name);
+        $relation = $this->getRelation($name, $alias ?? null);
 
         $relation->addEagerConstraints($models);
 
@@ -648,8 +659,8 @@ class Builder
         // using the relationship instance. Then we just return the finished arrays
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
-            $relation->initRelation($models, $name),
-            $relation->getEager(), $name
+            $relation->initRelation($models, $alias ?? $name),
+            $relation->getEager(), $alias ?? $name
         );
     }
 
@@ -657,9 +668,10 @@ class Builder
      * Get the relation instance for the given relation name.
      *
      * @param  string  $name
+     * @param  string|null  $alias
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
-    public function getRelation($name)
+    public function getRelation($name, $alias = null)
     {
         // We want to run a relationship query without any constrains so that we will
         // not have to remove these where clauses manually which gets really hacky
@@ -672,7 +684,7 @@ class Builder
             }
         });
 
-        $nested = $this->relationsNestedUnder($name);
+        $nested = $this->relationsNestedUnder($name, $alias ?? $name);
 
         // If there are nested relationships set on the query, we will put those onto
         // the query instances so that they can be handled after this relationship
