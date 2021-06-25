@@ -33,9 +33,11 @@ class MakesHttpRequestsTest extends TestCase
         $this->withoutMiddleware();
         $this->assertTrue($this->app->has('middleware.disable'));
         $this->assertTrue($this->app->make('middleware.disable'));
+        $this->assertSame([], $this->app->make('middleware.required'));
 
         $this->withMiddleware();
         $this->assertFalse($this->app->has('middleware.disable'));
+        $this->assertSame([], $this->app->make('middleware.ignored'));
     }
 
     public function testWithoutAndWithMiddlewareWithParameter()
@@ -56,6 +58,14 @@ class MakesHttpRequestsTest extends TestCase
             'foo',
             $this->app->make(MyMiddleware::class)->handle('foo', $next)
         );
+        $this->assertContains(
+            MyMiddleware::class,
+            $this->app->make('middleware.ignored')
+        );
+        $this->assertNotContains(
+            MyMiddleware::class,
+            $this->app->make('middleware.required')
+        );
 
         $this->withMiddleware(MyMiddleware::class);
         $this->assertFalse($this->app->has(MyMiddleware::class));
@@ -63,6 +73,65 @@ class MakesHttpRequestsTest extends TestCase
             'fooWithMiddleware',
             $this->app->make(MyMiddleware::class)->handle('foo', $next)
         );
+        $this->assertContains(
+            MyMiddleware::class,
+            $this->app->make('middleware.required')
+        );
+        $this->assertNotContains(
+            MyMiddleware::class,
+            $this->app->make('middleware.ignored')
+        );
+    }
+
+    public function testWithoutAndWithMiddlewareWithAndWithoutParameter()
+    {
+        $next = function ($request) {
+            return $request;
+        };
+
+        $this->assertFalse($this->app->has(MyMiddleware::class));
+        $this->assertSame(
+            'fooWithMiddleware',
+            $this->app->make(MyMiddleware::class)->handle('foo', $next)
+        );
+
+        $this->withoutMiddleware();
+        $this->assertTrue($this->app->has('middleware.disable'));
+        $this->assertTrue($this->app->make('middleware.disable'));
+        $this->assertSame([], $this->app->make('middleware.required'));
+
+        $this->withMiddleware(MyMiddleware::class);
+        $this->assertSame(
+            'fooWithMiddleware',
+            $this->app->make(MyMiddleware::class)->handle('foo', $next)
+        );
+        $this->assertContains(
+            MyMiddleware::class,
+            $this->app->make('middleware.required')
+        );
+
+        $this->withoutMiddleware(MyMiddleware::class);
+        $this->assertTrue($this->app->has(MyMiddleware::class));
+        $this->assertSame(
+            'foo',
+            $this->app->make(MyMiddleware::class)->handle('foo', $next)
+        );
+        $this->assertContains(
+            MyMiddleware::class,
+            $this->app->make('middleware.ignored')
+        );
+        $this->assertNotContains(
+            MyMiddleware::class,
+            $this->app->make('middleware.required')
+        );
+
+        $this->withMiddleware();
+        $this->assertSame(
+            'fooWithMiddleware',
+            $this->app->make(MyMiddleware::class)->handle('foo', $next)
+        );
+        $this->assertFalse($this->app->has('middleware.disable'));
+        $this->assertSame([], $this->app->make('middleware.ignored'));
     }
 
     public function testWithCookieSetCookie()

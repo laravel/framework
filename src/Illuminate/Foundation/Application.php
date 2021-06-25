@@ -1034,7 +1034,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             $signedMiddleware
         );
 
-        $this->forgetSignedMiddleware($middleware, !$sign);
+        $this->forgetSignedMiddleware($middleware, ! $sign);
 
         return $this;
     }
@@ -1063,7 +1063,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             $index = array_search($abstract, $signedMiddleware);
 
             if ($index !== false) {
-                if (!$sign) {
+                if (! $sign) {
                     unset($this[$abstract]);
                 }
 
