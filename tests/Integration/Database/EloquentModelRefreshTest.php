@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentModelRefreshTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,6 +22,13 @@ class EloquentModelRefreshTest extends DatabaseTestCase
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('comments', function (Blueprint $table) {
+            $table->increments('id');
+            $table->morphs('commentable');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -75,6 +83,27 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $post->children->first()->refresh();
     }
+
+    public function testMorph()
+    {
+        $post = Post::create(['title' => 'pat']);
+        $post = Post::with('comments', 'latestComment')->find($post->id);
+        $firstComment = Comment::create(['commentable_type' => Post::class, 'commentable_id' => $post->id]);
+
+        $this->assertEquals(0, $post->comments->count());
+
+        $post->refresh();
+
+        $this->assertEquals(1, $post->comments->count());
+        $this->assertEquals(1, $post->latestComment->id);
+
+        $secondComment = Comment::create(['commentable_type' => Post::class, 'commentable_id' => $post->id]);
+
+        $post->refresh();
+
+        $this->assertEquals(2, $post->comments->count());
+        $this->assertEquals(2, $post->latestComment->id);
+    }
 }
 
 class Post extends Model
@@ -92,6 +121,27 @@ class Post extends Model
         static::addGlobalScope('age', function ($query) {
             $query->where('title', '!=', 'mohamed');
         });
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function latestComment()
+    {
+        return $this->morphOne(Comment::class, 'commentable')->ofMany(['id' => 'max']);
+    }
+}
+
+class Comment extends MorphPivot
+{
+    public $table = 'comments';
+    protected $guarded = [];
+
+    public function commentable()
+    {
+        return $this->morphTo();
     }
 }
 
