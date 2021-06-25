@@ -51,7 +51,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->create();
-        $blueprint->integer('foo')->primary()->unsigned();
+        $blueprint->string('foo')->primary();
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
@@ -61,7 +61,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`foo` int unsigned primary key not null) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
+        $this->assertSame("create table `users` (`foo` varchar(255) primary key not null) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
     }
 
     public function testAutoIncrementStartingValue()
