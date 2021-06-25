@@ -649,7 +649,7 @@ class Builder
         // Then we will "back up" the existing where conditions on the query so we can
         // add our eager constraints. Then we will merge the wheres that were on the
         // query back to it in order that any where conditions might be specified.
-        $relation = $this->getRelation($name, $alias ?? null);
+        $relation = $this->getRelation($name);
 
         $relation->addEagerConstraints($models);
 
@@ -668,10 +668,9 @@ class Builder
      * Get the relation instance for the given relation name.
      *
      * @param  string  $name
-     * @param  string|null  $alias
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
-    public function getRelation($name, $alias = null)
+    public function getRelation($name)
     {
         // We want to run a relationship query without any constrains so that we will
         // not have to remove these where clauses manually which gets really hacky
@@ -684,7 +683,7 @@ class Builder
             }
         });
 
-        $nested = $this->relationsNestedUnder($name, $alias ?? $name);
+        $nested = $this->relationsNestedUnder($name);
 
         // If there are nested relationships set on the query, we will put those onto
         // the query instances so that they can be handled after this relationship

@@ -979,12 +979,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $post = $user->posts()->create(['name' => 'First Post']);
         $post2 = $user->posts()->create(['name' => 'Second Post']);
-        $post->childPosts()->create(['name' => 'Child Post', 'user_id' => $user->id]);
-        $post->childPosts()->create(['name' => 'Child Post2', 'user_id' => $user->id]);
+        $post->childPosts()->create(['name' => 'Child Post1', 'user_id' => $user->id]);
+        $post2->childPosts()->create(['name' => 'Child Post2', 'user_id' => $user->id]);
 
         $user = EloquentTestUser::with([
             'posts as aliasPosts' => function ($q) {
                 $q->where('name', 'Second Post');
+            },
+            'posts' => function ($q) {
+                $q->whereNull('parent_id');
             },
             'posts.childPosts' => function ($q) {
             },
@@ -994,7 +997,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         ])->where('email', 'taylorotwell@gmail.com')->first();
 
-        $this->assertNotNull($user->aliasPosts->first());
+        $this->assertCount(2, $user->posts);
+        $this->assertCount(1, $user->aliasPosts);
         $this->assertFalse(property_exists($user->aliasPosts->first(), 'childPosts'));
         $this->assertFalse(property_exists($user->aliasPosts->first(), 'aliasChildPosts'));
         $this->assertSame('Second Post', $user->aliasPosts->first()->name);
@@ -1003,10 +1007,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('First Post', $user->posts->first()->name);
 
         $this->assertNotNull($user->posts->first()->childPosts->first());
-        $this->assertSame('Child Post', $user->posts->first()->childPosts->first()->name);
+        $this->assertSame('Child Post1', $user->posts->get(0)->childPosts->first()->name);
 
         $this->assertNotNull($user->posts->first()->childPosts->first());
-        $this->assertSame('Child Post2', $user->posts->first()->aliasChildPosts->first()->name);
+        $this->assertSame('Child Post2', $user->posts->get(1)->aliasChildPosts->first()->name);
     }
 
     public function testBasicNestedSelfReferencingHasManyEagerLoading()
