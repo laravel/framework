@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Application;
 
 class EnvironmentCommand extends Command
 {
@@ -18,7 +19,7 @@ class EnvironmentCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Display the current framework environment';
+    protected $description = 'Display the current app environment info';
 
     /**
      * Execute the console command.
@@ -27,6 +28,14 @@ class EnvironmentCommand extends Command
      */
     public function handle()
     {
-        $this->line('<info>Current application environment:</info> <comment>'.$this->laravel['env'].'</comment>');
+        $laravel = $this->getLaravel();
+
+        $this->comment('Application Enviornment Details');
+
+        $this->line('<info>Current application environment:</info> <comment>'.$laravel['env'].'</comment>');
+        $this->line('<info>Laravel framework version:</info> <comment>'.Application::VERSION.'</comment>');
+        $this->line('<info>Current php version:</info> <comment>'.PHP_VERSION.'</comment>');
+        $this->line('<info>Application root:</info> <comment>'.$laravel['path.base'].'</comment>');
+        $this->line('<info>Database connection:</info> <comment>'.$laravel['config']['database.default'].'</comment>');
     }
 }
