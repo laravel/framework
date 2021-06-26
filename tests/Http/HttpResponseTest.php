@@ -245,7 +245,7 @@ class JsonableStub implements Jsonable
 
 class JsonSerializableStub implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return ['foo' => 'bar'];
     }

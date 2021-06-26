@@ -19,7 +19,7 @@ class JsonResponseTest extends TestCase
         Route::get('/response', function () {
             return new JsonResponse(new class implements \JsonSerializable
             {
-                public function jsonSerialize()
+                public function jsonSerialize(): string
                 {
                     return "\xB1\x31";
                 }
