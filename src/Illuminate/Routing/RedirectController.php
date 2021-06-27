@@ -39,7 +39,7 @@ class RedirectController extends Controller
             $url = Str::after($url, '/');
         }
         
-        if($request->hasSession()) {
+        if ($request->hasSession()) {
             $request->session()->reflash();
         }
 
