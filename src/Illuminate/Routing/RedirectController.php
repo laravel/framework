@@ -38,7 +38,7 @@ class RedirectController extends Controller
         if (! Str::startsWith($destination, '/') && Str::startsWith($url, '/')) {
             $url = Str::after($url, '/');
         }
-        
+
         if ($request->hasSession()) {
             $request->session()->reflash();
         }
