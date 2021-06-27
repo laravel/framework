@@ -10,13 +10,14 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\Tappable;
 
 /**
  * @mixin \Illuminate\Support\Collection
  */
 abstract class AbstractCursorPaginator implements Htmlable
 {
-    use ForwardsCalls;
+    use ForwardsCalls, Tappable;
 
     /**
      * All of the items being paginated.
@@ -195,13 +196,32 @@ abstract class AbstractCursorPaginator implements Htmlable
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
                 if ($item instanceof ArrayAccess || is_array($item)) {
-                    return $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')];
+                    return $this->ensureParameterIsPrimitive(
+                        $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')]
+                    );
                 } elseif (is_object($item)) {
-                    return $item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')};
+                    return $this->ensureParameterIsPrimitive(
+                        $item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')}
+                    );
                 }
 
                 throw new Exception('Only arrays and objects are supported when cursor paginating items.');
             })->toArray();
+    }
+
+    /**
+     * Ensure the parameter is a primitive type.
+     *
+     * This can resolve issues that arise the developer uses a value object for an attribute.
+     *
+     * @param  mixed  $parameter
+     * @return mixed
+     */
+    protected function ensureParameterIsPrimitive($parameter)
+    {
+        return is_object($parameter) && method_exists($parameter, '__toString')
+                        ? (string) $parameter
+                        : $parameter;
     }
 
     /**

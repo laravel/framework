@@ -48,6 +48,15 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $models[0]->modelTwos;
     }
 
+    public function testStrictModeDoesntThrowAnExceptionOnLazyLoadingWithSingleModel()
+    {
+        EloquentStrictLoadingTestModel1::create();
+
+        $models = EloquentStrictLoadingTestModel1::get();
+
+        $this->assertInstanceOf(Collection::class, $models);
+    }
+
     public function testStrictModeDoesntThrowAnExceptionOnAttributes()
     {
         EloquentStrictLoadingTestModel1::create();
@@ -85,6 +94,8 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
     {
         $model = EloquentStrictLoadingTestModel1::create();
 
+        $model = EloquentStrictLoadingTestModel1::find($model->id);
+
         $this->assertInstanceOf(Collection::class, $model->modelTwos);
     }
 
@@ -94,6 +105,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $this->expectExceptionMessage('Attempted to lazy load');
 
         $model1 = EloquentStrictLoadingTestModel1::create();
+        EloquentStrictLoadingTestModel2::create(['model_1_id' => $model1->id]);
         EloquentStrictLoadingTestModel2::create(['model_1_id' => $model1->id]);
 
         $models = EloquentStrictLoadingTestModel1::with('modelTwos')->get();

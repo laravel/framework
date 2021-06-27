@@ -692,7 +692,7 @@ class Collection extends BaseCollection implements QueueableCollection
         } elseif (count($relations) === 1) {
             return reset($relations);
         } else {
-            return array_intersect(...$relations);
+            return array_intersect(...array_values($relations));
         }
     }
 

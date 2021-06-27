@@ -897,6 +897,29 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testSlidingIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->sliding();
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->sliding()->take(1)->all();
+        });
+
+        $this->assertEnumerates(3, function ($collection) {
+            $collection->sliding()->take(2)->all();
+        });
+
+        $this->assertEnumerates(13, function ($collection) {
+            $collection->sliding(3, 5)->take(3)->all();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sliding()->all();
+        });
+    }
+
     public function testSkipIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

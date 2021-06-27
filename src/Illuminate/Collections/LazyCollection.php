@@ -921,6 +921,45 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Create chunks representing a "sliding window" view of the items in the collection.
+     *
+     * @param  int  $size
+     * @param  int  $step
+     * @return static
+     */
+    public function sliding($size = 2, $step = 1)
+    {
+        return new static(function () use ($size, $step) {
+            $iterator = $this->getIterator();
+
+            $chunk = [];
+
+            while ($iterator->valid()) {
+                $chunk[$iterator->key()] = $iterator->current();
+
+                if (count($chunk) == $size) {
+                    yield tap(new static($chunk), function () use (&$chunk, $step) {
+                        $chunk = array_slice($chunk, $step, null, true);
+                    });
+
+                    // If the $step between chunks is bigger than each chunk's $size
+                    // we will skip the extra items (which should never be in any
+                    // chunk) before we continue to the next chunk in the loop.
+                    if ($step > $size) {
+                        $skip = $step - $size;
+
+                        for ($i = 0; $i < $skip && $iterator->valid(); $i++) {
+                            $iterator->next();
+                        }
+                    }
+                }
+
+                $iterator->next();
+            }
+        });
+    }
+
+    /**
      * Skip the first {$count} items.
      *
      * @param  int  $count

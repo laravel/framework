@@ -404,6 +404,13 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(2, $user->roles->filter(function ($role) {
             return $role->pivot->admin === 'N';
         }));
+
+        $users = FactoryTestUserFactory::times(2)->sequence(function ($sequence) {
+            return ['name' => 'index: '.$sequence->index];
+        })->create();
+
+        $this->assertSame('index: 0', $users[0]->name);
+        $this->assertSame('index: 1', $users[1]->name);
     }
 
     public function test_resolve_nested_model_factories()

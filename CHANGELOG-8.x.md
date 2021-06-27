@@ -1,6 +1,144 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.42.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.48.1...8.x)
+
+
+## [v8.48.1 (2021-06-23)](https://github.com/laravel/framework/compare/v8.48.0...v8.48.1)
+
+### Fixed
+- Order of Modifiers Amended in MySqlGrammar ([#37782](https://github.com/laravel/framework/pull/37782))
+
+
+## [v8.48.0 (2021-06-23)](https://github.com/laravel/framework/compare/v8.47.0...v8.48.0)
+
+### Added
+- Added a queue:prune-failed command ([#37696](https://github.com/laravel/framework/pull/37696), [7aca658](https://github.com/laravel/framework/commit/7aca65833887d0760fc61e320bc46b80c9cb3398))
+- Added `Illuminate/Filesystem/FilesystemManager::build()` ([#37720](https://github.com/laravel/framework/pull/37720), [c21fc12](https://github.com/laravel/framework/commit/c21fc126dc87ff357c7ae5c79014135f693d0ffe))
+- Allow customising the event.stub file ([#37761](https://github.com/laravel/framework/pull/37761))
+- Added `Illuminate/Collections/Collection::sliding()` and `Illuminate/Collections/LazyCollection::sliding()` ([#37751](https://github.com/laravel/framework/pull/37751))
+- Make `Illuminate\Http\Client\Request` macroable ([#37744](https://github.com/laravel/framework/pull/37744))
+- Added GIF, WEBP, WBMP, BMP support to FileFactory::image() ([#37743](https://github.com/laravel/framework/pull/37743))
+- Dispatch 'connection failed' event in http client ([#37740](https://github.com/laravel/framework/pull/37740))
+
+### Fixed
+- Adds a small fix for unicode with blade echo handlers ([#37697](https://github.com/laravel/framework/pull/37697))
+- Solve the Primary Key issue in databases with sql_require_primary_key enabled ([#37715](https://github.com/laravel/framework/pull/37715))
+
+### Changed
+- Removed unnecessary checks in RequiredIf validation, fixed tests ([#37700](https://github.com/laravel/framework/pull/37700))
+- Replace non ASCII apostrophe in the email notification template ([#37709](https://github.com/laravel/framework/pull/37709))
+- Change the order of the bindings for a Sql Server query with a offset and a subquery order by ([#37728](https://github.com/laravel/framework/pull/37728), [401928b](https://github.com/laravel/framework/commit/401928b4ba2be400687fdd3c81830b260b51500b))
+- Bind mock instances as singletons so they are not overwritten ([#37746](https://github.com/laravel/framework/pull/37746))
+- Encode objects when casting as JSON ([#37759](https://github.com/laravel/framework/pull/37759))
+- Call on_stats handler in Http stub callbacks ([#37738](https://github.com/laravel/framework/pull/37738))
+
+
+## [v8.47.0 (2021-06-16)](https://github.com/laravel/framework/compare/v8.46.0...v8.47.0)
+
+### Added
+- Introduce scoped instances ([#37521](https://github.com/laravel/framework/pull/37521), [2971b64](https://github.com/laravel/framework/commit/2971b64ac29bec9e65afe683ab4fcd461c565fe5))
+- Added whereContains AssertableJson method ([#37631](https://github.com/laravel/framework/pull/37631), [2d2d108](https://github.com/laravel/framework/commit/2d2d108a21b21a149c797cb3995c3a25ac9b4be4))
+- Added `Illuminate/Database/Connection::setRecordModificationState()` ([ee1e6b4](https://github.com/laravel/framework/commit/ee1e6b4db76ff11505deb9e5faba3a04de424e97))
+- Added `match()` and `matchAll()` methods to `Illuminate/Support/Str.php` ([#37642](https://github.com/laravel/framework/pull/37642))
+- Copy password rule to current_password ([#37650](https://github.com/laravel/framework/pull/37650))
+- Allow tap() on Paginator ([#37682](https://github.com/laravel/framework/pull/37682))
+
+### Revert
+- Revert of ["Columns in the order by list must be unique"](https://github.com/laravel/framework/pull/37582) ([#37649](https://github.com/laravel/framework/pull/37649))
+
+### Fixed
+- Remove illuminate/foundation dependency from Password validation ([#37648](https://github.com/laravel/framework/pull/37648))
+- Fixed callable password defaults in validator ([0b1610f](https://github.com/laravel/framework/commit/0b1610f7a934787856b141205a9f178f33e17f8b))
+- Fixed dns_get_record loose check of A records for active_url rule ([#37675](https://github.com/laravel/framework/pull/37675))
+- Type hinted arguments for Illuminate\Validation\Rules\RequiredIf ([#37688](https://github.com/laravel/framework/pull/37688))
+- Fixed when passed object as parameters to scopes method ([#37692](https://github.com/laravel/framework/pull/37692))
+
+
+## [v8.46.0 (2021-06-08)](https://github.com/laravel/framework/compare/v8.45.1...v8.46.0)
+
+### Added
+- Allow Custom Notification Stubs ([#37584](https://github.com/laravel/framework/pull/37584))
+- Added methods for indicating the write connection should be used ([94dbf76](https://github.com/laravel/framework/commit/94dbf768fa46917cb012a05b38cbc889dbd2e8a0))
+- Added timestamp reference to schedule:run artisan command output ([#37591](https://github.com/laravel/framework/pull/37591))
+- Columns in the order by list must be unique ([#37582](https://github.com/laravel/framework/pull/37582))
+
+### Changed
+- Fire a trashed model event and listen to it for broadcasting events ([#37618](https://github.com/laravel/framework/pull/37618))
+- Cast JSON strings containing single quotes ([#37619](https://github.com/laravel/framework/pull/37619))
+
+### Fixed
+- Fixed for cloning issues with PendingRequest object ([#37596](https://github.com/laravel/framework/pull/37596), [96518b9](https://github.com/laravel/framework/commit/96518b9bbbc6e984f879c535502c199ef022f52a))
+- Makes the retrieval of Http client transferStats safe ([#37597](https://github.com/laravel/framework/pull/37597))
+- Fixed inconsistency in table names in validator ([#37606](https://github.com/laravel/framework/pull/37606))
+- Fixes for Stringable for views ([#37613](https://github.com/laravel/framework/pull/37613))
+- Fixed one-of-many bindings ([#37616](https://github.com/laravel/framework/pull/37616))
+- Fixed infinity loop on transaction committed ([#37626](https://github.com/laravel/framework/pull/37626))
+- Added missing fix to DatabaseRule::resolveTableName fix #37580 ([#37621](https://github.com/laravel/framework/pull/37621))
+
+
+## [v8.45.1 (2021-06-03)](https://github.com/laravel/framework/compare/v8.45.0...v8.45.1)
+
+### Revert
+- Revert of ["Columns in the order by list must be unique"](https://github.com/laravel/framework/pull/37550) ([dc2f0bb](https://github.com/laravel/framework/commit/dc2f0bb02c3eb4b27669d626bb3e810db8e7749d))
+
+
+## [v8.45.0 (2021-06-03)](https://github.com/laravel/framework/compare/v8.44.0...v8.45.0)
+
+### Added
+- Introduce Conditional trait ([#37504](https://github.com/laravel/framework/pull/37504), [45ff23c](https://github.com/laravel/framework/commit/45ff23c6174416f63ea7dbd77bc7fe8aafced86b), [#37561](https://github.com/laravel/framework/pull/37561))
+- Allow multiple SES configuration with IAM Role authentication ([#37523](https://github.com/laravel/framework/pull/37523))
+- Adds class handling for Blade echo statements ([#37478](https://github.com/laravel/framework/pull/37478))
+- Added `Illuminate/Session/DatabaseSessionHandler::setContainer()` ([7a71c29](https://github.com/laravel/framework/commit/7a71c292c0ae656c622cff883638e77de6f0bfde))
+- Allow connecting to read or write connections with the db command ([#37548](https://github.com/laravel/framework/pull/37548))
+- Added assertDownloadOffered test method to TestResponse class ([#37532](https://github.com/laravel/framework/pull/37532))
+- Added `Illuminate/Http/Client/Response::close()` ([#37566](https://github.com/laravel/framework/pull/37566))
+- Allow setting middleware on queued Mailables ([#37568](https://github.com/laravel/framework/pull/37568))
+- Adds new RequestSent and ResponseReceived events to the HTTP Client ([#37572](https://github.com/laravel/framework/pull/37572))
+
+### Changed
+- Rename protected method `Illuminate/Foundation/Console/StorageLinkCommand::removableSymlink()` to `Illuminate/Foundation/Console/StorageLinkCommand::isRemovableSymlink()` ([#37508](https://github.com/laravel/framework/pull/37508))
+- Correct minimum Predis version to 1.1.2 ([#37554](https://github.com/laravel/framework/pull/37554))
+- Columns in the order by list must be unique ([#37550](https://github.com/laravel/framework/pull/37550))
+- More Convenient Model Broadcasting ([#37491](https://github.com/laravel/framework/pull/37491))
+
+### Fixed
+- Get queueable relationship when collection has non-numeric keys ([#37556](https://github.com/laravel/framework/pull/37556))
+
+
+## [v8.44.0 (2021-05-27)](https://github.com/laravel/framework/compare/v8.43.0...v8.44.0)
+
+### Added
+- Delegate lazy loading violation to method ([#37480](https://github.com/laravel/framework/pull/37480))
+- Added `force` option to `Illuminate/Foundation/Console/StorageLinkCommand` ([#37501](https://github.com/laravel/framework/pull/37501), [3e547d2](https://github.com/laravel/framework/commit/3e547d2f276f9242d3856ff9cb02418560ae9a1b))
+
+### Fixed
+- Fixed aggregates with having ([#37487](https://github.com/laravel/framework/pull/37487), [c986e12](https://github.com/laravel/framework/commit/c986e12b00e9569cca5e24e5072e7770ffc25efa))
+- Bugfix passing errorlevel when command is run in background ([#37479](https://github.com/laravel/framework/pull/37479))
+
+### Changed
+- Init the traits when the model is being unserialized ([#37492](https://github.com/laravel/framework/pull/37492))
+- Relax the lazy loading restrictions ([#37503](https://github.com/laravel/framework/pull/37503))
+
+
+## [v8.43.0 (2021-05-25)](https://github.com/laravel/framework/compare/v8.42.1...v8.43.0)
+
+### Added
+- Added `Illuminate\Auth\Authenticatable::getAuthIdentifierForBroadcasting()` ([#37408](https://github.com/laravel/framework/pull/37408))
+- Added eloquent strict loading mode ([#37363](https://github.com/laravel/framework/pull/37363))
+- Added default timeout to NotPwnedVerifier validator ([#37440](https://github.com/laravel/framework/pull/37440), [45567e0](https://github.com/laravel/framework/commit/45567e0c0707bb2b418a4218e62fa85e478a68d9))
+- Added beforeQuery to base query builder ([#37431](https://github.com/laravel/framework/pull/37431))
+- Added `Illuminate\Queue\Jobs\Job::shouldFailOnTimeout()` ([#37450](https://github.com/laravel/framework/pull/37450))
+- Added `ValidatorAwareRule` interface ([#37442](https://github.com/laravel/framework/pull/37442))
+- Added model support for database assertions ([#37459](https://github.com/laravel/framework/pull/37459))
+
+### Fixed
+- Fixed eager loading one-of-many relationships with multiple aggregates ([#37436](https://github.com/laravel/framework/pull/37436))
+
+### Changed
+- Improve signed url signature verification ([#37432](https://github.com/laravel/framework/pull/37432))
+- Improve one-of-many performance ([#37451](https://github.com/laravel/framework/pull/37451)) 
+- Update `Illuminate/Pagination/Cursor::parameter()` ([#37458](https://github.com/laravel/framework/pull/37458))
+- Reconnect the correct connection when using ::read or ::write ([#37471](https://github.com/laravel/framework/pull/37471), [d1a32f9](https://github.com/laravel/framework/commit/d1a32f9acb225b6b7b360736f3c717461220dac9))
 
 
 ## [v8.42.1 (2021-05-19)](https://github.com/laravel/framework/compare/v8.42.0...v8.42.1)

@@ -50,7 +50,7 @@ trait InteractsWithContainer
      */
     protected function mock($abstract, Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
+        return $this->singletonInstance($abstract, Mockery::mock(...array_filter(func_get_args())));
     }
 
     /**
@@ -62,7 +62,7 @@ trait InteractsWithContainer
      */
     protected function partialMock($abstract, Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args()))->makePartial());
+        return $this->singletonInstance($abstract, Mockery::mock(...array_filter(func_get_args()))->makePartial());
     }
 
     /**
@@ -74,7 +74,25 @@ trait InteractsWithContainer
      */
     protected function spy($abstract, Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::spy(...array_filter(func_get_args())));
+        return $this->singletonInstance($abstract, Mockery::spy(...array_filter(func_get_args())));
+    }
+
+    /**
+     * Register an instance of an object as a singleton in the container.
+     *
+     * @param  string  $abstract
+     * @param  \Mockery\MockInterface  $instance
+     * @return \Mockery\MockInterface
+     */
+    protected function singletonInstance($abstract, $instance)
+    {
+        $abstract = $this->app->getAlias($abstract);
+
+        $this->app->singleton($abstract, function () use ($instance) {
+            return $instance;
+        });
+
+        return $instance;
     }
 
     /**
