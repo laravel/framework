@@ -196,7 +196,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create table "users" ("foo" varchar primary key not null)', $statements[0]);
+        $this->assertSame('create table "users" ("foo" varchar not null, primary key ("foo"))', $statements[0]);
     }
 
     public function testAddingForeignKey()
@@ -209,7 +209,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create table "users" ("foo" varchar primary key not null, "order_id" varchar not null, foreign key("order_id") references "orders"("id"))', $statements[0]);
+        $this->assertSame('create table "users" ("foo" varchar not null, "order_id" varchar not null, foreign key("order_id") references "orders"("id"), primary key ("foo"))', $statements[0]);
     }
 
     public function testAddingUniqueKey()
