@@ -96,14 +96,14 @@ class Repository implements ArrayAccess, CacheContract
 
         $itemKey = $this->itemKey($key, true);
 
-        if (!is_null($itemKey)) {
+        if (! is_null($itemKey)) {
             $value = $this->store->get($itemKey);
         }
 
         // If we could not find the cache value, we will fire the missed event and get
         // the default value for this cache value. This default could be a callback
         // so we will execute the value function which will resolve it if needed.
-        if (!isset($value) || is_null($value)) {
+        if (! isset($value) || is_null($value)) {
             $this->event(new CacheMissed($key));
 
             $value = value($default);
