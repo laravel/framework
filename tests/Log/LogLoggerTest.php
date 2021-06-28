@@ -29,7 +29,7 @@ class LogLoggerTest extends TestCase
     public function testContextIsAddedToAllSubsequentLogs()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class));
-        $writer->addContextToLogs(['bar' => 'baz']);
+        $writer->withContext(['bar' => 'baz']);
 
         $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
 

@@ -169,27 +169,6 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Adds context to all future logs.
-     *
-     * @param array $context
-     * @return void
-     */
-    public function addContextToLogs($context = [])
-    {
-        $this->context = array_merge([], $this->context, $context);
-    }
-
-    /**
-     * Clears any set context from future logs.
-     *
-     * @return void
-     */
-    public function clearContext()
-    {
-        $this->context = [];
-    }
-
-    /**
      * Write a message to the log.
      *
      * @param  string  $level
@@ -199,11 +178,37 @@ class Logger implements LoggerInterface
      */
     protected function writeLog($level, $message, $context)
     {
-        $context = array_merge([], $this->context, $context);
-
-        $this->logger->{$level}($message = $this->formatMessage($message), $context);
+        $this->logger->{$level}(
+            $message = $this->formatMessage($message),
+            $context = array_merge($this->context, $context)
+        );
 
         $this->fireLogEvent($level, $message, $context);
+    }
+
+    /**
+     * Add context to all future logs.
+     *
+     * @param  array  $context
+     * @return $this
+     */
+    public function withContext(array $context = [])
+    {
+        $this->context = array_merge($this->context, $context);
+
+        return $this;
+    }
+
+    /**
+     * Flush the existing context array.
+     *
+     * @return $this
+     */
+    public function withoutContext()
+    {
+        $this->context = [];
+
+        return $this;
     }
 
     /**
