@@ -86,20 +86,21 @@ class TaggedCache extends Repository
     /**
      * {@inheritdoc}
      */
-    protected function itemKey($key)
+    protected function itemKey($key, $readOnly = false)
     {
-        return $this->taggedItemKey($key);
+        return $this->taggedItemKey($key, $readOnly);
     }
 
     /**
      * Get a fully qualified key for a tagged item.
      *
      * @param  string  $key
+     * @param  bool    $readOnly
      * @return string
      */
-    public function taggedItemKey($key)
+    public function taggedItemKey($key, $readOnly)
     {
-        return sha1($this->tags->getNamespace()).':'.$key;
+        return sha1($this->tags->getNamespace($readOnly)).':'.$key;
     }
 
     /**

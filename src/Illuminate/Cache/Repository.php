@@ -94,12 +94,16 @@ class Repository implements ArrayAccess, CacheContract
             return $this->many($key);
         }
 
-        $value = $this->store->get($this->itemKey($key));
+        $itemKey = $this->itemKey($key, true);
+
+        if (!is_null($itemKey)) {
+            $value = $this->store->get($itemKey);
+        }
 
         // If we could not find the cache value, we will fire the missed event and get
         // the default value for this cache value. This default could be a callback
         // so we will execute the value function which will resolve it if needed.
-        if (is_null($value)) {
+        if (!isset($value) || is_null($value)) {
             $this->event(new CacheMissed($key));
 
             $value = value($default);
@@ -494,9 +498,10 @@ class Repository implements ArrayAccess, CacheContract
      * Format the key for a cache item.
      *
      * @param  string  $key
+     * @param  bool    $readOnly
      * @return string
      */
-    protected function itemKey($key)
+    protected function itemKey($key, $readOnly = false)
     {
         return $key;
     }

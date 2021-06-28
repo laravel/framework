@@ -59,11 +59,12 @@ class TagSet
     /**
      * Get a unique namespace that changes when any of the tags are flushed.
      *
+     * @param  bool   $readOnly
      * @return string
      */
-    public function getNamespace()
+    public function getNamespace($readOnly = false)
     {
-        return implode('|', $this->tagIds());
+        return implode('|', $this->tagIds($readOnly));
     }
 
     /**
@@ -71,19 +72,24 @@ class TagSet
      *
      * @return array
      */
-    protected function tagIds()
+    protected function tagIds($readOnly)
     {
-        return array_map([$this, 'tagId'], $this->names);
+        return array_map([$this, 'tagId'], $this->names, array_fill(0, count($this->names), $readOnly));
     }
 
     /**
      * Get the unique tag identifier for a given tag.
      *
      * @param  string  $name
+     * @param  bool    $readOnly
      * @return string
      */
-    public function tagId($name)
+    public function tagId($name, $readOnly)
     {
+        if ($readOnly) {
+            return $this->store->get($this->tagKey($name));
+        }
+
         return $this->store->get($this->tagKey($name)) ?: $this->resetTag($name);
     }
 
