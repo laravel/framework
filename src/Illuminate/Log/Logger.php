@@ -180,7 +180,7 @@ class Logger implements LoggerInterface
     {
         $this->logger->{$level}(
             $message = $this->formatMessage($message),
-            $context = array_merge($this->context, $context)
+            $context = array_replace_recursive($this->context, $context)
         );
 
         $this->fireLogEvent($level, $message, $context);
@@ -194,7 +194,7 @@ class Logger implements LoggerInterface
      */
     public function withContext(array $context = [])
     {
-        $this->context = array_merge($this->context, $context);
+        $this->context = array_replace_recursive($this->context, $context);
 
         return $this;
     }
