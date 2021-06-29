@@ -36,6 +36,27 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
+    public function testNestedContextOverrides()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => ['baz' => 'qux', 'baz2' => 'qux2']]);
+        $writer->withContext(['bar' => ['baz' => 'quux']]);
+
+        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => ['baz' => 'quux', 'baz2' => 'qux2']]);
+
+        $writer->error('foo');
+    }
+
+    public function testNestedLocalContextOverrides()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => ['baz' => 'qux', 'baz2' => 'qux2']]);
+
+        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => ['baz' => 'quux', 'baz2' => 'qux2']]);
+
+        $writer->error('foo', ['bar' => ['baz' => 'quux']]);
+    }
+
     public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
