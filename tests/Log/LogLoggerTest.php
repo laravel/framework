@@ -57,6 +57,26 @@ class LogLoggerTest extends TestCase
         $writer->error('foo', ['bar' => ['baz' => 'quux']]);
     }
 
+    public function testRetrieveAndOverrideCurrentContext()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => ['baz' => 'qux', 'baz2' => 'qux2']]);
+
+        $this->assertEquals(['bar' => ['baz' => 'quux', 'baz2' => 'qux2']], $writer->getContext(['bar' => ['baz' => 'quux']]));
+    }
+
+    public function testRetrievingContextWithOverrideDoesNotApplyToSubsequentLogs()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => ['baz' => 'qux', 'baz2' => 'qux2']]);
+
+        $writer->getContext(['bar' => ['baz' => 'quux']]);
+
+        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => ['baz' => 'qux', 'baz2' => 'qux2']]);
+
+        $writer->error('foo');
+    }
+
     public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);

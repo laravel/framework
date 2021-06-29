@@ -212,6 +212,17 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * Get current context.
+     *
+     * @param  array  $context  Will be merged into current result but not applied to future logs.
+     * @return $this
+     */
+    public function getContext(array $context = [])
+    {
+        return array_replace_recursive($this->context, $context);
+    }
+
+    /**
      * Register a new callback handler for when a log event is triggered.
      *
      * @param  \Closure  $callback
