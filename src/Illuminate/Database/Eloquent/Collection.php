@@ -159,7 +159,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $models = $models->pluck($name);
+        $models = $models->pluck($name)->whereNotNull();
 
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
