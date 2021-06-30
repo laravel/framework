@@ -22,6 +22,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use LogicException;
 use ReturnTypeWillChange;
+use Symfony\Component\VarDumper\VarDumper;
 
 abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -1881,6 +1882,30 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     public function broadcastChannel()
     {
         return str_replace('\\', '.', get_class($this)).'.'.$this->getKey();
+    }
+
+    /**
+     * Dump the model and end the script.
+     *
+     * @return void
+     */
+    public function dd()
+    {
+        $this->dump();
+
+        exit(1);
+    }
+
+    /**
+     * Dump the model.
+     *
+     * @return $this
+     */
+    public function dump()
+    {
+        VarDumper::dump($this);
+
+        return $this;
     }
 
     /**
