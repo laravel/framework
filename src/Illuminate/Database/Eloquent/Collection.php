@@ -201,7 +201,7 @@ class Collection extends BaseCollection implements QueueableCollection
                 $path[count($segments) - 1][end($segments)] = $value;
             }
 
-            $this->loadMissingRelation($this, $path);
+            $this->loadMissingRelation($this->whereNotNull(), $path);
         }
 
         return $this;
@@ -225,14 +225,14 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         $models->filter(function ($model) use ($name) {
-            return ! is_null($model) && ! $model->relationLoaded($name);
+            return ! $model->relationLoaded($name);
         })->load($relation);
 
         if (empty($path)) {
             return;
         }
 
-        $models = $models->pluck($name);
+        $models = $models->pluck($name)->whereNotNull();
 
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
