@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Aws\Ses\SesClient;
+use Aws\SesV2\SesV2Client;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
@@ -46,8 +46,8 @@ class MailSesTransportTest extends TestCase
         $message->setTo('me@example.com');
         $message->setBcc('you@example.com');
 
-        $client = $this->getMockBuilder(SesClient::class)
-            ->addMethods(['sendRawEmail'])
+        $client = $this->getMockBuilder(SesV2Client::class)
+            ->addMethods(['sendEmail'])
             ->disableOriginalConstructor()
             ->getMock();
         $transport = new SesTransport($client);
@@ -57,9 +57,9 @@ class MailSesTransportTest extends TestCase
         $messageId = Str::random(32);
         $sendRawEmailMock = new sendRawEmailMock($messageId);
         $client->expects($this->once())
-            ->method('sendRawEmail')
+            ->method('sendEmail')
             ->with($this->equalTo([
-                'Source' => 'myself@example.com',
+                'FromEmailAddress' => 'myself@example.com',
                 'RawMessage' => ['Data' => (string) $message],
             ]))
             ->willReturn($sendRawEmailMock);
@@ -83,7 +83,7 @@ class MailSesTransportTest extends TestCase
                             'region' => 'eu-west-1',
                             'options' => [
                                 'ConfigurationSetName' => 'Laravel',
-                                'Tags' => [
+                                'EmailTags' => [
                                     ['Name' => 'Laravel', 'Value' => 'Framework'],
                                 ],
                             ],
@@ -116,7 +116,7 @@ class MailSesTransportTest extends TestCase
 
         $this->assertSame([
             'ConfigurationSetName' => 'Laravel',
-            'Tags' => [
+            'EmailTags' => [
                 ['Name' => 'Laravel', 'Value' => 'Framework'],
             ],
         ], $transport->getOptions());

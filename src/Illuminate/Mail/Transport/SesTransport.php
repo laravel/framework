@@ -2,7 +2,7 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Aws\Ses\SesClient;
+use Aws\SesV2\SesV2Client;
 use Swift_Mime_SimpleMessage;
 
 class SesTransport extends Transport
@@ -10,7 +10,7 @@ class SesTransport extends Transport
     /**
      * The Amazon SES instance.
      *
-     * @var \Aws\Ses\SesClient
+     * @var \Aws\SesV2\SesV2Client
      */
     protected $ses;
 
@@ -24,11 +24,11 @@ class SesTransport extends Transport
     /**
      * Create a new SES transport instance.
      *
-     * @param  \Aws\Ses\SesClient  $ses
+     * @param  \Aws\SesV2\SesV2Client  $ses
      * @param  array  $options
      * @return void
      */
-    public function __construct(SesClient $ses, $options = [])
+    public function __construct(SesV2Client $ses, $options = [])
     {
         $this->ses = $ses;
         $this->options = $options;
@@ -41,10 +41,10 @@ class SesTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
-        $result = $this->ses->sendRawEmail(
+        $result = $this->ses->sendEmail(
             array_merge(
                 $this->options, [
-                    'Source' => key($message->getSender() ?: $message->getFrom()),
+                    'FromEmailAddress' => key($message->getSender() ?: $message->getFrom()),
                     'RawMessage' => [
                         'Data' => $message->toString(),
                     ],
@@ -65,7 +65,7 @@ class SesTransport extends Transport
     /**
      * Get the Amazon SES client for the SesTransport instance.
      *
-     * @return \Aws\Ses\SesClient
+     * @return \Aws\SesV2\SesV2Client
      */
     public function ses()
     {

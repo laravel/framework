@@ -2,7 +2,7 @@
 
 namespace Illuminate\Mail;
 
-use Aws\Ses\SesClient;
+use Aws\SesV2\SesV2Client;
 use Closure;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
@@ -271,7 +271,7 @@ class MailManager implements FactoryContract
         $config = Arr::except($config, ['transport']);
 
         return new SesTransport(
-            new SesClient($this->addSesCredentials($config)),
+            new SesV2Client($this->addSesCredentials($config)),
             $config['options'] ?? []
         );
     }
