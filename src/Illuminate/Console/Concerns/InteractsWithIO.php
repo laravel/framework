@@ -4,6 +4,7 @@ namespace Illuminate\Console\Concerns;
 
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
@@ -47,6 +48,20 @@ trait InteractsWithIO
         'quiet' => OutputInterface::VERBOSITY_QUIET,
         'normal' => OutputInterface::VERBOSITY_NORMAL,
     ];
+
+    /**
+     * Whether to prepend output with a timestamp.
+     *
+     * @var boolean
+     */
+    protected $timestamps = false;
+
+    /**
+     * The format to use when prepending any output with a timestamp.
+     *
+     * @var string
+     */
+    public $timestampFormat = 'Y-m-d H:i:s';
 
     /**
      * Determine if the given argument is present.
@@ -259,6 +274,10 @@ trait InteractsWithIO
      */
     public function line($string, $style = null, $verbosity = null)
     {
+        if ($this->timestamps) {
+            $string = Carbon::now()->format("[$this->timestampFormat] ") . $string;
+        }
+
         $styled = $style ? "<$style>$string</$style>" : $string;
 
         $this->output->writeln($styled, $this->parseVerbosity($verbosity));
@@ -393,5 +412,27 @@ trait InteractsWithIO
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * Enable/disable timestamped output.
+     *
+     * @param bool $enabled
+     * @return void
+     */
+    public function setTimestamps($enabled = true)
+    {
+        $this->timestamps = $enabled;
+    }
+
+    /**
+     * Set the timestamp format.
+     *
+     * @param string $format
+     * @return void
+     */
+    public function setTimestampFormat($format)
+    {
+        $this->timestampFormat = $format;
     }
 }

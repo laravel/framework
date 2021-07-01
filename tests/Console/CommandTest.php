@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Console;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -110,6 +111,43 @@ class CommandTest extends TestCase
 
         $command = new Command;
         $command->setOutput($output);
+
+        $command->info('foo');
+    }
+
+    public function testTheOutputContainsATimestampWithTheDefaultFormat()
+    {
+        Carbon::setTestNow(
+            $testNow = Carbon::now()
+        );
+
+        $command = new Command;
+        $output = m::mock(OutputStyle::class);
+        $output->shouldReceive('writeln')->once()->withArgs(function (...$args) use ($command, $testNow) {
+            return $args[0] === '<info>['.$testNow->format($command->timestampFormat).'] foo</info>';
+        });
+
+        $command->setOutput($output);
+        $command->setTimestamps(true);
+
+        $command->info('foo');
+    }
+
+    public function testTheOutputContainsATimestampWithACustomFormat()
+    {
+        Carbon::setTestNow(
+            $testNow = Carbon::now()
+        );
+
+        $command = new Command;
+        $command->setTimestampFormat('Y-m-d');
+        $output = m::mock(OutputStyle::class);
+        $output->shouldReceive('writeln')->once()->withArgs(function (...$args) use ($command, $testNow) {
+            return $args[0] === '<info>['.$testNow->format($command->timestampFormat).'] foo</info>';
+        });
+
+        $command->setOutput($output);
+        $command->setTimestamps(true);
 
         $command->info('foo');
     }
