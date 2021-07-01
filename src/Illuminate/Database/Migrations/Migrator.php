@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
@@ -411,16 +412,22 @@ class Migrator
      */
     protected function pretendToRun($migration, $method)
     {
-        foreach ($this->getQueries($migration, $method) as $query) {
+        try {
+            foreach ($this->getQueries($migration, $method) as $query) {
+                $name = get_class($migration);
+
+                $reflectionClass = new ReflectionClass($migration);
+
+                if ($reflectionClass->isAnonymous()) {
+                    $name = $this->getMigrationName($reflectionClass->getFileName());
+                }
+
+                $this->note("<info>{$name}:</info> {$query['query']}");
+            }
+        } catch (SchemaException $e) {
             $name = get_class($migration);
 
-            $reflectionClass = new ReflectionClass($migration);
-
-            if ($reflectionClass->isAnonymous()) {
-                $name = $this->getMigrationName($reflectionClass->getFileName());
-            }
-
-            $this->note("<info>{$name}:</info> {$query['query']}");
+            $this->note("<info>{$name}:</info> failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations.");
         }
     }
 
