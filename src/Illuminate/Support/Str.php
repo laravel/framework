@@ -513,9 +513,11 @@ class Str
      * Generate a more truly "random" alpha-numeric string.
      *
      * @param  int  $length
+     * @param  string  $regexPattern
+     *
      * @return string
      */
-    public static function random($length = 16)
+    public static function random($length = 16, $regexPattern='A-Za-z0-9')
     {
         $string = '';
 
@@ -524,7 +526,7 @@ class Str
 
             $bytes = random_bytes($size);
 
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            $string .= substr(preg_replace('/[^'.$regexPattern.'\-]/', '', base64_encode($bytes)), 0, $size);
         }
 
         return $string;
