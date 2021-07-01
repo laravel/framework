@@ -60,7 +60,9 @@ class MailSesTransportTest extends TestCase
             ->method('sendEmail')
             ->with($this->equalTo([
                 'FromEmailAddress' => 'myself@example.com',
-                'RawMessage' => ['Data' => (string) $message],
+                'Content' => [
+                    'Raw' => ['Data' => (string) $message],
+                ],
             ]))
             ->willReturn($sendRawEmailMock);
 
