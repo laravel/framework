@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
+use Illuminate\Bus\Batch;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Arr;
@@ -637,13 +638,33 @@ class BusFake implements QueueingDispatcher
      * Record the fake pending batch dispatch.
      *
      * @param  \Illuminate\Bus\PendingBatch $pendingBatch
-     * @return \Illuminate\Bus\Batch
+     * @return \Illuminate\Support\Testing\Fakes\BatchFake
      */
     public function recordPendingBatch(PendingBatch $pendingBatch)
     {
-        $this->batches[] = $pendingBatch;
+        $batchFake = (new BatchRepositoryFake)->store($pendingBatch);
 
-        return (new BatchRepositoryFake)->store($pendingBatch);
+        $this->batches[$batchFake->id] = $pendingBatch;
+
+        return $batchFake;
+    }
+
+    /**
+     * Record the fake batch add.
+     *
+     * @param  \Illuminate\Support\Testing\Fakes\BatchFake $batchFake
+     * @return \Illuminate\Support\Testing\Fakes\BatchFake
+     */
+    public function recordBatch(BatchFake $batchFake)
+    {
+        /** @var \Illuminate\Bus\PendingBatch $batch */
+        foreach ($this->batches as $key => $batch) {
+            if ($key === $batchFake->id) {
+                $this->batches[$key] = $batchFake;
+            }
+        }
+
+        return $batchFake;
     }
 
     /**

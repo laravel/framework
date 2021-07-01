@@ -4,7 +4,6 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Carbon\CarbonImmutable;
 use Closure;
-use Illuminate\Bus\Batch;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\UpdatedBatchJobCounts;
@@ -39,25 +38,27 @@ class BatchRepositoryFake implements BatchRepository
     /**
      * Store a new pending batch.
      *
-     * @param  \Illuminate\Bus\PendingBatch  $batch
-     * @return \Illuminate\Bus\Batch
+     * @param  \Illuminate\Bus\PendingBatch  $pendingBatch
+     * @return \Illuminate\Support\Testing\Fakes\BatchFake
      */
-    public function store(PendingBatch $batch)
+    public function store(PendingBatch $pendingBatch)
     {
-        return new Batch(
+        return tap(new BatchFake(
             new QueueFake(Facade::getFacadeApplication()),
             $this,
             (string) Str::orderedUuid(),
-            $batch->name,
-            count($batch->jobs),
-            count($batch->jobs),
+            $pendingBatch->name,
+            count($pendingBatch->jobs),
+            count($pendingBatch->jobs),
             0,
             [],
-            $batch->options,
+            $pendingBatch->options,
             CarbonImmutable::now(),
             null,
             null
-        );
+        ), function (BatchFake $batch) use ($pendingBatch) {
+            $batch->setBus($pendingBatch->bus());
+        });
     }
 
     /**

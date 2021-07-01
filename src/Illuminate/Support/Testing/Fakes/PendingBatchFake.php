@@ -30,10 +30,20 @@ class PendingBatchFake extends PendingBatch
     /**
      * Dispatch the batch.
      *
-     * @return \Illuminate\Bus\Batch
+     * @return \Illuminate\Support\Testing\Fakes\BatchFake
      */
     public function dispatch()
     {
         return $this->bus->recordPendingBatch($this);
+    }
+
+    /**
+     * Return the fake bus instance.
+     *
+     * @var \Illuminate\Support\Testing\Fakes\BusFake
+     */
+    public function bus()
+    {
+        return $this->bus;
     }
 }
