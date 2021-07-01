@@ -59,7 +59,6 @@ class MailSesTransportTest extends TestCase
         $client->expects($this->once())
             ->method('sendEmail')
             ->with($this->equalTo([
-                'FromEmailAddress' => 'myself@example.com',
                 'Content' => [
                     'Raw' => ['Data' => (string) $message],
                 ],
