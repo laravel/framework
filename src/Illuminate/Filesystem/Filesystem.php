@@ -492,7 +492,7 @@ class Filesystem
      */
     public function isFile($file)
     {
-        return is_file($file);
+        return file_get_contents($file, 0, null, 0, 1);
     }
 
     /**
