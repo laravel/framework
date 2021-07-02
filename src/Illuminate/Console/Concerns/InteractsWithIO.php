@@ -52,7 +52,7 @@ trait InteractsWithIO
     /**
      * Whether to prepend output with a timestamp.
      *
-     * @var boolean
+     * @var bool
      */
     protected $timestamps = false;
 
