@@ -5,14 +5,14 @@ namespace Illuminate\Database\Events;
 class ModelsPruned
 {
     /**
-     * The model class pruned.
+     * The model that was pruned.
      *
      * @var string
      */
     public $model;
 
     /**
-     * The amount of models records pruned.
+     * The amount of pruned records.
      *
      * @var int
      */

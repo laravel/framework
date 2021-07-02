@@ -17,7 +17,7 @@ class PruneCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'db:prune {--model=* : Class names the of models to prune}';
+    protected $signature = 'db:prune {--model=* : Class names of the models to be pruned}';
 
     /**
      * The console command description.
@@ -53,7 +53,7 @@ class PruneCommand extends Command
     }
 
     /**
-     * Dertermine the models that should be pruned.
+     * Determine the models that should be pruned.
      *
      * @return array
      */
