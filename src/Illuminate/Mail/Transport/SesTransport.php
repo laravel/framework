@@ -44,9 +44,8 @@ class SesTransport extends Transport
         $result = $this->ses->sendEmail(
             array_merge(
                 $this->options, [
-                    'FromEmailAddress' => key($message->getSender() ?: $message->getFrom()),
-                    'RawMessage' => [
-                        'Data' => $message->toString(),
+                    'Content' => [
+                        'Raw' => ['Data' => $message->toString()],
                     ],
                 ]
             )
