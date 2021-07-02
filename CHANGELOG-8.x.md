@@ -1,6 +1,21 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.48.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.48.2...8.x)
+
+
+## [v8.48.2 (2021-07-02)](https://github.com/laravel/framework/compare/v8.48.1...v8.48.2)
+
+### Added
+- Added parameter casting for cursor paginated items ([#37785](https://github.com/laravel/framework/pull/37785), [31ebfc8](https://github.com/laravel/framework/commit/31ebfc86e5c707954b88c43fbe872cb06bc76d28))
+- Added `Illuminate/Http/ResponseTrait::statusText()` ([#37795](https://github.com/laravel/framework/pull/37795))
+- Track a loop variable for sequence and pass it with count to closure ([#37799](https://github.com/laravel/framework/pull/37799))
+- Added "precedence" order to route:list command ([#37824](https://github.com/laravel/framework/pull/37824))
+
+### Fixed
+- Remove ksort in pool results that modifies intended original order ([#37775](https://github.com/laravel/framework/pull/37775))
+- Make sure availableIn returns positive values in `/Illuminate/Cache/RateLimiter::availableIn()` ([#37809](https://github.com/laravel/framework/pull/37809))-
+- Ensure alias is rebound when mocking items in the container in tests ([#37810](https://github.com/laravel/framework/pull/37810))
+- Move primary after collate in `/MySqlGrammar.php` modifiers ([#37815](https://github.com/laravel/framework/pull/37815)))
 
 
 ## [v8.48.1 (2021-06-23)](https://github.com/laravel/framework/compare/v8.48.0...v8.48.1)
