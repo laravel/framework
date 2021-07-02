@@ -59,9 +59,11 @@ class EloquentPrunableTest extends DatabaseTestCase
             ->times(2)
             ->with(m::type(ModelsPruned::class));
 
-        PrunableTestModel::insert(collect(range(1, 5000))->map(function ($id) {
+        collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id];
-        })->all());
+        })->chunk(500)->each(function ($chunk) {
+            PrunableTestModel::insert($chunk->all());
+        });
 
         $count = (new PrunableTestModel)->pruneAll();
 
@@ -76,9 +78,11 @@ class EloquentPrunableTest extends DatabaseTestCase
             ->times(3)
             ->with(m::type(ModelsPruned::class));
 
-        PrunableSoftDeleteTestModel::insert(collect(range(1, 5000))->map(function ($id) {
+        collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id, 'deleted_at' => now()];
-        })->all());
+        })->chunk(500)->each(function ($chunk) {
+            PrunableSoftDeleteTestModel::insert($chunk->all());
+        });
 
         $count = (new PrunableSoftDeleteTestModel)->pruneAll();
 
@@ -94,9 +98,11 @@ class EloquentPrunableTest extends DatabaseTestCase
             ->times(1)
             ->with(m::type(ModelsPruned::class));
 
-        PrunableWithCustomPruneMethodTestModel::insert(collect(range(1, 5000))->map(function ($id) {
+        collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id];
-        })->all());
+        })->chunk(500)->each(function ($chunk) {
+            PrunableWithCustomPruneMethodTestModel::insert($chunk->all());
+        });
 
         $count = (new PrunableWithCustomPruneMethodTestModel)->pruneAll();
 

@@ -58,9 +58,11 @@ class EloquentMassPrunableTest extends DatabaseTestCase
             ->times(2)
             ->with(m::type(ModelsPruned::class));
 
-        MassPrunableTestModel::insert(collect(range(1, 5000))->map(function ($id) {
+        collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id];
-        })->all());
+        })->chunk(500)->each(function ($chunk) {
+            MassPrunableTestModel::insert($chunk->all());
+        });
 
         $count = (new MassPrunableTestModel)->pruneAll();
 
@@ -75,9 +77,11 @@ class EloquentMassPrunableTest extends DatabaseTestCase
             ->times(3)
             ->with(m::type(ModelsPruned::class));
 
-        MassPrunableSoftDeleteTestModel::insert(collect(range(1, 5000))->map(function ($id) {
+        collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id, 'deleted_at' => now()];
-        })->all());
+        })->chunk(500)->each(function ($chunk) {
+            MassPrunableSoftDeleteTestModel::insert($chunk->all());
+        });
 
         $count = (new MassPrunableSoftDeleteTestModel)->pruneAll();
 
