@@ -61,7 +61,7 @@ class EloquentPrunableTest extends DatabaseTestCase
 
         collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id];
-        })->chunk(500)->each(function ($chunk) {
+        })->chunk(200)->each(function ($chunk) {
             PrunableTestModel::insert($chunk->all());
         });
 
@@ -80,7 +80,7 @@ class EloquentPrunableTest extends DatabaseTestCase
 
         collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id, 'deleted_at' => now()];
-        })->chunk(500)->each(function ($chunk) {
+        })->chunk(200)->each(function ($chunk) {
             PrunableSoftDeleteTestModel::insert($chunk->all());
         });
 
@@ -100,7 +100,7 @@ class EloquentPrunableTest extends DatabaseTestCase
 
         collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id];
-        })->chunk(500)->each(function ($chunk) {
+        })->chunk(200)->each(function ($chunk) {
             PrunableWithCustomPruneMethodTestModel::insert($chunk->all());
         });
 
