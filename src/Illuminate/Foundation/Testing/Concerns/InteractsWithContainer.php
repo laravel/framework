@@ -78,24 +78,6 @@ trait InteractsWithContainer
     }
 
     /**
-     * Register an instance of an object as a singleton in the container.
-     *
-     * @param  string  $abstract
-     * @param  \Mockery\MockInterface  $instance
-     * @return \Mockery\MockInterface
-     */
-    protected function singletonInstance($abstract, $instance)
-    {
-        $abstract = $this->app->getAlias($abstract);
-
-        $this->app->singleton($abstract, function () use ($instance) {
-            return $instance;
-        });
-
-        return $instance;
-    }
-
-    /**
      * Register an empty handler for Laravel Mix in the container.
      *
      * @return $this
