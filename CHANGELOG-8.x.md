@@ -1,9 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.48.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.49.0...8.x)
 
 
-## [v8.48.2 (2021-07-02)](https://github.com/laravel/framework/compare/v8.48.1...v8.48.2)
+## [v8.49.0 (2021-07-02)](https://github.com/laravel/framework/compare/v8.48.2...v8.49.0)
+
+### Added
+- Add context to subsequent logs ([#37847](https://github.com/laravel/framework/pull/37847))
+
+
+## [v8.48.2 (2021-06-26)](https://github.com/laravel/framework/compare/v8.48.1...v8.48.2)
 
 ### Added
 - Added parameter casting for cursor paginated items ([#37785](https://github.com/laravel/framework/pull/37785), [31ebfc8](https://github.com/laravel/framework/commit/31ebfc86e5c707954b88c43fbe872cb06bc76d28))
