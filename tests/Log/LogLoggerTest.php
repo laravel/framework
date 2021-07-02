@@ -16,6 +16,8 @@ class LogLoggerTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testMethodsPassErrorAdditionsToMonolog()
@@ -26,12 +28,23 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
-    public function testContextIsAddedToAllSubsequentLogs()
+    public function testContextIsRecursivelyAddedToAllSubsequentLogs()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['payload' => ['uuid' => 123]]);
+
+        $monolog->shouldReceive('error')->once()->with('foo', ['payload' => ['uuid' => 123, 'type' => 'cli']]);
+
+        $writer->error('foo', ['payload' => ['type' => 'cli']]);
+    }
+
+    public function testContextIsRemovedFromAllSubsequentLogs()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class));
         $writer->withContext(['bar' => 'baz']);
+        $writer->withoutContext();
 
-        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
+        $monolog->shouldReceive('error')->once()->with('foo', []);
 
         $writer->error('foo');
     }
