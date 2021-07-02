@@ -37,7 +37,7 @@ class PruneCommandTest extends TestCase
 10 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records have been pruned.
 20 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records have been pruned.
 
-EOF, $output->fetch());
+EOF, str_replace("\r", '', $output->fetch()));
     }
 
     public function testPrunableTestModelWithoutPrunableRecords()
@@ -47,7 +47,7 @@ EOF, $output->fetch());
         $this->assertEquals(<<<'EOF'
 No prunable [Illuminate\Tests\Database\PrunableTestModelWithoutPrunableRecords] records found.
 
-EOF, $output->fetch());
+EOF, str_replace("\r", '', $output->fetch()));
     }
 
     public function testNonPrunableTest()
@@ -57,7 +57,7 @@ EOF, $output->fetch());
         $this->assertEquals(<<<'EOF'
 No prunable [Illuminate\Tests\Database\NonPrunableTestModel] records found.
 
-EOF, $output->fetch());
+EOF, str_replace("\r", '', $output->fetch()));
     }
 
     protected function artisan($arguments)
