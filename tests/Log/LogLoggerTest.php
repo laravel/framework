@@ -32,8 +32,15 @@ class LogLoggerTest extends TestCase
     {
         $writer = new Logger($monolog = m::mock(Monolog::class));
         $writer->withContext(['payload' => ['uuid' => 123]]);
+        $writer->withContext(['payload' => ['pod' => 'xyz']]);
 
-        $monolog->shouldReceive('error')->once()->with('foo', ['payload' => ['uuid' => 123, 'type' => 'cli']]);
+        $monolog->shouldReceive('error')->once()->with('foo', [
+            'payload' => [
+                'uuid' => 123,
+                'pod' => 'xyz',
+                'type' => 'cli',
+            ],
+        ]);
 
         $writer->error('foo', ['payload' => ['type' => 'cli']]);
     }
