@@ -275,7 +275,7 @@ trait InteractsWithIO
     public function line($string, $style = null, $verbosity = null)
     {
         if ($this->timestamps) {
-            $string = Carbon::now()->format("[$this->timestampFormat] ") . $string;
+            $string = Carbon::now()->format("[$this->timestampFormat] ").$string;
         }
 
         $styled = $style ? "<$style>$string</$style>" : $string;
