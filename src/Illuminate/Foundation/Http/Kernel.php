@@ -459,7 +459,7 @@ class Kernel implements KernelContract
     /**
      * Set the Laravel application instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return $this
      */
     public function setApplication(Application $app)
