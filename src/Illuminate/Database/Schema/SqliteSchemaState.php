@@ -9,7 +9,7 @@ class SqliteSchemaState extends SchemaState
     /**
      * Dump the database's schema into a file.
      *
-     * @param  \Illuminate\Database\Connection
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
      * @return void
      */
