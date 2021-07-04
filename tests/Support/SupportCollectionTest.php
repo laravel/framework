@@ -1273,7 +1273,7 @@ class SupportCollectionTest extends TestCase
         $c1 = new $collection(['id' => 1, 'first_word' => 'Hello']);
         $c2 = new $collection(['ID' => 123, 'foo_bar' => 'Hello']);
         // demonstrate that diffKeys wont support case insensitivity
-        $this->assertEquals(['id'=>1, 'first_word'=> 'Hello'], $c1->diffKeys($c2)->all());
+        $this->assertEquals(['id' => 1, 'first_word' => 'Hello'], $c1->diffKeys($c2)->all());
         // allow for case insensitive difference
         $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeysUsing($c2, 'strcasecmp')->all());
     }
