@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
+use Exception;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
@@ -695,6 +696,14 @@ class SupportHelpersTest extends TestCase
 
         $_SERVER['foo'] = 'x"null"x'; // this should not be unquoted
         $this->assertSame('x"null"x', env('foo'));
+    }
+
+    public function testEnvOrThrow()
+    {
+        $_SERVER['foo'] = 'bar';
+        $this->assertSame('bar', env_or_throw('foo'));
+        $this->expectException(Exception::class);
+        env_or_throw('baz');
     }
 
     public function testGetFromSERVERFirst()

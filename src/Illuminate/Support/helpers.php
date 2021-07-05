@@ -133,6 +133,21 @@ if (! function_exists('env')) {
     }
 }
 
+if (! function_exists('env_or_throw')) {
+    /**
+     * Gets the value of an environment variable or throws if undefined.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    function env_or_throw($key)
+    {
+        return Env::get($key, function () use ($key) {
+            throw new Exception("Missing require environment variable '{$key}'.");
+        });
+    }
+}
+
 if (! function_exists('filled')) {
     /**
      * Determine if a value is "filled".
