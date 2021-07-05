@@ -465,14 +465,4 @@ class Batch implements Arrayable, JsonSerializable
     {
         return $this->toArray();
     }
-
-    /**
-     * Return the repository implementation.
-     *
-     * @var \Illuminate\Bus\BatchRepository
-     */
-    public function repository()
-    {
-        return $this->repository;
-    }
 }
