@@ -316,6 +316,18 @@ if (! function_exists('cookie')) {
     }
 }
 
+if (! function_exists('idempotency_key_field')) {
+    /**
+     * Generate a Idempotency Key form field.
+     *
+     * @return \Illuminate\Support\HtmlString
+     */
+    function idempotency_key_field()
+    {
+        return new HtmlString('<input type="hidden" name="_idempotency_key" value="'.Str::uuid().'">');
+    }
+}
+
 if (! function_exists('csrf_field')) {
     /**
      * Generate a CSRF token form field.
