@@ -18,7 +18,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $db = new DB;
 
         $db->addConnection([
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
         ]);
 
@@ -291,15 +291,15 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     {
         $user = HasOneOfManyTestUser::create();
         $user->states()->create([
-            'type'  => 'foo',
+            'type' => 'foo',
             'state' => 'draft',
         ]);
         $currentForState = $user->states()->create([
-            'type'  => 'foo',
+            'type' => 'foo',
             'state' => 'active',
         ]);
         $user->states()->create([
-            'type'  => 'bar',
+            'type' => 'bar',
             'state' => 'baz',
         ]);
 
@@ -374,7 +374,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertFalse($user->foo_state_exists);
 
         $user->states()->create([
-            'type'  => 'foo',
+            'type' => 'foo',
             'state' => 'bar',
         ]);
         $user = HasOneOfManyTestUser::withExists('foo_state')->first();
@@ -473,7 +473,7 @@ class HasOneOfManyTestUser extends Eloquent
     {
         return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->ofMany([
             'published_at' => 'max',
-            'id'           => 'max',
+            'id' => 'max',
         ], function ($q) {
             $q->where('published_at', '<', now());
         });

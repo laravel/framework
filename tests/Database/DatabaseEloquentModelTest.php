@@ -142,7 +142,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelCastingStub;
         $model->setRawAttributes([
-            'objectAttribute'     => '["one", "two", "three"]',
+            'objectAttribute' => '["one", "two", "three"]',
             'collectionAttribute' => '["one", "two", "three"]',
         ]);
         $model->syncOriginal();
@@ -504,7 +504,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testTimestampsAreReturnedAsObjectsOnCreate()
     {
         $timestamps = [
-            'created_at' =>Carbon::now(),
+            'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
         $model = new EloquentDateModelStub;

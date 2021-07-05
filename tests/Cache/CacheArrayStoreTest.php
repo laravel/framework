@@ -22,16 +22,16 @@ class CacheArrayStoreTest extends TestCase
         $store = new ArrayStore;
         $result = $store->put('foo', 'bar', 10);
         $resultMany = $store->putMany([
-            'fizz'  => 'buz',
-            'quz'   => 'baz',
+            'fizz' => 'buz',
+            'quz' => 'baz',
         ], 10);
         $this->assertTrue($result);
         $this->assertTrue($resultMany);
         $this->assertEquals([
-            'foo'   => 'bar',
-            'fizz'  => 'buz',
-            'quz'   => 'baz',
-            'norf'  => null,
+            'foo' => 'bar',
+            'fizz' => 'buz',
+            'quz' => 'baz',
+            'norf' => null,
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
     }
 
