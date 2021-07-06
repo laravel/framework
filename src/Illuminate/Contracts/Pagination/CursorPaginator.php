@@ -63,7 +63,7 @@ interface CursorPaginator
      * @param  string  $name
      * @return \Illuminate\Pagination\AbstractCursorPaginator
      */
-    public function setCursorName();
+    public function setCursorName($name);
 
     /**
      * Get the "cursor" of the previous set of items.
