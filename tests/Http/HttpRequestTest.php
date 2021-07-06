@@ -1016,7 +1016,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($request->request->all(), $body);
     }
     
-    /** 
+    /**
      * Ensure non-JSON GET requests don't pollute $request->request with the GET parameters.
      *
      * @link https://github.com/laravel/framework/pull/37921 Manually populate POST request body with JSON data only when required.
