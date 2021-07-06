@@ -45,7 +45,7 @@ class Idempotent
     }
 
     /**
-     * Get checksum of request payload
+     * Get checksum of request payload.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
@@ -91,7 +91,7 @@ class Idempotent
         $response = $next($request);
         $encodedData = json_encode([
             'payload_checksum' => $payloadChecksum,
-            'response' => serialize($response)
+            'response' => serialize($response),
         ]);
 
         $this->cache->set(
