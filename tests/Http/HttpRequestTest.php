@@ -994,9 +994,9 @@ class HttpRequestTest extends TestCase
     }
 
     /**
-     * Ensure JSON GET requests populate $request->request with the JSON content
+     * Ensure JSON GET requests populate $request->request with the JSON content.
      *
-     * @link https://github.com/laravel/framework/pull/7052 Correctly fill the $request->request parameter bag on creation
+     * @link https://github.com/laravel/framework/pull/7052 Correctly fill the $request->request parameter bag on creation.
      */
     public function testJsonRequestFillsRequestBodyParams()
     {
@@ -1017,18 +1017,18 @@ class HttpRequestTest extends TestCase
     }
     
     /** 
-     * Ensure non-JSON GET requests don't pollute $request->request with the GET parameters
+     * Ensure non-JSON GET requests don't pollute $request->request with the GET parameters.
      *
-     * @link https://github.com/laravel/framework/pull/37921 Manually populate POST request body with JSON data only when required
+     * @link https://github.com/laravel/framework/pull/37921 Manually populate POST request body with JSON data only when required.
      */
     public function testNonJsonRequestDoesntFillRequestBodyParams()
     {
         $params = ['foo' => 'bar'];
-        
+
         $getRequest = Request::create('/', 'GET', $params, [], [], []);
         $this->assertEquals($getRequest->request->all(), []);
         $this->assertEquals($getRequest->query->all(), $params);
-        
+
         $postRequest = Request::create('/', 'POST', $params, [], [], []);
         $this->assertEquals($postRequest->request->all(), $params);
         $this->assertEquals($postRequest->query->all(), []);
