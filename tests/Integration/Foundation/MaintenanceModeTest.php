@@ -174,5 +174,28 @@ class MaintenanceModeTest extends TestCase
         $otherResponse->assertStatus(503);
     }
 
+    public function testMultipleMaintenanceHandlersCanBeDefined()
+    {
+        $this->app['router']->addMaintenanceModeHandler(function(Request $request) {
+            return false;
+        });
+
+        $this->app['router']->addMaintenanceModeHandler(function(Request $request) {
+            return true;
+        });
+
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+            'refresh' => 60,
+        ]));
+
+        Route::get('/foo', function () {
+            return 'Hello world';
+        })->middleware(PreventRequestsDuringMaintenance::class);
+
+        $response = $this->get('/foo');
+        $response->assertStatus(200);
+    }
+
 
 }
