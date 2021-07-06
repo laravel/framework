@@ -17,14 +17,16 @@ class PruneCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'model:prune {--model=* : Class names of the models to be pruned}';
+    protected $signature = 'model:prune
+                                {--model=* : Class names of the models to be pruned}
+                                {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Prune obsolete models';
+    protected $description = 'Prune models that are no longer needed';
 
     /**
      * Execute the console command.
@@ -35,11 +37,19 @@ class PruneCommand extends Command
     public function handle(Dispatcher $events)
     {
         $events->listen(ModelsPruned::class, function ($event) {
-            $this->info("{$event->amount} [{$event->model}] records have been pruned.");
+            $this->info("{$event->count} [{$event->model}] records have been pruned.");
         });
 
         $this->models()->each(function ($model) {
-            $total = $this->isPrunable($model) ? (new $model)->pruneAll() : 0;
+            $instance = new $model;
+
+            $chunkSize = property_exists($instance, 'prunableChunkSize')
+                            ? $instance->prunableChunkSize
+                            : $this->option('chunk');
+
+            $total = $this->isPrunable($model)
+                        ? $instance->pruneAll($chunkSize)
+                        : 0;
 
             if ($total == 0) {
                 $this->info("No prunable [$model] records found.");

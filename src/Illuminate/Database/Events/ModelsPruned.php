@@ -5,29 +5,29 @@ namespace Illuminate\Database\Events;
 class ModelsPruned
 {
     /**
-     * The model that was pruned.
+     * The class name of the model that was pruned.
      *
      * @var string
      */
     public $model;
 
     /**
-     * The amount of pruned records.
+     * The number of pruned records.
      *
      * @var int
      */
-    public $amount;
+    public $count;
 
     /**
      * Create a new event instance.
      *
      * @param  string  $model
-     * @param  int  $amount
+     * @param  int  $count
      * @return void
      */
-    public function __construct($model, $amount)
+    public function __construct($model, $count)
     {
         $this->model = $model;
-        $this->amount = $amount;
+        $this->count = $count;
     }
 }
