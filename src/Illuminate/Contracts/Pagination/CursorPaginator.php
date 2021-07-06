@@ -51,6 +51,21 @@ interface CursorPaginator
     public function items();
 
     /**
+     * Get the query string variable used to store the cursor.
+     *
+     * @return string
+     */
+    public function getCursorName();
+
+    /**
+     * Set the query string variable used to store the cursor.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Pagination\AbstractCursorPaginator
+     */
+    public function setCursorName();
+
+    /**
      * Get the "cursor" of the previous set of items.
      *
      * @return \Illuminate\Pagination\Cursor|null
@@ -63,6 +78,13 @@ interface CursorPaginator
      * @return \Illuminate\Pagination\Cursor|null
      */
     public function nextCursor();
+
+    /**
+     * Determine if the paginator is on the first page.
+     *
+     * @return bool
+     */
+    public function onFirstPage();
 
     /**
      * Determine how many items are being shown per page.
@@ -84,6 +106,13 @@ interface CursorPaginator
      * @return bool
      */
     public function hasPages();
+
+    /**
+     * Determine if there are more items in the data source.
+     *
+     * @return bool
+     */
+    public function hasMorePages();
 
     /**
      * Get the base path for paginator generated URLs.
