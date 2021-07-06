@@ -111,7 +111,7 @@ class IdempotentRequestTest extends TestbenchTestCase
             ],
             [
                 'Accept' => 'application/json',
-                'Idempotency-Key' => Str::random(39)
+                'Idempotency-Key' => Str::random(39),
             ]
         );
 
