@@ -117,7 +117,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Callables used to determine whether or not a request should bypass maintenance mode.
      *
-     * @var array<callable>
+     * @var array
      */
     protected $maintenanceModeHandlers = [];
 
@@ -1293,7 +1293,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Returns any registered maintenance mode handlers.
      *
-     * @return array<callable>
+     * @return array
      */
     public function getMaintenanceModeHandlers()
     {
