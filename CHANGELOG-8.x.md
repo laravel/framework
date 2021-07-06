@@ -1,6 +1,20 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.49.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.49.1...8.x)
+
+
+## [v8.49.1 (2021-07-02)](https://github.com/laravel/framework/compare/v8.49.0...v8.49.1)
+
+### Reverted 
+- Reverted [Bind mock instances as singletons so they are not overwritten](https://github.com/laravel/framework/pull/37746) ([#37892](https://github.com/laravel/framework/pull/37892))
+
+### Fixed
+- Fixed undefined array key in SqlServerGrammar when using orderByRaw ([#37859](https://github.com/laravel/framework/pull/37859))
+- Fixed facade isMock to recognise LegacyMockInterface ([#37882](https://github.com/laravel/framework/pull/37882))
+
+### Changed
+- Reset the log context after each worker loop ([#37865](https://github.com/laravel/framework/pull/37865))
+- Improve pretend run Doctrine failure message ([#37879](https://github.com/laravel/framework/pull/37879))
 
 
 ## [v8.49.0 (2021-07-02)](https://github.com/laravel/framework/compare/v8.48.2...v8.49.0)
