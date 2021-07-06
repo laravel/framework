@@ -146,7 +146,7 @@ class NotificationChannelManagerTestCancelledNotification extends Notification
         return $this->line('test')->action('Text', 'url');
     }
 
-    public function shouldBeSent($notifiable, $channel)
+    public function shouldSend($notifiable, $channel)
     {
         return false;
     }
@@ -164,7 +164,7 @@ class NotificationChannelManagerTestNotCancelledNotification extends Notificatio
         return $this->line('test')->action('Text', 'url');
     }
 
-    public function shouldBeSent($notifiable, $channel)
+    public function shouldSend($notifiable, $channel)
     {
         return true;
     }

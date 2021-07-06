@@ -162,7 +162,8 @@ class NotificationSender
      */
     protected function shouldSendNotification($notifiable, $notification, $channel)
     {
-        if (method_exists($notification, 'shouldBeSent') && ($notification->shouldBeSent($notifiable, $channel) !== true)) {
+        if (method_exists($notification, 'shouldSend') &&
+            $notification->shouldSend($notifiable, $channel) === false) {
             return false;
         }
 
