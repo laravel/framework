@@ -14,7 +14,7 @@ class PreventRequestsDuringMaintenance
     /**
      * The application implementation.
      *
-     * @var Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -28,7 +28,7 @@ class PreventRequestsDuringMaintenance
     /**
      * Create a new middleware instance.
      *
-     * @param Application $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
      * @return void
      */
     public function __construct(Application $app)
@@ -39,11 +39,11 @@ class PreventRequestsDuringMaintenance
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
-     * @param Closure $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
      * @return mixed
      *
-     * @throws HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function handle($request, Closure $next)
     {
@@ -92,7 +92,7 @@ class PreventRequestsDuringMaintenance
     /**
      * Determine if the incoming request has a maintenance mode bypass cookie.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  array  $data
      * @return bool
      */
@@ -109,7 +109,7 @@ class PreventRequestsDuringMaintenance
     /**
      * Determine if the request has a URI that should be accessible in maintenance mode.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     protected function inExceptArray($request)
@@ -130,7 +130,7 @@ class PreventRequestsDuringMaintenance
     /**
      * Determine if there is a maintenance mode handler that returns true for the given request.
      *
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @return bool
      */
     protected function hasTruthyHandler(Request $request)
@@ -147,7 +147,7 @@ class PreventRequestsDuringMaintenance
      * Redirect the user back to the root of the application with a maintenance mode bypass cookie.
      *
      * @param  string  $secret
-     * @return RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     protected function bypassResponse(string $secret)
     {
