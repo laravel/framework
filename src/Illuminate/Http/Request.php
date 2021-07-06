@@ -315,6 +315,25 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Merge new input into the current request's input array if the key already exists.
+     *
+     * @param  array  $input
+     * @return $this
+     */
+    public function mergeIfExists(array $input)
+    {
+        foreach ($input as $key => $value) {
+            if ($this->has($key)) {
+                $this->merge([
+                    $key => $value,
+                ]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Replace the input for the current request.
      *
      * @param  array  $input
