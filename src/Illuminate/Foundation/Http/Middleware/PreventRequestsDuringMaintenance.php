@@ -5,6 +5,8 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PreventRequestsDuringMaintenance
@@ -12,7 +14,7 @@ class PreventRequestsDuringMaintenance
     /**
      * The application implementation.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var Application
      */
     protected $app;
 
@@ -26,7 +28,7 @@ class PreventRequestsDuringMaintenance
     /**
      * Create a new middleware instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param Application $app
      * @return void
      */
     public function __construct(Application $app)
@@ -37,11 +39,11 @@ class PreventRequestsDuringMaintenance
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
+     * @param Closure $next
      * @return mixed
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws HttpException
      */
     public function handle($request, Closure $next)
     {
@@ -53,7 +55,8 @@ class PreventRequestsDuringMaintenance
             }
 
             if ($this->hasValidBypassCookie($request, $data) ||
-                $this->inExceptArray($request)) {
+                $this->inExceptArray($request) ||
+                $this->hasTruthyHandler($request)) {
                 return $next($request);
             }
 
@@ -89,7 +92,7 @@ class PreventRequestsDuringMaintenance
     /**
      * Determine if the incoming request has a maintenance mode bypass cookie.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  array  $data
      * @return bool
      */
@@ -106,7 +109,7 @@ class PreventRequestsDuringMaintenance
     /**
      * Determine if the request has a URI that should be accessible in maintenance mode.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return bool
      */
     protected function inExceptArray($request)
@@ -125,10 +128,24 @@ class PreventRequestsDuringMaintenance
     }
 
     /**
+     * Determine if there is a maintenance mode handler that returns true for the given request.
+     *
+     * @param Request $request
+     * @return bool
+     */
+    protected function hasTruthyHandler(Request $request)
+    {
+        return !empty(array_filter(array_map(
+            function($callback) use ($request) { return $callback->__invoke($request); },
+            $this->app['router']->getMaintenanceModeHandlers()
+        )));
+    }
+
+    /**
      * Redirect the user back to the root of the application with a maintenance mode bypass cookie.
      *
      * @param  string  $secret
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     protected function bypassResponse(string $secret)
     {

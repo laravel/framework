@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
@@ -146,4 +147,32 @@ class MaintenanceModeTest extends TestCase
 
         Carbon::setTestNow(null);
     }
+
+    public function testCanAddClosureBasedExceptRoutes()
+    {
+        $this->app['router']->addMaintenanceModeHandler(function(Request $request) {
+            return $request->path() == 'foo';
+        });
+
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+            'refresh' => 60,
+        ]));
+
+        Route::get('/foo', function () {
+            return 'You shall pass!';
+        })->middleware(PreventRequestsDuringMaintenance::class);
+
+        Route::get('/bar', function () {
+            return 'You shall not pass!';
+        })->middleware(PreventRequestsDuringMaintenance::class);
+
+        $response = $this->get('/foo');
+        $response->assertStatus(200);
+
+        $otherResponse = $this->get('/bar');
+        $otherResponse->assertStatus(503);
+    }
+
+
 }

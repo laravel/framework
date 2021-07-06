@@ -115,6 +115,13 @@ class Router implements BindingRegistrar, RegistrarContract
     protected $groupStack = [];
 
     /**
+     * Callables used to determine whether or not a request should bypass maintenance mode.
+     *
+     * @var array<callable>
+     */
+    protected $maintenanceModeHandlers = [];
+
+    /**
      * All of the verbs supported by the router.
      *
      * @var string[]
@@ -1270,6 +1277,27 @@ class Router implements BindingRegistrar, RegistrarContract
             ->setContainer($this->container);
 
         $this->container->instance('routes', $this->routes);
+    }
+
+    /**
+     * Add a maintenance mode handler to the stack.
+     *
+     * @param callable $callback
+     * @return void
+     */
+    public function addMaintenanceModeHandler(callable $callback)
+    {
+        $this->maintenanceModeHandlers[] = $callback;
+    }
+
+    /**
+     * Returns any registered maintenance mode handlers.
+     *
+     * @return array<callable>
+     */
+    public function getMaintenanceModeHandlers()
+    {
+        return $this->maintenanceModeHandlers;
     }
 
     /**
