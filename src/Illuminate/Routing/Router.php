@@ -1282,7 +1282,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Add a maintenance mode handler to the stack.
      *
-     * @param callable $callback
+     * @param  callable  $callback
      * @return void
      */
     public function addMaintenanceModeHandler(callable $callback)
