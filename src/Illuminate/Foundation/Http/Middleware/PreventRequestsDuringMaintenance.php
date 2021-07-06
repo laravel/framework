@@ -135,8 +135,10 @@ class PreventRequestsDuringMaintenance
      */
     protected function hasTruthyHandler(Request $request)
     {
-        return !empty(array_filter(array_map(
-            function($callback) use ($request) { return $callback->__invoke($request); },
+        return ! empty(array_filter(array_map(
+            function ($callback) use ($request) {
+                return $callback->__invoke($request);
+            },
             $this->app['router']->getMaintenanceModeHandlers()
         )));
     }

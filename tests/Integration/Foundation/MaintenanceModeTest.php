@@ -150,7 +150,7 @@ class MaintenanceModeTest extends TestCase
 
     public function testCanAddClosureBasedExceptRoutes()
     {
-        $this->app['router']->addMaintenanceModeHandler(function(Request $request) {
+        $this->app['router']->addMaintenanceModeHandler(function (Request $request) {
             return $request->path() == 'foo';
         });
 
@@ -176,11 +176,11 @@ class MaintenanceModeTest extends TestCase
 
     public function testMultipleMaintenanceHandlersCanBeDefined()
     {
-        $this->app['router']->addMaintenanceModeHandler(function(Request $request) {
+        $this->app['router']->addMaintenanceModeHandler(function (Request $request) {
             return false;
         });
 
-        $this->app['router']->addMaintenanceModeHandler(function(Request $request) {
+        $this->app['router']->addMaintenanceModeHandler(function (Request $request) {
             return true;
         });
 
@@ -196,6 +196,4 @@ class MaintenanceModeTest extends TestCase
         $response = $this->get('/foo');
         $response->assertStatus(200);
     }
-
-
 }
