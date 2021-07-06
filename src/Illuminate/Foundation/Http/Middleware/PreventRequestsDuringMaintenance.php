@@ -129,7 +129,7 @@ class PreventRequestsDuringMaintenance
     /**
      * Determine if there is a maintenance mode handler that returns true for the given request.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     protected function hasTruthyHandler(Request $request)
