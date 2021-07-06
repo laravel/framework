@@ -1015,7 +1015,7 @@ class HttpRequestTest extends TestCase
 
         $this->assertEquals($request->request->all(), $body);
     }
-    
+
     /**
      * Ensure non-JSON GET requests don't pollute $request->request with the GET parameters.
      *
