@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\Exceptions\DuplicatedIdempotencyKeyException;
+use Illuminate\Foundation\Http\Exceptions\IdempotencyKeyCharacterLimitException;
 use Illuminate\Foundation\Http\Exceptions\MissingIdempotencyKeyException;
 use Illuminate\Http\Request;
 
@@ -71,6 +72,10 @@ class Idempotent
 
         if (! $idempotencyKey && $force === true) {
             throw new MissingIdempotencyKeyException();
+        }
+
+        if (strlen($idempotencyKey) > 38) {
+            throw new IdempotencyKeyCharacterLimitException();
         }
 
         $cacheKey = self::PREFIX.$idempotencyKey.$request->fingerprint();

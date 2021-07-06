@@ -97,4 +97,24 @@ class IdempotentRequestTest extends TestbenchTestCase
 
         $response->assertStatus(400);
     }
+
+    public function testCharacterLimitIdempotencyKey()
+    {
+        Route::post('/', function () {
+            return request()->name;
+        })->middleware(Idempotent::class);
+
+        $response = $this->post(
+            '/',
+            [
+                'name' => 'laravel',
+            ],
+            [
+                'Accept' => 'application/json',
+                'Idempotency-Key' => Str::random(39)
+            ]
+        );
+
+        $response->assertStatus(422);
+    }
 }
