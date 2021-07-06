@@ -85,7 +85,7 @@
         "league/flysystem-aws-s3-v3": "^2.0",
         "league/flysystem-ftp": "^2.0",
         "league/flysystem-sftp": "^2.0",
-        "mockery/mockery": "^1.4.2",
+        "mockery/mockery": "^1.4.3",
         "orchestra/testbench-core": "^7.0",
         "pda/pheanstalk": "^4.0",
         "phpunit/phpunit": "^9.4",
