@@ -29,7 +29,7 @@ trait InteractsWithGate
      * @param  mixed  ...$arguments
      * @return \Illuminate\Foundation\Testing\ExpectedPermission
      */
-    public function shouldAllow($ability, ...$arguments)
+    protected function shouldAllow($ability, ...$arguments)
     {
         return $this->setExpectedPermission(true, auth()->user(), $ability, $arguments);
     }
@@ -41,7 +41,7 @@ trait InteractsWithGate
      * @param  mixed  ...$arguments
      * @return \Illuminate\Foundation\Testing\ExpectedPermission
      */
-    public function shouldDeny($ability, ...$arguments)
+    protected function shouldDeny($ability, ...$arguments)
     {
         return $this->setExpectedPermission(false, auth()->user(), $ability, $arguments);
     }
