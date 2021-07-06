@@ -31,10 +31,10 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->db->addConnection([
             'driver' => 'sqlite',
             'read' => [
-                'database'  => ':memory:',
+                'database' => ':memory:',
             ],
             'write' => [
-                'database'  => ':memory:',
+                'database' => ':memory:',
             ],
         ], 'read_write');
 

@@ -29,9 +29,9 @@ class FilesystemManagerTest extends TestCase
         $this->assertInstanceOf(Filesystem::class, $filesystem->build('my-custom-path'));
 
         $this->assertInstanceOf(Filesystem::class, $filesystem->build([
-            'driver'     => 'local',
-            'root'       => 'my-custom-path',
-            'url'        => 'my-custom-url',
+            'driver' => 'local',
+            'root' => 'my-custom-path',
+            'url' => 'my-custom-url',
             'visibility' => 'public',
         ]));
 

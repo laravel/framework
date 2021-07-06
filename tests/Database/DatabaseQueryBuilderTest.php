@@ -1201,6 +1201,40 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
+    public function testOrderBysSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderBy('email')->orderBy('age', 'desc');
+        $this->assertSame('select * from [users] order by [email] asc, [age] desc', $builder->toSql());
+
+        $builder->orders = null;
+        $this->assertSame('select * from [users]', $builder->toSql());
+
+        $builder->orders = [];
+        $this->assertSame('select * from [users]', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderBy('email');
+        $this->assertSame('select * from [users] order by [email] asc', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderByDesc('name');
+        $this->assertSame('select * from [users] order by [name] desc', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderByRaw('[age] asc');
+        $this->assertSame('select * from [users] order by [age] asc', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderBy('email')->orderByRaw('[age] ? desc', ['foo']);
+        $this->assertSame('select * from [users] order by [email] asc, [age] ? desc', $builder->toSql());
+        $this->assertEquals(['foo'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->skip(25)->take(10)->orderByRaw('[email] desc');
+        $this->assertSame('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 26 and 35 order by row_num', $builder->toSql());
+    }
+
     public function testReorder()
     {
         $builder = $this->getBuilder();

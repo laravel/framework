@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
 use JsonSerializable;
+use ReturnTypeWillChange;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 
@@ -802,6 +803,7 @@ trait EnumeratesValues
      *
      * @return array
      */
+    #[ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return array_map(function ($value) {

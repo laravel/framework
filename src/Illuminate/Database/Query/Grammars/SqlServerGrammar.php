@@ -217,7 +217,7 @@ class SqlServerGrammar extends Grammar
         }
 
         return Arr::first($query->orders, function ($value) {
-            return $this->isExpression($value['column']);
+            return $this->isExpression($value['column'] ?? null);
         }, false) !== false;
     }
 
