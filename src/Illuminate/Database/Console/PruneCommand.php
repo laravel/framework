@@ -17,7 +17,7 @@ class PruneCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'db:prune {--model=* : Class names of the models to be pruned}';
+    protected $signature = 'model:prune {--model=* : Class names of the models to be pruned}';
 
     /**
      * The console command description.
@@ -35,10 +35,7 @@ class PruneCommand extends Command
     public function handle(Dispatcher $events)
     {
         $events->listen(ModelsPruned::class, function ($event) {
-            $amount = $event->amount;
-            $model = $event->model;
-
-            $this->info("$amount [$model] records have been pruned.");
+            $this->info("{$event->amount} [{$event->model}] records have been pruned.");
         });
 
         $this->models()->each(function ($model) {
@@ -78,7 +75,7 @@ class PruneCommand extends Command
     }
 
     /**
-     * Checks if the given model class is prunable.
+     * Determine if the given model class is prunable.
      *
      * @param  string  $model
      * @return bool

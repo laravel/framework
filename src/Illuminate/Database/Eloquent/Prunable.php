@@ -3,10 +3,19 @@
 namespace Illuminate\Database\Eloquent;
 
 use Illuminate\Database\Events\ModelsPruned;
+use LogicException;
 
 trait Prunable
 {
-    use Concerns\PrunableQueries;
+    /**
+     * Get the prunable model query.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function prunable()
+    {
+        throw new LogicException('Please implement the prunable method on your model.');
+    }
 
     /**
      * Prune all prunable models in the database.
@@ -18,7 +27,7 @@ trait Prunable
         $total = 0;
 
         $this->prunable()
-            ->when(in_array(SoftDeletes::class, class_uses_recursive(get_called_class())), function ($query) {
+            ->when(in_array(SoftDeletes::class, class_uses_recursive(get_class($this))), function ($query) {
                 $query->withTrashed();
             })->chunkById(1000, function ($models) use (&$total) {
                 $models->each->prune();
@@ -37,7 +46,7 @@ trait Prunable
      */
     public function prune()
     {
-        return in_array(SoftDeletes::class, class_uses_recursive(get_called_class()))
+        return in_array(SoftDeletes::class, class_uses_recursive(get_class($this)))
                 ? $this->forceDelete()
                 : $this->delete();
     }
