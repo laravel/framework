@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.20.30...6.x)
 
 
-## [v6.20.30 (2021-07-02)](https://github.com/laravel/framework/compare/v6.20.29...v6.20.30)
+## [v6.20.30 (2021-07-07)](https://github.com/laravel/framework/compare/v6.20.29...v6.20.30)
 
 ### Fixed
 - Fix edge case causing a BadMethodCallExceptions to be thrown when using loadMissing() ([#37871](https://github.com/laravel/framework/pull/37871))

@@ -1,6 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.49.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.49.2...8.x)
+
+
+## [v8.49.2 (2021-07-07)](https://github.com/laravel/framework/compare/v8.49.1...v8.49.2)
+
+### Added
+- Adds ResponseReceived events to async requests of HTTP Client ([#37917](https://github.com/laravel/framework/pull/37917))
+
+### Fixed
+- Fixed edge case causing a BadMethodCallExceptions to be thrown when using loadMissing() ([#37871](https://github.com/laravel/framework/pull/37871))
 
 
 ## [v8.49.1 (2021-07-02)](https://github.com/laravel/framework/compare/v8.49.0...v8.49.1)
