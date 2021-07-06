@@ -48,8 +48,20 @@ trait Prunable
      */
     public function prune()
     {
+        $this->pruning();
+
         return in_array(SoftDeletes::class, class_uses_recursive(get_class($this)))
                 ? $this->forceDelete()
                 : $this->delete();
+    }
+
+    /**
+     * Prepare the model for pruning.
+     *
+     * @return void
+     */
+    protected function pruning()
+    {
+        //
     }
 }
