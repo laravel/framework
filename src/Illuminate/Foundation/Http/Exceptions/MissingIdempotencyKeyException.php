@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Http\Exceptions;
 
-use Throwable;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 class MissingIdempotencyKeyException extends HttpException
 {

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Http\Middleware\Idempotent;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase as TestbenchTestCase;
 
 class IdempotentRequestTest extends TestbenchTestCase
@@ -18,11 +18,11 @@ class IdempotentRequestTest extends TestbenchTestCase
         $response = $this->post(
             '/',
             [
-                'name' => 'laravel'
+                'name' => 'laravel',
             ],
             [
                 'Accept' => 'application/json',
-                'Idempotency-Key' => Str::uuid()
+                'Idempotency-Key' => Str::uuid(),
             ]
         );
 
@@ -41,11 +41,11 @@ class IdempotentRequestTest extends TestbenchTestCase
         $response = $this->post(
             '/',
             [
-                'name' => 'laravel'
+                'name' => 'laravel',
             ],
             [
                 'Accept' => 'application/json',
-                'Idempotency-Key' => $uuid
+                'Idempotency-Key' => $uuid,
             ]
         );
 
@@ -54,15 +54,29 @@ class IdempotentRequestTest extends TestbenchTestCase
         $response = $this->post(
             '/',
             [
-                'name' => 'laravel'
+                'name' => 'php',
             ],
             [
                 'Accept' => 'application/json',
-                'Idempotency-Key' => $uuid
+                'Idempotency-Key' => $uuid,
             ]
         );
 
         $response->assertStatus(422);
+
+        $response = $this->post(
+            '/',
+            [
+                'name' => 'laravel',
+            ],
+            [
+                'Accept' => 'application/json',
+                'Idempotency-Key' => $uuid,
+            ]
+        );
+
+        $this->assertSame('laravel', $response->content());
+        $response->assertStatus(200);
     }
 
     public function testEmptyIdempotencyKey()
@@ -74,7 +88,7 @@ class IdempotentRequestTest extends TestbenchTestCase
         $response = $this->post(
             '/',
             [
-                'name' => 'laravel'
+                'name' => 'laravel',
             ],
             [
                 'Accept' => 'application/json',
