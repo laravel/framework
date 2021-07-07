@@ -5,6 +5,8 @@ services:
     ports:
       - "11211:11211"
     restart: always
+    networks:
+      - laravel-framework
   mysql:
     image: mysql:5.7
     environment:
@@ -14,8 +16,49 @@ services:
     ports:
       - "3306:3306"
     restart: always
+    networks:
+      - laravel-framework
   redis:
     image: redis:5.0-alpine
+    command: redis-server --save ''
     ports:
       - "6379:6379"
     restart: always
+    networks:
+      - laravel-framework
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    ports:
+      - "8000:8000"
+    restart: always
+    networks:
+      - laravel-framework
+  test:
+    image: registry.gitlab.com/grahamcampbell/php:8.0-base
+    depends_on:
+      - memcached
+      - mysql
+      - redis
+      - dynamodb
+    entrypoint: vendor/bin/phpunit
+    working_dir: /data
+    volumes:
+      - ".:/data:rw,delegated"
+    environment:
+      CI: 1
+      DB_HOST: mysql
+      DB_USERNAME: root
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MEMCACHED_HOST: memcached
+      MEMCACHED_PORT: 11211
+      DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
+      DYNAMODB_ENDPOINT: "http://dynamodb:8000"
+      AWS_ACCESS_KEY_ID: random_key
+      AWS_SECRET_ACCESS_KEY: random_secret
+    networks:
+      - laravel-framework
+
+networks:
+  laravel-framework:
+    driver: "bridge"
