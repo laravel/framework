@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ['7.4', '8.0']
+        php: ['8.0']
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: '8.1'
@@ -89,7 +89,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ['7.4', '8.0']
+        php: ['8.0']
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: '8.1'
