@@ -6146,6 +6146,44 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedMessages, $validator->messages()->toArray());
     }
 
+    public function testExcludingArrays()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'array', 'users.*.name' => 'string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed', 'location' => 'cairo']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'array', 'users.*.name' => 'string']
+        );
+        $validator->excludeArrays = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => ['mohamed', 'zain']],
+            ['users' => 'array', 'users.*' => 'string']
+        );
+        $validator->excludeArrays = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => ['mohamed', 'zain']], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => ['admins' => [['name' => 'mohamed', 'job' => 'dev']]]],
+            ['users' => 'array', 'users.admins' => 'array', 'users.admins.*.name' => 'string']
+        );
+        $validator->excludeArrays = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => ['admins' => [['name' => 'mohamed']]]], $validator->validated());
+    }
+
     public function testExcludeUnless()
     {
         $validator = new Validator(

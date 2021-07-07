@@ -74,6 +74,13 @@ class Factory implements FactoryContract
     protected $resolver;
 
     /**
+     * Indicates that array values should be excluded.
+     *
+     * @var bool
+     */
+    protected $excludeArrays;
+
+    /**
      * Create a new Validator factory instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
@@ -114,6 +121,8 @@ class Factory implements FactoryContract
         if (! is_null($this->container)) {
             $validator->setContainer($this->container);
         }
+
+        $validator->excludeArrays = $this->excludeArrays;
 
         $this->addExtensions($validator);
 
@@ -248,6 +257,16 @@ class Factory implements FactoryContract
     public function resolver(Closure $resolver)
     {
         $this->resolver = $resolver;
+    }
+
+    /**
+     * Indicates that array values should be excluded.
+     *
+     * @return void
+     */
+    public function excludeArrays()
+    {
+        $this->excludeArrays = true;
     }
 
     /**

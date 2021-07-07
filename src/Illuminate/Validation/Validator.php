@@ -157,6 +157,13 @@ class Validator implements ValidatorContract
     protected $stopOnFirstFailure = false;
 
     /**
+     * Indicates that array values should be excluded.
+     *
+     * @var bool
+     */
+    public $excludeArrays = false;
+
+    /**
      * All of the custom validator extensions.
      *
      * @var array
@@ -508,7 +515,13 @@ class Validator implements ValidatorContract
 
         $missingValue = new stdClass;
 
-        foreach (array_keys($this->getRules()) as $key) {
+        foreach ($this->getRules() as $key => $rules) {
+            if ($this->excludeArrays &&
+                in_array('array', $rules) &&
+                ! empty(preg_grep('/^'.$key.'\.*/', array_keys($this->implicitAttributes)))) {
+                continue;
+            }
+
             $value = data_get($this->getData(), $key, $missingValue);
 
             if ($value !== $missingValue) {
