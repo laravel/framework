@@ -43,17 +43,18 @@ class LazyCollection implements Enumerable
      *
      * @param  int  $from
      * @param  int  $to
+     * @param  int  $step
      * @return static
      */
-    public static function range($from, $to)
+    public static function range($from, $to, $step = 1)
     {
-        return new static(function () use ($from, $to) {
+        return new static(function () use ($from, $to, $step) {
             if ($from <= $to) {
-                for (; $from <= $to; $from++) {
+                for (; $from <= $to; $from += $step) {
                     yield $from;
                 }
             } else {
-                for (; $from >= $to; $from--) {
+                for (; $from >= $to; $from -= $step) {
                     yield $from;
                 }
             }

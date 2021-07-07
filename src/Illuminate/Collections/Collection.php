@@ -37,11 +37,12 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  int  $from
      * @param  int  $to
+     * @param  int  $step
      * @return static
      */
-    public static function range($from, $to)
+    public static function range($from, $to, $step = 1)
     {
-        return new static(range($from, $to));
+        return new static(range($from, $to, $step));
     }
 
     /**
