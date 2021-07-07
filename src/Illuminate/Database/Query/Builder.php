@@ -403,6 +403,8 @@ class Builder
             }
         }
 
+        $this->columns = array_unique($this->columns);
+
         return $this;
     }
 
