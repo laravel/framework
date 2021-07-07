@@ -3697,7 +3697,7 @@ SQL;
     public function testCursorPaginateMultipleOrderColumns()
     {
         $perPage = 16;
-        $columns = ['test'];
+        $columns = ['test', 'another'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['test' => 'bar', 'another' => 'foo']);
         $builder = $this->getMockQueryBuilder();
@@ -3708,7 +3708,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = collect([['test' => 'foo', 'another' => 1], ['test' => 'bar', 'another' => 2]]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
@@ -3837,6 +3837,45 @@ SQL;
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['id'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithMixedOrders()
+    {
+        $perPage = 16;
+        $columns = ['foo', 'bar', 'baz'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['foo' => 1, 'bar' => 2, 'baz' => 3]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->orderBy('foo')->orderByDesc('bar')->orderBy('baz');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['foo' => 1, 'bar' => 2, 'baz' => 4], ['foo' => 1, 'bar' => 1, 'baz' => 1]]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select * from "foobar" where ("foo" > ? or ("foo" = ? and ("bar" < ? or ("bar" = ? and ("baz" > ?))))) order by "foo" asc, "bar" desc, "baz" asc limit 17',
+                $builder->toSql()
+            );
+            $this->assertEquals([1, 1, 2, 2, 3], $builder->bindings['where']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['foo', 'bar', 'baz'],
         ]), $result);
     }
 
