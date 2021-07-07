@@ -707,7 +707,10 @@ class PendingRequest
     {
         return $this->promise = $this->sendRequest($method, $url, $options)
             ->then(function (MessageInterface $message) {
-                return $this->populateResponse(new Response($message));
+                return tap(new Response($message), function ($response) {
+                    $this->populateResponse($response);
+                    $this->dispatchResponseReceivedEvent($response);
+                });
             })
             ->otherwise(function (TransferException $e) {
                 return $e instanceof RequestException ? $this->populateResponse(new Response($e->getResponse())) : $e;
