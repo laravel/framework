@@ -6167,6 +6167,15 @@ class ValidationValidatorTest extends TestCase
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'array']
+        );
+        $validator->excludeArrays = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed', 'location' => 'cairo']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
             ['users' => ['mohamed', 'zain']],
             ['users' => 'array', 'users.*' => 'string']
         );
