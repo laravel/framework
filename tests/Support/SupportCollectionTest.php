@@ -4672,6 +4672,18 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testInsertBetweenEach($collection)
+    {
+        $fruits = $collection::make(['banana', 'mango', 'watermelon']);
+        $this->assertSame(['banana', 'apple', 'mango', 'apple', 'watermelon'], $fruits->insertBetweenEach('apple')->all());
+
+        $fruits = $collection::make(['lemon', 'mango', 'banana', 'watermelon']);
+        $this->assertSame(['lemon', 'kiwi', 'mango', 'kiwi', 'banana', 'kiwi', 'watermelon'], $fruits->insertBetweenEach('kiwi')->all());
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array

@@ -536,6 +536,19 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Insert a value between each item in the collection.
+     * 
+     * For example: ['a', 'b', 'c'] with 'x' becomes ['a', 'x', 'b', 'x', 'c'].
+     *
+     * @param  string  $value
+     * @return static
+     */
+    public function insertBetweenEach($value)
+    {
+        return new static($this->flatMap(fn ($item) => [$item, $value])->slice(0, -1));
+    }
+
+    /**
      * Intersect the collection with the given items by key.
      *
      * @param  mixed  $items
