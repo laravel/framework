@@ -350,6 +350,9 @@ class MorphTo extends BelongsTo
         return $this;
     }
 
+    /**
+     *  {@inheritdoc}
+     */
     public function select($columns = ['*'])
     {
         $this->macroBuffer[] = ['method' => 'select', 'parameters' => [$columns]];
@@ -357,6 +360,9 @@ class MorphTo extends BelongsTo
         return parent::select($columns);
     }
 
+    /**
+     *  {@inheritdoc}
+     */
     public function selectRaw($expression, array $bindings = [])
     {
         $this->macroBuffer[] = ['method' => 'selectRaw', 'parameters' => [$expression, $bindings]];
@@ -364,6 +370,9 @@ class MorphTo extends BelongsTo
         return parent::selectRaw($expression, $bindings);
     }
 
+    /**
+     *  {@inheritdoc}
+     */
     public function selectSub($query, $as)
     {
         $this->macroBuffer[] = ['method' => 'selectSub', 'parameters' => [$query, $as]];
@@ -371,6 +380,9 @@ class MorphTo extends BelongsTo
         return parent::selectSub($query, $as);
     }
 
+    /**
+     *  {@inheritdoc}
+     */
     public function addSelect($column)
     {
         $this->macroBuffer[] = ['method' => 'addSelect', 'parameters' => [$column]];
