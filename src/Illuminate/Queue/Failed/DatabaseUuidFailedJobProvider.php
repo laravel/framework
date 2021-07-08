@@ -90,7 +90,7 @@ class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, Pruna
      */
     public function find($id)
     {
-        if ($record = $this->getTable()->where('uuid', $id)->first()) {
+        if ($record = $this->getTable()->where('uuid', $id)->orWhere('id', $id)->first()) {
             $record->id = $record->uuid;
             unset($record->uuid);
         }
