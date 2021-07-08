@@ -5,8 +5,10 @@ namespace Illuminate\Mail;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use League\CommonMark\CommonMarkConverter;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\Table\TableExtension;
+use League\CommonMark\MarkdownConverter;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class Markdown
@@ -103,11 +105,14 @@ class Markdown
      */
     public static function parse($text)
     {
-        $converter = new CommonMarkConverter([
+        $environment = new Environment([
             'allow_unsafe_links' => false,
         ]);
 
-        $converter->getEnvironment()->addExtension(new TableExtension());
+        $environment->addExtension(new CommonMarkCoreExtension);
+        $environment->addExtension(new TableExtension);
+
+        $converter = new MarkdownConverter($environment);
 
         return new HtmlString((string) $converter->convertToHtml($text));
     }
