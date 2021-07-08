@@ -984,7 +984,7 @@ trait DecoratesQueryBuilder
      */
     public function numericAggregate($function, $columns = ['*'])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->toBase()->{__FUNCTION__}(...func_get_args());
     }
 
     /**
@@ -1080,7 +1080,7 @@ trait DecoratesQueryBuilder
      */
     public function newQuery()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->toBase()->{__FUNCTION__}(...func_get_args());
     }
 
     /**
