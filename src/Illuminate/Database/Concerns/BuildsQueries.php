@@ -282,18 +282,7 @@ trait BuildsQueries
     }
 
     /**
-     * Pass the query to a given callback.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function tap($callback)
-    {
-        return $this->when(true, $callback);
-    }
-
-    /**
-     * Paginate the given query into a cursor paginator.
+     * Paginate the given query using a cursor paginator.
      *
      * @param  int  $perPage
      * @param  array  $columns
@@ -301,23 +290,22 @@ trait BuildsQueries
      * @param  string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
      */
-    protected function runCursorPaginate($perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
+    protected function paginateUsingCursor($perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
         $cursor = $cursor ?: CursorPaginator::resolveCurrentCursor($cursorName);
 
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
-        if ($cursor !== null) {
-            $addCursorConditions = function (self $builder, $prev, $i) use (&$addCursorConditions, $orders, $cursor) {
-                if ($prev !== null) {
-                    $builder->where($prev, '=', $cursor->parameter($prev));
+        if (! is_null($cursor)) {
+            $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
+                if (! is_null($previousColumn)) {
+                    $builder->where($previousColumn, '=', $cursor->parameter($previousColumn));
                 }
 
-                $builder->where(function (self $builder) use ($orders, $cursor, $i, $addCursorConditions) {
+                $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i) {
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
-                    $operator = $direction === 'asc' ? '>' : '<';
 
-                    $builder->where($column, $operator, $cursor->parameter($column));
+                    $builder->where($column, $direction === 'asc' ? '>' : '<', $cursor->parameter($column));
 
                     if ($i < $orders->count() - 1) {
                         $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
@@ -326,6 +314,7 @@ trait BuildsQueries
                     }
                 });
             };
+
             $addCursorConditions($this, null, 0);
         }
 
@@ -385,5 +374,16 @@ trait BuildsQueries
         return Container::getInstance()->makeWith(CursorPaginator::class, compact(
             'items', 'perPage', 'cursor', 'options'
         ));
+    }
+
+    /**
+     * Pass the query to a given callback.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function tap($callback)
+    {
+        return $this->when(true, $callback);
     }
 }

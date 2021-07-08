@@ -831,7 +831,7 @@ class Builder
     {
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        return $this->runCursorPaginate($perPage, $columns, $cursorName, $cursor);
+        return $this->paginateUsingCursor($perPage, $columns, $cursorName, $cursor);
     }
 
     /**

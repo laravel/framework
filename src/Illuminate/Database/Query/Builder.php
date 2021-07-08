@@ -2409,7 +2409,7 @@ class Builder
      */
     public function cursorPaginate($perPage = 15, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
-        return $this->runCursorPaginate($perPage, $columns, $cursorName, $cursor);
+        return $this->paginateUsingCursor($perPage, $columns, $cursorName, $cursor);
     }
 
     /**
