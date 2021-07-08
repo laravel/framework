@@ -417,7 +417,7 @@ class MorphTo extends BelongsTo
         try {
             $result = parent::__call($method, $parameters);
 
-            if (in_array($method, ['select', 'selectRaw', 'selectSub', 'addSelect', 'withoutGlobalScopes'])) {
+            if ($method === 'withoutGlobalScopes') {
                 $this->macroBuffer[] = compact('method', 'parameters');
             }
 
