@@ -350,6 +350,34 @@ class MorphTo extends BelongsTo
         return $this;
     }
 
+    public function select($columns = ['*'])
+    {
+        $this->macroBuffer[] = ['method' => __FUNCTION__, 'parameters' => func_get_args()];
+
+        return parent::select($columns);
+    }
+
+    public function selectRaw($expression, array $bindings = [])
+    {
+        $this->macroBuffer[] = ['method' => __FUNCTION__, 'parameters' => func_get_args()];
+
+        return parent::selectRaw($expression, $bindings);
+    }
+
+    public function selectSub($query, $as)
+    {
+        $this->macroBuffer[] = ['method' => __FUNCTION__, 'parameters' => func_get_args()];
+
+        return parent::selectSub($query, $as);
+    }
+
+    public function addSelect($column)
+    {
+        $this->macroBuffer[] = ['method' => __FUNCTION__, 'parameters' => func_get_args()];
+
+        return parent::addSelect($column);
+    }
+
     /**
      * Replay stored macro calls on the actual related instance.
      *
