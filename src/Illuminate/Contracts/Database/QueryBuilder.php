@@ -232,7 +232,7 @@ interface QueryBuilder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  \Closure|string|array  $column
+     * @param  \Closure|QueryBuilder|string|array  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -255,7 +255,7 @@ interface QueryBuilder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|string|array  $column
+     * @param  \Closure|QueryBuilder|string|array  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      *
@@ -899,7 +899,7 @@ interface QueryBuilder
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|static|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|QueryBuilder|string  $column
      * @param  string  $direction
      *
      * @return static
@@ -909,7 +909,7 @@ interface QueryBuilder
     /**
      * Add a descending "order by" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|QueryBuilder|string  $column
      *
      * @return static
      */
@@ -918,7 +918,7 @@ interface QueryBuilder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|QueryBuilder|string  $column
      *
      * @return static
      */
@@ -927,7 +927,7 @@ interface QueryBuilder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|QueryBuilder|string  $column
      *
      * @return static
      */
