@@ -276,6 +276,28 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Check if a record is attached to the parent.
+     *
+     * @param  mixed  $id
+     * @return bool
+     */
+    public function isAttached($id)
+    {
+        $ids = $this->parseIds($id);
+        $idsCount = count($ids);
+
+        $query = $this
+            ->newPivotStatement()
+            ->where($this->foreignPivotKey, $this->parent->{$this->parentKey});
+
+        if ($idsCount === 1) {
+            return $query->where($this->relatedPivotKey, $ids)->exists();
+        }
+
+        return $query->whereIn($this->relatedPivotKey, $ids)->count() === $idsCount;
+    }
+
+    /**
      * Attach a model to the parent using a custom class.
      *
      * @param  mixed  $id

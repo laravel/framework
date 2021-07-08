@@ -274,6 +274,31 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($tag8->name, $post->tags[7]->name);
     }
 
+    public function testIsAttachedMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $post2 = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach($tag);
+        $post->tags()->attach($tag2);
+        $post2->tags()->attach($tag3);
+
+        $this->assertTrue($post->tags()->isAttached($tag));
+        $this->assertTrue($post->tags()->isAttached($tag2));
+        $this->assertTrue($post2->tags()->isAttached($tag3));
+
+        $this->assertTrue($post->tags()->isAttached($tag->id));
+        $this->assertTrue($post->tags()->isAttached([$tag->id, $tag2->id]));
+        $this->assertTrue($post->tags()->isAttached(new Collection([$tag, $tag2])));
+
+        $this->assertFalse($post->tags()->isAttached($tag3));
+        $this->assertFalse($post->tags()->isAttached([$tag, $tag2, $tag3]));
+    }
+
     public function testDetachMethod()
     {
         $post = Post::create(['title' => Str::random()]);
