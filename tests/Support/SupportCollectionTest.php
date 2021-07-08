@@ -2388,7 +2388,6 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
-     * @group range
      * @dataProvider collectionClassProvider
      */
     public function testRangeMethod($collection)
@@ -2396,6 +2395,11 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(
             [1, 2, 3, 4, 5],
             $collection::range(1, 5)->all()
+        );
+
+        $this->assertSame(
+            [1],
+            $collection::range(1, 1)->all()
         );
 
         $this->assertSame(
@@ -2436,6 +2440,16 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(
             [0, 5],
             $collection::range(0, 5, 5)->all()
+        );
+
+        $this->assertSame(
+            [10, 8, 6, 4, 2],
+            $collection::range(10, 1, 2)->all()
+        );
+
+        $this->assertSame(
+            [2],
+            $collection::range(2, 2, 2)->all()
         );
     }
 
