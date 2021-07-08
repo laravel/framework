@@ -34,7 +34,7 @@ services:
     networks:
       - laravel-framework
   test:
-    image: registry.gitlab.com/grahamcampbell/php:8.0-base
+    image: registry.gitlab.com/grahamcampbell/php:7.4-base
     depends_on:
       - memcached
       - mysql
