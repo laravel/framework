@@ -5,12 +5,15 @@ namespace Illuminate\Database\Eloquent;
 use BadMethodCallException;
 use Closure;
 use Exception;
+use Illuminate\Contracts\Database\QueryBuilder;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
+use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
+use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\CursorPaginationException;
 use Illuminate\Pagination\CursorPaginator;
@@ -23,14 +26,12 @@ use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
- *
- * @mixin \Illuminate\Database\Query\Builder
  */
-class Builder
+class Builder implements QueryBuilder
 {
-    use Concerns\QueriesRelationships, ExplainsQueries, ForwardsCalls;
+    use DecoratesQueryBuilder, ExplainsQueries, ForwardsCalls, QueriesRelationships;
     use BuildsQueries {
-        sole as baseSole;
+        BuildsQueries::sole as baseSole;
     }
 
     /**
@@ -76,38 +77,6 @@ class Builder
     protected $onDelete;
 
     /**
-     * The methods that should be returned from query builder.
-     *
-     * @var string[]
-     */
-    protected $passthru = [
-        'aggregate',
-        'average',
-        'avg',
-        'count',
-        'dd',
-        'doesntExist',
-        'dump',
-        'exists',
-        'getBindings',
-        'getConnection',
-        'getGrammar',
-        'getProcessor',
-        'implode',
-        'insert',
-        'insertGetId',
-        'insertOrIgnore',
-        'insertUsing',
-        'max',
-        'min',
-        'newQuery',
-        'numericAggregate',
-        'raw',
-        'sum',
-        'toSql',
-    ];
-
-    /**
      * Applied global scopes.
      *
      * @var array
@@ -127,7 +96,7 @@ class Builder
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return void
      */
-    public function __construct(QueryBuilder $query)
+    public function __construct(BaseBuilder $query)
     {
         $this->query = $query;
     }
@@ -831,7 +800,7 @@ class Builder
      * @param  int|null  $perPage
      * @param  array  $columns
      * @param  string  $cursorName
-     * @param  string|null  $cursor
+     * @param  \Illuminate\Pagination\Cursor|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
      * @throws \Illuminate\Pagination\CursorPaginationException
      */
@@ -1239,7 +1208,7 @@ class Builder
      * @param  int  $originalWhereCount
      * @return void
      */
-    protected function addNewWheresWithinGroup(QueryBuilder $query, $originalWhereCount)
+    protected function addNewWheresWithinGroup(BaseBuilder $query, $originalWhereCount)
     {
         // Here, we totally remove all of the where clauses since we are going to
         // rebuild them as nested queries by slicing the groups of wheres into
@@ -1264,7 +1233,7 @@ class Builder
      * @param  array  $whereSlice
      * @return void
      */
-    protected function groupWhereSliceForScope(QueryBuilder $query, $whereSlice)
+    protected function groupWhereSliceForScope(BaseBuilder $query, $whereSlice)
     {
         $whereBooleans = collect($whereSlice)->pluck('boolean');
 
@@ -1649,10 +1618,6 @@ class Builder
 
         if ($this->hasNamedScope($method)) {
             return $this->callNamedScope($method, $parameters);
-        }
-
-        if (in_array($method, $this->passthru)) {
-            return $this->toBase()->{$method}(...$parameters);
         }
 
         $this->forwardCallTo($this->query, $method, $parameters);

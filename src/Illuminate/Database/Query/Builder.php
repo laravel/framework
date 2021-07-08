@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use DateTimeInterface;
+use Illuminate\Contracts\Database\QueryBuilder;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -24,7 +25,7 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use RuntimeException;
 
-class Builder
+class Builder implements QueryBuilder
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
@@ -666,7 +667,7 @@ class Builder
      *
      * @param  array  $wheres
      * @param  array  $bindings
-     * @return void
+     * @return $this
      */
     public function mergeWheres($wheres, $bindings)
     {
@@ -675,6 +676,8 @@ class Builder
         $this->bindings['where'] = array_values(
             array_merge($this->bindings['where'], (array) $bindings)
         );
+
+        return $this;
     }
 
     /**
@@ -2459,7 +2462,7 @@ class Builder
      * @param  int|null  $perPage
      * @param  array  $columns
      * @param  string  $cursorName
-     * @param  string|null  $cursor
+     * @param  \Illuminate\Pagination\Cursor|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
      * @throws \Illuminate\Pagination\CursorPaginationException
      */
@@ -3336,9 +3339,9 @@ class Builder
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return $this
      */
-    public function mergeBindings(self $query)
+    public function mergeBindings(QueryBuilder $query)
     {
-        $this->bindings = array_merge_recursive($this->bindings, $query->bindings);
+        $this->bindings = array_merge_recursive($this->bindings, $query->getRawBindings());
 
         return $this;
     }
