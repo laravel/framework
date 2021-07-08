@@ -18,7 +18,7 @@ use Illuminate\Support\Traits\Macroable;
 abstract class Relation implements QueryBuilder
 {
     use DecoratesQueryBuilder, ForwardsCalls, Macroable {
-        __call as macroCall;
+        Macroable::__call as macroCall;
     }
 
     /**

@@ -29,8 +29,7 @@ use ReflectionMethod;
  */
 class Builder implements QueryBuilder
 {
-    use DecoratesQueryBuilder, ExplainsQueries, ForwardsCalls, QueriesRelationships;
-    use BuildsQueries {
+    use BuildsQueries, DecoratesQueryBuilder, ExplainsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
 

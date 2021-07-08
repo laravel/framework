@@ -4,9 +4,11 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Contracts\Database\QueryBuilder;
-use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Support\Traits\ForwardsCalls;
 
+/**
+ * @mixin \Illuminate\Database\Query\Builder
+ */
 trait DecoratesQueryBuilder
 {
     use ForwardsCalls;
@@ -1191,6 +1193,19 @@ trait DecoratesQueryBuilder
     public function cloneWithoutBindings(array $except)
     {
         return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * Handle dynamic method calls to the query builder.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     *
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->forwardCallToQueryBuilder($method, $parameters);
     }
 
     /**
