@@ -22,7 +22,7 @@
         "doctrine/inflector": "^1.4|^2.0",
         "dragonmantank/cron-expression": "^3.0.2",
         "egulias/email-validator": "^2.1.10",
-        "league/commonmark": "^1.3",
+        "league/commonmark": "^1.3|^2.0",
         "league/flysystem": "^1.1",
         "monolog/monolog": "^2.0",
         "nesbot/carbon": "^2.31",
