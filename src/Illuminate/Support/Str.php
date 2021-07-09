@@ -391,16 +391,19 @@ class Str
     {
         $string = '';
 
-        $excludeChars = is_string($excludeChars)
-            ? str_split($excludeChars)
-            : $excludeChars;
+        $excludeChars = array_merge(
+            ['/', '+', '='],
+            is_string($excludeChars)
+                ? str_split($excludeChars)
+                : $excludeChars
+        );
 
         while (($len = strlen($string)) < $length) {
             $size = $length - $len;
 
             $bytes = random_bytes($size);
 
-            $string .= substr(str_replace(array_merge(['/', '+', '='], $excludeChars), '', base64_encode($bytes)), 0, $size);
+            $string .= substr(str_replace($excludeChars, '', base64_encode($bytes)), 0, $size);
         }
 
         return $string;
@@ -414,7 +417,7 @@ class Str
      */
     public static function randomAlpha($length = 16)
     {
-        return static::random($length, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ]);
+        return static::random($length, range(0, 9));
     }
 
     /**
