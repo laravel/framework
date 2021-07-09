@@ -73,6 +73,18 @@ PHP);
             'name' => $user->name,
         ]);
     }
+
+    /**
+     * Require application cached routes.
+     */
+    protected function requireApplicationCachedRoutes(): void
+    {
+        $this->app->booted(function () {
+            $cachesRoutes = $this->app['files']->get($this->app->getCachedRoutesPath());
+
+            $this->app['router']->setRoutes(unserialize($cachesRoutes));
+        });
+    }
 }
 
 class ImplicitBindingModel extends Model

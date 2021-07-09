@@ -27,4 +27,16 @@ class RouteCachingTest extends TestCase
     {
         $this->defineCacheRoutes(file_get_contents($file));
     }
+
+    /**
+     * Require application cached routes.
+     */
+    protected function requireApplicationCachedRoutes(): void
+    {
+        $this->app->booted(function () {
+            $cachesRoutes = $this->app['files']->get($this->app->getCachedRoutesPath());
+
+            $this->app['router']->setRoutes(unserialize($cachesRoutes));
+        });
+    }
 }
