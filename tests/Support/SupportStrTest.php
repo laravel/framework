@@ -339,7 +339,8 @@ class SupportStrTest extends TestCase
     /**
      * @dataProvider excludedRandomChars
      */
-    public function testRandomWithExcludedChars($excludeChars) {
+    public function testRandomWithExcludedChars($excludeChars)
+    {
         $forPattern = is_array($excludeChars)
             ? implode('', $excludeChars)
             : $excludeChars;

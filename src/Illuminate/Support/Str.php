@@ -546,7 +546,7 @@ class Str
      */
     public static function randomAlpha($length = 16)
     {
-        return static::random($length, range(0,9));
+        return static::random($length, range(0, 9));
     }
 
     /**
