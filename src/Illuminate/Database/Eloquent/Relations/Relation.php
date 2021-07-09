@@ -463,7 +463,9 @@ abstract class Relation
      */
     public static function getMorphedModel($alias)
     {
-        return static::$morphMap[$alias] ?? null;
+        $dictionaryKey = static::getDictionaryKey($alias);
+
+        return static::$morphMap[$dictionaryKey] ?? null;
     }
 
     /**
