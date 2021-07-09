@@ -345,7 +345,7 @@ class SupportStrTest extends TestCase
             ? implode('', $excludeChars)
             : $excludeChars;
 
-        $this->assertMatchesRegularExpression(
+        $this->assertRegExp(
             '/^[^'.$forPattern.']{100}$/',
             Str::random(100, $excludeChars)
         );
@@ -357,7 +357,7 @@ class SupportStrTest extends TestCase
         $randomInteger = random_int(1, 100);
         $this->assertEquals($randomInteger, strlen(Str::randomAlpha($randomInteger)));
         $this->assertIsString(Str::randomAlpha());
-        $this->assertMatchesRegularExpression('/^[^0-9]{100}$/', Str::randomAlpha(100));
+        $this->assertRegExp('/^[^0-9]{100}$/', Str::randomAlpha(100));
     }
 
     public function testReplace()
