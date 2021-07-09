@@ -296,6 +296,29 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    /**
+     * @dataProvider excludedRandomChars
+     */
+    public function testRandomWithExcludedChars($excludeChars) {
+        $forPattern = is_array($excludeChars)
+            ? implode('', $excludeChars)
+            : $excludeChars;
+
+        $this->assertMatchesRegularExpression(
+            '/^[^'.$forPattern.']{100}$/',
+            Str::random(100, $excludeChars)
+        );
+    }
+
+    public function testRandomAlpha()
+    {
+        $this->assertEquals(16, strlen(Str::randomAlpha()));
+        $randomInteger = random_int(1, 100);
+        $this->assertEquals($randomInteger, strlen(Str::randomAlpha($randomInteger)));
+        $this->assertIsString(Str::randomAlpha());
+        $this->assertMatchesRegularExpression('/^[^0-9]{100}$/', Str::randomAlpha(100));
+    }
+
     public function testReplaceArray()
     {
         $this->assertSame('foo/bar/baz', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?'));
@@ -438,6 +461,33 @@ class SupportStrTest extends TestCase
             ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
+        ];
+    }
+
+    public function excludedRandomChars()
+    {
+        $chars = array_map(
+            function ($item) {
+                return chr($item);
+            },
+            array_merge(
+                range(ord('0'), ord('9')),
+                range(ord('A'), ord('Z')),
+                range(ord('a'), ord('z'))
+            )
+        );
+
+        shuffle($chars);
+
+        return [
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            ['abcdefjhijklmnopqrstuvwxyz'],
+            ['0123456789'],
         ];
     }
 }

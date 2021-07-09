@@ -384,21 +384,37 @@ class Str
      * Generate a more truly "random" alpha-numeric string.
      *
      * @param  int  $length
+     * @param  string|string[]  $excludeChars
      * @return string
      */
-    public static function random($length = 16)
+    public static function random($length = 16, $excludeChars = [])
     {
         $string = '';
+
+        $excludeChars = is_string($excludeChars)
+            ? str_split($excludeChars)
+            : $excludeChars;
 
         while (($len = strlen($string)) < $length) {
             $size = $length - $len;
 
             $bytes = random_bytes($size);
 
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            $string .= substr(str_replace(array_merge(['/', '+', '='], $excludeChars), '', base64_encode($bytes)), 0, $size);
         }
 
         return $string;
+    }
+
+    /**
+     * Generate a more truly "random" alpha string.
+     *
+     * @param  int  $length
+     * @return string
+     */
+    public static function randomAlpha($length = 16)
+    {
+        return static::random($length, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ]);
     }
 
     /**
