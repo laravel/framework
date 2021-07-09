@@ -336,6 +336,29 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    /**
+     * @dataProvider excludedRandomChars
+     */
+    public function testRandomWithExcludedChars($excludeChars) {
+        $forPattern = is_array($excludeChars)
+            ? implode('', $excludeChars)
+            : $excludeChars;
+
+        $this->assertMatchesRegularExpression(
+            '/^[^'.$forPattern.']{100}$/',
+            Str::random(100, $excludeChars)
+        );
+    }
+
+    public function testRandomAlpha()
+    {
+        $this->assertEquals(16, strlen(Str::randomAlpha()));
+        $randomInteger = random_int(1, 100);
+        $this->assertEquals($randomInteger, strlen(Str::randomAlpha($randomInteger)));
+        $this->assertIsString(Str::randomAlpha());
+        $this->assertMatchesRegularExpression('/^[^0-9]{100}$/', Str::randomAlpha(100));
+    }
+
     public function testReplace()
     {
         $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
@@ -570,6 +593,33 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
+    }
+
+    public function excludedRandomChars()
+    {
+        $chars = array_map(
+            function ($item) {
+                return chr($item);
+            },
+            array_merge(
+                range(ord('0'), ord('9')),
+                range(ord('A'), ord('Z')),
+                range(ord('a'), ord('z'))
+            )
+        );
+
+        shuffle($chars);
+
+        return [
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            [array_splice($chars, 0, 10)],
+            ['abcdefjhijklmnopqrstuvwxyz'],
+            ['0123456789'],
+        ];
     }
 }
 
