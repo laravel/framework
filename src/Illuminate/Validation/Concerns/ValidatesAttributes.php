@@ -410,6 +410,10 @@ trait ValidatesAttributes
 
         $format = $parameters[0];
 
+        if ($format == 'timestamp') {
+            $format = 'U';
+        }
+
         $date = DateTime::createFromFormat('!'.$format, $value);
 
         return $date && $date->format($format) == $value;
