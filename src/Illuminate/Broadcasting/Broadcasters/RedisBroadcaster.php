@@ -20,16 +20,16 @@ class RedisBroadcaster extends Broadcaster
     /**
      * The Redis connection to use for broadcasting.
      *
-     * @var string
+     * @var ?string
      */
-    protected $connection;
+    protected $connection = null;
 
     /**
      * The Redis key prefix.
      *
      * @var string
      */
-    protected $prefix;
+    protected $prefix = '';
 
     /**
      * Create a new broadcaster instance.
@@ -86,8 +86,14 @@ class RedisBroadcaster extends Broadcaster
 
         $channelName = $this->normalizeChannelName($request->channel_name);
 
+        $user = $this->retrieveUser($request, $channelName);
+
+        $broadcastIdentifier = method_exists($user, 'getAuthIdentifierForBroadcasting')
+                        ? $user->getAuthIdentifierForBroadcasting()
+                        : $user->getAuthIdentifier();
+
         return json_encode(['channel_data' => [
-            'user_id' => $this->retrieveUser($request, $channelName)->getAuthIdentifier(),
+            'user_id' => $broadcastIdentifier,
             'user_info' => $result,
         ]]);
     }

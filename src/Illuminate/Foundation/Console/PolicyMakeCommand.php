@@ -81,6 +81,8 @@ class PolicyMakeCommand extends GeneratorCommand
      * Get the model for the guard's user provider.
      *
      * @return string|null
+     *
+     * @throws \LogicException
      */
     protected function userProviderModel()
     {

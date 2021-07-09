@@ -55,6 +55,19 @@ class PendingBatch
     }
 
     /**
+     * Add jobs to the batch.
+     *
+     * @param  array  $jobs
+     * @return $this
+     */
+    public function add($jobs)
+    {
+        $this->jobs->push($jobs);
+
+        return $this;
+    }
+
+    /**
      * Add a callback to be executed after all jobs in the batch have executed successfully.
      *
      * @param  callable  $callback

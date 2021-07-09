@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\TestView;
 use Illuminate\View\View;
@@ -38,11 +37,13 @@ trait InteractsWithViews
             ViewFacade::addLocation(sys_get_temp_dir());
         }
 
-        $tempFile = tempnam($tempDirectory, 'laravel-blade').'.blade.php';
+        $tempFileInfo = pathinfo(tempnam($tempDirectory, 'laravel-blade'));
+
+        $tempFile = $tempFileInfo['dirname'].'/'.$tempFileInfo['filename'].'.blade.php';
 
         file_put_contents($tempFile, $template);
 
-        return new TestView(view(Str::before(basename($tempFile), '.blade.php'), $data));
+        return new TestView(view($tempFileInfo['filename'], $data));
     }
 
     /**

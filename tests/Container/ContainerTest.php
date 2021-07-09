@@ -106,6 +106,31 @@ class ContainerTest extends TestCase
         $this->assertSame($firstInstantiation, $secondInstantiation);
     }
 
+    public function testScopedClosureResolution()
+    {
+        $container = new Container;
+        $container->scoped('class', function () {
+            return new stdClass;
+        });
+        $firstInstantiation = $container->make('class');
+        $secondInstantiation = $container->make('class');
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testScopedClosureResets()
+    {
+        $container = new Container;
+        $container->scoped('class', function () {
+            return new stdClass;
+        });
+        $firstInstantiation = $container->make('class');
+
+        $container->forgetScopedInstances();
+
+        $secondInstantiation = $container->make('class');
+        $this->assertNotSame($firstInstantiation, $secondInstantiation);
+    }
+
     public function testAutoConcreteResolution()
     {
         $container = new Container;
@@ -120,6 +145,20 @@ class ContainerTest extends TestCase
         $var1 = $container->make(ContainerConcreteStub::class);
         $var2 = $container->make(ContainerConcreteStub::class);
         $this->assertSame($var1, $var2);
+    }
+
+    public function testScopedConcreteResolutionResets()
+    {
+        $container = new Container;
+        $container->scoped(ContainerConcreteStub::class);
+
+        $var1 = $container->make(ContainerConcreteStub::class);
+
+        $container->forgetScopedInstances();
+
+        $var2 = $container->make(ContainerConcreteStub::class);
+
+        $this->assertNotSame($var1, $var2);
     }
 
     public function testBindFailsLoudlyWithInvalidArgument()

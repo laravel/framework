@@ -49,7 +49,7 @@ class ScheduleTestCommand extends Command
 
         $event = $commands[$index];
 
-        $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
+        $this->line('<info>['.date('c').'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
         $event->run($this->laravel);
     }

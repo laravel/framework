@@ -272,9 +272,9 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterResourcesWithExceptOption()
     {
         $this->router->resources([
-            'resource-one'      => RouteRegistrarControllerStubOne::class,
-            'resource-two'      => RouteRegistrarControllerStubTwo::class,
-            'resource-three'    => RouteRegistrarControllerStubThree::class,
+            'resource-one' => RouteRegistrarControllerStubOne::class,
+            'resource-two' => RouteRegistrarControllerStubTwo::class,
+            'resource-three' => RouteRegistrarControllerStubThree::class,
         ], ['except' => ['create', 'show']]);
 
         $this->assertCount(15, $this->router->getRoutes());
@@ -294,9 +294,9 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterResourcesWithOnlyOption()
     {
         $this->router->resources([
-            'resource-one'      => RouteRegistrarControllerStubOne::class,
-            'resource-two'      => RouteRegistrarControllerStubTwo::class,
-            'resource-three'    => RouteRegistrarControllerStubThree::class,
+            'resource-one' => RouteRegistrarControllerStubOne::class,
+            'resource-two' => RouteRegistrarControllerStubTwo::class,
+            'resource-three' => RouteRegistrarControllerStubThree::class,
         ], ['only' => ['create', 'show']]);
 
         $this->assertCount(6, $this->router->getRoutes());
@@ -316,9 +316,9 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterResourcesWithoutOption()
     {
         $this->router->resources([
-            'resource-one'      => RouteRegistrarControllerStubOne::class,
-            'resource-two'      => RouteRegistrarControllerStubTwo::class,
-            'resource-three'    => RouteRegistrarControllerStubThree::class,
+            'resource-one' => RouteRegistrarControllerStubOne::class,
+            'resource-two' => RouteRegistrarControllerStubTwo::class,
+            'resource-three' => RouteRegistrarControllerStubThree::class,
         ]);
 
         $this->assertCount(21, $this->router->getRoutes());
@@ -442,9 +442,9 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterApiResourcesWithExceptOption()
     {
         $this->router->apiResources([
-            'resource-one'      => RouteRegistrarControllerStubOne::class,
-            'resource-two'      => RouteRegistrarControllerStubTwo::class,
-            'resource-three'    => RouteRegistrarControllerStubThree::class,
+            'resource-one' => RouteRegistrarControllerStubOne::class,
+            'resource-two' => RouteRegistrarControllerStubTwo::class,
+            'resource-three' => RouteRegistrarControllerStubThree::class,
         ], ['except' => ['create', 'show']]);
 
         $this->assertCount(12, $this->router->getRoutes());
@@ -464,9 +464,9 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterApiResourcesWithOnlyOption()
     {
         $this->router->apiResources([
-            'resource-one'      => RouteRegistrarControllerStubOne::class,
-            'resource-two'      => RouteRegistrarControllerStubTwo::class,
-            'resource-three'    => RouteRegistrarControllerStubThree::class,
+            'resource-one' => RouteRegistrarControllerStubOne::class,
+            'resource-two' => RouteRegistrarControllerStubTwo::class,
+            'resource-three' => RouteRegistrarControllerStubThree::class,
         ], ['only' => ['index', 'show']]);
 
         $this->assertCount(6, $this->router->getRoutes());
@@ -486,9 +486,9 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterApiResourcesWithoutOption()
     {
         $this->router->apiResources([
-            'resource-one'      => RouteRegistrarControllerStubOne::class,
-            'resource-two'      => RouteRegistrarControllerStubTwo::class,
-            'resource-three'    => RouteRegistrarControllerStubThree::class,
+            'resource-one' => RouteRegistrarControllerStubOne::class,
+            'resource-two' => RouteRegistrarControllerStubTwo::class,
+            'resource-three' => RouteRegistrarControllerStubThree::class,
         ]);
 
         $this->assertCount(15, $this->router->getRoutes());

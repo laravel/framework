@@ -8,13 +8,14 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\Tappable;
 
 /**
  * @mixin \Illuminate\Support\Collection
  */
 abstract class AbstractPaginator implements Htmlable
 {
-    use ForwardsCalls;
+    use ForwardsCalls, Tappable;
 
     /**
      * All of the items being paginated.
@@ -509,6 +510,21 @@ abstract class AbstractPaginator implements Htmlable
     public static function currentPageResolver(Closure $resolver)
     {
         static::$currentPageResolver = $resolver;
+    }
+
+    /**
+     * Resolve the query string or return the default value.
+     *
+     * @param  string|array|null  $default
+     * @return string
+     */
+    public static function resolveQueryString($default = null)
+    {
+        if (isset(static::$queryStringResolver)) {
+            return (static::$queryStringResolver)();
+        }
+
+        return $default;
     }
 
     /**

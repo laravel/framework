@@ -66,7 +66,8 @@ class TestDatabasesTest extends TestCase
 
     public function switchToDatabase($database)
     {
-        $instance = new class {
+        $instance = new class
+        {
             use TestDatabases;
         };
 

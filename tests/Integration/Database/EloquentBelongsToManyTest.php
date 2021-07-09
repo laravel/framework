@@ -335,7 +335,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post = Post::create(['title' => Str::random()]);
 
-        $post->tags()->firstOrFail(['id' => 10]);
+        $post->tags()->firstOrFail(['id']);
     }
 
     public function testFindMethod()
@@ -436,6 +436,30 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $new = $post->tags()->firstOrCreate(['name' => 'wavez']);
         $this->assertSame('wavez', $new->name);
+        $this->assertNotNull($new->id);
+    }
+
+    public function testFirstOrCreateMethodWithValues()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+        $post->tags()->attach(Tag::all());
+
+        $existing = $post->tags()->firstOrCreate(
+            ['name' => $tag->name],
+            ['type' => 'featured']
+        );
+
+        $this->assertEquals($tag->id, $existing->id);
+        $this->assertNotEquals('foo', $existing->name);
+
+        $new = $post->tags()->firstOrCreate(
+            ['name' => 'foo'],
+            ['type' => 'featured']
+        );
+
+        $this->assertSame('foo', $new->name);
+        $this->assertSame('featured', $new->type);
         $this->assertNotNull($new->id);
     }
 

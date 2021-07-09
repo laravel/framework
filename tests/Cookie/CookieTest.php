@@ -3,18 +3,12 @@
 namespace Illuminate\Tests\Cookie;
 
 use Illuminate\Cookie\CookieJar;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class CookieTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCookiesAreCreatedWithProperOptions()
     {
         $cookie = $this->getCreator();
@@ -118,6 +112,22 @@ class CookieTest extends TestCase
         $this->assertFalse($cookieJar->hasQueued('foo', '/wrongPath'));
     }
 
+    public function testExpire()
+    {
+        $cookieJar = $this->getCreator();
+        $this->assertCount(0, $cookieJar->getQueuedCookies());
+
+        $cookieJar->expire('foobar', '/path', '/domain');
+
+        $cookie = $cookieJar->queued('foobar');
+        $this->assertEquals('foobar', $cookie->getName());
+        $this->assertEquals(null, $cookie->getValue());
+        $this->assertEquals('/path', $cookie->getPath());
+        $this->assertEquals('/domain', $cookie->getDomain());
+        $this->assertTrue($cookie->getExpiresTime() < time());
+        $this->assertCount(1, $cookieJar->getQueuedCookies());
+    }
+
     public function testUnqueue()
     {
         $cookie = $this->getCreator();
@@ -186,6 +196,17 @@ class CookieTest extends TestCase
             [$cookieOne, $cookieTwo, $cookieThree],
             $cookieJar->getQueuedCookies()
         );
+    }
+
+    public function testFlushQueuedCookies(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieJar->queue($cookieJar->make('foo', 'bar', 0, '/path'));
+        $cookieJar->queue($cookieJar->make('foo', 'rab', 0, '/'));
+        $this->assertCount(2, $cookieJar->getQueuedCookies());
+
+        $cookieJar->flushQueuedCookies();
+        $this->assertEmpty($cookieJar->getQueuedCookies());
     }
 
     public function getCreator()

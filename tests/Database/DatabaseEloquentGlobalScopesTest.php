@@ -6,7 +6,6 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentGlobalScopesTest extends TestCase
@@ -16,14 +15,14 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         parent::setUp();
 
         tap(new DB)->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
         ])->bootEloquent();
     }
 
     protected function tearDown(): void
     {
-        m::close();
+        parent::tearDown();
 
         Model::unsetConnectionResolver();
     }

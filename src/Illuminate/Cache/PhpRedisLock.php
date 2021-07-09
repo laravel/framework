@@ -39,6 +39,8 @@ class PhpRedisLock extends RedisLock
      * Get the owner key, serialized and compressed.
      *
      * @return string
+     *
+     * @throws \UnexpectedValueException
      */
     protected function serializedAndCompressedOwner(): string
     {

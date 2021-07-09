@@ -2,7 +2,7 @@
 
 namespace Illuminate\Mail;
 
-use Aws\Ses\SesClient;
+use Aws\SesV2\SesV2Client;
 use Closure;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
@@ -156,6 +156,8 @@ class MailManager implements FactoryContract
      *
      * @param  array  $config
      * @return \Swift_Transport
+     *
+     * @throws \InvalidArgumentException
      */
     public function createTransport(array $config)
     {
@@ -168,7 +170,7 @@ class MailManager implements FactoryContract
             return call_user_func($this->customCreators[$transport], $config);
         }
 
-        if (trim($transport) === '' || ! method_exists($this, $method = 'create'.ucfirst($transport).'Transport')) {
+        if (trim($transport ?? '') === '' || ! method_exists($this, $method = 'create'.ucfirst($transport).'Transport')) {
             throw new InvalidArgumentException("Unsupported mail transport [{$transport}].");
         }
 
@@ -260,16 +262,16 @@ class MailManager implements FactoryContract
      */
     protected function createSesTransport(array $config)
     {
-        if (! isset($config['secret'])) {
-            $config = array_merge($this->app['config']->get('services.ses', []), [
-                'version' => 'latest', 'service' => 'email',
-            ]);
-        }
+        $config = array_merge(
+            $this->app['config']->get('services.ses', []),
+            ['version' => 'latest', 'service' => 'email'],
+            $config
+        );
 
         $config = Arr::except($config, ['transport']);
 
         return new SesTransport(
-            new SesClient($this->addSesCredentials($config)),
+            new SesV2Client($this->addSesCredentials($config)),
             $config['options'] ?? []
         );
     }

@@ -12,6 +12,7 @@ use LogicException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
+use TypeError;
 
 class Container implements ArrayAccess, ContainerContract
 {
@@ -49,6 +50,13 @@ class Container implements ArrayAccess, ContainerContract
      * @var object[]
      */
     protected $instances = [];
+
+    /**
+     * The container's scoped instances.
+     *
+     * @var array
+     */
+    protected $scopedInstances = [];
 
     /**
      * The registered type aliases.
@@ -233,6 +241,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
+     *
+     * @throws \TypeError
      */
     public function bind($abstract, $concrete = null, $shared = false)
     {
@@ -250,7 +260,7 @@ class Container implements ArrayAccess, ContainerContract
         // up inside its own Closure to give us more convenience when extending.
         if (! $concrete instanceof Closure) {
             if (! is_string($concrete)) {
-                throw new \TypeError(self::class.'::bind(): Argument #2 ($concrete) must be of type Closure|string|null');
+                throw new TypeError(self::class.'::bind(): Argument #2 ($concrete) must be of type Closure|string|null');
             }
 
             $concrete = $this->getClosure($abstract, $concrete);
@@ -386,6 +396,36 @@ class Container implements ArrayAccess, ContainerContract
     public function singletonIf($abstract, $concrete = null)
     {
         if (! $this->bound($abstract)) {
+            $this->singleton($abstract, $concrete);
+        }
+    }
+
+    /**
+     * Register a scoped binding in the container.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function scoped($abstract, $concrete = null)
+    {
+        $this->scopedInstances[] = $abstract;
+
+        $this->singleton($abstract, $concrete);
+    }
+
+    /**
+     * Register a scoped binding if it hasn't already been registered.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function scopedIf($abstract, $concrete = null)
+    {
+        if (! $this->bound($abstract)) {
+            $this->scopedInstances[] = $abstract;
+
             $this->singleton($abstract, $concrete);
         }
     }
@@ -1305,6 +1345,18 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Clear all of the scoped instances from the container.
+     *
+     * @return void
+     */
+    public function forgetScopedInstances()
+    {
+        foreach ($this->scopedInstances as $scoped) {
+            unset($this->instances[$scoped]);
+        }
+    }
+
+    /**
      * Flush the container of all bindings and resolved instances.
      *
      * @return void
@@ -1316,6 +1368,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->bindings = [];
         $this->instances = [];
         $this->abstractAliases = [];
+        $this->scopedInstances = [];
     }
 
     /**

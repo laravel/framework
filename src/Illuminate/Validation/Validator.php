@@ -5,9 +5,11 @@ namespace Illuminate\Validation;
 use BadMethodCallException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
@@ -747,6 +749,14 @@ class Validator implements ValidatorContract
         $attribute = $this->replacePlaceholderInString($attribute);
 
         $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
+
+        if ($rule instanceof ValidatorAwareRule) {
+            $rule->setValidator($this);
+        }
+
+        if ($rule instanceof DataAwareRule) {
+            $rule->setData($this->data);
+        }
 
         if (! $rule->passes($attribute, $value)) {
             $this->failedRules[$attribute][get_class($rule)] = [];

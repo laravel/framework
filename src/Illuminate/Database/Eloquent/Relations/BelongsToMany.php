@@ -596,7 +596,7 @@ class BelongsToMany extends Relation
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes)
+    public function firstOrNew(array $attributes = [])
     {
         if (is_null($instance = $this->related->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes);
@@ -609,14 +609,15 @@ class BelongsToMany extends Relation
      * Get the first related record matching the attributes or create it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @param  array  $joining
      * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrCreate(array $attributes, array $joining = [], $touch = true)
+    public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true)
     {
         if (is_null($instance = $this->related->where($attributes)->first())) {
-            $instance = $this->create($attributes, $joining, $touch);
+            $instance = $this->create($attributes + $values, $joining, $touch);
         }
 
         return $instance;
@@ -773,7 +774,7 @@ class BelongsToMany extends Relation
     public function get($columns = ['*'])
     {
         // First we'll add the proper select columns onto the query so it is run with
-        // the proper columns. Then, we will get the results and hydrate out pivot
+        // the proper columns. Then, we will get the results and hydrate our pivot
         // models with the result of those columns as a separate model relation.
         $builder = $this->query->applyScopes();
 

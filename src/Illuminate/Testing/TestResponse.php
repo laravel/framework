@@ -266,6 +266,54 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response offers a file download.
+     *
+     * @param  string|null  $filename
+     * @return $this
+     */
+    public function assertDownload($filename = null)
+    {
+        $contentDisposition = explode(';', $this->headers->get('content-disposition'));
+
+        if (trim($contentDisposition[0]) !== 'attachment') {
+            PHPUnit::fail(
+                'Response does not offer a file download.'.PHP_EOL.
+                'Disposition ['.trim($contentDisposition[0]).'] found in header, [attachment] expected.'
+            );
+        }
+
+        if (! is_null($filename)) {
+            if (isset($contentDisposition[1]) &&
+                trim(explode('=', $contentDisposition[1])[0]) !== 'filename') {
+                PHPUnit::fail(
+                    'Unsupported Content-Disposition header provided.'.PHP_EOL.
+                    'Disposition ['.trim(explode('=', $contentDisposition[1])[0]).'] found in header, [filename] expected.'
+                );
+            }
+
+            $message = "Expected file [{$filename}] is not present in Content-Disposition header.";
+
+            if (! isset($contentDisposition[1])) {
+                PHPUnit::fail($message);
+            } else {
+                PHPUnit::assertSame(
+                    $filename,
+                    isset(explode('=', $contentDisposition[1])[1])
+                        ? trim(explode('=', $contentDisposition[1])[1])
+                        : '',
+                    $message
+                );
+
+                return $this;
+            }
+        } else {
+            PHPUnit::assertTrue(true);
+
+            return $this;
+        }
+    }
+
+    /**
      * Asserts that the response contains the given cookie and equals the optional value.
      *
      * @param  string  $cookieName
