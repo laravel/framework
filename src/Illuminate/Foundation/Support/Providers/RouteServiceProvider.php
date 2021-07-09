@@ -105,7 +105,9 @@ class RouteServiceProvider extends ServiceProvider
     protected function loadCachedRoutes()
     {
         $this->app->booted(function () {
-            require $this->app->getCachedRoutesPath();
+            $cachesRoutes = $this->app['files']->get($this->app->getCachedRoutesPath());
+
+            $this->app['router']->setRoutes(unserialize($cachesRoutes));
         });
     }
 
