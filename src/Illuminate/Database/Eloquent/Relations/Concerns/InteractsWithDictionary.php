@@ -14,7 +14,7 @@ trait InteractsWithDictionary
      *
      * @throws \Doctrine\Instantiator\Exception\InvalidArgumentException
      */
-    protected function getDictionaryKey($attribute)
+    protected static function getDictionaryKey($attribute)
     {
         if (is_object($attribute)) {
             if (method_exists($attribute, '__toString')) {

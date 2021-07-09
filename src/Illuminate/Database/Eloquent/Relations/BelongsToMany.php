@@ -8,14 +8,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
-use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class BelongsToMany extends Relation
 {
-    use InteractsWithDictionary, InteractsWithPivotTable;
+    use InteractsWithPivotTable;
 
     /**
      * The intermediate table for the relation.
@@ -279,7 +278,7 @@ class BelongsToMany extends Relation
         // children back to their parent using the dictionary and the keys on the
         // the parent models. Then we will return the hydrated models back out.
         foreach ($models as $model) {
-            $key = $this->getDictionaryKey($model->{$this->parentKey});
+            $key = static::getDictionaryKey($model->{$this->parentKey});
 
             if (isset($dictionary[$key])) {
                 $model->setRelation(
@@ -305,7 +304,7 @@ class BelongsToMany extends Relation
         $dictionary = [];
 
         foreach ($results as $result) {
-            $value = $this->getDictionaryKey($result->{$this->accessor}->{$this->foreignPivotKey});
+            $value = static::getDictionaryKey($result->{$this->accessor}->{$this->foreignPivotKey});
 
             $dictionary[$value][] = $result;
         }
