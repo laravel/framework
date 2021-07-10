@@ -6191,6 +6191,15 @@ class ValidationValidatorTest extends TestCase
         $validator->excludeUnvalidatedArrayKeys = true;
         $this->assertTrue($validator->passes());
         $this->assertSame(['users' => ['admins' => [['name' => 'mohamed']]]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [1, 2, 3]],
+            ['users' => 'array|max:10']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [1, 2, 3]], $validator->validated());
     }
 
     public function testExcludeUnless()
