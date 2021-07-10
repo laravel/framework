@@ -542,9 +542,23 @@ class UrlGenerator implements UrlGeneratorContract
             $root = $this->cachedRoot;
         }
 
+        $root = $this->ensureRootHasScheme($root);
+
         $start = Str::startsWith($root, 'http://') ? 'http://' : 'https://';
 
-        return preg_replace('~'.$start.'~', $scheme, $root, 1);
+        return preg_replace('~' . $start . '~', $scheme, $root, 1);
+    }
+
+    /**
+     * Add scheme to root URL if none exists.
+     * @param $root
+     * @return string
+     */
+    protected function ensureRootHasScheme($root)
+    {
+        $needsScheme = !Str::startsWith($root, 'http://') && !Str::startsWith($root, 'https://');
+
+        return $needsScheme ? $this->request->getScheme() . '://' . $root : $root;
     }
 
     /**
