@@ -546,7 +546,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $start = Str::startsWith($root, 'http://') ? 'http://' : 'https://';
 
-        return preg_replace('~' . $start . '~', $scheme, $root, 1);
+        return preg_replace('~'.$start.'~', $scheme, $root, 1);
     }
 
     /**
@@ -556,9 +556,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function ensureRootHasScheme($root)
     {
-        $needsScheme = !Str::startsWith($root, 'http://') && !Str::startsWith($root, 'https://');
+        $needsScheme = ! Str::startsWith($root, 'http://') && ! Str::startsWith($root, 'https://');
 
-        return $needsScheme ? $this->request->getScheme() . '://' . $root : $root;
+        return $needsScheme ? $this->request->getScheme().'://'.$root : $root;
     }
 
     /**
