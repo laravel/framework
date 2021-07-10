@@ -56,6 +56,8 @@ abstract class Facade
                 static::swap($spy);
             });
         }
+
+        return static::getFacadeRoot();
     }
 
     /**

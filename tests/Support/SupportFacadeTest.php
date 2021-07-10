@@ -53,6 +53,16 @@ class SupportFacadeTest extends TestCase
         $spy->shouldHaveReceived('foo');
     }
 
+    public function testSpyReturnsAMockerySpyWhenItIsCalledASecondTime()
+    {
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new stdClass]);
+        FacadeStub::setFacadeApplication($app);
+
+        $this->assertInstanceOf(MockInterface::class, $spy = FacadeStub::spy());
+        $this->assertEquals($spy, FacadeStub::spy());
+    }
+
     public function testShouldReceiveCanBeCalledTwice()
     {
         $app = new ApplicationStub;
