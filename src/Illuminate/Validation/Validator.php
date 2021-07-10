@@ -157,11 +157,11 @@ class Validator implements ValidatorContract
     protected $stopOnFirstFailure = false;
 
     /**
-     * Indicates that array values should be excluded.
+     * Indicates that unvalidated array keys should be excluded, even if the parent array was validated.
      *
      * @var bool
      */
-    public $excludeArrays = false;
+    public $excludeUnvalidatedArrayKeys = false;
 
     /**
      * All of the custom validator extensions.
@@ -516,7 +516,7 @@ class Validator implements ValidatorContract
         $missingValue = new stdClass;
 
         foreach ($this->getRules() as $key => $rules) {
-            if ($this->excludeArrays &&
+            if ($this->excludeUnvalidatedArrayKeys &&
                 in_array('array', $rules) &&
                 ! empty(preg_grep('/^'.preg_quote($key, '/').'\.*/', array_keys($this->implicitAttributes)))) {
                 continue;

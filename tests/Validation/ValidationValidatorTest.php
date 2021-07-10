@@ -6161,7 +6161,7 @@ class ValidationValidatorTest extends TestCase
             ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
             ['users' => 'array', 'users.*.name' => 'string']
         );
-        $validator->excludeArrays = true;
+        $validator->excludeUnvalidatedArrayKeys = true;
         $this->assertTrue($validator->passes());
         $this->assertSame(['users' => [['name' => 'Mohamed']]], $validator->validated());
 
@@ -6170,7 +6170,7 @@ class ValidationValidatorTest extends TestCase
             ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
             ['users' => 'array']
         );
-        $validator->excludeArrays = true;
+        $validator->excludeUnvalidatedArrayKeys = true;
         $this->assertTrue($validator->passes());
         $this->assertSame(['users' => [['name' => 'Mohamed', 'location' => 'cairo']]], $validator->validated());
 
@@ -6179,7 +6179,7 @@ class ValidationValidatorTest extends TestCase
             ['users' => ['mohamed', 'zain']],
             ['users' => 'array', 'users.*' => 'string']
         );
-        $validator->excludeArrays = true;
+        $validator->excludeUnvalidatedArrayKeys = true;
         $this->assertTrue($validator->passes());
         $this->assertSame(['users' => ['mohamed', 'zain']], $validator->validated());
 
@@ -6188,7 +6188,7 @@ class ValidationValidatorTest extends TestCase
             ['users' => ['admins' => [['name' => 'mohamed', 'job' => 'dev']]]],
             ['users' => 'array', 'users.admins' => 'array', 'users.admins.*.name' => 'string']
         );
-        $validator->excludeArrays = true;
+        $validator->excludeUnvalidatedArrayKeys = true;
         $this->assertTrue($validator->passes());
         $this->assertSame(['users' => ['admins' => [['name' => 'mohamed']]]], $validator->validated());
     }
