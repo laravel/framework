@@ -6,6 +6,8 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -195,6 +197,21 @@ abstract class AbstractCursorPaginator implements Htmlable
         return collect($this->parameters)
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
+                if ($item instanceof Model) {
+                    $table = Str::beforeLast($parameterName, '.');
+
+                    /** @var \Illuminate\Database\Eloquent\Model $relation */
+                    foreach ($item->getRelations() as $relation) {
+                        if ($relation instanceof Pivot && $relation->getTable() === $table) {
+                            $attribute = Str::afterLast($parameterName, '.');
+
+                            return $this->ensureParameterIsPrimitive(
+                                $relation->getAttribute($attribute)
+                            );
+                        }
+                    }
+                }
+
                 if ($item instanceof ArrayAccess || is_array($item)) {
                     return $this->ensureParameterIsPrimitive(
                         $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')]
