@@ -158,7 +158,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string  $path
      * @return string
      */
-    public function path($path)
+    public function path($path = '')
     {
         return $this->prefixer->prefixPath($path);
     }
