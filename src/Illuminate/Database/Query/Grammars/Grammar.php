@@ -140,7 +140,14 @@ class Grammar extends BaseGrammar
             $select = 'select ';
         }
 
-        return $select.$this->columnize($columns);
+        if ($query->concat){
+            $concatColumns = $this->columnize($query->concat['columns']);
+            $column = $this->columnize($columns). ", CONCAT_WS('{$query->concat['separator']}', $concatColumns) as {$query->concat['as']}";
+        } else {
+            $column = $this->columnize($columns);
+        }
+
+        return $select.$column;
     }
 
     /**

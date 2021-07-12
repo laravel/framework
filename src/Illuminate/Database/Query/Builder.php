@@ -81,6 +81,13 @@ class Builder
     public $columns;
 
     /**
+     * The data that should be transformed with concat method.
+     *
+     * @var array
+     */
+    public $concat;
+
+    /**
      * Indicates if the query returns distinct results.
      *
      * Occasionally contains the columns that should be distinct.
@@ -2713,6 +2720,23 @@ class Builder
     public function doesntExistOr(Closure $callback)
     {
         return $this->doesntExist() ? true : $callback();
+    }
+
+
+    /**
+     * Retrieve the concatenated data with CONCAT method .
+     *
+     * @param  array  $columns
+     * @param  string  $as
+     * @param  string  $separator
+     * @return $this
+     */
+
+    public function concat($columns, $as, $separator = '')
+    {
+        $this->concat = compact('columns', 'as', 'separator');
+
+        return $this;
     }
 
     /**
