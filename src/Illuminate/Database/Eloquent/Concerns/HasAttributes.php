@@ -44,6 +44,13 @@ trait HasAttributes
     protected $changes = [];
 
     /**
+     * The model attribute's previous state.
+     *
+     * @var array
+     */
+    protected $previousAttributes = [];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array
@@ -1499,7 +1506,11 @@ trait HasAttributes
      */
     public function syncChanges()
     {
-        $this->changes = $this->getDirty();
+        $dirty = $this->getDirty();
+
+        $this->previousAttributes = Arr::only($this->original, array_keys($dirty));
+
+        $this->changes = $dirty;
 
         return $this;
     }
@@ -1567,6 +1578,55 @@ trait HasAttributes
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the attribute is transitioning to a given value.
+     *
+     * @param  string  $attribute
+     * @param  string|array  $to
+     * @param  string|array  $from
+     * @return bool
+     */
+    public function changingTo($attribute, $to, $from = null)
+    {
+        if (! $this->isDirty($attribute)) {
+            return false;
+        }
+
+        $oldValue = is_null($this->original[$attribute]) ? null : (string) $this->original[$attribute];
+        $newValue = is_null($this->attributes[$attribute]) ? null : (string) $this->attributes[$attribute];
+
+        if (func_num_args() == 3 && ! in_array($oldValue, is_array($from) ? $from : [$from])) {
+            return false;
+        }
+
+        return in_array($newValue, is_array($to) ? $to : [$to]);
+    }
+
+    /**
+     * Determine if the attribute has transitioned to a given value.
+     *
+     * @param  string  $attribute
+     * @param  string|array  $to
+     * @param  string|array  $from
+     * @return bool
+     */
+    public function changedTo($attribute, $to, $from = null)
+    {
+        if (! array_key_exists($attribute, $this->previousAttributes) ||
+            ! array_key_exists($attribute, $this->changes)) {
+            return false;
+        }
+
+        $oldValue = is_null($this->previousAttributes[$attribute]) ? null : (string) $this->previousAttributes[$attribute];
+        $newValue = is_null($this->changes[$attribute]) ? null : (string) $this->changes[$attribute];
+
+        if (func_num_args() == 3 && ! in_array($oldValue, is_array($from) ? $from : [$from])) {
+            return false;
+        }
+
+        return in_array($newValue, is_array($to) ? $to : [$to]);
     }
 
     /**
