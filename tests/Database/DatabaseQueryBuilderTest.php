@@ -1373,6 +1373,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" having "last_login_date" between ? and ? or user_foo < user_bar', $builder->toSql());
     }
 
+    public function testConcat()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->concat(['first_name', 'last_name'], 'full_name');
+        $this->assertSame('select *, CONCAT_WS(\'\', "first_name", "last_name") as full_name from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->concat(['first_name', 'last_name'], 'full_name', ' ');
+        $this->assertSame('select *, CONCAT_WS(\' \', "first_name", "last_name") as full_name from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['first_name', 'last_name'])->from('users')->concat(['first_name', 'last_name'], 'full_name');
+        $this->assertSame('select "first_name", "last_name", CONCAT_WS(\'\', "first_name", "last_name") as full_name from "users"', $builder->toSql());
+    }
+
     public function testLimitsAndOffsets()
     {
         $builder = $this->getBuilder();
