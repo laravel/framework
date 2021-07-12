@@ -104,7 +104,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($this->tempDir.DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->path('file.txt'));
     }
 
-    public function testRootPath()
+    public function testPathWithDefaultPathParameter()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertEquals($this->tempDir.DIRECTORY_SEPARATOR, $filesystemAdapter->path());
