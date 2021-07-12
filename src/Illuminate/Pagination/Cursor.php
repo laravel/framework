@@ -12,7 +12,7 @@ class Cursor implements Arrayable
      *
      * @var array
      */
-    protected $parameters;
+    public $parameters;
 
     /**
      * Determine whether the cursor points to the next or previous set of items.
