@@ -61,5 +61,9 @@ class ComposerScripts
         if (is_file($packagesPath = $laravel->getCachedPackagesPath())) {
             @unlink($packagesPath);
         }
+
+        if (is_file($configPath = $laravel->getCachedConfigPath())) {
+            @unlink($configPath);
+        }
     }
 }
