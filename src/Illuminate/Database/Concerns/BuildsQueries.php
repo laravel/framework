@@ -306,9 +306,10 @@ trait BuildsQueries
                 $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i) {
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
 
-                    $original = $this->reverseColumnAliasingForCursorPagination($this, $column);
-
-                    $builder->where($original, $direction === 'asc' ? '>' : '<', $cursor->parameter($column));
+                    $builder->where(
+                        $this->getOriginalColumnNameForCursorPagination($this, $column),
+                        $direction === 'asc' ? '>' : '<', $cursor->parameter($column)
+                    );
 
                     if ($i < $orders->count() - 1) {
                         $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
@@ -331,13 +332,13 @@ trait BuildsQueries
     }
 
     /**
-     * Reverse any aliases columns for column ordering.
+     * Get the original column name of the given column, without any aliasing.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  string  $parameter
      * @return string
      */
-    protected function reverseColumnAliasingForCursorPagination($builder, string $parameter)
+    protected function getOriginalColumnNameForCursorPagination($builder, string $parameter)
     {
         $columns = $builder instanceof Builder ? $builder->getQuery()->columns : $builder->columns;
 
