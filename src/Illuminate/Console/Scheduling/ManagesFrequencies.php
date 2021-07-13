@@ -270,6 +270,22 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run multiple times daily.
+     *
+     * @param  array  $hours
+     * @param  array  $minutes
+     * @return $this
+     */
+    public function multipleDialy($hours = [0], $minutes = [0])
+    {
+        $hours = implode(',', $hours);
+        $minutes = implode(',', $minutes);
+
+        return $this->spliceIntoPosition(2, $hours)
+                    ->spliceIntoPosition(1, $minutes);
+    }
+
+    /**
      * Schedule the event to run only on weekdays.
      *
      * @return $this
