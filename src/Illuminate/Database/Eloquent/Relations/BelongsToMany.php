@@ -870,7 +870,6 @@ class BelongsToMany extends Relation
      * @param  string  $cursorName
      * @param  string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
-     * @throws \Illuminate\Pagination\CursorPaginationException
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {

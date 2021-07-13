@@ -308,7 +308,8 @@ trait BuildsQueries
 
                     $builder->where(
                         $this->getOriginalColumnNameForCursorPagination($this, $column),
-                        $direction === 'asc' ? '>' : '<', $cursor->parameter($column)
+                        $direction === 'asc' ? '>' : '<',
+                        $cursor->parameter($column)
                     );
 
                     if ($i < $orders->count() - 1) {
