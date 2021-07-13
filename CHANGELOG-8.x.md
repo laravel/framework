@@ -1,6 +1,23 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.49.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.50.0...8.x)
+
+
+## [v8.50.0 (2021-07-13)](https://github.com/laravel/framework/compare/v8.49.2...v8.50.0)
+
+### Added
+- Added ability to cancel notifications immediately prior to sending ([#37930](https://github.com/laravel/framework/pull/37930))
+- Added the possibility of having "Prunable" models ([#37889](https://github.com/laravel/framework/pull/37889))
+- Added support for both CommonMark 1.x and 2.x ([#37954](https://github.com/laravel/framework/pull/37954))
+- Added `Illuminate/Validation/Factory::excludeUnvalidatedArrayKeys()` ([#37943](https://github.com/laravel/framework/pull/37943))
+
+### Fixed
+- Fixed `Illuminate/Bus/PendingBatch::add()` ([108385b](https://github.com/laravel/framework/commit/108385b4f98cacfc1ef1d6e323f57b1c2df3180f))
+- Cursor pagination fixes ([#37915](https://github.com/laravel/framework/pull/37915))
+
+### Changed
+- Mixed orders in cursor paginate ([#37762](https://github.com/laravel/framework/pull/37762))
+- Clear config after dumping auto-loaded files ([#37985](https://github.com/laravel/framework/pull/37985))
 
 
 ## [v8.49.2 (2021-07-07)](https://github.com/laravel/framework/compare/v8.49.1...v8.49.2)
