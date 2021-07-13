@@ -60,7 +60,7 @@ class FrequencyTest extends TestCase
     public function testMultipleDialy()
     {
         $this->assertSame('0 8,16,20 * * *', $this->event->multipleDialy([8, 16, 20])->getExpression());
-        $this->assertSame('15,30,45 12,14,16 * * *', $this->event->multipleDialy([12,14,16], [15,30,45])->getExpression());
+        $this->assertSame('15,30,45 12,14,16 * * *', $this->event->multipleDialy([12, 14, 16], [15, 30, 45])->getExpression());
     }
 
     public function testWeekly()
