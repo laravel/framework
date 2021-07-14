@@ -1434,7 +1434,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     }
 
     /**
-     * Get an instance of the model in its previous state.,
+     * Get an instance of the model in its previous state.
      *
      * @return  static
      */
