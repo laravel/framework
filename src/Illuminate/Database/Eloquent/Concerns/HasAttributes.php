@@ -1630,6 +1630,22 @@ trait HasAttributes
     }
 
     /**
+     * Get an instance of the model in its previous state.
+     *
+     * @return static
+     */
+    public function wormhole()
+    {
+        if (empty($this->previousAttributes)) {
+            throw new LogicException("Unable to wormhole. Model has not been saved.");
+        }
+
+        return tap(new static, function ($instance) {
+            $instance->setRawAttributes($this->previousAttributes, true);
+        });
+    }
+
+    /**
      * Get the attributes that have been changed since the last sync.
      *
      * @return array

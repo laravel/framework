@@ -1434,20 +1434,6 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     }
 
     /**
-     * Get an instance of the model in its previous state.
-     *
-     * @return  static
-     */
-    public function wormhole()
-    {
-        return tap(new static, function ($instance) {
-            $instance->setRawAttributes($this->previousAttributes);
-
-            $instance->setRelations($this->relations);
-        });
-    }
-
-    /**
      * Reload a fresh model instance from the database.
      *
      * @param  array|string  $with
