@@ -254,7 +254,7 @@ class FilesystemManager implements FactoryContract
      * @param  array  $config
      * @return \League\Flysystem\FilesystemInterface
      */
-    protected function createFlysystem(AdapterInterface $adapter, array $config)
+    public function createFlysystem(AdapterInterface $adapter, array $config)
     {
         $cache = Arr::pull($config, 'cache');
 
