@@ -80,7 +80,7 @@ class QueuedEventsTest extends TestCase
             return $queue;
         });
 
-        $d->listen('some.event', TestDispatcherGetConnection::class . '@handle');
+        $d->listen('some.event', TestDispatcherGetConnection::class.'@handle');
         $d->dispatch('some.event', ['foo', 'bar']);
     }
 
