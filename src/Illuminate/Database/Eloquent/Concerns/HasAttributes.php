@@ -1640,9 +1640,7 @@ trait HasAttributes
             throw new LogicException("Unable to wormhole. Model has not been saved.");
         }
 
-        return tap(new static, function ($instance) {
-            $instance->setRawAttributes($this->previousAttributes, true);
-        });
+        return (new static)->setRawAttributes($this->previousAttributes, true);
     }
 
     /**
