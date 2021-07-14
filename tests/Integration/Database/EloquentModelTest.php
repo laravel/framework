@@ -177,6 +177,32 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->changingTo('items', json_encode([1, 2])));
         $this->assertTrue($user->changingTo('items', json_encode([1, 2]), json_encode([0, 1])));
     }
+
+    public function testWormhole()
+    {
+        $user = TestModel2::create([
+            'name' => 'mohamed',
+            'title' => 'B',
+            'score' => 1,
+            'items' => [0, 1],
+        ]);
+
+        $user->refresh();
+
+        $user->name = 'zain';
+        $user->title = 'A';
+        $user->score = 20;
+        $user->items = [2, 3];
+
+        $user->save();
+
+        $previous = $user->wormhole();
+
+        $this->assertEquals('mohamed', $previous->name);
+        $this->assertEquals('B', $previous->title);
+        $this->assertEquals(1, $previous->score);
+        $this->assertEquals([0, 1], $previous->items);
+    }
 }
 
 class TestModel1 extends Model

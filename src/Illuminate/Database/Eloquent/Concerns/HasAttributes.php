@@ -1508,7 +1508,7 @@ trait HasAttributes
     {
         $dirty = $this->getDirty();
 
-        $this->previousAttributes = Arr::only($this->original, array_keys($dirty));
+        $this->previousAttributes = $this->original;
 
         $this->changes = $dirty;
 
