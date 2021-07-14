@@ -231,7 +231,7 @@ class Str
         foreach ((array) $needles as $needle) {
             if (
                 $needle !== '' && $needle !== null
-                && substr($haystack, -strlen($needle)) === (string) $needle
+                && str_ends_with($haystack, $needle)
             ) {
                 return true;
             }
