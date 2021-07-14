@@ -92,6 +92,19 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Taylor Otwell', (string) $this->stringable('Taylor Otwell')->words(3));
     }
 
+    public function testUnless()
+    {
+        $this->assertSame('unless false', (string) $this->stringable('unless')->unless(false, function ($stringable, $value) {
+            return $stringable->append(' false');
+        }));
+
+        $this->assertSame('unless true fallbacks to default', (string) $this->stringable('unless')->unless(true, function ($stringable, $value) {
+            return $stringable->append($value);
+        }, function ($stringable) {
+            return $stringable->append(' true fallbacks to default');
+        }));
+    }
+
     public function testWhenEmpty()
     {
         tap($this->stringable(), function ($stringable) {
@@ -106,6 +119,23 @@ class SupportStringableTest extends TestCase
 
         $this->assertSame('not-empty', (string) $this->stringable('not-empty')->whenEmpty(function () {
             return 'empty';
+        }));
+    }
+
+    public function testWhenNotEmpty()
+    {
+        tap($this->stringable(), function ($stringable) {
+            $this->assertSame($stringable, $stringable->whenNotEmpty(function ($stringable) {
+                return $stringable.'.';
+            }));
+        });
+
+        $this->assertSame('', (string) $this->stringable()->whenNotEmpty(function ($stringable) {
+            return $stringable.'.';
+        }));
+
+        $this->assertSame('Not empty.', (string) $this->stringable('Not empty')->whenNotEmpty(function ($stringable) {
+            return $stringable.'.';
         }));
     }
 
@@ -133,6 +163,34 @@ class SupportStringableTest extends TestCase
         }, function ($stringable) {
             return $stringable->append('fallbacks to default');
         }));
+    }
+
+    public function testUnlessTruthy()
+    {
+        $this->assertSame('unless', (string) $this->stringable('unless')->unless(1, function ($stringable, $value) {
+            return $stringable->append($value)->append('true');
+        }));
+
+        $this->assertSame('unless true fallbacks to default with value 1',
+            (string) $this->stringable('unless true ')->unless(1, function ($stringable, $value) {
+                return $stringable->append($value);
+            }, function ($stringable, $value) {
+                return $stringable->append('fallbacks to default with value ')->append($value);
+            }));
+    }
+
+    public function testUnlessFalsy()
+    {
+        $this->assertSame('unless 0', (string) $this->stringable('unless ')->unless(0, function ($stringable, $value) {
+            return $stringable->append($value);
+        }));
+
+        $this->assertSame('gets the value 0',
+            (string) $this->stringable('gets the value ')->unless(0, function ($stringable, $value) {
+                return $stringable->append($value);
+            }, function ($stringable) {
+                return $stringable->append('fallbacks to default');
+            }));
     }
 
     public function testTrimmedOnlyWhereNecessary()
@@ -415,6 +473,14 @@ class SupportStringableTest extends TestCase
     {
         $this->assertSame(11, $this->stringable('foo bar baz')->length());
         $this->assertSame(11, $this->stringable('foo bar baz')->length('UTF-8'));
+    }
+
+    public function testReplace()
+    {
+        $this->assertSame('foo/foo/foo', (string) $this->stringable('?/?/?')->replace('?', 'foo'));
+        $this->assertSame('bar/bar', (string) $this->stringable('?/?')->replace('?', 'bar'));
+        $this->assertSame('?/?/?', (string) $this->stringable('? ? ?')->replace(' ', '/'));
+        $this->assertSame('foo/bar/baz/bam', (string) $this->stringable('?1/?2/?3/?4')->replace(['?1', '?2', '?3', '?4'], ['foo', 'bar', 'baz', 'bam']));
     }
 
     public function testReplaceArray()

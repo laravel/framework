@@ -10,8 +10,10 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
+use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -429,7 +431,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['email' => null], ['email' => 'email']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
-        $this->assertSame(' is not a valid email', $v->messages()->first('email'));
+        $this->assertSame('empty is not a valid email', $v->messages()->first('email'));
     }
 
     public function testInputIsReplacedByItsDisplayableValue()
@@ -716,6 +718,100 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateCurrentPassword()
+    {
+        // Fails when user is not logged in.
+        $auth = m::mock(Guard::class);
+        $auth->shouldReceive('guard')->andReturn($auth);
+        $auth->shouldReceive('guest')->andReturn(true);
+
+        $hasher = m::mock(Hasher::class);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getTranslator();
+        $trans->shouldReceive('get')->andReturnArg(0);
+
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
+        $v->setContainer($container);
+
+        $this->assertFalse($v->passes());
+
+        // Fails when password is incorrect.
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword');
+
+        $auth = m::mock(Guard::class);
+        $auth->shouldReceive('guard')->andReturn($auth);
+        $auth->shouldReceive('guest')->andReturn(false);
+        $auth->shouldReceive('user')->andReturn($user);
+
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(false);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getTranslator();
+        $trans->shouldReceive('get')->andReturnArg(0);
+
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
+        $v->setContainer($container);
+
+        $this->assertFalse($v->passes());
+
+        // Succeeds when password is correct.
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword');
+
+        $auth = m::mock(Guard::class);
+        $auth->shouldReceive('guard')->andReturn($auth);
+        $auth->shouldReceive('guest')->andReturn(false);
+        $auth->shouldReceive('user')->andReturn($user);
+
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(true);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getTranslator();
+        $trans->shouldReceive('get')->andReturnArg(0);
+
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
+        $v->setContainer($container);
+
+        $this->assertTrue($v->passes());
+
+        // We can use a specific guard.
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword');
+
+        $auth = m::mock(Guard::class);
+        $auth->shouldReceive('guard')->with('custom')->andReturn($auth);
+        $auth->shouldReceive('guest')->andReturn(false);
+        $auth->shouldReceive('user')->andReturn($user);
+
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(true);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getTranslator();
+        $trans->shouldReceive('get')->andReturnArg(0);
+
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password:custom']);
+        $v->setContainer($container);
+
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateFilled()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -770,7 +866,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
         $v->setContainer($container);
@@ -794,7 +890,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
         $v->setContainer($container);
@@ -818,7 +914,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
         $v->setContainer($container);
@@ -842,7 +938,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get');
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password:custom']);
         $v->setContainer($container);
@@ -1134,13 +1230,44 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
         $v = new Validator($trans, ['foo' => 0], [
-            'foo' => 'required|boolean',
+            'foo' => 'nullable|required|boolean',
             'bar' => 'required_if:foo,true',
             'baz' => 'required_if:foo,false',
         ]);
         $this->assertTrue($v->fails());
         $this->assertCount(1, $v->messages());
         $this->assertSame('The baz field is required when foo is 0.', $v->messages()->first('baz'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], [
+            'foo' => 'nullable|boolean',
+            'baz' => 'nullable|required_if:foo,false',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => null], [
+            'foo' => 'nullable|boolean',
+            'baz' => 'nullable|required_if:foo,false',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], [
+            'foo' => 'nullable|boolean',
+            'baz' => 'nullable|required_if:foo,null',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => null], [
+            'foo' => 'nullable|boolean',
+            'baz' => 'nullable|required_if:foo,null',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertCount(1, $v->messages());
+        $this->assertSame('The baz field is required when foo is empty.', $v->messages()->first('baz'));
     }
 
     public function testRequiredUnless()
@@ -1172,6 +1299,18 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => false], ['bar' => 'required_unless:foo,true']);
         $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => '1'], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['bar' => 'required_unless:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['bar' => 'required_unless:foo,null']);
+        $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => true], ['bar' => 'required_unless:foo,null']);
@@ -2614,7 +2753,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, [
-            'x' => new class {
+            'x' => new class
+            {
                 public function __toString()
                 {
                     return 'aslsdlks';
@@ -2624,7 +2764,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, [
-            'x' => new class {
+            'x' => new class
+            {
                 public function __toString()
                 {
                     return 'foo@gmail.com';
@@ -3018,7 +3159,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $file2], ['x' => 'image']);
         $this->assertTrue($v->passes());
 
-        $file2 = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file2 = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file2->expects($this->any())->method('guessExtension')->willReturn('jpg');
         $file2->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpg');
         $v = new Validator($trans, ['x' => $file2], ['x' => 'image']);
@@ -3193,17 +3334,17 @@ class ValidationValidatorTest extends TestCase
         $file->expects($this->any())->method('guessExtension')->willReturn('rtf');
         $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('rtf');
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('getMimeType')->willReturn('text/rtf');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/*']);
         $this->assertTrue($v->passes());
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('getMimeType')->willReturn('application/pdf');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/rtf']);
         $this->assertFalse($v->passes());
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('getMimeType')->willReturn('image/jpeg');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:image/jpeg']);
         $this->assertTrue($v->passes());
@@ -3226,13 +3367,13 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $file2], ['x' => 'mimes:pdf']);
         $this->assertFalse($v->passes());
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('jpg');
         $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpg');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:jpeg']);
         $this->assertTrue($v->passes());
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('jpg');
         $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpeg');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:jpg']);
@@ -4908,6 +5049,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertNull($explicit_no_connection[0]);
         $this->assertSame('explicits', $explicit_no_connection[1]);
 
+        $explicit_model_with_prefix = $v->parseTable(ExplicitPrefixedTableModel::class);
+        $this->assertNull($explicit_model_with_prefix[0]);
+        $this->assertSame('prefix.explicits', $explicit_model_with_prefix[1]);
+
+        $explicit_table_with_connection_prefix = $v->parseTable('connection.table');
+        $this->assertSame('connection', $explicit_table_with_connection_prefix[0]);
+        $this->assertSame('table', $explicit_table_with_connection_prefix[1]);
+
         $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
         $this->assertNull($noneloquent_no_connection[0]);
         $this->assertEquals(NonEloquentModel::class, $noneloquent_no_connection[1]);
@@ -5087,7 +5236,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
             [
-                'name' => new class implements Rule {
+                'name' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return $value === 'taylor';
@@ -5109,7 +5259,8 @@ class ValidationValidatorTest extends TestCase
             ['name' => 'adam'],
             [
                 'name' => [
-                    new class implements Rule {
+                    new class implements Rule
+                    {
                         public function passes($attribute, $value)
                         {
                             return $value === 'taylor';
@@ -5163,7 +5314,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
             [
-                'states.*' => new class implements Rule {
+                'states.*' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return in_array($value, ['AK', 'HI']);
@@ -5201,7 +5353,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 42],
             [
-                'name' => new class implements Rule {
+                'name' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return $value === 'taylor';
@@ -5225,7 +5378,8 @@ class ValidationValidatorTest extends TestCase
             ['name' => 42],
             [
                 'name' => [
-                    new class implements Rule {
+                    new class implements Rule
+                    {
                         public function passes($attribute, $value)
                         {
                             return $value === 'taylor';
@@ -5244,6 +5398,180 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('name must be taylor', $v->errors()->get('name')[0]);
         $this->assertSame('name must be a first name', $v->errors()->get('name')[1]);
         $this->assertSame('validation.string', $v->errors()->get('name')[2]);
+
+        // Test access to the validator data
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['password' => 'foo', 'password_confirmation' => 'foo'],
+            [
+                'password' => [
+                    new class implements Rule, DataAwareRule
+                    {
+                        protected $data;
+
+                        public function setData($data)
+                        {
+                            $this->data = $data;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            return $value === $this->data['password_confirmation'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute confirmation does not match.'];
+                        }
+                    }, 'string',
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['password' => 'foo', 'password_confirmation' => 'bar'],
+            [
+                'password' => [
+                    new class implements Rule, DataAwareRule
+                    {
+                        protected $data;
+
+                        public function setData($data)
+                        {
+                            $this->data = $data;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            return $value === $this->data['password_confirmation'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute confirmation does not match.'];
+                        }
+                    }, 'string',
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertSame('The password confirmation does not match.', $v->errors()->get('password')[0]);
+
+        // Test access to the validator
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['base' => 21, 'double' => 42],
+            [
+                'base' => ['integer'],
+                'double' => [
+                    'integer',
+                    new class implements Rule, ValidatorAwareRule
+                    {
+                        protected $validator;
+
+                        public function setValidator($validator)
+                        {
+                            $this->validator = $validator;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            if ($this->validator->errors()->hasAny(['base', $attribute])) {
+                                return true;
+                            }
+
+                            return $value === 2 * $this->validator->getData()['base'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute must be the double of base.'];
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['base' => 21, 'double' => 10],
+            [
+                'base' => ['integer'],
+                'double' => [
+                    'integer',
+                    new class implements Rule, ValidatorAwareRule
+                    {
+                        protected $validator;
+
+                        public function setValidator($validator)
+                        {
+                            $this->validator = $validator;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            if ($this->validator->errors()->hasAny(['base', $attribute])) {
+                                return true;
+                            }
+
+                            return $value === 2 * $this->validator->getData()['base'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute must be the double of base.'];
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertSame('The double must be the double of base.', $v->errors()->get('double')[0]);
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['base' => 21, 'double' => 'foo'],
+            [
+                'base' => ['integer'],
+                'double' => [
+                    'integer',
+                    new class implements Rule, ValidatorAwareRule
+                    {
+                        protected $validator;
+
+                        public function setValidator($validator)
+                        {
+                            $this->validator = $validator;
+                        }
+
+                        public function passes($attribute, $value)
+                        {
+                            if ($this->validator->errors()->hasAny(['base', $attribute])) {
+                                return true;
+                            }
+
+                            return $value === 2 * $this->validator->getData()['base'];
+                        }
+
+                        public function message()
+                        {
+                            return ['The :attribute must be the double of base.'];
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertCount(1, $v->errors()->get('double'));
+        $this->assertSame('validation.integer', $v->errors()->get('double')[0]);
     }
 
     public function testCustomValidationObjectWithDotKeysIsCorrectlyPassedValue()
@@ -5252,7 +5580,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['foo' => ['foo.bar' => 'baz']],
             [
-                'foo' => new class implements Rule {
+                'foo' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return $value === ['foo.bar' => 'baz'];
@@ -5273,7 +5602,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['foo' => ['foo.bar' => 'baz']],
             [
-                'foo.foo\.bar' => new class implements Rule {
+                'foo.foo\.bar' => new class implements Rule
+                {
                     public function passes($attribute, $value)
                     {
                         return false;
@@ -5298,7 +5628,8 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => ''],
             [
-                'name' => $rule = new class implements ImplicitRule {
+                'name' => $rule = new class implements ImplicitRule
+                {
                     public $called = false;
 
                     public function passes($attribute, $value)
@@ -5815,6 +6146,62 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedMessages, $validator->messages()->toArray());
     }
 
+    public function testExcludingArrays()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'array', 'users.*.name' => 'string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed', 'location' => 'cairo']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'array', 'users.*.name' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'array']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed', 'location' => 'cairo']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => ['mohamed', 'zain']],
+            ['users' => 'array', 'users.*' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => ['mohamed', 'zain']], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => ['admins' => [['name' => 'mohamed', 'job' => 'dev']]]],
+            ['users' => 'array', 'users.admins' => 'array', 'users.admins.*.name' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => ['admins' => [['name' => 'mohamed']]]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [1, 2, 3]],
+            ['users' => 'array|max:10']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [1, 2, 3]], $validator->validated());
+    }
+
     public function testExcludeUnless()
     {
         $validator = new Validator(
@@ -5856,6 +6243,16 @@ class ValidationValidatorTest extends TestCase
         );
         $this->assertTrue($validator->passes());
         $this->assertSame(['foo' => true], $validator->validated());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => 'Hello'], ['bar' => 'exclude_unless:foo,true']);
+        $this->assertTrue($v->passes());
+        $this->assertSame([], $v->validated());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['bar' => 'Hello'], ['bar' => 'exclude_unless:foo,null']);
+        $this->assertTrue($v->passes());
+        $this->assertSame(['bar' => 'Hello'], $v->validated());
     }
 
     public function testExcludeWithout()
@@ -5965,6 +6362,13 @@ class ImplicitTableModel extends Model
 class ExplicitTableModel extends Model
 {
     protected $table = 'explicits';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class ExplicitPrefixedTableModel extends Model
+{
+    protected $table = 'prefix.explicits';
     protected $guarded = [];
     public $timestamps = false;
 }

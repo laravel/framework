@@ -15,6 +15,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('Taylor Otwell', Str::words('Taylor Otwell', 3));
     }
 
+    public function testStringCanBeLimitedByWordsNonAscii()
+    {
+        $this->assertSame('这是...', Str::words('这是 段中文', 1));
+        $this->assertSame('这是___', Str::words('这是 段中文', 1, '___'));
+        $this->assertSame('这是-段中文', Str::words('这是-段中文', 3, '___'));
+        $this->assertSame('这是___', Str::words('这是     段中文', 1, '___'));
+    }
+
     public function testStringTrimmedOnlyWhereNecessary()
     {
         $this->assertSame(' Taylor Otwell ', Str::words(' Taylor Otwell ', 3));
@@ -328,6 +336,14 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    public function testReplace()
+    {
+        $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
+        $this->assertSame('foo bar baz 8.x', Str::replace('?', '8.x', 'foo bar baz ?'));
+        $this->assertSame('foo/bar/baz', Str::replace(' ', '/', 'foo bar baz'));
+        $this->assertSame('foo bar baz', Str::replace(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
+    }
+
     public function testReplaceArray()
     {
         $this->assertSame('foo/bar/baz', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?'));
@@ -410,6 +426,18 @@ class SupportStrTest extends TestCase
         $this->assertSame('FooBar', Str::studly('foo_bar')); // test cache
         $this->assertSame('FooBarBaz', Str::studly('foo-barBaz'));
         $this->assertSame('FooBarBaz', Str::studly('foo-bar_baz'));
+    }
+
+    public function testMatch()
+    {
+        $this->assertSame('bar', Str::match('/bar/', 'foo bar'));
+        $this->assertSame('bar', Str::match('/foo (.*)/', 'foo bar'));
+        $this->assertEmpty(Str::match('/nothing/', 'foo bar'));
+
+        $this->assertEquals(['bar', 'bar'], Str::matchAll('/bar/', 'bar foo bar')->all());
+
+        $this->assertEquals(['un', 'ly'], Str::matchAll('/f(\w*)/', 'bar fun bar fly')->all());
+        $this->assertEmpty(Str::matchAll('/nothing/', 'bar fun bar fly'));
     }
 
     public function testCamel()

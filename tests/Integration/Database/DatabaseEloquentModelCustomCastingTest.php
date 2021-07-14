@@ -418,7 +418,8 @@ class ValueObject implements Castable
 
     public static function castUsing(array $arguments)
     {
-        return new class(...$arguments) implements CastsAttributes {
+        return new class(...$arguments) implements CastsAttributes
+        {
             private $argument;
 
             public function __construct($argument = null)

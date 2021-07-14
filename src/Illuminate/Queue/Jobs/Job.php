@@ -210,7 +210,7 @@ abstract class Job
         [$class, $method] = JobName::parse($payload['job']);
 
         if (method_exists($this->instance = $this->resolve($class), 'failed')) {
-            $this->instance->failed($payload['data'], $e, $payload['uuid']);
+            $this->instance->failed($payload['data'], $e, $payload['uuid'] ?? '');
         }
     }
 
@@ -263,6 +263,16 @@ abstract class Job
     public function maxExceptions()
     {
         return $this->payload()['maxExceptions'] ?? null;
+    }
+
+    /**
+     * Determine if the job should fail when it timeouts.
+     *
+     * @return bool
+     */
+    public function shouldFailOnTimeout()
+    {
+        return $this->payload()['failOnTimeout'] ?? false;
     }
 
     /**

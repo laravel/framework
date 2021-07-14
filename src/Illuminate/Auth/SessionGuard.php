@@ -17,6 +17,7 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Session\Session;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -375,6 +376,34 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Attempt to authenticate a user with credentials and additional callbacks.
+     *
+     * @param  array  $credentials
+     * @param  array|callable  $callbacks
+     * @param  false  $remember
+     * @return bool
+     */
+    public function attemptWhen(array $credentials = [], $callbacks = null, $remember = false)
+    {
+        $this->fireAttemptEvent($credentials, $remember);
+
+        $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
+
+        // This method does the exact same thing as attempt, but also executes callbacks after
+        // the user is retrieved and validated. If one of the callbacks returns falsy we do
+        // not login the user. Instead, we will fail the specific authentication attempt.
+        if ($this->hasValidCredentials($user, $credentials) && $this->shouldLogin($callbacks, $user)) {
+            $this->login($user, $remember);
+
+            return true;
+        }
+
+        $this->fireFailedEvent($user, $credentials);
+
+        return false;
+    }
+
+    /**
      * Determine if the user matches the credentials.
      *
      * @param  mixed  $user
@@ -390,6 +419,24 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         }
 
         return $validated;
+    }
+
+    /**
+     * Determine if the user should login by executing the given callbacks.
+     *
+     * @param  array|callable|null  $callbacks
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return bool
+     */
+    protected function shouldLogin($callbacks, AuthenticatableContract $user)
+    {
+        foreach (Arr::wrap($callbacks) as $callback) {
+            if (! $callback($user, $this)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -581,7 +628,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $password
      * @param  string  $attribute
-     * @return bool|null
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -608,7 +655,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $password
      * @param  string  $attribute
-     * @return bool|null
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      *
      * @throws \InvalidArgumentException
      */

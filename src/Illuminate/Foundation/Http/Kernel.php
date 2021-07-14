@@ -384,6 +384,16 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Get the priority-sorted list of middleware.
+     *
+     * @return array
+     */
+    public function getMiddlewarePriority()
+    {
+        return $this->middlewarePriority;
+    }
+
+    /**
      * Get the bootstrap classes for the application.
      *
      * @return array
@@ -449,7 +459,7 @@ class Kernel implements KernelContract
     /**
      * Set the Laravel application instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return $this
      */
     public function setApplication(Application $app)

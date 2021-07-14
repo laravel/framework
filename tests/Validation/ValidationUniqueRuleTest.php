@@ -35,9 +35,22 @@ class ValidationUniqueRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertSame('unique:table,column,"Taylor, Otwell",id_column,foo,"bar"', (string) $rule);
 
+        $rule = new Unique(PrefixedTableEloquentModelStub::class);
+        $this->assertSame('unique:'.PrefixedTableEloquentModelStub::class.',NULL,NULL,id', (string) $rule);
+
         $rule = new Unique(EloquentModelStub::class, 'column');
         $rule->ignore('Taylor, Otwell', 'id_column');
         $rule->where('foo', 'bar');
+        $this->assertSame('unique:table,column,"Taylor, Otwell",id_column,foo,"bar"', (string) $rule);
+
+        $rule = new Unique(EloquentModelStub::class, 'column');
+        $rule->where('foo', 'bar');
+        $rule->when(true, function ($rule) {
+            $rule->ignore('Taylor, Otwell', 'id_column');
+        });
+        $rule->unless(true, function ($rule) {
+            $rule->ignore('Chris', 'id_column');
+        });
         $this->assertSame('unique:table,column,"Taylor, Otwell",id_column,foo,"bar"', (string) $rule);
 
         $rule = new Unique('table', 'column');
@@ -73,6 +86,13 @@ class ValidationUniqueRuleTest extends TestCase
 class EloquentModelStub extends Model
 {
     protected $table = 'table';
+    protected $primaryKey = 'id_column';
+    protected $guarded = [];
+}
+
+class PrefixedTableEloquentModelStub extends Model
+{
+    protected $table = 'public.table';
     protected $primaryKey = 'id_column';
     protected $guarded = [];
 }

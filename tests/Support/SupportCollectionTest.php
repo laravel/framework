@@ -7,6 +7,8 @@ use ArrayIterator;
 use ArrayObject;
 use CachingIterator;
 use Exception;
+use Illuminate\Collections\ItemNotFoundException;
+use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
@@ -64,6 +66,92 @@ class SupportCollectionTest extends TestCase
         $data = new $collection;
         $result = $data->first(null, 'default');
         $this->assertSame('default', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->sole());
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', '=', 'foo'));
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', 'foo'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfNoItemsExists($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'INVALID')->sole();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfMoreThanOneItemExists($collection)
+    {
+        $this->expectException(MultipleItemsFoundException::class);
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'foo')->sole();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExistsWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'baz']);
+        $result = $data->sole(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfNoItemsExistsWithCallback($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'baz']);
+
+        $data->sole(function ($value) {
+            return $value === 'invalid';
+        });
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfMoreThanOneItemExistsWithCallback($collection)
+    {
+        $this->expectException(MultipleItemsFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'bar']);
+
+        $data->sole(function ($value) {
+            return $value === 'bar';
+        });
     }
 
     /**
@@ -145,6 +233,65 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('Otwell', $data->first());
         $this->assertSame('Otwell', $data->shift());
         $this->assertNull($data->first());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSliding($collection)
+    {
+        // Default parameters: $size = 2, $step = 1
+        $this->assertSame([], $collection::times(0)->sliding()->toArray());
+        $this->assertSame([], $collection::times(1)->sliding()->toArray());
+        $this->assertSame([[1, 2]], $collection::times(2)->sliding()->toArray());
+        $this->assertSame(
+            [[1, 2], [2, 3]],
+            $collection::times(3)->sliding()->map->values()->toArray()
+        );
+
+        // Custom step: $size = 2, $step = 3
+        $this->assertSame([], $collection::times(1)->sliding(2, 3)->toArray());
+        $this->assertSame([[1, 2]], $collection::times(2)->sliding(2, 3)->toArray());
+        $this->assertSame([[1, 2]], $collection::times(3)->sliding(2, 3)->toArray());
+        $this->assertSame([[1, 2]], $collection::times(4)->sliding(2, 3)->toArray());
+        $this->assertSame(
+            [[1, 2], [4, 5]],
+            $collection::times(5)->sliding(2, 3)->map->values()->toArray()
+        );
+
+        // Custom size: $size = 3, $step = 1
+        $this->assertSame([], $collection::times(2)->sliding(3)->toArray());
+        $this->assertSame([[1, 2, 3]], $collection::times(3)->sliding(3)->toArray());
+        $this->assertSame(
+            [[1, 2, 3], [2, 3, 4]],
+            $collection::times(4)->sliding(3)->map->values()->toArray()
+        );
+        $this->assertSame(
+            [[1, 2, 3], [2, 3, 4]],
+            $collection::times(4)->sliding(3)->map->values()->toArray()
+        );
+
+        // Custom size and custom step: $size = 3, $step = 2
+        $this->assertSame([], $collection::times(2)->sliding(3, 2)->toArray());
+        $this->assertSame([[1, 2, 3]], $collection::times(3)->sliding(3, 2)->toArray());
+        $this->assertSame([[1, 2, 3]], $collection::times(4)->sliding(3, 2)->toArray());
+        $this->assertSame(
+            [[1, 2, 3], [3, 4, 5]],
+            $collection::times(5)->sliding(3, 2)->map->values()->toArray()
+        );
+        $this->assertSame(
+            [[1, 2, 3], [3, 4, 5]],
+            $collection::times(6)->sliding(3, 2)->map->values()->toArray()
+        );
+
+        // Ensure keys are preserved, and inner chunks are also collections
+        $chunks = $collection::times(3)->sliding();
+
+        $this->assertSame([[0 => 1, 1 => 2], [1 => 2, 2 => 3]], $chunks->toArray());
+
+        $this->assertInstanceOf($collection, $chunks);
+        $this->assertInstanceOf($collection, $chunks->first());
+        $this->assertInstanceOf($collection, $chunks->skip(1)->first());
     }
 
     /**
@@ -618,7 +765,8 @@ class SupportCollectionTest extends TestCase
     public function testHigherOrderFilter($collection)
     {
         $c = new $collection([
-            new class {
+            new class
+            {
                 public $name = 'Alex';
 
                 public function active()
@@ -626,7 +774,8 @@ class SupportCollectionTest extends TestCase
                     return true;
                 }
             },
-            new class {
+            new class
+            {
                 public $name = 'John';
 
                 public function active()
@@ -1124,7 +1273,7 @@ class SupportCollectionTest extends TestCase
         $c1 = new $collection(['id' => 1, 'first_word' => 'Hello']);
         $c2 = new $collection(['ID' => 123, 'foo_bar' => 'Hello']);
         // demonstrate that diffKeys wont support case insensitivity
-        $this->assertEquals(['id'=>1, 'first_word'=> 'Hello'], $c1->diffKeys($c2)->all());
+        $this->assertEquals(['id' => 1, 'first_word' => 'Hello'], $c1->diffKeys($c2)->all());
         // allow for case insensitive difference
         $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeysUsing($c2, 'strcasecmp')->all());
     }
@@ -4640,7 +4789,7 @@ class TestJsonableObject implements Jsonable
 
 class TestJsonSerializeObject implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return ['foo' => 'bar'];
     }
@@ -4648,7 +4797,7 @@ class TestJsonSerializeObject implements JsonSerializable
 
 class TestJsonSerializeWithScalarValueObject implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return 'foo';
     }

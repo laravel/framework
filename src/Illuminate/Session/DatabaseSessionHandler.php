@@ -280,6 +280,19 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     }
 
     /**
+     * Set the application instance used by the handler.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $container
+     * @return $this
+     */
+    public function setContainer($container)
+    {
+        $this->container = $container;
+
+        return $this;
+    }
+
+    /**
      * Set the existence state for the session.
      *
      * @param  bool  $value

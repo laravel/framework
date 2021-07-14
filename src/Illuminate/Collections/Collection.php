@@ -4,6 +4,8 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Illuminate\Collections\ItemNotFoundException;
+use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
@@ -260,7 +262,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Retrieve duplicate items from the collection.
      *
-     * @param  callable|null  $callback
+     * @param  callable|string|null  $callback
      * @param  bool  $strict
      * @return static
      */
@@ -288,7 +290,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Retrieve duplicate items from the collection using strict comparison.
      *
-     * @param  callable|null  $callback
+     * @param  callable|string|null  $callback
      * @return static
      */
     public function duplicatesStrict($callback = null)
@@ -513,10 +515,10 @@ class Collection implements ArrayAccess, Enumerable
         $first = $this->first();
 
         if (is_array($first) || (is_object($first) && ! $first instanceof Stringable)) {
-            return implode($glue, $this->pluck($value)->all());
+            return implode($glue ?? '', $this->pluck($value)->all());
         }
 
-        return implode($value, $this->items);
+        return implode($value ?? '', $this->items);
     }
 
     /**
@@ -958,6 +960,22 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Create chunks representing a "sliding window" view of the items in the collection.
+     *
+     * @param  int  $size
+     * @param  int  $step
+     * @return static
+     */
+    public function sliding($size = 2, $step = 1)
+    {
+        $chunks = floor(($this->count() - $size) / $step) + 1;
+
+        return static::times($chunks, function ($number) use ($size, $step) {
+            return $this->slice(($number - 1) * $step, $size);
+        });
+    }
+
+    /**
      * Skip the first {$count} items.
      *
      * @param  int  $count
@@ -1048,6 +1066,36 @@ class Collection implements ArrayAccess, Enumerable
     public function splitIn($numberOfGroups)
     {
         return $this->chunk(ceil($this->count() / $numberOfGroups));
+    }
+
+    /**
+     * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return mixed
+     *
+     * @throws \Illuminate\Collections\ItemNotFoundException
+     * @throws \Illuminate\Collections\MultipleItemsFoundException
+     */
+    public function sole($key = null, $operator = null, $value = null)
+    {
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
+
+        $items = $this->when($filter)->filter($filter);
+
+        if ($items->isEmpty()) {
+            throw new ItemNotFoundException;
+        }
+
+        if ($items->count() > 1) {
+            throw new MultipleItemsFoundException;
+        }
+
+        return $items->first();
     }
 
     /**

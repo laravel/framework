@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
 use JsonSerializable;
+use ReturnTypeWillChange;
 
 class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
@@ -42,7 +43,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * The "data" wrapper that should be applied.
      *
-     * @var string
+     * @var string|null
      */
     public static $wrap = 'data';
 
@@ -226,6 +227,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      *
      * @return array
      */
+    #[ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->resolve(Container::getInstance()->make('request'));

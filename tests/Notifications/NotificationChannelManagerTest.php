@@ -58,6 +58,37 @@ class NotificationChannelManagerTest extends TestCase
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotificationWithTwoChannels);
     }
 
+    public function testNotificationNotSentWhenCancelled()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Dispatcher::class, $events = m::mock());
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $manager->shouldNotReceive('driver');
+        $events->shouldNotReceive('dispatch');
+
+        $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestCancelledNotification);
+    }
+
+    public function testNotificationSentWhenNotCancelled()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Dispatcher::class, $events = m::mock());
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $manager->shouldReceive('driver')->once()->andReturn($driver = m::mock());
+        $driver->shouldReceive('send')->once();
+        $events->shouldReceive('dispatch')->once()->with(m::type(NotificationSent::class));
+
+        $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotCancelledNotification);
+    }
+
     public function testNotificationCanBeQueued()
     {
         $container = new Container;
@@ -100,6 +131,42 @@ class NotificationChannelManagerTestNotificationWithTwoChannels extends Notifica
     public function message()
     {
         return $this->line('test')->action('Text', 'url');
+    }
+}
+
+class NotificationChannelManagerTestCancelledNotification extends Notification
+{
+    public function via()
+    {
+        return ['test'];
+    }
+
+    public function message()
+    {
+        return $this->line('test')->action('Text', 'url');
+    }
+
+    public function shouldSend($notifiable, $channel)
+    {
+        return false;
+    }
+}
+
+class NotificationChannelManagerTestNotCancelledNotification extends Notification
+{
+    public function via()
+    {
+        return ['test'];
+    }
+
+    public function message()
+    {
+        return $this->line('test')->action('Text', 'url');
+    }
+
+    public function shouldSend($notifiable, $channel)
+    {
+        return true;
     }
 }
 

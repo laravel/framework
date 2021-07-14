@@ -1,6 +1,60 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.23...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.30...6.x)
+
+
+## [v6.20.30 (2021-07-07)](https://github.com/laravel/framework/compare/v6.20.29...v6.20.30)
+
+### Fixed
+- Fix edge case causing a BadMethodCallExceptions to be thrown when using loadMissing() ([#37871](https://github.com/laravel/framework/pull/37871))
+
+
+## [v6.20.29 (2021-06-22)](https://github.com/laravel/framework/compare/v6.20.28...v6.20.29)
+
+### Changed
+- Removed unnecessary checks in RequiredIf validation, fixed tests ([#37700](https://github.com/laravel/framework/pull/37700))
+
+
+## [v6.20.28 (2021-06-15)](https://github.com/laravel/framework/compare/v6.20.27...v6.20.28)
+
+### Fixed
+- Fixed dns_get_record loose check of A records for active_url rule ([#37675](https://github.com/laravel/framework/pull/37675))
+- Type hinted arguments for Illuminate\Validation\Rules\RequiredIf ([#37688](https://github.com/laravel/framework/pull/37688))
+- Fixed when passed object as parameters to scopes method ([#37692](https://github.com/laravel/framework/pull/37692))
+
+
+## [v6.20.27 (2021-05-11)](https://github.com/laravel/framework/compare/v6.20.26...v6.20.27)
+
+### Added
+- Support mass assignment to SQL Server views ([#37307](https://github.com/laravel/framework/pull/37307))
+
+### Fixed
+- Fixed `Illuminate\Database\Query\Builder::offset()` with non numbers $value ([#37164](https://github.com/laravel/framework/pull/37164))
+- Fixed unless rules ([#37291](https://github.com/laravel/framework/pull/37291))
+
+### Changed
+- Allow reporting reportable exceptions with the default logger ([#37235](https://github.com/laravel/framework/pull/37235))
+
+
+## [v6.20.26 (2021-04-28)](https://github.com/laravel/framework/compare/v6.20.25...v6.20.26)
+
+### Fixed
+- Fixed Cache store with a name other than 'dynamodb' ([#37145](https://github.com/laravel/framework/pull/37145))
+
+### Changed
+- Some cast to int in `Illuminate\Database\Query\Grammars\SqlServerGrammar` ([09bf145](https://github.com/laravel/framework/commit/09bf1457e9df53e172e6fd5929cbafb539677c7c))
+
+
+## [v6.20.25 (2021-04-27)](https://github.com/laravel/framework/compare/v6.20.24...v6.20.25)
+
+### Fixed
+- Fixed nullable values for required_if ([#37128](https://github.com/laravel/framework/pull/37128), [86fd558](https://github.com/laravel/framework/commit/86fd558b4e5d8d7d45cf457cd1a72d54334297a1))
+
+
+## [v6.20.24 (2021-04-20)](https://github.com/laravel/framework/compare/v6.20.23...v6.20.24)
+
+### Fixed
+- Fixed required_if boolean validation ([#36969](https://github.com/laravel/framework/pull/36969))
 
 
 ## [v6.20.23 (2021-04-13)](https://github.com/laravel/framework/compare/v6.20.22...v6.20.23)

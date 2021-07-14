@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -896,6 +897,29 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testSlidingIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->sliding();
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->sliding()->take(1)->all();
+        });
+
+        $this->assertEnumerates(3, function ($collection) {
+            $collection->sliding()->take(2)->all();
+        });
+
+        $this->assertEnumerates(13, function ($collection) {
+            $collection->sliding(3, 5)->take(3)->all();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sliding()->all();
+        });
+    }
+
     public function testSkipIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
@@ -974,6 +998,33 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             $collection->some(function ($value) {
                 return false;
             });
+        });
+    }
+
+    public function testSoleIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            try {
+                $collection->sole();
+            } catch (MultipleItemsFoundException $e) {
+                //
+            }
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sole(function ($item) {
+                return $item === 1;
+            });
+        });
+
+        $this->assertEnumerates(4, function ($collection) {
+            try {
+                $collection->sole(function ($item) {
+                    return $item % 2 === 0;
+                });
+            } catch (MultipleItemsFoundException $e) {
+                //
+            }
         });
     }
 

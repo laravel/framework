@@ -35,7 +35,9 @@ class HttpMimeTypeTest extends TestCase
 
     public function testSearchExtensionFromMimeType()
     {
-        $this->assertSame('qt', MimeType::search('video/quicktime'));
+        // Regression: check for both "qt" & "mov" because of a behavioral change in Symfony 5.3
+        // See: https://github.com/symfony/symfony/pull/41016
+        $this->assertContains(MimeType::search('video/quicktime'), ['qt', 'mov']);
         $this->assertNull(MimeType::search('foo/bar'));
     }
 }

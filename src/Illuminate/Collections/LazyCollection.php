@@ -316,7 +316,7 @@ class LazyCollection implements Enumerable
     /**
      * Retrieve duplicate items.
      *
-     * @param  callable|null  $callback
+     * @param  callable|string|null  $callback
      * @param  bool  $strict
      * @return static
      */
@@ -328,7 +328,7 @@ class LazyCollection implements Enumerable
     /**
      * Retrieve duplicate items using strict comparison.
      *
-     * @param  callable|null  $callback
+     * @param  callable|string|null  $callback
      * @return static
      */
     public function duplicatesStrict($callback = null)
@@ -921,6 +921,45 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Create chunks representing a "sliding window" view of the items in the collection.
+     *
+     * @param  int  $size
+     * @param  int  $step
+     * @return static
+     */
+    public function sliding($size = 2, $step = 1)
+    {
+        return new static(function () use ($size, $step) {
+            $iterator = $this->getIterator();
+
+            $chunk = [];
+
+            while ($iterator->valid()) {
+                $chunk[$iterator->key()] = $iterator->current();
+
+                if (count($chunk) == $size) {
+                    yield tap(new static($chunk), function () use (&$chunk, $step) {
+                        $chunk = array_slice($chunk, $step, null, true);
+                    });
+
+                    // If the $step between chunks is bigger than each chunk's $size
+                    // we will skip the extra items (which should never be in any
+                    // chunk) before we continue to the next chunk in the loop.
+                    if ($step > $size) {
+                        $skip = $step - $size;
+
+                        for ($i = 0; $i < $skip && $iterator->valid(); $i++) {
+                            $iterator->next();
+                        }
+                    }
+                }
+
+                $iterator->next();
+            }
+        });
+    }
+
+    /**
      * Skip the first {$count} items.
      *
      * @param  int  $count
@@ -1008,6 +1047,31 @@ class LazyCollection implements Enumerable
     public function split($numberOfGroups)
     {
         return $this->passthru('split', func_get_args());
+    }
+
+    /**
+     * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return mixed
+     *
+     * @throws \Illuminate\Collections\ItemNotFoundException
+     * @throws \Illuminate\Collections\MultipleItemsFoundException
+     */
+    public function sole($key = null, $operator = null, $value = null)
+    {
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
+
+        return $this
+            ->when($filter)
+            ->filter($filter)
+            ->take(2)
+            ->collect()
+            ->sole();
     }
 
     /**
