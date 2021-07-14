@@ -839,7 +839,7 @@ trait HasAttributes
                 function () {
                 },
                 $this->normalizeCastClassResponse($key, $caster->set(
-                    $this, $key, $this->{$key}, $this->attributes
+                    $this, $key, $value, $this->attributes
                 ))
             ));
         } else {
