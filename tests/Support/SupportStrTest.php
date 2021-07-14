@@ -428,6 +428,18 @@ class SupportStrTest extends TestCase
         $this->assertSame('FooBarBaz', Str::studly('foo-bar_baz'));
     }
 
+    public function testMatch()
+    {
+        $this->assertSame('bar', Str::match('/bar/', 'foo bar'));
+        $this->assertSame('bar', Str::match('/foo (.*)/', 'foo bar'));
+        $this->assertEmpty(Str::match('/nothing/', 'foo bar'));
+
+        $this->assertEquals(['bar', 'bar'], Str::matchAll('/bar/', 'bar foo bar')->all());
+
+        $this->assertEquals(['un', 'ly'], Str::matchAll('/f(\w*)/', 'bar fun bar fly')->all());
+        $this->assertEmpty(Str::matchAll('/nothing/', 'bar fun bar fly'));
+    }
+
     public function testCamel()
     {
         $this->assertSame('laravelPHPFramework', Str::camel('Laravel_p_h_p_framework'));

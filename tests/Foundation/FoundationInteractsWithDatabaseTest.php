@@ -41,6 +41,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
+    public function testAssertDatabaseHasSupportModels()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHas(ProductStub::class, $this->data);
+        $this->assertDatabaseHas(new ProductStub, $this->data);
+    }
+
     public function testSeeInDatabaseDoesNotFindResults()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -91,6 +99,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
+    public function testAssertDatabaseMissingSupportModels()
+    {
+        $this->mockCountBuilder(0);
+
+        $this->assertDatabaseMissing(ProductStub::class, $this->data);
+        $this->assertDatabaseMissing(new ProductStub, $this->data);
+    }
+
     public function testDontSeeInDatabaseFindsResults()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -108,6 +124,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->mockCountBuilder(1);
 
         $this->assertDatabaseCount($this->table, 1);
+    }
+
+    public function testAssertDatabaseCountSupportModels()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseCount(ProductStub::class, 1);
+        $this->assertDatabaseCount(new ProductStub, 1);
     }
 
     public function testAssertTableEntriesCountWrong()
@@ -168,6 +192,13 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertSoftDeleted($this->table, $this->data);
     }
 
+    public function testAssertSoftDeletedSupportModelStrings()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertSoftDeleted(ProductStub::class, $this->data);
+    }
+
     public function testAssertSoftDeletedInDatabaseDoesNotFindResults()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -206,6 +237,13 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->shouldReceive('get')->andReturn(collect());
 
         $this->assertSoftDeleted(new CustomProductStub($this->data));
+    }
+
+    public function testGetTableNameFromModel()
+    {
+        $this->assertEquals($this->table, $this->getTable(ProductStub::class));
+        $this->assertEquals($this->table, $this->getTable(new ProductStub));
+        $this->assertEquals($this->table, $this->getTable($this->table));
     }
 
     protected function mockCountBuilder($countResult, $deletedAtColumn = 'deleted_at')

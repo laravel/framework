@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
@@ -154,6 +155,13 @@ class Validator implements ValidatorContract
      * @var bool
      */
     protected $stopOnFirstFailure = false;
+
+    /**
+     * Indicates that unvalidated array keys should be excluded, even if the parent array was validated.
+     *
+     * @var bool
+     */
+    public $excludeUnvalidatedArrayKeys = false;
 
     /**
      * All of the custom validator extensions.
@@ -507,7 +515,13 @@ class Validator implements ValidatorContract
 
         $missingValue = new stdClass;
 
-        foreach (array_keys($this->getRules()) as $key) {
+        foreach ($this->getRules() as $key => $rules) {
+            if ($this->excludeUnvalidatedArrayKeys &&
+                in_array('array', $rules) &&
+                ! empty(preg_grep('/^'.preg_quote($key, '/').'\.*/', array_keys($this->implicitAttributes)))) {
+                continue;
+            }
+
             $value = data_get($this->getData(), $key, $missingValue);
 
             if ($value !== $missingValue) {
@@ -748,6 +762,10 @@ class Validator implements ValidatorContract
         $attribute = $this->replacePlaceholderInString($attribute);
 
         $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
+
+        if ($rule instanceof ValidatorAwareRule) {
+            $rule->setValidator($this);
+        }
 
         if ($rule instanceof DataAwareRule) {
             $rule->setData($this->data);

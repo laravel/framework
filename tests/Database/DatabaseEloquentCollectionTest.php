@@ -485,6 +485,28 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['user'], $c->getQueueableRelations());
     }
 
+    public function testQueueableRelationshipsIgnoreCollectionKeys()
+    {
+        $c = new Collection([
+            'foo' => new class
+            {
+                public function getQueueableRelations()
+                {
+                    return [];
+                }
+            },
+            'bar' => new class
+            {
+                public function getQueueableRelations()
+                {
+                    return [];
+                }
+            },
+        ]);
+
+        $this->assertEquals([], $c->getQueueableRelations());
+    }
+
     public function testEmptyCollectionStayEmptyOnFresh()
     {
         $c = new Collection;

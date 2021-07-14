@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +18,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $db = new DB;
 
         $db->addConnection([
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
         ]);
 
@@ -41,6 +42,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->schema()->create('logins', function ($table) {
             $table->increments('id');
             $table->foreignId('user_id');
+            $table->dateTime('deleted_at')->nullable();
         });
 
         $this->schema()->create('states', function ($table) {
@@ -97,6 +99,14 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         // Using "oldestOfMAny"
         $relation = $user->latest_login()->oldestOfMAny('id', 'baz');
         $this->assertSame('baz', $relation->getRelationName());
+    }
+
+    public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $relation = $user->latest_login();
+        $relation->addEagerConstraints([$user]);
+        $this->assertSame('select MAX(id) as id, "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
     }
 
     public function testQualifyingSubSelectColumn()
@@ -281,15 +291,15 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     {
         $user = HasOneOfManyTestUser::create();
         $user->states()->create([
-            'type'  => 'foo',
+            'type' => 'foo',
             'state' => 'draft',
         ]);
         $currentForState = $user->states()->create([
-            'type'  => 'foo',
+            'type' => 'foo',
             'state' => 'active',
         ]);
         $user->states()->create([
-            'type'  => 'bar',
+            'type' => 'bar',
             'state' => 'baz',
         ]);
 
@@ -310,6 +320,37 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
         $user = HasOneOfManyTestUser::first();
         $this->assertSame($price->id, $user->price->id);
+    }
+
+    public function testEagerLoadingWithMultipleAggregates()
+    {
+        $user1 = HasOneOfManyTestUser::create();
+        $user2 = HasOneOfManyTestUser::create();
+
+        $user1->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+        $user1Price = $user1->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+        $user1->prices()->create([
+            'published_at' => '2021-04-01 00:00:00',
+        ]);
+
+        $user2Price = $user2->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+        $user2->prices()->create([
+            'published_at' => '2021-04-01 00:00:00',
+        ]);
+
+        $users = HasOneOfManyTestUser::with('price')->get();
+
+        $this->assertNotNull($users[0]->price);
+        $this->assertSame($user1Price->id, $users[0]->price->id);
+
+        $this->assertNotNull($users[1]->price);
+        $this->assertSame($user2Price->id, $users[1]->price->id);
     }
 
     public function testWithExists()
@@ -333,11 +374,19 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertFalse($user->foo_state_exists);
 
         $user->states()->create([
-            'type'  => 'foo',
+            'type' => 'foo',
             'state' => 'bar',
         ]);
         $user = HasOneOfManyTestUser::withExists('foo_state')->first();
         $this->assertTrue($user->foo_state_exists);
+    }
+
+    public function testWithSoftDeletes()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $user->logins()->create();
+        $user->latest_login_with_soft_deletes;
+        $this->assertNotNull($user->latest_login_with_soft_deletes);
     }
 
     /**
@@ -380,6 +429,11 @@ class HasOneOfManyTestUser extends Eloquent
         return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany();
     }
 
+    public function latest_login_with_soft_deletes()
+    {
+        return $this->hasOne(HasOneOfManyTestLoginWithSoftDeletes::class, 'user_id')->ofMany();
+    }
+
     public function latest_login_with_shortcut()
     {
         return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->latestOfMany();
@@ -419,7 +473,7 @@ class HasOneOfManyTestUser extends Eloquent
     {
         return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->ofMany([
             'published_at' => 'max',
-            'id'           => 'max',
+            'id' => 'max',
         ], function ($q) {
             $q->where('published_at', '<', now());
         });
@@ -446,6 +500,15 @@ class HasOneOfManyTestModel extends Eloquent
 
 class HasOneOfManyTestLogin extends Eloquent
 {
+    protected $table = 'logins';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class HasOneOfManyTestLoginWithSoftDeletes extends Eloquent
+{
+    use SoftDeletes;
+
     protected $table = 'logins';
     protected $guarded = [];
     public $timestamps = false;

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Cache;
 /**
  * @group integration
  */
-class MemcachedTaggedCacheTest extends MemcachedIntegrationTest
+class MemcachedTaggedCacheTestCase extends MemcachedIntegrationTestCase
 {
     public function testMemcachedCanStoreAndRetrieveTaggedCacheItems()
     {

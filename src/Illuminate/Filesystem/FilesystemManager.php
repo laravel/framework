@@ -91,6 +91,20 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Build an on-demand disk.
+     *
+     * @param  string|array  $config
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function build($config)
+    {
+        return $this->resolve('ondemand', is_array($config) ? $config : [
+            'driver' => 'local',
+            'root' => $config,
+        ]);
+    }
+
+    /**
      * Attempt to get the disk from the local cache.
      *
      * @param  string  $name
@@ -105,13 +119,14 @@ class FilesystemManager implements FactoryContract
      * Resolve the given disk.
      *
      * @param  string  $name
+     * @param  array|null  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      *
      * @throws \InvalidArgumentException
      */
-    protected function resolve($name)
+    protected function resolve($name, $config = null)
     {
-        $config = $this->getConfig($name);
+        $config = $config ?? $this->getConfig($name);
 
         if (empty($config['driver'])) {
             throw new InvalidArgumentException("Disk [{$name}] does not have a configured driver.");

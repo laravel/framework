@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Str;
+use Illuminate\View\Factory;
 use PHPUnit\Framework\TestCase;
 use Swift_Message;
 
@@ -67,6 +68,58 @@ class MailSesTransportTest extends TestCase
 
         $this->assertEquals($messageId, $message->getHeaders()->get('X-Message-ID')->getFieldBody());
         $this->assertEquals($messageId, $message->getHeaders()->get('X-SES-Message-ID')->getFieldBody());
+    }
+
+    public function testSesLocalConfiguration()
+    {
+        $container = new Container;
+
+        $container->singleton('config', function () {
+            return new Repository([
+                'mail' => [
+                    'mailers' => [
+                        'ses' => [
+                            'transport' => 'ses',
+                            'region' => 'eu-west-1',
+                            'options' => [
+                                'ConfigurationSetName' => 'Laravel',
+                                'Tags' => [
+                                    ['Name' => 'Laravel', 'Value' => 'Framework'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'services' => [
+                    'ses' => [
+                        'region' => 'us-east-1',
+                    ],
+                ],
+            ]);
+        });
+
+        $container->instance('view', $this->createMock(Factory::class));
+
+        $container->bind('events', function () {
+            return null;
+        });
+
+        $manager = new MailManager($container);
+
+        /** @var \Illuminate\Mail\Mailer $mailer */
+        $mailer = $manager->mailer('ses');
+
+        /** @var \Illuminate\Mail\Transport\SesTransport $transport */
+        $transport = $mailer->getSwiftMailer()->getTransport();
+
+        $this->assertSame('eu-west-1', $transport->ses()->getRegion());
+
+        $this->assertSame([
+            'ConfigurationSetName' => 'Laravel',
+            'Tags' => [
+                ['Name' => 'Laravel', 'Value' => 'Framework'],
+            ],
+        ], $transport->getOptions());
     }
 }
 

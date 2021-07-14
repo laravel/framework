@@ -1190,6 +1190,63 @@ class TestResponseTest extends TestCase
         $testResponse->assertJsonMissingValidationErrors('bar', 'data.errors');
     }
 
+    public function testAssertDownloadOffered()
+    {
+        $files = new Filesystem;
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file.txt', 'Hello World');
+        $testResponse = TestResponse::fromBaseResponse(new Response(
+            $files->get($tempDir.'/file.txt'), 200, [
+                'Content-Disposition' => 'attachment; filename=file.txt',
+            ]
+        ));
+        $testResponse->assertDownload();
+        $files->deleteDirectory($tempDir);
+    }
+
+    public function testAssertDownloadOfferedWithAFileName()
+    {
+        $files = new Filesystem;
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file.txt', 'Hello World');
+        $testResponse = TestResponse::fromBaseResponse(new Response(
+            $files->get($tempDir.'/file.txt'), 200, [
+                'Content-Disposition' => 'attachment; filename = file.txt',
+            ]
+        ));
+        $testResponse->assertDownload('file.txt');
+        $files->deleteDirectory($tempDir);
+    }
+
+    public function testAssertDownloadOfferedWorksWithBinaryFileResponse()
+    {
+        $files = new Filesystem;
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file.txt', 'Hello World');
+        $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
+            $tempDir.'/file.txt', 200, [], true, 'attachment'
+        ));
+        $testResponse->assertDownload('file.txt');
+        $files->deleteDirectory($tempDir);
+    }
+
+    public function testAssertDownloadOfferedFailsWithInlineContentDisposition()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $files = new Filesystem;
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file.txt', 'Hello World');
+        $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
+            $tempDir.'/file.txt', 200, [], true, 'inline'
+        ));
+        $testResponse->assertDownload();
+        $files->deleteDirectory($tempDir);
+    }
+
     public function testMacroable()
     {
         TestResponse::macro('foo', function () {
@@ -1324,7 +1381,7 @@ class TestResponseTest extends TestCase
 
 class JsonSerializableMixedResourcesStub implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'foo' => 'bar',
@@ -1358,7 +1415,7 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
 
 class JsonSerializableSingleResourceStub implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             ['foo' => 'foo 0', 'bar' => 'bar 0', 'foobar' => 'foobar 0'],
@@ -1371,7 +1428,7 @@ class JsonSerializableSingleResourceStub implements JsonSerializable
 
 class JsonSerializableSingleResourceWithIntegersStub implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             ['id' => 10, 'foo' => 'bar'],

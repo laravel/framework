@@ -61,9 +61,9 @@ class EloquentModelStringCastingTest extends TestCase
     {
         /** @var \Illuminate\Tests\Integration\Database\StringCasts $model */
         $model = StringCasts::create([
-            'array_attributes' => ['key1'=>'value1'],
-            'json_attributes' => ['json_key'=>'json_value'],
-            'object_attributes' => ['json_key'=>'json_value'],
+            'array_attributes' => ['key1' => 'value1'],
+            'json_attributes' => ['json_key' => 'json_value'],
+            'object_attributes' => ['json_key' => 'json_value'],
         ]);
         $this->assertSame(['key1' => 'value1'], $model->getOriginal('array_attributes'));
         $this->assertSame(['key1' => 'value1'], $model->getAttribute('array_attributes'));

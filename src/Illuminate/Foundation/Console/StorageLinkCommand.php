@@ -11,7 +11,9 @@ class StorageLinkCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'storage:link {--relative : Create the symbolic link using relative paths}';
+    protected $signature = 'storage:link
+                {--relative : Create the symbolic link using relative paths}
+                {--force : Recreate existing symbolic links}';
 
     /**
      * The console command description.
@@ -30,7 +32,7 @@ class StorageLinkCommand extends Command
         $relative = $this->option('relative');
 
         foreach ($this->links() as $link => $target) {
-            if (file_exists($link)) {
+            if (file_exists($link) && ! $this->isRemovableSymlink($link, $this->option('force'))) {
                 $this->error("The [$link] link already exists.");
                 continue;
             }
@@ -60,5 +62,17 @@ class StorageLinkCommand extends Command
     {
         return $this->laravel['config']['filesystems.links'] ??
                [public_path('storage') => storage_path('app/public')];
+    }
+
+    /**
+     * Determine if the provided path is a symlink that can be removed.
+     *
+     * @param  string  $link
+     * @param  bool  $force
+     * @return bool
+     */
+    protected function isRemovableSymlink(string $link, bool $force): bool
+    {
+        return is_link($link) && $force;
     }
 }

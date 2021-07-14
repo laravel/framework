@@ -33,6 +33,16 @@ trait ResponseTrait
     }
 
     /**
+     * Get the status text for the response.
+     *
+     * @return string
+     */
+    public function statusText()
+    {
+        return $this->statusText;
+    }
+
+    /**
      * Get the content of the response.
      *
      * @return string

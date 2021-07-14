@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
+use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -20,8 +21,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use LogicException;
+use ReturnTypeWillChange;
 
-abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
         Concerns\HasEvents,
@@ -157,6 +159,13 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @var bool
      */
     protected static $modelsShouldPreventLazyLoading = false;
+
+    /**
+     * The callback that is responsible for handling lazy loading violations.
+     *
+     * @var callable|null
+     */
+    protected static $lazyLoadingViolationCallback;
 
     /**
      * The name of the "created at" column.
@@ -356,6 +365,17 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public static function preventLazyLoading($value = true)
     {
         static::$modelsShouldPreventLazyLoading = $value;
+    }
+
+    /**
+     * Register a callback that is responsible for handling lazy loading violations.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function handleLazyLoadingViolationUsing(callable $callback)
+    {
+        static::$lazyLoadingViolationCallback = $callback;
     }
 
     /**
@@ -1407,6 +1427,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      *
      * @return array
      */
+    #[ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();
@@ -1843,6 +1864,26 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
+     * Get the broadcast channel route definition that is associated with the given entity.
+     *
+     * @return string
+     */
+    public function broadcastChannelRoute()
+    {
+        return str_replace('\\', '.', get_class($this)).'.{'.Str::camel(class_basename($this)).'}';
+    }
+
+    /**
+     * Get the broadcast channel name that is associated with the given entity.
+     *
+     * @return string
+     */
+    public function broadcastChannel()
+    {
+        return str_replace('\\', '.', get_class($this)).'.'.$this->getKey();
+    }
+
+    /**
      * Dynamically retrieve attributes on the model.
      *
      * @param  string  $key
@@ -1996,5 +2037,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public function __wakeup()
     {
         $this->bootIfNotBooted();
+
+        $this->initializeTraits();
     }
 }

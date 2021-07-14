@@ -8,13 +8,14 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\Tappable;
 
 /**
  * @mixin \Illuminate\Support\Collection
  */
 abstract class AbstractPaginator implements Htmlable
 {
-    use ForwardsCalls;
+    use ForwardsCalls, Tappable;
 
     /**
      * All of the items being paginated.

@@ -113,6 +113,13 @@ class HttpResponseTest extends TestCase
         $this->assertSame(404, $response->getStatusCode());
     }
 
+    public function testSetStatusCodeAndRetrieveStatusText()
+    {
+        $response = new Response('foo');
+        $response->setStatusCode(404);
+        $this->assertSame('Not Found', $response->statusText());
+    }
+
     public function testOnlyInputOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');
@@ -238,7 +245,7 @@ class JsonableStub implements Jsonable
 
 class JsonSerializableStub implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return ['foo' => 'bar'];
     }

@@ -6,6 +6,7 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
@@ -35,6 +36,44 @@ class RateLimitedTest extends TestCase
 
         $this->assertJobRanSuccessfully(RateLimitedTestJob::class);
         $this->assertJobRanSuccessfully(RateLimitedTestJob::class);
+    }
+
+    public function testRateLimitedJobsAreNotExecutedOnLimitReached2()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('get')->andReturn(0, 1, null);
+        $cache->shouldReceive('add')->andReturn(true, true);
+        $cache->shouldReceive('increment')->andReturn(1);
+        $cache->shouldReceive('has')->andReturn(true);
+
+        $rateLimiter = new RateLimiter($cache);
+        $this->app->instance(RateLimiter::class, $rateLimiter);
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $rateLimiter->for('test', function ($job) {
+            return Limit::perHour(1);
+        });
+
+        $this->assertJobRanSuccessfully(RateLimitedTestJob::class);
+
+        // Assert Job was released and released with a delay greater than 0
+        RateLimitedTestJob::$handled = false;
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+
+        $job->shouldReceive('hasFailed')->once()->andReturn(false);
+        $job->shouldReceive('release')->once()->withArgs(function ($delay) {
+            return $delay >= 0;
+        });
+        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+
+        $instance->call($job, [
+            'command' => serialize($command = new RateLimitedTestJob),
+        ]);
+
+        $this->assertFalse(RateLimitedTestJob::$handled);
     }
 
     public function testRateLimitedJobsAreNotExecutedOnLimitReached()

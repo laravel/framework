@@ -16,7 +16,7 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
         $db = new DB;
 
         $db->addConnection([
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
         ]);
 
@@ -54,6 +54,14 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
     {
         $this->schema()->drop('products');
         $this->schema()->drop('states');
+    }
+
+    public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery()
+    {
+        $product = MorphOneOfManyTestProduct::create();
+        $relation = $product->current_state();
+        $relation->addEagerConstraints([$product]);
+        $this->assertSame('select MAX(id) as id, "states"."stateful_id", "states"."stateful_type" from "states" where "states"."stateful_id" = ? and "states"."stateful_id" is not null and "states"."stateful_type" = ? and "states"."stateful_id" in (1) and "states"."stateful_type" = ? group by "states"."stateful_id", "states"."stateful_type"', $relation->getOneOfManySubQuery()->toSql());
     }
 
     public function testReceivingModel()
