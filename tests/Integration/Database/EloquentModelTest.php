@@ -86,46 +86,46 @@ class EloquentModelTest extends DatabaseTestCase
 
         $user->save();
 
-        $this->assertTrue($user->transitionedTo('name', 'zain'));
-        $this->assertTrue($user->transitionedTo('name', 'zain', 'mohamed'));
-        $this->assertTrue($user->transitionedTo('name', 'zain', ['mohamed', 'said']));
-        $this->assertTrue($user->transitionedTo('name', ['zain', 'lara'], ['mohamed', 'said']));
-        $this->assertTrue($user->transitionedTo('name', ['zain', 'lara'], 'mohamed'));
-        $this->assertFalse($user->transitionedTo('name', 'zain', 'said'));
+        $this->assertTrue($user->changedTo('name', 'zain'));
+        $this->assertTrue($user->changedTo('name', 'zain', 'mohamed'));
+        $this->assertTrue($user->changedTo('name', 'zain', ['mohamed', 'said']));
+        $this->assertTrue($user->changedTo('name', ['zain', 'lara'], ['mohamed', 'said']));
+        $this->assertTrue($user->changedTo('name', ['zain', 'lara'], 'mohamed'));
+        $this->assertFalse($user->changedTo('name', 'zain', 'said'));
 
-        $this->assertTrue($user->transitionedTo('title', 'A'));
-        $this->assertTrue($user->transitionedTo('title', 'A', null));
-        $this->assertTrue($user->transitionedTo('title', ['A', 'C'], ['BB', null]));
-        $this->assertFalse($user->transitionedTo('title', 'A', 'B'));
+        $this->assertTrue($user->changedTo('title', 'A'));
+        $this->assertTrue($user->changedTo('title', 'A', null));
+        $this->assertTrue($user->changedTo('title', ['A', 'C'], ['BB', null]));
+        $this->assertFalse($user->changedTo('title', 'A', 'B'));
 
         $user->title = null;
 
         $user->save();
 
-        $this->assertTrue($user->transitionedTo('title', null));
-        $this->assertTrue($user->transitionedTo('title', null, 'A'));
-        $this->assertFalse($user->transitionedTo('title', null, 'B'));
+        $this->assertTrue($user->changedTo('title', null));
+        $this->assertTrue($user->changedTo('title', null, 'A'));
+        $this->assertFalse($user->changedTo('title', null, 'B'));
 
         $user->title = 'B';
 
         $user->save();
 
-        $this->assertTrue($user->transitionedTo('title', 'B'));
-        $this->assertTrue($user->transitionedTo('title', 'B', null));
-        $this->assertFalse($user->transitionedTo('title', 'B', 'A'));
+        $this->assertTrue($user->changedTo('title', 'B'));
+        $this->assertTrue($user->changedTo('title', 'B', null));
+        $this->assertFalse($user->changedTo('title', 'B', 'A'));
 
         $user->increment('score');
 
-        $this->assertTrue($user->transitionedTo('score', 1));
-        $this->assertTrue($user->transitionedTo('score', 1, 0));
-        $this->assertFalse($user->transitionedTo('score', 1, 2));
+        $this->assertTrue($user->changedTo('score', 1));
+        $this->assertTrue($user->changedTo('score', 1, 0));
+        $this->assertFalse($user->changedTo('score', 1, 2));
 
         $user->items = [1, 2];
 
         $user->save();
 
-        $this->assertTrue($user->transitionedTo('items', json_encode([1, 2])));
-        $this->assertTrue($user->transitionedTo('items', json_encode([1, 2]), json_encode([0, 1])));
+        $this->assertTrue($user->changedTo('items', json_encode([1, 2])));
+        $this->assertTrue($user->changedTo('items', json_encode([1, 2]), json_encode([0, 1])));
     }
 
     public function testAttributeTransitioningFromTo()
@@ -140,42 +140,42 @@ class EloquentModelTest extends DatabaseTestCase
         $user->name = 'zain';
         $user->title = 'A';
 
-        $this->assertTrue($user->transitioningTo('name', 'zain'));
-        $this->assertTrue($user->transitioningTo('name', 'zain', 'mohamed'));
-        $this->assertTrue($user->transitioningTo('name', 'zain', ['mohamed', 'said']));
-        $this->assertFalse($user->transitioningTo('name', 'zain', 'said'));
+        $this->assertTrue($user->changingTo('name', 'zain'));
+        $this->assertTrue($user->changingTo('name', 'zain', 'mohamed'));
+        $this->assertTrue($user->changingTo('name', 'zain', ['mohamed', 'said']));
+        $this->assertFalse($user->changingTo('name', 'zain', 'said'));
 
-        $this->assertTrue($user->transitioningTo('title', 'A'));
-        $this->assertTrue($user->transitioningTo('title', 'A', null));
-        $this->assertTrue($user->transitioningTo('title', ['A', 'C'], ['BB', null]));
-        $this->assertFalse($user->transitioningTo('title', 'A', 'B'));
+        $this->assertTrue($user->changingTo('title', 'A'));
+        $this->assertTrue($user->changingTo('title', 'A', null));
+        $this->assertTrue($user->changingTo('title', ['A', 'C'], ['BB', null]));
+        $this->assertFalse($user->changingTo('title', 'A', 'B'));
 
         $user->save();
 
         $user->title = null;
 
-        $this->assertTrue($user->transitioningTo('title', null));
-        $this->assertTrue($user->transitioningTo('title', null, 'A'));
-        $this->assertFalse($user->transitioningTo('title', null, 'B'));
+        $this->assertTrue($user->changingTo('title', null));
+        $this->assertTrue($user->changingTo('title', null, 'A'));
+        $this->assertFalse($user->changingTo('title', null, 'B'));
 
         $user->save();
 
         $user->title = 'B';
 
-        $this->assertTrue($user->transitioningTo('title', 'B'));
-        $this->assertTrue($user->transitioningTo('title', 'B', null));
-        $this->assertFalse($user->transitioningTo('title', 'B', 'A'));
+        $this->assertTrue($user->changingTo('title', 'B'));
+        $this->assertTrue($user->changingTo('title', 'B', null));
+        $this->assertFalse($user->changingTo('title', 'B', 'A'));
 
         $user->score = 1;
 
-        $this->assertTrue($user->transitioningTo('score', 1));
-        $this->assertTrue($user->transitioningTo('score', 1, 0));
-        $this->assertFalse($user->transitioningTo('score', 1, 2));
+        $this->assertTrue($user->changingTo('score', 1));
+        $this->assertTrue($user->changingTo('score', 1, 0));
+        $this->assertFalse($user->changingTo('score', 1, 2));
 
         $user->items = [1, 2];
 
-        $this->assertTrue($user->transitioningTo('items', json_encode([1, 2])));
-        $this->assertTrue($user->transitioningTo('items', json_encode([1, 2]), json_encode([0, 1])));
+        $this->assertTrue($user->changingTo('items', json_encode([1, 2])));
+        $this->assertTrue($user->changingTo('items', json_encode([1, 2]), json_encode([0, 1])));
     }
 }
 

@@ -44,11 +44,11 @@ trait HasAttributes
     protected $changes = [];
 
     /**
-     * The model attribute's old state.
+     * The model attribute's previous state.
      *
      * @var array
      */
-    protected $old = [];
+    protected $previousAttributes = [];
 
     /**
      * The attributes that should be cast.
@@ -1506,9 +1506,11 @@ trait HasAttributes
      */
     public function syncChanges()
     {
-        $this->old = Arr::only($this->original, array_keys($this->getDirty()));
+        $dirty = $this->getDirty();
 
-        $this->changes = $this->getDirty();
+        $this->previousAttributes = Arr::only($this->original, array_keys($dirty));
+
+        $this->changes = $dirty;
 
         return $this;
     }
@@ -1579,22 +1581,21 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the attribute has transitioned to a given value.
+     * Determine if the attribute is transitioning to a given value.
      *
      * @param  string  $attribute
      * @param  string|array  $to
      * @param  string|array  $from
      * @return bool
      */
-    public function transitionedTo($attribute, $to, $from = null)
+    public function changingTo($attribute, $to, $from = null)
     {
-        if (! array_key_exists($attribute, $this->old) ||
-            ! array_key_exists($attribute, $this->changes)) {
+        if (! $this->isDirty($attribute)) {
             return false;
         }
 
-        $oldValue = is_null($this->old[$attribute]) ? null : (string) $this->old[$attribute];
-        $newValue = is_null($this->changes[$attribute]) ? null : (string) $this->changes[$attribute];
+        $oldValue = is_null($this->original[$attribute]) ? null : (string) $this->original[$attribute];
+        $newValue = is_null($this->attributes[$attribute]) ? null : (string) $this->attributes[$attribute];
 
         if (func_num_args() == 3 && ! in_array($oldValue, is_array($from) ? $from : [$from])) {
             return false;
@@ -1604,21 +1605,22 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the attribute is transitioning to a given value.
+     * Determine if the attribute has transitioned to a given value.
      *
      * @param  string  $attribute
      * @param  string|array  $to
      * @param  string|array  $from
      * @return bool
      */
-    public function transitioningTo($attribute, $to, $from = null)
+    public function changedTo($attribute, $to, $from = null)
     {
-        if (! $this->isDirty($attribute)) {
+        if (! array_key_exists($attribute, $this->previousAttributes) ||
+            ! array_key_exists($attribute, $this->changes)) {
             return false;
         }
 
-        $oldValue = is_null($this->original[$attribute]) ? null : (string) $this->original[$attribute];
-        $newValue = is_null($this->attributes[$attribute]) ? null : (string) $this->attributes[$attribute];
+        $oldValue = is_null($this->previousAttributes[$attribute]) ? null : (string) $this->previousAttributes[$attribute];
+        $newValue = is_null($this->changes[$attribute]) ? null : (string) $this->changes[$attribute];
 
         if (func_num_args() == 3 && ! in_array($oldValue, is_array($from) ? $from : [$from])) {
             return false;
