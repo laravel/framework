@@ -59,12 +59,10 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
-        return tap(parent::handle(), function($result) {
-            if ($result === false || !$this->hasOption('register')) {
-                return;
+        return tap(parent::handle(), function ($result) {
+            if ($result !== false && $this->option('register')) {
+                $this->registerProvider();
             }
-
-            $this->registerProvider();
         });
     }
 
