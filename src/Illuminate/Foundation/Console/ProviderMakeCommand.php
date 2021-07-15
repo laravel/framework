@@ -61,7 +61,7 @@ class ProviderMakeCommand extends GeneratorCommand
     {
         return tap(parent::handle(), function ($result) {
             if ($result !== false && $this->option('register')) {
-                $this->registerProvider();
+                $this->registerProvider('RouteServiceProvider');
             }
         });
     }
@@ -71,29 +71,17 @@ class ProviderMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    protected function registerProvider()
+    protected function registerProvider(string $after)
     {
-        $namespace = $this->laravel->getNamespace();
-        $className = $this->qualifyClass($this->argument('name'));
         $appConfig = file_get_contents(config_path('app.php'));
 
-        if (Str::contains($appConfig, $className)) {
-            return;
+        if (! Str::contains($appConfig, 'App\\Providers\\'.$this->getNameInput().'::class')) {
+            file_put_contents(config_path('app.php'), str_replace(
+                'App\\Providers\\'.$after.'::class,',
+                'App\\Providers\\'.$after.'::class,'.PHP_EOL.'        App\\Providers\\'.$this->getNameInput().'::class,',
+                $appConfig
+            ));
         }
-
-        $lineEndingCount = [
-            "\r\n" => substr_count($appConfig, "\r\n"),
-            "\r" => substr_count($appConfig, "\r"),
-            "\n" => substr_count($appConfig, "\n"),
-        ];
-
-        $eol = array_keys($lineEndingCount, max($lineEndingCount))[0];
-
-        file_put_contents(config_path('app.php'), str_replace(
-            "{$namespace}Providers\RouteServiceProvider::class,".$eol,
-            "{$namespace}Providers\RouteServiceProvider::class,".$eol.'        '.$className.'::class,'.$eol,
-            $appConfig
-        ));
 
         $this->info($this->type.' registered successfully.');
     }
