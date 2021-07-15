@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Http\Request;
-use Illuminate\Log\LogManager;
 use Illuminate\Log\LoggedExceptionCollection;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
@@ -144,7 +143,8 @@ trait MakesHttpRequests
         }
 
         foreach ((array) $middleware as $abstract) {
-            $this->app->instance($abstract, new class {
+            $this->app->instance($abstract, new class
+            {
                 public function handle($request, $next)
                 {
                     return $next($request);
