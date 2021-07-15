@@ -24,7 +24,7 @@ abstract class Facade
     protected static $resolvedInstance;
 
     /**
-     * Determine if the resolved facade should be cached.
+     * Determine if the resolved instance should be cached.
      *
      * @var bool
      */
