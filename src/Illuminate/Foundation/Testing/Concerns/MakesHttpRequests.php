@@ -643,9 +643,11 @@ trait MakesHttpRequests
     protected function createTestResponse($response)
     {
         return tap(TestResponse::fromBaseResponse($response), function ($response) {
-            $response->withExceptions($this->app->bound(LoggedExceptionCollection::class)
-                            ? $this->app->make(LoggedExceptionCollection::class)
-                            : new LoggedExceptionCollection);
+            $response->withExceptions(
+                $this->app->bound(LoggedExceptionCollection::class)
+                    ? $this->app->make(LoggedExceptionCollection::class)
+                    : new LoggedExceptionCollection
+            );
         });
     }
 }
