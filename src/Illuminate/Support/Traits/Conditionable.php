@@ -13,8 +13,7 @@ trait Conditionable
      * @param  mixed  $value
      * @param  callable|null  $callback
      * @param  callable|null  $default
-     *
-     * @return mixed
+     * @return $this|mixed
      */
     public function when($value, callable $callback = null, callable $default = null)
     {
@@ -39,8 +38,7 @@ trait Conditionable
      * @param  mixed  $value
      * @param  callable|null  $callback
      * @param  callable|null  $default
-     *
-     * @return mixed
+     * @return $this|mixed
      */
     public function unless($value, callable $callback = null, callable $default = null)
     {

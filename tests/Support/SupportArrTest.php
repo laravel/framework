@@ -808,6 +808,25 @@ class SupportArrTest extends TestCase
         $this->assertEquals($expect, Arr::sortRecursive($array));
     }
 
+    public function testToCssClasses()
+    {
+        $classes = Arr::toCssClasses([
+            'font-bold',
+            'mt-4',
+        ]);
+
+        $this->assertEquals('font-bold mt-4', $classes);
+
+        $classes = Arr::toCssClasses([
+            'font-bold',
+            'mt-4',
+            'ml-2' => true,
+            'mr-2' => false,
+        ]);
+
+        $this->assertEquals('font-bold mt-4 ml-2', $classes);
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];
