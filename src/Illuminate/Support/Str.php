@@ -187,7 +187,7 @@ class Str
         }
 
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
+            if ($needle !== '' && str_contains($haystack, $needle)) {
                 return true;
             }
         }
@@ -231,7 +231,7 @@ class Str
         foreach ((array) $needles as $needle) {
             if (
                 $needle !== '' && $needle !== null
-                && substr($haystack, -strlen($needle)) === (string) $needle
+                && str_ends_with($haystack, $needle)
             ) {
                 return true;
             }
@@ -763,7 +763,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
+            if ((string) $needle !== '' && str_starts_with($haystack, $needle)) {
                 return true;
             }
         }
