@@ -351,7 +351,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function select($columns = ['*'])
     {
@@ -361,7 +361,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function selectRaw($expression, array $bindings = [])
     {
@@ -371,7 +371,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function selectSub($query, $as)
     {
@@ -381,7 +381,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function addSelect($column)
     {
