@@ -2806,7 +2806,7 @@ class Builder implements BuilderContract
     /**
      * @inheritdoc
      */
-    public function mergeBindings(Builder $query)
+    public function mergeBindings(BuilderContract $query)
     {
         $this->bindings = array_merge_recursive($this->bindings, $query->getRawBindings());
 
