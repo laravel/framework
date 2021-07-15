@@ -58,6 +58,7 @@ class TestResponse implements ArrayAccess
     public function __construct($response)
     {
         $this->baseResponse = $response;
+        $this->exceptions = new Collection;
     }
 
     /**
