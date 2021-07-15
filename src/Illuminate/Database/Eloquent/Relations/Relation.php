@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Closure;
-use Illuminate\Contracts\Database\QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
@@ -15,7 +15,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
-abstract class Relation implements QueryBuilder
+abstract class Relation implements BuilderContract
 {
     use DecoratesQueryBuilder, ForwardsCalls, Macroable {
         Macroable::__call as macroCall;

@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
-use Illuminate\Contracts\Database\QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
@@ -16,7 +16,7 @@ trait DecoratesQueryBuilder
     /**
      * The decorated query builder instance.
      *
-     * @var QueryBuilder
+     * @var \Illuminate\Contracts\Database\Query\Builder
      */
     protected $query;
 
@@ -1126,7 +1126,7 @@ trait DecoratesQueryBuilder
     /**
      * @inheritdoc
      */
-    public function mergeBindings(QueryBuilder $query)
+    public function mergeBindings(Builder $query)
     {
         return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
     }

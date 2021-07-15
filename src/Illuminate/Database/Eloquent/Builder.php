@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use BadMethodCallException;
 use Closure;
 use Exception;
-use Illuminate\Contracts\Database\QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -25,7 +25,7 @@ use ReflectionMethod;
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
  */
-class Builder implements QueryBuilder
+class Builder implements BuilderContract
 {
     use BuildsQueries, DecoratesQueryBuilder, ExplainsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;

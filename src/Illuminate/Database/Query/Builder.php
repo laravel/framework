@@ -4,7 +4,7 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use DateTimeInterface;
-use Illuminate\Contracts\Database\QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -23,7 +23,7 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use RuntimeException;
 
-class Builder implements QueryBuilder
+class Builder implements BuilderContract
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
@@ -2806,7 +2806,7 @@ class Builder implements QueryBuilder
     /**
      * @inheritdoc
      */
-    public function mergeBindings(QueryBuilder $query)
+    public function mergeBindings(Builder $query)
     {
         $this->bindings = array_merge_recursive($this->bindings, $query->getRawBindings());
 

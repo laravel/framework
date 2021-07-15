@@ -1,10 +1,10 @@
 <?php
 
-namespace Illuminate\Contracts\Database;
+namespace Illuminate\Contracts\Database\Query;
 
 use Closure;
 
-interface QueryBuilder
+interface Builder
 {
     /**
      * Set the columns to be selected.
@@ -232,7 +232,7 @@ interface QueryBuilder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  \Closure|QueryBuilder|string|array  $column
+     * @param  \Closure|Builder|string|array  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -255,7 +255,7 @@ interface QueryBuilder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|QueryBuilder|string|array  $column
+     * @param  \Closure|Builder|string|array  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      *
@@ -899,7 +899,7 @@ interface QueryBuilder
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|QueryBuilder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|Builder|string  $column
      * @param  string  $direction
      *
      * @return static
@@ -909,7 +909,7 @@ interface QueryBuilder
     /**
      * Add a descending "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|QueryBuilder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|Builder|string  $column
      *
      * @return static
      */
@@ -918,7 +918,7 @@ interface QueryBuilder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|QueryBuilder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|Builder|string  $column
      *
      * @return static
      */
@@ -927,7 +927,7 @@ interface QueryBuilder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|QueryBuilder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|Builder|string  $column
      *
      * @return static
      */
@@ -1125,11 +1125,11 @@ interface QueryBuilder
     /**
      * Merge an array of bindings into our bindings.
      *
-     * @param  QueryBuilder  $query
+     * @param  Builder  $query
      *
      * @return static
      */
-    public function mergeBindings(QueryBuilder $query);
+    public function mergeBindings(Builder $query);
 
     /**
      * Remove all of the expressions from a list of bindings.
