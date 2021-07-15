@@ -494,6 +494,17 @@ class Arr
     }
 
     /**
+     * Convert the array into a query string.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function query($array)
+    {
+        return http_build_query($array, '', '&', PHP_QUERY_RFC3986);
+    }
+
+    /**
      * Get one or a specified number of random values from an array.
      *
      * @param  array  $array
@@ -642,12 +653,12 @@ class Arr
     }
 
     /**
-     * Conditionally compile classes from an array into a class list.
+     * Conditionally compile classes from an array into a CSS class list.
      *
      * @param  array  $array
      * @return string
      */
-    public static function toClasses($array)
+    public static function toCssClasses($array)
     {
         $classList = static::wrap($array);
 
@@ -662,17 +673,6 @@ class Arr
         }
 
         return implode(' ', $classes);
-    }
-
-    /**
-     * Convert the array into a query string.
-     *
-     * @param  array  $array
-     * @return string
-     */
-    public static function query($array)
-    {
-        return http_build_query($array, '', '&', PHP_QUERY_RFC3986);
     }
 
     /**
