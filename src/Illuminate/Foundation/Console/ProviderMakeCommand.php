@@ -61,7 +61,7 @@ class ProviderMakeCommand extends GeneratorCommand
     {
         return tap(parent::handle(), function ($result) {
             if ($result !== false && $this->option('register')) {
-                $this->registerProvider('RouteServiceProvider');
+                $this->registerProvider();
             }
         });
     }
@@ -71,14 +71,14 @@ class ProviderMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    protected function registerProvider(string $after)
+    protected function registerProvider()
     {
         $appConfig = file_get_contents(config_path('app.php'));
 
         if (! Str::contains($appConfig, 'App\\Providers\\'.$this->getNameInput().'::class')) {
             file_put_contents(config_path('app.php'), str_replace(
-                'App\\Providers\\'.$after.'::class,',
-                'App\\Providers\\'.$after.'::class,'.PHP_EOL.'        App\\Providers\\'.$this->getNameInput().'::class,',
+                'App\\Providers\\RouteServiceProvider::class,',
+                'App\\Providers\\RouteServiceProvider::class,'.PHP_EOL.'        App\\Providers\\'.$this->getNameInput().'::class,',
                 $appConfig
             ));
         }
