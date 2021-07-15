@@ -642,7 +642,7 @@ class Arr
     }
 
     /**
-     * Conditionally merge classes from an array into a class list.
+     * Conditionally compile classes from an array into a class list.
      *
      * @param  array  $array
      * @return string
