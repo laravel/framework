@@ -212,7 +212,7 @@ abstract class Facade
         if (isset(static::$resolvedInstance[$name])) {
             return static::$resolvedInstance[$name];
         }
-        dump(array_keys(static::$resolvedInstance));
+
         if (static::$app) {
             if (static::$cached) {
                 return static::$resolvedInstance[$name] = static::$app[$name];
