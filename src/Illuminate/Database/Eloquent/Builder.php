@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
@@ -93,7 +93,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return void
      */
-    public function __construct(BaseBuilder $query)
+    public function __construct(QueryBuilder $query)
     {
         $this->query = $query;
     }
@@ -1174,7 +1174,7 @@ class Builder implements BuilderContract
      * @param  int  $originalWhereCount
      * @return void
      */
-    protected function addNewWheresWithinGroup(BaseBuilder $query, $originalWhereCount)
+    protected function addNewWheresWithinGroup(QueryBuilder $query, $originalWhereCount)
     {
         // Here, we totally remove all of the where clauses since we are going to
         // rebuild them as nested queries by slicing the groups of wheres into
@@ -1199,7 +1199,7 @@ class Builder implements BuilderContract
      * @param  array  $whereSlice
      * @return void
      */
-    protected function groupWhereSliceForScope(BaseBuilder $query, $whereSlice)
+    protected function groupWhereSliceForScope(QueryBuilder $query, $whereSlice)
     {
         $whereBooleans = collect($whereSlice)->pluck('boolean');
 
