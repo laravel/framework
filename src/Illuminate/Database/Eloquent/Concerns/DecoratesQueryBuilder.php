@@ -28,7 +28,7 @@ trait DecoratesQueryBuilder
     abstract public function toBase();
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function select($columns = ['*'])
     {
@@ -36,7 +36,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function selectSub($query, $as)
     {
@@ -44,7 +44,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function selectRaw($expression, array $bindings = [])
     {
@@ -52,7 +52,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function fromSub($query, $as)
     {
@@ -60,7 +60,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function fromRaw($expression, $bindings = [])
     {
@@ -68,7 +68,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function addSelect($column)
     {
@@ -76,7 +76,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function distinct()
     {
@@ -84,7 +84,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function from($table, $as = null)
     {
@@ -92,7 +92,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
@@ -100,7 +100,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function joinWhere($table, $first, $operator, $second, $type = 'inner')
     {
@@ -108,7 +108,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function joinSub($query, $as, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
@@ -116,7 +116,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
     {
@@ -124,7 +124,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function leftJoinWhere($table, $first, $operator, $second)
     {
@@ -132,7 +132,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
     {
@@ -140,7 +140,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
     {
@@ -148,7 +148,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function rightJoinWhere($table, $first, $operator, $second)
     {
@@ -156,7 +156,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function rightJoinSub($query, $as, $first, $operator = null, $second = null)
     {
@@ -164,7 +164,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null)
     {
@@ -172,7 +172,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function crossJoinSub($query, $as)
     {
@@ -180,7 +180,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function mergeWheres($wheres, $bindings)
     {
@@ -188,7 +188,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -196,7 +196,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
@@ -204,7 +204,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhere($column, $operator = null, $value = null)
     {
@@ -212,7 +212,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
     {
@@ -220,7 +220,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereColumn($first, $operator = null, $second = null)
     {
@@ -228,7 +228,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereRaw($sql, $bindings = [], $boolean = 'and')
     {
@@ -236,7 +236,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereRaw($sql, $bindings = [])
     {
@@ -244,7 +244,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
@@ -252,7 +252,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereIn($column, $values)
     {
@@ -260,7 +260,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotIn($column, $values, $boolean = 'and')
     {
@@ -268,7 +268,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotIn($column, $values)
     {
@@ -276,7 +276,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false)
     {
@@ -284,7 +284,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereIntegerInRaw($column, $values)
     {
@@ -292,7 +292,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
     {
@@ -300,7 +300,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereIntegerNotInRaw($column, $values)
     {
@@ -308,7 +308,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNull($columns, $boolean = 'and', $not = false)
     {
@@ -316,7 +316,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNull($column)
     {
@@ -324,7 +324,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotNull($columns, $boolean = 'and')
     {
@@ -332,7 +332,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
@@ -340,7 +340,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereBetweenColumns($column, array $values, $boolean = 'and', $not = false)
     {
@@ -348,7 +348,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereBetween($column, iterable $values)
     {
@@ -356,7 +356,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereBetweenColumns($column, array $values)
     {
@@ -364,7 +364,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotBetween($column, iterable $values, $boolean = 'and')
     {
@@ -372,7 +372,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotBetweenColumns($column, array $values, $boolean = 'and')
     {
@@ -380,7 +380,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotBetween($column, iterable $values)
     {
@@ -388,7 +388,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotBetweenColumns($column, array $values)
     {
@@ -396,7 +396,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotNull($column)
     {
@@ -404,7 +404,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
@@ -412,7 +412,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereDate($column, $operator, $value = null)
     {
@@ -420,7 +420,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
     {
@@ -428,7 +428,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereTime($column, $operator, $value = null)
     {
@@ -436,7 +436,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
@@ -444,7 +444,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereDay($column, $operator, $value = null)
     {
@@ -452,7 +452,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
@@ -460,7 +460,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereMonth($column, $operator, $value = null)
     {
@@ -468,7 +468,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
@@ -476,7 +476,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereYear($column, $operator, $value = null)
     {
@@ -484,7 +484,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNested(Closure $callback, $boolean = 'and')
     {
@@ -492,7 +492,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
     {
@@ -500,7 +500,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereExists(Closure $callback, $boolean = 'and', $not = false)
     {
@@ -508,7 +508,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereExists(Closure $callback, $not = false)
     {
@@ -516,7 +516,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotExists(Closure $callback, $boolean = 'and')
     {
@@ -524,7 +524,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotExists(Closure $callback)
     {
@@ -532,7 +532,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereRowValues($columns, $operator, $values, $boolean = 'and')
     {
@@ -540,7 +540,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereRowValues($columns, $operator, $values)
     {
@@ -548,7 +548,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereJsonContains($column, $value, $boolean = 'and', $not = false)
     {
@@ -556,7 +556,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereJsonContains($column, $value)
     {
@@ -564,7 +564,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereJsonDoesntContain($column, $value, $boolean = 'and')
     {
@@ -572,7 +572,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereJsonDoesntContain($column, $value)
     {
@@ -580,7 +580,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
     {
@@ -588,7 +588,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereJsonLength($column, $operator, $value = null)
     {
@@ -596,7 +596,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function groupBy(...$groups)
     {
@@ -604,7 +604,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function groupByRaw($sql, array $bindings = [])
     {
@@ -612,7 +612,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function having($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -620,7 +620,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orHaving($column, $operator = null, $value = null)
     {
@@ -628,7 +628,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function havingNull($columns, $boolean = 'and', $not = false)
     {
@@ -636,7 +636,7 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orHavingNull($column)
     {
