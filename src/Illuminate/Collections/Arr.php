@@ -642,6 +642,29 @@ class Arr
     }
 
     /**
+     * Conditionally merge classes from an array into a class list.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function toClasses($array)
+    {
+        $classList = static::wrap($array);
+
+        $classes = [];
+
+        foreach ($classList as $class => $constraint) {
+            if (is_numeric($class)) {
+                $classes[] = $constraint;
+            } elseif ($constraint) {
+                $classes[] = $class;
+            }
+        }
+
+        return implode(' ', $classes);
+    }
+
+    /**
      * Convert the array into a query string.
      *
      * @param  array  $array
