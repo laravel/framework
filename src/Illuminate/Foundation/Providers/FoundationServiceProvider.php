@@ -3,6 +3,8 @@
 namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Http\Request;
+use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Log\LoggedExceptionCollection;
 use Illuminate\Support\AggregateServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\ParallelTestingServiceProvider;
@@ -45,6 +47,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
 
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
+
+        if ($this->app->runningUnitTests()) {
+            $this->registerExceptionTracking();
+        }
     }
 
     /**
@@ -84,6 +90,26 @@ class FoundationServiceProvider extends AggregateServiceProvider
 
         Request::macro('hasValidRelativeSignature', function () {
             return URL::hasValidSignature($this, $absolute = false);
+        });
+    }
+
+    /**
+     * Register an event listener to track logged exceptions.
+     *
+     * @return void
+     */
+    protected function registerExceptionTracking()
+    {
+        $this->app->instance(
+            LoggedExceptionCollection::class,
+            new LoggedExceptionCollection
+        );
+
+        $this->app->make('events')->listen(MessageLogged::class, function ($event) {
+            if ($event->context['exception']) {
+                $this->app->make(LoggedExceptionCollection::class)
+                        ->push($event->context['exception']);
+            }
         });
     }
 }
