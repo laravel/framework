@@ -227,7 +227,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function select($columns = ['*'])
     {
@@ -247,7 +247,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function selectSub($query, $as)
     {
@@ -259,7 +259,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function selectRaw($expression, array $bindings = [])
     {
@@ -273,7 +273,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function fromSub($query, $as)
     {
@@ -283,7 +283,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function fromRaw($expression, $bindings = [])
     {
@@ -358,7 +358,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function addSelect($column)
     {
@@ -380,7 +380,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function distinct()
     {
@@ -396,7 +396,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function from($table, $as = null)
     {
@@ -410,7 +410,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
@@ -442,7 +442,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function joinWhere($table, $first, $operator, $second, $type = 'inner')
     {
@@ -450,7 +450,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function joinSub($query, $as, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
@@ -464,7 +464,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
     {
@@ -472,7 +472,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function leftJoinWhere($table, $first, $operator, $second)
     {
@@ -480,7 +480,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
     {
@@ -488,7 +488,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
     {
@@ -496,7 +496,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function rightJoinWhere($table, $first, $operator, $second)
     {
@@ -504,7 +504,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function rightJoinSub($query, $as, $first, $operator = null, $second = null)
     {
@@ -512,7 +512,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null)
     {
@@ -526,7 +526,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function crossJoinSub($query, $as)
     {
@@ -555,7 +555,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function mergeWheres($wheres, $bindings)
     {
@@ -569,7 +569,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -674,7 +674,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
@@ -715,7 +715,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhere($column, $operator = null, $value = null)
     {
@@ -727,7 +727,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
     {
@@ -758,7 +758,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereColumn($first, $operator = null, $second = null)
     {
@@ -766,7 +766,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereRaw($sql, $bindings = [], $boolean = 'and')
     {
@@ -778,7 +778,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereRaw($sql, $bindings = [])
     {
@@ -786,7 +786,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
@@ -821,7 +821,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereIn($column, $values)
     {
@@ -829,7 +829,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotIn($column, $values, $boolean = 'and')
     {
@@ -837,7 +837,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotIn($column, $values)
     {
@@ -845,7 +845,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false)
     {
@@ -865,7 +865,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereIntegerInRaw($column, $values)
     {
@@ -873,7 +873,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
     {
@@ -881,7 +881,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereIntegerNotInRaw($column, $values)
     {
@@ -889,7 +889,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNull($columns, $boolean = 'and', $not = false)
     {
@@ -903,7 +903,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNull($column)
     {
@@ -911,7 +911,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotNull($columns, $boolean = 'and')
     {
@@ -919,7 +919,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
@@ -933,7 +933,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereBetweenColumns($column, array $values, $boolean = 'and', $not = false)
     {
@@ -945,7 +945,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereBetween($column, iterable $values)
     {
@@ -953,7 +953,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereBetweenColumns($column, array $values)
     {
@@ -961,7 +961,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotBetween($column, iterable $values, $boolean = 'and')
     {
@@ -969,7 +969,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotBetweenColumns($column, array $values, $boolean = 'and')
     {
@@ -977,7 +977,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotBetween($column, iterable $values)
     {
@@ -985,7 +985,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotBetweenColumns($column, array $values)
     {
@@ -993,7 +993,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotNull($column)
     {
@@ -1001,7 +1001,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1019,7 +1019,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereDate($column, $operator, $value = null)
     {
@@ -1031,7 +1031,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1049,7 +1049,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereTime($column, $operator, $value = null)
     {
@@ -1061,7 +1061,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1083,7 +1083,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereDay($column, $operator, $value = null)
     {
@@ -1095,7 +1095,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1117,7 +1117,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereMonth($column, $operator, $value = null)
     {
@@ -1129,7 +1129,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1147,7 +1147,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereYear($column, $operator, $value = null)
     {
@@ -1180,7 +1180,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNested(Closure $callback, $boolean = 'and')
     {
@@ -1200,7 +1200,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
     {
@@ -1243,7 +1243,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereExists(Closure $callback, $boolean = 'and', $not = false)
     {
@@ -1258,7 +1258,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereExists(Closure $callback, $not = false)
     {
@@ -1266,7 +1266,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereNotExists(Closure $callback, $boolean = 'and')
     {
@@ -1274,7 +1274,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereNotExists(Closure $callback)
     {
@@ -1301,7 +1301,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereRowValues($columns, $operator, $values, $boolean = 'and')
     {
@@ -1319,7 +1319,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereRowValues($columns, $operator, $values)
     {
@@ -1327,7 +1327,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereJsonContains($column, $value, $boolean = 'and', $not = false)
     {
@@ -1343,7 +1343,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereJsonContains($column, $value)
     {
@@ -1351,7 +1351,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereJsonDoesntContain($column, $value, $boolean = 'and')
     {
@@ -1359,7 +1359,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereJsonDoesntContain($column, $value)
     {
@@ -1367,7 +1367,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1387,7 +1387,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orWhereJsonLength($column, $operator, $value = null)
     {
@@ -1461,7 +1461,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function groupBy(...$groups)
     {
@@ -1476,7 +1476,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function groupByRaw($sql, array $bindings = [])
     {
@@ -1488,7 +1488,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function having($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -1518,7 +1518,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orHaving($column, $operator = null, $value = null)
     {
@@ -1530,7 +1530,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function havingNull($columns, $boolean = 'and', $not = false)
     {
@@ -1544,7 +1544,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orHavingNull($column)
     {
@@ -1552,7 +1552,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function havingNotNull($columns, $boolean = 'and')
     {
@@ -1560,7 +1560,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orHavingNotNull($column)
     {
@@ -1568,7 +1568,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function havingBetween($column, array $values, $boolean = 'and', $not = false)
     {
@@ -1582,7 +1582,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function havingRaw($sql, array $bindings = [], $boolean = 'and')
     {
@@ -1596,7 +1596,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orHavingRaw($sql, array $bindings = [])
     {
@@ -1604,7 +1604,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orderBy($column, $direction = 'asc')
     {
@@ -1631,7 +1631,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orderByDesc($column)
     {
@@ -1639,7 +1639,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function latest($column = 'created_at')
     {
@@ -1647,7 +1647,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function oldest($column = 'created_at')
     {
@@ -1655,7 +1655,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function inRandomOrder($seed = '')
     {
@@ -1663,7 +1663,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function orderByRaw($sql, $bindings = [])
     {
@@ -1677,7 +1677,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function skip($value)
     {
@@ -1685,7 +1685,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function offset($value)
     {
@@ -1697,7 +1697,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function take($value)
     {
@@ -1705,7 +1705,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      */
     public function limit($value)
     {
