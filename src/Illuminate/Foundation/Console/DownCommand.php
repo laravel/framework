@@ -70,7 +70,7 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
-            'exclude' => $this->excludePaths(),
+            'except' => $this->exceptPaths(),
             'redirect' => $this->redirectPath(),
             'retry' => $this->getRetryTime(),
             'refresh' => $this->option('refresh'),
@@ -81,11 +81,11 @@ class DownCommand extends Command
     }
 
     /**
-     * Get the exclude paths to be placed in the "down" file.
+     * Get the except paths to be placed in the "down" file.
      *
      * @return array
      */
-    protected function excludePaths()
+    protected function exceptPaths()
     {
         return $this->laravel->make(PreventRequestsDuringMaintenance::class)->getExceptPaths();
     }
