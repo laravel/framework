@@ -733,6 +733,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Wrap a string in given character(s)
+     *
+     * @param  string  $characters
+     * @return static
+     */
+    public function wrap($characters)
+    {
+        return new static(Str::wrap($this->value, $characters));
+    }
+
+    /**
      * Limit the number of words in a string.
      *
      * @param  int  $words

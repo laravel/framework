@@ -528,6 +528,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
     }
 
+    public function testWrap()
+    {
+        $this->assertEquals('"Some String"', Str::wrap('Some String', '"'));
+        $this->assertEquals('AABBCCJamesAABBCC', Str::wrap('James', 'AABBCC'));
+    }
+
     public function validUuidList()
     {
         return [

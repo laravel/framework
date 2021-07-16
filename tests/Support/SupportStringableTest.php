@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -679,5 +680,11 @@ class SupportStringableTest extends TestCase
     {
         $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+    }
+
+    public function testWrap()
+    {
+        $this->assertEquals('"Some String"', $this->stringable('Some String')->wrap('"'));
+        $this->assertEquals('AABBCCJamesAABBCC', $this->stringable('James')->wrap('AABBCC'));
     }
 }
