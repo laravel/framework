@@ -1200,7 +1200,6 @@ trait DecoratesQueryBuilder
      *
      * @param  string  $method
      * @param  array  $parameters
-     *
      * @return mixed
      */
     public function __call($method, $parameters)
@@ -1209,9 +1208,10 @@ trait DecoratesQueryBuilder
     }
 
     /**
-     * @param $method
-     * @param $parameters
+     * Forward the given method to the query builder.
      *
+     * @param  string  $method
+     * @param  array  $parameters
      * @return static|mixed
      */
     protected function forwardCallToQueryBuilder($method, $parameters)
