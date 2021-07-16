@@ -23,7 +23,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher;
         $queue = m::mock(Queue::class);
 
-        $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
+        $queue->shouldReceive('setConnectionName')->once()->with(null)->andReturnSelf();
 
         $queue->shouldReceive('pushOn')->once()->with(null, m::type(CallQueuedListener::class));
 
@@ -72,7 +72,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher;
         $queue = m::mock(Queue::class);
 
-        $queue->shouldReceive('connection')->once()->with('some_other_connection')->andReturnSelf();
+        $queue->shouldReceive('setConnectionName')->once()->with('some_other_connection')->andReturnSelf();
 
         $queue->shouldReceive('pushOn')->once()->with(null, m::type(CallQueuedListener::class));
 
