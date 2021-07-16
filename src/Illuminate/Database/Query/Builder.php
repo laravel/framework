@@ -407,6 +407,7 @@ class Builder
     /**
      * Force the query to only return distinct results.
      *
+     * @param  mixed  $distinct,...
      * @return $this
      */
     public function distinct()
