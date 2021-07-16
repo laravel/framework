@@ -830,7 +830,7 @@ class Str
     }
 
     /**
-     * Wrap a string in given character(s)
+     * Wrap a string in given character(s).
      *
      * @param  string  $string
      * @param  string  $characters
@@ -838,7 +838,7 @@ class Str
      */
     public static function wrap($string, $characters)
     {
-        return $characters . $string . $characters;
+        return $characters.$string.$characters;
     }
 
     /**

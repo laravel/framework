@@ -733,7 +733,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Wrap a string in given character(s)
+     * Wrap a string in given character(s).
      *
      * @param  string  $characters
      * @return static
