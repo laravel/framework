@@ -78,8 +78,8 @@ class EloquentModelCustomCastingTest extends TestCase
 
         $this->assertInstanceOf(AddressModel::class, $another_model->address);
 
-        $this->assertSame('address_line_one_value', $model->address->lineOne);
-        $this->assertSame('address_line_two_value', $model->address->lineTwo);
+        $this->assertSame('address_line_one_value', $another_model->address->lineOne);
+        $this->assertSame('address_line_two_value', $another_model->address->lineTwo);
     }
 
     public function testInvalidArgumentExceptionOnInvalidValue()
