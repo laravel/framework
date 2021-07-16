@@ -5,9 +5,12 @@ namespace Illuminate\Database\Eloquent;
 use BadMethodCallException;
 use Closure;
 use Exception;
+use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
+use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
+use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -21,14 +24,11 @@ use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
- *
- * @mixin \Illuminate\Database\Query\Builder
  */
-class Builder
+class Builder implements BuilderContract
 {
-    use Concerns\QueriesRelationships, ExplainsQueries, ForwardsCalls;
-    use BuildsQueries {
-        sole as baseSole;
+    use BuildsQueries, DecoratesQueryBuilder, ExplainsQueries, ForwardsCalls, QueriesRelationships {
+        BuildsQueries::sole as baseSole;
     }
 
     /**
@@ -72,38 +72,6 @@ class Builder
      * @var \Closure
      */
     protected $onDelete;
-
-    /**
-     * The methods that should be returned from query builder.
-     *
-     * @var string[]
-     */
-    protected $passthru = [
-        'aggregate',
-        'average',
-        'avg',
-        'count',
-        'dd',
-        'doesntExist',
-        'dump',
-        'exists',
-        'getBindings',
-        'getConnection',
-        'getGrammar',
-        'getProcessor',
-        'implode',
-        'insert',
-        'insertGetId',
-        'insertOrIgnore',
-        'insertUsing',
-        'max',
-        'min',
-        'newQuery',
-        'numericAggregate',
-        'raw',
-        'sum',
-        'toSql',
-    ];
 
     /**
      * Applied global scopes.
@@ -1616,10 +1584,6 @@ class Builder
 
         if ($this->hasNamedScope($method)) {
             return $this->callNamedScope($method, $parameters);
-        }
-
-        if (in_array($method, $this->passthru)) {
-            return $this->toBase()->{$method}(...$parameters);
         }
 
         $this->forwardCallTo($this->query, $method, $parameters);
