@@ -402,10 +402,10 @@ class Collection implements ArrayAccess, Enumerable
 
     /**
      * Get an item from the collection by key.
-     *
+     * @template P
      * @param  mixed  $key
-     * @param  mixed  $default
-     * @return T
+     * @param  P  $default
+     * @return T|P
      */
     public function get($key, $default = null)
     {
