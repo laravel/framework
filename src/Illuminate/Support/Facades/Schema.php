@@ -25,7 +25,7 @@ namespace Illuminate\Support\Facades;
 class Schema extends Facade
 {
     /**
-     * Determine if the resolved facade should be cached.
+     * Indicates if the resolved facade should be cached.
      *
      * @var bool
      */
