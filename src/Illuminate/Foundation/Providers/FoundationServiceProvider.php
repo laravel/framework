@@ -4,9 +4,9 @@ namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
-use Illuminate\Log\LoggedExceptionCollection;
 use Illuminate\Support\AggregateServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
 use Illuminate\Validation\ValidationException;
 
