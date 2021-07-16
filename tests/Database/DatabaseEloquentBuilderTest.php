@@ -1643,6 +1643,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
     }
 
+    public function testToRawSql()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('foo', 'bar')->where('baz', 1);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "foo" = \'bar\' and "baz" = 1', $builder->toRawSql());
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';

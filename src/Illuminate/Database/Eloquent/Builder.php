@@ -98,6 +98,7 @@ class Builder
         'raw',
         'sum',
         'toSql',
+        'toRawSql',
     ];
 
     /**
