@@ -60,7 +60,7 @@ class ProviderMakeCommand extends GeneratorCommand
     public function handle()
     {
         return tap(parent::handle(), function ($result) {
-            if ($result !== false && $this->option('register')) {
+            if ($result !== false && $this->option('install')) {
                 $this->registerProvider();
             }
         });
@@ -83,7 +83,7 @@ class ProviderMakeCommand extends GeneratorCommand
             ));
         }
 
-        $this->info($this->type.' registered successfully.');
+        $this->info($this->type.' installed successfully.');
     }
 
     /**
@@ -94,7 +94,7 @@ class ProviderMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['register', 'r', InputOption::VALUE_NONE, 'Automatically register the created provider in your application'],
+            ['install', 'i', InputOption::VALUE_NONE, 'Automatically install the created provider in your application'],
         ];
     }
 }
