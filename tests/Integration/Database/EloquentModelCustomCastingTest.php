@@ -138,7 +138,7 @@ class EloquentModelCustomCastingTest extends TestCase
 /**
  * Eloquent Casts...
  */
-class Address implements CastsAttributes
+class AddressCast implements CastsAttributes
 {
     /**
      * Cast the given value.
@@ -198,7 +198,7 @@ class CustomCasts extends Eloquent
      * @var array
      */
     protected $casts = [
-        'address' => Address::class,
+        'address' => AddressCast::class,
     ];
 }
 
