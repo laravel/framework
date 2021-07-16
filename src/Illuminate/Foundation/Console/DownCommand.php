@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
+use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
-use App\Http\Middleware\PreventRequestsDuringMaintenance;
 
 class DownCommand extends Command
 {
