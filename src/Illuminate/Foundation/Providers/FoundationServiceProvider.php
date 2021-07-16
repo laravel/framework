@@ -47,10 +47,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
 
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
-
-        if ($this->app->runningUnitTests()) {
-            $this->registerExceptionTracking();
-        }
+        $this->registerExceptionTracking();
     }
 
     /**
@@ -100,6 +97,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     protected function registerExceptionTracking()
     {
+        if (! $this->app->runningUnitTests()) {
+            return;
+        }
+
         $this->app->instance(
             LoggedExceptionCollection::class,
             new LoggedExceptionCollection
