@@ -10,6 +10,9 @@ use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
 
+/**
+ * @template T
+ */
 class Collection implements ArrayAccess, Enumerable
 {
     use EnumeratesValues, Macroable;
@@ -17,14 +20,14 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * The items contained in the collection.
      *
-     * @var array
+     * @var array<T>
      */
     protected $items = [];
 
     /**
      * Create a new collection.
      *
-     * @param  mixed  $items
+     * @param  mixed $items
      * @return void
      */
     public function __construct($items = [])
@@ -47,7 +50,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get all of the items in the collection.
      *
-     * @return array
+     * @return array<T>
      */
     public function all()
     {
@@ -354,7 +357,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  callable|null  $callback
      * @param  mixed  $default
-     * @return mixed
+     * @return T|null
      */
     public function first(callable $callback = null, $default = null)
     {
@@ -402,7 +405,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  mixed  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return T
      */
     public function get($key, $default = null)
     {
@@ -610,7 +613,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  callable|null  $callback
      * @param  mixed  $default
-     * @return mixed
+     * @return T|null
      */
     public function last(callable $callback = null, $default = null)
     {
@@ -812,7 +815,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Push one or more items onto the end of the collection.
      *
-     * @param  mixed  $values [optional]
+     * @param  array<T>|T  $values [optional]
      * @return $this
      */
     public function push(...$values)
@@ -846,7 +849,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  mixed  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return T
      */
     public function pull($key, $default = null)
     {
@@ -856,8 +859,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Put an item in the collection by key.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  mixed $key
+     * @param  T  $value
      * @return $this
      */
     public function put($key, $value)
@@ -871,7 +874,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
-     * @return static|mixed
+     * @return static|T
      *
      * @throws \InvalidArgumentException
      */
@@ -941,7 +944,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get and remove the first item from the collection.
      *
-     * @return mixed
+     * @return T
      */
     public function shift()
     {
@@ -989,7 +992,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Skip items in the collection until the given condition is met.
      *
-     * @param  mixed  $value
+     * @param  T  $value
      * @return static
      */
     public function skipUntil($value)
@@ -1000,7 +1003,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Skip items in the collection while the given condition is met.
      *
-     * @param  mixed  $value
+     * @param  T  $value
      * @return static
      */
     public function skipWhile($value)
@@ -1074,7 +1077,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $key
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @return mixed
+     * @return T
      *
      * @throws \Illuminate\Collections\ItemNotFoundException
      * @throws \Illuminate\Collections\MultipleItemsFoundException
@@ -1320,7 +1323,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Take items in the collection until the given condition is met.
      *
-     * @param  mixed  $value
+     * @param  T  $value
      * @return static
      */
     public function takeUntil($value)
@@ -1331,7 +1334,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Take items in the collection while the given condition is met.
      *
-     * @param  mixed  $value
+     * @param  T  $value
      * @return static
      */
     public function takeWhile($value)
@@ -1399,7 +1402,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get an iterator for the items.
      *
-     * @return \ArrayIterator
+     * @return \ArrayIterator<T>
      */
     public function getIterator()
     {
@@ -1430,7 +1433,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Add an item to the collection.
      *
-     * @param  mixed  $item
+     * @param  T  $item
      * @return $this
      */
     public function add($item)
@@ -1443,7 +1446,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get a base Support collection instance from this collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<T>
      */
     public function toBase()
     {
@@ -1476,7 +1479,7 @@ class Collection implements ArrayAccess, Enumerable
      * Set the item at a given offset.
      *
      * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  T  $value
      * @return void
      */
     public function offsetSet($key, $value)
