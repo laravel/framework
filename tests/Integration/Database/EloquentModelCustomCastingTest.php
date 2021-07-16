@@ -40,6 +40,7 @@ class EloquentModelCustomCastingTest extends TestCase
             $table->increments('id');
             $table->string('address_line_one');
             $table->string('address_line_two');
+            $table->string('string_field');
             $table->timestamps();
         });
     }
@@ -62,6 +63,7 @@ class EloquentModelCustomCastingTest extends TestCase
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
         $model = CustomCasts::create([
             'address' => new AddressModel('address_line_one_value', 'address_line_two_value'),
+            'string_field' => null,
         ]);
 
         $this->assertSame('address_line_one_value', $model->getOriginal('address_line_one'));
@@ -70,10 +72,15 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->assertSame('address_line_two_value', $model->getOriginal('address_line_two'));
         $this->assertSame('address_line_two_value', $model->getAttribute('address_line_two'));
 
+        $this->assertSame(null, $model->getOriginal('string_field'));
+        $this->assertSame(null, $model->getAttribute('string_field'));
+        $this->assertSame('', $model->getRawOriginal('string_field'));
+
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $another_model */
         $another_model = CustomCasts::create([
             'address_line_one' => 'address_line_one_value',
             'address_line_two' => 'address_line_two_value',
+            'string_field' => 'string_value',
         ]);
 
         $this->assertInstanceOf(AddressModel::class, $another_model->address);
@@ -87,6 +94,7 @@ class EloquentModelCustomCastingTest extends TestCase
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
         $model = CustomCasts::create([
             'address' => new AddressModel('address_line_one_value', 'address_line_two_value'),
+            'string_field' => 'string_value',
         ]);
 
         $this->expectException(InvalidArgumentException::class);
@@ -103,6 +111,7 @@ class EloquentModelCustomCastingTest extends TestCase
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
         $model = CustomCasts::create([
             'address' => new AddressModel('address_line_one_value', 'address_line_two_value'),
+            'string_field' => 'string_value',
         ]);
 
         $this->expectException(InvalidArgumentException::class);
@@ -179,6 +188,37 @@ class AddressCast implements CastsAttributes
     }
 }
 
+class NonNullableString implements CastsAttributes
+{
+    /**
+     * Cast the given value.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  string  $value
+     * @param  array  $attributes
+     * @return string|null
+     */
+    public function get($model, $key, $value, $attributes)
+    {
+        return ($value <> '') ? $value : null;
+    }
+
+    /**
+     * Prepare the given value for storage.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  string|null  $value
+     * @param  array  $attributes
+     * @return string
+     */
+    public function set($model, $key, $value, $attributes)
+    {
+        return $value ?? '';
+    }
+}
+
 /**
  * Eloquent Models...
  */
@@ -199,6 +239,7 @@ class CustomCasts extends Eloquent
      */
     protected $casts = [
         'address' => AddressCast::class,
+        'string_field' => NonNullableString::class,
     ];
 }
 
