@@ -9,6 +9,7 @@ use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
@@ -35,6 +36,13 @@ class TestResponse implements ArrayAccess
     public $baseResponse;
 
     /**
+     * The collection of logged exceptions for the request.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $exceptions;
+
+    /**
      * The streamed content of the response.
      *
      * @var string
@@ -50,6 +58,7 @@ class TestResponse implements ArrayAccess
     public function __construct($response)
     {
         $this->baseResponse = $response;
+        $this->exceptions = new Collection;
     }
 
     /**
@@ -70,10 +79,13 @@ class TestResponse implements ArrayAccess
      */
     public function assertSuccessful()
     {
-        PHPUnit::assertTrue(
-            $this->isSuccessful(),
-            'Response status code ['.$this->getStatusCode().'] is not a successful status code.'
-        );
+        $lastException = $this->exceptions->last();
+
+        $message = isset($lastException)
+                    ? $this->statusMessageWithException('>=200, <300', $this->getStatusCode(), $lastException)
+                    : 'Response status code ['.$this->getStatusCode().'] is not a successful status code.';
+
+        PHPUnit::assertTrue($this->isSuccessful(), $message);
 
         return $this;
     }
@@ -85,12 +97,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertOk()
     {
-        PHPUnit::assertTrue(
-            $this->isOk(),
-            'Response status code ['.$this->getStatusCode().'] does not match expected 200 status code.'
-        );
-
-        return $this;
+        return $this->assertStatus(200);
     }
 
     /**
@@ -100,14 +107,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertCreated()
     {
-        $actual = $this->getStatusCode();
-
-        PHPUnit::assertSame(
-            201, $actual,
-            "Response status code [{$actual}] does not match expected 201 status code."
-        );
-
-        return $this;
+        return $this->assertStatus(201);
     }
 
     /**
@@ -132,12 +132,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertNotFound()
     {
-        PHPUnit::assertTrue(
-            $this->isNotFound(),
-            'Response status code ['.$this->getStatusCode().'] is not a not found status code.'
-        );
-
-        return $this;
+        return $this->assertStatus(404);
     }
 
     /**
@@ -147,12 +142,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertForbidden()
     {
-        PHPUnit::assertTrue(
-            $this->isForbidden(),
-            'Response status code ['.$this->getStatusCode().'] is not a forbidden status code.'
-        );
-
-        return $this;
+        return $this->assertStatus(403);
     }
 
     /**
@@ -162,14 +152,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertUnauthorized()
     {
-        $actual = $this->getStatusCode();
-
-        PHPUnit::assertSame(
-            401, $actual,
-            "Response status code [{$actual}] is not an unauthorized status code."
-        );
-
-        return $this;
+        return $this->assertStatus(401);
     }
 
     /**
@@ -182,12 +165,38 @@ class TestResponse implements ArrayAccess
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertSame(
-            $actual, $status,
-            "Expected status code {$status} but received {$actual}."
-        );
+        $lastException = $actual === 500 && $status !== 500
+                    ? $this->exceptions->last()
+                    : null;
+
+        $message = isset($lastException)
+                    ? $this->statusMessageWithException($status, $actual, $lastException)
+                    : "Expected status code [{$status}] but received {$actual}.";
+
+        PHPUnit::assertSame($actual, $status, $message);
 
         return $this;
+    }
+
+    /**
+     * Get an assertion message for a status assertion that has an unexpected exception.
+     *
+     * @param  string|int  $expected
+     * @param  string|int  $actual
+     * @param  \Throwable  $exception
+     * @return string
+     */
+    protected function statusMessageWithException($expected, $actual, $exception)
+    {
+        $exception = (string) $exception;
+
+        return <<<EOF
+Expected response status code [$expected] but received $actual.
+
+The following exception occurred during the request:
+
+$exception
+EOF;
     }
 
     /**
@@ -1206,6 +1215,19 @@ class TestResponse implements ArrayAccess
         $this->sendContent();
 
         return $this->streamedContent = ob_get_clean();
+    }
+
+    /**
+     * Set the previous exceptions on the response.
+     *
+     * @param  \Illuminate\Support\Collection  $exceptions
+     * @return $this
+     */
+    public function withExceptions(Collection $exceptions)
+    {
+        $this->exceptions = $exceptions;
+
+        return $this;
     }
 
     /**

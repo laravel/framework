@@ -393,7 +393,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] does not match expected 200 status code.');
+        $this->expectExceptionMessage('Expected status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -409,7 +409,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] does not match expected 201 status code.');
+        $this->expectExceptionMessage('Expected status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -424,7 +424,7 @@ class TestResponseTest extends TestCase
         $statusCode = 500;
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a not found status code.');
+        $this->expectExceptionMessage('Expected status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -440,7 +440,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a forbidden status code.');
+        $this->expectExceptionMessage('Expected status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -456,7 +456,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not an unauthorized status code.');
+        $this->expectExceptionMessage('Expected status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -472,7 +472,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage("Expected status code 204 but received {$statusCode}");
+        $this->expectExceptionMessage('Expected status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -489,7 +489,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage("Expected status code {$expectedStatusCode} but received {$statusCode}");
+        $this->expectExceptionMessage('Expected status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -521,7 +521,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage("Expected status code {$expectedStatusCode} but received {$statusCode}");
+        $this->expectExceptionMessage('Expected status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
