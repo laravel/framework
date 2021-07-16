@@ -2,7 +2,6 @@
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
          beStrictAboutTestsThatDoNotTestAnything="false"
-         bootstrap="tests/bootstrap.php"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
@@ -18,6 +17,8 @@
         </testsuite>
     </testsuites>
     <php>
+        <ini name="date.timezone" value="UTC" />
+        <ini name="intl.default_locale" value="C.UTF-8" />
         <ini name="memory_limit" value="2048M" />
         <!--
         <env name="REDIS_HOST" value="127.0.0.1" />
