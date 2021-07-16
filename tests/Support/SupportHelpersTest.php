@@ -555,6 +555,27 @@ class SupportHelpersTest extends TestCase
         $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.02);
     }
 
+    public function testRetryWithPassingSleepCallback()
+    {
+        $startTime = microtime(true);
+
+        $attempts = retry(3, function ($attempts) {
+            if ($attempts > 2) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, function ($attempt) {
+            return $attempt * 100;
+        });
+
+        // Make sure we made three attempts
+        $this->assertEquals(3, $attempts);
+
+        // Make sure we waited 300ms for the first two attempts
+        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.02);
+    }
+
     public function testRetryWithPassingWhenCallback()
     {
         $startTime = microtime(true);
