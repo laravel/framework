@@ -204,6 +204,14 @@ $exception
 EOF;
     }
 
+    /**
+     * Get an assertion message for a status assertion that has an unexpected validation exception.
+     *
+     * @param  string|int  $expected
+     * @param  string|int  $actual
+     * @param  \Illuminate\Validation\ValidationException $exception;
+     * @return string
+     */
     protected function statusMessageWithValidationErrors($expected, $actual, $exception)
     {
         if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
