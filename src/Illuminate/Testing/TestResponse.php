@@ -214,11 +214,9 @@ EOF;
      */
     protected function statusMessageWithValidationErrors($expected, $actual, $exception)
     {
-        if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
-            $errors = json_encode($exception->errors(), JSON_PRETTY_PRINT);
-        } else {
-            $errors = implode(PHP_EOL, Arr::flatten($exception->errors()));
-        }
+        $errors = $this->baseResponse->headers->get('Content-Type') === 'application/json'
+            ? json_encode($exception->errors(), JSON_PRETTY_PRINT)
+            : implode(PHP_EOL, Arr::flatten($exception->errors()));
 
         return <<<EOF
 Expected response status code [$expected] but received $actual.
