@@ -109,6 +109,25 @@ class ContainerCallTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $result);
     }
 
+    public function testBindMethodPassedInterface()
+    {
+        $container = new Container;
+        $container->bind(ContainerTestCallStubInterface::class, ContainerTestCallStub::class);
+        $container->bindMethod([ContainerTestCallStubInterface::class, 'unresolvable'], function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call(ContainerTestCallStubInterface::class.'@unresolvable');
+        $this->assertEquals(['foo', 'bar'], $result);
+
+        $container = new Container;
+        $container->bind(ContainerTestCallStubContract::class, ContainerTestCallStub::class);
+        $container->bindMethod([ContainerTestCallStubContract::class, 'unresolvable'], function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call(ContainerTestCallStubContract::class.'@unresolvable');
+        $this->assertEquals(['foo', 'bar'], $result);
+    }
+
     public function testClosureCallWithInjectedDependency()
     {
         $container = new Container;
@@ -208,7 +227,25 @@ class ContainerCallTest extends TestCase
     }
 }
 
-class ContainerTestCallStub
+interface ContainerTestCallStubInterface
+{
+    public function work();
+
+    public function inject(ContainerCallConcreteStub $stub, $default = 'taylor');
+
+    public function unresolvable($foo, $bar);
+}
+
+interface ContainerTestCallStubContract
+{
+    public function work();
+
+    public function inject(ContainerCallConcreteStub $stub, $default = 'taylor');
+
+    public function unresolvable($foo, $bar);
+}
+
+class ContainerTestCallStub implements ContainerTestCallStubInterface, ContainerTestCallStubContract
 {
     public function work()
     {
