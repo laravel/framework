@@ -19,7 +19,7 @@ namespace Illuminate\Support\Facades;
  * @method static string temporarySignedRoute(string $name, \DateTimeInterface|\DateInterval|int $expiration, array $parameters = [], bool $absolute = true)
  * @method static string to(string $path, $extra = [], bool $secure = null)
  * @method static void defaults(array $defaults)
- * @method static void forceScheme(string $scheme)
+ * @method static void forceScheme(string $scheme, bool $condition = true)
  * @method static bool isValidUrl(string $path)
  *
  * @see \Illuminate\Routing\UrlGenerator
