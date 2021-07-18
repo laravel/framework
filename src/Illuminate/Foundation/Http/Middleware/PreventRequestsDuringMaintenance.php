@@ -155,11 +155,11 @@ class PreventRequestsDuringMaintenance
     }
 
     /**
-     * Get the URIs that should not be accessible while maintenance mode is enabled.
+     * Get the URIs that should be accessible even when maintenance mode is enabled.
      *
      * @return array
      */
-    public function getExceptPaths()
+    public function getExcludedPaths()
     {
         return $this->except;
     }

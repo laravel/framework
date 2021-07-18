@@ -6,6 +6,7 @@ use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
+use Throwable;
 
 class DownCommand extends Command
 {
@@ -70,7 +71,7 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
-            'except' => $this->exceptPaths(),
+            'except' => $this->excludedPaths(),
             'redirect' => $this->redirectPath(),
             'retry' => $this->getRetryTime(),
             'refresh' => $this->option('refresh'),
@@ -81,13 +82,17 @@ class DownCommand extends Command
     }
 
     /**
-     * Get the except paths to be placed in the "down" file.
+     * Get the paths that should be excluded from maintenance mode.
      *
      * @return array
      */
-    protected function exceptPaths()
+    protected function excludedPaths()
     {
-        return $this->laravel->make(PreventRequestsDuringMaintenance::class)->getExceptPaths();
+        try {
+            return $this->laravel->make(PreventRequestsDuringMaintenance::class)->getExcludedPaths();
+        } catch (Throwable $e) {
+            return [];
+        }
     }
 
     /**

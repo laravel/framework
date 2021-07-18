@@ -13,7 +13,7 @@ if (! isset($data['template'])) {
     return;
 }
 
-// Allow framework to handle request if current uri is in the exclude list...
+// Allow framework to handle request if request URI is in the exclude list...
 if (isset($data['except'])) {
     $uri = parse_url($_SERVER['REQUEST_URI'])['path'];
 
