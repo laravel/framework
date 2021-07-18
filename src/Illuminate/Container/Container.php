@@ -328,12 +328,12 @@ class Container implements ArrayAccess, ContainerContract
     protected function parseBindMethod($method)
     {
         if (is_array($method)) {
-            $interfaceNames = [
+            $contractNames = [
                 'Interface',
                 'Contract',
             ];
 
-            foreach ($interfaceNames as $name) {
+            foreach ($contractNames as $name) {
                 if (strpos($method[0], $name) !== false) {
                     $method[0] = get_class(
                         $this->resolve($method[0])
