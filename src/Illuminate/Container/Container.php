@@ -333,6 +333,14 @@ class Container implements ArrayAccess, ContainerContract
                 'Contract',
             ];
 
+            foreach ($interfaceNames as $name) {
+                if (strpos($method[0], $name) !== false) {
+                    $method[0] = get_class(
+                        $this->make($method[0])
+                    );
+                }
+            }
+
             return $method[0].'@'.$method[1];
         }
 
