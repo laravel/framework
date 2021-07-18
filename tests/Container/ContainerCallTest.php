@@ -109,7 +109,7 @@ class ContainerCallTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $result);
     }
 
-    public function testBindMethodPassedInterface()
+    public function testBindMethodPassedAnInterface()
     {
         $container = new Container;
         $container->bind(ContainerTestCallStubInterface::class, ContainerTestCallStub::class);
