@@ -4,6 +4,7 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use SplFileInfo;
 use stdClass;
@@ -253,6 +254,17 @@ trait InteractsWithInput
         }
 
         return $results;
+    }
+
+    /**
+     * Get all of the input and files for the request as a collection.
+     *
+     * @param  array|mixed|null  $keys
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($keys = null)
+    {
+        return Collection::make($this->all($keys));
     }
 
     /**
