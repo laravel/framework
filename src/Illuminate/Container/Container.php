@@ -336,7 +336,7 @@ class Container implements ArrayAccess, ContainerContract
             foreach ($interfaceNames as $name) {
                 if (strpos($method[0], $name) !== false) {
                     $method[0] = get_class(
-                        $this->make($method[0])
+                        $this->resolve($method[0])
                     );
                 }
             }
