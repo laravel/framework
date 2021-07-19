@@ -11,7 +11,8 @@ use Illuminate\Support\Traits\Macroable;
 use stdClass;
 
 /**
- * @template T
+ * @template TKey
+ * @template TValue
  */
 class Collection implements ArrayAccess, Enumerable
 {
@@ -20,7 +21,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * The items contained in the collection.
      *
-     * @var array<T>
+     * @var array<TKey, TValue>
      */
     protected $items = [];
 
@@ -50,7 +51,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get all of the items in the collection.
      *
-     * @return array<T>
+     * @return array<TKey, TValue>
      */
     public function all()
     {
@@ -70,7 +71,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the average value of a given key.
      *
-     * @param  callable|string|null  $callback
+     * @param  callable|TKey|null  $callback
      * @return mixed
      */
     public function avg($callback = null)
@@ -91,7 +92,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the median of a given key.
      *
-     * @param  string|array|null  $key
+     * @param  TKey|null  $key
      * @return mixed
      */
     public function median($key = null)
@@ -121,7 +122,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the mode of a given key.
      *
-     * @param  string|array|null  $key
+     * @param  TKey|null  $key
      * @return array|null
      */
     public function mode($key = null)
@@ -160,9 +161,9 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Determine if an item exists in the collection.
      *
-     * @param  mixed  $key
+     * @param  TKey   $key
      * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  TValue $value
      * @return bool
      */
     public function contains($key, $operator = null, $value = null)
@@ -323,7 +324,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get all items except for those with the specified keys.
      *
-     * @param  \Illuminate\Support\Collection|mixed  $keys
+     * @param  \Illuminate\Support\Collection<int,TKey>|mixed  $keys
      * @return static
      */
     public function except($keys)
@@ -388,7 +389,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Remove an item from the collection by key.
      *
-     * @param  string|array  $keys
+     * @param  TKey|array<TKey>  $keys
      * @return $this
      */
     public function forget($keys)
@@ -402,10 +403,9 @@ class Collection implements ArrayAccess, Enumerable
 
     /**
      * Get an item from the collection by key.
-     * @template P
-     * @param  mixed  $key
-     * @param  P  $default
-     * @return T|P
+     * @param  TKey   $key
+     * @param  TValue $default
+     * @return TValue
      */
     public function get($key, $default = null)
     {
@@ -490,7 +490,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Determine if an item exists in the collection by key.
      *
-     * @param  mixed  $key
+     * @param  TKey $key
      * @return bool
      */
     public function has($key)
@@ -601,7 +601,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the keys of the collection items.
      *
-     * @return static
+     * @return static<int, TKey>
      */
     public function keys()
     {
@@ -613,7 +613,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  callable|null  $callback
      * @param  mixed  $default
-     * @return T|null
+     * @return TValue|null
      */
     public function last(callable $callback = null, $default = null)
     {
@@ -801,8 +801,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Push an item onto the beginning of the collection.
      *
-     * @param  mixed  $value
-     * @param  mixed  $key
+     * @param  TValue $value
+     * @param  TKey   $key
      * @return $this
      */
     public function prepend($value, $key = null)
@@ -815,7 +815,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Push one or more items onto the end of the collection.
      *
-     * @param  array<T>|T  $values [optional]
+     * @param  array<TValue>|TValue  $values [optional]
      * @return $this
      */
     public function push(...$values)
@@ -847,9 +847,9 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get and remove an item from the collection.
      *
-     * @param  mixed  $key
-     * @param  mixed  $default
-     * @return T
+     * @param  TKey  $key
+     * @param  TValue  $default
+     * @return TValue
      */
     public function pull($key, $default = null)
     {
@@ -859,8 +859,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Put an item in the collection by key.
      *
-     * @param  mixed $key
-     * @param  T  $value
+     * @param  TKey   $key
+     * @param  TValue $value
      * @return $this
      */
     public function put($key, $value)
@@ -874,7 +874,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
-     * @return static|T
+     * @return static|TValue
      *
      * @throws \InvalidArgumentException
      */
@@ -912,7 +912,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Reverse items order.
      *
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function reverse()
     {
@@ -922,8 +922,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Search the collection for a given value and return the corresponding key if successful.
      *
-     * @param  mixed  $value
-     * @param  bool  $strict
+     * @param  TValue $value
+     * @param  bool   $strict
      * @return mixed
      */
     public function search($value, $strict = false)
@@ -944,7 +944,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get and remove the first item from the collection.
      *
-     * @return T
+     * @return TValue
      */
     public function shift()
     {
@@ -955,7 +955,7 @@ class Collection implements ArrayAccess, Enumerable
      * Shuffle the items in the collection.
      *
      * @param  int|null  $seed
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function shuffle($seed = null)
     {
@@ -967,7 +967,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  int  $size
      * @param  int  $step
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function sliding($size = 2, $step = 1)
     {
@@ -982,7 +982,7 @@ class Collection implements ArrayAccess, Enumerable
      * Skip the first {$count} items.
      *
      * @param  int  $count
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function skip($count)
     {
@@ -992,8 +992,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Skip items in the collection until the given condition is met.
      *
-     * @param  T  $value
-     * @return static
+     * @param  TValue  $value
+     * @return static<TKey, TValue>
      */
     public function skipUntil($value)
     {
@@ -1003,8 +1003,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Skip items in the collection while the given condition is met.
      *
-     * @param  T  $value
-     * @return static
+     * @param  TValue  $value
+     * @return static<TKey, TValue>
      */
     public function skipWhile($value)
     {
@@ -1016,7 +1016,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  int  $offset
      * @param  int|null  $length
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function slice($offset, $length = null)
     {
@@ -1027,7 +1027,7 @@ class Collection implements ArrayAccess, Enumerable
      * Split a collection into a certain number of groups.
      *
      * @param  int  $numberOfGroups
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function split($numberOfGroups)
     {
@@ -1064,7 +1064,7 @@ class Collection implements ArrayAccess, Enumerable
      * Split a collection into a certain number of groups, and fill the first groups completely.
      *
      * @param  int  $numberOfGroups
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function splitIn($numberOfGroups)
     {
@@ -1074,10 +1074,10 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
      *
-     * @param  mixed  $key
+     * @param  TKey   $key
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @return T
+     * @return TValue
      *
      * @throws \Illuminate\Collections\ItemNotFoundException
      * @throws \Illuminate\Collections\MultipleItemsFoundException
@@ -1105,7 +1105,7 @@ class Collection implements ArrayAccess, Enumerable
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function chunk($size)
     {
@@ -1126,7 +1126,7 @@ class Collection implements ArrayAccess, Enumerable
      * Chunk the collection into chunks with a callback.
      *
      * @param  callable  $callback
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function chunkWhile(callable $callback)
     {
@@ -1139,7 +1139,7 @@ class Collection implements ArrayAccess, Enumerable
      * Sort through each item with a callback.
      *
      * @param  callable|int|null  $callback
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function sort($callback = null)
     {
@@ -1156,7 +1156,7 @@ class Collection implements ArrayAccess, Enumerable
      * Sort items in descending order.
      *
      * @param  int  $options
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function sortDesc($options = SORT_REGULAR)
     {
@@ -1173,7 +1173,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  callable|array|string  $callback
      * @param  int  $options
      * @param  bool  $descending
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
     {
@@ -1209,7 +1209,7 @@ class Collection implements ArrayAccess, Enumerable
      * Sort the collection using multiple comparisons.
      *
      * @param  array  $comparisons
-     * @return static
+     * @return static<TKey, TValue>
      */
     protected function sortByMany(array $comparisons = [])
     {
@@ -1254,7 +1254,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  callable|string  $callback
      * @param  int  $options
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function sortByDesc($callback, $options = SORT_REGULAR)
     {
@@ -1266,7 +1266,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  int  $options
      * @param  bool  $descending
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function sortKeys($options = SORT_REGULAR, $descending = false)
     {
@@ -1281,7 +1281,7 @@ class Collection implements ArrayAccess, Enumerable
      * Sort the collection keys in descending order.
      *
      * @param  int  $options
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function sortKeysDesc($options = SORT_REGULAR)
     {
@@ -1294,7 +1294,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  int  $offset
      * @param  int|null  $length
      * @param  mixed  $replacement
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function splice($offset, $length = null, $replacement = [])
     {
@@ -1309,7 +1309,7 @@ class Collection implements ArrayAccess, Enumerable
      * Take the first or last {$limit} items.
      *
      * @param  int  $limit
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function take($limit)
     {
@@ -1323,8 +1323,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Take items in the collection until the given condition is met.
      *
-     * @param  T  $value
-     * @return static
+     * @param  TValue  $value
+     * @return static<TKey, TValue>
      */
     public function takeUntil($value)
     {
@@ -1334,8 +1334,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Take items in the collection while the given condition is met.
      *
-     * @param  T  $value
-     * @return static
+     * @param  TValue  $value
+     * @return static<TKey, TValue>
      */
     public function takeWhile($value)
     {
@@ -1358,7 +1358,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Reset the keys on the underlying array.
      *
-     * @return static
+     * @return static<int, TValue>
      */
     public function values()
     {
@@ -1391,8 +1391,8 @@ class Collection implements ArrayAccess, Enumerable
      * Pad collection to the specified length with a value.
      *
      * @param  int  $size
-     * @param  mixed  $value
-     * @return static
+     * @param  TValue  $value
+     * @return static<TKey, TValue>
      */
     public function pad($size, $value)
     {
@@ -1402,7 +1402,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get an iterator for the items.
      *
-     * @return \ArrayIterator<T>
+     * @return \ArrayIterator<TKey, TValue>
      */
     public function getIterator()
     {
@@ -1433,7 +1433,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Add an item to the collection.
      *
-     * @param  T  $item
+     * @param  TValue  $item
      * @return $this
      */
     public function add($item)
@@ -1446,7 +1446,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get a base Support collection instance from this collection.
      *
-     * @return \Illuminate\Support\Collection<T>
+     * @return \Illuminate\Support\Collection<TKey, TValue>
      */
     public function toBase()
     {
@@ -1456,7 +1456,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Determine if an item exists at an offset.
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @return bool
      */
     public function offsetExists($key)
@@ -1467,7 +1467,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get an item at a given offset.
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @return mixed
      */
     public function offsetGet($key)
@@ -1478,8 +1478,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Set the item at a given offset.
      *
-     * @param  mixed  $key
-     * @param  T  $value
+     * @param  TKey  $key
+     * @param  TValue  $value
      * @return void
      */
     public function offsetSet($key, $value)
@@ -1494,7 +1494,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Unset the item at a given offset.
      *
-     * @param  string  $key
+     * @param  TKey  $key
      * @return void
      */
     public function offsetUnset($key)
