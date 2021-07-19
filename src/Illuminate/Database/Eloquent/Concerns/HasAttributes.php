@@ -669,8 +669,8 @@ trait HasAttributes
      */
     protected function isCustomDateTimeCast($cast)
     {
-        return strncmp($cast, 'date:', 5) === 0 ||
-               strncmp($cast, 'datetime:', 9) === 0;
+        return str_starts_with($cast, 'date:') ||
+                str_starts_with($cast, 'datetime:');
     }
 
     /**
@@ -681,7 +681,7 @@ trait HasAttributes
      */
     protected function isDecimalCast($cast)
     {
-        return strncmp($cast, 'decimal:', 8) === 0;
+        return str_starts_with($cast, 'decimal:');
     }
 
     /**
