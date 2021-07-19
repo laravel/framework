@@ -214,8 +214,8 @@ class Filesystem
     /**
      * Replace a given string within a given file.
      *
-     * @param  string  $search
-     * @param  string  $replace
+     * @param  array|string  $search
+     * @param  array|string  $replace
      * @param  string  $path
      * @return void
      */
