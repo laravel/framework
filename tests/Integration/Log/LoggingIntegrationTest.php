@@ -7,7 +7,7 @@ use Orchestra\Testbench\TestCase;
 
 class LoggingIntegrationTest extends TestCase
 {
-    public function testMigrate()
+    public function testLoggingCanBeRunWithoutEncounteringExceptions()
     {
         Log::info('Hello World');
 
