@@ -107,7 +107,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
         );
 
         $this->app->make('events')->listen(MessageLogged::class, function ($event) {
-            if ($event->context['exception']) {
+            if (isset($event->context['exception'])) {
                 $this->app->make(LoggedExceptionCollection::class)
                         ->push($event->context['exception']);
             }

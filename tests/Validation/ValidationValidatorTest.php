@@ -6167,6 +6167,15 @@ class ValidationValidatorTest extends TestCase
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
+            ['admin' => ['name' => 'Mohamed', 'location' => 'cairo'], 'users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['admin' => 'array', 'admin.name' => 'string', 'users' => 'array', 'users.*.name' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['admin' => ['name' => 'Mohamed'], 'users' => [['name' => 'Mohamed']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
             ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
             ['users' => 'array']
         );
@@ -6185,7 +6194,7 @@ class ValidationValidatorTest extends TestCase
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
-            ['users' => ['admins' => [['name' => 'mohamed', 'job' => 'dev']]]],
+            ['users' => ['admins' => [['name' => 'mohamed', 'job' => 'dev']], 'unvalidated' => 'foobar']],
             ['users' => 'array', 'users.admins' => 'array', 'users.admins.*.name' => 'string']
         );
         $validator->excludeUnvalidatedArrayKeys = true;
