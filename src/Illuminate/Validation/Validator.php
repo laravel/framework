@@ -515,10 +515,12 @@ class Validator implements ValidatorContract
 
         $missingValue = new stdClass;
 
+        $attributes = array_merge(array_keys($this->implicitAttributes), array_keys($this->getRules()));
+
         foreach ($this->getRules() as $key => $rules) {
             if ($this->excludeUnvalidatedArrayKeys &&
                 in_array('array', $rules) &&
-                ! empty(preg_grep('/^'.preg_quote($key, '/').'\.*/', array_keys($this->implicitAttributes)))) {
+                ! empty(preg_grep('/^'.preg_quote($key, '/').'\.+/', $attributes))) {
                 continue;
             }
 
