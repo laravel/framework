@@ -328,17 +328,11 @@ class HttpRequestTest extends TestCase
             $bar = true;
         });
 
-        $baz = $request->whenHas('foobar', function () use (&$foo) {
-            $foo = 'test';
-        });
-
         $this->assertSame('Taylor', $name);
         $this->assertSame('', $age);
         $this->assertNull($city);
         $this->assertFalse($foo);
         $this->assertTrue($bar);
-        $this->assertSame('', $request->whenHas('age'));
-        $this->assertInstanceOf(Request::class, $baz);
     }
 
     public function testWhenFilledMethod()
@@ -369,18 +363,11 @@ class HttpRequestTest extends TestCase
             $bar = true;
         });
 
-        $baz = $request->whenFilled('foobar', function () use (&$foo) {
-            $foo = 'test';
-        });
-
         $this->assertSame('Taylor', $name);
         $this->assertFalse($age);
         $this->assertFalse($city);
         $this->assertFalse($foo);
         $this->assertTrue($bar);
-        $this->assertSame('Taylor', $request->whenFilled('name'));
-        $this->assertInstanceOf(Request::class, $request->whenFilled('age'));
-        $this->assertInstanceOf(Request::class, $baz);
     }
 
     public function testMissingMethod()
