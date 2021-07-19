@@ -16,6 +16,7 @@ use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Validation\ValidationException;
 use LogicException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -165,7 +166,7 @@ class TestResponse implements ArrayAccess
     {
         $actual = $this->getStatusCode();
 
-        $lastException = $actual === 500 && $status !== 500
+        $lastException = $actual !== $status && in_array($actual, [422, 500])
                     ? $this->exceptions->last()
                     : null;
 
@@ -188,6 +189,10 @@ class TestResponse implements ArrayAccess
      */
     protected function statusMessageWithException($expected, $actual, $exception)
     {
+        if ($exception instanceof ValidationException) {
+            return $this->statusMessageWithValidationErrors($expected, $actual, $exception);
+        }
+
         $exception = (string) $exception;
 
         return <<<EOF
@@ -196,6 +201,29 @@ Expected response status code [$expected] but received $actual.
 The following exception occurred during the request:
 
 $exception
+EOF;
+    }
+
+    /**
+     * Get an assertion message for a status assertion that has an unexpected validation exception.
+     *
+     * @param  string|int  $expected
+     * @param  string|int  $actual
+     * @param  \Illuminate\Validation\ValidationException $exception;
+     * @return string
+     */
+    protected function statusMessageWithValidationErrors($expected, $actual, $exception)
+    {
+        $errors = $this->baseResponse->headers->get('Content-Type') === 'application/json'
+            ? json_encode($exception->errors(), JSON_PRETTY_PRINT)
+            : implode(PHP_EOL, Arr::flatten($exception->errors()));
+
+        return <<<EOF
+Expected response status code [$expected] but received $actual.
+
+The following validation errors occurred during the request:
+
+$errors
 EOF;
     }
 
