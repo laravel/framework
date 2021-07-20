@@ -127,7 +127,7 @@ abstract class ServiceProvider
             $config = $this->app->make('config');
 
             $config->set($key, array_merge(
-                require $path, $config->get($key, [])
+                $this->app->make('files')->getRequire($path), $config->get($key, [])
             ));
         }
     }
@@ -141,7 +141,7 @@ abstract class ServiceProvider
     protected function loadRoutesFrom($path)
     {
         if (! ($this->app instanceof CachesRoutes && $this->app->routesAreCached())) {
-            require $path;
+            $this->app->make('files')->getRequire($path);
         }
     }
 
