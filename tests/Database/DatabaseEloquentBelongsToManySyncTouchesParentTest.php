@@ -81,8 +81,6 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
     {
         $this->seedData();
 
-        /** @var DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle $article */
-
         Carbon::setTestNow('2021-07-19 10:13:14');
         $article = DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle::create(['id' => 1, 'title' => 'uuid title']);
         $article->users()->sync([1, 2, 3]);
