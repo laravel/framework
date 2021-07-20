@@ -34,6 +34,19 @@ class PendingBroadcast
     }
 
     /**
+     * Broadcast the event using a specific broadcaster.
+     *
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function withBroadcaster($connection = null)
+    {
+        $this->event->broadcaster = $connection;
+
+        return $this;
+    }
+
+    /**
      * Broadcast the event to everyone except the current user.
      *
      * @return $this
