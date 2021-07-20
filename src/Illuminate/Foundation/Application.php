@@ -914,6 +914,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
             $this->call([$provider, 'boot']);
         }
 
+        $provider->bootRoutes();
+
         $provider->callBootedCallbacks();
     }
 

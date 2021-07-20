@@ -48,6 +48,13 @@ abstract class ServiceProvider
     public static $publishGroups = [];
 
     /**
+     * Route files to be loaded.
+     *
+     * @var string[]
+     */
+    protected $routeFiles = [];
+
+    /**
      * Create a new service provider instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -129,6 +136,18 @@ abstract class ServiceProvider
             $config->set($key, array_merge(
                 require $path, $config->get($key, [])
             ));
+        }
+    }
+
+    /**
+     * Load the route files on the provider instance.
+     *
+     * @return void
+     */
+    public function bootRoutes()
+    {
+        foreach ($this->routeFiles as $routeFile) {
+            $this->loadRoutesFrom($routeFile);
         }
     }
 
