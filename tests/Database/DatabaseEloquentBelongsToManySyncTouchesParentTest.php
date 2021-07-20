@@ -85,7 +85,7 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
 
         Carbon::setTestNow('2021-07-19 10:13:14');
         $article = DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle::create(['id' => 1, 'title' => 'uuid title']);
-        $article->users()->sync([1,2,3]);
+        $article->users()->sync([1, 2, 3]);
         $this->assertSame('2021-07-19 10:13:14', $article->updated_at->format('Y-m-d H:i:s'));
 
         Carbon::setTestNow('2021-07-20 19:13:14');
