@@ -8,6 +8,12 @@ use Illuminate\Contracts\Support\Jsonable;
 use IteratorAggregate;
 use JsonSerializable;
 
+/**
+ * @template TKey
+ * @template TValue
+ *
+ * @extends IteratorAggregate<TKey, TValue>
+ */
 interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
     /**
@@ -244,7 +250,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Determine if all items pass the given truth test.
      *
-     * @param  string|callable  $key
+     * @param  string|callable(TValue, TKey): bool  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
@@ -468,17 +474,17 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Group an associative array by a field or using a callback.
      *
-     * @param  array|callable|string  $groupBy
-     * @param  bool  $preserveKeys
-     * @return static
+     * @param array<mixed>|string|callable(TValue, TKey): mixed $groupBy
+     * @param bool $preserveKeys
+     * @return static<static<mixed>>
      */
     public function groupBy($groupBy, $preserveKeys = false);
 
     /**
      * Key an associative array by a field or using a callback.
      *
-     * @param  callable|string  $keyBy
-     * @return static
+     * @param  string|callable(TValue, TKey): mixed  $keyBy
+     * @return static<TValue>
      */
     public function keyBy($keyBy);
 
@@ -575,8 +581,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * The callback should return an associative array with a single key/value pair.
      *
-     * @param  callable  $callback
-     * @return static
+     * @param  callable(TValue, TKey): array<mixed>  $callback
+     * @return static<array<mixed>>
      */
     public function mapToDictionary(callable $callback);
 
@@ -595,8 +601,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * The callback should return an associative array with a single key/value pair.
      *
-     * @param  callable  $callback
-     * @return static
+     * @param  callable(TValue, TKey): array<mixed> $callback  $callback
+     * @return static<mixed>
      */
     public function mapWithKeys(callable $callback);
 
@@ -611,8 +617,9 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Map the values into a new class.
      *
-     * @param  string  $class
-     * @return static
+     * @template TClass
+     * @param class-string<TClass> $class
+     * @return static<TClass>
      */
     public function mapInto($class);
 
@@ -693,10 +700,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Partition the collection into two arrays using the given callback or key.
      *
-     * @param  callable|string  $key
+     * @param  string|callable(TValue, TKey): bool  $key
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @return static
+     * @return static<static>
      */
     public function partition($key, $operator = null, $value = null);
 
@@ -812,7 +819,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
-     * @return static
+     * @return static<static>
      */
     public function chunk($size);
 
@@ -911,8 +918,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Pass the collection to the given callback and then return it.
      *
-     * @param  callable  $callback
-     * @return $this
+     * @param  callable(static): void  $callback
+     * @return static
      */
     public function tap(callable $callback);
 
