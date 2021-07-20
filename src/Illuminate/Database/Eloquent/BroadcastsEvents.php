@@ -44,7 +44,7 @@ trait BroadcastsEvents
      */
     public function broadcastCreated($channels = null)
     {
-        return $this->broadcastIfBroadcastChannelsExistForEvent(
+        return $this->broadcast(
             $this->newBroadcastableModelEvent('created'), 'created', $channels
         );
     }
@@ -57,7 +57,7 @@ trait BroadcastsEvents
      */
     public function broadcastUpdated($channels = null)
     {
-        return $this->broadcastIfBroadcastChannelsExistForEvent(
+        return $this->broadcast(
             $this->newBroadcastableModelEvent('updated'), 'updated', $channels
         );
     }
@@ -70,7 +70,7 @@ trait BroadcastsEvents
      */
     public function broadcastTrashed($channels = null)
     {
-        return $this->broadcastIfBroadcastChannelsExistForEvent(
+        return $this->broadcast(
             $this->newBroadcastableModelEvent('trashed'), 'trashed', $channels
         );
     }
@@ -83,7 +83,7 @@ trait BroadcastsEvents
      */
     public function broadcastRestored($channels = null)
     {
-        return $this->broadcastIfBroadcastChannelsExistForEvent(
+        return $this->broadcast(
             $this->newBroadcastableModelEvent('restored'), 'restored', $channels
         );
     }
@@ -96,24 +96,51 @@ trait BroadcastsEvents
      */
     public function broadcastDeleted($channels = null)
     {
-        return $this->broadcastIfBroadcastChannelsExistForEvent(
+        return $this->broadcast(
             $this->newBroadcastableModelEvent('deleted'), 'deleted', $channels
         );
     }
 
     /**
-     * Broadcast the given event instance if channels are configured for the model event.
+     * Broadcast the given event instance if the model event is allowed to be broadcast and channels are configured.
      *
      * @param  mixed  $instance
      * @param  string  $event
      * @param  mixed  $channels
      * @return \Illuminate\Broadcasting\PendingBroadcast|null
      */
-    protected function broadcastIfBroadcastChannelsExistForEvent($instance, $event, $channels = null)
+    protected function broadcast($instance, $event, $channels = null)
     {
-        if (! empty($this->broadcastOn($event)) || ! empty($channels)) {
-            return broadcast($instance->onChannels(Arr::wrap($channels)));
+        if (! $this->shouldBroadcastEvent($event)) {
+            return;
         }
+
+        if (! $this->broadcastChannelsExistForEvent($event, $channels)) {
+            return;
+        }
+
+        return broadcast($instance->onChannels(Arr::wrap($channels)));
+    }
+
+    /**
+     * Determine if channels are configured for the model event broadcast.
+     *
+     * @return bool
+     */
+    protected function broadcastChannelsExistForEvent($event, $channels = null)
+    {
+        return ! empty($this->broadcastOn($event))
+            || ! empty($channels);
+    }
+
+    /**
+     * Determine if the model event is allowed to broadcast or not.
+     *
+     * @return bool
+     */
+    protected function shouldBroadcastEvent($event)
+    {
+        return in_array($event, $this->broadcastEvents());
     }
 
     /**
@@ -148,6 +175,16 @@ trait BroadcastsEvents
     public function broadcastOn($event)
     {
         return [$this];
+    }
+
+    /**
+     * Get the events that should be broadcasted.
+     *
+     * @return array
+     */
+    public function broadcastEvents()
+    {
+        return ['created', 'updated', 'trashed', 'restored', 'deleted'];
     }
 
     /**

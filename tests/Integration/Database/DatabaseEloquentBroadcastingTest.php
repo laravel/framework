@@ -36,9 +36,9 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         $model->save();
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
-            return $event->model instanceof TestEloquentBroadcastUser &&
-                   count($event->broadcastOn()) === 1 &&
-                   $event->broadcastOn()[0]->name == 'private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.'.$event->model->id;
+            return $event->model instanceof TestEloquentBroadcastUser
+                && count($event->broadcastOn()) === 1
+                && $event->broadcastOn()[0]->name == 'private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.'.$event->model->id;
         });
     }
 
@@ -60,10 +60,51 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         $model->delete();
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
-            return $event->model instanceof SoftDeletableTestEloquentBroadcastUser &&
-                $event->event() == 'trashed' &&
-                count($event->broadcastOn()) === 1 &&
-                $event->broadcastOn()[0]->name == 'private-Illuminate.Tests.Integration.Database.SoftDeletableTestEloquentBroadcastUser.'.$event->model->id;
+            return $event->model instanceof SoftDeletableTestEloquentBroadcastUser
+                && $event->event() == 'trashed'
+                && count($event->broadcastOn()) === 1
+                && $event->broadcastOn()[0]->name == 'private-Illuminate.Tests.Integration.Database.SoftDeletableTestEloquentBroadcastUser.'.$event->model->id;
+        });
+    }
+
+    public function testBroadcastingOnSpecificModelEvents()
+    {
+        Event::fake([BroadcastableModelEventOccurred::class]);
+
+        $model = new SoftDeletableTestEloquentBroadcastUserForSpecificEvents;
+        $model->name = 'Mohamed';
+        $model->save();
+
+        Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
+            return $event->model instanceof SoftDeletableTestEloquentBroadcastUserForSpecificEvents
+                && $event->event() == 'created';
+        });
+
+        Event::fake([BroadcastableModelEventOccurred::class]);
+
+        $model->name = 'James';
+        $model->save();
+
+        Event::assertNotDispatched(BroadcastableModelEventOccurred::class);
+
+        $model->delete();
+
+        Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
+            return $event->model instanceof SoftDeletableTestEloquentBroadcastUserForSpecificEvents
+                && $event->event() == 'trashed';
+        });
+
+        Event::fake([BroadcastableModelEventOccurred::class]);
+
+        $model->restore();
+
+        Event::assertNotDispatched(BroadcastableModelEventOccurred::class);
+
+        $model->forceDelete();
+
+        Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
+            return $event->model instanceof SoftDeletableTestEloquentBroadcastUserForSpecificEvents
+                && $event->event() == 'deleted';
         });
     }
 }
@@ -80,4 +121,16 @@ class SoftDeletableTestEloquentBroadcastUser extends Model
     use BroadcastsEvents, SoftDeletes;
 
     protected $table = 'test_eloquent_broadcasting_users';
+}
+
+class SoftDeletableTestEloquentBroadcastUserForSpecificEvents extends Model
+{
+    use BroadcastsEvents, SoftDeletes;
+
+    protected $table = 'test_eloquent_broadcasting_users';
+
+    public function broadcastEvents()
+    {
+        return ['created', 'trashed', 'deleted'];
+    }
 }
