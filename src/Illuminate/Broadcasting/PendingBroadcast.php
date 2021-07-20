@@ -41,8 +41,8 @@ class PendingBroadcast
      */
     public function withBroadcaster($connection = null)
     {
-        if (method_exists($this->event, 'broadcaster')) {
-            $this->event->broadcaster($connection);
+        if (method_exists($this->event, 'withBroadcaster')) {
+            $this->event->withBroadcaster($connection);
         }
 
         return $this;
