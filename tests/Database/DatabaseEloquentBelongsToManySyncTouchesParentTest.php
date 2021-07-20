@@ -89,16 +89,17 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
         $this->assertSame('2021-07-19 10:13:14', $article->updated_at->format('Y-m-d H:i:s'));
 
         Carbon::setTestNow('2021-07-20 19:13:14');
-        $article->users()->sync([1,2]);
+        $result = $article->users()->sync([1, 2]);
+        $this->assertTrue(collect($result['detached'])->count() === 1);
+        $this->assertSame("3", collect($result['detached'])->first());
+
         $article->refresh();
         $this->assertSame('2021-07-20 19:13:14', $article->updated_at->format('Y-m-d H:i:s'));
 
         $user1 = DatabaseEloquentBelongsToManySyncTouchesParentTestTestUser::find(1);
         $this->assertNotSame('2021-07-20 19:13:14', $user1->updated_at->format('Y-m-d H:i:s'));
-
         $user2 = DatabaseEloquentBelongsToManySyncTouchesParentTestTestUser::find(2);
         $this->assertNotSame('2021-07-20 19:13:14', $user2->updated_at->format('Y-m-d H:i:s'));
-
         $user3 = DatabaseEloquentBelongsToManySyncTouchesParentTestTestUser::find(3);
         $this->assertNotSame('2021-07-20 19:13:14', $user3->updated_at->format('Y-m-d H:i:s'));
     }
