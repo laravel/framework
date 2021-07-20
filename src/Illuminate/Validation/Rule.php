@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
@@ -14,6 +15,16 @@ use Illuminate\Validation\Rules\Unique;
 class Rule
 {
     use Macroable;
+
+    /**
+     * Get an array constraint builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\ArrayRule
+     */
+    public static function array()
+    {
+        return new ArrayRule();
+    }
 
     /**
      * Get a dimensions constraint builder instance.

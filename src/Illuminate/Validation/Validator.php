@@ -14,6 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\ArrayRule;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -516,9 +517,7 @@ class Validator implements ValidatorContract
         $missingValue = new stdClass;
 
         foreach ($this->getRules() as $key => $rules) {
-            if ($this->excludeUnvalidatedArrayKeys &&
-                in_array('array', $rules) &&
-                ! empty(preg_grep('/^'.preg_quote($key, '/').'\.+/', array_keys($this->getRules())))) {
+            if ($this->shouldExcludeKeyFromData($key)) {
                 continue;
             }
 
@@ -530,6 +529,25 @@ class Validator implements ValidatorContract
         }
 
         return $this->replacePlaceholders($results);
+    }
+
+    /**
+     * Determine if the attribute should be excluded from the validated array.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function shouldExcludeKeyFromData($attribute)
+    {
+        $excludeUnvalidatedArrayKeys = $this->excludeUnvalidatedArrayKeys;
+
+        if (($rule = $this->getRule($attribute, ArrayRule::class)) !== null) {
+            $excludeUnvalidatedArrayKeys = $rule[0]->excludeUnvalidatedArrayKeys ?? $excludeUnvalidatedArrayKeys;
+        }
+
+        return $excludeUnvalidatedArrayKeys &&
+            ($rule !== null || $this->hasRule($attribute, 'Array')) &&
+            ! empty(preg_grep('/^'.preg_quote($attribute, '/').'\.+/', array_keys($this->getRules())));
     }
 
     /**
@@ -987,6 +1005,14 @@ class Validator implements ValidatorContract
 
             if (in_array($rule, $rules)) {
                 return [$rule, $parameters];
+            }
+
+            if ($rule instanceof RuleContract) {
+                foreach ($rules as $checkRule) {
+                    if ($rule instanceof $checkRule) {
+                        return [$rule, $parameters];
+                    }
+                }
             }
         }
     }
