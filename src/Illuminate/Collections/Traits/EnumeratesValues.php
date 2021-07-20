@@ -18,6 +18,8 @@ use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 
 /**
+ * @template TKey
+ * @template TValue
  * @property-read HigherOrderCollectionProxy $average
  * @property-read HigherOrderCollectionProxy $avg
  * @property-read HigherOrderCollectionProxy $contains
@@ -127,9 +129,9 @@ trait EnumeratesValues
     /**
      * Create a new collection by invoking the callback a given amount of times.
      *
-     * @param  int  $number
-     * @param  callable|null  $callback
-     * @return static
+     * @param int $number
+     * @param null|callable(int, int): mixed $callback
+     * @return static<mixed>
      */
     public static function times($number, callable $callback = null)
     {
@@ -145,8 +147,8 @@ trait EnumeratesValues
     /**
      * Alias for the "avg" method.
      *
-     * @param  callable|string|null  $callback
-     * @return mixed
+     * @param  string|null|callback(TValue): float|int  $callback
+     * @return float|int
      */
     public function average($callback = null)
     {
@@ -226,8 +228,8 @@ trait EnumeratesValues
     /**
      * Execute a callback over each item.
      *
-     * @param  callable  $callback
-     * @return $this
+     * @param callable(TValue, TKey): (void|bool) $callable
+     * @return static<TValue>
      */
     public function each(callable $callback)
     {
@@ -306,8 +308,8 @@ trait EnumeratesValues
     /**
      * Run a map over each nested chunk of items.
      *
-     * @param  callable  $callback
-     * @return static
+     * @param callable $callback
+     * @return static<int, mixed>
      */
     public function mapSpread(callable $callback)
     {
@@ -323,8 +325,8 @@ trait EnumeratesValues
      *
      * The callback should return an associative array with a single key/value pair.
      *
-     * @param  callable  $callback
-     * @return static
+     * @param callable(TValue, TKey): array<mixed> $callback
+     * @return static<static<mixed>>
      */
     public function mapToGroups(callable $callback)
     {
@@ -336,8 +338,8 @@ trait EnumeratesValues
     /**
      * Map a collection and flatten the result by a single level.
      *
-     * @param  callable  $callback
-     * @return static
+     * @param callable(TValue, TKey): mixed $callback
+     * @return static<mixed>
      */
     public function flatMap(callable $callback)
     {
