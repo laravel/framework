@@ -653,26 +653,26 @@ class Arr
     }
 
     /**
-     * Conditionally compile classes from an array into a CSS class list.
+     * Conditionally compile values from an array into a string.
      *
      * @param  array  $array
      * @return string
      */
-    public static function toCssClasses($array)
+    public static function conditionallyToString($array, $separator = ' ')
     {
-        $classList = static::wrap($array);
+        $array = static::wrap($array);
 
-        $classes = [];
+        $values = [];
 
-        foreach ($classList as $class => $constraint) {
-            if (is_numeric($class)) {
-                $classes[] = $constraint;
-            } elseif ($constraint) {
-                $classes[] = $class;
+        foreach ($array as $key => $value) {
+            if (is_numeric($key)) {
+                $values[] = $value;
+            } elseif ($value) {
+                $values[] = $key;
             }
         }
 
-        return implode(' ', $classes);
+        return implode($separator, $values);
     }
 
     /**

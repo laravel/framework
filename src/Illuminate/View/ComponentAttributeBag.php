@@ -183,7 +183,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         $classList = Arr::wrap($classList);
 
-        return $this->merge(['class' => Arr::toCssClasses($classList)]);
+        return $this->merge(['class' => Arr::conditionallyToString($classList)]);
     }
 
     /**

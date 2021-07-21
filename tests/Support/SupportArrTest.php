@@ -808,16 +808,16 @@ class SupportArrTest extends TestCase
         $this->assertEquals($expect, Arr::sortRecursive($array));
     }
 
-    public function testToCssClasses()
+    public function testConditionallyToString()
     {
-        $classes = Arr::toCssClasses([
+        $classes = Arr::conditionallyToString([
             'font-bold',
             'mt-4',
         ]);
 
         $this->assertEquals('font-bold mt-4', $classes);
 
-        $classes = Arr::toCssClasses([
+        $classes = Arr::conditionallyToString([
             'font-bold',
             'mt-4',
             'ml-2' => true,
@@ -825,6 +825,20 @@ class SupportArrTest extends TestCase
         ]);
 
         $this->assertEquals('font-bold mt-4 ml-2', $classes);
+
+        $classes = Arr::conditionallyToString([
+            'we',
+            'do',
+            'not' => false,
+            'want',
+            'to' => true,
+            'build',
+            'something' => true,
+            'slug',
+            'like'
+        ], '-');
+
+        $this->assertEquals('we-do-want-to-build-something-slug-like', $classes);
     }
 
     public function testWhere()
