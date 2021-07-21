@@ -88,6 +88,17 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($tempFile, 'Hello World');
     }
 
+    public function testReplaceInFileCorrectlyReplaces()
+    {
+        $tempFile = self::$tempDir.'/file.txt';
+
+        $filesystem = new Filesystem;
+
+        $filesystem->put($tempFile, 'Hello World');
+        $filesystem->replaceInFile('Hello World', 'Hello Taylor', $tempFile);
+        $this->assertStringEqualsFile($tempFile, 'Hello Taylor');
+    }
+
     public function testReplaceWhenUnixSymlinkExists()
     {
         if (windows_os()) {

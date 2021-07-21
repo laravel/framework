@@ -1,6 +1,30 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.50.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.51.0...8.x)
+
+
+## [v8.51.0 (2021-07-20)](https://github.com/laravel/framework/compare/v8.50.0...v8.51.0)
+
+### Added
+- Allow dynamically customizing connection for queued event listener ([#38005](https://github.com/laravel/framework/pull/38005), [ebc3ce4](https://github.com/laravel/framework/commit/ebc3ce49fb99e85fc2b5695fd9d88b95429bc5a0))
+- Added `@class` Blade directive ([#38016](https://github.com/laravel/framework/pull/38016))
+- Accept closure for retry() sleep ([#38035](https://github.com/laravel/framework/pull/38035))
+- The controller can directly return the stdClass object ([#38033](https://github.com/laravel/framework/pull/38033))
+- Make FilesystemAdapter macroable ([#38030](https://github.com/laravel/framework/pull/38030))
+- Track exceptions and display them on failed status checks for dx ([#38025](https://github.com/laravel/framework/pull/38025))
+- Display unexpected validation errors when asserting status ([#38046](https://github.com/laravel/framework/pull/38046))
+- Ability to return the default value of a request whenHas and whenFilled methods ([#38060](https://github.com/laravel/framework/pull/38060))
+- Added `Filesystem::replaceInFile()` method ([#38069](https://github.com/laravel/framework/pull/38069))
+
+### Fixed
+- Fixed passing cursor to pagination methods ([#37996](https://github.com/laravel/framework/pull/37996))
+- Fixed issue with cursor pagination and Json resources ([#38026](https://github.com/laravel/framework/pull/38026))
+- ErrorException: Undefined array key "exception" ([#38059](https://github.com/laravel/framework/pull/38059))
+- Fixed unvalidated array keys without implicit attributes ([#38052](https://github.com/laravel/framework/pull/38052))
+
+### Changed
+- Passthrough excluded uri's in maintenance mode ([#38041](https://github.com/laravel/framework/pull/38041))
+- Allow for named arguments via dispatchable trait ([#38066](https://github.com/laravel/framework/pull/38066))
 
 
 ## [v8.50.0 (2021-07-13)](https://github.com/laravel/framework/compare/v8.49.2...v8.50.0)
