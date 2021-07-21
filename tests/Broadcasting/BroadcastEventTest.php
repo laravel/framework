@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Illuminate\Broadcasting\BroadcastEvent;
-use Illuminate\Broadcasting\InteractsWithBroadcaster;
+use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Mockery as m;
@@ -94,10 +94,10 @@ class TestBroadcastEventWithManualData extends TestBroadcastEvent
 
 class TestBroadcastEventWithSpecificBroadcaster extends TestBroadcastEvent
 {
-    use InteractsWithBroadcaster;
+    use InteractsWithBroadcasting;
 
     public function __construct()
     {
-        $this->withBroadcaster('log');
+        $this->broadcastVia('log');
     }
 }

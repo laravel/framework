@@ -39,10 +39,10 @@ class PendingBroadcast
      * @param  string|null  $connection
      * @return $this
      */
-    public function withBroadcaster($connection = null)
+    public function via($connection = null)
     {
-        if (method_exists($this->event, 'withBroadcaster')) {
-            $this->event->withBroadcaster($connection);
+        if (method_exists($this->event, 'broadcastVia')) {
+            $this->event->broadcastVia($connection);
         }
 
         return $this;
