@@ -788,6 +788,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get and remove the last item from the collection.
      *
+     * @param int $number
      * @return mixed
      */
     public function pop($number = 1)
@@ -951,6 +952,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get and remove the first item from the collection.
      *
+     * @param int $number
      * @return mixed
      */
     public function shift($number = 1)
