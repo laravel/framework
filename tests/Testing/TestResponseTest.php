@@ -9,13 +9,12 @@ use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
+use Illuminate\Session\ArraySessionHandler;
+use Illuminate\Session\Store;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
-use Illuminate\Translation\ArrayLoader;
-use Illuminate\Translation\Translator;
-use Illuminate\Validation\Factory as ValidationFactory;
-use Illuminate\Validation\ValidationException;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
@@ -557,26 +556,22 @@ class TestResponseTest extends TestCase
 
     public function testAssertStatusShowsValidationErrorsOnUnexpected422()
     {
-        $statusCode = 422;
+        $statusCode = 302;
         $expectedStatusCode = 200;
 
         $this->expectException(AssertionFailedError::class);
 
         $this->expectExceptionMessage('The first name field is required.');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new RedirectResponse('/', $statusCode), function ($response) {
+            $response->setSession(new Store('test-session', new ArraySessionHandler(1)));
+            $response->withErrors([
+                'first_name' => 'The first name field is required.',
+                'last_name' => 'The last name field is required.',
+            ]);
         });
-        $translator = new Translator(new ArrayLoader, 'en');
-        $validator = (new ValidationFactory($translator))->make(
-            [],
-            ['first_name' => 'required', 'last_name' => 'required'],
-            ['required' => 'The :attribute field is required.']
-        );
-        $exceptions = collect([new ValidationException($validator)]);
 
-        $response = TestResponse::fromBaseResponse($baseResponse)
-            ->withExceptions($exceptions);
+        $response = TestResponse::fromBaseResponse($baseResponse);
         $response->assertStatus($expectedStatusCode);
     }
 
@@ -589,19 +584,18 @@ class TestResponseTest extends TestCase
 
         $this->expectExceptionMessage('"The first name field is required."');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
-            $response->header('Content-Type', 'application/json');
-        });
-        $translator = new Translator(new ArrayLoader, 'en');
-        $validator = (new ValidationFactory($translator))->make(
-            [],
-            ['first_name' => 'required', 'last_name' => 'required'],
-            ['required' => 'The :attribute field is required.']
+        $baseResponse = new Response(
+            [
+                'message' => 'The given data was invalid.',
+                'errors' => [
+                    'first_name' => 'The first name field is required.',
+                    'last_name' => 'The last name field is required.',
+                ]
+            ],
+            $statusCode
         );
-        $exceptions = collect([new ValidationException($validator)]);
 
-        $response = TestResponse::fromBaseResponse($baseResponse)->withExceptions($exceptions);
+        $response = TestResponse::fromBaseResponse($baseResponse);
         $response->assertStatus($expectedStatusCode);
     }
 
