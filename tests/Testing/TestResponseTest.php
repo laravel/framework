@@ -590,7 +590,7 @@ class TestResponseTest extends TestCase
                 'errors' => [
                     'first_name' => 'The first name field is required.',
                     'last_name' => 'The last name field is required.',
-                ]
+                ],
             ],
             $statusCode
         );

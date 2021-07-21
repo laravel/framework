@@ -227,7 +227,7 @@ EOF;
     }
 
     /**
-     * Get an assertion message for a status assertion that contained errors
+     * Get an assertion message for a status assertion that contained errors.
      *
      * @param  string|int  $expected
      * @param  string|int  $actual
