@@ -72,7 +72,7 @@ class BroadcastEvent implements ShouldQueue
 
         $payload = $this->getPayloadFromEvent($this->event);
 
-        foreach ($connections as $connection ) {
+        foreach ($connections as $connection) {
             $manager->connection($connection)->broadcast(
                 $channels, $name, $payload
             );
