@@ -826,7 +826,25 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals('font-bold mt-4 ml-2', $classes);
 
-        $classes = Arr::conditionallyToString([
+        $values = Arr::conditionallyToString([
+            'Taylor',
+            'John',
+            'Sponge Bob' => false,
+            'Dave' => true,
+        ], ',');
+
+        $this->assertEquals('Taylor,John,Dave', $values);
+
+        $values = Arr::conditionallyToString([
+            'Taylor',
+            'John',
+            'Sponge Bob' => false,
+            'Dave' => true,
+        ], ', ');
+
+        $this->assertEquals('Taylor, John, Dave', $values);
+
+        $slugParts = Arr::conditionallyToString([
             'we',
             'do',
             'not' => false,
@@ -838,7 +856,7 @@ class SupportArrTest extends TestCase
             'like'
         ], '-');
 
-        $this->assertEquals('we-do-want-to-build-something-slug-like', $classes);
+        $this->assertEquals('we-do-want-to-build-something-slug-like', $slugParts);
     }
 
     public function testWhere()
