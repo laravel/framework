@@ -853,7 +853,7 @@ class SupportArrTest extends TestCase
             'build',
             'something' => true,
             'slug',
-            'like'
+            'like',
         ], '-');
 
         $this->assertEquals('we-do-want-to-build-something-slug-like', $slugParts);
