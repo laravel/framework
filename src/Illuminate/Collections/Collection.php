@@ -790,9 +790,20 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @return mixed
      */
-    public function pop()
+    public function pop($number = 1)
     {
-        return array_pop($this->items);
+        if ($number === 1) {
+            return array_pop($this->items);
+        }
+
+        $results = [];
+
+        foreach (range(1, $number) as $item) {
+            array_push($results, array_pop($this->items));
+        }
+
+        return collect($results);
+
     }
 
     /**
@@ -943,9 +954,20 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @return mixed
      */
-    public function shift()
+    public function shift($number = 1)
     {
-        return array_shift($this->items);
+        if ($number === 1) {
+            return array_shift($this->items);
+        }
+
+        $results = [];
+
+        foreach (range(1, $number) as $item) {
+            array_push($results, array_shift($this->items));
+        }
+
+        return collect($results);
+
     }
 
     /**
