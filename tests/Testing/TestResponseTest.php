@@ -397,7 +397,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected status code');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -413,7 +413,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected status code');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -428,7 +428,7 @@ class TestResponseTest extends TestCase
         $statusCode = 500;
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Expected status code');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -444,7 +444,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected status code');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -460,7 +460,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected status code');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -476,7 +476,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected status code');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -493,7 +493,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected status code');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -525,7 +525,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected status code');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);

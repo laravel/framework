@@ -198,7 +198,7 @@ class TestResponse implements ArrayAccess
             }
         }
 
-        return "Expected status code [{$expected}] but received {$actual}.";
+        return "Expected response status code [{$expected}] but received {$actual}.";
     }
 
     /**
