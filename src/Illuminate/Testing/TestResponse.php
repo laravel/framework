@@ -186,7 +186,7 @@ class TestResponse implements ArrayAccess
 
         if ($this->baseResponse instanceof RedirectResponse) {
             $session = $this->baseResponse->getSession();
-            if ($session->has('errors')) {
+            if (! is_null($session) && $session->has('errors')) {
                 return $this->statusMessageWithErrors($expected, $actual, $session->get('errors')->all());
             }
         }
