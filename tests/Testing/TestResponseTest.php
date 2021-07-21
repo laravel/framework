@@ -554,7 +554,7 @@ class TestResponseTest extends TestCase
         $response->assertStatus($expectedStatusCode);
     }
 
-    public function testAssertStatusShowsValidationErrorsOnUnexpected422()
+    public function testAssertStatusShowsErrorsOnUnexpectedErrorRedirect()
     {
         $statusCode = 302;
         $expectedStatusCode = 200;
@@ -575,7 +575,7 @@ class TestResponseTest extends TestCase
         $response->assertStatus($expectedStatusCode);
     }
 
-    public function testAssertStatusShowsJsonValidationErrorsOnUnexpected422()
+    public function testAssertStatusShowsJsonErrorsOnUnexpected422()
     {
         $statusCode = 422;
         $expectedStatusCode = 200;
