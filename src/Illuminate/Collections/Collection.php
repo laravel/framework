@@ -786,23 +786,24 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Get and remove the last item from the collection.
+     * Get and remove the last N items from the collection.
      *
+     * @param  int  $count
      * @return mixed
      */
-    public function pop($number = 1)
+    public function pop($count = 1)
     {
-        if ($number === 1) {
+        if ($count === 1) {
             return array_pop($this->items);
         }
 
         $results = [];
 
-        foreach (range(1, $number) as $item) {
+        foreach (range(1, $count) as $item) {
             array_push($results, array_pop($this->items));
         }
 
-        return collect($results);
+        return new static($results);
     }
 
     /**
@@ -949,23 +950,24 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Get and remove the first item from the collection.
+     * Get and remove the first N items from the collection.
      *
+     * @param  int  $count
      * @return mixed
      */
-    public function shift($number = 1)
+    public function shift($count = 1)
     {
-        if ($number === 1) {
+        if ($count === 1) {
             return array_shift($this->items);
         }
 
         $results = [];
 
-        foreach (range(1, $number) as $item) {
+        foreach (range(1, $count) as $item) {
             array_push($results, array_shift($this->items));
         }
 
-        return collect($results);
+        return new static($results);
     }
 
     /**
