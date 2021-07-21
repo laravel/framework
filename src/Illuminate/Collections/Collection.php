@@ -803,7 +803,6 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         return collect($results);
-
     }
 
     /**
@@ -967,7 +966,6 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         return collect($results);
-
     }
 
     /**
