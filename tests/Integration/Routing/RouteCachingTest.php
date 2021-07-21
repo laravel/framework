@@ -23,6 +23,19 @@ class RouteCachingTest extends TestCase
         $this->get('/foo/1')->assertSee('GET response');
     }
 
+    public function testDifferentMethodsForOneUrl()
+    {
+        $this->routes(__DIR__.'/Fixtures/conflicty_routes.php');
+
+        $this->delete('/url')->assertSee('response from any');
+        $this->patch('/url')->assertSee('response from any');
+
+        $this->get('/url')->assertSee('2');
+        $this->get('/_slug_')->assertSee('sluggish (-_-)zzz');
+
+        $this->post('/url')->assertSee('1');
+    }
+
     protected function routes(string $file)
     {
         $this->defineCacheRoutes(file_get_contents($file));
