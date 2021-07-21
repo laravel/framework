@@ -133,6 +133,20 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     {
         $compiled = $this->dumper()->getCompiledRoutes();
 
+        // Here we manually override if a static url has many routes with different methods
+        foreach ($compiled[1] as $url => $routesData) {
+            for ($i = count($routesData) - 1; $i !== 0; $i--) {
+                $methods = $routesData[$i][2];
+                $domain = $routesData[$i][1];
+                for ($j = $i - 1; $j !== -1; $j--) {
+                    // if they are defined for the same domain
+                    if ($compiled[1][$url][$j][1] === $domain) {
+                        $compiled[1][$url][$j][2] = array_diff_key($routesData[$j][2], $methods);
+                    }
+                }
+            }
+        }
+
         $attributes = [];
 
         foreach ($this->getRoutes() as $route) {

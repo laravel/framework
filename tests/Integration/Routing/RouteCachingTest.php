@@ -20,7 +20,7 @@ class RouteCachingTest extends TestCase
 
         $this->post('/foo/1')->assertRedirect('/foo/1/bar');
         $this->get('/foo/1/bar')->assertSee('Redirect response');
-        $this->get('/foo/1')->assertRedirect('/foo/1/bar');
+        $this->get('/foo/1')->assertSee('GET response');
     }
 
     protected function routes(string $file)
