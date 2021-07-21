@@ -81,9 +81,10 @@ class TestResponse implements ArrayAccess
      */
     public function assertSuccessful()
     {
-        $message = $this->statusMessageWithDetails('>=200, <300', $this->getStatusCode());
-
-        PHPUnit::assertTrue($this->isSuccessful(), $message);
+        PHPUnit::assertTrue(
+            $this->isSuccessful(),
+            $this->statusMessageWithDetails('>=200, <300', $this->getStatusCode())
+        );
 
         return $this;
     }
@@ -161,9 +162,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertStatus($status)
     {
-        $actual = $this->getStatusCode();
-
-        $message = $this->statusMessageWithDetails($status, $actual);
+        $message = $this->statusMessageWithDetails($status, $actual = $this->getStatusCode());
 
         PHPUnit::assertSame($actual, $status, $message);
 
@@ -171,7 +170,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Get an assertion message for a status assertion containing extra details where available.
+     * Get an assertion message for a status assertion containing extra details when available.
      *
      * @param  string|int  $expected
      * @param  string|int  $actual
@@ -180,12 +179,14 @@ class TestResponse implements ArrayAccess
     protected function statusMessageWithDetails($expected, $actual)
     {
         $lastException = $this->exceptions->last();
+
         if ($lastException) {
             return $this->statusMessageWithException($expected, $actual, $lastException);
         }
 
         if ($this->baseResponse instanceof RedirectResponse) {
             $session = $this->baseResponse->getSession();
+
             if (! is_null($session) && $session->has('errors')) {
                 return $this->statusMessageWithErrors($expected, $actual, $session->get('errors')->all());
             }
@@ -193,6 +194,7 @@ class TestResponse implements ArrayAccess
 
         if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
             $json = $this->json();
+
             if (isset($json['errors'])) {
                 return $this->statusMessageWithErrors($expected, $actual, $json);
             }
@@ -246,6 +248,7 @@ Expected response status code [$expected] but received $actual.
 The following errors occurred during the request:
 
 $errors
+
 EOF;
     }
 
