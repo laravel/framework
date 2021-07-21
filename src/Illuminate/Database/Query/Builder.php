@@ -349,7 +349,7 @@ class Builder implements BuilderContract
             $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
 
-            if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
+            if (str_contains($query->from, $databaseName) && strpos($query->from, '.') === false) {
                 $query->from($databaseName.'.'.$query->from);
             }
         }
@@ -2172,7 +2172,7 @@ class Builder implements BuilderContract
             return $column;
         }
 
-        $separator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
+        $separator = str_contains(strtolower($column), ' as ') ? ' as ' : '\.';
 
         return last(preg_split('~'.$separator.'~i', $column));
     }

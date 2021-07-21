@@ -27,7 +27,7 @@ trait QueriesRelationships
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
     {
         if (is_string($relation)) {
-            if (strpos($relation, '.') !== false) {
+            if (str_contains($relation, '.')) {
                 return $this->hasNested($relation, $operator, $count, $boolean, $callback);
             }
 
